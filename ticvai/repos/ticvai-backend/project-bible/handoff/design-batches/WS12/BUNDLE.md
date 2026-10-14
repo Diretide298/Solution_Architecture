@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-256` | Graphical Access Map & Live Gate Performance | C | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-257` | Attendance & Admission Analytics | C | 2 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-258` | Entry, Exit, Re-entry & Crossover Analytics | C | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-259` | Throughput, Queue & Validation Performance Analytics | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-259` | Throughput, Queue & Validation Performance Analytics | C | 0 | 13 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-260` | Validation Outcome & Rejection Analytics | C | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-261` | Guest Dwell Time, Length of Stay & Attraction Flow | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-262` | Access Reports, Scheduled Reporting & Data Export | D | 2 | 0 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
@@ -652,6 +652,8 @@ venues:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -824,6 +826,8 @@ areas:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `SCOPE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -980,6 +984,8 @@ critical: North Entry turnstile 2 - Critical - reject 9.8%
 - `listGraphicalAccessMap` → `SCOPE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `SCOPE_VIEW`
 
 #### Requirements it meets
 
@@ -1162,6 +1168,8 @@ groups:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1309,6 +1317,8 @@ crossover:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1394,7 +1404,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Yellow Rate** (metric tile)
 
-**Reject Rate** (metric tile)
+**Reject Rate** (metric tile, from `listThroughputQueueValidation`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Gate | text | — |
+| Guests per minute | 1,234.5 | Guests per Minute |
+| Guests per hour | 1,234 | Guests per Hour |
+| Average scan time | 1,234.5 | Seconds |
+| Average gate cycle | 1,234.5 | Seconds |
+| Success rate | 12.5% | Success Rate |
+| Yellow rate | 12.5% | Yellow Rate |
+| Manual intervention rate | 12.5% | Manual Intervention Rate |
+| Downtime | 1,234 | Minutes |
+| Bottleneck reason | chip: QR read failures, Excessive manual verification, Hardware latency, Policy … | Vocabulary listed under Potential reasons. |
+| Gate name | text | — |
+| Reject rate | 12.5% | Percent |
+| Underperforming | yes / no (icon or chip) | — |
 
 **Manual Intervention Rate** (metric tile)
 
@@ -1461,6 +1487,8 @@ gates:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1490,7 +1518,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-259?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-254`.
@@ -1626,6 +1654,8 @@ reasons:
 - `listValidationOutcomeRejection` → `REPORT_VIEW_VENUE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_VENUE`
 
 #### Requirements it meets
 
@@ -1776,6 +1806,8 @@ attraction:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1923,6 +1955,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `listReports` → `REPORT_VIEW_VENUE` (operate) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_VENUE`
 
 #### Requirements it meets
 
@@ -2084,6 +2118,8 @@ answer: 'Throughput fell 22%: Main Plaza Gate 4 offline 18 min, elevated QR retr
 - `listAccessExecutiveInsight` → `REPORT_VIEW_VENUE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_VENUE`
 
 #### Requirements it meets
 

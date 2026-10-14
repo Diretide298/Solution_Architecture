@@ -326,12 +326,14 @@
     }
    },
    "conflicts": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "$ref": "#/components/schemas/CartConflict"
     }
    },
    "consentQuestions": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
@@ -695,7 +697,8 @@
   "properties": {
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "venue"
    },
    "name": {
     "$ref": "#/components/schemas/queue::LocalisedText"
@@ -832,6 +835,7 @@
     "nullable": true
    },
    "fastPass": {
+    "x-ticvai-persisted": false,
     "allOf": [
      {
       "$ref": "#/components/schemas/QueueFastPass"
@@ -865,6 +869,7 @@
     "$ref": "#/components/schemas/DeliveryLocationKind"
    },
    "label": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "description": "What a runner is told. \"Cabana 12\", \"Row H Seat 4\", \"Lawn — north gate\"."
    },
@@ -1012,6 +1017,7 @@
     "readOnly": true
    },
    "outletId": {
+    "x-ticvai-references": "platform.outlet",
     "type": "string",
     "format": "uuid"
    },
@@ -1117,6 +1123,7 @@
   ],
   "properties": {
    "reservationId": {
+    "x-ticvai-references": "fnb.table_reservation",
     "type": "string",
     "format": "uuid"
    },
@@ -1599,10 +1606,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -1999,6 +2008,8 @@
     }
    },
    "boundary": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "nullable": true,
     "description": "The shape drawn, as a polygon in drawing coordinates. Null for a pin.",
@@ -2155,6 +2166,7 @@
     "nullable": true
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "enum": [
      "waiting",
@@ -2385,6 +2397,76 @@
      "revoked"
     ],
     "description": "The only status a caller may set. Every other move is the server's."
+   }
+  }
+ },
+ "UpdateTableReservationRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; a partial update of fnb.table_reservation",
+  "description": "**A partial update of TableReservation** (the CR-089 pattern; CHG-SHP-008): `updateTableReservation` sends only what changes, and a field left out keeps its stored value. Nothing is required and nothing has a default, so a generated client never resends a value it did not mean to change. The server's own fields (actualPartySize, createdAt, id, tableVisitId, takenByPrincipalId) are not sendable.",
+  "minProperties": 1,
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string"
+   },
+   "contactPoint": {
+    "type": "string"
+   },
+   "partySize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "durationMinutes": {
+    "type": "integer",
+    "description": "**How long the cover is held.** An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked.\n"
+   },
+   "tables": {
+    "type": "array",
+    "description": "The dining tables assigned to this reservation, one row each.\n**Usually empty until seating.** Committing a specific table at booking time refuses later bookings against a constraint that did not need to exist — that was true of the `tableIds` array this replaces and it is still true, because it is about *when* a table is assigned rather than how the assignment is stored.\n**Replaces `tableIds`, retired 20 September.** An array cannot carry per-row state, which is the same reason this merge took `entry_rule_point`, `menu_item_modifier`, `seat_block_item`, `plan_benefit`, `payment_method_config` and `tier_module` from the backend workbook. A party seated across three tables that releases one early has nowhere to say so in an array, and *\"which reservations are on table 7 tonight\"* is a GIN scan over every reservation instead of an index seek.\n",
+    "items": {
+     "$ref": "#/components/schemas/FnbReservationTable"
+    }
+   },
+   "status": {
+    "$ref": "#/components/schemas/TableReservationStatus"
+   },
+   "notes": {
+    "type": "string",
+    "description": "Allergies, accessibility needs and other requests, as the guest wrote them."
+   },
+   "seatingPreference": {
+    "type": "string",
+    "maxLength": 64,
+    "nullable": true,
+    "description": "**The seating area the guest asked for**, e.g. indoor, terrace, majlis (Chinmay, 2 October, workbook Q204; DI-791; CHG-CSA-018). The outlet's own area names, as the waitlist's `RestaurantWaitlist.seatingPreference` takes them. A preference, not a table: the host seats the party on the night."
+   },
+   "occasion": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "birthday",
+     "anniversary",
+     "business",
+     "celebration",
+     "other"
+    ],
+    "description": "The occasion the guest named (workbook Q204, DI-337; CHG-CSA-018). Shown to the host and the server; never a price."
+   },
+   "deposit": {
+    "$ref": "#/components/schemas/TableReservationDeposit"
    }
   }
  },
@@ -2767,6 +2849,26 @@
     "nullable": true,
     "readOnly": true,
     "description": "Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"
+   },
+   "isClosed": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "Closed by `setPathClosure`; routing does not use a closed path."
+   },
+   "expectedReopenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a closed path is expected to reopen (`setPathClosure`)."
+   },
+   "closedNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The free text with an `other` closure reason (`setPathClosure`; audit R222)."
    }
   }
  },
@@ -2907,6 +3009,8 @@
     "description": "**What the guest reads on Item Detail** (29 September, MOB-4). Keyed by locale, like `nameLocalised`. One screen now serves rides, shows, restaurants and shops (GST-004 and GST-006 merged), and it opens from the map pin, so the point carries the words rather than each kind borrowing them from a different module. Set on BO-094.\n"
    },
    "media": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 12,
     "description": "**The gallery on Item Detail** (29 September, MOB-4): images and short clips from the asset library, first `isPrimary` shown on the map card. Assets are referenced, never copied, so a replaced photo changes everywhere.\n",

@@ -408,12 +408,12 @@ paths:
   /recognition-schedules/validate:
     post:
       operationId: validateRecognitionSchedules
+      x-ticvai-consumed-by:
+        - "P08 BO-076 Revenue Recognition"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: in-process
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-076 Revenue Recognition"
       summary: Find product kinds claimed by more than one schedule
       description: '**The defect this exists to catch is silent.** Two schedules claiming one product
         kind means revenue recognised twice, and the numbers look plausible — nothing fails, the period
@@ -465,12 +465,12 @@ paths:
   /deposits:
     post:
       operationId: recordDeposit
+      x-ticvai-consumed-by:
+        - "P08 BO-1029 Quote, Deposit & Payment"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
         route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-1029 Quote, Deposit & Payment"
       summary: Money taken before the sale is complete
       description: '**A deposit is not deferred revenue and the distinction is a balance-sheet one.**
         `deferredRevenue` covers a sold entitlement not yet consumed — the sale happened. A deposit is
@@ -657,6 +657,12 @@ paths:
   /reconciliation/unified:
     get:
       operationId: getUnifiedReconciliation
+      x-ticvai-consumed-by:
+        - "P08 ADM-627 Reconciliation Audit, Trace & Evidence Center"
+        - "P08 ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor"
+        - "P08 BO-1081 Finance Dashboard"
+        - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
+        - "P16 ANL-072 Finance Dashboard"
       x-ticvai-read-via:
       - query: orders#paymentRecords
         route: in-process
@@ -664,12 +670,6 @@ paths:
       - query: wallet#walletTransactionRecords
         route: in-process
         for: 'its read of wallet.wallet_transaction, Wallet''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 ADM-627 Reconciliation Audit, Trace & Evidence Center"
-        - "P08 ADM-628 Reconciliation Simulator, Forecast & AI Operations Advisor"
-        - "P08 BO-1081 Finance Dashboard"
-        - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
-        - "P16 ANL-072 Finance Dashboard"
       summary: Every money source against the ledger, in one view
       description: '4.2.19. **Reconciliation was per provider and the question is not per provider.**
         `ingestSettlementFile` and its siblings are good and gateway-scoped; **a venue closing a day needs
@@ -923,9 +923,9 @@ paths:
   /accounts:
     get:
       operationId: listAccounts
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1180,10 +1180,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAccountMappings
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One set per region, the caller''s region: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per region, the caller''s region: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: region
@@ -1247,9 +1247,9 @@ paths:
   /cost-centers:
     get:
       operationId: listCostCenters
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1333,9 +1333,9 @@ paths:
   /tax-codes:
     get:
       operationId: listTaxCodes
-      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
+      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1639,9 +1639,9 @@ paths:
   /recognition-schedules:
     get:
       operationId: listRecognitionSchedules
-      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-076 Revenue Recognition"
+      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1722,12 +1722,12 @@ paths:
   /deferred-revenue:
     get:
       operationId: getDeferredRevenue
+      x-ticvai-consumed-by:
+        - "P08 BO-076 Revenue Recognition"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
         route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-076 Revenue Recognition"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -1772,12 +1772,12 @@ paths:
   /recognition/run:
     post:
       operationId: runRecognition
+      x-ticvai-consumed-by:
+        - "P08 BO-076 Revenue Recognition"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
         route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-076 Revenue Recognition"
       x-ticvai-audience:
       - staff
       summary: Recognise earned revenue for a period
@@ -1838,9 +1838,9 @@ paths:
   /journal-entries:
     get:
       operationId: listJournalEntries
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-089 Journal Entries"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2582,9 +2582,9 @@ paths:
   /ledger/entries:
     get:
       operationId: listLedgerEntries
-      description: '**Order.** Newest first, by `postedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-043 Daily Reconciliation"
+      description: '**Order.** Newest first, by `postedAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -2830,7 +2830,6 @@ paths:
   /settlements:
     get:
       operationId: listSettlements
-      description: '**Order.** Soonest first, by `periodStart` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 ADM-623 Settlement & Payout Manager"
         - "P08 BO-025 Chargebacks & Disputes"
@@ -2838,6 +2837,7 @@ paths:
         - "P08 BO-101 Orders & Money"
         - "P09 ADM-619 Reconciliation & Settlement Command Center"
         - "P10 PTR-014 Settlement & Payment History"
+      description: '**Order.** Soonest first, by `periodStart` ascending, then by `id`.'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
@@ -2885,15 +2885,15 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: ingestSettlementFile
-      x-ticvai-read-via:
-      - query: payments#providerConnectionRecords
-        route: in-process
-        for: 'its read of payments.provider_connection, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-620 Reconciliation Source & Import Manager"
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-read-via:
+      - query: payments#providerConnectionRecords
+        route: in-process
+        for: 'its read of payments.provider_connection, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -3089,15 +3089,15 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: resolveSettlementException
-      x-ticvai-read-via:
-      - query: orders#paymentRecords
-        route: in-process
-        for: 'the payment matchedPaymentId names (400) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P08 ADM-622 Reconciliation Exception & Investigation Center"
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: in-process
+        for: 'the payment matchedPaymentId names (400) (CHG-MOD-003)'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -3227,7 +3227,6 @@ paths:
       operationId: createLegalEntity
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
-        - "P09 ADM-411 Billing & Legal Entity Information"
       x-ticvai-audience:
       - staff
       summary: Create a legal entity
@@ -3262,11 +3261,11 @@ paths:
   /fiscal-periods:
     get:
       operationId: listFiscalPeriods
-      description: '**Order.** Newest first, by `occurredAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
         - "P08 BO-1170 Wallet Financial Period & Closing Controls"
         - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
+      description: '**Order.** Newest first, by `occurredAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3693,12 +3692,12 @@ paths:
   /fx-rates/ingest:
     post:
       operationId: ingestFxRates
+      x-ticvai-consumed-by:
+        - "P08 BO-077 FX Rates & Variances"
       x-ticvai-read-via:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-077 FX Rates & Variances"
       summary: Pull rates from the configured provider
       description: '**Scheduled ingestion, which had no home.** `setFxRate` is a `PUT` carrying `setByPrincipalId`
         — a person setting a rate — so a daily provider pull had to be modelled as a person doing it,
@@ -3976,7 +3975,6 @@ paths:
         - "P04 POS-026 Receipt & Reprint"
         - "P08 BO-022 Order Detail"
         - "P08 BO-1081 Finance Dashboard"
-        - "P09 ADM-068 Tax, Fee & Calculation Command Center"
         - "P16 ANL-072 Finance Dashboard"
       x-ticvai-audience:
       - staff
@@ -4052,6 +4050,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: issueTaxInvoice
+      x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
+        - "P02 GST-019 Order History"
+        - "P04 POS-026 Receipt & Reprint"
+        - "P04 POS-030 Sales Journal"
+        - "P08 BO-022 Order Detail"
       x-ticvai-read-via:
       - query: orders#orderLineRecords
         route: in-process
@@ -4062,12 +4066,6 @@ paths:
       - query: orders#salesOrderRecords
         route: in-process
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-019 Order History"
-        - "P02 GST-019 Order History"
-        - "P04 POS-026 Receipt & Reprint"
-        - "P04 POS-030 Sales Journal"
-        - "P08 BO-022 Order Detail"
       x-ticvai-audience:
       - staff
       - guest
@@ -4230,14 +4228,14 @@ paths:
         format: uuid
     post:
       operationId: issueCreditMemo
-      x-ticvai-read-via:
-      - query: orders#refundRecords
-        route: in-process
-        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
+      x-ticvai-read-via:
+      - query: orders#refundRecords
+        route: in-process
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       - service
@@ -4444,9 +4442,9 @@ paths:
   /tax-invoice-templates:
     get:
       operationId: listTaxInvoiceTemplates
-      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
+      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93 template, numbering, language); shape follows listLegalEntities'
@@ -4546,10 +4544,10 @@ paths:
   /e-invoicing/providers:
     get:
       operationId: listEInvoicingProviders
-      description: '**Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
         - "P08 ADM-077 Calculation Validation, Reconciliation & Service Interface"
+      description: '**Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1); shape follows listLegalEntities'
@@ -4872,7 +4870,6 @@ paths:
       operationId: getVatReturn
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
-        - "P09 ADM-068 Tax, Fee & Calculation Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 6.1.23); shape follows getFinancialReport'

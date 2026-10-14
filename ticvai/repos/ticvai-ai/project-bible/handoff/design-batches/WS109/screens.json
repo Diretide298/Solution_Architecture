@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-holder-directory-bo-625",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationHolderDirectory.tsx",
+   "component": "src/routes/access-venue/AccreditationHolderDirectory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -151,7 +152,7 @@
         "Credential status"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAccreditationHolders",
        "provenance": "pack ACCREDITATION.pdf, page 10 §Each holder record shall display"
       }
      ]
@@ -259,6 +260,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "2",
@@ -268,7 +270,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-holder-profile-bo-626",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationHolderProfile.tsx",
+   "component": "src/routes/access-venue/AccreditationHolderProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -313,7 +315,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getAccreditationHolder",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getAccreditationHolder"
       }
      ]
     }
@@ -380,6 +383,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "2",
@@ -389,7 +393,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/identity-details-verification-bo-627",
-   "component": "apps/venue-management-web/src/routes/access-venue/IdentityDetailsVerification.tsx",
+   "component": "src/routes/access-venue/IdentityDetailsVerification.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -412,6 +416,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Capture identity data and verify the holder before approval.",
+  "division": "Shares `getAccreditationHolder`, `updateAccreditationHolder` with BO-628; this screen is Identity Details & Verification (pack ACCREDITATION.pdf, board 2.3, page 12): capture identity data and verify the holder before approval.",
   "gaps": [
    {
     "operation": null,
@@ -526,6 +531,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "2",
@@ -535,7 +541,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/photo-management-bo-628",
-   "component": "apps/venue-management-web/src/routes/access-venue/PhotoManagement.tsx",
+   "component": "src/routes/access-venue/PhotoManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -558,6 +564,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage accreditation holder photographs.",
+  "division": "Shares `getAccreditationHolder`, `updateAccreditationHolder` with BO-627; this screen is Photo Management (pack ACCREDITATION.pdf, board 2.4, page 13): manage accreditation holder photographs.",
   "gaps": [
    {
     "operation": null,
@@ -671,6 +678,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "2",
@@ -680,7 +688,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/document-repository-bo-629",
-   "component": "apps/venue-management-web/src/routes/access-venue/DocumentRepository.tsx",
+   "component": "src/routes/access-venue/DocumentRepository.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -800,6 +808,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "2",
@@ -809,7 +818,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/document-verification-queue-bo-630",
-   "component": "apps/venue-management-web/src/routes/access-venue/DocumentVerificationQueue.tsx",
+   "component": "src/routes/access-venue/DocumentVerificationQueue.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -939,6 +948,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_MANAGE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "2",
@@ -948,7 +958,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/duplicate-identity-conflict-detection-bo-631",
-   "component": "apps/venue-management-web/src/routes/access-venue/DuplicateIdentityConflictDetection.tsx",
+   "component": "src/routes/access-venue/DuplicateIdentityConflictDetection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -998,7 +1008,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAccreditationIdentityConflicts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAccreditationIdentityConflicts"
       }
      ]
     },
@@ -1110,6 +1121,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_MANAGE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "2",
@@ -1119,7 +1131,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/organization-affiliation-management-bo-632",
-   "component": "apps/venue-management-web/src/routes/access-venue/OrganizationAffiliationManagement.tsx",
+   "component": "src/routes/access-venue/OrganizationAffiliationManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1243,6 +1255,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "2",
@@ -1252,7 +1265,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/profile-completeness-compliance-monitor-bo-633",
-   "component": "apps/venue-management-web/src/routes/access-venue/ProfileCompletenessComplianceMonitor.tsx",
+   "component": "src/routes/access-venue/ProfileCompletenessComplianceMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1297,7 +1310,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getAccreditationHolder",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getAccreditationHolder"
       }
      ]
     }
@@ -1364,6 +1378,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "2",
@@ -1373,7 +1388,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/profile-history-audit-timeline-bo-634",
-   "component": "apps/venue-management-web/src/routes/access-venue/ProfileHistoryAuditTimeline.tsx",
+   "component": "src/routes/access-venue/ProfileHistoryAuditTimeline.tsx",
    "status": "notStarted"
   },
   "navigation": {

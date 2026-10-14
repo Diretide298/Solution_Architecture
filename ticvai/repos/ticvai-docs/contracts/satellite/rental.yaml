@@ -155,6 +155,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalProduct'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-products/{productId}:
@@ -223,6 +225,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalProduct'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-products/{productId}/validate:
@@ -341,6 +345,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalProduct'
         '409':
+          x-ticvai-problem-types: [blocking-findings-remain]
           description: Blocking findings remain; they are listed
           content:
             application/problem+json:
@@ -408,6 +413,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalCategory'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-products/{productId}/locations:
@@ -674,6 +681,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalInventoryModel'
         '409':
+          x-ticvai-problem-types: [inventory-model-has-bookings]
           description: Bookings exist under the current model
           content:
             application/problem+json:
@@ -899,6 +907,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalBlackout'
         '409':
+          x-ticvai-problem-types: [blackout-window-has-bookings]
           description: Bookings exist in the window; they are listed
           content:
             application/problem+json:
@@ -983,6 +992,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalPricingProfile'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-pricing-profiles/{profileId}:
@@ -1025,6 +1036,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalPricingProfile'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-price:
@@ -1121,6 +1134,8 @@ paths:
         - "P08 BO-529 Deposit & Security Hold Policy"
         - "P08 BO-530 Deposit Lifecycle & Settlement Rules"
         - "P08 BO-909 Deposit & Rental Financial Control"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per rental product or category, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: How much is held, how, and what happens to it
       description: 'Boards 4.6 and 4.7. Fixed or percentage, with minimum and maximum, by
@@ -1168,6 +1183,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-531 Late Fee, Grace Period & Extension Pricing"
         - "P08 BO-909 Deposit & Rental Financial Control"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per rental product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Grace period, late fees and extension pricing
       description: 'Board 4.8. *Expected 14:00, actual 15:12, grace 15 minutes, chargeable 57 minutes.*
@@ -1399,6 +1416,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalBooking'
         '409':
+          x-ticvai-problem-types: [no-availability]
           description: Not available for that window, quantity or location
           content:
             application/problem+json:
@@ -1406,7 +1424,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
           description: '`quoteExpired` or `quoteMismatch`: the `acceptedQuoteId` has expired or was
-            given for a different product, location, window or quantity.'
+            given for a different `productId`, location, window or quantity.'
           x-ticvai-problem-types: [quote-expired, quote-mismatch]
           content:
             application/problem+json:
@@ -1506,6 +1524,7 @@ paths:
                   type: integer
                   nullable: true
                 reason:
+                  x-ticvai-stored-as: rental.booking.change_reason
                   type: string
                   nullable: true
       responses:
@@ -1571,6 +1590,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalAgreementSignature'
+        '409':
+          description: 'The booking is `cancelled` or `noShow` (`rental-booking-cancelled`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is signed.'
+          x-ticvai-problem-types: [rental-booking-cancelled, rental-booking-already-settled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/check-out:
@@ -1667,6 +1693,10 @@ paths:
         - "P08 BO-548 Equipment Scan & Validation"
         - "P08 BO-552 Group & Multi-Item Checkout"
         - "P08 BO-907 Guest & Resource Assignment"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'the product the asset must be of (409 wrong-product) (CHG-MOD-003)'
       x-ticvai-conflict-policy: serverWins
       summary: Bind specific assets to the booking, by scan where required
       description: 'Boards 6.4 and 6.5. **This is the moment a serialised rental stops being a quantity.**
@@ -1712,6 +1742,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/RentalEquipmentAssignment'
         '409':
+          x-ticvai-problem-types: [asset-already-out, asset-under-maintenance, wrong-product]
           description: Asset already out, under maintenance, or of the wrong product
           content:
             application/problem+json:
@@ -1782,6 +1813,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/RentalBooking'
         '409':
+          x-ticvai-problem-types: [equipment-reserved-for-later-booking]
           description: '**The equipment is reserved for a later booking.** The conflicting booking''s
             window is named, so the counter can offer a shorter extension instead of a refusal.
 
@@ -1859,6 +1891,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalBooking'
+        '409':
+          description: 'The booking is not out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`; `rental-booking-not-checked-out`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is swapped.'
+          x-ticvai-problem-types: [rental-booking-not-checked-out, rental-booking-already-settled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/return:
@@ -1928,6 +1967,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalSettlement'
+        '409':
+          description: 'The booking never went out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`; `rental-booking-not-checked-out`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is settled.'
+          x-ticvai-problem-types: [rental-booking-not-checked-out, rental-booking-already-settled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/inspection:
@@ -1979,6 +2025,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalInspection'
+        '409':
+          description: 'The booking is `cancelled` or `noShow` (`rental-booking-cancelled`), or the phase does not fit it: `preRental` once the equipment has gone out, or `postRental` before it has (`inspection-phase-mismatch`). Nothing is recorded.'
+          x-ticvai-problem-types: [rental-booking-cancelled, inspection-phase-mismatch]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/{bookingId}/damage:
@@ -2028,6 +2081,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RentalDamageAssessment'
+        '409':
+          description: 'The booking never went out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`), so there is no equipment to assess. Nothing is recorded.'
+          x-ticvai-problem-types: [rental-booking-not-checked-out]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rental-bookings/overdue:
@@ -2129,6 +2189,8 @@ paths:
         **We held `agreement_rules` and `agreement_signature` and no agreement.** The signature
         referenced a participant and a version *string*, so it signed a version number rather than a
         document. Decision 1 took their `rental_agreement` for exactly this.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - rental
       x-ticvai-permission: RENTAL_VIEW
@@ -2157,6 +2219,7 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createRentalAgreement
+      x-ticvai-names-for-context: [rental.agreement_signature]
       x-ticvai-conflict-policy: serverWins
       summary: Raise a rental agreement
       description: >
@@ -2331,12 +2394,15 @@ components:
           type: string
           format: uuid
         rentalAgreementId:
+          x-ticvai-references: rental.agreement
           type: string
           format: uuid
         orderLineId:
+          x-ticvai-references: orders.order_line
           type: string
           format: uuid
         catalogueProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         trackingMode:
@@ -2403,9 +2469,11 @@ components:
           type: string
           format: uuid
         rentalInspectionId:
+          x-ticvai-references: rental.inspection
           type: string
           format: uuid
         rentalAgreementItemId:
+          x-ticvai-references: rental.agreement_item
           type: string
           format: uuid
         componentCode:
@@ -2443,6 +2511,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -2516,6 +2585,7 @@ components:
           type: boolean
           default: true
     RentalCategory:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by importRentalCatalogue, listRentalCategories, validateRentalProduct
       type: object
       x-ticvai-persistence: maintenance.asset_category
       description: 'Board 1.4. **Defaults cascade and products override within a permitted set.**'
@@ -2527,6 +2597,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -2591,6 +2662,8 @@ components:
           nullable: true
           description: Pooled only. *150 lockers.*
         components:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**Hybrid only** — *one serialised kayak, two pooled paddles, two pooled life
             jackets.* One booking, two mechanisms.
@@ -2626,6 +2699,14 @@ components:
           default: true
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product this model is for (one per product), from the path.
     RentalLocationRule:
       type: object
       x-ticvai-persistence: rental.location_rule
@@ -2637,6 +2718,7 @@ components:
       - locationId
       properties:
         locationId:
+          x-ticvai-references: inventory.location
           type: string
           format: uuid
         enabled:
@@ -2667,6 +2749,13 @@ components:
           additionalProperties: true
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          description: The rental product offered at this location, from the path of `setRentalProductLocations`.
     RentalDurationRules:
       type: object
       x-ticvai-persistence: rental.duration_rules
@@ -2701,6 +2790,14 @@ components:
           default: false
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RentalOperationalRules:
       type: object
       x-ticvai-persistence: rental.operational_rules
@@ -2755,6 +2852,14 @@ components:
           default: false
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RuleRequirement:
       type: string
       enum:
@@ -2801,6 +2906,14 @@ components:
           default: perParticipant
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RentalConfigurationFinding:
       type: object
       description: 'Boards 1.10 and 4.10. **Severity travels with the finding**, so the publish gate can
@@ -2908,6 +3021,8 @@ components:
         '
       properties:
         operatingWindows:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2938,6 +3053,14 @@ components:
           default: 0
         scopePath:
           type: string
+        productId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.product
+          x-ticvai-unique: tenant
+          description: The rental product these rules are for (one set per product), from the path.
     RentalBlackout:
       type: object
       x-ticvai-persistence: rental.blackout
@@ -2988,6 +3111,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -3033,6 +3157,8 @@ components:
         basePrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
         durationTiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: 'Board 4.3. *30 min AED 40, 60 min AED 60, 90 min AED 80, 120 min AED 95.*'
           items:
@@ -3058,6 +3184,8 @@ components:
           - roundUpHour
           default: exactUsage
         calendarRules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: 'Board 4.4. *Peak 16:00–20:00 AED 90/hr; off-peak 09:00–12:00 AED 50/hr; peak
             season 1 Nov – 31 Mar.*
@@ -3184,6 +3312,7 @@ components:
           type: string
           format: uuid
         productId:
+          x-ticvai-references: rental.product
           type: string
           format: uuid
           description: The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted.
@@ -3367,6 +3496,8 @@ components:
         lateFeeAmount:
           $ref: ../shared/common.yaml#/components/schemas/Money
         lateFeeTiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3509,6 +3640,7 @@ components:
           items:
             $ref: '#/components/schemas/RentalParticipant'
         acceptedQuoteId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true
@@ -3537,6 +3669,7 @@ components:
         reference:
           type: string
         productId:
+          x-ticvai-references: rental.product
           type: string
           format: uuid
         locationId:
@@ -3589,6 +3722,7 @@ components:
           format: date-time
           nullable: true
         depositAuthorisationId:
+          x-ticvai-references: orders.stored_value_authorisation
           type: string
           format: uuid
           nullable: true
@@ -3597,6 +3731,7 @@ components:
         accruedLateFee:
           $ref: ../shared/common.yaml#/components/schemas/Money
         readiness:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           description: '**Computed, not stored** — agreement, requirements, deposit, equipment.'
@@ -3616,7 +3751,14 @@ components:
             $ref: '#/components/schemas/RentalParticipant'
         scopePath:
           type: string
+        changeReason:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Why the booking was last changed (`updateRentalBooking`).
     RentalParticipant:
+      required: [scopePath]
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by checkOutRental, createRentalBooking, extendRental, getRentalBooking and others
       type: object
       x-ticvai-persistence: rental.participant
       description: 'Board 5.5. **A group rental is one booking with participants**, because the
@@ -3624,6 +3766,10 @@ components:
 
         '
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -3740,6 +3886,7 @@ components:
           type: string
           format: uuid
         assetId:
+          x-ticvai-references: maintenance.asset
           type: string
           format: uuid
           description: A `maintenance.Asset`, which is also a `resources` resource where the product is
@@ -3762,6 +3909,13 @@ components:
           nullable: true
         scopePath:
           type: string
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.booking
+          description: The rental booking the equipment is assigned to, from the path of `assignRentalEquipment`.
     RentalInspection:
       type: object
       x-ticvai-persistence: rental.inspection
@@ -3800,6 +3954,8 @@ components:
 
             '
         checklist:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3827,6 +3983,19 @@ components:
           format: date-time
         scopePath:
           type: string
+        recordedAt:
+          type: string
+          format: date-time
+          description: '**When the device made the write** (R113; CHG-OFL-003). `recordRentalInspection` is offline-capable, so
+            the client sets this from its own clock and keeps it on replay; `created_at` is when the server
+            heard of it. Omitted online, the server sets it to the time it received the call.'
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.booking
+          description: The rental booking inspected, from the path of `recordRentalInspection`.
     RentalDamageAssessment:
       type: object
       x-ticvai-persistence: rental.damage_assessment
@@ -3871,6 +4040,13 @@ components:
           description: Raised in `maintenance`, so the repair is tracked where every other repair is.
         scopePath:
           type: string
+        bookingId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: rental.booking
+          description: The rental booking assessed, from the path of `assessRentalDamage`.
     RentalReturn:
       type: object
       description: 'Board 8. **Late fee, damage and partial return all land on one deposit.**'
@@ -4017,3 +4193,9 @@ components:
           default: false
         scopePath:
           type: string
+        recordedAt:
+          type: string
+          format: date-time
+          description: '**When the device made the write** (R113; CHG-OFL-003). `reportRentalIncident` is offline-capable, so
+            the client sets this from its own clock and keeps it on replay; `created_at` is when the server
+            heard of it. Omitted online, the server sets it to the time it received the call.'

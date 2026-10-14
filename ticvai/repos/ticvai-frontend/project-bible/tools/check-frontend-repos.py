@@ -32,6 +32,20 @@ location frontend_repos.py derives. These read one against the other:
                          `srcRoot`, the platform names a shared package the repository does not have, or the
                          repository is no Nx workspace while a screen path still names apps/<app>/
 
+**14 October 2026, CHG-RPO-001..003** (the Block A audit, the lead's decision 3: layouts are read from the
+repositories and recorded as observed; owners confirm afterwards). Every repository's entry now has `observed:`,
+with `reachable: false` where the clone was refused (nothing inside read: its profile stays the assumed default
+and the check notes it), and each repository has a profile (tools/frontend_repos.py profile()). These rules read
+against the profile now:
+
+    FR-OLD-PATH          also: a screen's component is not the path its repository's profile gives it
+                         (frontend_repos.component_path, written by tools/apply-repo-layout.py)
+    FR-LAYOUT-MISMATCH   compares only a layout that was read (reachable: true)
+    FR-FIELDS            also: an `observed:` block with no by, date or reachable, or one read with no workspace,
+                         packageManager or srcRoot
+    FR-SETUP-TABLE       also: setup's frontend CLAUDE.md block of what each repository holds differs from the
+                         profile (frontend_repos.setup_block)
+
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (tools/audit_guard.py).
 
     python3 tools/check-frontend-repos.py [--all]
@@ -51,9 +65,12 @@ RULES = {
     "FR-APP-MISSING": "every frontend app is on an entry (CHG-R6-059)",
     "FR-APP-MISMATCH": "an entry's app is its platform's app (CHG-R6-059)",
     "FR-REPO-TWICE": "a repository serves one platform unless `shared` says why (CHG-R6-059)",
-    "FR-FIELDS": "an entry with a repository says assumed true or false; names and url follow the group (CHG-R6-059)",
-    "FR-SETUP-TABLE": "ADAM setup's frontend CLAUDE.md names the same repository per platform (CHG-R6-059)",
-    "FR-OLD-PATH": "a screen with a repository names its component under the old apps/<app>/ workspace (CHG-SWP-003)",
+    "FR-FIELDS": ("an entry with a repository says assumed true or false; names and url follow the group; "
+                  "an observed block says by, date, reachable (CHG-R6-059, CHG-RPO-001)"),
+    "FR-SETUP-TABLE": ("ADAM setup's frontend CLAUDE.md names the same repository per platform and the same profile "
+                       "(CHG-R6-059, CHG-RPO-003)"),
+    "FR-OLD-PATH": ("a screen with a repository names its component under the old apps/<app>/ workspace, or not where "
+                    "its repository's profile puts it (CHG-SWP-003, CHG-RPO-002)"),
     "FR-LAYOUT-UNCONFIRMED": "a repository's layout is assumed and nothing observed is recorded (CHG-SWP-003)",
     "FR-LAYOUT-MISMATCH": "a repository's observed layout contradicts what the package says of it (#27741, CHG-SWP-003)",
 }
@@ -106,6 +123,17 @@ def main() -> int:
             guard.add("FR-FIELDS", f"{code}:name", f"{code}: repository {repo!r} is not of the form ticvai-<name>")
         if not isinstance(e.get("assumed"), bool):
             guard.add("FR-FIELDS", f"{code}:assumed", f"{code}: {repo} has no `assumed: true|false`")
+        obs = e.get("observed")
+        if isinstance(obs, dict):                   # CHG-RPO-001: what was seen, by whom, when, and whether it was
+            need = ["by", "date", "reachable"]      # read at all; a read layout says what it is
+            if obs.get("reachable") is True:
+                need += ["workspace", "packageManager", "srcRoot"]
+            for k in need:
+                if obs.get(k) in (None, ""):
+                    guard.add("FR-FIELDS", f"{code}:observed:{k}", f"{code}: {repo}'s `observed:` has no {k}")
+            if "reachable" in obs and not isinstance(obs.get("reachable"), bool):
+                guard.add("FR-FIELDS", f"{code}:observed:reachable", f"{code}: {repo}'s `observed.reachable` is not "
+                                                                      "true or false")
         by_repo.setdefault(repo, []).append(code)
     for repo, codes in sorted(by_repo.items()):
         if len(codes) > 1 and not all(entries[c].get("shared") for c in codes):
@@ -127,6 +155,16 @@ def main() -> int:
             if isinstance(e, dict) and e.get("repo") and code not in seen:
                 guard.add("FR-SETUP-TABLE", code, f"frontend-repos.yaml maps {code} to {e['repo']}; setup's frontend "
                                                   "CLAUDE.md table does not list it")
+        # CHG-RPO-003: the block of what each repository holds is the profile's, word for word.
+        text = STARTER.read_text(encoding="utf-8").replace("\r\n", "\n")
+        if fr.SETUP_BEGIN not in text or fr.SETUP_END not in text:
+            guard.add("FR-SETUP-TABLE", "profile", "setup's frontend CLAUDE.md has no block of what each repository "
+                                                   "holds (run tools/apply-repo-layout.py --setup)")
+        elif fr.SETUP_BEGIN + text.split(fr.SETUP_BEGIN, 1)[1].split(fr.SETUP_END, 1)[0] + fr.SETUP_END \
+                != fr.setup_block():
+            guard.add("FR-SETUP-TABLE", "profile", "setup's frontend CLAUDE.md block of what each repository holds "
+                                                   "differs from frontend-repos.yaml (run tools/apply-repo-layout.py "
+                                                   "--setup)")
     else:
         guard.note("viewer/mcp/setup/starters/frontend/CLAUDE.md not found: the setup table was not compared")
     layouts(guard, doc, entries)
@@ -140,7 +178,7 @@ def layouts(guard, doc: dict, entries: dict) -> None:
     for stem, s in g.screens():
         by_platform.setdefault(stem[:3], []).append(s)
     assumed = bool((doc.get("layout") or {}).get("assumed"))
-    old = {}
+    old, unread = {}, []
     for code, e in sorted(entries.items()):
         if not isinstance(e, dict) or not e.get("repo"):
             continue
@@ -155,11 +193,21 @@ def layouts(guard, doc: dict, entries: dict) -> None:
                 guard.add("FR-OLD-PATH", s["id"], f"{code} {s['id']}: component {comp} is in the one-workspace "
                                                   f"layout; the screen is built in {e['repo']}")
                 old[code] = old.get(code, 0) + 1
+            elif fr.component_path(code, comp) != comp:
+                # CHG-RPO-002: the path its repository's profile gives it, nothing else.
+                guard.add("FR-OLD-PATH", s["id"], f"{code} {s['id']}: component {comp} is not where {e['repo']}'s "
+                                                  f"profile puts it ({fr.component_path(code, comp)}; run "
+                                                  "tools/apply-repo-layout.py)")
+                old[code] = old.get(code, 0) + 1
         obs = e.get("observed")
         if not isinstance(obs, dict):
             if assumed:
                 guard.add("FR-LAYOUT-UNCONFIRMED", code, f"{code} {e['repo']}: no `observed:` layout; the "
                                                          f"{len(paths)} locations its tickets suggest are assumed")
+            continue
+        if obs.get("reachable") is not True:
+            # CHG-RPO-001: the clone was refused; that is what was observed. Its profile stays the assumed default.
+            unread.append(f"{code} {e['repo']} ({len(paths)} screens)")
             continue
         src = str(obs.get("srcRoot") or "").strip("/")
         if src:
@@ -179,6 +227,9 @@ def layouts(guard, doc: dict, entries: dict) -> None:
                       f"and {old[code]} of its screens name apps/{app}/")
     if old:
         guard.note("FR-OLD-PATH by platform: " + ", ".join(f"{c} {n}" for c, n in sorted(old.items())))
+    if unread:
+        guard.note("observed but not read (the clone was refused; profile assumed until the owner confirms): "
+                   + "; ".join(unread))
 
 
 if __name__ == "__main__":

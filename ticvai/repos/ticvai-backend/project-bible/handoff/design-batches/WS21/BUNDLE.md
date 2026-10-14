@@ -96,14 +96,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-022` | Partner Management Command Center | B | 2 | 30 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-022` | Partner Management Command Center | B | 2 | 270 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `PTR-023` | Partner Profile & Organization Setup | B | 16 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `PTR-024` | Partner Onboarding & Application Workflow | B | 15 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
-| `PTR-025` | Partner Contacts & User Administration | B | 40 | 0 | 5 | 5 | 1 | 0 | — | notStarted (generated) |
+| `PTR-025` | Partner Contacts & User Administration | B | 39 | 0 | 5 | 5 | 1 | 0 | — | notStarted (generated) |
 | `PTR-027` | Partner Brand, Venue & Business Scope Assignment | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `PTR-028` | Partner Documentation & Compliance Repository | B | 15 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `PTR-030` | Partner Approval, Status & Lifecycle Management | B | 12 | 0 | 5 | 0 | 2 | 3 | — | notStarted (generated) |
-| `PTR-031` | Partner 360° Profile, Readiness & AI Review | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-030` | Partner Approval, Status & Lifecycle Management | B | 22 | 0 | 5 | 0 | 2 | 3 | — | notStarted (generated) |
+| `PTR-031` | Partner 360° Profile, Readiness & AI Review | B | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -170,29 +170,305 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Shown**
 
-**Total Partners** (metric tile)
+**Total Partners** (metric tile, from `listPartner`)
 
-**Active Partners** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
 
-**Pending Onboarding** (metric tile)
+**Active Partners** (metric tile, from `listPartner`)
 
-**Pending Approval** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
 
-**Suspended Partners** (metric tile)
+**Pending Onboarding** (metric tile, from `listPartner`)
 
-**Expiring Agreements** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
 
-**Documentation Issues** (metric tile)
+**Pending Approval** (metric tile, from `listPartner`)
 
-**Partners With Credit Holds** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
 
-**Connected OTA/API Partners** (metric tile)
+**Suspended Partners** (metric tile, from `listPartner`)
 
-**Partner Sales YTD** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
 
-**Partner Revenue YTD** (metric tile)
+**Expiring Agreements** (metric tile, from `listPartner`)
 
-**High-Risk Partners** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
+
+**Documentation Issues** (metric tile, from `listPartner`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
+
+**Partners With Credit Holds** (metric tile, from `listPartner`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
+
+**Connected OTA/API Partners** (metric tile, from `listPartner`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
+
+**Partner Sales YTD** (metric tile, from `listPartner`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
+
+**Partner Revenue YTD** (metric tile, from `listPartner`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
+
+**High-Risk Partners** (metric tile, from `listPartner`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | the name it points at, never the id | Partner ID |
+| Trading name | text | Trading Name |
+| Legal entity | text | Legal Entity |
+| Partner type | text | Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 … |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Territory | text | Territory: summary of the authorised markets (listTerritoryMarketDistribution) |
+| Assigned brands | list or chips (count when long) | Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue) |
+| Assigned venues | list or chips (count when long) | Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue) |
+| Commercial owner | text | Commercial Owner: staff display name of the account manager |
+| Distribution channel | list or chips (count when long) | Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI … |
+| Account status | text | Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and … |
+| Onboarding status | text | Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview … |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status of the partner's current agreement; empty when none |
+| Credit status | text | Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness … |
+| Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
+| Last activity | 1 Oct 2026, 14:30 | Last Activity |
+| Risk rating | chip: Low, Medium, High, Critical | Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI |
+| AI insights | list or chips (count when long) | Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6) |
+| Next cursor | text | — |
 
 **Every partner** (data table, from `listPartner`)
 
@@ -214,7 +490,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Integration status | chip: None, Testing, Connected, Degraded, Disconnected | Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). |
 | Last activity | 1 Oct 2026, 14:30 | Last Activity |
 
-**The selected partner** (detail panel): The pack groups this record's detail under its own headings: “Partner Attention Required”.
+**The selected partner** (detail panel, from `listPartner`): The pack groups this record's detail under its own headings: “Partner Attention Required”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -283,6 +559,8 @@ metric tiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -316,7 +594,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (270 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-022?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-023`, `PTR-024`, `PTR-027`, `PTR-028`, `PTR-025`, `PTR-030`.
@@ -425,6 +703,8 @@ form example:
 - `setPartnerProfileOrganization` → `PLATFORM_CELL_MANAGE` (configure) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_CELL_MANAGE`
 
 #### Requirements it meets
 
@@ -590,6 +870,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -643,7 +925,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | `partnerId` (session) |
+| Opens with | `partnerId` (session), `contactId` (navigation) |
 | Route | `/partners/partner-contacts-user-administration-ptr-025` |
 
 **Known gaps.** **The pack names 9 actions on this screen; 6 are served since the writers pass (29 September): Primary Contact, Commercial, Finance, Operations, Management, Emergency Contact by …
@@ -705,6 +987,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Time zone `timeZone` | text field | optional | — | — | — | IANA name | `setPartnerContact` body |
 | Contact type `contactType` | select | optional | — | Primary · Commercial · Reservations · Finance · Technical · Operations · Management · Emergency | — | Contact type; required to create | `setPartnerContact` body |
 
+Carried, not typed: `contactId`
+
 Errors to draw in the form: 404 No such contact or partner; 409 The action does not fit the contact's status (states/partner-contact.yaml), or it would leave the partner with no active primary contact
 
 **Form: Create partner user** (modal, opened by *Create partner user*; *Create partner user* calls `createPartnerUser`, *Cancel* sends nothing)
@@ -713,7 +997,6 @@ Errors to draw in the form: 404 No such contact or partner; 409 The action does 
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createPartnerUser` body |
 | Partner `partnerId` | picker: choose a partner | required | — | — | shows names, sends the id | The partner (control.partner) the user belongs to. | `createPartnerUser` body |
 | Principal `principalId` | picker: choose a principal | required | — | — | shows names, sends the id | — | `createPartnerUser` body |
 | Role `role` | text field | optional | — | — | — | The partner role shown for the user: Partner Administrator, Booking Agent, Supervisor, Finance User, Reporting User or API Administrator (pack p.12). | `createPartnerUser` body |
@@ -739,7 +1022,7 @@ Errors to draw in the form: 404 No such contact or partner; 409 The action does 
 | Emergency Contact (secondary button) | navigation or local | — | — | — | — |
 | Password policy (secondary button) | navigation or local | — | — | — | — |
 | SSO where available (secondary button) | navigation or local | — | — | — | — |
-| Save partner contact (secondary button) | `setPartnerContact` PUT `/partner-contacts` | PartnerContactInput | PartnerContact | 404 No such contact or partner; 409 The action does not fit the contact's status (states/partner-contact.yaml), or it would leave the partner with no active primary contact | gated `PARTNER_MANAGE`; opens modal first |
+| Save partner contact (secondary button) | `setPartnerContact` PUT `/partner-contacts/{contactId}` | PartnerContactInput | PartnerContact | 404 No such contact or partner; 409 The action does not fit the contact's status (states/partner-contact.yaml), or it would leave the partner with no active primary contact | gated `PARTNER_MANAGE`; opens modal first |
 | Create partner user (secondary button) | `createPartnerUser` POST `/partners/{partnerId}/users` | PartnerUser | PartnerUser | — | gated `PARTNER_MANAGE`; opens modal first |
 
 **Data it reads**: `listPartnerContactUser` (onLoad, Partner Contacts & User Administration)
@@ -795,6 +1078,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -828,7 +1113,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (40), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (39), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-025?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Primary Contact, Commercial, Finance, Operations, Management, Emergency Contact, Password policy, SSO where available, Save partner contact, Create partner user.
@@ -906,6 +1191,8 @@ venues:
 - `setPartnerBrandVenue` → `PLATFORM_CELL_MANAGE` (configure) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_CELL_MANAGE`
 
 #### Requirements it meets
 
@@ -1056,6 +1343,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1130,6 +1419,21 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Management Decision | select field | — | — | — | — | — | — |
 | Authentication code | text field | — | — | — | — | Asked in place inside the Approve confirmation, because `approvePartnerStatuLifecycle` needs a fresh step-up token (`x-ticvai-step-up: mfa`); its result is the `stepUpToken`. Five wrong codes lock … | — |
 
+**Sent by *Approve*** (`approvePartnerStatuLifecycle`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Partner `partnerId` | picker: choose a partner | optional | — | — | shows names, sends the id | Partner | `approvePartnerStatuLifecycle` body |
+| Action `action` | select | optional | — | Approve · Activate · Restrict · Suspend · Reactivate · Terminate · Archive | — | Status Actions | `approvePartnerStatuLifecycle` body |
+| Reason category `reasonCategory` | select | optional | — | Commercial · Compliance · Credit · Fraud · Contract expiry · Performance · Technical · Management decision | — | Status Reasons | `approvePartnerStatuLifecycle` body |
+| Reason note `reasonNote` | text field | optional | — | — | — | Free-text reason | `approvePartnerStatuLifecycle` body |
+| Suspension scope `suspensionScope` | segmented control | optional | — | Full · Selected | — | Suspension Scope: full suspension or selected restrictions | `approvePartnerStatuLifecycle` body |
+| Restrictions `restrictions` | multi-select chips | optional | — | Stop new bookings · Stop credit sales · Stop API · Stop specific venue · Stop specific market | — | Selected restrictions when suspensionScope is selected, or for restrict | `approvePartnerStatuLifecycle` body |
+| Restricted venues `restrictedVenueIds` | list of values (chips) | optional | — | — | — | Venues for stopSpecificVenue | `approvePartnerStatuLifecycle` body |
+| Restricted markets `restrictedMarkets` | list of values (chips) | optional | — | — | — | Markets for stopSpecificMarket | `approvePartnerStatuLifecycle` body |
+| Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | When the change takes effect; lifecycle changes are effective-dated | `approvePartnerStatuLifecycle` body |
+| Dry run `dryRun` | toggle | optional | — | — | — | When true, return the impact analysis without changing anything, so the screen can show it before the administrator confirms (decided 29 September, readiness close-out) | `approvePartnerStatuLifecycle` body |
+
 **Sent by *Email me a code instead*** (`createMfaChallenge`; no form is declared, so these are filled from the screen or collected inline)
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
@@ -1148,7 +1452,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Approve (primary button) | navigation or local | — | — | — | — |
+| Approve (primary button) | `approvePartnerStatuLifecycle` PUT `/partner-statu-lifecycle` | PartnerApprovalStatusLifecycleManagementInput | PartnerApprovalStatusLifecycleManagementView | — | step-up: mfa (Makes a partner able to trade, or stops them.); gated `Approve` |
 | Email me a code instead (secondary button) | `createMfaChallenge` POST `/auth/mfa/challenge` | inline | inline | — | — |
 
 **What each action does** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
@@ -1164,7 +1468,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | Nothing waiting for approval: every partner is in a settled state. Offers no create action. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The challenge was already completed; a challenge is single-use, so ask for a new one.; 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Sample data for the mock-up
 
@@ -1189,6 +1493,8 @@ form example:
 - `verifyMfaChallenge` → no permission · staff, partner, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_CELL_MANAGE`
 
 #### Requirements it meets
 
@@ -1219,7 +1525,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (410, 422).
+- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (409, 410, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-030?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Approve, Email me a code instead.
@@ -1268,7 +1574,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listPartnerProfileReadiness`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Company information and hierarchy | text | Organization: legal entity and parent chain, e.g. |
+| Key partner contacts | list or chips (count when long) | Contacts: key partner contacts (name and contact type) |
+| Active B2B users | 1,234 | Users: active B2B users |
+| Authorized markets | list or chips (count when long) | Territories: authorized markets |
+| Brands and venues | list or chips (count when long) | Business Scope: brands and venues |
+| Compliance status | text | Documentation: compliant, expiring, incomplete or nonCompliant |
+| Authorized capabilities | list or chips (count when long) | Permissions: authorized capabilities |
+| Commercial summary | text | Commercial: agreement and credit summary |
+| Connected channels | list or chips (count when long) | Distribution: connected channels |
+| Performance summary | text | Performance: scorecard summary |
+| Partner | the name it points at, never the id | Partner |
+| Partner name | text | Partner Name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Country | text | Country, ISO 3166-1 alpha-2 |
+| Status | text | Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and p.18 … |
+| Risk rating | chip: Low, Medium, High, Critical | Risk |
+| Sales ytd | AED 1,234.50 | Sales YTD |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
 
 **Data it reads**: `listPartnerProfileReadiness` (onLoad, Partner 360° Profile, Readiness & AI Review)
 
@@ -1299,6 +1628,8 @@ aiNote: Trade licence expires in 20 days
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1324,7 +1655,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-031?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] No transition is declared; back returns where the user came from.
@@ -1431,7 +1762,7 @@ Method, path, parameters, request and response for every operation these screens
 "listPartnerOnboardingApplication": {"method":"GET","path":"/partner-onboarding-application","contract":"subscription","summary":"Partner Onboarding & Application Workflow","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"stage","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"requestedPartnerType","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPartnerProfileReadiness": {"method":"GET","path":"/partner-profile-readiness","contract":"subscription","summary":"Partner 360° Profile, Readiness & AI Review","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"partnerId","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setPartnerBrandVenue": {"method":"PUT","path":"/partner-brand-venue","contract":"subscription","summary":"Partner Brand, Venue & Business Scope Assignment","permission":"PLATFORM_CELL_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PartnerBrandVenueBusinessScopeAssignmentInput","responds":"PartnerBrandVenueBusinessScopeAssignmentView"},
-"setPartnerContact": {"method":"PUT","path":"/partner-contacts","contract":"subscription","summary":"Create, edit, disable, enable or revoke a partner contact","permission":"PARTNER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PartnerContactInput","responds":"PartnerContact"},
+"setPartnerContact": {"method":"PUT","path":"/partner-contacts/{contactId}","contract":"subscription","summary":"Create, edit, disable, enable or revoke a partner contact","permission":"PARTNER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"contactId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"PartnerContactInput","responds":"PartnerContact"},
 "setPartnerProfileOrganization": {"method":"PUT","path":"/partner-profile-organization","contract":"subscription","summary":"Partner Profile & Organization Setup","permission":"PLATFORM_CELL_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PartnerProfileOrganizationSetupInput","responds":"PartnerProfileOrganizationSetupView"},
 "verifyMfaChallenge": {"method":"POST","path":"/auth/mfa/challenge/{challengeId}/verify","contract":"identity","summary":"Complete a sign-in or step-up challenge","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null}
 }
@@ -1452,7 +1783,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "PartnerApprovalStatusLifecycleManagementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner and control.partner_status_history and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Approval, Status & Lifecycle Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"futureBookings":{"type":"integer","description":"Impact: future bookings"},"activeHolds":{"type":"integer","description":"Impact: active holds"},"outstandingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Impact: outstanding balance"},"pendingSettlement":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Impact: pending settlement"},"activeUsers":{"type":"integer","description":"Impact: active users"},"activeIntegrations":{"type":"integer","description":"Impact: active integrations"},"existingCustomers":{"type":"integer","description":"Impact: existing customers holding tickets"},"existingTickets":{"type":"integer","description":"Impact: existing tickets; never invalidated by a suspension"},"currentAllocations":{"type":"integer","description":"Impact: current contractual allocations"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"action":{"type":"string","enum":["approve","activate","restrict","suspend","reactivate","terminate","archive"],"description":"Status Actions"},"reasonCategory":{"type":"string","enum":["commercial","compliance","credit","fraud","contractExpiry","performance","technical","managementDecision"],"description":"Status Reasons"},"reasonNote":{"type":"string","description":"Free-text reason","nullable":true},"suspensionScope":{"type":"string","enum":["full","selected"],"description":"Suspension Scope: full suspension or selected restrictions","nullable":true},"restrictions":{"type":"array","items":{"type":"string","enum":["stopNewBookings","stopCreditSales","stopApi","stopSpecificVenue","stopSpecificMarket"]},"description":"Selected restrictions when suspensionScope is selected, or for restrict"},"restrictedVenueIds":{"type":"array","items":{"type":"string"},"description":"Venues for stopSpecificVenue"},"restrictedMarkets":{"type":"array","items":{"type":"string"},"description":"Markets for stopSpecificMarket"},"effectiveFrom":{"type":"string","format":"date-time","description":"When the change takes effect; lifecycle changes are effective-dated"},"status":{"type":"string","description":"Resulting account status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and p.18 merged with MoM 31 Aug 4.3 lead -> submitted -> active -> suspended; \"submitted\" is applicant)"},"applied":{"type":"boolean","description":"False when dryRun was set or the change awaits approval"},"approvalRequestId":{"type":"string","description":"Approval request raised for the change","nullable":true},"aiImpactSummary":{"type":"string","description":"Advisory AI summary of the business impact","nullable":true}}},
 "PartnerBrandVenueBusinessScopeAssignmentInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; stored as control.partner_scope_assignment (PartnerScopeAssignment); brand, venue and attraction land in brandId, venueId and attractionId, assignmentId is its id (data model DM4)","description":"**What Partner Brand, Venue & Business Scope Assignment submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"tenant":{"type":"string","description":"Tenant id"},"brand":{"type":"string","description":"Brand id; blank = every brand of the tenant","nullable":true},"venue":{"type":"string","description":"Venue id; blank = every venue of the brand","nullable":true},"attraction":{"type":"string","description":"Attraction id; blank = every attraction of the venue","nullable":true},"businessUnit":{"type":"string","description":"Business Unit","nullable":true},"eventPortfolio":{"type":"string","description":"Event Portfolio","nullable":true},"market":{"type":"string","description":"Market","nullable":true},"startDate":{"type":"string","format":"date","description":"Start Date"},"endDate":{"type":"string","format":"date","description":"End Date; a set end date makes the assignment temporary","nullable":true},"seasonalScope":{"type":"boolean","description":"Seasonal Scope: when true the start and end month-day recur every year (decided 29 September, readiness close-out)"},"assignmentId":{"type":"string","format":"uuid","description":"Assignment id; omit to create"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"authorized":{"type":"boolean","description":"Authorized (true) or explicitly not authorized (false), the pack's Not Authorized example"},"scopeExclusions":{"type":"array","items":{"type":"string"},"description":"Scope Overrides: product or product-category ids excluded inside this scope (e.g. all Dubai Arena events except VIP Hospitality); consumed by the commercial/channel rules"}}},
 "PartnerBrandVenueBusinessScopeAssignmentView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner_scope_assignment (PartnerScopeAssignment) and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Brand, Venue & Business Scope Assignment displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"tenant":{"type":"string","description":"Tenant id"},"brand":{"type":"string","description":"Brand id; blank = every brand of the tenant","nullable":true},"venue":{"type":"string","description":"Venue id; blank = every venue of the brand","nullable":true},"attraction":{"type":"string","description":"Attraction id; blank = every attraction of the venue","nullable":true},"businessUnit":{"type":"string","description":"Business Unit","nullable":true},"eventPortfolio":{"type":"string","description":"Event Portfolio","nullable":true},"market":{"type":"string","description":"Market","nullable":true},"startDate":{"type":"string","format":"date","description":"Start Date"},"endDate":{"type":"string","format":"date","description":"End Date; a set end date makes the assignment temporary","nullable":true},"seasonalScope":{"type":"boolean","description":"Seasonal Scope: when true the start and end month-day recur every year (decided 29 September, readiness close-out)"},"assignmentId":{"type":"string","format":"uuid","description":"Assignment id; omit to create"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"authorized":{"type":"boolean","description":"Authorized (true) or explicitly not authorized (false), the pack's Not Authorized example"},"scopeExclusions":{"type":"array","items":{"type":"string"},"description":"Scope Overrides: product or product-category ids excluded inside this scope (e.g. all Dubai Arena events except VIP Hospitality); consumed by the commercial/channel rules"}}},
-"PartnerContact": {"type":"object","x-ticvai-persistence":"control.partner_contact","description":"A person at the partner, with or without a B2B user account. A contact with an account links to its principal (`control.partner_user` carries the branch, quota and credit); one without an account is still somebody finance or operations must be able to reach (decided 29 September, data model DM4)\n\n**Written by** setPartnerContact (create, edit, disable, enable, revoke) and by createPartnerUser, which creates the contact `invited` for a user with an account (decided 29 September, writers pass; DM4).","required":["id","partnerId","name","contactType","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"partnerId":{"type":"string","format":"uuid","description":"The partner (control.partner)."},"name":{"type":"string","description":"Name."},"position":{"type":"string","nullable":true,"description":"Position."},"department":{"type":"string","nullable":true,"description":"Department."},"email":{"type":"string","format":"email","nullable":true,"description":"Email."},"mobile":{"type":"string","nullable":true,"description":"Mobile."},"telephone":{"type":"string","nullable":true,"description":"Telephone."},"language":{"type":"string","nullable":true,"description":"Language, BCP 47 tag."},"timeZone":{"type":"string","nullable":true,"description":"Time zone, IANA name."},"contactType":{"type":"string","enum":["primary","commercial","reservations","finance","technical","operations","management","emergency"],"description":"Contact type."},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"Identity principal of the B2B user account (identity.principal); empty for a contact with no account."},"status":{"type":"string","enum":["invited","active","disabled","revoked","expired"],"default":"active","description":"Status; a contact with no user account is active or disabled."},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `tenant` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"PartnerContact": {"type":"object","x-ticvai-persistence":"control.partner_contact","description":"A person at the partner, with or without a B2B user account. A contact with an account links to its principal (`control.partner_user` carries the branch, quota and credit); one without an account is still somebody finance or operations must be able to reach (decided 29 September, data model DM4)\n\n**Written by** setPartnerContact (create, edit, disable, enable, revoke) and by createPartnerUser, which creates the contact `invited` for a user with an account (decided 29 September, writers pass; DM4).","required":["id","partnerId","name","contactType","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"partnerId":{"x-ticvai-references":"control.partner","type":"string","format":"uuid","description":"The partner (control.partner)."},"name":{"type":"string","description":"Name."},"position":{"type":"string","nullable":true,"description":"Position."},"department":{"type":"string","nullable":true,"description":"Department."},"email":{"type":"string","format":"email","nullable":true,"description":"Email."},"mobile":{"type":"string","nullable":true,"description":"Mobile."},"telephone":{"type":"string","nullable":true,"description":"Telephone."},"language":{"type":"string","nullable":true,"description":"Language, BCP 47 tag."},"timeZone":{"type":"string","nullable":true,"description":"Time zone, IANA name."},"contactType":{"type":"string","enum":["primary","commercial","reservations","finance","technical","operations","management","emergency"],"description":"Contact type."},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"Identity principal of the B2B user account (identity.principal); empty for a contact with no account."},"status":{"type":"string","enum":["invited","active","disabled","revoked","expired"],"default":"active","description":"Status; a contact with no user account is active or disabled."},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `tenant` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "PartnerContactInput": {"type":"object","x-ticvai-persistence":"none — request only; stored as control.partner_contact (PartnerContact) (decided 29 September, writers pass; DM4)","description":"What setPartnerContact submits. Without `contactId` it creates a contact with no user account; a contact who signs in is created through createPartnerUser (decided 29 September, writers pass; DM4)","required":["partnerId"],"properties":{"contactId":{"type":"string","format":"uuid","nullable":true,"description":"The contact to change; omit to create"},"partnerId":{"type":"string","format":"uuid","description":"The partner (control.partner)"},"action":{"type":"string","enum":["save","disable","enable","revoke"],"default":"save","description":"save creates or edits; disable, enable and revoke change access (states/partner-contact.yaml)"},"name":{"type":"string","description":"Name; required to create"},"position":{"type":"string","nullable":true},"department":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true},"mobile":{"type":"string","nullable":true},"telephone":{"type":"string","nullable":true},"language":{"type":"string","nullable":true,"description":"BCP 47 tag"},"timeZone":{"type":"string","nullable":true,"description":"IANA name"},"contactType":{"type":"string","enum":["primary","commercial","reservations","finance","technical","operations","management","emergency"],"description":"Contact type; required to create"}}},
 "PartnerContactsUserAdministrationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner_contact (PartnerContact) with control.partner_user and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Contacts & User Administration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"name":{"type":"string","description":"Name"},"position":{"type":"string","description":"Position"},"department":{"type":"string","description":"Department"},"email":{"type":"string","description":"Email","format":"email"},"mobile":{"type":"string","description":"Mobile"},"telephone":{"type":"string","description":"Telephone"},"language":{"type":"string","description":"Language, BCP 47 tag"},"timeZone":{"type":"string","description":"Time Zone, IANA name"},"contactType":{"type":"string","enum":["primary","commercial","reservations","finance","technical","operations","management","emergency"],"description":"Contact Type"},"status":{"type":"string","description":"Status: invited, active, disabled, revoked or expired (a contact with no user account is active or disabled)"},"username":{"type":"string","description":"Username of the B2B user account; empty for a contact with no account","nullable":true},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"branchScopePath":{"type":"string","description":"Branch the user sits on, as the PartnerUser scope path","nullable":true},"role":{"type":"string","description":"Partner role, e.g. Partner Administrator, Booking Agent, Supervisor, Finance User, Reporting User, API Administrator; PartnerUser.role (control.partner_user), the grants themselves are RBAC data (decided 29 September, writers pass; DM4)","nullable":true},"permissions":{"type":"array","items":{"type":"string"},"description":"Effective permissions of the user, within the partner ceiling"},"salesLocation":{"type":"string","description":"Sales Location; PartnerUser.salesLocation (control.partner_user), empty for a contact with no account (decided 29 September, writers pass; DM4)","nullable":true},"currency":{"type":"string","pattern":"^[A-Z]{3}$","description":"Currency the user sells in; PartnerUser.currency (control.partner_user) (decided 29 September, writers pass; DM4)"},"mfaEnrolled":{"type":"boolean","description":"MFA enrolled"},"accountExpiresAt":{"type":"string","format":"date-time","description":"Account expiry; PartnerUser.accountExpiresAt (control.partner_user) (decided 29 September, writers pass; DM4)","nullable":true},"contactId":{"type":"string","format":"uuid","description":"Contact id"},"principalId":{"type":"string","format":"uuid","description":"Identity principal of the B2B user account; empty for a contact with no account","nullable":true}}},
 "PartnerDocumentationComplianceRepositoryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner_document (PartnerDocument) and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Documentation & Compliance Repository displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"documentType":{"type":"string","description":"Document Type code from the configurable list, seeded with tradeLicence, taxVatCertificate, commercialRegistration, bankDetails, insurance, signedAgreement, nda, apiAgreement, complianceDocument, authorizedSignatoryId, other"},"documentNumber":{"type":"string","description":"Document Number"},"expiryDate":{"type":"string","format":"date","description":"Expiry Date","nullable":true},"issuingAuthority":{"type":"string","description":"Issuing Authority"},"fileRef":{"type":"string","description":"Stored file reference","nullable":true},"verificationStatus":{"type":"string","description":"Verification Status: missing, uploaded, underReview, verified, rejected, expiring or expired"},"verifiedBy":{"type":"string","description":"Verified By: staff display name","nullable":true},"verificationDate":{"type":"string","format":"date-time","description":"Verification Date","nullable":true},"notes":{"type":"string","description":"Notes"},"documentId":{"type":"string","format":"uuid","description":"Document id"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"issueDate":{"type":"string","format":"date","description":"Issue Date","nullable":true},"mandatory":{"type":"boolean","description":"Whether this document type is mandatory for the partner type"},"daysToExpiry":{"type":"integer","description":"Days until expiry; negative once expired","nullable":true},"expiryAction":{"type":"string","enum":["warnOnly","blockNewBookings","blockCreditTransactions","suspendPartner","requireManualReview"],"description":"Compliance Rules: what expiry or absence of this document does"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Advisory AI findings from the uploaded file (extracted fields, missing or inconsistent information)"}}},
@@ -1463,7 +1794,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "PartnerOperationsCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Partner Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partner":{"type":"string","description":"Partner trading name"},"partnerType":{"type":"string","description":"Partner Type code"},"accountManager":{"type":"string","description":"Account Manager"},"orders":{"type":"integer","description":"Orders"},"tickets":{"type":"integer","description":"Tickets"},"grossSales":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Gross Sales"},"netSales":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Net Sales"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission"},"outstandingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Outstanding Balance"},"creditUtilization":{"type":"number","description":"Credit Utilization, percent"},"allocationUtilization":{"type":"number","description":"Allocation Utilization, percent"},"cancellationRate":{"type":"number","description":"Cancellation Rate, percent"},"operationalStatus":{"type":"string","description":"Operational Status: normal, attention, restricted, suspended"},"risk":{"type":"string","enum":["low","medium","high","critical"],"description":"Risk"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Advisory AI attention flags for this partner"}}},
 "PartnerProfileOrganizationSetupInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; stored as control.partner (Partner); accountManager and the other owners land in the *PrincipalId columns (data model DM4)","description":"**What Partner Profile & Organization Setup submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"partnerId":{"type":"string","format":"uuid","description":"Partner ID; omit to create a new partner"},"legalEntityName":{"type":"string","description":"Legal Entity Name"},"tradingName":{"type":"string","description":"Trading Name"},"partnerType":{"type":"string","description":"Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 list: b2bReseller, travelAgent, tourOperator, ota, corporateCustomer, hotelConcierge, destinationManagementCompany, affiliate, wholesaler, distributor, governmentPartner, schoolInstitution, apiPartner, internalGroupCompany"},"registrationNumber":{"type":"string","description":"Registration Number"},"taxVatNumber":{"type":"string","description":"Tax/VAT Number"},"country":{"type":"string","description":"Country, ISO 3166-1 alpha-2"},"city":{"type":"string","description":"City"},"registeredAddress":{"type":"string","description":"Registered Address"},"businessAddress":{"type":"string","description":"Business Address"},"website":{"type":"string","description":"Website","format":"uri"},"mainTelephone":{"type":"string","description":"Main Telephone"},"generalEmail":{"type":"string","description":"General Email","format":"email"},"preferredLanguage":{"type":"string","description":"Preferred Language, BCP 47 tag"},"defaultCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"Default Currency, ISO 4217"},"timeZone":{"type":"string","description":"Time Zone, IANA name"},"accountManager":{"type":"string","format":"uuid","description":"Account Manager: staff principal id"},"commercialManager":{"type":"string","format":"uuid","description":"Commercial Manager: staff principal id"},"financeOwner":{"type":"string","format":"uuid","description":"Finance Owner: staff principal id"},"operationalOwner":{"type":"string","format":"uuid","description":"Operational Owner: staff principal id"},"technicalOwner":{"type":"string","format":"uuid","description":"Technical Owner: staff principal id"},"parentPartnerId":{"type":"string","format":"uuid","description":"Parent partner in the hierarchy; empty for a top-level partner","nullable":true},"classificationTags":{"type":"array","items":{"type":"string","enum":["strategic","keyAccount","standard","newPartner","highVolume","vip","restricted"]},"description":"Account Classification: internal tags"}}},
 "PartnerProfileOrganizationSetupView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner (Partner) and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Profile & Organization Setup displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partnerId":{"type":"string","format":"uuid","description":"Partner ID; server-assigned"},"legalEntityName":{"type":"string","description":"Legal Entity Name"},"tradingName":{"type":"string","description":"Trading Name"},"partnerType":{"type":"string","description":"Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 list: b2bReseller, travelAgent, tourOperator, ota, corporateCustomer, hotelConcierge, destinationManagementCompany, affiliate, wholesaler, distributor, governmentPartner, schoolInstitution, apiPartner, internalGroupCompany"},"registrationNumber":{"type":"string","description":"Registration Number"},"taxVatNumber":{"type":"string","description":"Tax/VAT Number"},"country":{"type":"string","description":"Country, ISO 3166-1 alpha-2"},"city":{"type":"string","description":"City"},"registeredAddress":{"type":"string","description":"Registered Address"},"businessAddress":{"type":"string","description":"Business Address"},"website":{"type":"string","description":"Website","format":"uri"},"mainTelephone":{"type":"string","description":"Main Telephone"},"generalEmail":{"type":"string","description":"General Email","format":"email"},"preferredLanguage":{"type":"string","description":"Preferred Language, BCP 47 tag"},"defaultCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"Default Currency, ISO 4217"},"timeZone":{"type":"string","description":"Time Zone, IANA name"},"accountManager":{"type":"string","format":"uuid","description":"Account Manager: staff principal id"},"commercialManager":{"type":"string","format":"uuid","description":"Commercial Manager: staff principal id"},"financeOwner":{"type":"string","format":"uuid","description":"Finance Owner: staff principal id"},"operationalOwner":{"type":"string","format":"uuid","description":"Operational Owner: staff principal id"},"technicalOwner":{"type":"string","format":"uuid","description":"Technical Owner: staff principal id"},"parentPartnerId":{"type":"string","format":"uuid","description":"Parent partner in the hierarchy (Global Partner -> UAE Entity); empty for a top-level partner","nullable":true},"classificationTags":{"type":"array","items":{"type":"string","enum":["strategic","keyAccount","standard","newPartner","highVolume","vip","restricted"]},"description":"Account Classification: internal tags"},"possibleDuplicates":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Advisory: partner ids the AI duplicate check matched on company details; a human decides"}}},
-"PartnerUser": {"type":"object","x-ticvai-persistence":"control.partner_user","description":"2.7.51, BL-075. **A partner was a flat account** — `registerPartner` created one and nothing created a user beneath it.\nThe requirement asks for Master Agency, Branch, Department and User with permissions, quotas and credit cascading down. **That is a scope tree, and `tenancy` already has one** — so this is a principal on a partner branch rather than a new hierarchy.\n**Quota and credit resolve the way configuration does: nearest ancestor wins.** A branch with no credit limit inherits the agency's, which is the behaviour a partner expects and would otherwise have to be enforced by hand.\n","required":["id","partnerId","principalId","branchScopePath"],"properties":{"id":{"type":"string","format":"uuid"},"partnerId":{"x-ticvai-references":"control.partner","type":"string","format":"uuid","description":"The partner (control.partner) the user belongs to. **Resolves to control.partner**, not to control.partner_agreement as the naming convention guessed before the partner master existed (decided 29 September, writers pass; DM4)"},"principalId":{"type":"string","format":"uuid"},"role":{"type":"string","nullable":true,"description":"The partner role shown for the user: Partner Administrator, Booking Agent, Supervisor, Finance User, Reporting User or API Administrator (pack p.12). The permissions the role grants stay RBAC data in identity; this is the label listPartnerContactUser shows (decided 29 September, writers pass; DM4)"},"salesLocation":{"type":"string","nullable":true,"description":"The sales location (branch office or desk) the user sells from, shown on listPartnerContactUser (decided 29 September, writers pass; DM4)"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"Currency the user sells in, ISO 4217; empty means the agreement's settlementCurrency (decided 29 September, writers pass; DM4)"},"accountExpiresAt":{"type":"string","format":"date-time","nullable":true,"description":"When the user's account expires; empty for no expiry. An expired account cannot sign in and shows as `expired` on listPartnerContactUser (decided 29 September, writers pass; DM4)"},"branchScopePath":{"type":"string","description":"The branch this user sits on. **An ltree, like every other scope path**, so a report at agency level rolls up its branches without anybody writing a join.\n"},"allocationQuota":{"type":"integer","nullable":true,"description":"Units this branch may sell. **Null inherits the parent's**, and a quota set at branch level below the agency's is a deliberate restriction rather than an error.\n"},"creditLimitOverride":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"canManageUsers":{"type":"boolean","default":false,"description":"**Partner-managed access control** — 2.7.51 asks for it, and a venue administering every travel agent's staff list is a venue doing the agency's HR.\n"}}},
+"PartnerUser": {"type":"object","x-ticvai-persistence":"control.partner_user","description":"2.7.51, BL-075. **A partner was a flat account** — `registerPartner` created one and nothing created a user beneath it.\nThe requirement asks for Master Agency, Branch, Department and User with permissions, quotas and credit cascading down. **That is a scope tree, and `tenancy` already has one** — so this is a principal on a partner branch rather than a new hierarchy.\n**Quota and credit resolve the way configuration does: nearest ancestor wins.** A branch with no credit limit inherits the agency's, which is the behaviour a partner expects and would otherwise have to be enforced by hand.\n","required":["id","partnerId","principalId","branchScopePath"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"partnerId":{"x-ticvai-references":"control.partner","type":"string","format":"uuid","description":"The partner (control.partner) the user belongs to. **Resolves to control.partner**, not to control.partner_agreement as the naming convention guessed before the partner master existed (decided 29 September, writers pass; DM4)"},"principalId":{"type":"string","format":"uuid"},"role":{"type":"string","nullable":true,"description":"The partner role shown for the user: Partner Administrator, Booking Agent, Supervisor, Finance User, Reporting User or API Administrator (pack p.12). The permissions the role grants stay RBAC data in identity; this is the label listPartnerContactUser shows (decided 29 September, writers pass; DM4)"},"salesLocation":{"type":"string","nullable":true,"description":"The sales location (branch office or desk) the user sells from, shown on listPartnerContactUser (decided 29 September, writers pass; DM4)"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"Currency the user sells in, ISO 4217; empty means the agreement's settlementCurrency (decided 29 September, writers pass; DM4)"},"accountExpiresAt":{"type":"string","format":"date-time","nullable":true,"description":"When the user's account expires; empty for no expiry. An expired account cannot sign in and shows as `expired` on listPartnerContactUser (decided 29 September, writers pass; DM4)"},"branchScopePath":{"type":"string","description":"The branch this user sits on. **An ltree, like every other scope path**, so a report at agency level rolls up its branches without anybody writing a join.\n"},"allocationQuota":{"type":"integer","nullable":true,"description":"Units this branch may sell. **Null inherits the parent's**, and a quota set at branch level below the agency's is a deliberate restriction rather than an error.\n"},"creditLimitOverride":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"canManageUsers":{"type":"boolean","default":false,"description":"**Partner-managed access control** — 2.7.51 asks for it, and a venue administering every travel agent's staff list is a venue doing the agency's HR.\n"}}},
 "Session": {"type":"object","required":["sessionId","principalId","roleId","scope","effectivePermissions"],"properties":{"sessionId":{"type":"string","format":"uuid"},"principalId":{"type":"string","format":"uuid"},"roleId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"scope":{"type":"array","description":"Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n","items":{"$ref":"../shared/common.yaml#/components/schemas/ScopeRef"}},"effectivePermissions":{"allOf":[{"$ref":"../shared/permissions.yaml#/components/schemas/PermissionSet"}],"description":"Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"},"permissionsByScope":{"type":"array","description":"Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n","items":{"$ref":"../shared/permissions.yaml#/components/schemas/ScopedPermissions"}},"saleBoardId":{"type":"string","format":"uuid","description":"Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"},"workstation":{"$ref":"#/components/schemas/WorkstationContext"},"openedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"}}},
 "WorkstationContext": {"type":"object","required":["id","code","venueId","regionId"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"regionId":{"type":"string","format":"uuid"},"accessPointId":{"type":"string","format":"uuid","description":"Inherited from the workstation, never selected by the operator."},"devices":{"type":"array","items":{"type":"object","required":["kind","driver"],"properties":{"kind":{"type":"string","enum":["receiptPrinter","ticketPrinter","cashDrawer","barcodeScanner","rfidReader","paymentTerminal","customerDisplay"]},"driver":{"type":"string"},"identifier":{"type":"string"}}}},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"currencyScale":{"type":"integer","minimum":0,"maximum":4},"timezone":{"type":"string"},"cellName":{"type":"string","description":"The cell serving this workstation's region. One cell per tenant per region (ADR-0014). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"},"deploymentProfile":{"type":"string","enum":["terminalLocal","venueEdge","thin"],"description":"Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"},"pinLength":{"type":"integer","enum":[4,6,8],"readOnly":true,"description":"**The tenant's `PasswordPolicy.pinLength`, carried to the device** (14 October 2026, CHG-CRD-002, ADAM CR-078). A device door draws its PIN keypad, and its supervisor step-up prompt, at this many digits; the device keeps it with the workstation context of the last session on it, so the door needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the server decides. Read from `identity.password_policy`, not stored on the workstation."}}}
 }

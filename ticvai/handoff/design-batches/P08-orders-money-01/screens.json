@@ -5,11 +5,12 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/order-detail",
-   "component": "apps/venue-management-web/src/routes/venue-operations/OrderDetailDetail.tsx",
+   "component": "src/routes/venue-operations/OrderDetailDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -663,11 +664,12 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/refunds-exchanges",
-   "component": "apps/venue-management-web/src/routes/venue-operations/RefundsExchangesDetail.tsx",
+   "component": "src/routes/venue-operations/RefundsExchangesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -882,7 +884,10 @@
     "component": "confirmDialog",
     "trigger": "Void order",
     "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A refunds exchanges this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is the void reason list (`VoidReason`: guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other); **choosing Other makes `note` required** (decided 28 September, audit R125 (4), R222).",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+    "provenance": "contract orders.yaml POST /orders/{orderId}/voids",
+    "confirm": {
+     "operation": "voidOrder"
+    }
    },
    {
     "id": "formCreateRefund",
@@ -1267,11 +1272,12 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/payment-exceptions",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PaymentExceptionsDetail.tsx",
+   "component": "src/routes/venue-operations/PaymentExceptionsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1539,11 +1545,12 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "SETTLEMENT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/chargebacks-disputes",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ChargebacksDisputesDetail.tsx",
+   "component": "src/routes/venue-operations/ChargebacksDisputesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1851,11 +1858,12 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/group-bookings",
-   "component": "apps/venue-management-web/src/routes/venue-operations/GroupBookingsDetail.tsx",
+   "component": "src/routes/venue-operations/GroupBookingsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2587,11 +2595,12 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/reissue-media-replacement",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ReissueMediaReplacementDetail.tsx",
+   "component": "src/routes/venue-operations/ReissueMediaReplacementDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2685,14 +2694,16 @@
        "label": "Ticket reissues",
        "derived": true,
        "impliedBy": "listTicketReissueFulfillment",
-       "notes": "Carried from BO-320 (merged 28 September, audit R276) — tickets and media regenerated after an amendment, correction, loss or delivery failure. **Cursor pagination, never offset.**"
+       "notes": "Carried from BO-320 (merged 28 September, audit R276) — tickets and media regenerated after an amendment, correction, loss or delivery failure. **Cursor pagination, never offset.**",
+       "operation": "listTicketReissueFulfillment"
       },
       {
        "kind": "dataTable",
        "label": "Credential replacements",
        "derived": true,
        "impliedBy": "listCredentialReplacementReissue",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. Carried from BO-652 (merged 28 September, audit R276)."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. Carried from BO-652 (merged 28 September, audit R276).",
+       "operation": "listCredentialReplacementReissue"
       }
      ]
     }
@@ -2846,11 +2857,12 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "ORDER_REFUND_APPROVE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/refund-approval-queue",
-   "component": "apps/venue-management-web/src/routes/venue-operations/RefundApprovalQueueDetail.tsx",
+   "component": "src/routes/venue-operations/RefundApprovalQueueDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2989,11 +3001,12 @@
   "module": "Orders & Money",
   "requiresModule": "analytics",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/report-builder",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ReportBuilderDetail.tsx",
+   "component": "src/routes/venue-operations/ReportBuilderDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3389,11 +3402,12 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_WORKSTATION",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/shift-directory",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ShiftDirectoryDetail.tsx",
+   "component": "src/routes/venue-operations/ShiftDirectoryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3654,11 +3668,12 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_WORKSTATION",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/variance-approval",
-   "component": "apps/venue-management-web/src/routes/venue-operations/VarianceApprovalDetail.tsx",
+   "component": "src/routes/venue-operations/VarianceApprovalDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

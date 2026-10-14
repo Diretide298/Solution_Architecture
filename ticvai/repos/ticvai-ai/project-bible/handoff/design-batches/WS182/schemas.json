@@ -47,10 +47,12 @@
     "format": "uuid"
    },
    "fromProductId": {
+    "x-ticvai-references": "catalogue.product",
     "type": "string",
     "format": "uuid"
    },
    "toProductId": {
+    "x-ticvai-references": "catalogue.product",
     "type": "string",
     "format": "uuid"
    },
@@ -152,6 +154,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

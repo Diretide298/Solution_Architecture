@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/workforce-roster-command-center-bo-883",
-   "component": "apps/venue-management-web/src/routes/rentals/WorkforceRosterCommandCenter.tsx",
+   "component": "src/routes/rentals/WorkforceRosterCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -114,7 +115,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listRotaAssignments",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listRotaAssignments"
       }
      ]
     }
@@ -178,6 +180,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "4",
@@ -187,7 +190,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/attraction-operational-staffing-roster-bo-884",
-   "component": "apps/venue-management-web/src/routes/rentals/AttractionOperationalStaffingRoster.tsx",
+   "component": "src/routes/rentals/AttractionOperationalStaffingRoster.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -384,6 +387,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_MANAGE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "4",
@@ -393,7 +397,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/minimum-staffing-coverage-rule-configuration-bo-885",
-   "component": "apps/venue-management-web/src/routes/rentals/MinimumStaffingCoverageRuleConfiguration.tsx",
+   "component": "src/routes/rentals/MinimumStaffingCoverageRuleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -508,6 +512,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "4",
@@ -517,7 +522,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/staffing-gap-coverage-control-center-bo-886",
-   "component": "apps/venue-management-web/src/routes/rentals/StaffingGapCoverageControlCenter.tsx",
+   "component": "src/routes/rentals/StaffingGapCoverageControlCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -586,7 +591,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -710,6 +715,16 @@
    "workshopBoard": "wireframes/WS129 Resource Management Configuration Board 4.dc.html#bo-886"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 53. 0 of 0 labels bound to a contract property; 0 of 31 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Layout drafted 29 September (VM close-out)** from pack Resource_Management_Configuration_Reference.pdf p.53; pack Resource_Management_Configuration_Reference.pdf p.54; contract workforce.yaml GET /staffing-coverage. Pack labels with no schema field yet (shown as plain labels): Live operational gap, Checked-in (actual attendance), Gap type, Recommended employee, Match score.",
+  "entryState": {
+   "params": [
+    {
+     "name": "alertRuleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setAlertRule` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -739,6 +754,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "4",
@@ -748,7 +764,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/shift-marketplace-workforce-requests-bo-887",
-   "component": "apps/venue-management-web/src/routes/rentals/ShiftMarketplaceWorkforceRequests.tsx",
+   "component": "src/routes/rentals/ShiftMarketplaceWorkforceRequests.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -805,7 +821,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listOpenShifts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listOpenShifts"
       },
       {
        "kind": "dataTable",
@@ -877,6 +894,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "4",
@@ -886,7 +904,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/attendance-live-workforce-command-center-bo-888",
-   "component": "apps/venue-management-web/src/routes/rentals/AttendanceLiveWorkforceCommandCenter.tsx",
+   "component": "src/routes/rentals/AttendanceLiveWorkforceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -941,7 +959,7 @@
         "Planned vs Actual"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAttendance",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 55 §Display"
       }
      ]
@@ -1035,6 +1053,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ATTENDANCE_RECORD",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "4",
@@ -1044,7 +1063,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/staff-check-in-check-out-attendance-exceptions-bo-889",
-   "component": "apps/venue-management-web/src/routes/rentals/StaffCheckInCheckOutAttendanceExceptions.tsx",
+   "component": "src/routes/rentals/StaffCheckInCheckOutAttendanceExceptions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1265,6 +1284,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "4",
@@ -1274,7 +1294,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/workforce-compliance-validation-center-bo-890",
-   "component": "apps/venue-management-web/src/routes/rentals/WorkforceComplianceValidationCenter.tsx",
+   "component": "src/routes/rentals/WorkforceComplianceValidationCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1413,6 +1433,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "4",
@@ -1422,7 +1443,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/labor-cost-staffing-budget-control-bo-891",
-   "component": "apps/venue-management-web/src/routes/rentals/LaborCostStaffingBudgetControl.tsx",
+   "component": "src/routes/rentals/LaborCostStaffingBudgetControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1536,7 +1557,8 @@
         "Variance"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Cost Calculation”, “Managers shall understand”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 59 §Display"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 59 §Display",
+       "operation": "getLabourCost"
       }
      ]
     },
@@ -1595,6 +1617,14 @@
     "Forecast",
     "Actual",
     "Variance"
+   ],
+   "params": [
+    {
+     "name": "labourBudgetId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listLabourBudgets`."
+    }
    ]
   },
   "wireframe": {
@@ -1657,6 +1687,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "4",
@@ -1666,7 +1697,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/ai-workforce-planner-roster-optimization-bo-892",
-   "component": "apps/venue-management-web/src/routes/rentals/AiWorkforcePlannerRosterOptimization.tsx",
+   "component": "src/routes/rentals/AiWorkforcePlannerRosterOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1739,7 +1770,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {

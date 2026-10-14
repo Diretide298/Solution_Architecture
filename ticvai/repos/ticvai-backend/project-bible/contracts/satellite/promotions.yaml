@@ -73,6 +73,102 @@ tags:
 - name: allocation
 - name: upsell
 - name: evaluation
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  bundleRecords:
+    module: promotions
+    table: promotions.bundle
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The promotions.bundle rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Bundle'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its promotions.bundle rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
+  couponCampaignRecords:
+    module: promotions
+    table: promotions.coupon_campaign
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The promotions.coupon_campaign rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/CouponCampaign'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its promotions.coupon_campaign rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked in process within commerce, through the C# query interface Catalogue implements.
+    served: [in-process]
+  couponCodeRecords:
+    module: promotions
+    table: promotions.coupon_code
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The promotions.coupon_code rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/CouponCode'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its promotions.coupon_code rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements.
+    served: [in-process]
+  promotionRecords:
+    module: promotions
+    table: promotions.promotion
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The promotions.promotion rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Promotion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its promotions.promotion rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements, and asked from another
+      deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  voucherRecords:
+    module: promotions
+    table: promotions.voucher
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The promotions.voucher rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Voucher'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its promotions.voucher rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Catalogue implements.
+    served: [in-process]
 paths:
   /promotions/{promotionId}/simulate:
     parameters:
@@ -88,6 +184,13 @@ paths:
         - "P08 ADM-157 Rule Test, Simulation & AI Recommendation Workspace"
         - "P08 ADM-177 Offer Simulation, Basket Trace & AI Optimization"
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: What this promotion would have cost on real history
       description: 'BL-114. **A promotion is priced by guessing until it runs.** Run it against a past
         period and the answer is arithmetic: how many orders would have qualified, what the discount would
@@ -220,6 +323,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/PromotionVariant'
         '400':
+          x-ticvai-problem-types: [traffic-percent-not-100]
           description: The variants' `trafficPercent` values do not sum to 100 (audit R101)
           content:
             application/problem+json:
@@ -230,6 +334,13 @@ paths:
   /recommendations:
     post:
       operationId: getRecommendations
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: orders#cartRecords
+        route: in-process
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -369,6 +480,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Voucher'
+        '409':
+          description: 'The voucher is already `voided` (`voucher-already-voided`), or is `redeemed` or `expired` with nothing left to void (`voucher-transition-not-allowed`). Nothing changes.'
+          x-ticvai-problem-types: [voucher-already-voided, voucher-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /promotions:
@@ -402,6 +520,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets live, published
         promotions, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `PRICE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.
       tags:
       - promotion
       x-ticvai-permission: PRICE_VIEW
@@ -641,6 +761,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Promotion'
         '409':
+          x-ticvai-problem-types: [live-promotion-terms-locked]
           description: Conditions or discount amended on a live promotion
           content:
             application/problem+json:
@@ -699,6 +820,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [promotion-not-live]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -758,6 +880,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [promotion-not-live-or-paused]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -804,6 +927,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [promotion-not-scheduled]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -824,6 +948,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-141 Promotion Lifecycle & Status Manager"
         - "P08 BO-010 Promotions & Coupons"
+      x-ticvai-names-for-context: [promotions.promotion_conflict]
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -974,7 +1099,9 @@ paths:
       description: 'A campaign is the master definition. Individual codes are generated from it and carry
         their own redemption state.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - coupon
       x-ticvai-permission: PRICE_VIEW
@@ -1036,6 +1163,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CouponCampaign'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /coupon-campaigns/{campaignId}/codes:
@@ -1052,6 +1181,7 @@ paths:
         - "P08 ADM-158 Coupon & Promo Code Command Center"
         - "P08 ADM-164 Code Distribution & Assignment Manager"
         - "P08 BO-010 Promotions & Coupons"
+      description: '**Order.** Soonest first, by `validFrom` ascending, then by `assignedSubjectId`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1155,6 +1285,7 @@ paths:
                     format: uuid
       responses:
         '400':
+          x-ticvai-problem-types: [assignees-exceed-quantity]
           description: More guests in `assignToSubjectIds` than `quantity` codes (audit R101)
           content:
             application/problem+json:
@@ -1325,6 +1456,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [coupon-code-not-issued]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -1385,6 +1517,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CouponCode'
         '409':
+          x-ticvai-problem-types: [coupon-already-redeemed]
           description: Already redeemed. A redeemed code cannot be voided
           content:
             application/problem+json:
@@ -1404,7 +1537,9 @@ paths:
       description: 'Vouchers carry monetary value and are sold or issued. Distinct from coupons, which
         modify the price of something else.
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - voucher
       x-ticvai-permission: PRICE_VIEW
@@ -1516,6 +1651,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Voucher'
         '409':
+          x-ticvai-problem-types: [voucher-expired, voucher-fully-redeemed, redemption-exceeds-balance]
           description: Expired, already fully redeemed, or amount exceeds the balance
           content:
             application/problem+json:
@@ -1526,6 +1662,7 @@ paths:
   /bundles:
     get:
       operationId: listBundles
+      description: '**Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1563,6 +1700,10 @@ paths:
       operationId: createBundle
       x-ticvai-consumed-by:
         - "P08 BO-011 Packages & Bundles"
+      x-ticvai-read-via:
+      - query: fnb#menuItemRecords
+        route: service
+        for: 'its read of fnb.menu_item, F&B''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Create a bundle
@@ -1613,6 +1754,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Bundle'
         '422':
+          x-ticvai-problem-types: [menu-item-id-missing, menu-item-variant-not-sold]
           description: A `fnbMenuItem` component with no `menuItemId`, or whose menu item does not sell the
             component's `variantId` (MOB-4, 29 September).
           content:
@@ -1620,6 +1762,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '400':
+          x-ticvai-problem-types: [allocation-not-100-percent, fixed-allocation-not-bundle-price]
           description: 'Allocation does not sum to 100 per cent, or fixed amounts do not sum to the bundle
             price.
 
@@ -1628,6 +1771,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /bundles/{bundleId}:
@@ -1745,6 +1890,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Bundle'
         '400':
+          x-ticvai-problem-types: [fixed-allocation-mismatch]
           description: The bundle's allocation is `fixedAmount` and the new price no longer equals the
             sum of the fixed amounts.
           content:
@@ -1763,7 +1909,9 @@ paths:
       description: 'How a bundled price divides across components. Consumed by the ledger at posting and
         at recognition.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - allocation
       x-ticvai-permission: LEDGER_VIEW
@@ -1846,6 +1994,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AllocationPreview'
         '400':
+          x-ticvai-problem-types: [weights-sum-to-zero, fixed-amounts-not-total]
           description: Weights sum to zero, or fixed amounts do not sum to the total
           content:
             application/problem+json:
@@ -1866,7 +2015,9 @@ paths:
       description: 'Read at venue: a venue sees the rules of the region above it. Rules are owned at region
         (decided 28 September, audit R183).
 
-        '
+        
+
+        **Order.** Sorted by `priority` ascending, then by `id`.'
       tags:
       - upsell
       x-ticvai-permission: PRODUCT_VIEW
@@ -2128,6 +2279,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-139 Promotion & Campaign Directory"
         - "P08 ADM-229 Campaign & Promotion Performance Explorer"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.8; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (19 filters to query parameters; 12 non-field properties removed)'
@@ -2530,6 +2685,16 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-146 Promotion Health & Performance Monitor"
         - "P08 ADM-228 Promotion Performance Command Center"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -2811,6 +2976,13 @@ paths:
       operationId: listCustomerMembershipSegment
       x-ticvai-consumed-by:
         - "P08 ADM-153 Customer, Membership & Segment Discount Rules"
+      x-ticvai-read-via:
+      - query: marketing-crm#programmeTierRecords
+        route: service
+        for: 'its read of marketing.programme_tier, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -2982,6 +3154,8 @@ paths:
   /rule-test-recommendation:
     put:
       operationId: setRuleTestRecommendation
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.32; MoM 14 Aug (phase-one AI is a configuration assistant); shape fixed (26 non-field properties removed; added appliedRules, rejectedRules, discount, finalAmount, marginImpact, aiRecommendation)'
@@ -3124,6 +3298,10 @@ paths:
       operationId: listUsageCapacityFrequency
       x-ticvai-consumed-by:
         - "P08 ADM-162 Usage, Capacity & Frequency Control"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -3213,6 +3391,8 @@ paths:
       operationId: setCodeDistributionManager
       x-ticvai-consumed-by:
         - "P08 ADM-164 Code Distribution & Assignment Manager"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per code batch, the one the body''s `batchId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.42; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 non-field properties removed; enums assigneeType; added batchId, partner)'
@@ -3264,6 +3444,16 @@ paths:
       operationId: listRedemptionCodeLookup
       x-ticvai-consumed-by:
         - "P08 ADM-165 Redemption Monitor & Code Lookup"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.43; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (9 filters to query parameters; 21 non-field properties removed; added validationResult)'
@@ -3364,6 +3554,10 @@ paths:
       operationId: listCodeSecurityFraud
       x-ticvai-consumed-by:
         - "P08 ADM-166 Code Security, Fraud & Exception Center"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -3412,6 +3606,13 @@ paths:
       operationId: listRedemption
       x-ticvai-consumed-by:
         - "P08 ADM-167 Redemption Analytics, Audit & AI Optimization"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.45; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (10 non-field properties removed; enums auditEvent)'
@@ -3505,6 +3706,10 @@ paths:
       operationId: listAdvancedOffer
       x-ticvai-consumed-by:
         - "P08 ADM-168 Advanced Offer Command Center"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.50; MoM 7 Aug 17 and MoM 1 Sep 4.7 (automatic rule-based offers such as buy-2-get-1, BOGO); shape fixed (4 filters to query parameters)'
@@ -3850,6 +4055,16 @@ paths:
       operationId: listBundleCombo
       x-ticvai-consumed-by:
         - "P08 ADM-178 Bundle & Combo Command Center"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.63; MoM 10 Aug 4.10 (predefined and dynamically built packages); shape fixed (6 filters to query parameters)'
@@ -4206,6 +4421,8 @@ paths:
       operationId: simulateBundlePreviewRecommendation
       x-ticvai-consumed-by:
         - "P08 ADM-187 Bundle Preview, Simulation & AI Recommendation"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per bundle, the one the body''s `bundleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.73; MoM 14 Aug (AI advisory in phase one); shape fixed (rewritten from the pack page)'
@@ -4258,6 +4475,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-188 Dynamic Bundle Operations Command Center"
         - "P08 ADM-197 Dynamic Bundle Simulation & AI Optimization"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -4611,6 +4832,13 @@ paths:
       operationId: listBundleAvailabilityForecast
       x-ticvai-consumed-by:
         - "P08 ADM-196 Bundle Availability Forecast, Alerts & Recovery"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -4697,6 +4925,16 @@ paths:
       operationId: listTargetingEligibility
       x-ticvai-consumed-by:
         - "P08 ADM-198 Targeting & Eligibility Command Center"
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.94; MoM 20 Aug (offers are pre-configured and system-validated); shape fixed (6 filters to query parameters; enums ruleHealth)'
@@ -4825,6 +5063,13 @@ paths:
       operationId: listCrmCustomerSegment
       x-ticvai-consumed-by:
         - "P08 ADM-200 CRM & Customer Segment Manager"
+      x-ticvai-read-via:
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -4870,6 +5115,13 @@ paths:
       operationId: listMembershipLoyaltyGuest
       x-ticvai-consumed-by:
         - "P08 ADM-201 Membership, Loyalty & Guest Eligibility"
+      x-ticvai-read-via:
+      - query: marketing-crm#loyaltyPositionRecords
+        route: service
+        for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#programmeTierRecords
+        route: service
+        for: 'its read of marketing.programme_tier, Marketing''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -4915,6 +5167,22 @@ paths:
       operationId: listBehavioralTransactionTargeting
       x-ticvai-consumed-by:
         - "P08 ADM-202 Behavioral & Transaction Targeting"
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: orders#cartRecords
+        route: in-process
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5042,6 +5310,19 @@ paths:
       operationId: listAudiencePreviewReach
       x-ticvai-consumed-by:
         - "P08 ADM-205 Audience Preview, Reach & Eligibility Simulator"
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5086,6 +5367,10 @@ paths:
       operationId: listTargetingConflictFrequency
       x-ticvai-consumed-by:
         - "P08 ADM-206 Targeting Conflict, Frequency & Exclusion Controls"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5130,6 +5415,19 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-207 AI Audience Discovery & Targeting Optimization"
         - "P08 BO-761 AI Audience Discovery"
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5180,6 +5478,10 @@ paths:
       operationId: listStackingConflict
       x-ticvai-consumed-by:
         - "P08 ADM-208 Stacking & Conflict Command Center"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5266,6 +5568,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-148 Promotion Rule Builder"
         - "P08 ADM-210 Promotion Stacking Rule Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.111; MoM 1 Sep 4.4; shape fixed (4 non-field properties removed; enums scope; added stackingModel, maximumPromotions, promotionTypeA, promotionTypeB, canStack)'
@@ -5539,6 +5843,16 @@ paths:
       operationId: listPromotionDecisionTrace
       x-ticvai-consumed-by:
         - "P08 ADM-216 Promotion Decision Trace & Transaction Explainer"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5629,6 +5943,13 @@ paths:
       operationId: listCampaignGovernanceBudget
       x-ticvai-consumed-by:
         - "P08 ADM-218 Campaign Governance & Budget Command Center"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5675,6 +5996,8 @@ paths:
       operationId: setCampaignBudgetFinancial
       x-ticvai-consumed-by:
         - "P08 ADM-219 Campaign Budget & Financial Limit Setup"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.126; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -5768,6 +6091,10 @@ paths:
       operationId: listBudgetConsumptionForecast
       x-ticvai-consumed-by:
         - "P08 ADM-221 Budget Consumption & Forecast Monitor"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5856,6 +6183,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-223 Campaign Approval Workflow Designer"
         - "P08 BO-770 Campaign Approval Workflow"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.131; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (1 non-field properties removed)'
@@ -5957,6 +6286,13 @@ paths:
       operationId: listCampaignFinancialCommercial
       x-ticvai-consumed-by:
         - "P08 ADM-225 Campaign Financial & Commercial Simulator"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6000,6 +6336,13 @@ paths:
       operationId: listCampaignExperimentTest
       x-ticvai-consumed-by:
         - "P08 ADM-226 Campaign Experiment & A/B Test Manager"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6090,6 +6433,16 @@ paths:
         - "P08 ADM-146 Promotion Health & Performance Monitor"
         - "P08 ADM-228 Promotion Performance Command Center"
         - "P08 ADM-229 Campaign & Promotion Performance Explorer"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.142; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (13 filters to query parameters; 14 non-field properties removed)'
@@ -6216,6 +6569,16 @@ paths:
         - "P08 ADM-139 Promotion & Campaign Directory"
         - "P08 ADM-228 Promotion Performance Command Center"
         - "P08 ADM-229 Campaign & Promotion Performance Explorer"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6261,6 +6624,16 @@ paths:
       operationId: listRedemptionConversionFunnel
       x-ticvai-consumed-by:
         - "P08 ADM-230 Redemption, Conversion & Funnel Analytics"
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: in-process
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.144; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape agreed as drafted'
@@ -6352,6 +6725,16 @@ paths:
       operationId: listDiscountMarginProfitability
       x-ticvai-consumed-by:
         - "P08 ADM-231 Discount, Margin & Profitability Analytics"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6397,6 +6780,16 @@ paths:
       operationId: listBundleBogoAdvanced
       x-ticvai-consumed-by:
         - "P08 ADM-232 Bundle, BOGO & Advanced Offer Analytics"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6443,6 +6836,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-233 Upsell, Cross-Sell & Attach-Rate Analytics"
         - "P08 ADM-659 Cross-Sell Command Center"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6487,6 +6887,22 @@ paths:
       operationId: listCustomerSegmentChannel
       x-ticvai-consumed-by:
         - "P08 ADM-234 Customer, Segment, Channel & Partner Analytics"
+      x-ticvai-read-via:
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6532,6 +6948,16 @@ paths:
       operationId: listIncrementalityAttributionCannibalization
       x-ticvai-consumed-by:
         - "P08 ADM-235 Incrementality, Attribution & Cannibalization Analysis"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6578,6 +7004,13 @@ paths:
       operationId: listNextBestAction
       x-ticvai-consumed-by:
         - "P08 ADM-236 AI Optimization & Next-Best-Action Center"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6627,6 +7060,16 @@ paths:
       operationId: listExecutivePromotionReporting
       x-ticvai-consumed-by:
         - "P08 ADM-237 Executive Promotion Intelligence & Reporting Studio"
+      x-ticvai-read-via:
+      - query: orders#discountRecords
+        route: in-process
+        for: 'its read of orders.discount, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack Promotions___Bundles_Management_Reference.pdf p.151; no promotions minutes on file (the 3 September walkthrough was not minuted), so our build plan; shape fixed (6 filters to query parameters; 35 non-field properties removed; added campaign, revenue, attentionReason)'
@@ -6829,6 +7272,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationStrategy'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-strategies/{strategyId}:
@@ -6900,6 +7345,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationStrategy'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /product-relationships:
@@ -6960,6 +7407,8 @@ paths:
         - "P08 ADM-660 Cross-Sell Relationship Builder"
         - "P08 ADM-663 Cross-Category Recommendation Manager"
         - "P08 ADM-664 Multi-Attraction, Destination & Partner Cross-Sell"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: Declare what upgrades to, pairs with or replaces what
       description: '**Publishes `promotions.recommendationStrategyPublished`** (29 September, AI system
         design 2.2 A and 5.4) through `platform.outbox` in the same transaction as the write, on every
@@ -7009,6 +7458,13 @@ paths:
         - "P08 ADM-661 Product Affinity Matrix & Relationship Map"
         - "P08 ADM-662 Frequently Bought Together & Basket Pattern Engine"
         - "P08 ADM-667 AI Cross-Sell Discovery, Scoring & Ranking Engine"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: What is actually bought together
       description: 'Upsell boards 3.3 and 3.4. **Measured from baskets, not declared.** *Frequently bought
         together* is a fact about what happened, and a merchandiser''s intuition about what should pair
@@ -7200,6 +7656,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RecommendationExperiment'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /recommendation-experiments/{experimentId}/conclude:
@@ -7251,12 +7709,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/RecommendationExperiment'
         '400':
+          x-ticvai-problem-types: [winning-variant-not-in-experiment]
           description: '`winningVariant` does not name one of the experiment''s own variants.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [experiment-not-running]
           description: The experiment is not `running`. A draft never ran, and a concluded or abandoned
             experiment already has its outcome.
           content:
@@ -7280,6 +7740,10 @@ paths:
         - "P08 ADM-690 Recommendation Strategy & Placement Analytics"
         - "P08 ADM-693 Recommendation Attribution & Incrementality Analytics"
         - "P08 ADM-694 AI Model Performance & Drift Monitor"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       summary: Impressions, acceptance, revenue and incremental lift
       description: 'Upsell boards 6.1, 6.2 and 6.5. **Attributed revenue and incremental revenue are
         reported apart**, because the first flatters and the second is true. A strategy that shows an
@@ -7332,6 +7796,8 @@ paths:
         - "P08 ADM-645 Recommendation Priority, Ranking & Suppression Manager17"
         - "P08 ADM-677 Contextual Trigger, Frequency & Experience Controls"
         - "P08 ADM-685 Customer Preference, Fatigue & Suppression Intelligence"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Fatigue limits, frequency caps and hard exclusions
       description: 'Upsell boards 1.7 and 5.7. **Fatigue is the reason a good recommender stops working.**
         A guest offered the same parking upsell at every touchpoint for three visits has learned to
@@ -7457,7 +7923,9 @@ paths:
         budget are not in these rows; the governance and budget screens work them out on read.
         (decided 29 September, writers pass)
 
-        '
+        
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.'
       tags:
       - promotion
       x-ticvai-permission: PRICE_VIEW
@@ -7552,12 +8020,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/CommercialCampaign'
         '400':
+          x-ticvai-problem-types: [invalid-window]
           description: '`validTo` at or before `validFrom`.'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: '`code` is already used by another campaign at the venue.'
           content:
             application/problem+json:
@@ -7648,6 +8118,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CommercialCampaign'
         '400':
+          x-ticvai-problem-types: [campaign-ends-before-start]
           description: '`validTo` at or before `validFrom`.'
           content:
             application/problem+json:
@@ -7656,6 +8127,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [duplicate-code, campaign-dates-strand-items]
           description: The new code is already used at the venue, or the new dates would leave a scheduled
             or live promotion, coupon campaign or active bundle of the campaign outside them. The response
             names each one.
@@ -7688,7 +8160,9 @@ paths:
         partner where it differs. The live figures (reserved, remaining) are the catalogue''s and are
         shown by listCapacityPoolReservation and listBundleAvailabilityChannel, not here.
 
-        '
+        
+
+        **Order.** Sorted by `channel` ascending, then by `id`.'
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW
@@ -7786,6 +8260,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [duplicate-policy-scope, default-policy-missing, policy-of-other-bundle]
           description: Two rows share a (channel, venueId, partnerId), there is no default row, or an `id`
             names a policy of another bundle.
           content:
@@ -7815,7 +8290,9 @@ paths:
         stands for which partner product, on what price, commission and terms, and the last connection
         reading the partner sync job wrote. The cross-bundle monitor is listPartnerExternalProduct.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - bundle
       x-ticvai-permission: PRODUCT_VIEW
@@ -7914,6 +8391,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [component-not-in-bundle, component-mapped-twice, mapping-of-other-bundle]
           description: A `bundleComponentId` is not a component of this bundle, two rows map the same
             component, or an `id` names a mapping of another bundle.
           content:
@@ -7983,6 +8461,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -8112,9 +8591,11 @@ components:
           type: string
           format: uuid
         fromProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         toProductId:
+          x-ticvai-references: catalogue.product
           type: string
           format: uuid
         kind:
@@ -8367,6 +8848,12 @@ components:
           description: '**The control group.** Without it there is attribution and no incrementality.'
         scopePath:
           type: string
+        recordedAt:
+          type: string
+          format: date-time
+          description: '**When the device made the write** (R113; CHG-OFL-003). `recordRecommendationOutcome` is offline-capable, so
+            the client sets this from its own clock and keeps it on replay; `created_at` is when the server
+            heard of it. Omitted online, the server sets it to the time it received the call.'
     RecommendationExperiment:
       type: object
       x-ticvai-persistence: promotions.recommendation_experiment
@@ -8379,6 +8866,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -8386,6 +8874,8 @@ components:
           type: string
           nullable: true
         variants:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -8472,6 +8962,8 @@ components:
           type: integer
           nullable: true
         hardExclusions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -8837,6 +9329,7 @@ components:
               the audit history (`promotions.promotion_audit`) and the channel publication monitor
               (`promotions.promotion_channel_publication`) name. (DM5, 29 September: data model for the agreed operations)'
     PromotionVariant:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listCampaignExperimentTest, listCampaignFinancialCommercial, listGovernanceRiskLaunch, listIncrementalityAttributionCannibalization and others
       x-ticvai-persistence: promotions.promotion_variant
       type: object
       description: 'One arm of a promotion A/B test (BL-114), written by `setPromotionVariants`. **Stored
@@ -8847,7 +9340,12 @@ components:
       required:
       - label
       - trafficPercent
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -8889,9 +9387,11 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
           maxLength: 64
           nullable: true
@@ -9055,6 +9555,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         promotionId:
@@ -9240,6 +9741,7 @@ components:
             format: uuid
             readOnly: true
           venueId:
+            x-ticvai-references: platform.scope
             type: string
             format: uuid
     PromotionConflict:
@@ -9264,6 +9766,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         conflictType:
@@ -9327,9 +9830,11 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
           description: The order (`orders.sales_order`) in the order service.
@@ -9400,6 +9905,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         promotionId:
@@ -9515,6 +10021,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         entityType:
@@ -9612,6 +10119,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         promotionId:
@@ -9816,6 +10324,7 @@ components:
       - validFrom
       properties:
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
@@ -9888,6 +10397,7 @@ components:
           readOnly: true
           description: The `batchId` that `generateCouponCodes` returned.
         campaignId:
+          x-ticvai-references: promotions.campaign
           type: string
           format: uuid
         quantity:
@@ -10233,6 +10743,7 @@ components:
                 format: uuid
                 readOnly: true
               variantId:
+                x-ticvai-references: catalogue.variant
                 type: string
                 format: uuid
               quantity:
@@ -10271,6 +10782,7 @@ components:
 
             '
         variantId:
+          x-ticvai-references: catalogue.variant
           type: string
           format: uuid
         componentKind:
@@ -10368,6 +10880,7 @@ components:
 
             '
         variantId:
+          x-ticvai-references: catalogue.variant
           type: string
           format: uuid
         percentage:
@@ -10474,6 +10987,7 @@ components:
       - allocation
       properties:
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
@@ -10609,12 +11123,14 @@ components:
           format: uuid
           readOnly: true
         bundleComponentId:
+          x-ticvai-references: promotions.bundle_component
           type: string
           format: uuid
         partnerId:
           type: string
           format: uuid
         externalProductId:
+          x-ticvai-references: none
           type: string
           maxLength: 128
         productName:
@@ -10690,6 +11206,7 @@ components:
           format: uuid
           readOnly: true
         bundleId:
+          x-ticvai-references: promotions.bundle
           type: string
           format: uuid
         channel:
@@ -10766,6 +11283,7 @@ components:
       - suggestedVariantIds
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         regionId:

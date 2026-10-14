@@ -8,10 +8,11 @@
 | Runtime | reactNative |
 | App | guest-app |
 | Repository | P02 ticvai-guest-app |
+| Repository layout | P02 ticvai-guest-app: React Native CLI, one app at the repository root; Redux Toolkit, React Navigation; workspace: none; shared packages: none; package manager npm; screens in `src/screens/<area>/<Component>.tsx` (assumed); scripts: typecheck none; the rest as its package.json says (observed 2026-10-14 by the developer's agent on #27741 (AM-IDENTITY-SECURITY-P02), in its own clone; relayed by the lead (assumed: the screens folder); owner confirms) |
 | Offline | yes |
 | Themes | light |
 | Directions | ltr, rtl |
-| Packages | design-tokens, ui, api-client, offline-core |
+| Packages |  |
 | target | iOS / Android native |
 | distribution | App Store + Play, tenant developer account |
 | bundleUpdate | over-the-air for JS; store release for native |
@@ -25,7 +26,7 @@
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
-| [GST-001](#gst-001-home) | Home | Discovery & Browse | 1 | 12 |
+| [GST-001](#gst-001-home) | Home | Discovery & Browse | 1 | 9 |
 | [GST-002](#gst-002-explore) | Explore | Discovery & Browse | 1 | 3 |
 | [GST-003](#gst-003-buy-tickets) | Buy Tickets | Discovery & Browse | 1 | 5 |
 | [GST-004](#gst-004-item-detail) | Item Detail | Discovery & Browse | 1 | 7 |
@@ -35,11 +36,11 @@
 | [GST-008](#gst-008-tickets-add-ons) | Tickets & Add-ons | Booking & Selection | 1 | 6 |
 | [GST-009](#gst-009-review-payment) | Review & Payment | Cart & Checkout | 1 | 8 |
 | [GST-010](#gst-010-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 5 |
-| [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 1 | 8 |
-| [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 6 |
-| [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 5 |
+| [GST-011](#gst-011-wallet-overview) | Wallet Overview | Membership, Loyalty & Value | 1 | 6 |
+| [GST-012](#gst-012-my-tickets) | My Tickets | Account & Self-Service | 1 | 7 |
+| [GST-013](#gst-013-ticket-details) | Ticket Details | Account & Self-Service | 1 | 6 |
 | [GST-014](#gst-014-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 3 |
-| [GST-015](#gst-015-memberships) | Memberships | Membership, Loyalty & Value | 1 | 10 |
+| [GST-015](#gst-015-memberships) | Memberships | Membership, Loyalty & Value | 1 | 8 |
 | [GST-016](#gst-016-my-reservations) | My Reservations | Ticketing | 1 | 3 |
 | [GST-017](#gst-017-reservation-details) | Reservation Details | Ticketing | 1 | 2 |
 | [GST-018](#gst-018-add-to-calendar-reminders) | Add to Calendar / Reminders | Account & Self-Service | 1 | 5 |
@@ -56,16 +57,16 @@
 | [GST-029](#gst-029-venue-info-services) | Venue Info & Services | In-venue Services | 1 | 3 |
 | [GST-030](#gst-030-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 1 | 2 |
 | [GST-031](#gst-031-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 1 | 9 |
-| [GST-032](#gst-032-ai-concierge-chat) | AI Concierge – Chat | Engagement & Support | 1 | 10 |
+| [GST-032](#gst-032-ai-concierge-chat) | AI Concierge – Chat | Engagement & Support | 1 | 9 |
 | [GST-033](#gst-033-ai-concierge-contextual-help) | AI Concierge – Contextual Help | Engagement & Support | 1 | 5 |
 | [GST-034](#gst-034-lost-found) | Lost & Found | Support | 1 | 4 |
 | [GST-035](#gst-035-feedback-ratings) | Feedback & Ratings | Engagement & Support | 1 | 5 |
-| [GST-036](#gst-036-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 1 | 11 |
+| [GST-036](#gst-036-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 1 | 9 |
 | [GST-037](#gst-037-offers-promotions) | Offers & Promotions | Promotions | 1 | 3 |
 | [GST-038](#gst-038-at-the-venue) | At the Venue | In-venue Services | 1 | 3 |
 | [GST-039](#gst-039-profile) | Profile | Account & Self-Service | 1 | 5 |
 | [GST-040](#gst-040-help-support) | Help & Support | Engagement & Support | 1 | 7 |
-| [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 12 |
+| [GST-041](#gst-041-checkout-entry) | Checkout Entry | Cart & Checkout | 1 | 13 |
 | [GST-042](#gst-042-simple-registration-otp) | Simple Registration & OTP | Account & Self-Service | 1 | 13 |
 | [GST-043](#gst-043-arabic-rtl-experience) | Arabic / RTL Experience | System States | 1 | 1 |
 | [GST-044](#gst-044-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
@@ -75,9 +76,9 @@
 | [GST-048](#gst-048-upsell-cross-sell) | Upsell / Cross-Sell | Booking & Selection | 1 | 4 |
 | [GST-049](#gst-049-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 5 |
 | [GST-050](#gst-050-resource-booking-cabana) | Resource Booking – Cabana | Booking & Selection | 1 | 3 |
-| [GST-051](#gst-051-plan) | Plan | Engagement & Support | 1 | 4 |
+| [GST-051](#gst-051-plan) | Plan | Engagement & Support | 1 | 3 |
 | [GST-052](#gst-052-suggested-itineraries) | Suggested Itineraries | Engagement & Support | 1 | 3 |
-| [GST-053](#gst-053-your-plan) | Your Plan | Engagement & Support | 1 | 7 |
+| [GST-053](#gst-053-your-plan) | Your Plan | Engagement & Support | 1 | 5 |
 | [GST-054](#gst-054-ai-planner) | AI Planner | Engagement & Support | 1 | 6 |
 | [GST-055](#gst-055-dynamic-qr-ticket) | Dynamic QR Ticket | Account & Self-Service | 1 | 4 |
 | [GST-056](#gst-056-bundle-package) | Bundle Package | Booking & Selection | 1 | 2 |
@@ -88,18 +89,18 @@
 | [GST-062](#gst-062-shop-drop-collection) | Shop & Drop Collection | In-Venue Experience | 1 | 2 |
 | [GST-063](#gst-063-explore-search-results) | Explore – Search Results | Discovery | 1 | 1 |
 | [GST-065](#gst-065-newsletter-preferences) | Newsletter & Preferences | Marketing | 1 | 5 |
-| [GST-066](#gst-066-privacy-my-data) | Privacy & My Data | Account & Self-Service | 1 | 9 |
+| [GST-066](#gst-066-privacy-my-data) | Privacy & My Data | Account & Self-Service | 1 | 5 |
 | [GST-067](#gst-067-refunds-resale) | Refunds & Resale | Account & Self-Service | 1 | 3 |
 | [GST-068](#gst-068-help-my-cases) | Help & My Cases | Engagement & Support | 1 | 4 |
 | [GST-069](#gst-069-face-pass) | Face Pass | Account & Self-Service | 1 | 5 |
 | [GST-070](#gst-070-reserve-a-table) | Reserve a Table | In-venue Services | 1 | 7 |
 | [GST-071](#gst-071-payment-methods) | Payment Methods | Account & Self-Service | 1 | 8 |
 | [GST-072](#gst-072-share-group-booking) | Share & Group Booking | Booking & Selection | 1 | 6 |
-| [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 1 | 12 |
+| [GST-073](#gst-073-security-sign-in) | Security & Sign-in | Account & Self-Service | 1 | 9 |
 | [GST-074](#gst-074-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 1 | 8 |
 | [GST-075](#gst-075-book-a-space-by-the-hour) | Book a Space by the Hour | Booking & Selection | 1 | 4 |
 | [GST-076](#gst-076-intercity-trip-route-schedule) | Intercity Trip — Route & Schedule | Transport | 1 | 4 |
-| [GST-077](#gst-077-intercity-trip-route-passengers) | Intercity Trip — Route & Passengers | Transport | 1 | 7 |
+| [GST-077](#gst-077-intercity-trip-route-passengers) | Intercity Trip — Route & Passengers | Transport | 1 | 6 |
 | [GST-078](#gst-078-intercity-trip-multi-trip-passes) | Intercity Trip — Multi-trip Passes | Transport | 1 | 3 |
 | [GST-079](#gst-079-intercity-trip-favourite-routes) | Intercity Trip — Favourite Routes | Transport | 1 | 2 |
 
@@ -115,7 +116,7 @@
 | Route | `/general/home-default` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `HomeDefaultDashboard` |
-| Suggested location | `src/routes/general/HomeDefaultDashboard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/HomeDefaultDashboard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -133,11 +134,8 @@
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | Every ticket, pass and membership this guest holds; on a visit day, the ticket's venue is suggested (decided 28 September, audit R267) | `ORDER_VIEW` |
 | `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name | `None` |
 | `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | onLoad | The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display settings and languages, read before anyone signs in (GFIX-1)  Also the analytics providers to start once their consent category is granted, from the published config (listAnalyticsProviders needs TENANT_CONFIGURE and left the guest screens: decided by Chinmay, 3 October 2026 (CHG-SPF-007)). | `None` |
-| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Tracking consent prompt on first launch and the SDK gate | `None` |
-| `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Accept, reject or customise tracking on first launch | `None` |
-| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
-| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
-| `recordStorefrontSessionEvents` | [WhiteLabelService](../backend/WhiteLabelService.md#recordstorefrontsessionevents) | onLoad | App-shell beacon of hashed browsing behaviour for fraud prevention | `None` |
+| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | background | Read by the app shell, not a control: which tracking categories this device has granted, so SDKs and the tag loader start only for those (none until granted) | `None` |
+| `recordStorefrontSessionEvents` | [WhiteLabelService](../backend/WhiteLabelService.md#recordstorefrontsessionevents) | background | App-shell beacon of hashed browsing behaviour for fraud prevention | `None` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | One or two highlights per type (rides, dining, events, shops) for the Home sections (MOB-3) | `PRODUCT_VIEW` |
 | `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | The type tiles on Home (rides, dining, events, shops) | `PRODUCT_VIEW` |
 
@@ -187,7 +185,7 @@
 | GST-033 | AI Concierge – Contextual Help |  |  |
 | GST-034 | Lost & Found |  |  |
 | GST-037 | Offers & Promotions |  |  |
-| GST-039 | Profile | subjectId |  |
+| GST-039 | Profile |  |  |
 | GST-040 | Help & Support |  |  |
 | GST-041 | Checkout Entry | productId |  |
 | GST-042 | Simple Registration & OTP | subjectId |  |
@@ -235,7 +233,7 @@
 | Route | `/general/explore-categories` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ExploreCategoriesList` |
-| Suggested location | `src/routes/general/ExploreCategoriesList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/ExploreCategoriesList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -263,7 +261,7 @@
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
 | GST-003 | Event & Attraction Listing | eventId |  |
-| GST-004 | Attraction Details | eventId, productId |  |
+| GST-004 | Attraction Details | bundleId, eventId, productId |  |
 | GST-063 | Searches (results in place) |  |  |
 
 ## GST-003 Buy Tickets
@@ -278,7 +276,7 @@
 | Route | `/general/buy-tickets` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `BuyTicketsList` |
-| Suggested location | `src/routes/general/BuyTicketsList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/BuyTicketsList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -314,7 +312,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | GST-001 | Home – Default |  |  |
-| GST-004 | Attraction Details | eventId, productId |  |
+| GST-004 | Attraction Details | bundleId, eventId, productId |  |
 | GST-007 | Book (a dated product: date, then time, then tickets) | productId |  |
 | GST-008 | Book (an undated product, or a product-first flow such as a workshop) | productId |  |
 | GST-074 | Book (a spot on the venue map, where the flow picks on the map) | productId |  |
@@ -334,7 +332,7 @@
 | Route | `/general/item-detail` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ItemDetail` |
-| Suggested location | `src/routes/general/ItemDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/ItemDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -387,7 +385,7 @@
 
 ## GST-005 What's On
 
-**Find what's on for this venue.**
+**What is on at this venue over the dates the guest picks: each performance and the products that run.**
 
 |  |  |
 |---|---|
@@ -397,7 +395,7 @@
 | Route | `/general/whats-on` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `WhatsOnList` |
-| Suggested location | `src/routes/general/WhatsOnList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/WhatsOnList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -434,7 +432,7 @@
 
 ## GST-006 Item Detail – Event / Exhibition
 
-**See event / exhibition details for this venue.**
+**One event or exhibition: what it is, and the performance being booked, before choosing tickets.**
 
 |  |  |
 |---|---|
@@ -444,7 +442,7 @@
 | Route | `/general/event-exhibition-details` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `EventExhibitionDetailsDetail` |
-| Suggested location | `src/routes/general/EventExhibitionDetailsDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/EventExhibitionDetailsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -491,7 +489,7 @@
 | Route | `/general/select-date-and-time` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SelectDateAndTimeDetail` |
-| Suggested location | `src/routes/general/SelectDateAndTimeDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/SelectDateAndTimeDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -513,7 +511,7 @@
 | `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onLoad | The experience filter with descriptions | `PRODUCT_VIEW` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Products of a category or level | `PRODUCT_VIEW` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the chosen time to the cart (the lease is taken server-side) | `None` |
-| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onAction | The cart's `consentQuestions` after the time is added | `None` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | background | Read by the screen right after addCartLine, not a control: the cart's consentQuestions, which open the consent questions pop-up; with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `None` |
 | `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the booking's consent questions | `ORDER_CREATE` |
 | `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Join the waitlist of a sold-out time (CHG-R6-037) | `None` |
 | `leaveWaitlist` | [CatalogueService](../backend/CatalogueService.md#leavewaitlist) | onAction | Leave it (CHG-R6-037) | `None` |
@@ -553,7 +551,7 @@
 | Route | `/general/tickets-and-add-ons` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `TicketsAndAddOnsList` |
-| Suggested location | `src/routes/general/TicketsAndAddOnsList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/TicketsAndAddOnsList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -610,7 +608,7 @@
 | Route | `/general/review-and-payment` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ReviewAndPaymentForm` |
-| Suggested location | `src/routes/general/ReviewAndPaymentForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/ReviewAndPaymentForm.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -667,7 +665,7 @@
 | Route | `/general/booking-confirmation` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `BookingConfirmationDetail` |
-| Suggested location | `src/routes/general/BookingConfirmationDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/BookingConfirmationDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -714,7 +712,7 @@
 | Route | `/general/wallet-overview` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `WalletOverviewDashboard` |
-| Suggested location | `src/routes/general/WalletOverviewDashboard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/WalletOverviewDashboard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -733,9 +731,7 @@
 | `listWalletTransactions` | [WalletService](../backend/WalletService.md#listwallettransactions) | onLoad | Wallet transaction history | `WALLET_VIEW` |
 | `getWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#getwalletautoreloadsetting) | onLoad | Show auto top-up | `WALLET_VIEW` |
 | `setWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#setwalletautoreloadsetting) | onAction | Set auto top-up | `WALLET_OPERATE` |
-| `getWalletExitBalance` | [WalletService](../backend/WalletService.md#getwalletexitbalance) | onLoad | Balance due / refundable at exit | `WALLET_VIEW` |
-| `settleWalletAtExit` | [WalletService](../backend/WalletService.md#settlewalletatexit) | onAction | Settle the wallet at exit | `WALLET_OPERATE` |
-| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Balance on a game card | `None` |
+| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Balance on a game card | `WALLET_VIEW` |
 | `listPaymentTokens` | [OrderService](../backend/OrderService.md#listpaymenttokens) | onLoad | The guest's saved cards: the auto top-up card and a stored-card exit settlement pick one (paymentTokenId) | `ORDER_VIEW` |
 
 **States**
@@ -759,7 +755,7 @@
 
 ## GST-012 My Tickets
 
-**Find my tickets for this venue.**
+**The guest's tickets and passes, current and past: open one to see its code and history, or send it to another guest.**
 
 |  |  |
 |---|---|
@@ -769,7 +765,7 @@
 | Route | `/general/my-tickets` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MyTicketsList` |
-| Suggested location | `src/routes/general/MyTicketsList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/MyTicketsList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -790,6 +786,7 @@
 | `getEntitlementCredential` | [AccessService](../backend/AccessService.md#getentitlementcredential) | onLoad | The thing that gets scanned | `ORDER_VIEW` |
 | `getEntitlementHistory` | [AccessService](../backend/AccessService.md#getentitlementhistory) | onLoad | Every scan, freeze, share and reissue against it | `ORDER_VIEW` |
 | `listEntitlements` | [AccessService](../backend/AccessService.md#listentitlements) | onLoad | Every entitlement this guest holds, including expired | `None` |
+| `listTicketTransfers` | [OrderService](../backend/OrderService.md#listtickettransfers) | background | Re-read by the screen after transferOrderTickets answers 202, not a control: the guest's transfers, so the ticket shows as offered, then claimed or returned when the offer lapses | `None` |
 
 **States**
 
@@ -811,7 +808,7 @@
 
 ## GST-013 Ticket Details
 
-**Find ticket details for this venue.**
+**One ticket: its code to scan, what remains on it and every scan against it; send it to another guest or bind it to this phone.**
 
 |  |  |
 |---|---|
@@ -821,7 +818,7 @@
 | Route | `/general/ticket-details` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `TicketDetailsDetail` |
-| Suggested location | `src/routes/general/TicketDetailsDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/TicketDetailsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -842,6 +839,7 @@
 | `getEntitlementHistory` | [AccessService](../backend/AccessService.md#getentitlementhistory) | onLoad | Every scan, freeze, share and reissue against it | `ORDER_VIEW` |
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `bindCredentialDevice` | [AccessService](../backend/AccessService.md#bindcredentialdevice) | onAction | Bind my credential to this device | `None` |
+| `listTicketTransfers` | [OrderService](../backend/OrderService.md#listtickettransfers) | background | Re-read by the screen after transferOrderTickets answers 202, not a control: the guest's transfers, so the ticket shows as offered, then claimed or returned when the offer lapses | `None` |
 
 **States**
 
@@ -862,7 +860,7 @@
 
 ## GST-014 Ticket Transfer
 
-**Work with ticket transfer for this venue.**
+**Send tickets from one of the guest's orders to another guest, and claim tickets someone sent.**
 
 |  |  |
 |---|---|
@@ -872,7 +870,7 @@
 | Route | `/general/ticket-transfer` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `TicketTransferDetail` |
-| Suggested location | `src/routes/general/TicketTransferDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/TicketTransferDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -910,7 +908,7 @@
 
 ## GST-015 Memberships
 
-**Find memberships for this venue.**
+**The guest's membership: plans, statements, payments that need them, and family members who may use it.**
 
 |  |  |
 |---|---|
@@ -920,7 +918,7 @@
 | Route | `/general/memberships` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MembershipsDetail` |
-| Suggested location | `src/routes/general/MembershipsDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/MembershipsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -944,8 +942,6 @@
 | `listDelegations` | [IdentityService](../backend/IdentityService.md#listdelegations) | onLoad | Who may act for this guest, and for whom they may act | `GUEST_VIEW` |
 | `grantDelegation` | [IdentityService](../backend/IdentityService.md#grantdelegation) | onAction | Let one guest act for another | `GUEST_MANAGE` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-| `listInstalmentPlans` | [OrderService](../backend/OrderService.md#listinstalmentplans) | onLoad | Instalment plans and schedule | `PAYMENT_VIEW` |
-| `createInstalmentPlan` | [OrderService](../backend/OrderService.md#createinstalmentplan) | onAction | Pay in instalments | `ORDER_CREATE` |
 
 **States**
 
@@ -967,7 +963,7 @@
 
 ## GST-016 My Reservations
 
-**Find my reservations for this venue.**
+**The guest's reservations, each opened to see it or cancel it.**
 
 |  |  |
 |---|---|
@@ -977,7 +973,7 @@
 | Route | `/general/my-reservations` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MyReservationsDetail` |
-| Suggested location | `src/routes/general/MyReservationsDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/MyReservationsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1015,7 +1011,7 @@
 
 ## GST-017 Reservation Details
 
-**See reservation details for this venue.**
+**One reservation, read and cancellable.**
 
 |  |  |
 |---|---|
@@ -1025,7 +1021,7 @@
 | Route | `/general/reservation-details` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ReservationDetailsDetail` |
-| Suggested location | `src/routes/general/ReservationDetailsDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/ReservationDetailsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1060,7 +1056,7 @@
 
 ## GST-018 Add to Calendar / Reminders
 
-**Find add to calendar / reminders for this venue.**
+**Put a booked visit in the phone's calendar or wallet, and turn its visit reminder on or off.**
 
 |  |  |
 |---|---|
@@ -1070,7 +1066,7 @@
 | Route | `/general/add-to-calendar-reminders` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AddToCalendarRemindersDetail` |
-| Suggested location | `src/routes/general/AddToCalendarRemindersDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/AddToCalendarRemindersDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1118,7 +1114,7 @@
 | Route | `/general/order-history-wallet` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `OrderHistoryWalletDashboard` |
-| Suggested location | `src/routes/general/OrderHistoryWalletDashboard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/OrderHistoryWalletDashboard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1172,7 +1168,7 @@
 | Route | `/general/saved-items-wishlist` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SavedItemsWishlistList` |
-| Suggested location | `src/routes/general/SavedItemsWishlistList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/SavedItemsWishlistList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1217,7 +1213,7 @@
 | Route | `/general/interactive-map` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `InteractiveMapCanvas` |
-| Suggested location | `src/routes/general/InteractiveMapCanvas.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/InteractiveMapCanvas.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1260,7 +1256,7 @@
 
 ## GST-022 Attraction Wait Times
 
-**See attraction wait times for this venue.**
+**How long each attraction's queue is right now.**
 
 |  |  |
 |---|---|
@@ -1270,7 +1266,7 @@
 | Route | `/general/attraction-wait-times` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AttractionWaitTimesDetail` |
-| Suggested location | `src/routes/general/AttractionWaitTimesDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/AttractionWaitTimesDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Operations**
@@ -1309,7 +1305,7 @@
 | Route | `/general/virtual-queue-join-queue` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `VirtualQueueJoinQueueDetail` |
-| Suggested location | `src/routes/general/VirtualQueueJoinQueueDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/VirtualQueueJoinQueueDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1358,7 +1354,7 @@
 | Route | `/general/fandb-browse-and-order` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `FandbBrowseAndOrderList` |
-| Suggested location | `src/routes/general/FandbBrowseAndOrderList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/FandbBrowseAndOrderList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1414,7 +1410,7 @@
 | Route | `/general/fandb-order-tracking` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `FandbOrderTrackingDetail` |
-| Suggested location | `src/routes/general/FandbOrderTrackingDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/FandbOrderTrackingDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1461,7 +1457,7 @@
 | Route | `/general/retail-merchandise` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `RetailMerchandiseDetail` |
-| Suggested location | `src/routes/general/RetailMerchandiseDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/RetailMerchandiseDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1511,7 +1507,7 @@
 | Route | `/general/parking-reserve-and-pay` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ParkingReserveAndPayDetail` |
-| Suggested location | `src/routes/general/ParkingReserveAndPayDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/ParkingReserveAndPayDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1528,7 +1524,7 @@
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166) | `None` |
 | `updateParkingEntitlement` | [AccessService](../backend/AccessService.md#updateparkingentitlement) | onAction | Change the plate, or revoke | `None` |
 | `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
-| `getParkingEntitlement` | [AccessService](../backend/AccessService.md#getparkingentitlement) | onLoad | Load the parking entitlement being changed | `None` |
+| `getParkingEntitlement` | [AccessService](../backend/AccessService.md#getparkingentitlement) | onLoad | Load the parking entitlement being changed. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4) | `None` |
 
 **States**
 
@@ -1562,7 +1558,7 @@
 | Route | `/general/parking-reservation-confirmed` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ParkingReservationConfirmedDetail` |
-| Suggested location | `src/routes/general/ParkingReservationConfirmedDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/ParkingReservationConfirmedDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1612,7 +1608,7 @@
 | Route | `/general/venue-info-and-services` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `VenueInfoAndServicesDetail` |
-| Suggested location | `src/routes/general/VenueInfoAndServicesDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/VenueInfoAndServicesDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1647,7 +1643,7 @@
 
 ## GST-030 In-Venue Notifications
 
-**Work with in-venue notifications for this venue.**
+**The guest's in-venue notifications, newest first: queue calls, order ready, booking changes and venue alerts, marked read once seen.**
 
 |  |  |
 |---|---|
@@ -1657,7 +1653,7 @@
 | Route | `/general/in-venue-notifications` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `InVenueNotificationsDetail` |
-| Suggested location | `src/routes/general/InVenueNotificationsDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/InVenueNotificationsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1702,7 +1698,7 @@
 | Route | `/general/ai-concierge-home` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AiConciergeHomeDashboard` |
-| Suggested location | `src/routes/general/AiConciergeHomeDashboard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/AiConciergeHomeDashboard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1719,13 +1715,13 @@
 |---|---|---|---|---|
 | `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onAction | Optional "Order food" shortcut to the menu in force | `None` |
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
-| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first message; the scope comes from the session, never a module the guest picks | `AI_USE` |
+| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first message; the scope comes from the session, never a module the guest picks. Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject) | `AI_USE` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | One tap; reason guestRequested and Sahli's summary are set for the guest | `None` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'. | `AI_USE` |
-| `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | The guest's own earlier conversations | `AI_USE` |
+| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'. Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject) | `AI_USE` |
+| `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | The guest's own earlier conversations. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4) | `AI_USE` |
 | `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
 | `sendGuestConversationMessage` | [MarketingService](../backend/MarketingService.md#sendguestconversationmessage) | onAction | After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013)) | `None` |
-| `getGuestConversation` | [MarketingService](../backend/MarketingService.md#getguestconversation) | onInterval | The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003) | `None` |
+| `getGuestConversation` | [MarketingService](../backend/MarketingService.md#getguestconversation) | onInterval | The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject) | `None` |
 
 **States**
 
@@ -1756,7 +1752,7 @@
 | Route | `/general/ai-concierge-chat` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AiConciergeChatDetail` |
-| Suggested location | `src/routes/general/AiConciergeChatDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/AiConciergeChatDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1775,13 +1771,12 @@
 | `createGuestFnbOrder` | [FnbService](../backend/FnbService.md#createguestfnborder) | onAction | From the flow it appears in | `None` |
 | `getGuestOrderStatus` | [FnbService](../backend/FnbService.md#getguestorderstatus) | onLoad | Track an order Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add what the assistant offers in the chat to the guest's cart | `None` |
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order | `None` |
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
 | `sendGuestConversationMessage` | [MarketingService](../backend/MarketingService.md#sendguestconversationmessage) | onAction | After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013)) | `None` |
-| `getGuestConversation` | [MarketingService](../backend/MarketingService.md#getguestconversation) | onInterval | The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003) | `None` |
+| `getGuestConversation` | [MarketingService](../backend/MarketingService.md#getguestconversation) | onInterval | The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject) | `None` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | Pass an assistant conversation to a person | `None` |
-| `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
 
 **States**
 
@@ -1813,7 +1808,7 @@
 | Route | `/general/ai-concierge-contextual-help` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AiConciergeContextualHelpDetail` |
-| Suggested location | `src/routes/general/AiConciergeContextualHelpDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/AiConciergeContextualHelpDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1828,10 +1823,10 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
-| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first question; the scope comes from the session | `AI_USE` |
+| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first question; the scope comes from the session. Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject) | `AI_USE` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | One tap; reason guestRequested | `None` |
 | `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
-| `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | Show the guest's earlier conversations with the assistant | `AI_USE` |
+| `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | Show the guest's earlier conversations with the assistant. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4) | `AI_USE` |
 
 **States**
 
@@ -1851,7 +1846,7 @@
 
 ## GST-034 Lost & Found
 
-**See lost & found for this venue.**
+**Report a lost item, follow the guest's lost-property cases and reply on them.**
 
 |  |  |
 |---|---|
@@ -1861,7 +1856,7 @@
 | Route | `/general/lost-and-found` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `LostAndFoundDetail` |
-| Suggested location | `src/routes/general/LostAndFoundDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/LostAndFoundDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1908,7 +1903,7 @@
 | Route | `/general/feedback-and-ratings` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `FeedbackAndRatingsList` |
-| Suggested location | `src/routes/general/FeedbackAndRatingsList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/FeedbackAndRatingsList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1923,9 +1918,9 @@
 |---|---|---|---|---|
 | `submitReview` | [MarketingService](../backend/MarketingService.md#submitreview) | onAction | from page inventory | `None` |
 | `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report something — lost property, a complaint, a question | `None` |
-| `getForm` | [MarketingService](../backend/MarketingService.md#getform) | onLoad | A triggered survey opened from its link | `GUEST_VIEW` |
+| `getForm` | [MarketingService](../backend/MarketingService.md#getform) | onLoad | A triggered survey opened from its link. Read once the guest is signed in (getForm needs the guest session): a signed-out guest opening the link is offered sign-in and brought back (GFIX-4) | `GUEST_VIEW` |
 | `submitForm` | [MarketingService](../backend/MarketingService.md#submitform) | onAction | Answer the survey | `GUEST_VIEW` |
-| `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The recent visits a review can be about | `None` |
+| `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The recent visits a review can be about. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4) | `None` |
 
 **States**
 
@@ -1954,7 +1949,7 @@
 | Route | `/loyalty-rewards` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `LoyaltyRewards` |
-| Suggested location | `src/routes/LoyaltyRewards.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/LoyaltyRewards.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1971,8 +1966,6 @@
 | `getLoyaltyPosition` | [MarketingService](../backend/MarketingService.md#getloyaltyposition) | onLoad | A guest's points, tier and what is within reach | `None` |
 | `listLoyaltyProgrammes` | [MarketingService](../backend/MarketingService.md#listloyaltyprogrammes) | onLoad | List loyalty programmes | `MARKETING_VIEW` |
 | `listPromotions` | [CatalogueService](../backend/CatalogueService.md#listpromotions) | onLoad | List promotions | `PRICE_VIEW` |
-| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
-| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
 | `listRewards` | [MarketingService](../backend/MarketingService.md#listrewards) | onLoad | What points can be turned into | `MARKETING_VIEW` |
 | `listCustomerBadges` | [MarketingService](../backend/MarketingService.md#listcustomerbadges) | onLoad | Badges the guest holds | `MARKETING_VIEW` |
 | `listLeaderboard` | [MarketingService](../backend/MarketingService.md#listleaderboard) | onLoad | Standings, by nickname | `None` |
@@ -2000,7 +1993,7 @@
 
 ## GST-037 Offers & Promotions
 
-**Find offers & promotions for this venue.**
+**The offers running at this venue, one opened in detail, and a code the guest typed checked.**
 
 |  |  |
 |---|---|
@@ -2010,7 +2003,7 @@
 | Route | `/general/offers-and-promotions` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `OffersAndPromotionsDetail` |
-| Suggested location | `src/routes/general/OffersAndPromotionsDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/OffersAndPromotionsDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2058,7 +2051,7 @@
 | Route | `/general/at-the-venue` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AtTheVenueDetail` |
-| Suggested location | `src/routes/general/AtTheVenueDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/AtTheVenueDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -2106,14 +2099,14 @@
 | Route | `/general/profile` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ProfileDashboard` |
-| Suggested location | `src/routes/general/ProfileDashboard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/ProfileDashboard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
 
 | Parameter | From |
 |---|---|
-| subjectId | GST-001 |
+| subjectId | session |
 
 **Operations**
 
@@ -2157,7 +2150,7 @@
 | Route | `/general/help-and-support` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `HelpAndSupportDetail` |
-| Suggested location | `src/routes/general/HelpAndSupportDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/HelpAndSupportDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | commandCentre |
 
 **Entry parameters**
@@ -2208,7 +2201,7 @@
 | Route | `/general/checkout-entry` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `CheckoutEntryForm` |
-| Suggested location | `src/routes/general/CheckoutEntryForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/CheckoutEntryForm.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2238,6 +2231,7 @@
 | `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onLoad | The visit date of each line (`Performance.startsAt`) | `PRODUCT_VIEW` |
 | `getResourceHold` | [VenueOpsService](../backend/VenueOpsService.md#getresourcehold) | onInterval | The countdown of a spot held on the venue map With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `ORDER_VIEW` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
+| `createCart` | [OrderService](../backend/OrderService.md#createcart) | background | Started by the runtime the first time a line is added, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `None` |
 
 **States**
 
@@ -2271,7 +2265,7 @@
 | Route | `/general/simple-registration-and-otp` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SimpleRegistrationAndOtpDetail` |
-| Suggested location | `src/routes/general/SimpleRegistrationAndOtpDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/SimpleRegistrationAndOtpDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | form |
 
 **Entry parameters**
@@ -2296,9 +2290,9 @@
 | `refreshToken` | [IdentityService](../backend/IdentityService.md#refreshtoken) | background | Rotate the access token | `None` |
 | `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | Request a one-time code | `None` |
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
-| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at a venue with guest two-step verification on | `None` |
+| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | background | Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step verification on (action signIn), not a control: the code is then typed in Verification code | `None` |
 | `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the code and release the session | `None` |
-| `claimDeviceConsent` | [MarketingService](../backend/MarketingService.md#claimdeviceconsent) | onAction | Attach this device's tracking decision to the guest after sign-in or registration | `None` |
+| `claimDeviceConsent` | [MarketingService](../backend/MarketingService.md#claimdeviceconsent) | background | Sent by the screen after sign-in or registration, not a control: attaches this device's tracking decision to the guest | `None` |
 
 **States**
 
@@ -2331,7 +2325,7 @@
 | Route | `/general/arabic-rtl-experience` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ArabicRtlExperienceDetail` |
-| Suggested location | `src/routes/general/ArabicRtlExperienceDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/ArabicRtlExperienceDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Operations**
@@ -2367,7 +2361,7 @@
 | Route | `/general/multi-currency-and-pricing` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MultiCurrencyAndPricingDetail` |
-| Suggested location | `src/routes/general/MultiCurrencyAndPricingDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/MultiCurrencyAndPricingDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -2396,7 +2390,7 @@
 
 ## GST-045 Ticket Delivery & Sharing
 
-**Find ticket delivery & sharing for this venue.**
+**Send some of the guest's tickets to someone else, and see the tickets sent and received.**
 
 |  |  |
 |---|---|
@@ -2406,7 +2400,7 @@
 | Route | `/general/ticket-delivery-and-sharing` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `TicketDeliveryAndSharingDetail` |
-| Suggested location | `src/routes/general/TicketDeliveryAndSharingDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/TicketDeliveryAndSharingDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -2452,7 +2446,7 @@
 | Route | `/general/branded-queue-waiting-room` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `BrandedQueueWaitingRoomDetail` |
-| Suggested location | `src/routes/general/BrandedQueueWaitingRoomDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/BrandedQueueWaitingRoomDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2496,7 +2490,7 @@
 | Route | `/general/maintenance-page` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MaintenancePageDetail` |
-| Suggested location | `src/routes/general/MaintenancePageDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/MaintenancePageDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Operations**
@@ -2528,7 +2522,7 @@
 
 ## GST-048 Upsell / Cross-Sell
 
-**See upsell / cross-sell for this venue.**
+**Suggestions for the cart the guest is about to pay for, each added with one tap.**
 
 |  |  |
 |---|---|
@@ -2538,7 +2532,7 @@
 | Route | `/general/upsell-cross-sell` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `UpsellCrossSellDetail` |
-| Suggested location | `src/routes/general/UpsellCrossSellDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/UpsellCrossSellDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2551,10 +2545,10 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add a suggested item to the cart the suggestions are for | `None` |
 | `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill the cart slot, maxItems 3 (DI-959) | `AI_USE` |
-| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report what happened to recommended items | `AI_USE` |
-| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | Show the cart the suggestions are for | `None` |
+| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | background | Sent by the Suggested for you list, not a control: impressions, clicks, add-to-cart and declines of the recommended items, batched | `AI_USE` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | Show the cart the suggestions are for, with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `None` |
 
 **States**
 
@@ -2574,7 +2568,7 @@
 
 ## GST-049 Interactive Seat Selection
 
-**See interactive seat selection for this venue.**
+**Pick seats on the seat map for the chosen performance, or let the venue recommend them, and hold them.**
 
 |  |  |
 |---|---|
@@ -2584,7 +2578,7 @@
 | Route | `/general/interactive-seat-selection` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `InteractiveSeatSelectionCanvas` |
-| Suggested location | `src/routes/general/InteractiveSeatSelectionCanvas.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/InteractiveSeatSelectionCanvas.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2603,7 +2597,7 @@
 | `createSeatHold` | [CatalogueService](../backend/CatalogueService.md#createseathold) | onAction | Hold specific seats | `ORDER_CREATE` |
 | `recommendSeats` | [CatalogueService](../backend/CatalogueService.md#recommendseats) | onAction | Recommend seats for a party | `PRODUCT_VIEW` |
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The event's other times (time bar, date and time pop-up) | `PRODUCT_VIEW` |
-| `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold | `ORDER_CREATE` |
+| `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | background | Sent by the time bar when the guest switches time, not a control: releases the seats held for the old performance (decided 29 September), with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `ORDER_CREATE` |
 
 **States**
 
@@ -2635,7 +2629,7 @@
 | Route | `/general/resource-booking-cabana` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ResourceBookingCabanaDetail` |
-| Suggested location | `src/routes/general/ResourceBookingCabanaDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/ResourceBookingCabanaDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2648,7 +2642,7 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the chosen cabana and time to the cart | `None` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `getAvailability` | [CatalogueService](../backend/CatalogueService.md#getavailability) | onLoad | Live remaining capacity | `PRODUCT_VIEW` |
 
@@ -2682,7 +2676,7 @@
 | Route | `/general/plan-your-adventure-start` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `PlanYourAdventureStartDetail` |
-| Suggested location | `src/routes/general/PlanYourAdventureStartDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/PlanYourAdventureStartDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | multiStepForm |
 
 **Entry parameters**
@@ -2695,7 +2689,6 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, park per day, pace, interests, shops, cuisine); each day from its own park's points only | `None` |
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | The tenant's active venues, for the park-per-day choice in a multi-venue tenant | `None` |
@@ -2732,7 +2725,7 @@
 | Route | `/general/suggested-itineraries` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SuggestedItinerariesDetail` |
-| Suggested location | `src/routes/general/SuggestedItinerariesDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/SuggestedItinerariesDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2780,7 +2773,7 @@
 | Route | `/general/your-plan` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `YourPlanDetail` |
-| Suggested location | `src/routes/general/YourPlanDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/YourPlanDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2796,8 +2789,6 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
 | `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
@@ -2839,7 +2830,7 @@
 | Route | `/general/ai-planner` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AIPlannerDetail` |
-| Suggested location | `src/routes/general/AIPlannerDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/AIPlannerDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2858,8 +2849,8 @@
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Chat with the planner agent; its tools are the plan operations, so a change it makes is a new plan version | `AI_USE` |
 | `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
 | `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
-| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | onAction | Opened on the first message to the planner, never on opening the Plan tab (a conversation is billed); the plan loads without it | `AI_USE` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | onAction | A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent's proposal for the plan, applied through `updateVisitPlan`. Later (CHG-RONEP-010): the planner agent's refinement in chat (AI-ENGINE-PLANNER); the rules plan still answers in A1 ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'. | `AI_USE` |
+| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened by the screen on the first message to the planner, not a control, and only when signed in; never on opening the Plan tab (a conversation is billed) | `AI_USE` |
+| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | Read by the Ask the planner panel after an answer, not a control, and only when signed in: the planner's itinerary proposal that Apply this change applies | `AI_USE` |
 
 **States**
 
@@ -2893,7 +2884,7 @@
 | Route | `/general/dynamic-qr-ticket` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `DynamicQrTicketCanvas` |
-| Suggested location | `src/routes/general/DynamicQrTicketCanvas.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/DynamicQrTicketCanvas.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | credentialView |
 
 **Entry parameters**
@@ -2932,7 +2923,7 @@
 
 ## GST-056 Bundle Package
 
-**See bundle package for this venue.**
+**One bundle: what it includes and its price, added to the cart.**
 
 |  |  |
 |---|---|
@@ -2942,7 +2933,7 @@
 | Route | `/general/bundle-package` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `BundlePackageDetail` |
-| Suggested location | `src/routes/general/BundlePackageDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/BundlePackageDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2957,7 +2948,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getBundle` | [CatalogueService](../backend/CatalogueService.md#getbundle) | onLoad | Read a bundle with components and allocation | `PRODUCT_VIEW` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the bundle to the cart | `None` |
 
 **States**
 
@@ -2989,7 +2980,7 @@
 | Route | `/general/accessibility-information` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `AccessibilityInformationForm` |
-| Suggested location | `src/routes/general/AccessibilityInformationForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/AccessibilityInformationForm.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -3028,7 +3019,7 @@
 | Route | `/general/resource-availability-cabana` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ResourceAvailabilityCabanaDetail` |
-| Suggested location | `src/routes/general/ResourceAvailabilityCabanaDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/ResourceAvailabilityCabanaDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -3069,7 +3060,7 @@
 | Route | `/general/plan-my-day-in-progress` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `PlanMyDayInProgressDetail` |
-| Suggested location | `src/routes/general/PlanMyDayInProgressDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/PlanMyDayInProgressDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3120,7 +3111,7 @@
 | Route | `/in-venue-experience/menu-item-detail` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MenuItemDetail` |
-| Suggested location | `src/routes/in-venue-experience/MenuItemDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/in-venue-experience/MenuItemDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3166,7 +3157,7 @@
 | Route | `/in-venue-experience/shop-and-drop-collection` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ShopAndDropCollectionList` |
-| Suggested location | `src/routes/in-venue-experience/ShopAndDropCollectionList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/in-venue-experience/ShopAndDropCollectionList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3211,7 +3202,7 @@
 | Route | `/search` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `Search` |
-| Suggested location | `src/routes/Search.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/Search.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -3250,7 +3241,7 @@
 | Route | `/newsletter-preferences` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `NewsletterPreferences` |
-| Suggested location | `src/routes/NewsletterPreferences.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/NewsletterPreferences.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3298,7 +3289,7 @@
 | Route | `/account/privacy-my-data` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `PrivacyMyData` |
-| Suggested location | `src/routes/account/PrivacyMyData.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/account/PrivacyMyData.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3314,10 +3305,6 @@
 | `exportSubjectData` | [IdentityService](../backend/IdentityService.md#exportsubjectdata) | onAction | Everything the platform holds about one guest | `GUEST_VIEW_PII` |
 | `deleteGuestAccount` | [IdentityService](../backend/IdentityService.md#deleteguestaccount) | onAction | Self-service account deletion | `None` |
 | `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | Read a guest's consent state | `GUEST_VIEW` |
-| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Tracking preferences: categories and the current decision | `None` |
-| `listPublishedTrackingTechnologies` | [MarketingService](../backend/MarketingService.md#listpublishedtrackingtechnologies) | onLoad | Each SDK and tracker the app uses | `None` |
-| `getDeviceConsentHistory` | [MarketingService](../backend/MarketingService.md#getdeviceconsenthistory) | onLoad | My tracking decisions so far | `None` |
-| `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Change or withdraw tracking preferences | `None` |
 | `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Withdraw or give a consent from the privacy page: withdrawal as easy as granting | `GUEST_MANAGE` |
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
 
@@ -3336,7 +3323,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-039 | Profile | subjectId |  |
+| GST-039 | Profile |  |  |
 
 ## GST-067 Refunds & Resale
 
@@ -3350,7 +3337,7 @@
 | Route | `/account/refunds-resale` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `RefundsResale` |
-| Suggested location | `src/routes/account/RefundsResale.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/account/RefundsResale.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3383,7 +3370,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-039 | Profile | subjectId |  |
+| GST-039 | Profile |  |  |
 
 ## GST-068 Help & My Cases
 
@@ -3397,7 +3384,7 @@
 | Route | `/account/help-my-cases` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `HelpMyCases` |
-| Suggested location | `src/routes/account/HelpMyCases.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/account/HelpMyCases.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3430,7 +3417,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-039 | Profile | subjectId |  |
+| GST-039 | Profile |  |  |
 
 ## GST-069 Face Pass
 
@@ -3444,7 +3431,7 @@
 | Route | `/account/face-pass` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `FacePass` |
-| Suggested location | `src/routes/account/FacePass.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/account/FacePass.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3480,7 +3467,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-039 | Profile | subjectId |  |
+| GST-039 | Profile |  |  |
 
 ## GST-070 Reserve a Table
 
@@ -3494,7 +3481,7 @@
 | Route | `/reserve-table` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ReserveTable` |
-| Suggested location | `src/routes/ReserveTable.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/ReserveTable.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | form |
 
 **Entry parameters**
@@ -3534,7 +3521,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-039 | Profile | subjectId |  |
+| GST-039 | Profile |  |  |
 | GST-041 | Pay the deposit (only when the venue requires one) | cartId | the reservation is awaitingDeposit |
 
 ## GST-071 Payment Methods
@@ -3549,7 +3536,7 @@
 | Route | `/account/payment-methods` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `PaymentMethods` |
-| Suggested location | `src/routes/account/PaymentMethods.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/account/PaymentMethods.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3588,7 +3575,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-039 | Profile | subjectId |  |
+| GST-039 | Profile |  |  |
 
 ## GST-072 Share & Group Booking
 
@@ -3602,7 +3589,7 @@
 | Route | `/account/share-group-booking` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `ShareGroupBooking` |
-| Suggested location | `src/routes/account/ShareGroupBooking.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/account/ShareGroupBooking.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3623,7 +3610,7 @@
 | `getGroupPackageDefinition` | [CatalogueService](../backend/CatalogueService.md#getgrouppackagedefinition) | onAction | What a package includes | `PRODUCT_VIEW` |
 | `requestGroupBooking` | [OrderService](../backend/OrderService.md#requestgroupbooking) | onAction | Ask for a school trip or a birthday party | `None` |
 | `shareEntitlement` | [OrderService](../backend/OrderService.md#shareentitlement) | onAction | Let somebody else use this, without giving it away | `ORDER_MODIFY` |
-| `getGroupBooking` | [OrderService](../backend/OrderService.md#getgroupbooking) | onLoad | getGroupBooking | `ORDER_VIEW` |
+| `getGroupBooking` | [OrderService](../backend/OrderService.md#getgroupbooking) | onLoad | The group booking this guest belongs to: its leader, its name and who still has to give their name | `ORDER_VIEW` |
 | `respondToInvitation` | [MarketingService](../backend/MarketingService.md#respondtoinvitation) | onAction | Accept or decline | `GUEST_VIEW` |
 
 **States**
@@ -3641,7 +3628,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-039 | Profile | subjectId |  |
+| GST-039 | Profile |  |  |
 
 ## GST-073 Security & Sign-in
 
@@ -3655,7 +3642,7 @@
 | Route | `/account/security-sign-in` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SecuritySignIn` |
-| Suggested location | `src/routes/account/SecuritySignIn.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/account/SecuritySignIn.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -3680,9 +3667,6 @@
 | `listMfaMethods` | [IdentityService](../backend/IdentityService.md#listmfamethods) | onLoad | The guest's enrolled methods | `None` |
 | `enrolMfaMethod` | [IdentityService](../backend/IdentityService.md#enrolmfamethod) | onAction | Enrol an authenticator (email code as fallback) | `None` |
 | `verifyMfaEnrolment` | [IdentityService](../backend/IdentityService.md#verifymfaenrolment) | onAction | Confirm the enrolment with a first code | `None` |
-| `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove a method | `None` |
-| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Step-up before a sensitive act at a venue that has it on | `None` |
-| `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the step-up code | `None` |
 
 **States**
 
@@ -3698,7 +3682,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| GST-039 | Profile | subjectId |  |
+| GST-039 | Profile |  |  |
 
 ## GST-074 Map Booking — Cabanas & Spots
 
@@ -3712,7 +3696,7 @@
 | Route | `/general/map-booking` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MapBookingCanvas` |
-| Suggested location | `src/routes/general/MapBookingCanvas.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/MapBookingCanvas.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3769,7 +3753,7 @@
 | Route | `/general/space-by-the-hour` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `SpaceByTheHourWizard` |
-| Suggested location | `src/routes/general/SpaceByTheHourWizard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/general/SpaceByTheHourWizard.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | multiStepForm |
 
 **Entry parameters**
@@ -3818,7 +3802,7 @@
 | Route | `/transport/route-and-schedule` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `RouteAndScheduleList` |
-| Suggested location | `src/routes/transport/RouteAndScheduleList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/transport/RouteAndScheduleList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3869,7 +3853,7 @@
 | Route | `/transport/route-and-passengers` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `RouteAndPassengersDetail` |
-| Suggested location | `src/routes/transport/RouteAndPassengersDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/transport/RouteAndPassengersDetail.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -3884,7 +3868,6 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getTransportRoute` | [VenueOpsService](../backend/VenueOpsService.md#gettransportroute) | onLoad | The route and its stops | `None` |
 | `getTransportRouteMap` | [VenueOpsService](../backend/VenueOpsService.md#gettransportroutemap) | onLoad | Stop list, line and bounds for the map | `None` |
 | `getTransportFareTable` | [VenueOpsService](../backend/VenueOpsService.md#gettransportfaretable) | onLoad | Passenger types and fares of the route | `None` |
 | `quoteTransportFare` | [VenueOpsService](../backend/VenueOpsService.md#quotetransportfare) | onAction | The price for the stations and passengers | `None` |
@@ -3924,7 +3907,7 @@
 | Route | `/transport/multi-trip-passes` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `MultiTripPassesList` |
-| Suggested location | `src/routes/transport/MultiTripPassesList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/transport/MultiTripPassesList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -3971,7 +3954,7 @@
 | Route | `/transport/favourite-routes` |
 | Repository | ticvai-guest-app (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-app.git) |
 | Component | `FavouriteRoutesList` |
-| Suggested location | `src/routes/transport/FavouriteRoutesList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/screens/transport/FavouriteRoutesList.tsx` (its layout as observed 2026-10-14: React Native CLI, one app at the repository root, npm, src/; the screens folder is assumed, match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**

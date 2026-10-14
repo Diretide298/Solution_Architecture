@@ -5,6 +5,7 @@
   "module": "AI",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "AI_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "ticvai-web",
@@ -56,6 +57,7 @@
      "components": [
       {
        "kind": "publishGate",
+       "operation": "publishPromptTemplate",
        "impliedBy": "publishPromptTemplate",
        "notes": "Declares `publishPromptTemplate`. **The gate names what the publish will affect before it happens**: which tenants, venues or capabilities take the new version, and that the previous one stays available to roll back to.",
        "provenance": "check-screens publish rule, 29 September 2026"

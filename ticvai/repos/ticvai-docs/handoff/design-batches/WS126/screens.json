@@ -5,6 +5,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/event-schedule-command-center-bo-697",
-   "component": "apps/venue-management-web/src/routes/sell/EventScheduleCommandCenter.tsx",
+   "component": "src/routes/sell/EventScheduleCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -56,6 +57,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Set and review an event's schedule: its dates, sessions and timings.",
   "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-697)",
+  "division": "Shares `getEvent`, `setEventSchedule` with BO-698; this screen is Event Schedule Command Center (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 2.01, page 81): set and review an event's schedule: its dates, sessions and timings.",
   "gaps": [
    {
     "operation": null,
@@ -168,6 +170,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -177,7 +180,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/dynamic-performance-duration-configuration-bo-698",
-   "component": "apps/venue-management-web/src/routes/sell/DynamicPerformanceDurationConfiguration.tsx",
+   "component": "src/routes/sell/DynamicPerformanceDurationConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -204,6 +207,7 @@
   "patternReason": "the pack gives this screen a display directory (§Configure KPI by; Display) and no metric row",
   "purpose": "Set how long an event's performances last, including durations that vary by day or session.",
   "purposeNote": "Administrators can define measurable operator/instructor KPIs and calculate performance using traceable operational records from completed sessions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-698)",
+  "division": "Shares `getEvent`, `setEventSchedule` with BO-697; this screen is Dynamic Performance Duration Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 2.07, page 86): set how long an event's performances last, including durations that vary by day or session.",
   "gaps": [
    {
     "operation": null,
@@ -327,6 +331,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -336,7 +341,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/schedule-change-rescheduling-configuration-bo-699",
-   "component": "apps/venue-management-web/src/routes/sell/ScheduleChangeReschedulingConfiguration.tsx",
+   "component": "src/routes/sell/ScheduleChangeReschedulingConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -363,6 +368,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Move an event to new dates and decide how its existing bookings follow.",
   "purposeNote": "Eligible event transactions can trigger automated invoice requests with complete event and customer references while financial posting remains controlled by Finance. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-699)",
+  "division": "Shares `getEvent`, `rescheduleEvent` with BO-719, BO-720; this screen is Schedule Change & Rescheduling Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 2.08, page 87): move an event to new dates and decide how its existing bookings follow.",
   "gaps": [
    {
     "operation": null,

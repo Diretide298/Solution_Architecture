@@ -1,5 +1,5 @@
 id: LLD-identity
-title: identity — 97 operations
+title: identity — 98 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -244,6 +244,18 @@ operations:
   - approvals.request
   - cache:idempotency
   - pii.subject
+- operation: endGuestDeviceSessions
+  verb: POST
+  path: /internal/guest-sessions/end-for-device
+  scope: subject
+  permission: null
+  audience:
+  - service
+  offline: false
+  reads:
+  - identity.guest_session
+  writes:
+  - identity.guest_session
 - operation: endOwnSession
   verb: POST
   path: /auth/sessions/mine/{sessionId}/end
@@ -286,7 +298,7 @@ operations:
   reads:
   - identity.access_decision
   writes:
-  - identity.authz_audit
+  - identity.access_decision
 - operation: exportSubjectData
   verb: POST
   path: /guests/{subjectId}/data-export
@@ -705,7 +717,6 @@ operations:
   offline: false
   reads:
   - identity.delegated_access
-  - marketing.guest_profile
   - pii.subject
   writes: []
 - operation: listGuestIdentityVerifications
@@ -1127,7 +1138,7 @@ operations:
   - identity.authorisation_policy
 - operation: setCapabilityTemplate
   verb: PUT
-  path: /capability-templates
+  path: /capability-templates/{capabilityTemplateId}
   scope: tenant
   permission: ROLE_MANAGE
   audience:

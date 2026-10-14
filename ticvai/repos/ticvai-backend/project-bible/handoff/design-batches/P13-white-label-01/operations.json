@@ -624,6 +624,19 @@
   "requestBody": null,
   "responds": "PromoBlock"
  },
+ "listProposedActions": {
+  "method": "GET",
+  "path": "/proposed-actions",
+  "contract": "ai",
+  "summary": "What the assistant has proposed and nobody has decided",
+  "permission": "AI_USE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ProposedAction"
+ },
  "previewProductTickets": {
   "method": "GET",
   "path": "/products/{productId}/ticket-previews",

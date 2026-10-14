@@ -206,15 +206,6 @@
    }
   }
  },
- "AiEvidenceItemList": {
-  "type": "array",
-  "x-ticvai-persistence-kind": "valueObject",
-  "x-ticvai-persistence-column": "jsonb",
-  "description": "The evidence of one decision record, stored with it.",
-  "items": {
-   "$ref": "#/components/schemas/AiEvidenceItem"
-  }
- },
  "AiForecastAccuracy": {
   "type": "object",
   "x-ticvai-persistence": "ai.forecast_accuracy",
@@ -541,96 +532,6 @@
    }
   }
  },
- "AiForecastScenario": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.forecast_scenario",
-  "description": "**A what-if against a published version** (ADM-507, ADM-517, BO-931). Changes nothing in production; its points are written with `scenarioId`.",
-  "required": [
-   "baseVersionId",
-   "changes"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "name": {
-    "type": "string"
-   },
-   "baseVersionId": {
-    "type": "string",
-    "format": "uuid",
-    "x-ticvai-references": "ai.forecast_version"
-   },
-   "changes": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "lever"
-     ],
-     "properties": {
-      "lever": {
-       "type": "string",
-       "enum": [
-        "price",
-        "capacity",
-        "openingHours",
-        "weather",
-        "event",
-        "marketing",
-        "staffing",
-        "closure"
-       ]
-      },
-      "target": {
-       "type": "string",
-       "nullable": true
-      },
-      "value": {
-       "type": "object",
-       "additionalProperties": true,
-       "nullable": true
-      }
-     }
-    },
-    "minItems": 1
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "computing",
-     "ready",
-     "failed"
-    ],
-    "readOnly": true
-   },
-   "result": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "readOnly": true,
-    "description": "Deltas against the base version by subject and period."
-   },
-   "createdByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
  "AiForecastVersion": {
   "type": "object",
   "x-ticvai-persistence": "ai.forecast_version",
@@ -731,151 +632,6 @@
     "readOnly": true
    },
    "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
- "AiInsight": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.insight",
-  "description": "**An insight with a lifecycle** (AIP-181): new, reviewed, accepted or rejected, actioned, measured. Anomalies, forecast deviations, trends and opportunities land here; the narrative binds numbers to results, so a figure can only come from a query (design 8, 5.10).",
-  "required": [
-   "kind",
-   "title",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "anomaly",
-     "forecastDeviation",
-     "trend",
-     "opportunity",
-     "executiveSummary",
-     "rootCause",
-     "forecastThreshold",
-     "marketingRecommendation"
-    ]
-   },
-   "detectorId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "x-ticvai-references": "ai.anomaly_detector"
-   },
-   "metricKey": {
-    "type": "string",
-    "nullable": true
-   },
-   "subjectKind": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "campaign",
-     "journey",
-     "forecastDefinition",
-     "venue"
-    ],
-    "description": "What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for `marketingRecommendation`, a forecast definition for `forecastThreshold`."
-   },
-   "subjectRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "recommendedAction": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. Applied by a person in the owning module, never here."
-   },
-   "expectedImpact": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6)."
-   },
-   "title": {
-    "type": "string"
-   },
-   "narrative": {
-    "type": "string",
-    "nullable": true
-   },
-   "evidence": {
-    "$ref": "#/components/schemas/AiEvidenceItemList"
-   },
-   "magnitude": {
-    "type": "number",
-    "nullable": true
-   },
-   "priority": {
-    "type": "string",
-    "enum": [
-     "low",
-     "medium",
-     "high",
-     "critical"
-    ]
-   },
-   "correlationKey": {
-    "type": "string",
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "new",
-     "reviewed",
-     "accepted",
-     "rejected",
-     "actioned",
-     "measured"
-    ],
-    "readOnly": true
-   },
-   "decidedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "actionRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "measuredImpact": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "readOnly": true
-   },
-   "decisionRecordId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true
-   },
-   "detectedAt": {
     "type": "string",
     "format": "date-time",
     "readOnly": true
@@ -1040,45 +796,6 @@
    "dataAsOf": {
     "type": "string",
     "format": "date-time"
-   }
-  }
- },
- "AiScenarioComparison": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed from ai.forecast_point",
-  "description": "Scenarios side by side against their base version.",
-  "required": [
-   "scenarios"
-  ],
-  "properties": {
-   "scenarios": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AiForecastScenario"
-    }
-   },
-   "rows": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "subject": {
-       "type": "string"
-      },
-      "periodStart": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "base": {
-       "type": "number"
-      },
-      "values": {
-       "type": "object",
-       "additionalProperties": true,
-       "description": "Scenario id to value."
-      }
-     }
-    }
    }
   }
  },
@@ -1398,6 +1115,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -1472,6 +1190,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

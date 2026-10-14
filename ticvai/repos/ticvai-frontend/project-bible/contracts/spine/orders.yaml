@@ -119,12 +119,229 @@ x-ticvai-queries:
       source: orders.sales_order
       feeds: [order.created, order.paid, order.completed, order.cancelled, order.lapsed, order.refunded,
               order.linkedToGuest, guest.merged]
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October). Rule questions keep queries of their own, above.
+  cartRecords:
+    module: orders
+    table: orders.cart
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.cart rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Cart'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.cart rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements, and asked from another
+      deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  cartLineRecords:
+    module: orders
+    table: orders.cart_line
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.cart_line rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/CartLine'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.cart_line rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Orders' service route (serviceAuth).
+    served: [service]
+  discountRecords:
+    module: orders
+    table: orders.discount
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.discount rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/OrdersDiscount'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.discount rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements.
+    served: [in-process]
+  groupBookingRecords:
+    module: orders
+    table: orders.group_booking
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.group_booking rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/GroupBooking'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.group_booking rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Orders' service route (serviceAuth).
+    served: [service]
+  invitationRecords:
+    module: orders
+    table: orders.invitation
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.invitation rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Invitation'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.invitation rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Orders' service route (serviceAuth).
+    served: [service]
+  orderLineRecords:
+    module: orders
+    table: orders.order_line
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.order_line rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Order'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.order_line rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements, and asked from another
+      deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  paymentRecords:
+    module: orders
+    table: orders.payment
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.payment rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Payment'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.payment rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements, and asked from another
+      deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  refundRecords:
+    module: orders
+    table: orders.refund
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.refund rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Refund'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.refund rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements, and asked from another
+      deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  reservationRecords:
+    module: orders
+    table: orders.reservation
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.reservation rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Reservation'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.reservation rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Orders' service route (serviceAuth).
+    served: [service]
+  salesOrderRecords:
+    module: orders
+    table: orders.sales_order
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.sales_order rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Order'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.sales_order rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements, and asked from another
+      deployable through Orders' service route (serviceAuth).
+    served: [in-process, service]
+  tokenRecords:
+    module: orders
+    table: payments.token
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The payments.token rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PaymentToken'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its payments.token rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements.
+    served: [in-process]
 paths:
   /carts:
     post:
       operationId: createCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P02 GST-041 Checkout Entry"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -194,6 +411,10 @@ paths:
         - "P02 GST-014 Ticket Transfer"
         - "P02 GST-019 Order History"
         - "P02 GST-035 Feedback & Ratings"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -205,7 +426,11 @@ paths:
         **Scoped to the caller, not filtered by it.** The same shape as `listMyCases` and `listMyEntitlements`:
         a guest-facing list that accepts a subject is a list somebody will call with another subject.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`failed`, `voided`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - orders
       x-ticvai-permission: null
@@ -260,7 +485,9 @@ paths:
         `riskWeight` accumulates across rules, so **three weak signals can hold a transaction that no
         single rule would** — which is the point of a weight rather than a flag.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - orders
       parameters:
@@ -295,6 +522,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-614 Refund Approval & Exception Workflow"
         - "P08 ADM-630 Payment Risk Rule & Decision Engine"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: Change what holds a transaction
       description: '**The whole set in one call**, because a rule set edited one rule at a time spends
         time in states nobody intended — a threshold lowered before its companion is raised.
@@ -341,6 +570,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-026 Group Bookings"
         - "P08 BO-272 Quote-to-Booking Conversion & Confirmation"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       summary: Turn an order into a group booking
       description: 'BL-028. **`getGroupBooking` read a table nothing wrote**, so `BO-026 Group Bookings`
         still ran on generic order operations: no leader, no expected size, no names to collect.
@@ -405,6 +638,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
+      x-ticvai-read-via:
+      - query: catalogue#groupPackageRecords
+        route: in-process
+        for: 'its read of catalogue.group_package, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: Ask for a school trip or a birthday party
       description: '**Design gap, 23 September.** The guest-facing half of `createGroupBooking`: a school
         or a parent asks online, the date is held at once, and the booking starts `provisional`.
@@ -491,6 +731,8 @@ paths:
       operationId: setDepositPolicy
       x-ticvai-consumed-by:
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Set how deposits work
       description: '**Design gap, 23 September.** Parties and some dining bookings take a deposit now and
         the balance on the day, refundable up to 24 hours ahead. Nothing in the orders contract said how
@@ -556,6 +798,10 @@ paths:
         - "P04 POS-031 Reservations & Group Arrivals"
         - "P08 BO-026 Group Bookings"
         - "P08 BO-273 Group Booking 360° & Handover Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -597,6 +843,10 @@ paths:
         - "P08 BO-026 Group Bookings"
         - "P08 BO-272 Quote-to-Booking Conversion & Confirmation"
         - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       summary: Confirm numbers, change the leader or cancel a group
       description: '**`confirmedSize` against `minimumSize` is where the money is decided.** Confirming
         below the minimum is allowed and recorded, because the group has already arrived. Whether the
@@ -838,6 +1088,10 @@ paths:
       operationId: resendPaymentLink
       x-ticvai-consumed-by:
         - "P08 ADM-593 Payment Link Distribution & Customer Journey Manager"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: marketing.message_dispatch
         operation: sendTransactionalMessage
@@ -885,6 +1139,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentLink'
+        '409':
+          description: 'The link is not live (`paid`, `expired`, `superseded` or `cancelled`); only an `issued` or `viewed` link is resent. Nothing is sent.'
+          x-ticvai-problem-types: [payment-link-not-live]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payment-links/{linkId}/cancel:
@@ -969,6 +1230,10 @@ paths:
         format: uuid
     post:
       operationId: convertToTermProduct
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1025,11 +1290,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConvertToTermResult'
+        '409':
+          description: 'The order is not paid (`pending`, `held`, `partiallyPaid`, `voided` or `failed`; `order-not-paid`) or has been `refunded` (`order-refunded`), so there is no payment to credit. Nothing changes.'
+          x-ticvai-problem-types: [order-not-paid, order-refunded]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-credit-accounts:
     post:
       operationId: openGuestCreditAccount
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       summary: A credit limit for an individual booking ahead
       description: 'BL-051, 1.3.51. **`orders.CreditPosition` is B2B only** — a partner with net terms.
         The requirement puts a 25,000 AED limit on an **individual** who books ahead and settles X days
@@ -1206,6 +1482,13 @@ paths:
       operationId: reissueEntitlement
       x-ticvai-consumed-by:
         - "P04 POS-026 Receipt & Reprint"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.reissued
@@ -1264,6 +1547,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReissuedEntitlement'
         '409':
+          x-ticvai-problem-types: [entitlement-not-expired, entitlement-already-replaced]
           description: 'The entitlement is not expired (`entitlementNotExpired`) — this is the reissue
             of an expired entitlement, and a live one is exchanged or rescheduled instead — or it has
             already been replaced by an earlier reissue (`entitlementAlreadyReplaced`).
@@ -1288,6 +1572,16 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-072 Share & Group Booking"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.shareChanged
@@ -1344,6 +1638,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/EntitlementShare'
         '409':
+          x-ticvai-problem-types: [sharing-not-allowed, recipient-cannot-share-on, entitlement-not-active]
           description: 'Not shareable, and the reason says which: the entitlement''s template does not
             allow sharing (`sharingNotAllowed`, `EntitlementTemplate.canShareMedia` false), the caller
             holds it only through a share and cannot pass it on (`recipientCannotShareOn`), or it is
@@ -1365,6 +1660,7 @@ paths:
         type: string
         format: uuid
     - name: shareId
+      x-ticvai-column: identity.delegated_access.id
       in: path
       required: true
       schema:
@@ -1372,6 +1668,13 @@ paths:
         format: uuid
     post:
       operationId: revokeEntitlementShare
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.shareChanged
@@ -1424,6 +1727,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-018 My Tickets"
         - "P02 GST-018 Add to Calendar / Reminders"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1492,6 +1799,10 @@ paths:
         format: uuid
     post:
       operationId: pushWalletPassUpdate
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       summary: Push a change to every device holding it
       description: '**Every registered device, not just the one that asked.** A guest with the pass on
         a phone and a watch is one entitlement and two registrations, and a gate change that reaches one
@@ -1534,6 +1845,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WalletPass'
+        '409':
+          description: 'The pass is `voided` or `expired`; nothing is pushed to its devices.'
+          x-ticvai-problem-types: [wallet-pass-voided, wallet-pass-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resale-fee-policy:
@@ -1541,6 +1859,7 @@ paths:
       operationId: getResaleFeePolicy
       x-ticvai-consumed-by:
         - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
+      x-ticvai-names-for-context: [orders.order_fee, orders.resale_listing, payments.fee_rule]
       summary: The commission and price cap a resale listing is created under
       description: '**`orders.resale_listing` stored `sellerFeePercent`, `buyerFeePercent` and
         `priceCapPercent` on every listing and nothing produced them.** Two listings created a minute
@@ -1578,6 +1897,8 @@ paths:
       operationId: setResaleFeePolicy
       x-ticvai-consumed-by:
         - "P08 ADM-283 Resale Fees, Commission & Seller Proceeds"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per event or product, the one the body''s `eventId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Set resale commission and the price ceiling
       description: '**`priceCapPercent` is regulated in several jurisdictions and the package has said
         so**: the resale backlog entry records that anti-scalping limits bind in some markets and that
@@ -1623,6 +1944,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-067 Refunds & Resale"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1698,6 +2026,16 @@ paths:
         - "P08 ADM-653 Ticket, Experience & Bundle Upgrade Manager"
         - "P08 ADM-654 Membership & Pass Upgrade Engine"
         - "P08 ADM-656 Post-Purchase & In-Journey Upgrade Manager"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1784,7 +2122,9 @@ paths:
         Inactive templates are returned only when asked for: a template retired last season still
         explains a ticket issued from it.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - orders
       x-ticvai-permission: PRODUCT_VIEW
@@ -1961,6 +2301,10 @@ paths:
       operationId: printTicketProof
       x-ticvai-consumed-by:
         - "P08 BO-344 Media Design Studio Command Center"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: Print a sample without selling anything
       description: '2.16.6. **Artwork is checked by looking at it, and the only way to look at it was
         to sell something.**
@@ -2013,7 +2357,9 @@ paths:
       description: '**Sorted by `evidenceDueBy`, not by date received.** A case received yesterday with
         two days left outranks one received last week with twelve.
 
-        '
+        
+
+        **Statuses.** Every `status` is returned, ended ones included (`expired`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - orders
       parameters:
@@ -2054,6 +2400,10 @@ paths:
       operationId: respondToChargeback
       x-ticvai-consumed-by:
         - "P08 ADM-634 Chargeback & Dispute Command Center"
+      x-ticvai-read-via:
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       summary: Submit evidence, or accept the loss
       description: '**Accepting is a legitimate outcome and is recorded as a decision.** A 40 AED case
         with a 30 AED fee and two hours of work is one a venue should be able to concede deliberately
@@ -2125,6 +2475,7 @@ paths:
       operationId: listPaymentProviders
       x-ticvai-consumed-by:
         - "P09 ADM-412 Payment Method & Settlement Setup"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       summary: Gateways configured for this scope
       tags:
       - orders
@@ -2154,6 +2505,7 @@ paths:
                           $ref: '#/components/schemas/PaymentProvider'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /payment-providers/{providerId}:
     put:
       operationId: setPaymentProvider
       x-ticvai-consumed-by:
@@ -2186,6 +2538,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: providerId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -2222,7 +2579,9 @@ paths:
       description: '**Masked, always.** The last four digits and the brand — enough to choose between
         two saved cards and not enough to use one.
 
-        '
+        
+
+        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       tags:
       - orders
       parameters:
@@ -2258,6 +2617,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
+      x-ticvai-read-via:
+      - query: marketing-crm#consentRecords
+        route: service
+        for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: marketing.consent_record
         event: paymentToken.stored
@@ -2425,6 +2788,14 @@ paths:
   /invitations:
     post:
       operationId: issueInvitation
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-names-for-context: [orders.sales_order]
       x-ticvai-write-via:
       - table: access.entitlement
         event: invitation.issued
@@ -2532,11 +2903,17 @@ paths:
   /invitations/allowances:
     get:
       operationId: listInvitationAllowances
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       summary: Who may issue comps, and how many are left
       description: '8.1.5. **The allowance is the control.** Without it, restriction by profile is a yes/no
         on an unbounded right, which is not a restriction.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - orders
       parameters:
@@ -2570,6 +2947,16 @@ paths:
       operationId: authoriseStoredValue
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
+      x-ticvai-read-via:
+      - query: promotions#voucherRecords
+        route: in-process
+        for: 'its read of promotions.voucher, Catalogue''s data (CHG-MOD-001)'
+      - query: wallet#giftCardRecords
+        route: in-process
+        for: 'its read of wallet.gift_card, Wallet''s data (CHG-MOD-001)'
+      - query: wallet#walletRecords
+        route: in-process
+        for: 'its read of wallet.wallet, Wallet''s data (CHG-MOD-001)'
       x-ticvai-note: >-
         **One wallet debit path** (system-design review SD-027, 29 September). For a platform wallet this is a
         reference to a WalletService hold: authorising calls `wallet.holdWalletFunds` (guarded decrement of
@@ -2820,10 +3207,25 @@ paths:
         - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-041 Checkout Entry"
         - "P02 GST-048 Upsell / Cross-Sell"
-        - "P02 GST-053 Your Plan"
         - "P04 POS-010 Add to Existing Ticket"
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+      - query: promotions#promotionRecords
+        route: in-process
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-latency-budget-ms: 200
       parameters:
@@ -2986,7 +3388,7 @@ paths:
       - guest
       - partner
       - staff
-      summary: Add something
+      summary: Add a line to the cart
       description: '**A till''s cart is the session''s own** (decided 2 October 2026, CHG-SEED-013). On the till the cart
         belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller''s
         own cart, and for a till that is the session''s. A guest identified at the till is attached to
@@ -3084,6 +3486,12 @@ paths:
         - query: catalogue#variantsSellableAt
           route: in-process
           for: "the line's variantId on the caller's channel (409 notSellableOnChannel)"
+        - query: marketing-crm#consentQuestionRecords
+          route: service
+          for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+        - query: marketing-crm#consentQuestionVersionRecords
+          route: service
+          for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       - $ref: ../shared/common.yaml#/components/parameters/AdmissionToken
@@ -3108,6 +3516,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/AdmissionRequired
         '409':
+          x-ticvai-problem-types: [not-sellable-on-channel, sold-out-for-session, sold-out-for-day, window-unavailable, product-info-only, resource-hold-invalid]
           description: 'No capacity, or the product is not sellable on this channel (`notSellableOnChannel`).
             **The reason is specific** — sold out for this session (`soldOutForSession`) reads differently
             from sold out for the day (`soldOutForDay`), and no room of the type free for the booked window
@@ -3121,6 +3530,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartProblem'
         '422':
+          x-ticvai-problem-types: [window-required, window-not-allowed, window-length-mismatch, deposit-not-due, seat-limit-exceeded, transport-fare-unavailable, pass-not-valid-for-trip]
           description: 'The booked window is missing, not allowed or the wrong length for the variant
             (`windowRequired`, `windowNotAllowed`, `windowLengthMismatch`; rev 3 REV3-13), or a table deposit
             line names a booking that is not awaiting one (`depositNotDue`; rev 3 REV3-8b). More seats for
@@ -3154,6 +3564,16 @@ paths:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Holds go through Catalogue's one locked path, never a direct write** (system-design review SD-023,
@@ -3231,6 +3651,13 @@ paths:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-read-via:
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Holds go through Catalogue's one locked path, never a direct write** (system-design review SD-023,
@@ -3286,6 +3713,16 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       x-ticvai-note: >-
         **Holds go through Catalogue's one locked path, never a direct write** (system-design review SD-023,
         29 September). The order service takes the cart's hold with `catalogue.acquireInventoryHold`
@@ -3357,6 +3794,16 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-041 Checkout Entry"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -3381,6 +3828,13 @@ paths:
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
+        '409':
+          description: 'The cart is `checkedOut` or `abandoned` (`cart-not-open`), or already belongs to another guest (`cart-already-claimed`). Nothing is attached or merged.'
+          x-ticvai-problem-types: [cart-not-open, cart-already-claimed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
         '200':
@@ -3411,6 +3865,13 @@ paths:
         - "P02 GST-041 Checkout Entry"
         - "P05 KSK-006 Review"
         - "P10 PTR-010 Cart & Quote"
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: marketing.consent_record
         event: order.created
@@ -3661,6 +4122,10 @@ paths:
       operationId: listAbandonedCarts
       x-ticvai-consumed-by:
         - "P08 BO-778 Abandoned Cart Recovery"
+      x-ticvai-read-via:
+      - query: identity#subjectContactRecords
+        route: in-process
+        for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Carts that lapsed without checking out
@@ -3669,7 +4134,9 @@ paths:
         **Excludes carts abandoned deliberately.** A guest who emptied their cart said no, and chasing
         them is the difference between a reminder and a nuisance.
 
-        '
+        
+
+        **Order.** Sorted by `cartId` descending (a UUIDv7, so newest first).'
       tags:
       - cart
       x-ticvai-permission: MARKETING_MANAGE
@@ -3814,7 +4281,9 @@ paths:
         **A guest sees their own and nothing else** (`x-ticvai-self-scoped: subject`); supplying
         another subject is 403 rather than silently honoured.
 
-        '
+        
+
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -3864,6 +4333,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-023 Membership Management"
         - "P02 GST-015 Memberships"
+      x-ticvai-read-via:
+      - query: finance#taxInvoiceLineRecords
+        route: in-process
+        for: 'its read of ledger.tax_invoice_line, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - guest
       - staff
@@ -3955,7 +4428,9 @@ paths:
         own history is `listMyOrders`, which is scoped to the caller rather than filtered by a parameter
         (raised 24 August for `WEB-019` and `GST-019`). A guest surface does not load its list from here.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - order
       x-ticvai-permission: ORDER_VIEW
@@ -4056,6 +4531,10 @@ paths:
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'the performance''s seat limit on the channel (422 seat-limit-exceeded) (CHG-MOD-003)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-latency-budget-ms: 400
       security:
@@ -4111,6 +4590,11 @@ paths:
       x-ticvai-guest-callable: true
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
+      x-ticvai-offline-refused-on: [POS-004]
+      x-ticvai-offline-condition: 'No line carries a seat hold or a resource hold (Chinmay, 14 October 2026: "POS
+        createOrder and payments are offline-capable on the POS"; CHG-OFL-001). Seated inventory stays online
+        (ADR-0013) and a resource hold is a live reservation (REV3-15), so the seat map (POS-004) refuses a sale
+        offline; any other sale is written to the local journal and replayed through `syncOrders`.'
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -4395,6 +4879,10 @@ paths:
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
+      x-ticvai-read-via:
+      - query: seating#seatRecords
+        route: in-process
+        for: 'the seated lines'' leases (409 seat-lease-expiring) (CHG-MOD-003)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -4460,6 +4948,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Order'
         '409':
+          x-ticvai-problem-types: [already-paid, order-voided, seat-lease-expiring]
           description: 'Order is already paid (`alreadyPaid`) or voided (`orderVoided`) — only a
             `pending` order is parked — or a seated line''s lease ends before `holdUntil`
             (`seatLeaseExpiring`, naming the lines in `lineIds`), because parking cannot extend it and
@@ -4718,6 +5207,7 @@ paths:
       operationId: listOrderRefunds
       x-ticvai-consumed-by:
         - "P04 POS-006 Held Orders"
+        - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 ADM-609 Refund & Payment Adjustment Command Center"
@@ -4740,6 +5230,10 @@ paths:
       summary: List refunds against an order
       description: An unknown order, or one outside the caller's scope, is the shared 404; an order with
         no refunds is an empty list.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`failed`); a screen that shows only live rows filters on `status` itself.
       tags:
       - refund
       parameters:
@@ -5328,6 +5822,13 @@ paths:
         - "P06 EMP-035 Payment on device"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
         - "P10 PTR-012 Checkout / Credit Purchase"
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Order, payment, ticket: the saga** (system-design review SD-026, 29 September). When this payment
@@ -5422,6 +5923,14 @@ paths:
       x-ticvai-guest-callable: true
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
+      x-ticvai-offline-apps: [P04]
+      x-ticvai-offline-refused-on: [POS-004]
+      x-ticvai-offline-condition: 'Cash only, at a till (Chinmay, 14 October 2026: "POS createOrder and payments
+        are offline-capable on the POS"; CHG-OFL-001). Card, wallet, gift card and voucher need the gateway, and
+        cash is refused off a till (`cashNotOnHandheld`), so the payment queues in the till''s outbox and nowhere
+        else: the guest app and the staff app take it online, and the seat map (POS-004), where no seated sale is
+        made offline (ADR-0013), refuses it. The offline payment carries `recordedAt` and is replayed through
+        `syncOrders`.'
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -5531,6 +6040,13 @@ paths:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/PaymentProblem'
+        '409':
+          description: 'The payment is not `pendingConfirmation`; its outcome is already known and there is nothing to ask the provider. Nothing changes.'
+          x-ticvai-problem-types: [payment-not-pending-confirmation]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /payments/{paymentId}/tip:
@@ -5564,6 +6080,7 @@ paths:
       x-ticvai-permission: ORDER_MODIFY
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: true
+      x-ticvai-offline-apps: [P04]
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -5632,6 +6149,10 @@ paths:
         - "P06 EMP-035 Payment on device"
         - "P08 BO-024 Payment Exceptions"
         - "P10 PTR-012 Checkout / Credit Purchase"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-note: >-
         **Order, payment, ticket: the saga** (system-design review SD-026, 29 September). When this payment
@@ -5777,6 +6298,16 @@ paths:
         - "P04 POS-013 Mobile POS, Event Sales & Offline Operations"
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-132 Offline Transaction Monitor & Sync Queue"
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceListRecords
+        route: in-process
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#variantRecords
+        route: in-process
+        for: 'its read of catalogue.variant, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: sync.rejection
         operation: recordSyncRejection
@@ -5817,6 +6348,7 @@ paths:
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: workstation
       x-ticvai-offline-capable: false
+      x-ticvai-outbox-replay: true
       x-ticvai-conflict-policy: append
       requestBody:
         required: true
@@ -5864,6 +6396,10 @@ paths:
         - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P08 BO-132 Offline Transaction Monitor & Sync Queue"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
+      x-ticvai-read-via:
+      - query: cross-region#rejectionRecords
+        route: service
+        for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5874,7 +6410,9 @@ paths:
         A rejection leaves this list''s unresolved view when `resolveSyncRejection` records what was
         done about it.
 
-        '
+        
+
+        **Order.** Newest first, by `recordedAt` descending, then by `id`.'
       tags:
       - sync
       x-ticvai-permission: ORDER_VIEW
@@ -5941,6 +6479,10 @@ paths:
         - "P08 BO-038 Reconciliation Queue"
         - "P08 BO-130 Offline Policy & Rules Configuration"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
+      x-ticvai-read-via:
+      - query: cross-region#rejectionRecords
+        route: service
+        for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: sync.rejection
         operation: recordSyncRejectionResolution
@@ -6024,6 +6566,10 @@ paths:
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'whether a targeted line''s entitlement is redeemed (409 line-redeemed) (CHG-MOD-003)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -6065,6 +6611,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderModificationResult'
         '409':
+          x-ticvai-problem-types: [line-redeemed, order-voided]
           description: 'A targeted line''s entitlement has been redeemed (`lineRedeemed`, naming it in
             `lineIds`), or the order is voided (`orderVoided`).
 
@@ -6089,6 +6636,19 @@ paths:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: What is already on this media
@@ -6127,6 +6687,10 @@ paths:
         - "P04 POS-010 Add to Existing Ticket"
         - "P06 EMP-036 Issue media"
         - "P08 BO-027 Reissue & Media Replacement"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: order.paid
@@ -6176,6 +6740,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppendEntitlementResult'
         '409':
+          x-ticvai-problem-types: [media-expired, media-blocked, media-surrendered, entitlement-cannot-share-media, venue-mismatch, guest-already-departed]
           description: 'Media expired (`mediaExpired`), blocked (`mediaBlocked`), already surrendered at
             exit (`mediaSurrendered`), or the entitlement cannot share media
             (`entitlementCannotShareMedia`) — a single-entry ticket surrendered at the gate is not a claim
@@ -6293,6 +6858,10 @@ paths:
         - "P10 PTR-002 Partner Dashboard"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'the target performance (409 target-unavailable) (CHG-MOD-003)'
       x-ticvai-api-scope: ticketing.write
       x-ticvai-audience:
       - staff
@@ -6361,6 +6930,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrderExchangeResult'
         '409':
+          x-ticvai-problem-types: [target-unavailable, outside-reschedule-window]
           description: Target performance is unavailable (`targetUnavailable`) or outside the
             reschedule window (`outsideRescheduleWindow`). The window is the venue setting
             `rescheduleCutoffHours`, with a tenant default; a reschedule is refused once the original
@@ -6437,6 +7007,7 @@ paths:
       x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
+      x-ticvai-offline-apps: [P04, P06]
       x-ticvai-conflict-policy: append
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -6534,6 +7105,13 @@ paths:
         - "P02 GST-013 Ticket Details"
         - "P02 GST-014 Ticket Transfer"
         - "P02 GST-045 Ticket Delivery & Sharing"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'whether the product allows transfer (409 transfer-not-allowed) (CHG-MOD-003)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.transferred
@@ -6608,6 +7186,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TicketTransfer'
         '409':
+          x-ticvai-problem-types: [already-redeemed, already-offered, transfer-not-allowed]
           description: 'Ticket already redeemed (`alreadyRedeemed`), already offered (`alreadyOffered`),
             or the product forbids transfer (`transferNotAllowed`). `ticketIds` names the tickets refused,
             so the guest can send the rest.
@@ -6631,6 +7210,10 @@ paths:
       operationId: claimTicketTransfer
       x-ticvai-consumed-by:
         - "P02 GST-014 Ticket Transfer"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.transferred
@@ -6672,6 +7255,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TicketTransfer'
         '410':
+          x-ticvai-problem-types: [offer-expired, already-claimed, offer-cancelled]
           description: Offer expired (`offerExpired`), already claimed (`alreadyClaimed`), or withdrawn by
             the sender (`offerCancelled`).
           content:
@@ -6684,6 +7268,9 @@ paths:
     get:
       operationId: listTicketTransfers
       x-ticvai-consumed-by:
+        - "P01 WEB-018 My Tickets"
+        - "P02 GST-012 My Tickets"
+        - "P02 GST-013 Ticket Details"
         - "P02 GST-045 Ticket Delivery & Sharing"
       x-ticvai-audience:
       - guest
@@ -6697,7 +7284,9 @@ paths:
         appears where the caller is its sender (`fromSubjectId`) or, once claimed, its recipient
         (`toSubjectId`).
 
-        '
+        
+
+        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       tags:
       - order
       x-ticvai-permission: null
@@ -6772,6 +7361,10 @@ paths:
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
         - "P10 PTR-016 Voucher / Ticket Download"
+      x-ticvai-read-via:
+      - query: finance#postingRecords
+        route: in-process
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
       x-ticvai-api-scope: ticketing.read
       x-ticvai-audience:
       - staff
@@ -6821,7 +7414,9 @@ paths:
         reservations; another guest''s reservation is refused exactly as one that does not exist, never
         returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - reservation
       x-ticvai-permission: ORDER_VIEW
@@ -7231,6 +7826,10 @@ paths:
       operationId: listUpgradeConversion
       x-ticvai-consumed-by:
         - "P08 ADM-308 Upgrade & Conversion Command Center"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.3; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (3 filters to query parameters; 6 non-field properties removed)'
@@ -7325,6 +7924,12 @@ paths:
       operationId: setUpgradeConversionPath
       x-ticvai-consumed-by:
         - "P08 ADM-309 Upgrade & Conversion Path Builder"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per upgrade path, the one the body''s `pathCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.5; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (rewritten from the pack page)'
@@ -7383,6 +7988,13 @@ paths:
       operationId: listUpgradeEligibilityQualification
       x-ticvai-consumed-by:
         - "P08 ADM-310 Upgrade Eligibility & Qualification Rules"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7433,6 +8045,10 @@ paths:
       operationId: listUpgradeTimingUsage
       x-ticvai-consumed-by:
         - "P08 ADM-311 Upgrade Timing, Usage & Ticket Status Rules"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7483,6 +8099,10 @@ paths:
       operationId: listUpgradeFinancialTreatment
       x-ticvai-consumed-by:
         - "P08 ADM-312 Upgrade Financial Treatment & Price Difference Rules"
+      x-ticvai-read-via:
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7533,6 +8153,8 @@ paths:
       operationId: setProRataResidual
       x-ticvai-consumed-by:
         - "P08 ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.12; MoM 1 Sep 4.9 and Key Decisions (pro-rata credit for memberships and usage-based products); shape fixed (rewritten from the pack page)'
@@ -7590,6 +8212,10 @@ paths:
       operationId: listPersonTypeProduct
       x-ticvai-consumed-by:
         - "P08 ADM-314 Person-Type, Product & Entitlement Conversion Rules"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7640,6 +8266,13 @@ paths:
       operationId: listBulkGroupAssisted
       x-ticvai-consumed-by:
         - "P08 ADM-315 Bulk, Group & Assisted Upgrade Operations"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.16; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (8 filters to query parameters; 5 non-field properties removed; added bulkAction, selectedCount, eligibleCount, notEligibleCount, ineligibilityReasons, totalOriginalEligibleValue, totalTargetValue, totalUpgradeDifference, fees, taxes, finalCollectionOrRefund, partialProcessing)'
@@ -7740,6 +8373,10 @@ paths:
       operationId: createUpgradeCredentialRegeneration
       x-ticvai-consumed-by:
         - "P08 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
         operation: replaceCredential
@@ -7799,6 +8436,10 @@ paths:
       operationId: listUpgradeException
       x-ticvai-consumed-by:
         - "P08 ADM-317 Upgrade History, Exception Management & Audit Explorer"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Upgrade, Exchange & Conversion_Reference.pdf p.20; MoM 1 Sep 4.9 (paths, eligibility, pro-rata, guest-app upgrades, group upgrades by request); shape fixed (5 filters to query parameters; 5 non-field properties removed; enums exceptionType)'
@@ -8076,6 +8717,7 @@ paths:
                   $ref: '#/components/schemas/GroupCustomerOrganizationProfileView'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /group-customer-organization/{organisationId}:
     put:
       operationId: setGroupCustomerOrganization
       x-ticvai-consumed-by:
@@ -8100,6 +8742,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: VM close-out; pack label on BO-266 (Event Organizer); shape follows updateGroupBooking'
       parameters:
+      - name: organisationId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `organisationId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: '../shared/common.yaml#/components/parameters/IfMatch'
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
@@ -8129,6 +8776,16 @@ paths:
       operationId: listGroupRequirementAvailability
       x-ticvai-consumed-by:
         - "P08 BO-267 Group Requirements, Availability & Capacity Planner"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8174,6 +8831,18 @@ paths:
       operationId: setGroupPackageExperience
       x-ticvai-consumed-by:
         - "P08 BO-268 Group Package & Experience Builder"
+      x-ticvai-read-via:
+      - query: catalogue#groupPackageRecords
+        route: in-process
+        for: 'its read of catalogue.group_package, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.9; MoM 31 Aug 4.7 (package builder against real-time availability); shape fixed (enums componentTypes, template; added packageName, guestCount, components)'
@@ -8228,6 +8897,12 @@ paths:
       operationId: setGroupQuotationProposal
       x-ticvai-consumed-by:
         - "P08 BO-269 Group Quotation Builder & Proposal Generation"
+      x-ticvai-read-via:
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.11; MoM 31 Aug 4.7 (quotation, versions, approval of extra discount); shape fixed (9 non-field properties removed; enums deliveryFormats; added lines)'
@@ -8329,6 +9004,10 @@ paths:
       operationId: approveGroupDiscountException
       x-ticvai-consumed-by:
         - "P08 BO-271 Group Discount, Exception & Approval Workflow"
+      x-ticvai-read-via:
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.13; MoM 31 Aug 4.7 (configurable approval for additional discounts); shape fixed (3 non-field properties removed; added decision)'
@@ -8429,6 +9108,8 @@ paths:
       operationId: setGroupBookingHandover
       x-ticvai-consumed-by:
         - "P08 BO-273 Group Booking 360° & Handover Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.16; MoM 31 Aug 4.7-4.8 (group flow, payment link, group check-in); MoM 1 Sep 4.12 (deposits); shape fixed (7 non-field properties removed)'
@@ -8489,6 +9170,10 @@ paths:
       operationId: listGroupBooking
       x-ticvai-consumed-by:
         - "P08 BO-274 Group Booking Operations Command Center"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8532,6 +9217,8 @@ paths:
       operationId: setGroupOperationalPlanning
       x-ticvai-consumed-by:
         - "P08 BO-275 Group Operational Planning & Task Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.22; MoM 31 Aug 4.8 (guides or educators assigned ahead of arrival); shape fixed (14 non-field properties removed; added tasks)'
@@ -8586,6 +9273,10 @@ paths:
       operationId: listParticipantGuestList
       x-ticvai-consumed-by:
         - "P08 BO-276 Participants, Guest Lists & Group Structure"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8683,6 +9374,10 @@ paths:
       operationId: listGroupTicketSeat
       x-ticvai-consumed-by:
         - "P08 BO-278 Group Ticket, Seat & Entitlement Allocation"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8728,6 +9423,13 @@ paths:
       operationId: listGroupTicketFulfillment
       x-ticvai-consumed-by:
         - "P08 BO-279 Group Ticket Fulfillment & Distribution"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: marketing-crm#messageDispatchRecords
+        route: service
+        for: 'its read of marketing.message_dispatch, Marketing''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8778,6 +9480,13 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-031 Reservations & Group Arrivals"
         - "P08 BO-280 Group Arrival, Check-In & Admission Operations"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8873,6 +9582,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-274 Group Booking Operations Command Center"
         - "P08 BO-282 Group Booking Reconciliation, Closure & Performance"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -8920,6 +9636,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-264 Group Sales Command Center"
         - "P08 BO-283 Group Sales Analytics & AI Intelligence Center"
+      x-ticvai-read-via:
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Group_Sales___Corporate_Booking_Management_Reference.pdf p.33; MoM 14 Aug (forecasting needs history; AI advisory in phase one); shape fixed (2 filters to query parameters; 12 non-field properties removed)'
@@ -9028,6 +9748,10 @@ paths:
       operationId: listOrderReservation
       x-ticvai-consumed-by:
         - "P08 BO-304 Order & Reservation Command Center"
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.3; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (7 filters to query parameters; 3 non-field properties removed)'
@@ -9098,6 +9822,7 @@ paths:
           type: string
         description: Mobile
       - name: membershipId
+        x-ticvai-column: orders.membership_renewal.customer_membership_id
         in: query
         required: false
         schema:
@@ -9165,6 +9890,15 @@ paths:
   /order-detail-transaction:
     put:
       operationId: setOrderDetailTransaction
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.5; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (13 non-field properties removed; added lines)'
@@ -9216,6 +9950,8 @@ paths:
       operationId: setReservationHoldPolicy
       x-ticvai-consumed-by:
         - "P08 BO-306 Reservation & Hold Policy Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.7; MoM 1 Sep 4.11 (hold released to inventory when payment is not completed); audit R094 (cart hold extension); shape fixed (2 non-field properties removed; enums holdType, lockedCapacity; added holdDurationMinutes, onExpiry)'
@@ -9273,6 +10009,8 @@ paths:
       operationId: setOrderReservationStatus
       x-ticvai-consumed-by:
         - "P08 BO-307 Order & Reservation Status Lifecycle Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.9; MoM 1 Sep 4.11 (draft, reserved, completed, cancelled or expired); shape agreed as drafted'
@@ -9383,6 +10121,12 @@ paths:
       operationId: setCustomerGuestAccount
       x-ticvai-consumed-by:
         - "P08 BO-309 Customer, Guest & Account Assignment"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per customer, the one the body''s `customerId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.11; MoM 1 Sep 4.11 (guest checkout or registration per channel; customer category decides what is collected); shape fixed (3 non-field properties removed; enums customerType)'
@@ -9403,7 +10147,13 @@ paths:
         customer category decides what is collected). Shape: 3 properties removed that were filters,
         actions, behaviour, roles, examples or prose fragments rather than fields; 6
         one-value-per-field properties folded into enums (customerType); renamed
-        anonymousSaleWherePermitted to anonymousSale, costCenterWhereApplicable to costCenter.'
+        anonymousSaleWherePermitted to anonymousSale, costCenterWhereApplicable to costCenter.
+
+
+        **It announces each order it attaches to a guest** (14 October 2026, CHG-MOD-006): one `order.linkedToGuest`
+        per order whose subject it sets, written to the outbox in its own transaction (ADR-0033), so Identity''s
+        projection of what each guest holds (`SubjectHolding`) learns that the guest holds the order
+        (`orders#openOrdersForSubject`).'
       tags:
       - drafted
       x-ticvai-permission: ORDER_CREATE
@@ -9439,6 +10189,16 @@ paths:
       operationId: listOrderLineProduct
       x-ticvai-consumed-by:
         - "P08 BO-310 Order Line, Product & Entitlement Composition"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -9488,6 +10248,13 @@ paths:
       operationId: listCapacityReservationInventory
       x-ticvai-consumed-by:
         - "P08 BO-311 Capacity Reservation & Inventory Commitment"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -9538,6 +10305,10 @@ paths:
       operationId: listReservationConfirmationExpiry
       x-ticvai-consumed-by:
         - "P08 BO-312 Reservation Confirmation, Expiry & Fulfillment Readiness"
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -9588,6 +10359,10 @@ paths:
       operationId: listOrderLifecycleTimeline
       x-ticvai-consumed-by:
         - "P08 BO-313 Order Lifecycle Timeline, SLA, Exceptions & AI Operations"
+      x-ticvai-read-via:
+      - query: cross-region#rejectionRecords
+        route: service
+        for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -9741,6 +10516,18 @@ paths:
   /order-amendment:
     put:
       operationId: setOrderAmendment
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.22; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (12 non-field properties removed)'
@@ -9802,6 +10589,8 @@ paths:
       operationId: setAmendmentEligibilityPolicy
       x-ticvai-consumed-by:
         - "P08 BO-316 Amendment Eligibility & Policy Rule Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.24; MoM 1 Sep 4.12; shape fixed (3 non-field properties removed; enums eligibleTicketStatuses; added exceptionRole)'
@@ -9858,6 +10647,8 @@ paths:
       operationId: setCancellationPartialPolicy
       x-ticvai-consumed-by:
         - "P08 BO-317 Cancellation & Partial Cancellation Policy Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.26; MoM 10 Aug (tiered refund policy driven by back-office rules per business); MoM 1 Sep 4.12; audit R123 (6); shape fixed (1 non-field properties removed; enums permittedScopes, evaluatedConditions; added windows, reasonCodes)'
@@ -9971,6 +10762,10 @@ paths:
       operationId: listTicketReissueFulfillment
       x-ticvai-consumed-by:
         - "P08 BO-027 Reissue & Media Replacement"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10016,6 +10811,8 @@ paths:
       operationId: setAfterSaleFinancial
       x-ticvai-consumed-by:
         - "P08 BO-321 After-Sales Financial Settlement & Adjustment Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per order, the one the body''s `orderId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.32; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (5 non-field properties removed; enums paymentStatus; added refundDue, commitPolicy, orderId)'
@@ -10218,6 +11015,13 @@ paths:
       operationId: listPaymentOrderFinancial
       x-ticvai-consumed-by:
         - "P08 BO-324 Payment & Order Financial Command Center"
+      x-ticvai-read-via:
+      - query: finance#settlementExceptionRecords
+        route: in-process
+        for: 'its read of ledger.settlement_exception, Ledger''s data (CHG-MOD-001)'
+      - query: finance#settlementRecords
+        route: in-process
+        for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.40; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (4 filters to query parameters; 18 non-field properties removed; added paymentStatus)'
@@ -10289,6 +11093,10 @@ paths:
         - "P08 ADM-607 Mixed Tender Transaction Trace & Allocation Audit"
         - "P08 ADM-617 Refund Transaction Trace & Audit Investigation"
         - "P08 BO-325 Order Payment Detail & Transaction Ledger"
+      x-ticvai-read-via:
+      - query: finance#settlementExceptionRecords
+        route: in-process
+        for: 'its read of ledger.settlement_exception, Ledger''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10334,6 +11142,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-601 Split Payment & Tender Allocation Manager"
         - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.43; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (4 non-field properties removed; enums allocationLevel)'
@@ -10581,6 +11391,10 @@ paths:
       operationId: listExternalPaymentPartner
       x-ticvai-consumed-by:
         - "P08 BO-330 External Payment, Partner & Settlement Reference Mapping"
+      x-ticvai-read-via:
+      - query: finance#settlementRecords
+        route: in-process
+        for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10631,6 +11445,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-024 Payment Exceptions"
         - "P08 BO-331 Payment Reconciliation & Exception Management"
+      x-ticvai-read-via:
+      - query: finance#settlementExceptionRecords
+        route: in-process
+        for: 'its read of ledger.settlement_exception, Ledger''s data (CHG-MOD-001)'
+      - query: finance#settlementRecords
+        route: in-process
+        for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10679,6 +11500,10 @@ paths:
       operationId: listFinancialTraceability
       x-ticvai-consumed-by:
         - "P08 BO-332 Financial Traceability, Control & Audit Explorer"
+      x-ticvai-read-via:
+      - query: finance#postingRecords
+        route: in-process
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.51; MoM 1 Sep 4.11-4.12 (orders, holds, amendments, deposits); shape fixed (1 filters to query parameters; 5 non-field properties removed; enums interventionType)'
@@ -10740,6 +11565,13 @@ paths:
       operationId: listOrderFinancialReconciliation
       x-ticvai-consumed-by:
         - "P08 BO-333 Order Financial Analytics & AI Reconciliation Intelligence"
+      x-ticvai-read-via:
+      - query: finance#settlementExceptionRecords
+        route: in-process
+        for: 'its read of ledger.settlement_exception, Ledger''s data (CHG-MOD-001)'
+      - query: finance#settlementRecords
+        route: in-process
+        for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Order___Reservation_Management_Reference.pdf p.53; MoM 14 Aug (AI advisory in phase one); shape fixed (5 non-field properties removed)'
@@ -10832,6 +11664,13 @@ paths:
       operationId: listResaleMarketplace
       x-ticvai-consumed-by:
         - "P08 ADM-278 Resale Marketplace Command Center"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.4; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (2 filters to query parameters; 1 non-field properties removed)'
@@ -10937,6 +11776,8 @@ paths:
       operationId: setResaleEligibilityRule
       x-ticvai-consumed-by:
         - "P08 ADM-279 Resale Eligibility Rule Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.5; MoM 31 Aug 4.12 (eligibility such as minimum time before validity, no expired tickets); MoM 1 Sep 4.14 (Board 1 resale rules); shape fixed (enums requiredConditions)'
@@ -11039,6 +11880,16 @@ paths:
       operationId: createListingSeller
       x-ticvai-consumed-by:
         - "P08 ADM-281 Listing Creation & Seller Configuration"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: in-process
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.9; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (11 non-field properties removed; enums listingType)'
@@ -11095,6 +11946,10 @@ paths:
       operationId: listResalePricingPrice
       x-ticvai-consumed-by:
         - "P08 ADM-282 Resale Pricing & Price Guardrails"
+      x-ticvai-read-via:
+      - query: catalogue#priceRecords
+        route: in-process
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11192,6 +12047,8 @@ paths:
       operationId: approveListingModeration
       x-ticvai-consumed-by:
         - "P08 ADM-284 Listing Approval & Moderation"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.13; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (1 non-field properties removed; enums reviewReasons; added decision)'
@@ -11251,6 +12108,13 @@ paths:
       operationId: listResaleInventoryAvailability
       x-ticvai-consumed-by:
         - "P08 ADM-285 Resale Inventory & Availability Management"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11345,6 +12209,8 @@ paths:
       operationId: setResaleMarketplaceRecommendation
       x-ticvai-consumed-by:
         - "P08 ADM-287 AI Resale Configuration & Marketplace Recommendations"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.18; MoM 14 Aug (AI advisory in phase one); shape fixed (8 non-field properties removed; added decision)'
@@ -11400,6 +12266,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-288 Resale Operations Command Center"
         - "P08 ADM-297 Resale Analytics & AI Intelligence"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11448,6 +12318,10 @@ paths:
       operationId: listBuyerPurchaseResale
       x-ticvai-consumed-by:
         - "P08 ADM-289 Buyer Purchase & Resale Order Management"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11492,6 +12366,10 @@ paths:
       operationId: listTicketOwnershipTransfer
       x-ticvai-consumed-by:
         - "P08 ADM-290 Ticket Ownership Transfer Management"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11543,6 +12421,10 @@ paths:
       operationId: listCredentialRevocationRegeneration
       x-ticvai-consumed-by:
         - "P08 ADM-291 Credential Revocation & Regeneration"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11590,6 +12472,13 @@ paths:
       operationId: listResaleFraudDuplicate
       x-ticvai-consumed-by:
         - "P08 ADM-292 Resale Fraud & Duplicate Sale Protection"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11636,6 +12525,13 @@ paths:
       operationId: listCapacityInventoryReconciliation
       x-ticvai-consumed-by:
         - "P08 ADM-293 Capacity & Inventory Reconciliation"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -11785,6 +12681,10 @@ paths:
       operationId: listResaleOwnership
       x-ticvai-consumed-by:
         - "P08 ADM-296 Resale Audit & Ownership History"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.34; MoM 1 Sep 4.14 Decision (ownership change log against a stable ticket ID); shape fixed (10 filters to query parameters; 8 non-field properties removed)'
@@ -11902,6 +12802,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-288 Resale Operations Command Center"
         - "P08 ADM-297 Resale Analytics & AI Intelligence"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: in-process
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack Ticket Resale Marketplace_Reference.pdf p.35; MoM 31 Aug 4.12 and MoM 1 Sep 4.14 (three access models, ID preserved through resale); shape fixed (11 non-field properties removed)'
@@ -11995,6 +12899,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-278 Resale Marketplace Command Center"
         - "P08 ADM-298 My Tickets & Resale Marketplace Entry"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12041,6 +12952,16 @@ paths:
       operationId: listResaleEligibilityTicket
       x-ticvai-consumed-by:
         - "P08 ADM-299 Resale Eligibility & Ticket Selection"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: access#scanEventRecords
+        route: service
+        for: 'its read of access.scan_event, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12178,6 +13099,13 @@ paths:
       operationId: listResaleListingSeller
       x-ticvai-consumed-by:
         - "P08 ADM-302 My Resale Listings & Seller Dashboard"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12224,6 +13152,16 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-278 Resale Marketplace Command Center"
         - "P08 ADM-303 Official Resale Marketplace & Buyer Discovery"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12269,6 +13207,16 @@ paths:
       operationId: listResaleTicketDetail
       x-ticvai-consumed-by:
         - "P08 ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: in-process
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12314,6 +13262,13 @@ paths:
       operationId: listBuyerCheckoutInventory
       x-ticvai-consumed-by:
         - "P08 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment"
+      x-ticvai-read-via:
+      - query: catalogue#inventoryReservationRecords
+        route: in-process
+        for: 'its read of catalogue.inventory_reservation, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: in-process
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12360,6 +13315,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-296 Resale Audit & Ownership History"
         - "P08 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -12460,7 +13419,9 @@ paths:
 
         An unknown membership is the shared 404; one never renewed is an empty list.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -12558,12 +13519,15 @@ paths:
       operationId: listDeposits
       x-ticvai-consumed-by:
         - "P08 BO-024 Payment Exceptions"
+      x-ticvai-names-for-context: [ledger.deposit]
       summary: Deposits and their authorisation state
       description: >
         **The authorisation lifecycle, not the accounting one.** `required`, `authorized`,
         `captured`, `released` and `forfeited` are what the card company knows; `ledger.deposit`
         holds the liability posting and its `refundableUntil`. Two tables called deposit, two
         different questions.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -12601,6 +13565,8 @@ paths:
         **Distinct from `promotions`, which decides whether a discount applies.** This records that
         one did, to this order, for this amount — the row a refund has to reverse and a report has
         to total.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -12640,6 +13606,8 @@ paths:
         to read them.
 
         An unknown order is the shared 404; an order with no fees is an empty list.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -12687,6 +13655,8 @@ paths:
         **`quoteUpgrade` priced an upgrade and nothing recorded that one happened.** The quote is
         the cheap half; the record is what a guest arriving with an upgraded entitlement is checked
         against.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -12729,6 +13699,19 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
         - "P02 GST-041 Checkout Entry"
+      x-ticvai-read-via:
+      - query: marketing-crm#consentQuestionRecords
+        route: service
+        for: 'its read of marketing.consent_question, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentQuestionVersionRecords
+        route: service
+        for: 'its read of marketing.consent_question_version, Marketing''s data (CHG-MOD-001)'
+      - query: promotions#couponCampaignRecords
+        route: in-process
+        for: 'its read of promotions.coupon_campaign, Catalogue''s data (CHG-MOD-001)'
+      - query: promotions#couponCodeRecords
+        route: in-process
+        for: 'its read of promotions.coupon_code, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-api-scope: ticketing.write
       security:
       - guestAuth: []
@@ -12947,6 +13930,13 @@ paths:
       operationId: migrateMembership
       x-ticvai-consumed-by:
         - "P08 BO-299 Membership Upgrade, Downgrade & Product Migration Operations"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'the target product (409 same-product) (CHG-MOD-003)'
+      - query: identity#customerMembershipRecords
+        route: in-process
+        for: 'whether the membership is active (409 membership-not-active) (CHG-MOD-003)'
       summary: Upgrade, downgrade or migrate an active membership to another product
       description: '**An active membership moves to another plan without being cancelled and
         resold** (decided 29 September, readiness close-out). It sits beside `renewMembership`
@@ -12992,6 +13982,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [membership-not-active, same-product, migration-already-scheduled]
           description: The membership is not active (`membershipNotActive`), the target is the product
             it already holds (`sameProduct`), or a migration is already scheduled (`migrationAlreadyScheduled`).
           content:
@@ -13287,6 +14278,8 @@ paths:
       operationId: setRefundCalculationPolicy
       x-ticvai-consumed-by:
         - "P08 BO-318 Refund Policy & Refund Calculation Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Set how a venue calculates a refund and where it goes
       description: '**`setRefundPolicy` holds authority limits and time bands; this holds the
         arithmetic and the destination** (decided 29 September, readiness close-out).
@@ -13355,6 +14348,10 @@ paths:
       operationId: voidEntitlement
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: access.entitlement
         event: entitlement.voided
@@ -13642,6 +14639,9 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-280 Resale Policy & Marketplace Settings"
         - "P08 ADM-282 Resale Pricing & Price Guardrails"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-names-for-context: [orders.resale_eligibility_rule, orders.resale_fee_policy]
       summary: Set how the venue's resale marketplace runs
       description: '**The writer `orders.resale_marketplace_config` lacked** (DM5 open item: nine
         screens showed the row and none wrote it). One row per venue, replaced whole, as
@@ -14009,7 +15009,9 @@ paths:
         mappings with their reason. Gateway references already on the payment and refund are not
         repeated here.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -14104,7 +15106,9 @@ paths:
         customer type. Narrowest match wins; a row naming nothing is the venue default. Filter by any
         match key; `isActive` defaults to true.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - orders
       x-ticvai-permission: ORDER_VIEW
@@ -14162,6 +15166,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-634 Chargeback & Dispute Command Center"
         - "P08 BO-025 Chargebacks & Disputes"
+      x-ticvai-read-via:
+      - query: finance#accountMappingRecords
+        route: in-process
+        for: 'its read of ledger.account_mapping, Ledger''s data (CHG-MOD-001)'
+      - query: finance#fiscalPeriodRecords
+        route: in-process
+        for: 'its read of ledger.fiscal_period, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       - service
@@ -14359,6 +15370,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-634 Chargeback & Dispute Command Center"
         - "P08 BO-025 Chargebacks & Disputes"
+      x-ticvai-read-via:
+      - query: finance#accountMappingRecords
+        route: in-process
+        for: 'its read of ledger.account_mapping, Ledger''s data (CHG-MOD-001)'
+      - query: finance#fiscalPeriodRecords
+        route: in-process
+        for: 'its read of ledger.fiscal_period, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       - service
@@ -14437,6 +15455,13 @@ paths:
         - "P08 ADM-634 Chargeback & Dispute Command Center"
         - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
         - "P08 BO-025 Chargebacks & Disputes"
+      x-ticvai-read-via:
+      - query: catalogue#productCategoryRecords
+        route: in-process
+        for: 'its read of catalogue.product_category, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 4.2.21); shape follows getPaymentPerformance'
@@ -14784,6 +15809,7 @@ components:
           nullable: true
           description: How many of the benefit. Required with `benefitId`.
     MemberExceptionView:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createMemberException
       type: object
       x-ticvai-persistence: orders.member_exception
       description: '**One exception made to a membership, and who made it.** Written by
@@ -14797,7 +15823,12 @@ components:
       - kind
       - reason
       - recordedAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -14955,6 +15986,7 @@ components:
           format: date-time
           nullable: true
     GroupEnquiryOpportunityView:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by approveGroupDiscountException, createGroupEnquiry, listGroupCustomerOrganization, listGroupEnquiryOpportunity and others
       type: object
       x-ticvai-persistence: orders.group_enquiry
       description: '**One captured group enquiry.** Written by `createGroupEnquiry` (decided 29
@@ -14968,7 +16000,12 @@ components:
       - contact
       - groupSize
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -15391,6 +16428,7 @@ components:
       - milestones
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -16010,6 +17048,7 @@ components:
       - allocations
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -16039,6 +17078,7 @@ components:
                 format: uuid
                 readOnly: true
               productId:
+                x-ticvai-references: catalogue.product
                 type: string
                 format: uuid
               quantity:
@@ -16100,6 +17140,7 @@ components:
       - recipients
       properties:
         groupBookingId:
+          x-ticvai-references: orders.group_booking
           type: string
           format: uuid
           readOnly: true
@@ -16170,6 +17211,7 @@ components:
           nullable: true
           description: Required for `block` and `escalate`.
     MembershipActivationView:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by resolveMembershipActivation
       type: object
       x-ticvai-persistence: orders.membership_activation_action
       description: '**One action taken on a membership in the activation queue.** Written by
@@ -16261,6 +17303,7 @@ components:
           default: false
           description: Charge or credit the difference for the remaining term.
     MembershipMigrationView:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by migrateMembership
       type: object
       x-ticvai-persistence: orders.membership_migration
       description: '**One move of a membership to another product.** Written by `migrateMembership`
@@ -16275,7 +17318,12 @@ components:
       - direction
       - effectiveTiming
       - status
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -16407,6 +17455,7 @@ components:
               items:
                 $ref: ../shared/common.yaml#/components/schemas/SalesChannel
     RefundCalculationPolicyView:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by setRefundCalculationPolicy
       type: object
       x-ticvai-persistence: orders.refund_calculation_policy
       description: '**How a venue calculates a refund and where the money goes.** Set by
@@ -16417,7 +17466,12 @@ components:
       required:
       - refundTypes
       - refundDestinations
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -16692,10 +17746,12 @@ components:
           format: uuid
           readOnly: true
         customerMembershipId:
+          x-ticvai-references: identity.customer_membership
           type: string
           format: uuid
           description: The membership in the path. Taken from the path on `renewMembership`.
         entitlementTemplateId:
+          x-ticvai-references: catalogue.entitlement_template
           type: string
           format: uuid
         orderId:
@@ -16806,6 +17862,7 @@ components:
           type: string
           format: uuid
         originalOrderLineId:
+          x-ticvai-references: orders.order_line
           type: string
           format: uuid
         newOrderLineId:
@@ -17424,6 +18481,7 @@ components:
           maxLength: 50
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         orderLineId:
@@ -17675,9 +18733,11 @@ components:
           format: uuid
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         relatedOrderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         relationshipType:
@@ -18074,6 +19134,7 @@ components:
           format: uuid
           readOnly: true
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         paymentId:
@@ -18102,6 +19163,7 @@ components:
           maxLength: 60
           nullable: true
         merchantId:
+          x-ticvai-references: payments.merchant_account
           type: string
           maxLength: 60
           nullable: true
@@ -18244,6 +19306,7 @@ components:
 
             '
         token:
+          x-ticvai-secret: blind-index
           type: string
           format: password
           writeOnly: true
@@ -18359,6 +19422,7 @@ components:
       - expectedSize
       properties:
         groupQuoteId:
+          x-ticvai-persisted: false
           x-ticvai-references: orders.group_quote
           type: string
           format: uuid
@@ -18830,6 +19894,7 @@ components:
           type: string
           format: uuid
         leaderSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         organisationName:
@@ -18900,6 +19965,7 @@ components:
         serialNumber:
           type: string
         authenticationToken:
+          x-ticvai-secret: blind-index
           type: string
           format: password
           writeOnly: true
@@ -19029,6 +20095,7 @@ components:
           type: string
           format: uuid
         sellerSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         askPrice:
@@ -19565,6 +20632,7 @@ components:
           format: uuid
           description: Unique; one settlement per sold listing.
         sellerSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         listingPrice:
@@ -19705,6 +20773,7 @@ components:
         isActive:
           type: boolean
     TicketTemplate:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by cloneTicketTemplate, createTicketTemplate, importTicketTemplate, issueWalletPass and others
       type: object
       # `appliesToChannels` is an array of the shared `SalesChannel` enum, so it is a value list with
       # rows of its own: one per template and channel. Named here so the uniqueness rule the create and
@@ -19722,7 +20791,12 @@ components:
       - name
       - mediaType
       - isActive
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -19923,6 +20997,7 @@ components:
           nullable: true
           description: The `chargebackReversal` entry posted when the case is won, or the additional fee when lost.
     FraudRule:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by checkoutCart, createRefund, listResaleFraudDuplicate
       type: object
       x-ticvai-persistence: orders.fraud_rule
       description: 'BL-118. **Evaluated before the charge, and it holds rather than refuses.**
@@ -20125,6 +21200,7 @@ components:
               type: boolean
               default: false
         credentialRef:
+          x-ticvai-secret: vault-reference
           type: string
           writeOnly: true
           description: 'A vault reference. **Never the credential**, never returned, and rotated without
@@ -20238,6 +21314,7 @@ components:
 
             **Operations write it at `venue` scope.**'
     PaymentToken:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createInstalmentPlan, listPaymentTokens, storePaymentToken
       type: object
       x-ticvai-persistence: payments.token
       description: 'BL-116. **A stored credential, held by the provider and referenced here.** The platform
@@ -20266,6 +21343,7 @@ components:
           type: string
           format: uuid
         token:
+          x-ticvai-secret: field-encrypted
           type: string
           format: password
           writeOnly: true
@@ -20334,6 +21412,7 @@ components:
           - community
           - trade
         offeredByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         issuedByPrincipalId:
@@ -20374,6 +21453,7 @@ components:
 
             **Operations write it at `venue` scope.**'
     InvitationAllowance:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by issueInvitation, listInvitationAllowances
       type: object
       x-ticvai-persistence: orders.invitation_allowance
       description: '8.1.5. **What a profile may give away, and over what period.** An unbounded comp right
@@ -20385,7 +21465,12 @@ components:
       - periodKind
       - allowance
       - used
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -20575,6 +21660,7 @@ components:
           type: string
           nullable: true
         claimToken:
+          x-ticvai-secret: blind-index
           type: string
           format: password
           writeOnly: true
@@ -20784,7 +21870,7 @@ components:
       - surrendered
     EntitlementSummary:
       type: object
-      x-ticvai-persistence: catalogue.entitlement_template
+      x-ticvai-persistence: 'none — projection of access.entitlement and its product, as a guest or a steward sees it'
       description: 'One entitlement on a piece of media, as a guest or a steward sees it.
 
         '
@@ -21279,10 +22365,12 @@ components:
           nullable: true
           description: Null for an anonymous sale. Identity and entitlement are separate.
         guestLinkId:
+          x-ticvai-persisted: false
           type: string
           nullable: true
           description: Present where the guest is linked across cells.
         catalogueBundleVersion:
+          x-ticvai-persisted: false
           type: string
           description: 'The bundle the client priced from. Lets the server explain a variance rather than
             merely report one.
@@ -21310,6 +22398,7 @@ components:
           format: uuid
           description: Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these.
         variantId:
+          x-ticvai-references: catalogue.variant
           type: string
           format: uuid
         recommendationId:
@@ -21744,10 +22833,12 @@ components:
           items:
             $ref: '#/components/schemas/CartLine'
         conflicts:
+          x-ticvai-persisted: false
           type: array
           items:
             $ref: '#/components/schemas/CartConflict'
         consentQuestions:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           description: >
@@ -22184,6 +23275,7 @@ components:
         principalId:
           type: string
           format: uuid
+          x-ticvai-staff-only: Omitted from the response when the caller is a guest (R164).
         workstationId:
           type: string
           format: uuid
@@ -22607,16 +23699,19 @@ components:
 
             '
         walletAuthorisationId:
+          x-ticvai-persisted: false
           type: string
           nullable: true
           description: Cross-cell wallet hold, where the guest's home cell is elsewhere.
         walletHoldId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true
           description: For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture
             debits it; the order service writes no wallet table.
         returnUrl:
+          x-ticvai-persisted: false
           type: string
           format: uri
           nullable: true
@@ -22628,6 +23723,7 @@ components:
           nullable: true
           description: The card terminal to instruct, for a card payment at a till (ECR flow, SD-034).
         deviceId:
+          x-ticvai-persisted: false
           type: string
           format: uuid
           nullable: true
@@ -23155,6 +24251,7 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         creditLimit:
@@ -27291,8 +28388,7 @@ components:
     CustomerGuestAccountAssignmentInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `orders.reservation` (with `orders.sales_order`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Customer, Guest & Account Assignment submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -29627,8 +30723,7 @@ components:
     ListingCreationSellerConfigurationInput:
       type: object
       x-ticvai-drafted-shape: true
-      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
-        so nothing the package stores today is what this configures
+      x-ticvai-persistence: 'none — request only; applied to `orders.resale_listing`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept'
       description: '**What Listing Creation & Seller Configuration submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'

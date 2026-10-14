@@ -205,6 +205,8 @@
     "nullable": true
    },
    "steps": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "minItems": 1,
     "maxItems": 20,
@@ -362,6 +364,7 @@
   ]
  },
  "ConsentPurposeConfig": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.consent_purpose + marketing.consent_purpose_channel",
   "type": "object",
   "required": [
@@ -480,6 +483,8 @@
     "description": "The white-label theme it takes colours and fonts from."
    },
    "buttons": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -509,6 +514,8 @@
     "description": "Must be true."
    },
    "links": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -532,6 +539,8 @@
     }
    },
    "categories": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "minItems": 1,
     "items": {
@@ -793,7 +802,7 @@
      "daily",
      "weekly",
      "monthly",
-     false
+     "off"
     ]
    },
    "dayOfWeek": {
@@ -1291,6 +1300,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -1631,6 +1641,8 @@
     ]
    },
    "items": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1649,6 +1661,7 @@
     }
    },
    "validationIssues": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -1683,6 +1696,7 @@
     }
    },
    "simulation": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "description": "What the scenario's guest would be shown, step by step (from `simulate`; not stored).",
     "items": {
@@ -1730,6 +1744,7 @@
     "nullable": true
    },
    "audit": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -2269,6 +2284,7 @@
   }
  },
  "TrackingTechnologyCatalogueEntry": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "marketing.tracking_technology_catalogue",
   "description": "**The platform's catalogue of known cookies and trackers** (Chinmay, 2 October, contract follow-ups: \"a platform-wide catalogue of known cookies\"; CHG-FUP-010). One row per known technology, matched on `namePattern` + `provider`, with the category TICVAI's privacy owner approved. Seeded from the Open Cookie Database (Apache-2.0) and curated by platform staff; mastered in the control plane and replicated read-only into every cell with the platform root as `scopePath`, as the platform model catalogue is. **It suggests, it does not decide**: a scan finding that matches takes `suggestedCategory` from it with `classificationSource` `platformCatalogue`, and each venue still approves its own registry entry (`setTrackingTechnology`), so `_ga` is suggested once for every tenant rather than researched by each.",

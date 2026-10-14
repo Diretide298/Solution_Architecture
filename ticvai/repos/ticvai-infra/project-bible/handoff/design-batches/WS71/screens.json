@@ -5,6 +5,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "10",
@@ -103,67 +104,79 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "Active Dashboards",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Active Reports",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Published KPIs",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Connected Data Sources",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Active Datasets",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Data Refresh Success %",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Data Quality Score",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Failed Refreshes",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "BI Service Health",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "AI Analytics Health",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Active Alerts",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Analytics Users",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display"
       }
      ]
@@ -179,7 +192,7 @@
         "Healthy / Warning / Critical / Offline"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAnalyticsPipelines",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Each component shall show"
       }
      ]
@@ -192,6 +205,7 @@
        "kind": "detailPanel",
        "label": "The selected analytics administration",
        "bindsTo": null,
+       "operation": "listAnalyticsPipelines",
        "columns": [
         "Healthy / Warning / Critical / Offline"
        ],
@@ -260,6 +274,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "10",
@@ -292,6 +307,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§KPI Categories; KPI Status) and no metric row",
   "purpose": "Maintain the authoritative catalogue of approved TICVAI business KPIs. This is essential because every dashboard must use the same definition of a metric.",
+  "division": "Shares `createKpi`, `listKpis` with ANL-025; this screen is Enterprise KPI Library (pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, board 10.10.2, page 124): maintain the authoritative catalogue of approved TICVAI business KPIs. This is essential because every dashboard must use the same definition of a metric.",
   "gaps": [
    {
     "operation": null,
@@ -326,7 +342,7 @@
         "Resources"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listKpis",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories"
       }
      ]
@@ -339,6 +355,7 @@
        "kind": "detailPanel",
        "label": "The selected enterprise kpi",
        "bindsTo": null,
+       "operation": "listKpis",
        "columns": [
         "Executive",
         "Sales",
@@ -434,6 +451,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "10",
@@ -476,41 +494,49 @@
       {
        "kind": "selectField",
        "label": "Organization",
+       "operation": "setKpiTargets",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
       },
       {
        "kind": "selectField",
        "label": "Site",
+       "operation": "setKpiTargets",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
       },
       {
        "kind": "selectField",
        "label": "Venue",
+       "operation": "setKpiTargets",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
       },
       {
        "kind": "selectField",
        "label": "Attraction",
+       "operation": "setKpiTargets",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
       },
       {
        "kind": "selectField",
        "label": "Business Unit",
+       "operation": "setKpiTargets",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
       },
       {
        "kind": "selectField",
        "label": "Product",
+       "operation": "setKpiTargets",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
       },
       {
        "kind": "selectField",
        "label": "Channel",
+       "operation": "setKpiTargets",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
       },
       {
        "kind": "selectField",
        "label": "Period",
+       "operation": "setKpiTargets",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets may be configured by"
       }
      ]
@@ -587,6 +613,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "10",
@@ -629,36 +656,43 @@
       {
        "kind": "metricTile",
        "label": "Revenue per Visitor",
+       "operation": "getAnalyticsBenchmark",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
       },
       {
        "kind": "metricTile",
        "label": "Transactions per 1,000 Visitors",
+       "operation": "getAnalyticsBenchmark",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
       },
       {
        "kind": "metricTile",
        "label": "Entries per Gate per Hour",
+       "operation": "getAnalyticsBenchmark",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
       },
       {
        "kind": "metricTile",
        "label": "Incidents per 10,000 Visitors",
+       "operation": "getAnalyticsBenchmark",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
       },
       {
        "kind": "metricTile",
        "label": "Revenue per m² where applicable",
+       "operation": "getAnalyticsBenchmark",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
       },
       {
        "kind": "metricTile",
        "label": "Revenue per Operating Hour",
+       "operation": "getAnalyticsBenchmark",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
       },
       {
        "kind": "metricTile",
        "label": "Utilization %",
+       "operation": "getAnalyticsBenchmark",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support metrics such as"
       },
       {
@@ -811,6 +845,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "10",
@@ -874,7 +909,7 @@
         "Data Classification"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAnalyticsPipelines",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 128 §Display"
       }
      ]
@@ -887,6 +922,7 @@
        "kind": "detailPanel",
        "label": "The selected data source integration",
        "bindsTo": null,
+       "operation": "listAnalyticsPipelines",
        "columns": [
         "Source Name",
         "Source Type",
@@ -1162,6 +1198,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "10",
@@ -1206,42 +1243,49 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "Pipelines Running",
+       "operation": "listAnalyticsPipelines",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Successful Refreshes",
+       "operation": "listAnalyticsPipelines",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Failed Refreshes",
+       "operation": "listAnalyticsPipelines",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Average Refresh Duration",
+       "operation": "listAnalyticsPipelines",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Data Latency",
+       "operation": "listAnalyticsPipelines",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Stale Datasets",
+       "operation": "listAnalyticsPipelines",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Records Processed",
+       "operation": "listAnalyticsPipelines",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards"
       }
      ]
@@ -1353,6 +1397,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "10",
@@ -1482,6 +1527,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "10",
@@ -1525,77 +1571,91 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "Active Analytics Users",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Dashboard Views",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Report Runs",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "AI Queries",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Exports",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "API Requests",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Peak Concurrent Users",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Average Dashboard Load Time",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Query Duration",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Slowest Reports",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Failed Queries",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Dataset Size",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Refresh Duration",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Embedded BI Availability",
+       "operation": "getAnalyticsUsage",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance KPIs"
       }
      ]
@@ -1705,6 +1765,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "10",

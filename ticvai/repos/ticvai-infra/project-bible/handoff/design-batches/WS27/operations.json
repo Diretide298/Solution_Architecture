@@ -312,7 +312,7 @@
  },
  "setGroupCustomerOrganization": {
   "method": "PUT",
-  "path": "/group-customer-organization",
+  "path": "/group-customer-organization/{organisationId}",
   "contract": "orders",
   "summary": "Save a group customer organisation's profile",
   "permission": "PRODUCT_CONFIGURE",
@@ -320,6 +320,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "organisationId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

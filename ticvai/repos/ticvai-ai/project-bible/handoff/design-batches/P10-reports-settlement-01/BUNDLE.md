@@ -315,6 +315,8 @@ prepaidPartner: Al Noor Travel & Tourism · prepaid · balance AED 42,300.00 · 
 
 **A refused user sees:** Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SETTLEMENT_RECONCILE` for `ingestSettlementFile`, `resolveSettlementException`.
 
+Screen guard: `SETTLEMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -459,6 +461,8 @@ statement:
 - `listPartnerAgreements` → `PARTNER_MANAGE` (configure) · staff, partner
 
 **A refused user sees:** Shown when the caller lacks `PARTNER_MANAGE`, which `listPartnerAgreements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PARTNER_VIEW` for `getCommissionStatement`.
+
+Screen guard: `PARTNER_MANAGE`
 
 #### Requirements it meets
 
@@ -765,6 +769,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `updateReport` → `REPORT_MANAGE` (configure) · staff, partner
 
 **A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `createReport`, `deleteReport`, `saveNaturalLanguageQuery`, `updateReport`.
+
+Screen guard: `REPORT_VIEW_VENUE`
 
 #### Requirements it meets
 

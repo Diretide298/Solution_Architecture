@@ -5,6 +5,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/audience-intelligence-bo-754",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AudienceIntelligence.tsx",
+   "component": "src/routes/engagement-support/AudienceIntelligence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -128,7 +129,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSegments",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSegments"
       }
      ]
     }
@@ -192,6 +194,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "3",
@@ -201,7 +204,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/dynamic-segment-builder-bo-755",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DynamicSegmentBuilder.tsx",
+   "component": "src/routes/engagement-support/DynamicSegmentBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -473,6 +476,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "3",
@@ -482,7 +486,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/static-lists-imports-bo-756",
-   "component": "apps/venue-management-web/src/routes/engagement-support/StaticListsImports.tsx",
+   "component": "src/routes/engagement-support/StaticListsImports.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -534,7 +538,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAudienceLists",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAudienceLists"
       },
       {
        "kind": "secondaryButton",
@@ -609,6 +614,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "3",
@@ -618,7 +624,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/behavioral-segmentation-bo-757",
-   "component": "apps/venue-management-web/src/routes/engagement-support/BehavioralSegmentation.tsx",
+   "component": "src/routes/engagement-support/BehavioralSegmentation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -773,6 +779,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "3",
@@ -782,7 +789,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/membership-loyalty-segments-bo-758",
-   "component": "apps/venue-management-web/src/routes/engagement-support/MembershipLoyaltySegments.tsx",
+   "component": "src/routes/engagement-support/MembershipLoyaltySegments.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -805,6 +812,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create audiences using membership, loyalty and wallet state. Filter by membership type, status, start, expiry, renewal, freeze, benefit use and upgrade eligibility. Filter by loyalty tier, points, earn/redemption history, reward use, milestone and tier movement. Use wallet balance, top-up, spend, low-balance and dormancy conditions while protecting financial data. Combine these signals with profile and behavior rules and show reachable audience before activation. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "division": "Shares `createSegment`, `previewSegment` with BO-760; this screen is Membership & Loyalty Segments (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 3.05, page 17): create audiences using membership, loyalty and wallet state. Filter by membership type, status, start, expiry, renewal, freeze, benefit use and upgrade eligibility. Filter by loyalty tier, points, earn/redemption history, reward use, milestone and tier movement. Use wallet balance, top-up, spend, low-balance and dormancy conditions while protecting financial data. Combine these signals with profile and behavior rules and show reachable audience before activation. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
   "gaps": [
    {
     "operation": null,
@@ -924,6 +932,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "3",
@@ -933,7 +942,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/demographic-geographic-bo-759",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DemographicGeographic.tsx",
+   "component": "src/routes/engagement-support/DemographicGeographic.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1047,6 +1056,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "3",
@@ -1056,7 +1066,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/revenue-engagement-segments-bo-760",
-   "component": "apps/venue-management-web/src/routes/engagement-support/RevenueEngagementSegments.tsx",
+   "component": "src/routes/engagement-support/RevenueEngagementSegments.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1079,6 +1089,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create value- and engagement-based audiences. Configuration Scope of Work | Version 1.0 17 Use total revenue, LTV, average order value, purchase frequency, category spend, refund behavior and propensity. Use engagement score, campaign interaction, app activity, visit frequency, inactivity and product affinity. Define bands, percentiles, scoring periods and calculation sources and preview distribution before publishing. Protect against circular attribution and record the data snapshot and scoring version used. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "division": "Shares `createSegment`, `previewSegment` with BO-758; this screen is Revenue & Engagement Segments (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 3.07, page 17): create value- and engagement-based audiences. Configuration Scope of Work | Version 1.0 17 Use total revenue, LTV, average order value, purchase frequency, category spend, refund behavior and propensity. Use engagement score, campaign interaction, app activity, visit frequency, inactivity and product affinity. Define bands, percentiles, scoring periods and calculation sources and preview distribution before publishing. Protect against circular attribution and record the data snapshot and scoring version used. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
   "gaps": [
    {
     "operation": null,
@@ -1198,6 +1209,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "3",
@@ -1207,7 +1219,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/ai-audience-discovery-bo-761",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AiAudienceDiscovery.tsx",
+   "component": "src/routes/engagement-support/AiAudienceDiscovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1252,7 +1264,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAudienceDiscoveryTargeting",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAudienceDiscoveryTargeting"
       },
       {
        "kind": "primaryButton",
@@ -1328,6 +1341,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "3",
@@ -1337,7 +1351,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/predictive-audiences-bo-762",
-   "component": "apps/venue-management-web/src/routes/engagement-support/PredictiveAudiences.tsx",
+   "component": "src/routes/engagement-support/PredictiveAudiences.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1435,6 +1449,13 @@
     "purpose": "Propose a lookalike segment from a seed segment or list, as rules to save",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listProposedActions",
+    "contract": "ai",
+    "purpose": "Follows decideProposedAction (202) until what it started settles: What the assistant has proposed and nobody has decided",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -1486,6 +1507,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "3",
@@ -1495,7 +1517,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/activation-governance-bo-763",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ActivationGovernance.tsx",
+   "component": "src/routes/engagement-support/ActivationGovernance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1546,7 +1568,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAudienceActivations",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAudienceActivations"
       },
       {
        "kind": "secondaryButton",

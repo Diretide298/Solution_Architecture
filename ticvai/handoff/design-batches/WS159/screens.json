@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/experience-resource-requirement-builder-bo-893",
-   "component": "apps/venue-management-web/src/routes/rentals/ExperienceResourceRequirementBuilder.tsx",
+   "component": "src/routes/rentals/ExperienceResourceRequirementBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -240,6 +241,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "5",
@@ -249,7 +251,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/staff-to-experience-qualification-mapping-bo-894",
-   "component": "apps/venue-management-web/src/routes/rentals/StaffToExperienceQualificationMapping.tsx",
+   "component": "src/routes/rentals/StaffToExperienceQualificationMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -442,6 +444,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "5",
@@ -451,7 +454,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-combination-builder-bo-895",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceCombinationBuilder.tsx",
+   "component": "src/routes/rentals/ResourceCombinationBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -475,6 +478,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Option A; Option B) and no display directory — it is settings, not a population",
   "purpose": "Allow experiences to require multiple resources in valid combinations.",
   "purposeNote": "Administrators can configure flexible multi-resource combinations and TICVAI can determine whether at least one valid combination exists before confirming availability.",
+  "division": "Shares `createResourcePackage`, `listResourcePackages`, `updateResourcePackage` with BO-861, BO-918; this screen is Resource Combination Builder (pack Resource_Management_Configuration_Reference.pdf, board 5.03, page 67): allow experiences to require multiple resources in valid combinations.",
   "gaps": [
    {
     "operation": null,
@@ -618,6 +622,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "5",
@@ -627,7 +632,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/ticket-demand-resource-capacity-mapping-bo-896",
-   "component": "apps/venue-management-web/src/routes/rentals/TicketDemandResourceCapacityMapping.tsx",
+   "component": "src/routes/rentals/TicketDemandResourceCapacityMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -688,7 +693,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -810,6 +815,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_CONFIGURE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "5",
@@ -819,7 +825,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/customer-resource-selection-configuration-bo-897",
-   "component": "apps/venue-management-web/src/routes/rentals/CustomerResourceSelectionConfiguration.tsx",
+   "component": "src/routes/rentals/CustomerResourceSelectionConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -860,7 +866,8 @@
        "derived": true,
        "impliedBy": "setResourceSelectionPolicy",
        "label": "Save",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setResourceSelectionPolicy"
       },
       {
        "kind": "secondaryButton",
@@ -931,6 +938,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "5",
@@ -940,7 +948,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/skill-based-smart-resource-selection-bo-898",
-   "component": "apps/venue-management-web/src/routes/rentals/SkillBasedSmartResourceSelection.tsx",
+   "component": "src/routes/rentals/SkillBasedSmartResourceSelection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1114,6 +1122,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_BOOK",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "5",
@@ -1123,7 +1132,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/customer-cashier-resource-assignment-experience-bo-899",
-   "component": "apps/venue-management-web/src/routes/rentals/CustomerCashierResourceAssignmentExperience.tsx",
+   "component": "src/routes/rentals/CustomerCashierResourceAssignmentExperience.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1163,7 +1172,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "allocateResources",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "allocateResources"
       },
       {
        "kind": "secondaryButton",
@@ -1238,6 +1248,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "5",
@@ -1247,7 +1258,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/dynamic-resource-allocation-engine-bo-900",
-   "component": "apps/venue-management-web/src/routes/rentals/DynamicResourceAllocationEngine.tsx",
+   "component": "src/routes/rentals/DynamicResourceAllocationEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1271,6 +1282,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
   "purpose": "Configure how TICVAI automatically chooses a resource when a customer or cashier does not make a specific selection.",
   "purposeNote": "mobile, and API channels.",
+  "division": "Shares `getResourceAllocationPolicy`, `setResourceAllocationPolicy` with BO-901, BO-948; this screen is Dynamic Resource Allocation Engine (pack Resource_Management_Configuration_Reference.pdf, board 5.08, page 73): configure how TICVAI automatically chooses a resource when a customer or cashier does not make a specific selection.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1401,6 +1413,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "5",
@@ -1410,7 +1423,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/priority-scoring-allocation-policy-bo-901",
-   "component": "apps/venue-management-web/src/routes/rentals/PriorityScoringAllocationPolicy.tsx",
+   "component": "src/routes/rentals/PriorityScoringAllocationPolicy.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1434,6 +1447,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure how TICVAI ranks eligible resources when several resources could satisfy the same requirement.",
   "purposeNote": "Resource allocation priorities are configurable, transparent, testable, and explainable.",
+  "division": "Shares `getResourceAllocationPolicy`, `setResourceAllocationPolicy` with BO-900, BO-948; this screen is Priority, Scoring & Allocation Policy (pack Resource_Management_Configuration_Reference.pdf, board 5.09, page 74): configure how TICVAI ranks eligible resources when several resources could satisfy the same requirement.",
   "gaps": [
    {
     "operation": null,
@@ -1531,6 +1545,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_BOOK",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "5",
@@ -1540,7 +1555,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/automatic-replacement-assignment-recovery-bo-902",
-   "component": "apps/venue-management-web/src/routes/rentals/AutomaticReplacementAssignmentRecovery.tsx",
+   "component": "src/routes/rentals/AutomaticReplacementAssignmentRecovery.tsx",
    "status": "notStarted"
   },
   "navigation": {

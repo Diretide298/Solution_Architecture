@@ -1,5 +1,5 @@
 id: LLD-subscription
-title: subscription — 152 operations
+title: subscription — 153 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -550,6 +550,16 @@ operations:
   reads:
   - control.cell
   - control.cell_instance
+  writes: []
+- operation: getCommercialMetrics
+  verb: GET
+  path: /commercial-metrics
+  scope: platform
+  permission: PLATFORM_BILLING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: getCommissionStatement
   verb: GET
@@ -1162,7 +1172,7 @@ operations:
   writes: []
 - operation: listPartner2
   verb: GET
-  path: /partner
+  path: /partner-2
   scope: tenant
   permission: PLATFORM_TENANT_VIEW
   audience:
@@ -1803,7 +1813,7 @@ operations:
   - control.billing_entity
 - operation: setChannelListing
   verb: PUT
-  path: /channel-listings
+  path: /channel-listings/{listingId}
   scope: venue
   permission: PARTNER_MANAGE
   audience:
@@ -1849,7 +1859,7 @@ operations:
   - subscription.enforcement_policy
 - operation: setLicensingModel
   verb: PUT
-  path: /licensing-models
+  path: /licensing-models/{licensingModelId}
   scope: platform
   permission: PLATFORM_PLAN_MANAGE
   audience:
@@ -1962,7 +1972,7 @@ operations:
   - subscription.membership_usage_policy
 - operation: setModuleListing
   verb: PUT
-  path: /module-catalogue
+  path: /module-catalogue/{moduleCode}
   scope: platform
   permission: PLATFORM_PLAN_MANAGE
   audience:
@@ -2053,7 +2063,7 @@ operations:
   - control.partner_commission_rule_tier
 - operation: setPartnerContact
   verb: PUT
-  path: /partner-contacts
+  path: /partner-contacts/{contactId}
   scope: tenant
   permission: PARTNER_MANAGE
   audience:
@@ -2229,7 +2239,7 @@ operations:
   - subscription.contract
 - operation: setTrialConfiguration
   verb: PUT
-  path: /trial-configurations
+  path: /trial-configurations/{trialConfigurationId}
   scope: platform
   permission: PLATFORM_PLAN_MANAGE
   audience:

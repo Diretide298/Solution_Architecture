@@ -14,6 +14,7 @@
     "format": "uuid"
    },
    "tenantId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid"
    },
@@ -61,6 +62,87 @@
    "clientHosted"
   ]
  },
+ "CommercialMetric": {
+  "type": "object",
+  "description": "One commercial figure. Money-valued codes carry a `Money`; counts, rates and days a number (naming-and-style 5.1: money is never a float).",
+  "required": [
+   "code",
+   "value"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The band, profile or model this row is for, on a code split by one; null otherwise."
+   },
+   "unit": {
+    "type": "string",
+    "enum": [
+     "count",
+     "currency",
+     "percent",
+     "days"
+    ]
+   },
+   "value": {
+    "oneOf": [
+     {
+      "type": "number"
+     },
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ]
+   },
+   "comparison": {
+    "nullable": true,
+    "oneOf": [
+     {
+      "type": "number"
+     },
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ]
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   }
+  }
+ },
+ "CommercialMetricSet": {
+  "type": "object",
+  "description": "The commercial command centres' figures, one row per metric code (getCommercialMetrics).",
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The customer the figures are for; null for the whole portfolio."
+   },
+   "period": {
+    "type": "string"
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "metrics": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CommercialMetric"
+    }
+   }
+  }
+ },
  "CreatePlanRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -74,6 +156,7 @@
   ],
   "properties": {
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -235,6 +318,8 @@
     }
    },
    "overagePricing": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -463,6 +548,8 @@
     "type": "integer"
    },
    "factors": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -506,6 +593,8 @@
     }
    },
    "tiers": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

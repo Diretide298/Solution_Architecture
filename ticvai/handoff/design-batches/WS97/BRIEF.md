@@ -189,7 +189,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-584` | Rental Executive Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-585` | Rental Revenue & Commercial Analytics | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-585` | Rental Revenue & Commercial Analytics | D | 2 | 140 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-586` | Utilization & Capacity Analytics | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-587` | Inventory & Equipment Performance Analytics | B | 0 | 12 | 6 | 0 | 1 | 4 | — | notStarted (—) |
 | `BO-588` | Rental Duration, Extension & Return Analytics | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |

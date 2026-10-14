@@ -1,6 +1,6 @@
 # WS162 — Resource Management Configuration board 8
 
-**10 screens · 16 operations · 20 schemas · 4 permissions**
+**10 screens · 16 operations · 21 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -122,14 +122,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-923` | AI Resource Intelligence Command Center | D | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-924` | Optimal Resource Recommendation Engine | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-925` | AI Staff Recommendation & Workforce Matching | D | 0 | 0 | 6 | 19 | 0 | 0 | — | notStarted (—) |
+| `BO-925` | AI Staff Recommendation & Workforce Matching | D | 0 | 19 | 6 | 19 | 0 | 0 | — | notStarted (—) |
 | `BO-926` | Resource Demand Forecasting | D | 0 | 6 | 6 | 46 | 0 | 0 | — | notStarted (—) |
 | `BO-927` | AI Staffing Requirement Forecast | A | 17 | 16 | 6 | 47 | 1 | 0 | — | notStarted (—) |
 | `BO-928` | AI Conflict Resolution Assistant | D | 0 | 0 | 6 | 15 | 0 | 0 | — | notStarted (—) |
-| `BO-929` | Automatic Schedule Optimization | D | 0 | 0 | 6 | 12 | 0 | 0 | — | notStarted (—) |
+| `BO-929` | Automatic Schedule Optimization | D | 0 | 18 | 6 | 12 | 0 | 0 | — | notStarted (—) |
 | `BO-930` | Alternative & Replacement Resource | D | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-931` | Operational Scenario Simulator & Digital Twin | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-932` | Conversational AI Resource Copilot | D | 0 | 0 | 6 | 16 | 0 | 0 | — | notStarted (—) |
+| `BO-932` | Conversational AI Resource Copilot | D | 0 | 10 | 6 | 16 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

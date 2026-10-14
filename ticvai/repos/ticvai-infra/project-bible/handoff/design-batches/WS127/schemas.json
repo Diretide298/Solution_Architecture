@@ -23,6 +23,7 @@
     "format": "uuid"
    },
    "venueMapZoneId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid",
     "nullable": true

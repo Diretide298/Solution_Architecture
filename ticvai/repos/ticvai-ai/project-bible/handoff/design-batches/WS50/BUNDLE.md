@@ -107,15 +107,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-188` | Dynamic Bundle Operations Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-189` | Component Inventory & Availability Matrix | B | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `ADM-190` | Bundle Sellability & Dependency Rule Engine | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-191` | Capacity Pool & Reservation Manager | C | 19 | 6 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-192` | Dynamic Component Substitution Engine | C | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-193` | Dynamic Bundle Rule & Composition Engine | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-194` | Real-Time Availability & Checkout Validation | C | 1 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-195` | Bundle Availability by Channel, Venue & Partner | C | 17 | 6 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-196` | Bundle Availability Forecast, Alerts & Recovery | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | C | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-189` | Component Inventory & Availability Matrix | B | 0 | 6 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `ADM-190` | Bundle Sellability & Dependency Rule Engine | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-191` | Capacity Pool & Reservation Manager | B | 19 | 6 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-192` | Dynamic Component Substitution Engine | B | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-193` | Dynamic Bundle Rule & Composition Engine | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-194` | Real-Time Availability & Checkout Validation | B | 1 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-195` | Bundle Availability by Channel, Venue & Partner | B | 17 | 6 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-196` | Bundle Availability Forecast, Alerts & Recovery | B | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | B | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -232,6 +232,8 @@ row:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -315,7 +317,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getInventoryKitDefinition`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kit item | the name it points at, never the id | — |
+| Components | list or chips (count when long) | — |
+| Kit item | the name it points at, never the id | — |
+| Component item | the name it points at, never the id | — |
+| Quantity | 1,234.5 | — |
+| Unit | text | The component's base unit where omitted. |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -356,6 +367,8 @@ cell:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -383,7 +396,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-189?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-188`.
@@ -402,7 +415,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-190 |
+| Block | Block B · task VM-ADM-190 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -472,6 +485,8 @@ rule: If lunch sells out, stop the bundle; if parking sells out, sell without it
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -515,7 +530,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-191 |
+| Block | Block B · task VM-ADM-191 |
 | Who uses it | venue staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -627,6 +642,8 @@ policy:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -672,7 +689,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-192 |
+| Block | Block B · task VM-ADM-192 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§For each component define; Define whether substitute) and no display directory — it is settings, not a population |
@@ -744,6 +761,8 @@ substitution:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -787,7 +806,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-193 |
+| Block | Block B · task VM-ADM-193 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -850,6 +869,8 @@ rule: On Fridays the show replaces the guided tour
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -893,7 +914,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-194 |
+| Block | Block B · task VM-ADM-194 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Payment authorization/capture) and no display directory — it is settings, not a population |
@@ -959,6 +980,8 @@ check:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1007,7 +1030,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-195 |
+| Block | Block B · task VM-ADM-195 |
 | Who uses it | venue staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1116,6 +1139,8 @@ channels:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1159,7 +1184,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-196 |
+| Block | Block B · task VM-ADM-196 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |
@@ -1249,6 +1274,8 @@ alert:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1292,7 +1319,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-197 |
+| Block | Block B · task VM-ADM-197 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1378,6 +1405,8 @@ scenario: 'Planetarium closed: substitution applied to 38 bundles'
 - `listDynamicBundleRule` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -1530,7 +1559,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "BundleAvailabilityByChannelVenuePartnerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Availability by Channel, Venue & Partner displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"channelsType":{"type":"string","enum":["b2c","b2b","pos","mobilePos","mobileApp","kiosk","callCenter","api","ota","reseller","partner"],"description":"Vocabulary listed under Channels."},"venueSpecificAvailability":{"type":"string","description":"Venue-specific availability"},"attractionSpecificAvailability":{"type":"string","description":"Attraction-specific availability"},"operatingArea":{"type":"string","description":"Operating area"},"countryMarket":{"type":"string","description":"Country/market"},"salesLocation":{"type":"string","description":"Sales location"},"dedicatedAllocation":{"type":"string","description":"Dedicated allocation"},"sharedAllocation":{"type":"string","description":"Shared allocation"},"capacityCeiling":{"type":"integer","description":"Capacity ceiling"},"bookingCutoff":{"type":"string","description":"Booking cutoff"}}},
 "BundleAvailabilityForecastAlertsRecoveryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Availability Forecast, Alerts & Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"historicalDemand":{"type":"string","description":"Historical demand"},"currentBookingVelocity":{"type":"string","description":"Current booking velocity"},"inventory":{"type":"string","description":"Inventory"},"capacity":{"type":"integer","description":"Capacity"},"timeslotUtilization":{"type":"number","description":"Timeslot utilization"},"seasonality":{"type":"string","description":"Seasonality"},"dayOfWeek":{"type":"string","description":"Day of week"},"campaignActivity":{"type":"string","description":"Campaign activity"},"partnerReservations":{"type":"string","description":"Partner reservations"},"levelsType":{"type":"string","enum":["information","warning","critical"],"description":"Vocabulary listed under Alert Levels."},"switchChoiceGroup":{"type":"string","description":"Switch choice group"},"restrictChannel":{"type":"string","description":"Restrict channel"},"reduceBundleAllocation":{"type":"string","description":"Reduce bundle allocation"},"increaseAlternativeInventory":{"type":"string","description":"Increase alternative inventory"},"recommendAnotherTimeslot":{"type":"string","description":"Recommend another timeslot"},"potentialRevenueRecoverableThroughSubstitution":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Potential Revenue Recoverable Through Substitution"}}},
-"BundleCapacityPolicy": {"x-ticvai-persistence":"promotions.bundle_capacity_policy","type":"object","description":"How a bundle draws on capacity, per channel where it differs: the capacity source, dedicated or shared and hard or soft allocation, the ceiling, how long a hold lasts, the booking cut-off, and whether overbooking or a waitlist is allowed (Capacity Pool & Reservation Manager; Bundle Availability by Channel, Venue & Partner). The capacity itself is the catalogue's (`catalogue.channel_capacity`, `catalogue.inventory_reservation`). A row with no channel is the bundle's default. (DM5, 29 September: data model for the agreed operations)\n**Written by setBundleCapacityPolicy; read by listBundleCapacityPolicies, listCapacityPoolReservation and listBundleAvailabilityChannel** (decided 29 September, writers pass).","required":["id","bundleId","capacitySource"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"bundleId":{"type":"string","format":"uuid"},"channel":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}],"nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true,"description":"Where the policy differs by venue for a multi-venue bundle."},"partnerId":{"type":"string","format":"uuid","nullable":true},"capacitySource":{"type":"string","enum":["sharedPool","dedicatedBundleAllocation","channelAllocation","partnerAllocation","eventCapacity","timeslotCapacity","seatInventory","resourceCapacity"]},"allocationMode":{"type":"string","enum":["hard","soft"],"default":"hard","description":"Hard allocation is ring-fenced for the bundle; soft is released back when unsold."},"capacityCeiling":{"type":"integer","minimum":0,"nullable":true},"holdDurationMinutes":{"type":"integer","minimum":1,"nullable":true,"description":"How long a temporary reservation of the components lasts."},"bookingCutoffMinutes":{"type":"integer","minimum":0,"nullable":true,"description":"Minutes before the experience after which the bundle is no longer sold."},"allowOverbooking":{"type":"boolean","default":false},"allowWaitlist":{"type":"boolean","default":false}}},
+"BundleCapacityPolicy": {"x-ticvai-persistence":"promotions.bundle_capacity_policy","type":"object","description":"How a bundle draws on capacity, per channel where it differs: the capacity source, dedicated or shared and hard or soft allocation, the ceiling, how long a hold lasts, the booking cut-off, and whether overbooking or a waitlist is allowed (Capacity Pool & Reservation Manager; Bundle Availability by Channel, Venue & Partner). The capacity itself is the catalogue's (`catalogue.channel_capacity`, `catalogue.inventory_reservation`). A row with no channel is the bundle's default. (DM5, 29 September: data model for the agreed operations)\n**Written by setBundleCapacityPolicy; read by listBundleCapacityPolicies, listCapacityPoolReservation and listBundleAvailabilityChannel** (decided 29 September, writers pass).","required":["id","bundleId","capacitySource"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"bundleId":{"x-ticvai-references":"promotions.bundle","type":"string","format":"uuid"},"channel":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}],"nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true,"description":"Where the policy differs by venue for a multi-venue bundle."},"partnerId":{"type":"string","format":"uuid","nullable":true},"capacitySource":{"type":"string","enum":["sharedPool","dedicatedBundleAllocation","channelAllocation","partnerAllocation","eventCapacity","timeslotCapacity","seatInventory","resourceCapacity"]},"allocationMode":{"type":"string","enum":["hard","soft"],"default":"hard","description":"Hard allocation is ring-fenced for the bundle; soft is released back when unsold."},"capacityCeiling":{"type":"integer","minimum":0,"nullable":true},"holdDurationMinutes":{"type":"integer","minimum":1,"nullable":true,"description":"How long a temporary reservation of the components lasts."},"bookingCutoffMinutes":{"type":"integer","minimum":0,"nullable":true,"description":"Minutes before the experience after which the bundle is no longer sold."},"allowOverbooking":{"type":"boolean","default":false},"allowWaitlist":{"type":"boolean","default":false}}},
 "BundleSellabilityDependencyRuleEngineView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle Sellability & Dependency Rule Engine displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"dependencyRule":{"type":"string","enum":["allComponentsRequired","atLeastXOfY","atLeastOneFromCategory","optionalComponent","conditionalComponent","substituteAllowed","partnerComponentRequired"],"description":"The sellability rule."},"bundleId":{"type":"string","description":"Bundle ID"},"componentIds":{"type":"array","items":{"type":"string"},"description":"Components the rule covers"},"minimumCount":{"type":"integer","description":"For atLeastXOfY: X"}}},
 "CapacityPoolReservationManagerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Capacity Pool & Reservation Manager displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"temporaryReservation":{"type":"string","description":"Temporary reservation"},"holdDuration":{"type":"string","format":"date-time","description":"Hold duration"},"hardAllocation":{"type":"string","description":"Hard allocation"},"softAllocation":{"type":"string","description":"Soft allocation"},"overbookingPolicy":{"type":"string","description":"Overbooking policy"},"waitlistBehavior":{"type":"string","description":"Waitlist behavior"},"capacitySource":{"type":"string","enum":["sharedPool","dedicatedBundleAllocation","channelAllocation","partnerAllocation","eventCapacity","timeslotCapacity","seatInventory","resourceCapacity"],"description":"Capacity source."}}},
 "ComponentInventoryAvailabilityMatrixView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Component Inventory & Availability Matrix displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"availabilitySource":{"type":"string","enum":["ticketInventory","attractionCapacity","eventCapacity","seatInventory","timeslots","fBAvailability","retailStock","resourceAvailability","parking","rental","externalPartnerApi"],"description":"Where the component's availability comes from."},"componentStatus":{"type":"string","enum":["available","limited","low","soldOut","closed","suspended","unpublished","apiUnavailable"],"description":"Component status."},"componentId":{"type":"string","description":"Component ID"},"componentName":{"type":"string","description":"Component"},"inventory":{"type":"integer","description":"Inventory"},"capacity":{"type":"integer","description":"Capacity"},"schedule":{"type":"string","description":"Schedule"}}},

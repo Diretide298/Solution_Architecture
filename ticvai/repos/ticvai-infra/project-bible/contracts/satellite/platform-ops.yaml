@@ -47,6 +47,84 @@ tags:
 - name: environment
 - name: rollout
 - name: notice
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  contentBlockRecords:
+    module: platform-ops
+    table: control.content_block
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.content_block rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A control.content_block row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.content_block rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements, and asked from another
+      deployable through Platform's service route (serviceAuth).
+    served: [in-process, service]
+  seoMetadataRecords:
+    module: platform-ops
+    table: control.seo_metadata
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.seo_metadata rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A control.seo_metadata row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.seo_metadata rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements.
+    served: [in-process]
+  tenantDomainRecords:
+    module: platform-ops
+    table: control.tenant_domain
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.tenant_domain rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A control.tenant_domain row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.tenant_domain rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Platform's service route (serviceAuth).
+    served: [service]
+  urlRedirectRecords:
+    module: platform-ops
+    table: control.url_redirect
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.url_redirect rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A control.url_redirect row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.url_redirect rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements.
+    served: [in-process]
 paths:
   /rollouts/{rolloutId}/cells/{cellId}/skip:
     parameters:
@@ -112,8 +190,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/RolloutCell'
+        '409':
+          description: 'The cell is not `pending` (already `running`, `complete`, `failed`, `skipped` or `rolledBack`); only a cell the wave has not reached can be skipped. Nothing changes.'
+          x-ticvai-problem-types: [rollout-cell-not-pending]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /releases:
@@ -123,6 +207,7 @@ paths:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
         - "P09 ADM-024 Release Notification Composer"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -204,6 +289,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Release'
         '400':
+          x-ticvai-problem-types: [required-migration-missing, unknown-component-version]
           description: 'A required migration is absent, or a component version does not exist in the registry.
 
             '
@@ -292,6 +378,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [release-not-in-staging]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -343,6 +430,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [release-transition-not-allowed]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -414,6 +502,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Rollout'
         '403':
+          x-ticvai-problem-types: [approver-is-requester, step-up-token-missing, step-up-token-expired]
           description: Approver is the requester, or the step-up token is absent or expired
           content:
             application/problem+json:
@@ -478,7 +567,9 @@ paths:
       description: 'A rollout is one release reaching one environment across many cells. The deployment
         monitor reads this.
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - rollout
       x-ticvai-permission: PLATFORM_RELEASE_VIEW
@@ -632,6 +723,7 @@ paths:
                     format: uuid
                     description: The pending `releasePromotion` request.
         '409':
+          x-ticvai-problem-types: [rollout-transition-not-allowed]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -689,6 +781,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RolloutDetail'
+        '409':
+          description: 'The rollout is already `paused` (`rollout-already-paused`), or is not `rolling` (`queued`, `canary`, or finished as `complete`, `failed` or `rolledBack`; `rollout-not-rolling`). Nothing changes.'
+          x-ticvai-problem-types: [rollout-already-paused, rollout-not-rolling]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /rollouts/{rolloutId}/rollback:
@@ -777,7 +876,9 @@ paths:
       description: 'Every migration, its module, whether it is reversible, and which cells have applied
         it. This is the migration console''s landing view.
 
-        '
+        
+
+        **Order.** Newest first, by `rollbackTestedAt` descending.'
       tags:
       - migration
       x-ticvai-permission: PLATFORM_MIGRATION_VIEW
@@ -868,6 +969,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MigrationPlan'
         '400':
+          x-ticvai-problem-types: [unknown-target-version, migration-path-not-contiguous]
           description: Target version unknown, or the path between versions is not contiguous
           content:
             application/problem+json:
@@ -944,6 +1046,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MigrationRun'
         '409':
+          x-ticvai-problem-types: [migration-plan-stale]
           description: 'The plan is stale — cell state changed since it was computed. Re-plan and review
             before applying.
 
@@ -1392,6 +1495,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UpgradeSchedule'
         '400':
+          x-ticvai-problem-types: [deferral-window-exceeded]
           description: Deferral exceeds the maximum permitted window
           content:
             application/problem+json:
@@ -1473,6 +1577,13 @@ paths:
       operationId: listDeadLetters
       x-ticvai-consumed-by:
         - "P09 ADM-318 Dead Letters"
+      x-ticvai-read-via:
+      - query: tenancy#deadLetterRecords
+        route: service
+        for: 'its read of platform.dead_letter, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#outboxRecords
+        route: service
+        for: 'its read of platform.outbox, Tenancy''s data (CHG-MOD-001)'
       summary: Undeliverable events
       description: ADR-0033. **A dead-letter table nobody reads is worse than no table** — it converts
         a visible outage into an invisible backlog. This is the query behind the screen that stops that.
@@ -1510,6 +1621,11 @@ paths:
       operationId: replayDeadLetter
       x-ticvai-consumed-by:
         - "P09 ADM-318 Dead Letters"
+      x-ticvai-read-via:
+      - query: tenancy#deadLetterRecords
+        route: service
+        for: 'its read of platform.dead_letter, Tenancy''s data (CHG-MOD-001)'
+      x-ticvai-names-for-context: [platform.outbox]
       x-ticvai-write-via:
       - table: platform.dead_letter
         operation: requeueDeadLetter
@@ -1519,7 +1635,7 @@ paths:
       description: '**Records the replay as a new attempt rather than resetting the count** (ADR-0033).
         An operator retrying the same poison message forty times should be able to see that they did.
 
-        **The owner writes it.** `platform.dead_letter` sits beside `platform.outbox` in TenancyService''s
+        **The owner writes it.** `platform.dead_letter` sits beside the outbox in TenancyService''s
         schema, in `commerce`; this checks the operator''s permission and calls tenancy `requeueDeadLetter`,
         which puts the event back on the outbox and counts the replay in one transaction (ADR-0055 rule 4,
         CHG-XDW-003).'
@@ -1556,6 +1672,10 @@ paths:
       operationId: republishOutbox
       x-ticvai-consumed-by:
         - "P09 ADM-318 Dead Letters"
+      x-ticvai-read-via:
+      - query: tenancy#outboxRecords
+        route: service
+        for: 'its read of platform.outbox, Tenancy''s data (CHG-MOD-001)'
       summary: Republish one tenant database's outbox rows for a time range
       description: '**ADR-0058, amended 1 October (section 3).** When the broker is lost or rebuilt, or a
         DR failover starts an empty broker in the other region (ADR-0060), every message it held and no
@@ -1826,6 +1946,7 @@ paths:
                   $ref: '#/components/schemas/WafRule'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waf-policies/{wafRuleId}:
     put:
       operationId: setWafPolicy
       x-ticvai-consumed-by:
@@ -1851,6 +1972,11 @@ paths:
             schema:
               $ref: '#/components/schemas/WafRule'
       parameters:
+        - name: wafRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -1954,6 +2080,8 @@ paths:
       operationId: setScalingPolicy
       x-ticvai-consumed-by:
         - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per cell and service, the one the body''s `cellId` names, within the caller''s region: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Change the scaling policy
@@ -2050,6 +2178,7 @@ components:
           maxLength: 200
           description: The consumer's stable name (`<service>.<handler>`); one event is processed once per consumer.
         eventId:
+          x-ticvai-references: none
           type: string
           format: uuid
           description: The envelope's `eventId`, which is the producing outbox row's id (UUIDv7).
@@ -2066,6 +2195,7 @@ components:
       - id
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         cellId:
@@ -2168,6 +2298,7 @@ components:
       - id
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         cellId:
@@ -2455,9 +2586,11 @@ components:
       - status
       properties:
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         cellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         databaseName:
@@ -2510,6 +2643,7 @@ components:
       - status
       properties:
         rolloutId:
+          x-ticvai-references: control.rollout
           type: string
           format: uuid
           description: 'The rollout this row belongs to (`control.rollout`).'
@@ -2565,6 +2699,7 @@ components:
       - status
       properties:
         cellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         cellName:
@@ -2874,6 +3009,7 @@ components:
           type: string
           format: uuid
         planId:
+          x-ticvai-references: control.migration_plan
           type: string
           format: uuid
         status:
@@ -2985,6 +3121,7 @@ components:
       - name
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         kind:
@@ -3018,6 +3155,8 @@ components:
       - scheduledFor
       properties:
         tenantId:
+          readOnly: true
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         tenantName:
@@ -3053,9 +3192,11 @@ components:
       - publishedAt
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         version:
+          readOnly: true
           type: string
         supportEndsAt:
           type: string
@@ -3170,6 +3311,7 @@ components:
           type: string
           format: uuid
         eventId:
+          x-ticvai-references: none
           type: string
           format: uuid
           description: '**The envelope''s event id, which is this row''s `id`** (ADR-0058; UUIDv7, ADR-0056). The
@@ -3183,6 +3325,7 @@ components:
           minimum: 1
           description: The event's `version`, carried in the envelope so a consumer on an older version can tell.
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
           description: The tenant the change belongs to (envelope field, SD-030).

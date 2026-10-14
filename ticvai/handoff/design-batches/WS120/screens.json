@@ -5,6 +5,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "2",
@@ -122,7 +123,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -191,61 +192,73 @@
       {
        "kind": "metricTile",
        "label": "Forecast Attendance",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Peak In-Venue Population",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Forecast Occupancy",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "High-Pressure Periods",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Attractions at Risk",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Queue Pressure Alerts",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Required Workforce",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Workforce Gap",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Required POS Capacity",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "F&B Demand Index",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Inventory Risk Items",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Operational Readiness Score",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 32 §Header KPIs"
       }
      ]
@@ -265,13 +278,6 @@
     "operationId": "getForecast",
     "contract": "ai",
     "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -365,6 +371,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "2",
@@ -456,12 +463,14 @@
       },
       {
        "kind": "dataTable",
+       "operation": "getForecast",
        "derived": true,
        "impliedBy": "listOperationalRequirements",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
        "kind": "primaryButton",
+       "operation": "configureAnomalyDetector",
        "derived": true,
        "impliedBy": "configureAnomalyDetector",
        "notes": "The act the screen exists for."
@@ -505,13 +514,6 @@
     "contract": "ai",
     "purpose": "Set an alert when the forecast crosses a threshold (e.g. attendance p50 above N, occupancy above % of capacity)",
     "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAiInsights",
-    "contract": "ai",
-    "purpose": "Forecast threshold alerts (kind forecastThreshold)",
-    "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -610,6 +612,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "2",
@@ -701,12 +704,14 @@
       },
       {
        "kind": "dataTable",
+       "operation": "getForecast",
        "derived": true,
        "impliedBy": "listOperationalRequirements",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
        "kind": "primaryButton",
+       "operation": "requestSuggestion",
        "derived": true,
        "impliedBy": "requestSuggestion",
        "notes": "The act the screen exists for."
@@ -735,13 +740,6 @@
     "operationId": "getForecast",
     "contract": "ai",
     "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -842,6 +840,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "2",
@@ -933,6 +932,7 @@
       },
       {
        "kind": "dataTable",
+       "operation": "getForecast",
        "derived": true,
        "impliedBy": "listOperationalRequirements",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -954,13 +954,6 @@
     "operationId": "getForecast",
     "contract": "ai",
     "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -1054,6 +1047,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "2",
@@ -1154,7 +1148,7 @@
         "Manual validation rate"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getStaffingCoverage",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 38 §Show"
       }
      ]
@@ -1167,6 +1161,7 @@
        "kind": "detailPanel",
        "label": "The selected workforce demand staffing",
        "bindsTo": null,
+       "operation": "getStaffingCoverage",
        "columns": [
         "Required Staff",
         "Currently Scheduled",
@@ -1194,20 +1189,6 @@
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, `WORKFORCE_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
-   {
-    "operationId": "getForecast",
-    "contract": "ai",
-    "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
    {
     "operationId": "getStaffingCoverage",
     "contract": "workforce",
@@ -1313,6 +1294,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "2",
@@ -1452,20 +1434,6 @@
   },
   "apis": [
    {
-    "operationId": "getForecast",
-    "contract": "ai",
-    "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listTenants",
     "contract": "subscription",
     "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
@@ -1563,6 +1531,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "2",
@@ -1654,6 +1623,7 @@
       },
       {
        "kind": "dataTable",
+       "operation": "getForecast",
        "derived": true,
        "impliedBy": "listOperationalRequirements",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -1675,13 +1645,6 @@
     "operationId": "getForecast",
     "contract": "ai",
     "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -1775,6 +1738,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "2",
@@ -1866,6 +1830,7 @@
       },
       {
        "kind": "dataTable",
+       "operation": "getForecast",
        "derived": true,
        "impliedBy": "listOperationalRequirements",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -1887,13 +1852,6 @@
     "operationId": "getForecast",
     "contract": "ai",
     "purpose": "Forecast values",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -1987,6 +1945,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "2",
@@ -2068,21 +2027,25 @@
       {
        "kind": "metricTile",
        "label": "Readiness 87% 93% 90% 91%",
+       "operation": "compareForecastScenarios",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline A B C"
       },
       {
        "kind": "metricTile",
        "label": "Workforce Gap 18 0 18 18",
+       "operation": "compareForecastScenarios",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline A B C"
       },
       {
        "kind": "metricTile",
        "label": "Avg Queue 26m 24m 25m 19m",
+       "operation": "compareForecastScenarios",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline A B C"
       },
       {
        "kind": "metricTile",
        "label": "POS Wait 17m 16m 7m 16m",
+       "operation": "compareForecastScenarios",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 44 §Metric Baseline A B C"
       }
      ]
@@ -2099,24 +2062,10 @@
   },
   "apis": [
    {
-    "operationId": "createForecastScenario",
-    "contract": "ai",
-    "purpose": "Run a what-if",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "compareForecastScenarios",
     "contract": "ai",
     "purpose": "Compare scenarios",
     "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -2209,6 +2158,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "2",
@@ -2362,20 +2312,6 @@
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
-   {
-    "operationId": "listOperationalRequirements",
-    "contract": "ai",
-    "purpose": "Requirements derived from the forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "decideOperationalRequirement",
-    "contract": "ai",
-    "purpose": "Accept, modify or reject a requirement",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
    {
     "operationId": "listTenants",
     "contract": "subscription",

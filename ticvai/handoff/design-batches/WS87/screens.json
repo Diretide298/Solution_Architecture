@@ -14,7 +14,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/self-service-experience-command-center-bo-484",
-   "component": "apps/venue-management-web/src/routes/games-rides/SelfServiceExperienceCommandCenter.tsx",
+   "component": "src/routes/games-rides/SelfServiceExperienceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -96,7 +96,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -227,7 +227,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/self-service-kiosk-profile-channel-configuration-bo-485",
-   "component": "apps/venue-management-web/src/routes/games-rides/SelfServiceKioskProfileChannelConfiguration.tsx",
+   "component": "src/routes/games-rides/SelfServiceKioskProfileChannelConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -581,6 +581,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "10",
@@ -590,7 +591,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/customer-card-wallet-identification-bo-486",
-   "component": "apps/venue-management-web/src/routes/games-rides/CustomerCardWalletIdentification.tsx",
+   "component": "src/routes/games-rides/CustomerCardWalletIdentification.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -654,7 +655,8 @@
         "4321"
        ],
        "notes": "The pack groups this record's detail under its own headings: “WELCOME”, “Identification Methods”, “Customer Tap”, “Invalid Results”.",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 98 §Validate Card Status"
+       "provenance": "pack Game_and_Ride_Module.pdf, page 98 §Validate Card Status",
+       "operation": "getGameCard"
       }
      ]
     }
@@ -725,6 +727,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "10",
@@ -734,7 +737,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/customer-wallet-balance-summary-bo-487",
-   "component": "apps/venue-management-web/src/routes/games-rides/CustomerWalletBalanceSummary.tsx",
+   "component": "src/routes/games-rides/CustomerWalletBalanceSummary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -892,6 +895,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "10",
@@ -901,7 +905,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/self-service-wallet-top-up-bo-488",
-   "component": "apps/venue-management-web/src/routes/games-rides/SelfServiceWalletTopUp.tsx",
+   "component": "src/routes/games-rides/SelfServiceWalletTopUp.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1033,6 +1037,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "10",
@@ -1042,7 +1047,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/bonus-free-game-benefit-view-bo-489",
-   "component": "apps/venue-management-web/src/routes/games-rides/BonusFreeGameBenefitView.tsx",
+   "component": "src/routes/games-rides/BonusFreeGameBenefitView.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1104,7 +1109,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1229,6 +1234,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "10",
@@ -1238,7 +1244,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/game-ride-eligibility-what-can-i-play-bo-490",
-   "component": "apps/venue-management-web/src/routes/games-rides/GameRideEligibilityWhatCanIPlay.tsx",
+   "component": "src/routes/games-rides/GameRideEligibilityWhatCanIPlay.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1349,6 +1355,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "10",
@@ -1358,7 +1365,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/redemption-balance-prize-discovery-bo-491",
-   "component": "apps/venue-management-web/src/routes/games-rides/RedemptionBalancePrizeDiscovery.tsx",
+   "component": "src/routes/games-rides/RedemptionBalancePrizeDiscovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1468,6 +1475,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "10",
@@ -1477,7 +1485,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/customer-game-wallet-transaction-history-bo-492",
-   "component": "apps/venue-management-web/src/routes/games-rides/CustomerGameWalletTransactionHistory.tsx",
+   "component": "src/routes/games-rides/CustomerGameWalletTransactionHistory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1588,6 +1596,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "10",
@@ -1597,7 +1606,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/self-service-ui-theme-language-journey-configuration-bo-493",
-   "component": "apps/venue-management-web/src/routes/games-rides/SelfServiceUiThemeLanguageJourneyConfiguration.tsx",
+   "component": "src/routes/games-rides/SelfServiceUiThemeLanguageJourneyConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {

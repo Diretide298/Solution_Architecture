@@ -323,7 +323,7 @@
  "ChannelPublicationAvailabilityInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.product` (with `catalogue.audit_entry`, `catalogue.product_channel_assignment`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Channel Publication & Availability submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "channels": {
@@ -734,6 +734,8 @@
     ]
    },
    "groups": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -860,6 +862,9 @@
   }
  },
  "ProposedAction": {
+  "x-ticvai-retired-columns": [
+   "interaction_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "ai.proposed_action",
   "required": [
@@ -876,6 +881,8 @@
     "format": "uuid"
    },
    "interactionId": {
+    "x-ticvai-references": "ai.activity",
+    "x-ticvai-column": "activity_id",
     "type": "string",
     "format": "uuid"
    },
@@ -1016,6 +1023,9 @@
   }
  },
  "VenueSettings": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
@@ -1665,6 +1675,9 @@
   }
  },
  "Workstation": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "x-ticvai-persistence": "platform.workstation",
   "type": "object",
   "required": [

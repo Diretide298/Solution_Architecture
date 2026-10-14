@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/group-reservation-center-bo-1023",
-   "component": "apps/venue-management-web/src/routes/access-venue/GroupReservationCenter.tsx",
+   "component": "src/routes/access-venue/GroupReservationCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -122,7 +123,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listGroupSeatRequests",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listGroupSeatRequests"
       }
      ]
     }
@@ -179,6 +181,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "8",
@@ -188,7 +191,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/group-type-configuration-bo-1024",
-   "component": "apps/venue-management-web/src/routes/access-venue/GroupTypeConfiguration.tsx",
+   "component": "src/routes/access-venue/GroupTypeConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -238,7 +241,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listGroupSeatRequests",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listGroupSeatRequests"
       }
      ]
     }
@@ -295,6 +299,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "8",
@@ -304,7 +309,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/group-request-intake-bo-1025",
-   "component": "apps/venue-management-web/src/routes/access-venue/GroupRequestIntake.tsx",
+   "component": "src/routes/access-venue/GroupRequestIntake.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -432,6 +437,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "8",
@@ -441,7 +447,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/availability-best-fit-search-bo-1026",
-   "component": "apps/venue-management-web/src/routes/access-venue/AvailabilityBestFitSearch.tsx",
+   "component": "src/routes/access-venue/AvailabilityBestFitSearch.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -464,6 +470,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Find the strongest seating options for a group request. Search live inventory by group size, contiguous requirement, split limit, price, zone, view and accessibility. Rank sections or seat groups by fit score, average price, distance, fragmentation and operational constraints. Allow comparison, map preview, alternative performance and immediate controlled hold creation. Bulk allocation shall use the same real-time inventory and hold controls as individual sale; discounts, deposits, release dates and contract approvals follow shared finance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `allocateGroupSeats`, `listGroupSeatRequests` with BO-1027; this screen is Availability & Best-Fit Search (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 8.04, page 35): find the strongest seating options for a group request. Search live inventory by group size, contiguous requirement, split limit, price, zone, view and accessibility. Rank sections or seat groups by fit score, average price, distance, fragmentation and operational constraints. Allow comparison, map preview, alternative performance and immediate controlled hold creation. Bulk allocation shall use the same real-time inventory and hold controls as individual sale; discounts, deposits, release dates and contract approvals follow shared finance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -486,7 +493,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "allocateGroupSeats",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "allocateGroupSeats"
       },
       {
        "kind": "secondaryButton",
@@ -578,6 +586,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "8",
@@ -587,7 +596,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/bulk-seat-allocation-bo-1027",
-   "component": "apps/venue-management-web/src/routes/access-venue/BulkSeatAllocation.tsx",
+   "component": "src/routes/access-venue/BulkSeatAllocation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -610,6 +619,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allocate large quantities without compromising seat-state integrity. Select section, row, seat range, polygon or recommended group and validate all inventory atomically. Configure contiguous groups, aisle breaks, split sections, wheelchair/companion pairings and staff seats. Create the linked hold/reservation with value, expiry, owner and exact allocated-seat list. Bulk allocation shall use the same real-time inventory and hold controls as individual sale; discounts, deposits, release dates and contract approvals follow shared finance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `allocateGroupSeats`, `listGroupSeatRequests` with BO-1026; this screen is Bulk Seat Allocation (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 8.05, page 35): allocate large quantities without compromising seat-state integrity. Select section, row, seat range, polygon or recommended group and validate all inventory atomically. Configure contiguous groups, aisle breaks, split sections, wheelchair/companion pairings and staff seats. Create the linked hold/reservation with value, expiry, owner and exact allocated-seat list. Bulk allocation shall use the same real-time inventory and hold controls as individual sale; discounts, deposits, release dates and contract approvals follow shared finance policies. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -632,7 +642,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "allocateGroupSeats",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "allocateGroupSeats"
       },
       {
        "kind": "secondaryButton",
@@ -724,6 +735,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "8",
@@ -733,7 +745,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/roster-participant-assignment-bo-1028",
-   "component": "apps/venue-management-web/src/routes/access-venue/RosterParticipantAssignment.tsx",
+   "component": "src/routes/access-venue/RosterParticipantAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -870,6 +882,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "8",
@@ -879,7 +892,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/quote-deposit-payment-bo-1029",
-   "component": "apps/venue-management-web/src/routes/access-venue/QuoteDepositPayment.tsx",
+   "component": "src/routes/access-venue/QuoteDepositPayment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -924,7 +937,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listGroupSeatRequests",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listGroupSeatRequests"
       },
       {
        "kind": "primaryButton",
@@ -1001,6 +1015,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "8",
@@ -1010,7 +1025,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/modify-release-cancel-bo-1030",
-   "component": "apps/venue-management-web/src/routes/access-venue/ModifyReleaseCancel.tsx",
+   "component": "src/routes/access-venue/ModifyReleaseCancel.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1062,7 +1077,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listGroupSeatRequests",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listGroupSeatRequests"
       },
       {
        "kind": "secondaryButton",
@@ -1154,6 +1170,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "APPROVAL_REQUEST",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "8",
@@ -1163,7 +1180,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/contracts-approval-workflow-bo-1031",
-   "component": "apps/venue-management-web/src/routes/access-venue/ContractsApprovalWorkflow.tsx",
+   "component": "src/routes/access-venue/ContractsApprovalWorkflow.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1273,6 +1290,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "8",
@@ -1282,7 +1300,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/group-reporting-audit-bo-1032",
-   "component": "apps/venue-management-web/src/routes/access-venue/GroupReportingAudit.tsx",
+   "component": "src/routes/access-venue/GroupReportingAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1327,7 +1345,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listGroupSeatRequests",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listGroupSeatRequests"
       }
      ]
     }

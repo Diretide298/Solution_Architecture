@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/in-venue-notifications",
-   "component": "apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx",
+   "component": "src/screens/general/InVenueNotificationsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -41,7 +41,7 @@
   "density": "comfortable",
   "pattern": "configEditor",
   "patternReason": "`listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session claim stays a form on the same screen, so the pattern is kept until the screen is redrawn",
-  "purpose": "Work with in-venue notifications for this venue.",
+  "purpose": "The guest's in-venue notifications, newest first: queue calls, order ready, booking changes and venue alerts, marked read once seen.",
   "layout": {
    "template": "form",
    "regions": [
@@ -164,7 +164,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/ai-concierge-home",
-   "component": "apps/guest-app/src/routes/general/AiConciergeHomeDashboard.tsx",
+   "component": "src/screens/general/AiConciergeHomeDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -311,7 +311,7 @@
    {
     "operationId": "createAiConversation",
     "contract": "ai",
-    "purpose": "Opened silently on the first message; the scope comes from the session, never a module the guest picks",
+    "purpose": "Opened silently on the first message; the scope comes from the session, never a module the guest picks. Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject)",
     "trigger": "background"
    },
    {
@@ -323,13 +323,13 @@
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'.",
+    "purpose": "From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'. Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject)",
     "trigger": "background"
    },
    {
     "operationId": "listAiConversations",
     "contract": "ai",
-    "purpose": "The guest's own earlier conversations",
+    "purpose": "The guest's own earlier conversations. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4)",
     "trigger": "onLoad"
    },
    {
@@ -347,7 +347,7 @@
    {
     "operationId": "getGuestConversation",
     "contract": "marketing-crm",
-    "purpose": "The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003)",
+    "purpose": "The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject)",
     "trigger": "onInterval",
     "pollSeconds": 5,
     "pollSecondsHidden": 30,
@@ -431,7 +431,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/ai-concierge-chat",
-   "component": "apps/guest-app/src/routes/general/AiConciergeChatDetail.tsx",
+   "component": "src/screens/general/AiConciergeChatDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -594,7 +594,7 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add something",
+    "purpose": "Add what the assistant offers in the chat to the guest's cart",
     "trigger": "onAction"
    },
    {
@@ -618,7 +618,7 @@
    {
     "operationId": "getGuestConversation",
     "contract": "marketing-crm",
-    "purpose": "The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003)",
+    "purpose": "The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject)",
     "trigger": "onInterval",
     "pollSeconds": 5,
     "pollSecondsHidden": 30,
@@ -629,13 +629,6 @@
     "contract": "marketing-crm",
     "purpose": "Pass an assistant conversation to a person",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "recordAnswerFeedback",
-    "contract": "ai",
-    "purpose": "Say whether an answer helped",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -771,6 +764,14 @@
     "provenance": "client-verified"
    }
   ],
+  "gaps": [
+   {
+    "operation": "recordAnswerFeedback",
+    "removed": true,
+    "why": "The client-approved screen has no Helpful / Not helpful control (GST-031 has it).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -812,7 +813,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/ai-concierge-contextual-help",
-   "component": "apps/guest-app/src/routes/general/AiConciergeContextualHelpDetail.tsx",
+   "component": "src/screens/general/AiConciergeContextualHelpDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -913,7 +914,7 @@
    {
     "operationId": "createAiConversation",
     "contract": "ai",
-    "purpose": "Opened silently on the first question; the scope comes from the session",
+    "purpose": "Opened silently on the first question; the scope comes from the session. Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject)",
     "trigger": "background"
    },
    {
@@ -931,7 +932,7 @@
    {
     "operationId": "listAiConversations",
     "contract": "ai",
-    "purpose": "Show the guest's earlier conversations with the assistant",
+    "purpose": "Show the guest's earlier conversations with the assistant. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4)",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
@@ -1005,7 +1006,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/feedback-and-ratings",
-   "component": "apps/guest-app/src/routes/general/FeedbackAndRatingsList.tsx",
+   "component": "src/screens/general/FeedbackAndRatingsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1127,7 +1128,7 @@
    {
     "operationId": "getForm",
     "contract": "marketing-crm",
-    "purpose": "A triggered survey opened from its link",
+    "purpose": "A triggered survey opened from its link. Read once the guest is signed in (getForm needs the guest session): a signed-out guest opening the link is offered sign-in and brought back (GFIX-4)",
     "trigger": "onLoad"
    },
    {
@@ -1139,7 +1140,7 @@
    {
     "operationId": "listMyOrders",
     "contract": "orders",
-    "purpose": "The recent visits a review can be about",
+    "purpose": "The recent visits a review can be about. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4)",
     "trigger": "onLoad"
    }
   ],
@@ -1231,7 +1232,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/help-and-support",
-   "component": "apps/guest-app/src/routes/general/HelpAndSupportDetail.tsx",
+   "component": "src/screens/general/HelpAndSupportDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1534,7 +1535,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/plan-your-adventure-start",
-   "component": "apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx",
+   "component": "src/screens/general/PlanYourAdventureStartDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1698,12 +1699,6 @@
   },
   "apis": [
    {
-    "operationId": "getWaitTimes",
-    "contract": "queue",
-    "purpose": "Wait times across a venue",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "listProducts",
     "contract": "catalogue",
     "purpose": "List products",
@@ -1737,6 +1732,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-051",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-051.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -1746,6 +1742,14 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
+  "gaps": [
+   {
+    "operation": "getWaitTimes",
+    "removed": true,
+    "why": "The client-approved Plan questions show no wait time; the plan is built from them by generateVisitPlan.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1787,7 +1791,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/suggested-itineraries",
-   "component": "apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx",
+   "component": "src/screens/general/SuggestedItinerariesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1959,7 +1963,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/your-plan",
-   "component": "apps/guest-app/src/routes/general/YourPlanDetail.tsx",
+   "component": "src/screens/general/YourPlanDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2169,18 +2173,6 @@
   },
   "apis": [
    {
-    "operationId": "getCart",
-    "contract": "orders",
-    "purpose": "The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listProducts",
-    "contract": "catalogue",
-    "purpose": "List products",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "getWaitTimes",
     "contract": "queue",
     "purpose": "Wait times across a venue",
@@ -2242,6 +2234,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-053",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-053.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -2251,6 +2244,20 @@
    }
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
+  "gaps": [
+   {
+    "operation": "getCart",
+    "removed": true,
+    "why": "The client-approved Your Plan shows no cart; Book this plan returns the cart and opens it (GST-041).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "listProducts",
+    "removed": true,
+    "why": "Nothing on the client-approved Your Plan lists products; swaps and additions come from listVisitPlanAlternatives.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -2292,7 +2299,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/ai-planner",
-   "component": "apps/guest-app/src/routes/general/AIPlannerDetail.tsx",
+   "component": "src/screens/general/AIPlannerDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2441,15 +2448,15 @@
    {
     "operationId": "createAiConversation",
     "contract": "ai",
-    "purpose": "Opened on the first message to the planner, never on opening the Plan tab (a conversation is billed); the plan loads without it",
-    "trigger": "onAction",
+    "purpose": "Opened by the screen on the first message to the planner, not a control, and only when signed in; never on opening the Plan tab (a conversation is billed)",
+    "trigger": "background",
     "provenance": "decided 29 September 2026, MOB-6"
    },
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent's proposal for the plan, applied through `updateVisitPlan`. Later (CHG-RONEP-010): the planner agent's refinement in chat (AI-ENGINE-PLANNER); the rules plan still answers in A1 ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'.",
-    "trigger": "onAction",
+    "purpose": "Read by the Ask the planner panel after an answer, not a control, and only when signed in: the planner's itinerary proposal that Apply this change applies",
+    "trigger": "background",
     "provenance": "decided 29 September 2026, MOB-6"
    }
   ],
@@ -2475,6 +2482,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-054",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-054.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",

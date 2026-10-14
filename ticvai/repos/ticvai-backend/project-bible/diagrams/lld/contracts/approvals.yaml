@@ -677,7 +677,7 @@ operations:
   - cache:idempotency
 - operation: setApprovalControlPolicy
   verb: PUT
-  path: /approval-control-policies
+  path: /approval-control-policies/{controlPolicyId}
   scope: tenant
   permission: APPROVAL_CONFIGURE
   audience:
@@ -689,7 +689,7 @@ operations:
   - approvals.control_policy
 - operation: setApprovalExternalProvider
   verb: PUT
-  path: /approval-external-providers
+  path: /approval-external-providers/{externalProviderId}
   scope: tenant
   permission: APPROVAL_CONFIGURE
   audience:
@@ -704,7 +704,7 @@ operations:
   - cache:idempotency
 - operation: setApprovalMatrix
   verb: PUT
-  path: /approval-matrices
+  path: /approval-matrices/{matrixId}
   scope: venue
   permission: APPROVAL_CONFIGURE
   audience:
@@ -721,7 +721,7 @@ operations:
   - cache:idempotency
 - operation: setApprovalRetentionPolicy
   verb: PUT
-  path: /approval-retention
+  path: /approval-retention/{retentionPolicyId}
   scope: tenant
   permission: APPROVAL_CONFIGURE
   audience:
@@ -735,7 +735,7 @@ operations:
   - cache:idempotency
 - operation: setApprovalSlaPolicy
   verb: PUT
-  path: /approval-sla-policies
+  path: /approval-sla-policies/{slaPolicyId}
   scope: tenant
   permission: APPROVAL_CONFIGURE
   audience:
@@ -747,7 +747,7 @@ operations:
   - approvals.sla_policy
 - operation: setApproverAvailability
   verb: PUT
-  path: /approval-delegations/availability
+  path: /approval-delegations/availability/{availabilityId}
   scope: venue
   permission: APPROVAL_DECIDE
   audience:

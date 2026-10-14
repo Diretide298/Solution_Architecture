@@ -5,6 +5,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/communications-center-bo-784",
-   "component": "apps/venue-management-web/src/routes/engagement-support/CommunicationsCenter.tsx",
+   "component": "src/routes/engagement-support/CommunicationsCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -113,7 +114,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listCommunicationService",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listCommunicationService"
       }
      ]
     }
@@ -170,6 +172,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -179,7 +182,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/template-library-bo-785",
-   "component": "apps/venue-management-web/src/routes/engagement-support/TemplateLibrary.tsx",
+   "component": "src/routes/engagement-support/TemplateLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -445,6 +448,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -454,7 +458,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/newsletter-builder-bo-786",
-   "component": "apps/venue-management-web/src/routes/engagement-support/NewsletterBuilder.tsx",
+   "component": "src/routes/engagement-support/NewsletterBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -477,6 +481,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create responsive, branded newsletters without coding. Provide drag-and-drop header, text, image, event, ticket, membership, loyalty, CTA, divider and footer blocks. Configuration Scope of Work | Version 1.0 31 Support personalization, dynamic content, reusable templates, language variants and desktop/mobile preview. Validate accessibility, links, unsubscribe content, sender details and deliverability before test or approval. Support draft, test send, review, approve, schedule, clone and version-management workflows. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "division": "Shares `createMessageTemplate`, `proposeMarketingContent` with BO-787; this screen is Newsletter Builder (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 6.03, page 31): create responsive, branded newsletters without coding. Provide drag-and-drop header, text, image, event, ticket, membership, loyalty, CTA, divider and footer blocks. Configuration Scope of Work | Version 1.0 31 Support personalization, dynamic content, reusable templates, language variants and desktop/mobile preview. Validate accessibility, links, unsubscribe content, sender details and deliverability before test or approval. Support draft, test send, review, approve, schedule, clone and version-management workflows. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
   "gaps": [
    {
     "operation": null,
@@ -576,6 +581,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -585,7 +591,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/content-blocks-product-feed-bo-787",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ContentBlocksProductFeed.tsx",
+   "component": "src/routes/engagement-support/ContentBlocksProductFeed.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -608,6 +614,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Connect communications to reusable content and live products. Maintain approved content blocks for banners, copy, events, tickets, memberships, loyalty, promotions, CTAs and footers. Configure live feeds from events, products, ticket inventory, capacity, pricing, promotions and recommendations. Define filters, sorting, fallback content, refresh interval, expiration and behavior when inventory is unavailable. Track which campaigns and templates use each block before editing or deactivation. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "division": "Shares `createMessageTemplate`, `proposeMarketingContent` with BO-786; this screen is Content Blocks & Product Feed (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 6.04, page 32): connect communications to reusable content and live products. Maintain approved content blocks for banners, copy, events, tickets, memberships, loyalty, promotions, CTAs and footers. Configure live feeds from events, products, ticket inventory, capacity, pricing, promotions and recommendations. Define filters, sorting, fallback content, refresh interval, expiration and behavior when inventory is unavailable. Track which campaigns and templates use each block before editing or deactivation. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
   "gaps": [
    {
     "operation": null,
@@ -702,6 +709,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "GUEST_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -711,7 +719,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/subscriptions-preferences-bo-788",
-   "component": "apps/venue-management-web/src/routes/engagement-support/SubscriptionsPreferences.tsx",
+   "component": "src/routes/engagement-support/SubscriptionsPreferences.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -838,6 +846,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -847,7 +856,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/transactional-notification-rules-bo-789",
-   "component": "apps/venue-management-web/src/routes/engagement-support/TransactionalNotificationRules.tsx",
+   "component": "src/routes/engagement-support/TransactionalNotificationRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -892,7 +901,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSystemTransactionalTemplate",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSystemTransactionalTemplate"
       },
       {
        "kind": "primaryButton",
@@ -977,6 +987,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -986,7 +997,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/scheduling-priority-approval-bo-790",
-   "component": "apps/venue-management-web/src/routes/engagement-support/SchedulingPriorityApproval.tsx",
+   "component": "src/routes/engagement-support/SchedulingPriorityApproval.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1031,7 +1042,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listRoutingPriorityThrottling",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listRoutingPriorityThrottling"
       }
      ]
     }
@@ -1088,6 +1100,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -1097,7 +1110,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/delivery-retry-failover-bo-791",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DeliveryRetryFailover.tsx",
+   "component": "src/routes/engagement-support/DeliveryRetryFailover.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1142,13 +1155,15 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listDeliveryQueueFailure",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listDeliveryQueueFailure"
       },
       {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "retryMessageDispatch",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "retryMessageDispatch"
       },
       {
        "kind": "secondaryButton",
@@ -1229,6 +1244,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -1238,7 +1254,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/deliverability-analytics-bo-792",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DeliverabilityAnalytics.tsx",
+   "component": "src/routes/engagement-support/DeliverabilityAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1283,7 +1299,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listProviderHealthUsage",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listProviderHealthUsage"
       }
      ]
     }
@@ -1340,6 +1357,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -1349,7 +1367,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/ai-content-translation-audit-bo-793",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AiContentTranslationAudit.tsx",
+   "component": "src/routes/engagement-support/AiContentTranslationAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1441,6 +1459,13 @@
     "purpose": "Draft other languages of a message template (any channel) for review",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listProposedActions",
+    "contract": "ai",
+    "purpose": "Follows decideProposedAction (202) until what it started settles: What the assistant has proposed and nobody has decided",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {

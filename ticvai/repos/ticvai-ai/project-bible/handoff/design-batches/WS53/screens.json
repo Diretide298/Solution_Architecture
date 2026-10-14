@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "9",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/campaign-governance-budget-command-center-adm-218",
-   "component": "apps/venue-management-web/src/routes/commercial/CampaignGovernanceBudgetCommandCenter.tsx",
+   "component": "src/routes/commercial/CampaignGovernanceBudgetCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -247,6 +248,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "9",
@@ -256,7 +258,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/campaign-budget-financial-limit-setup-adm-219",
-   "component": "apps/venue-management-web/src/routes/commercial/CampaignBudgetFinancialLimitSetup.tsx",
+   "component": "src/routes/commercial/CampaignBudgetFinancialLimitSetup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -558,6 +560,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "9",
@@ -567,7 +570,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/redemption-discount-exposure-limit-manager-adm-220",
-   "component": "apps/venue-management-web/src/routes/commercial/RedemptionDiscountExposureLimitManager.tsx",
+   "component": "src/routes/commercial/RedemptionDiscountExposureLimitManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -691,6 +694,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "9",
@@ -700,7 +704,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/budget-consumption-forecast-monitor-adm-221",
-   "component": "apps/venue-management-web/src/routes/commercial/BudgetConsumptionForecastMonitor.tsx",
+   "component": "src/routes/commercial/BudgetConsumptionForecastMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -835,6 +839,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "9",
@@ -844,7 +849,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/threshold-actions-automatic-suspension-adm-222",
-   "component": "apps/venue-management-web/src/routes/commercial/ThresholdActionsAutomaticSuspension.tsx",
+   "component": "src/routes/commercial/ThresholdActionsAutomaticSuspension.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1028,6 +1033,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "9",
@@ -1037,7 +1043,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/campaign-approval-workflow-designer-adm-223",
-   "component": "apps/venue-management-web/src/routes/commercial/CampaignApprovalWorkflowDesigner.tsx",
+   "component": "src/routes/commercial/CampaignApprovalWorkflowDesigner.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1187,6 +1193,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "9",
@@ -1196,7 +1203,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/approval-inbox-decision-workspace-adm-224",
-   "component": "apps/venue-management-web/src/routes/commercial/ApprovalInboxDecisionWorkspace.tsx",
+   "component": "src/routes/commercial/ApprovalInboxDecisionWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1368,6 +1375,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "9",
@@ -1377,7 +1385,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/campaign-financial-commercial-simulator-adm-225",
-   "component": "apps/venue-management-web/src/routes/commercial/CampaignFinancialCommercialSimulator.tsx",
+   "component": "src/routes/commercial/CampaignFinancialCommercialSimulator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1523,6 +1531,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "9",
@@ -1532,7 +1541,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/campaign-experiment-a-b-test-manager-adm-226",
-   "component": "apps/venue-management-web/src/routes/commercial/CampaignExperimentABTestManager.tsx",
+   "component": "src/routes/commercial/CampaignExperimentABTestManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1725,6 +1734,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "9",
@@ -1734,7 +1744,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/governance-audit-ai-risk-launch-readiness-adm-227",
-   "component": "apps/venue-management-web/src/routes/commercial/GovernanceAuditAiRiskLaunchReadiness.tsx",
+   "component": "src/routes/commercial/GovernanceAuditAiRiskLaunchReadiness.tsx",
    "status": "notStarted"
   },
   "navigation": {

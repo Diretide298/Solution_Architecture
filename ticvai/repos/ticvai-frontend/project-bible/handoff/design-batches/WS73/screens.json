@@ -5,6 +5,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "2",
@@ -106,7 +107,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -131,7 +132,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
@@ -313,6 +314,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW_PII",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "2",
@@ -352,7 +354,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -496,6 +498,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "2",
@@ -684,6 +687,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW_PII",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "2",
@@ -851,6 +855,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW_PII",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "2",
@@ -988,6 +993,14 @@
     "WaiverVerificationValidationWorkspaceView.version",
     "WaiverVerificationValidationWorkspaceView.booking",
     "WaiverVerificationValidationWorkspaceView.signatory"
+   ],
+   "params": [
+    {
+     "name": "verificationId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listWaiverVerificationQueue`."
+    }
    ]
   },
   "wireframe": {
@@ -1026,6 +1039,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW_PII",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "2",
@@ -1177,6 +1191,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW_PII",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "2",
@@ -1315,6 +1330,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW_PII",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "2",
@@ -1442,6 +1458,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "2",
@@ -1481,7 +1498,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -1627,6 +1644,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "2",
@@ -1686,6 +1704,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listWaiverComplianceRisk",
        "derived": true,
        "impliedBy": "listWaiverComplianceRisk",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."

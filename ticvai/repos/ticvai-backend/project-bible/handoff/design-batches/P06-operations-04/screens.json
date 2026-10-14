@@ -5,11 +5,12 @@
   "module": "Operations",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "ORDER_CREATE",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/payment-on-device",
-   "component": "apps/venue-staff-app/src/routes/operations/PaymentOnDeviceDetail.tsx",
+   "component": "src/routes/operations/PaymentOnDeviceDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -255,11 +256,12 @@
   "module": "Operations",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/issue-media",
-   "component": "apps/venue-staff-app/src/routes/operations/IssueMediaDetail.tsx",
+   "component": "src/routes/operations/IssueMediaDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -470,11 +472,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/notifications",
-   "component": "apps/venue-staff-app/src/routes/operations/NotificationsDetail.tsx",
+   "component": "src/routes/operations/NotificationsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -731,11 +734,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/announcements",
-   "component": "apps/venue-staff-app/src/routes/operations/AnnouncementsDetail.tsx",
+   "component": "src/routes/operations/AnnouncementsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -772,6 +776,7 @@
   "pattern": "listDetail",
   "patternReason": "`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act",
   "purpose": "Read what the venue told everybody.",
+  "division": "Shares `acknowledgeAnnouncement`, `listAnnouncements` with EMP-047; this screen is Announcements: read what the venue told everybody.",
   "layout": {
    "template": "split",
    "regions": [
@@ -931,11 +936,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/broadcast-to-team",
-   "component": "apps/venue-staff-app/src/routes/operations/BroadcastToTeamDetail.tsx",
+   "component": "src/routes/operations/BroadcastToTeamDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1182,11 +1188,12 @@
   "module": "Operations",
   "requiresModule": "ai",
   "wave": 2,
+  "permission": "AI_USE",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/knowledge-base",
-   "component": "apps/venue-staff-app/src/routes/operations/KnowledgeBaseDetail.tsx",
+   "component": "src/routes/operations/KnowledgeBaseDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1315,11 +1322,12 @@
   "module": "Operations",
   "requiresModule": "ai",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/training",
-   "component": "apps/venue-staff-app/src/routes/operations/TrainingDetail.tsx",
+   "component": "src/routes/operations/TrainingDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1504,7 +1512,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/profile",
-   "component": "apps/venue-staff-app/src/routes/operations/ProfileDetail.tsx",
+   "component": "src/routes/operations/ProfileDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1811,11 +1819,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "DEVICE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/device-settings",
-   "component": "apps/venue-staff-app/src/routes/operations/DeviceSettingsDetail.tsx",
+   "component": "src/routes/operations/DeviceSettingsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2023,7 +2032,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/accessibility",
-   "component": "apps/venue-staff-app/src/routes/operations/AccessibilityDetail.tsx",
+   "component": "src/routes/operations/AccessibilityDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

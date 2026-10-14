@@ -23,11 +23,13 @@
     "description": "Server-created when the obligation arises, so a UUID, as the `obligationId` path parameter types it."
    },
    "fromLegalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid",
     "description": "The selling entity. Holds the liability, and therefore the FX exposure."
    },
    "toLegalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid",
     "description": "The consuming entity, which provided the service at redemption."

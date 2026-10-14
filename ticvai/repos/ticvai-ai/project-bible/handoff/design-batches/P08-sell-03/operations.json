@@ -215,6 +215,19 @@
   "requestBody": null,
   "responds": "EntitlementTemplate"
  },
+ "getReportExecution": {
+  "method": "GET",
+  "path": "/report-executions/{executionId}",
+  "contract": "reporting",
+  "summary": "Execution status, and where its result is",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReportExecution"
+ },
  "importProductCatalogue": {
   "method": "POST",
   "path": "/products/import",
@@ -715,7 +728,7 @@
     "required": null
    }
   ],
-  "requestBody": "DonationCampaign",
+  "requestBody": "UpdateDonationCampaignRequest",
   "responds": "DonationCampaign"
  },
  "updateEntitlementTemplate": {

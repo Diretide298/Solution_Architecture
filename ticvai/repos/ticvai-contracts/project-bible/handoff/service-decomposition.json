@@ -1,5 +1,5 @@
 {
- "note": "How 33 contracts and 1132 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
+ "note": "How 33 contracts and 1129 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
  "generated": "21 September 2026",
  "tiers": {
   "foundation": "Read by everything, reads nothing above. Deploys first and alone.",
@@ -26,14 +26,14 @@
     "identity",
     "pii"
    ],
-   "operations": 97,
+   "operations": 98,
    "tables": 41,
    "why": "**Twelve contracts read it and it reads almost nothing.** The one service nothing can be deployed without, and the only writer of `pii` — which is what makes a subject-access export and a deletion request answerable at all (ADR-0023).",
    "scale": "Read-heavy, latency-critical, cached hard. Every request resolves a principal.",
    "risk": "**A restart is an outage everywhere.** Deploys go out first and alone.",
    "readsFrom": {
     "TenancyService": 7,
-    "MarketingService": 2,
+    "MarketingService": 1,
     "OrderService": 1,
     "VenueOpsService": 1
    },
@@ -68,7 +68,7 @@
     "kernel"
    ],
    "operations": 213,
-   "tables": 106,
+   "tables": 105,
    "why": "**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy spine. Workforce and approvals are folded in because each is small, both read `org_unit` constantly and write it rarely, and splitting them means three services doing the same joins.\n\n**`shift` was folded in here on 24 August and moved to OrderService the same day.** The reasoning was that a shift owns no tables of its own — which is true — and the conclusion was wrong. **A service with no data belongs where its data is**, and a shift's data is entirely in `orders`: `orders.shift`, `orders.deposit_box`, `orders.cash_movement`, `orders.cash_count_line`.\n\n**The coupling made it visible.** All 43 of Tenancy's cross-service touches into `orders` were the `shift` contract — 19 writes and 24 reads, the heaviest coupling in the platform, created to solve a cosmetic problem.",
    "scale": "Read-heavy and highly cacheable. Config changes are rare.",
    "risk": "Same as identity — nothing runs without a scope.",
@@ -149,7 +149,7 @@
     "payments"
    ],
    "operations": 299,
-   "tables": 115,
+   "tables": 114,
    "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern — but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** — separating them makes every settlement a distributed join.\n\n**Guest recurring billing lives here, decided by [ADR-0048](../../docs/adr/0048-guest-recurring-billing-is-commerce.md)** rather than in the Control Plane that provisions cells. `payments.dunning_policy` and `payments.dunning_case` are the two newest tables in the service. **A charge on a schedule fails differently from a charge at a till** — nobody is standing at the counter when a renewal declines, so the recovery path is a queue and a timetable rather than a second card.",
    "scale": "Write-heavy, spiky, latency-critical. **The one that autoscales.**",
    "risk": "**Down means no sales.** Highest availability target in the platform.",
@@ -164,7 +164,7 @@
     "WalletService": 1
    },
    "writesOutside": {
-    "TenancyService": 37,
+    "TenancyService": 38,
     "LedgerService": 12,
     "AccessService": 10,
     "CatalogueService": 10,
@@ -357,7 +357,7 @@
     "marketing"
    ],
    "operations": 278,
-   "tables": 132,
+   "tables": 131,
    "why": "**93 operations and 37 tables — the biggest thing in the package, and probably two services eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely; a campaign send is a burst of millions of rows nobody reads again.\n\n**Kept as one for now** because splitting a service before it has a load profile is guessing.",
    "scale": "Bursty on send, read-heavy otherwise. **The one to watch for a split.**",
    "risk": "Down stops campaigns and guest lookup. Neither stops trading.",
@@ -373,7 +373,7 @@
    },
    "writesOutside": {
     "TenancyService": 5,
-    "IdentityService": 3,
+    "IdentityService": 4,
     "OrderService": 2,
     "PlatformService": 2
    },
@@ -488,7 +488,7 @@
     "control",
     "subscription"
    ],
-   "operations": 228,
+   "operations": 229,
    "tables": 109,
    "why": "**Three contracts, one schema, 41 tables.** Subscription, platform operations and the public API all write `control.*` — **they are one bounded context that was split into three contracts for API-surface reasons, not for data reasons.**\n\nSplitting them would give three services writing one schema, which is the arrangement every distributed-data guide warns about.",
    "scale": "Low volume, high consequence. Tenant provisioning and licensing.",

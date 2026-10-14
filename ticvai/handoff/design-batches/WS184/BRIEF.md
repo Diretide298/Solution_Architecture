@@ -129,8 +129,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-679` | Personalization & NBO Command Center | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-680` | Customer Recommendation Profile | D | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `ADM-679` | Personalization & NBO Command Center | C | 0 | 10 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-680` | Customer Recommendation Profile | D | 0 | 20 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `ADM-681` | Customer Feature & Signal Configuration | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-682` | Propensity Model & Customer Intent Manager | C | 0 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-683` | Next-Best-Offer Decision Studio | C | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |

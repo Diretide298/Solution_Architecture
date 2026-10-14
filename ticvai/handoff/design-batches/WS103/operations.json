@@ -1,23 +1,4 @@
 {
- "addLicenceAddOn": {
-  "method": "POST",
-  "path": "/tenants/{tenantId}/licences/add-ons",
-  "contract": "subscription",
-  "summary": "License a module outside the plan",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "LicenceAddOn",
-  "responds": "LicencePosition"
- },
  "createOrgUnit": {
   "method": "POST",
   "path": "/org-units",

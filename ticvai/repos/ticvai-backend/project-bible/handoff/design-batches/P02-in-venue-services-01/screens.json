@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/interactive-map",
-   "component": "apps/guest-app/src/routes/general/InteractiveMapCanvas.tsx",
+   "component": "src/screens/general/InteractiveMapCanvas.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -208,7 +208,7 @@
     "differences": "The walking navigation follows the route in 3D, with turn-by-turn above the map and a live position (ADR-0069). The 2D/3D choice is a demo setting of the prototype (Config, Maps: 3D or 2D), not a switch the guest has, and neither the 3D-unavailable state (map3dUnavailable) nor the weak-GPS state (weakGps, \"Position approximate\") is drawn: both pending in design: specified, and built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md)."
    },
    "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
-   "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing. Drawn frame: wireframes/incoming/P02-mobile-v4/gst-021.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json)."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
@@ -252,7 +252,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/attraction-wait-times",
-   "component": "apps/guest-app/src/routes/general/AttractionWaitTimesDetail.tsx",
+   "component": "src/screens/general/AttractionWaitTimesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -298,7 +298,7 @@
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getWaitTimes` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "See attraction wait times for this venue.",
+  "purpose": "How long each attraction's queue is right now.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -343,6 +343,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-022",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-022.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -393,7 +394,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/virtual-queue-join-queue",
-   "component": "apps/guest-app/src/routes/general/VirtualQueueJoinQueueDetail.tsx",
+   "component": "src/screens/general/VirtualQueueJoinQueueDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -628,7 +629,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/fandb-browse-and-order",
-   "component": "apps/guest-app/src/routes/general/FandbBrowseAndOrderList.tsx",
+   "component": "src/screens/general/FandbBrowseAndOrderList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -920,7 +921,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/fandb-order-tracking",
-   "component": "apps/guest-app/src/routes/general/FandbOrderTrackingDetail.tsx",
+   "component": "src/screens/general/FandbOrderTrackingDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1098,7 +1099,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/parking-reserve-and-pay",
-   "component": "apps/guest-app/src/routes/general/ParkingReserveAndPayDetail.tsx",
+   "component": "src/screens/general/ParkingReserveAndPayDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1249,7 +1250,7 @@
    {
     "operationId": "getParkingEntitlement",
     "contract": "access",
-    "purpose": "Load the parking entitlement being changed",
+    "purpose": "Load the parking entitlement being changed. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4)",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
@@ -1382,7 +1383,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/parking-reservation-confirmed",
-   "component": "apps/guest-app/src/routes/general/ParkingReservationConfirmedDetail.tsx",
+   "component": "src/screens/general/ParkingReservationConfirmedDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1604,7 +1605,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/venue-info-and-services",
-   "component": "apps/guest-app/src/routes/general/VenueInfoAndServicesDetail.tsx",
+   "component": "src/screens/general/VenueInfoAndServicesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1790,7 +1791,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/at-the-venue",
-   "component": "apps/guest-app/src/routes/general/AtTheVenueDetail.tsx",
+   "component": "src/screens/general/AtTheVenueDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1962,6 +1963,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-038",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-038.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -2013,7 +2015,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/reserve-table",
-   "component": "apps/guest-app/src/routes/ReserveTable.tsx",
+   "component": "src/screens/ReserveTable.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2030,10 +2032,7 @@
     {
      "to": "GST-039",
      "trigger": "Profile",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-070 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-039 declares entryState.params  and GST-070 holds none of them. The edge carries nothing: GST-039 needs nothing to open"
     },
     {
      "to": "GST-041",

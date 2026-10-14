@@ -178,19 +178,6 @@
   "requestBody": null,
   "responds": null
  },
- "getMyIdentityVerification": {
-  "method": "GET",
-  "path": "/auth/guest/identity-verifications/current",
-  "contract": "identity",
-  "summary": "The guest's own latest identity verification",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "IdentityGuestVerification"
- },
  "getMyProfile": {
   "method": "GET",
   "path": "/guests/me/profile",
@@ -683,6 +670,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listTicketTransfers": {
+  "method": "GET",
+  "path": "/ticket-transfers",
+  "contract": "orders",
+  "summary": "The ticket transfers this guest sent or received",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "direction",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "recordConsent": {
   "method": "POST",
   "path": "/guests/{subjectId}/consents",
@@ -776,7 +797,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "marketing-crm::Invitation"
+  "responds": "CampaignInvitation"
  },
  "shareEntitlement": {
   "method": "POST",
@@ -796,25 +817,6 @@
   ],
   "requestBody": null,
   "responds": "EntitlementShare"
- },
- "submitGuestIdentityDocument": {
-  "method": "POST",
-  "path": "/auth/guest/identity-verifications",
-  "contract": "identity",
-  "summary": "Submit an identity document for verification",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "IdentityGuestDocumentSubmission",
-  "responds": "IdentityGuestVerification"
  },
  "transferOrderTickets": {
   "method": "POST",

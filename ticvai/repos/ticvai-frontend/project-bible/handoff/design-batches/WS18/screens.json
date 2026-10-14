@@ -5,6 +5,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "6",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/governance-compliance-command-center-adm-339",
-   "component": "apps/venue-management-web/src/routes/platform/GovernanceComplianceCommandCenter.tsx",
+   "component": "src/routes/platform/GovernanceComplianceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -211,6 +212,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PERMISSION_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "6",
@@ -220,7 +222,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/segregation-of-duties-policy-manager-adm-340",
-   "component": "apps/venue-management-web/src/routes/platform/SegregationOfDutiesPolicyManager.tsx",
+   "component": "src/routes/platform/SegregationOfDutiesPolicyManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -372,6 +374,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "6",
@@ -381,7 +384,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/four-eyes-dual-control-policy-adm-341",
-   "component": "apps/venue-management-web/src/routes/platform/FourEyesDualControlPolicy.tsx",
+   "component": "src/routes/platform/FourEyesDualControlPolicy.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -482,7 +485,16 @@
    "workshopBoard": "wireframes/WS35 Approval Workflows and Governance Board 6.dc.html#adm-341"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 52. 0 of 0 labels bound to a contract property; 7 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "controlPolicyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listApprovalControlPolicies`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -512,6 +524,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "6",
@@ -521,7 +534,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/authentication-mfa-policy-manager-adm-342",
-   "component": "apps/venue-management-web/src/routes/platform/AuthenticationMfaPolicyManager.tsx",
+   "component": "src/routes/platform/AuthenticationMfaPolicyManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -780,6 +793,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "6",
@@ -789,7 +803,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/sensitive-action-confirmation-adm-343",
-   "component": "apps/venue-management-web/src/routes/platform/SensitiveActionConfirmation.tsx",
+   "component": "src/routes/platform/SensitiveActionConfirmation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -924,7 +938,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/digital-signature-management-adm-344",
-   "component": "apps/venue-management-web/src/routes/platform/DigitalSignatureManagement.tsx",
+   "component": "src/routes/platform/DigitalSignatureManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1050,6 +1064,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "6",
@@ -1059,7 +1074,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/immutable-approval-record-tamper-detection-adm-345",
-   "component": "apps/venue-management-web/src/routes/platform/ImmutableApprovalRecordTamperDetection.tsx",
+   "component": "src/routes/platform/ImmutableApprovalRecordTamperDetection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1137,7 +1152,8 @@
         "investigation status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “APR-10543”, “Integrity Information”.",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 55 §Display"
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 55 §Display",
+       "operation": "getApprovalRecord"
       }
      ]
     }
@@ -1212,6 +1228,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "TENANT_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "6",
@@ -1221,7 +1238,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approval-record-retention-policy-adm-346",
-   "component": "apps/venue-management-web/src/routes/platform/ApprovalRecordRetentionPolicy.tsx",
+   "component": "src/routes/platform/ApprovalRecordRetentionPolicy.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1341,6 +1358,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDataRetentionSettings` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "retentionPolicyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalRetentionPolicy` takes it, from the record the user acts on."
     }
    ]
   },
@@ -1373,6 +1396,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "6",
@@ -1382,7 +1406,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/regulatory-audit-evidence-center-adm-347",
-   "component": "apps/venue-management-web/src/routes/platform/RegulatoryAuditEvidenceCenter.tsx",
+   "component": "src/routes/platform/RegulatoryAuditEvidenceCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1501,6 +1525,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "6",
@@ -1510,7 +1535,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/governance-risk-ai-compliance-advisor-adm-348",
-   "component": "apps/venue-management-web/src/routes/platform/GovernanceRiskAiComplianceAdvisor.tsx",
+   "component": "src/routes/platform/GovernanceRiskAiComplianceAdvisor.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-590` | Digital & Alternative Payment Method Manager | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-591` | Digital Wallet & Mobile Payment Configuration | C | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-592` | Payment Link Builder & Configuration | C | 13 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-593` | Payment Link Distribution & Customer Journey Manager | C | 1 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-593` | Payment Link Distribution & Customer Journey Manager | C | 3 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-594` | Hosted Checkout, Redirect & Return Flow Configuration | C | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-595` | Digital Payment Session & Transaction Monitor | C | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-596` | Authentication, Tokenization & Recurring Payment Controls | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -204,7 +204,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | POS payment link | text | not in the schema: `POS Payment Link` |
 | Partner/api | text | not in the schema: `Partner/API` |
 
-**The selected digital payments \t71** (detail panel): The pack groups this record's detail under its own headings: “Show by”.
+**The selected digital payments \t71** (detail panel, from `getPaymentPerformance`): The pack groups this record's detail under its own headings: “Show by”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -260,6 +260,8 @@ kpis:
 - `getPaymentPerformance` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -372,6 +374,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the digital alternative payment are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Consistency with other screens
 
@@ -394,6 +397,8 @@ method:
 - `updatePaymentMethod` → `PAYMENT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -418,7 +423,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (412).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 412).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-590?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Online card, Mobile/digital wallets, Redirect payments, Stored-value wallet, Future payment methods through adapters.
@@ -522,6 +527,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the digital wallet mobile are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -539,6 +545,8 @@ method:
 - `listPaymentMethods` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -568,7 +576,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (412).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 412).
 - [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-591?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save payment method, Cancel.
@@ -669,6 +677,8 @@ link:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_CREATE`
+
 #### Requirements it meets
 
 4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -749,20 +759,50 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The link is not live (paid, expired, superseded or already cancelled; `payment-link-not-live`; CHG-RUL-021).
 
+**Sent by **** (`resendPaymentLink`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Channel `channel` | segmented control | optional | — | Email · SMS · Whatsapp | — | — | `resendPaymentLink` body |
+| Extend expiry hours `extendExpiryHours` | number field (hours) | optional | — | — | — | — | `resendPaymentLink` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
 **Permissions this screen separates** (banner): **The pack separates these permissions:** Resend, Change approved delivery channel, Extend expiry, Cancel. Resend is `resendPaymentLink` (ORDER_MODIFY) and Cancel is `cancelPaymentLink` (ORDER_CREATE, 3 October 2026); changing the channel and extending expiry still have no control.
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getPaymentLink`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Link | grouped details | The link as its holder may see it, not the staff record. The token, the address it went to and who issued it are not repeated to somebody … |
+| Status | chip: Issued, Viewed, Paid, Expired, Cancelled, Superseded | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Release hold on expiry | yes / no (icon or chip) | — |
+| Lines | list or chips (count when long) | — |
+| ID | the name it points at, never the id | Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these. |
+| Variant | the name it points at, never the id | — |
+| Recommendation | the name it points at, never the id | The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a … |
+| Performance | the name it points at, never the id | — |
+| Booked window | grouped details | The booked time window of an hourly product, such as a meeting room (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in … |
+| Starts at | 1 Oct 2026, 14:30 | — |
+| Ends at | 1 Oct 2026, 14:30 | After `startsAt`, on the same venue day. |
+| Inventory hold | text | Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products. |
+| Seats | list or chips (count when long) | Seated products only, as `seating.Seat.id`. Not available offline. |
+| Resource hold | the name it points at, never the id | A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed … |
+| Attributes | grouped details | Open attributes of a line, kept from the cart to the order line. `transport` is the one with a defined shape (decided 29 September, rev 3 … |
+| Transport | grouped details | What a transport line is for (decided 29 September, rev 3 REV3-21). Present on a one-way trip, a pass purchase, or a seat reserved with a … |
+| Quantity | 1,234 | — |
+| Eligibility declaration | list or chips (count when long) | What was declared for each guest on this line, kept as the record staff check at the gate. |
+| Age band | chip: Infant, Child, Junior, Adult, Senior | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Cancel link (destructive button) | `cancelPaymentLink` POST `/payment-links/{linkId}/cancel` | inline | PaymentLink | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The link is not live (paid, expired, superseded or already cancelled; `payment-link-not-live`; CHG-RUL-021). | opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `resendPaymentLink` POST `/payment-links/{linkId}/resend` | inline | PaymentLink | 409 The link is not live (`paid`, `expired`, `superseded` or `cancelled`); only an `issued` or `viewed` link is resent. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -785,7 +825,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the payment link distribution are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The link is not live (paid, expired, superseded or already cancelled; `payment-link-not-live`; CHG-RUL-021). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The link is not live (`paid`, `expired`, `superseded` or `cancelled`); only an `issued` or `viewed` link is resent.; 409 The link is not live (paid, expired, superseded or already cancelled; `payment-link-not-live`; CHG-RUL-021). |
 
 #### Sample data for the mock-up
 
@@ -804,6 +844,8 @@ link:
 - `cancelPaymentLink` → `ORDER_CREATE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -833,8 +875,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404, 409, 410).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (3), with its required mark, default, format and its error state (404, 409, 410).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-593?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Cancel link, , Cancel.
 - [ ] Every transition is wired: `ADM-589`.
@@ -936,6 +978,8 @@ config:
 - `setHostedCheckoutConfiguration` → `PAYMENT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1075,6 +1119,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the digital payment session are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The payment is not `pendingConfirmation`; its outcome is already known and there is nothing to ask the provider. |
 
 #### Sample data for the mock-up
 
@@ -1091,6 +1136,8 @@ session:
 - `inquirePaymentStatus` → `ORDER_CREATE` (operate) · staff, guest, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_CREATE`
 
 #### Requirements it meets
 
@@ -1116,7 +1163,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (404).
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-595?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1238,6 +1285,8 @@ policy:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1349,6 +1398,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the digital payment exception are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The payment is not `pendingConfirmation`; its outcome is already known and there is nothing to ask the provider. |
 
 #### Sample data for the mock-up
 
@@ -1366,6 +1416,8 @@ exception:
 - `inquirePaymentStatus` → `ORDER_CREATE` (operate) · staff, guest, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1391,7 +1443,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 412).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409, 412).
 - [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-597?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1542,6 +1594,8 @@ result:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1688,7 +1742,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"CreateOrderLine": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","variantId","quantity","quotedUnitPrice"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."},"variantId":{"type":"string","format":"uuid"},"recommendationId":{"type":"string","format":"uuid","nullable":true,"description":"The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Carried from the cart line at checkout; stored on `orders.order_line` and sent in `order.completed` lines.\n"},"performanceId":{"type":"string","format":"uuid"},"bookedWindow":{"$ref":"#/components/schemas/BookedWindow"},"inventoryHoldId":{"x-ticvai-column":"inventory_reservation_id","x-ticvai-references":"catalogue.inventory_reservation","type":"string","nullable":true,"description":"Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."},"seatIds":{"type":"array","maxItems":50,"items":{"type":"string","format":"uuid"},"description":"Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."},"resourceHoldId":{"x-ticvai-column":"resource_reservation_id","type":"string","format":"uuid","nullable":true,"description":"A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."},"attributes":{"$ref":"#/components/schemas/OrderLineAttributes"},"quantity":{"type":"integer","minimum":1},"eligibilityDeclaration":{"type":"array","nullable":true,"x-ticvai-note":"One row per declared guest in `orders.order_line_eligibility` (named on `OrderLine`), because an array of objects is a child table's rows, not a column.\n","items":{"type":"object","properties":{"ageBand":{"type":"string","enum":["infant","child","junior","adult","senior"],"description":"Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+."},"ageYears":{"type":"integer","nullable":true},"heightBandIndex":{"type":"integer","nullable":true},"confidentSwimmer":{"type":"boolean","nullable":true,"description":"**Derived, kept for the gate check** (decided 29 September, rev 3 REV3-26). The swim question is a consent: the answer is a `marketing.BookingConsentRecord` of kind `swim`, and this is filled from it (true for a `yes` covering this person, whether answered for them or once for the booking). A value sent that contradicts the record is ignored and the record wins. No longer the place a swim answer is captured.\n"},"guardianSigned":{"type":"boolean"}}},"description":"What was declared for each guest on this line, kept as the record staff check at the gate."},"quotedUnitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"What the client charged, from its local bundle."},"holderName":{"type":"string","nullable":true},"dataMaskValues":{"type":"object","additionalProperties":true,"description":"**Deliberately open.** Custom fields keyed by the venue's data mask: the field definitions travel in the catalogue bundle (`catalogue.CatalogueBundle.payload`), so the keys are the venue's to define, as on `catalogue`'s own `dataMaskValues`.\n"}}},
+"CreateOrderLine": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","variantId","quantity","quotedUnitPrice"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."},"variantId":{"x-ticvai-references":"catalogue.variant","type":"string","format":"uuid"},"recommendationId":{"type":"string","format":"uuid","nullable":true,"description":"The `trackingId` of the ai `decideRecommendations` item this line came from (29 September, build, AI system design 2.2 A step 8), so a purchase is attributed to the recommendation that led to it rather than guessed. Carried from the cart line at checkout; stored on `orders.order_line` and sent in `order.completed` lines.\n"},"performanceId":{"type":"string","format":"uuid"},"bookedWindow":{"$ref":"#/components/schemas/BookedWindow"},"inventoryHoldId":{"x-ticvai-column":"inventory_reservation_id","x-ticvai-references":"catalogue.inventory_reservation","type":"string","nullable":true,"description":"Lease the units were drawn from — a `catalogue.InventoryHold.id`. Absent for uncontended products."},"seatIds":{"type":"array","maxItems":50,"items":{"type":"string","format":"uuid"},"description":"Seated products only, as `seating.Seat.id`. Not available offline. **At most `VenueSettings.seating.maxSeatsPerGuestOrder` seats per booking on a guest channel** (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); **at most 10 per sale on staff and POS** (audit R080 (c)), across all the lines of one order for one performance. `createOrder` refuses more with 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`)."},"resourceHoldId":{"x-ticvai-column":"resource_reservation_id","type":"string","format":"uuid","nullable":true,"description":"A `resources.ResourceHold` on a resource the guest picked on a venue map (decided 29 September, rev 3 REV3-15); `variantId` is the placed resource's price-band variant. `createOrder` converts the hold into a `ResourceBooking` without releasing it. Not available offline."},"attributes":{"$ref":"#/components/schemas/OrderLineAttributes"},"quantity":{"type":"integer","minimum":1},"eligibilityDeclaration":{"type":"array","nullable":true,"x-ticvai-note":"One row per declared guest in `orders.order_line_eligibility` (named on `OrderLine`), because an array of objects is a child table's rows, not a column.\n","items":{"type":"object","properties":{"ageBand":{"type":"string","enum":["infant","child","junior","adult","senior"],"description":"Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+."},"ageYears":{"type":"integer","nullable":true},"heightBandIndex":{"type":"integer","nullable":true},"confidentSwimmer":{"type":"boolean","nullable":true,"description":"**Derived, kept for the gate check** (decided 29 September, rev 3 REV3-26). The swim question is a consent: the answer is a `marketing.BookingConsentRecord` of kind `swim`, and this is filled from it (true for a `yes` covering this person, whether answered for them or once for the booking). A value sent that contradicts the record is ignored and the record wins. No longer the place a swim answer is captured.\n"},"guardianSigned":{"type":"boolean"}}},"description":"What was declared for each guest on this line, kept as the record staff check at the gate."},"quotedUnitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"What the client charged, from its local bundle."},"holderName":{"type":"string","nullable":true},"dataMaskValues":{"type":"object","additionalProperties":true,"description":"**Deliberately open.** Custom fields keyed by the venue's data mask: the field definitions travel in the catalogue bundle (`catalogue.CatalogueBundle.payload`), so the keys are the venue's to define, as on `catalogue`'s own `dataMaskValues`.\n"}}},
 "ExchangeRateDecimal": {"type":"string","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,6)","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n","pattern":"^\\d+(\\.\\d{1,6})?$"},
 "HostedCheckoutConfig": {"type":"object","x-ticvai-persistence":"payments.hosted_checkout","description":"Board 4.6. **The return leg is where hosted checkout goes wrong.**","properties":{"returnUrl":{"type":"string"},"cancelUrl":{"type":"string"},"webhookUrl":{"type":"string","description":"**The authoritative settle path**, because a guest who closes the tab has still paid.\n"},"webhookSecretFingerprint":{"type":"string","readOnly":true},"sessionTimeoutMinutes":{"type":"integer","default":15},"orphanReconciliationWindowMinutes":{"type":"integer","default":60,"description":"For the ones that fall through both the redirect and the webhook."},"brandingAssetId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
@@ -1697,14 +1751,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Payment": {"x-ticvai-persistence":"orders.payment","type":"object","required":["id","orderId","tender","amount","status","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"tender":{"$ref":"#/components/schemas/TenderKind"},"tenderCurrency":{"type":"string","pattern":"^[A-Z]{3}$","description":"4.6.11. **What the guest actually handed over**, which is not always what the venue books. A tourist paying USD cash at a till is a foreign tender; the sale is still recorded in base currency.\nEqual to the base currency for almost every payment. **Present on all of them so the foreign-tender report has a source** — `getForeignTenderReport` promised *what was taken in which currency* and nothing recorded it until 18 August.\n"},"tenderAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The amount in `tenderCurrency`, at that currency's own scale."},"fxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"description":"The rate applied, **stored on the payment rather than looked up later** (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken.\n"},"fxRateSource":{"type":"string","nullable":true,"enum":["manual","feed","cardScheme"],"description":"4.2.8. Manual or fed on a schedule. **`cardScheme` is where the terminal did the conversion and told us** — dynamic currency conversion, the scheme's rate rather than ours.\n"},"changeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"description":"4.6.11 is deliberately asymmetric: **accept foreign currency, refund in local.** A till giving change in five currencies needs five floats and five counts, and the variance becomes unattributable.\n**Cash at a till only** (CHG-FIN-001, 2 October 2026). A card or wallet payment the guest made in a currency they selected is refunded in that currency (`Refund.tenderCurrency`).\n"},"amount":{"x-ticvai-column":"payment_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"changeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["authorised","captured","pendingConfirmation","declined","failed","voided","refunded"]},"providerName":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true,"description":"The provider's own id for the charge (Stripe PaymentIntent, NI order reference). What `payments.receivePaymentProviderWebhook` matches an incoming event on (SD-034)."},"providerIdempotencyKey":{"type":"string","nullable":true,"readOnly":true,"description":"The idempotency key sent to the provider, which is this payment's `id` (SD-034, 29 September). A retried provider call cannot charge twice."},"terminalId":{"type":"string","format":"uuid","nullable":true,"description":"The card terminal a till payment ran on (ECR flow, SD-034)."},"nextAction":{"type":"object","nullable":true,"x-ticvai-persisted":false,"description":"**What the caller does while the payment is `pendingConfirmation`** (SD-034, 29 September). `redirect`: send the browser to `url` (3-D Secure challenge or hosted page); the provider returns the guest to `returnUrl` and the result arrives by webhook. `terminal`: the card terminal has been instructed; wait for its result. Null once the payment has an outcome.","properties":{"kind":{"type":"string","enum":["redirect","terminal"]},"url":{"type":"string","format":"uri","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"lastInquiryAt":{"type":"string","format":"date-time","nullable":true},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "PaymentAuthenticationPolicy": {"type":"object","x-ticvai-persistence":"payments.authentication_policy","description":"Board 4.8. **A commercial trade as much as a security one.**","properties":{"threeDSecureMode":{"type":"string","enum":["never","whenRequired","aboveThreshold","always"],"default":"whenRequired"},"threeDSecureThreshold":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"claimedExemptions":{"type":"array","items":{"type":"string","enum":["lowValue","trustedBeneficiary","transactionRiskAnalysis","recurring","merchantInitiated"]}},"tokenisationEnabled":{"type":"boolean","default":false},"tokenRetentionMonths":{"type":"integer","nullable":true},"recurringMandateRequired":{"type":"boolean","default":true,"description":"**A card stored for a renewal without a mandate is a renewal the venue cannot defend.**\n"},"mandateTextAssetId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
 "PaymentConfigurationSimulation": {"type":"object","description":"Boards 1.10 and 5.10. **Eight boards of configuration that compose, silently.**","properties":{"offeredMethods":{"type":"array","items":{"type":"object","properties":{"methodId":{"type":"string","format":"uuid"},"name":{"type":"string"},"routesTo":{"type":"string","nullable":true},"estimatedCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"surcharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"suppressedMethods":{"type":"array","items":{"type":"object","properties":{"methodId":{"type":"string","format":"uuid"},"reason":{"type":"string"}}}},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning"]},"message":{"type":"string"}}}}}},
-"PaymentLink": {"type":"object","x-ticvai-persistence":"orders.payment_link","description":"BL-072. **A booking taken at POS could not be paid later by the guest**, so a phone booking either took a card over the phone or was not taken.\n`createPaymentLink` was contracted on 18 August with no schema behind it and no guest-facing path. **The link existed and nobody could open it** — found on 20 August by walking the journey rather than the contract.\n**The link is the credential.** A guest holding one is anonymous: not signed in, and quite possibly without an account, because a phone booking is exactly the case where they have not registered. The token grants read of one order and payment against it, and nothing else.\n","required":["id","orderId","token","status","expiresAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"orderId":{"type":"string","format":"uuid"},"reservationId":{"type":"string","format":"uuid","nullable":true,"description":"Where the link was issued against a reservation rather than an order. **A reservation holds inventory and carries no money**, which is the whole reason a link is needed.\n"},"token":{"type":"string","format":"password","writeOnly":true,"description":"**Write-only, single purpose, and it is the only thing the guest presents.** Long enough not to be guessed and scoped to one order — **a token that can read a second order is a token that read somebody else's booking.**\n"},"status":{"type":"string","enum":["issued","viewed","paid","expired","cancelled","superseded"]},"channel":{"type":"string","enum":["email","sms","whatsapp","printed"]},"sentTo":{"type":"string","nullable":true,"description":"Masked. **The address it went to is how an operator answers *I never got it*** — and it is personal data, so it is masked here and resolved from `pii` when somebody with permission asks.\n"},"expiresAt":{"type":"string","format":"date-time","description":"**The expiry releases the hold, not just the link.** An unpaid link holding inventory is inventory nobody can sell, and a link that outlives its hold sells a seat twice.\n"},"releaseHoldOnExpiry":{"type":"boolean","default":true},"viewedAt":{"type":"string","format":"date-time","nullable":true},"paidAt":{"type":"string","format":"date-time","nullable":true},"resendCount":{"type":"integer","default":0,"description":"**A resend supersedes rather than duplicates.** Two live links against one order is two guests paying for the same booking, and the second payment is a refund somebody has to make.\n"},"issuedByPrincipalId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"PaymentLink": {"type":"object","x-ticvai-persistence":"orders.payment_link","description":"BL-072. **A booking taken at POS could not be paid later by the guest**, so a phone booking either took a card over the phone or was not taken.\n`createPaymentLink` was contracted on 18 August with no schema behind it and no guest-facing path. **The link existed and nobody could open it** — found on 20 August by walking the journey rather than the contract.\n**The link is the credential.** A guest holding one is anonymous: not signed in, and quite possibly without an account, because a phone booking is exactly the case where they have not registered. The token grants read of one order and payment against it, and nothing else.\n","required":["id","orderId","token","status","expiresAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"orderId":{"type":"string","format":"uuid"},"reservationId":{"type":"string","format":"uuid","nullable":true,"description":"Where the link was issued against a reservation rather than an order. **A reservation holds inventory and carries no money**, which is the whole reason a link is needed.\n"},"token":{"x-ticvai-secret":"blind-index","type":"string","format":"password","writeOnly":true,"description":"**Write-only, single purpose, and it is the only thing the guest presents.** Long enough not to be guessed and scoped to one order — **a token that can read a second order is a token that read somebody else's booking.**\n"},"status":{"type":"string","enum":["issued","viewed","paid","expired","cancelled","superseded"]},"channel":{"type":"string","enum":["email","sms","whatsapp","printed"]},"sentTo":{"type":"string","nullable":true,"description":"Masked. **The address it went to is how an operator answers *I never got it*** — and it is personal data, so it is masked here and resolved from `pii` when somebody with permission asks.\n"},"expiresAt":{"type":"string","format":"date-time","description":"**The expiry releases the hold, not just the link.** An unpaid link holding inventory is inventory nobody can sell, and a link that outlives its hold sells a seat twice.\n"},"releaseHoldOnExpiry":{"type":"boolean","default":true},"viewedAt":{"type":"string","format":"date-time","nullable":true},"paidAt":{"type":"string","format":"date-time","nullable":true},"resendCount":{"type":"integer","default":0,"description":"**A resend supersedes rather than duplicates.** Two live links against one order is two guests paying for the same booking, and the second payment is a refund somebody has to make.\n"},"issuedByPrincipalId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "PaymentLinkView": {"type":"object","x-ticvai-persistence":"none — projection of orders.payment_link for its holder","description":"What an anonymous holder of a payment link is shown about the link itself.","required":["status","expiresAt"],"properties":{"status":{"type":"string","enum":["issued","viewed","paid","expired","cancelled","superseded"]},"expiresAt":{"type":"string","format":"date-time"},"releaseHoldOnExpiry":{"type":"boolean"}}},
-"PaymentMethod": {"type":"object","x-ticvai-persistence":"payments.method","description":"Board 1.2. **A method is not a provider.**","required":["code","name","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["card","digitalWallet","bankTransfer","cash","storedValue","giftCard","voucher","onAccount","buyNowPayLater","paymentLink"]},"cardSchemes":{"type":"array","items":{"type":"string"}},"currencies":{"type":"array","items":{"type":"string"}},"channels":{"type":"array","items":{"type":"string"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"surcharge":{"type":"object","nullable":true,"properties":{"percent":{"type":"number","nullable":true},"fixed":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"disclosedToGuest":{"type":"boolean","default":true,"description":"**Undisclosed surcharging is illegal in several of the markets this platform sells into.** The flag exists so the answer is a configuration somebody chose rather than a template nobody read.\n"}}},"refundable":{"type":"boolean","default":true},"partialRefundSupported":{"type":"boolean","default":true},"displayOrder":{"type":"integer","default":0},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"PaymentMethod": {"type":"object","x-ticvai-persistence":"payments.method","description":"Board 1.2. **A method is not a provider.**","required":["code","name","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["card","digitalWallet","bankTransfer","cash","storedValue","giftCard","voucher","onAccount","buyNowPayLater","paymentLink"]},"cardSchemes":{"type":"array","items":{"type":"string"}},"currencies":{"type":"array","items":{"type":"string"}},"channels":{"type":"array","items":{"type":"string"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"surcharge":{"type":"object","nullable":true,"properties":{"percent":{"type":"number","nullable":true},"fixed":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"disclosedToGuest":{"type":"boolean","default":true,"description":"**Undisclosed surcharging is illegal in several of the markets this platform sells into.** The flag exists so the answer is a configuration somebody chose rather than a template nobody read.\n"}}},"refundable":{"type":"boolean","default":true},"partialRefundSupported":{"type":"boolean","default":true},"displayOrder":{"type":"integer","default":0},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "PaymentPerformanceRow": {"type":"object","description":"Board 8.8. **The last and most expensive place a venue loses a sale.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"attempts":{"type":"integer"},"authorised":{"type":"integer"},"declined":{"type":"integer"},"errored":{"type":"integer"},"abandoned":{"type":"integer"},"authorisationRate":{"type":"number"},"conversionRate":{"type":"number"},"averageValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"topDeclineReason":{"type":"string","nullable":true}}},
 "PaymentRuleSet": {"type":"object","x-ticvai-persistence":"none — composed from the three payment rule tables","description":"**Three tables, one decision.** Whether a guest may pay with this method, in this currency, and what it costs the venue are evaluated together at checkout. An administrator changing one without seeing the others is how a method becomes eligible in a currency it cannot settle.\n","properties":{"currencyRules":{"type":"array","items":{"$ref":"#/components/schemas/PaymentsCurrencyRule"}},"eligibilityRules":{"type":"array","items":{"$ref":"#/components/schemas/PaymentsEligibilityRule"}},"feeRules":{"type":"array","items":{"$ref":"#/components/schemas/PaymentsFeeRule"}}}},
 "PaymentsCurrencyRule": {"type":"object","x-ticvai-persistence":"payments.currency_rule","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-level currency rules such as accepted/settlement currency, min/max payment amount and rounding.","required":["paymentPolicyId","code","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"paymentPolicyId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","nullable":true},"channelId":{"type":"string","format":"uuid","nullable":true},"code":{"type":"string","maxLength":10},"settlementCurrencyCode":{"type":"string","maxLength":10,"nullable":true},"minPaymentAmount":{"type":"number","nullable":true},"maxPaymentAmount":{"type":"number","nullable":true},"roundingIncrement":{"type":"number","nullable":true},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "PaymentsEligibilityRule": {"type":"object","x-ticvai-persistence":"payments.eligibility_rule","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Defines when a payment method is allowed or denied for a transaction.","required":["paymentPolicyId","paymentMethodId","effect","priority","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"paymentPolicyId":{"type":"string","format":"uuid"},"paymentMethodId":{"x-ticvai-references":"payments.method","type":"string","format":"uuid"},"scopePath":{"type":"string","nullable":true},"channelId":{"type":"string","format":"uuid","nullable":true},"businessArea":{"type":"string","maxLength":30,"nullable":true},"currencyCode":{"type":"string","maxLength":10,"nullable":true},"minOrderAmount":{"type":"number","nullable":true},"maxOrderAmount":{"type":"number","nullable":true},"effect":{"type":"string","maxLength":10},"priority":{"type":"integer"},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
-"PaymentsFeeRule": {"type":"object","x-ticvai-persistence":"payments.fee_rule","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-related fees or surcharges that may be applied to an order.","required":["paymentPolicyId","name","category","calculationType","value","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"paymentPolicyId":{"type":"string","format":"uuid"},"paymentMethodId":{"type":"string","format":"uuid","nullable":true},"providerId":{"type":"string","format":"uuid","nullable":true},"channelId":{"type":"string","format":"uuid","nullable":true},"businessArea":{"type":"string","maxLength":30,"nullable":true},"currencyCode":{"type":"string","maxLength":10,"nullable":true},"name":{"type":"string","maxLength":150},"category":{"type":"string","maxLength":20},"calculationType":{"type":"string","maxLength":20},"value":{"type":"number"},"minFee":{"type":"number","nullable":true},"maxFee":{"type":"number","nullable":true},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"PaymentsFeeRule": {"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"payments.fee_rule","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Defines payment-related fees or surcharges that may be applied to an order.","required":["paymentPolicyId","name","category","calculationType","value","isActive","createdAt","scopePath"],"properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid"},"paymentPolicyId":{"type":"string","format":"uuid"},"paymentMethodId":{"type":"string","format":"uuid","nullable":true},"providerId":{"type":"string","format":"uuid","nullable":true},"channelId":{"type":"string","format":"uuid","nullable":true},"businessArea":{"type":"string","maxLength":30,"nullable":true},"currencyCode":{"type":"string","maxLength":10,"nullable":true},"name":{"type":"string","maxLength":150},"category":{"type":"string","maxLength":20},"calculationType":{"type":"string","maxLength":20},"value":{"type":"number"},"minFee":{"type":"number","nullable":true},"maxFee":{"type":"number","nullable":true},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "RoutingContext": {"type":"object","required":["amount"],"properties":{"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"methodId":{"type":"string","format":"uuid","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"channel":{"type":"string","nullable":true},"cardScheme":{"type":"string","nullable":true},"cardIssuerCountry":{"type":"string","nullable":true},"cardPresent":{"type":"boolean","default":false},"customerId":{"type":"string","format":"uuid","nullable":true}}},
 "TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]}
 }

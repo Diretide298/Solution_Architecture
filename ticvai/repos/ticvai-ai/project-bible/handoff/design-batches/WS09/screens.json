@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/live-access-operations-command-center-bo-224",
-   "component": "apps/venue-management-web/src/routes/access-venue/LiveAccessOperationsCommandCenter.tsx",
+   "component": "src/routes/access-venue/LiveAccessOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -109,7 +110,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -287,6 +288,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -296,7 +298,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/podium-operations-console-bo-225",
-   "component": "apps/venue-management-web/src/routes/access-venue/PodiumOperationsConsole.tsx",
+   "component": "src/routes/access-venue/PodiumOperationsConsole.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -534,6 +536,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "TICKET_LOOKUP",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -543,7 +546,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/ticket-credential-investigation-console-bo-226",
-   "component": "apps/venue-management-web/src/routes/access-venue/TicketCredentialInvestigationConsole.tsx",
+   "component": "src/routes/access-venue/TicketCredentialInvestigationConsole.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -662,6 +665,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -671,7 +675,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/validation-exception-reason-code-manager-bo-227",
-   "component": "apps/venue-management-web/src/routes/access-venue/ValidationExceptionReasonCodeManager.tsx",
+   "component": "src/routes/access-venue/ValidationExceptionReasonCodeManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -864,6 +868,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_OVERRIDE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -873,7 +878,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/manual-override-supervisor-approval-bo-228",
-   "component": "apps/venue-management-web/src/routes/access-venue/ManualOverrideSupervisorApproval.tsx",
+   "component": "src/routes/access-venue/ManualOverrideSupervisorApproval.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1009,6 +1014,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -1018,7 +1024,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-disable-blacklist-whitelist-operations-bo-229",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialDisableBlacklistWhitelistOperations.tsx",
+   "component": "src/routes/access-venue/CredentialDisableBlacklistWhitelistOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1213,6 +1219,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -1222,7 +1229,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/live-gate-mode-lane-control-bo-230",
-   "component": "apps/venue-management-web/src/routes/access-venue/LiveGateModeLaneControl.tsx",
+   "component": "src/routes/access-venue/LiveGateModeLaneControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1400,7 +1407,10 @@
     "component": "confirmDialog",
     "trigger": "Cancel gate mode change",
     "body": "**Names what `cancelGateModeChange` changes and what it leaves alone**, in the consequence rather than the verb. A access gate mode change this affects should be identified in the dialog, not just counted. **Collects what `cancelGateModeChange` sends before it is called.** Nothing in the body is required. Optional: `reason`.",
-    "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel"
+    "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel",
+    "confirm": {
+     "operation": "cancelGateModeChange"
+    }
    },
    {
     "id": "formSetAccessPointDirection",
@@ -1472,6 +1482,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -1481,7 +1492,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/queue-throughput-lane-optimization-bo-231",
-   "component": "apps/venue-management-web/src/routes/access-venue/QueueThroughputLaneOptimization.tsx",
+   "component": "src/routes/access-venue/QueueThroughputLaneOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1600,6 +1611,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "INCIDENT_MANAGE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -1609,7 +1621,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/operational-incident-exception-workspace-bo-232",
-   "component": "apps/venue-management-web/src/routes/access-venue/OperationalIncidentExceptionWorkspace.tsx",
+   "component": "src/routes/access-venue/OperationalIncidentExceptionWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1733,6 +1745,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "AUDIT_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -1742,7 +1755,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/operations-audit-shift-handover-control-summary-bo-233",
-   "component": "apps/venue-management-web/src/routes/access-venue/OperationsAuditShiftHandoverControlSummary.tsx",
+   "component": "src/routes/access-venue/OperationsAuditShiftHandoverControlSummary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1801,7 +1814,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listShiftHandoverSummary",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listShiftHandoverSummary"
       }
      ]
     }

@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-operations-command-center-bo-354",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialOperationsCommandCenter.tsx",
+   "component": "src/routes/access-venue/CredentialOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -112,7 +113,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -142,7 +143,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -345,6 +346,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "3",
@@ -354,7 +356,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/virtual-ticket-credential-360-workspace-bo-355",
-   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketCredential360Workspace.tsx",
+   "component": "src/routes/access-venue/VirtualTicketCredential360Workspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -384,7 +386,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -648,6 +650,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "3",
@@ -657,7 +660,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-generation-issuance-monitor-bo-356",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialGenerationIssuanceMonitor.tsx",
+   "component": "src/routes/access-venue/CredentialGenerationIssuanceMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -880,6 +883,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "3",
@@ -889,7 +893,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-delivery-distribution-operations-bo-357",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialDeliveryDistributionOperations.tsx",
+   "component": "src/routes/access-venue/CredentialDeliveryDistributionOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1097,6 +1101,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "3",
@@ -1106,7 +1111,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/media-binding-activation-assignment-operations-bo-358",
-   "component": "apps/venue-management-web/src/routes/access-venue/MediaBindingActivationAssignmentOperations.tsx",
+   "component": "src/routes/access-venue/MediaBindingActivationAssignmentOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1307,6 +1312,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "3",
@@ -1316,7 +1322,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-replacement-reissue-revocation-recovery-bo-359",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialReplacementReissueRevocationRecovery.tsx",
+   "component": "src/routes/access-venue/CredentialReplacementReissueRevocationRecovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1481,6 +1487,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "3",
@@ -1490,7 +1497,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/failed-generation-delivery-credential-exception-manageme-bo-360",
-   "component": "apps/venue-management-web/src/routes/access-venue/FailedGenerationDeliveryCredentialExceptionManag.tsx",
+   "component": "src/routes/access-venue/FailedGenerationDeliveryCredentialExceptionManag.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1690,6 +1697,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "TICKET_LOOKUP",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "3",
@@ -1699,7 +1707,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-usage-cross-media-traceability-bo-361",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialUsageCrossMediaTraceability.tsx",
+   "component": "src/routes/access-venue/CredentialUsageCrossMediaTraceability.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1852,6 +1860,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "AUDIT_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "3",
@@ -1861,7 +1870,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-security-audit-operational-evidence-bo-362",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialSecurityAuditOperationalEvidence.tsx",
+   "component": "src/routes/access-venue/CredentialSecurityAuditOperationalEvidence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1980,6 +1989,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "3",
@@ -1989,7 +1999,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/ticket-media-analytics-ai-operations-intelligence-bo-363",
-   "component": "apps/venue-management-web/src/routes/access-venue/TicketMediaAnalyticsAiOperationsIntelligence.tsx",
+   "component": "src/routes/access-venue/TicketMediaAnalyticsAiOperationsIntelligence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2011,7 +2021,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {

@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/equipment-asset-command-center-bo-903",
-   "component": "apps/venue-management-web/src/routes/rentals/EquipmentAssetCommandCenter.tsx",
+   "component": "src/routes/rentals/EquipmentAssetCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -256,6 +257,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -265,7 +267,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-resource-configuration-bo-904",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalResourceConfiguration.tsx",
+   "component": "src/routes/rentals/RentalResourceConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -517,6 +519,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -526,7 +529,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-inventory-availability-control-bo-905",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalInventoryAvailabilityControl.tsx",
+   "component": "src/routes/rentals/RentalInventoryAvailabilityControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -657,6 +660,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -666,7 +670,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-checkout-workspace-bo-906",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceCheckoutWorkspace.tsx",
+   "component": "src/routes/rentals/ResourceCheckoutWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -834,6 +838,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -843,7 +848,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/guest-resource-assignment-bo-907",
-   "component": "apps/venue-management-web/src/routes/rentals/GuestResourceAssignment.tsx",
+   "component": "src/routes/rentals/GuestResourceAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1014,6 +1019,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -1023,7 +1029,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-duration-extension-return-management-bo-908",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalDurationExtensionReturnManagement.tsx",
+   "component": "src/routes/rentals/RentalDurationExtensionReturnManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1207,6 +1213,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_PRICE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -1216,7 +1223,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/deposit-rental-financial-control-bo-909",
-   "component": "apps/venue-management-web/src/routes/rentals/DepositRentalFinancialControl.tsx",
+   "component": "src/routes/rentals/DepositRentalFinancialControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1372,6 +1379,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -1381,7 +1389,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/maintenance-resource-blocking-bo-910",
-   "component": "apps/venue-management-web/src/routes/rentals/MaintenanceResourceBlocking.tsx",
+   "component": "src/routes/rentals/MaintenanceResourceBlocking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1626,6 +1634,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 1,
+  "permission": "INSPECTION_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -1635,7 +1644,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/inspection-condition-compliance-management-bo-911",
-   "component": "apps/venue-management-web/src/routes/rentals/InspectionConditionComplianceManagement.tsx",
+   "component": "src/routes/rentals/InspectionConditionComplianceManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1835,6 +1844,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -1844,7 +1854,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/asset-lifecycle-depreciation-retirement-bo-912",
-   "component": "apps/venue-management-web/src/routes/rentals/AssetLifecycleDepreciationRetirement.tsx",
+   "component": "src/routes/rentals/AssetLifecycleDepreciationRetirement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1979,7 +1989,8 @@
         "Current value"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Retirement Assessment”, “Projector P-17”, “Retirement may require”, “Stroller S-084”, “Typical operational states include”, “Board 6 shall integrate with”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 93 §Track"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 93 §Track",
+       "operation": "getAssetHistory"
       }
      ]
     },

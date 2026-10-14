@@ -312,6 +312,7 @@ operations:
   writes:
   - marketing.consent_record
   - orders.cart
+  - orders.deposit
   - orders.order_line
   - orders.order_line_discount
   - orders.order_line_eligibility
@@ -730,6 +731,7 @@ operations:
   writes:
   - cache:idempotency
   - orders.order_event
+  - orders.order_line
   - orders.sales_order
   - platform.outbox
 - operation: extendCart
@@ -1128,7 +1130,7 @@ operations:
   writes: []
 - operation: listAmendmentAfterSale2
   verb: GET
-  path: /amendment-after-sale
+  path: /amendment-after-sale-2
   scope: venue
   permission: ORDER_VIEW
   audience:
@@ -1518,7 +1520,7 @@ operations:
   writes: []
 - operation: listGroupSale2
   verb: GET
-  path: /group-sale
+  path: /group-sale-2
   scope: venue
   permission: ORDER_VIEW
   audience:
@@ -1716,7 +1718,6 @@ operations:
   reads:
   - ledger.settlement_exception
   - orders.payment
-  - orders.payment_tip
   - orders.refund
   - orders.sales_order
   - orders.stored_value_authorisation
@@ -1743,6 +1744,7 @@ operations:
   offline: false
   reads:
   - catalogue.inventory_reservation
+  - orders.membership_renewal
   - orders.order_line
   - orders.payment
   - orders.payment_link
@@ -1949,7 +1951,7 @@ operations:
   writes: []
 - operation: listResale2
   verb: GET
-  path: /resale
+  path: /resale-2
   scope: venue
   permission: ORDER_VIEW
   audience:
@@ -2909,6 +2911,7 @@ operations:
   - cache:idempotency
   - orders.reservation
   - orders.sales_order
+  - platform.outbox
 - operation: setDepositPolicy
   verb: PUT
   path: /deposit-policy
@@ -2959,7 +2962,7 @@ operations:
   - orders.group_visit_plan
 - operation: setGroupCustomerOrganization
   verb: PUT
-  path: /group-customer-organization
+  path: /group-customer-organization/{organisationId}
   scope: venue
   permission: PRODUCT_CONFIGURE
   audience:
@@ -3153,7 +3156,7 @@ operations:
   - orders.group_participant
 - operation: setPaymentProvider
   verb: PUT
-  path: /payment-providers
+  path: /payment-providers/{providerId}
   scope: venue
   permission: TENANT_CONFIGURE
   audience:

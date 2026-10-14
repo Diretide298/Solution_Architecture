@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Resale Marketplace_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/resale-operations-command-center-adm-288",
-   "component": "apps/venue-management-web/src/routes/commercial/ResaleOperationsCommandCenter.tsx",
+   "component": "src/routes/commercial/ResaleOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -101,6 +102,7 @@
   "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Operations can monitor every resale transaction from buyer payment through final completion and immediately identify transactions requiring intervention.",
+  "division": "Shares `listResale`, `listResale2` with ADM-297; this screen is Resale Operations Command Center (pack Ticket Resale Marketplace_Reference.pdf, board 2.3.2.1, page 21): provide operations teams with a real-time control center for all resale transactions after listings move into purchase/fulfillment.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each resale transaction shall show) — counts over a population, then the population",
   "purpose": "Provide operations teams with a real-time control center for all resale transactions after listings move into purchase/fulfillment.",
@@ -108,7 +110,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -322,6 +324,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Resale Marketplace_Reference.pdf",
    "board": "2",
@@ -331,7 +334,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/buyer-purchase-resale-order-management-adm-289",
-   "component": "apps/venue-management-web/src/routes/commercial/BuyerPurchaseResaleOrderManagement.tsx",
+   "component": "src/routes/commercial/BuyerPurchaseResaleOrderManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -484,6 +487,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Resale Marketplace_Reference.pdf",
    "board": "2",
@@ -493,7 +497,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ticket-ownership-transfer-management-adm-290",
-   "component": "apps/venue-management-web/src/routes/commercial/TicketOwnershipTransferManagement.tsx",
+   "component": "src/routes/commercial/TicketOwnershipTransferManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -608,6 +612,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Resale Marketplace_Reference.pdf",
    "board": "2",
@@ -617,7 +622,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/credential-revocation-regeneration-adm-291",
-   "component": "apps/venue-management-web/src/routes/commercial/CredentialRevocationRegeneration.tsx",
+   "component": "src/routes/commercial/CredentialRevocationRegeneration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -770,6 +775,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Resale Marketplace_Reference.pdf",
    "board": "2",
@@ -779,7 +785,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/resale-fraud-duplicate-sale-protection-adm-292",
-   "component": "apps/venue-management-web/src/routes/commercial/ResaleFraudDuplicateSaleProtection.tsx",
+   "component": "src/routes/commercial/ResaleFraudDuplicateSaleProtection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -926,6 +932,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Resale Marketplace_Reference.pdf",
    "board": "2",
@@ -935,7 +942,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/capacity-inventory-reconciliation-adm-293",
-   "component": "apps/venue-management-web/src/routes/commercial/CapacityInventoryReconciliation.tsx",
+   "component": "src/routes/commercial/CapacityInventoryReconciliation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -966,7 +973,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1135,6 +1142,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Resale Marketplace_Reference.pdf",
    "board": "2",
@@ -1144,7 +1152,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/seller-settlement-payout-management-adm-294",
-   "component": "apps/venue-management-web/src/routes/commercial/SellerSettlementPayoutManagement.tsx",
+   "component": "src/routes/commercial/SellerSettlementPayoutManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1405,6 +1413,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Resale Marketplace_Reference.pdf",
    "board": "2",
@@ -1414,7 +1423,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/refunds-disputes-resale-exceptions-adm-295",
-   "component": "apps/venue-management-web/src/routes/commercial/RefundsDisputesResaleExceptions.tsx",
+   "component": "src/routes/commercial/RefundsDisputesResaleExceptions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1652,6 +1661,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Resale Marketplace_Reference.pdf",
    "board": "2",
@@ -1661,7 +1671,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/resale-audit-ownership-history-adm-296",
-   "component": "apps/venue-management-web/src/routes/commercial/ResaleAuditOwnershipHistory.tsx",
+   "component": "src/routes/commercial/ResaleAuditOwnershipHistory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1692,7 +1702,7 @@
    "template": "form",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -1867,6 +1877,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Resale Marketplace_Reference.pdf",
    "board": "2",
@@ -1876,7 +1887,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/resale-analytics-ai-intelligence-adm-297",
-   "component": "apps/venue-management-web/src/routes/commercial/ResaleAnalyticsAiIntelligence.tsx",
+   "component": "src/routes/commercial/ResaleAnalyticsAiIntelligence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1892,6 +1903,7 @@
   "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Management can evaluate the commercial and operational performance of resale and use explainable AI insights to improve primary pricing, marketplace policies and future event strategy. Board 2 — Final Screen Register Screen Backend Screen Primary Responsibility",
+  "division": "Shares `listResale`, `listResale2` with ADM-288; this screen is Resale Analytics & AI Intelligence (pack Ticket Resale Marketplace_Reference.pdf, board 2.3.2.10, page 35): provide management with commercial, operational and predictive intelligence about the resale marketplace. Board 3 defines how the end customer actually accesses, uses, sells through, and buys from The existing resale architecture already defines the backend marketplace configuration and transaction processing across Boards 1 and 2. Board 3 closes the missing experience layer: Board 1 — Configure Marketplace Eligibility → Policy → Listings → Pricing → Fees → Approval → Inventory Board 2 — Execute Resale Transaction Buyer → Payment → Ownership Transfer → Credentials → Fraud → Settlement → Audit Board 3 — Customer Experience Seller Journey → Buyer Journey → White-Label Portal → Client B2C Integration → Hosted Marketplace → Headless/API.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Provide management with commercial, operational and predictive intelligence about the resale marketplace. Board 3 defines how the end customer actually accesses, uses, sells through, and buys from The existing resale architecture already defines the backend marketplace configuration and transaction processing across Boards 1 and 2. Board 3 closes the missing experience layer: Board 1 — Configure Marketplace Eligibility → Policy → Listings → Pricing → Fees → Approval → Inventory Board 2 — Execute Resale Transaction Buyer → Payment → Ownership Transfer → Credentials → Fraud → Settlement → Audit Board 3 — Customer Experience Seller Journey → Buyer Journey → White-Label Portal → Client B2C Integration → Hosted Marketplace → Headless/API",
@@ -1899,7 +1911,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {

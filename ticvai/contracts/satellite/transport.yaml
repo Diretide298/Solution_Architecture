@@ -383,8 +383,6 @@ paths:
     get:
       operationId: getTransportRoute
       x-ticvai-consumed-by:
-        - "P01 WEB-049 Transport — Route & Schedule"
-        - "P02 GST-077 Intercity Trip — Route & Passengers"
         - "P08 BO-1184 Transport Routes & Stops"
       x-ticvai-audience: [guest, public, staff]
       x-ticvai-read-routing: replica
@@ -483,12 +481,12 @@ paths:
         schema: { type: string, format: uuid }
     put:
       operationId: setTransportRouteStatus
+      x-ticvai-consumed-by:
+        - "P08 BO-1184 Transport Routes & Stops"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'seats sold on a departure still on sale (409 route-has-sold-departures) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P08 BO-1184 Transport Routes & Stops"
       x-ticvai-audience: [staff]
       summary: Activate, suspend or retire a route
       description: >
@@ -774,9 +772,9 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listTransportTimetables
-      description: '**Order.** Newest first, by `publishedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-1186 Transport Timetables"
+      description: '**Order.** Newest first, by `publishedAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: A route's timetables
@@ -913,12 +911,12 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: publishTransportTimetable
+      x-ticvai-consumed-by:
+        - "P08 BO-1186 Transport Timetables"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'seats sold on a superseded timetable''s departures (409 timetable-overlaps-sold-departures) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P08 BO-1186 Transport Timetables"
       x-ticvai-audience: [staff]
       summary: Publish a timetable and release its departures
       description: >
@@ -972,12 +970,12 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: withdrawTransportTimetable
+      x-ticvai-consumed-by:
+        - "P08 BO-1186 Transport Timetables"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'seats sold on a future departure (409 timetable-overlaps-sold-departures) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P08 BO-1186 Transport Timetables"
       x-ticvai-audience: [staff]
       summary: Withdraw a published timetable
       description: >
@@ -1023,13 +1021,13 @@ paths:
   /transport/departures:
     get:
       operationId: searchTransportDepartures
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-076 Intercity Trip — Route & Schedule"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-049 Transport — Route & Schedule"
-        - "P02 GST-076 Intercity Trip — Route & Schedule"
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: Search Trips — departures between two stations on a date
@@ -1125,13 +1123,13 @@ paths:
   /transport/departures/next:
     get:
       operationId: getNextTransportDeparture
+      x-ticvai-consumed-by:
+        - "P01 WEB-049 Transport — Route & Schedule"
+        - "P02 GST-076 Intercity Trip — Route & Schedule"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-049 Transport — Route & Schedule"
-        - "P02 GST-076 Intercity Trip — Route & Schedule"
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: Next Available Trip
@@ -1244,12 +1242,12 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getTransportDeparture
+      x-ticvai-consumed-by:
+        - "P02 GST-077 Intercity Trip — Route & Passengers"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P02 GST-077 Intercity Trip — Route & Passengers"
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: One departure, as a guest books it
@@ -1281,13 +1279,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateTransportDeparture
+      x-ticvai-consumed-by:
+        - "P08 BO-1187 Transport Departure Board"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
         for: 'seats sold on the departure (422 capacity-below-sold) (CHG-MOD-003)'
       x-ticvai-names-for-context: [catalogue.channel_capacity]
-      x-ticvai-consumed-by:
-        - "P08 BO-1187 Transport Departure Board"
       x-ticvai-audience: [staff]
       summary: Change a departure's coach or capacity
       description: |-
@@ -1398,9 +1396,9 @@ paths:
   /transport/pass-types:
     get:
       operationId: listTransportPassTypes
-      description: '**Order.** Sorted by `sortOrder` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-1188 Transport Pass Types"
+      description: '**Order.** Sorted by `sortOrder` ascending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The venue's multi-trip pass types

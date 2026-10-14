@@ -31,7 +31,7 @@
 | catalogue | [`getReport`](#getreport) | GET | `/reports/{reportId}` | core | 1 | ANL-023, BO-029, BO-058, BO-059, BO-060, POS-008 … |
 | catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 1 | ANL-023, ANL-031, BO-029, BO-058, BO-059, BO-060 … |
 | catalogue | [`updateReport`](#updatereport) | PUT | `/reports/{reportId}` | setup | 1 | ANL-035, ANL-036, ANL-037, ANL-038, BO-029, BO-058 … |
-| dashboard | [`createDashboard`](#createdashboard) | POST | `/dashboards` | setup | 1 | ADM-031, ANL-021, ANL-022, ANL-023, ANL-053 |
+| dashboard | [`createDashboard`](#createdashboard) | POST | `/dashboards` | setup | 1 | ADM-031, ANL-022, ANL-023, ANL-053 |
 | dashboard | [`getDashboard`](#getdashboard) | GET | `/dashboards/{dashboardId}` | core | 1 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
 | dashboard | [`listDashboards`](#listdashboards) | GET | `/dashboards` | core | 1 | ADM-031, ANL-021, ANL-068, BO-1081, KIT-010 |
 | dashboard | [`recordDashboardView`](#recorddashboardview) | POST | `/dashboards/{dashboardId}/views` | core | 1 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
@@ -41,8 +41,8 @@
 | naturalLanguage | [`saveNaturalLanguageQuery`](#savenaturallanguagequery) | POST | `/reports/ask/{conversationId}/save` | setup | 1 | ANL-052, BO-029, BO-058, BO-059, BO-060, PTR-018 … |
 | reporting | [`createKpi`](#createkpi) | POST | `/kpis` | setup | 1 | ANL-025, ANL-062 |
 | reporting | [`deleteDashboard`](#deletedashboard) | DELETE | `/dashboards/{dashboardId}` | setup | 1 | ANL-023 |
-| reporting | [`listAlerts`](#listalerts) | GET | `/alerts` | core | 1 | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-133 … |
-| reporting | [`setAlertRule`](#setalertrule) | PUT | `/alert-rules` | setup | 1 | ANL-009, BO-133, BO-886 |
+| reporting | [`listAlerts`](#listalerts) | GET | `/alerts` | core | 1 | ANL-001, ANL-003, ANL-009, BO-036, BO-133, BO-141 … |
+| reporting | [`setAlertRule`](#setalertrule) | PUT | `/alert-rules/{alertRuleId}` | setup | 1 | ANL-009, BO-133, BO-886 |
 | reporting | [`setSemanticModel`](#setsemanticmodel) | PUT | `/semantic-model` | setup | 1 | ANL-066 |
 
 ## Group: catalogue
@@ -287,6 +287,9 @@ Retired rather than deleted where executions or paused schedules reference it �
 
 Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` does not appear to a venue-scoped user at all — an empty result is a worse answer than an absent entry.
 
+
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `REPORT_VIEW_VENUE` |
@@ -305,7 +308,7 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | category | query |  | ReportCategory: enum (sales, admission, financial, inventory, guest, operations, marketing, workforce, …) |  |
-| search | query |  | string |  |
+| search | query |  | string | Matched case-insensitively as a substring of the report definition's name or description; no wildcards. |
 | pageSize | query |  | integer |  |
 | cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
 
@@ -512,7 +515,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.dashboard`, `reporting.dashboard_tile` |
 | Writes | `cache:idempotency`, `reporting.dashboard`, `reporting.dashboard_tile` |
-| Called by | ADM-031, ANL-021, ANL-022, ANL-023, ANL-053 |
+| Called by | ADM-031, ANL-022, ANL-023, ANL-053 |
 
 **Parameters**
 
@@ -594,7 +597,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Read routing | analytical |
 | Reads | `reporting.dashboard`, `reporting.dashboard_tile` |
 | Writes | - |
-| Called by | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-008, ANL-017, ANL-021, ANL-023, ANL-030, BO-010, BO-833, EMP-061, KIT-010 |
+| Called by | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-008, ANL-017, ANL-021, ANL-023, ANL-029, ANL-030, BO-010, BO-833, KIT-010 |
 
 **Parameters**
 
@@ -831,7 +834,7 @@ Scope is applied from the caller's resolved permissions. Parameters narrow; they
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.execution`, `reporting.report_definition`, `reporting.report_parameter` |
 | Writes | `cache:idempotency`, `reporting.execution` |
-| Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, ANL-039, ANL-040, BO-010, BO-029, BO-058, BO-059, BO-060, BO-1059, BO-1082, BO-118, BO-133, BO-262, POS-008, POS-020, PTR-018, SUP-008 |
+| Called by | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006, ANL-007, ANL-009, BO-010, BO-029, BO-058, BO-059, BO-060, BO-1059, BO-1082, BO-118, BO-133, BO-262, POS-008, POS-020, PTR-018, SUP-008 |
 
 **Parameters**
 
@@ -1142,6 +1145,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### deleteDashboard
@@ -1196,7 +1200,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 | Read routing | replica |
 | Reads | `reporting.alert`, `reporting.alert_rule` |
 | Writes | - |
-| Called by | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-133, BO-141, BO-886, EMP-061, EMP-070, POS-020, POS-025 |
+| Called by | ANL-001, ANL-003, ANL-009, BO-036, BO-133, BO-141, BO-886, EMP-070, POS-020, POS-025 |
 
 **Parameters**
 
@@ -1217,7 +1221,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 
 ### setAlertRule
 
-**`PUT /alert-rules`**: Watch a metric and tell somebody
+**`PUT /alert-rules/{alertRuleId}`**: Watch a metric and tell somebody
 
 BL-152. **The metric comes from the closed set**, so a rule cannot watch something nothing produces.
 **PUT semantics — an upsert of one rule, keyed on the body's `id`.** The collection path carries no id, so the body names the rule: a client-generated `id` that does not exist creates the rule (`201`); an `id` that exists replaces that rule whole (`200`). **Replace means every field** — an optional field left out of the body returns to its default, it does not keep its stored value. Other rules are never touched; removing a rule is `isActive: false`.
@@ -1240,13 +1244,14 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| alertRuleId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AlertRule`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | name | string | yes |  |
 | metric | object | yes | From the closed set, so a rule cannot watch something nothing produces — the same discipline MetricSource exists for. |
 | comparator | enum (above, below, outsideRange, changesBy, equals) | yes |  |
@@ -1258,13 +1263,13 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | recipientRoleIds | array of string (uuid) |  |  |
 | cooldownMinutes | integer |  | How long before the same rule may fire again. (default 30) |
 | isActive | boolean | yes |  |
-| scopePath | string | yes | The partition key (ADR-0005). |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
 
 **Response**: `AlertRule`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | name | string | yes |  |
 | metric | object | yes | From the closed set, so a rule cannot watch something nothing produces — the same discipline MetricSource exists for. |
 | comparator | enum (above, below, outsideRange, changesBy, equals) | yes |  |
@@ -1276,7 +1281,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | recipientRoleIds | array of string (uuid) |  |  |
 | cooldownMinutes | integer |  | How long before the same rule may fire again. (default 30) |
 | isActive | boolean | yes |  |
-| scopePath | string | yes | The partition key (ADR-0005). |
+| scopePath | string | yes | The partition key (ADR-0005). (read-only) |
 
 **Responses**
 
@@ -1474,7 +1479,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | domain | text | no |  |
 | formula | text | no | Expressed against the semantic model, not against tables. |
 | unit | text | no |  |
-| higher_is_better | boolean | no | Refund rate and revenue both go up. |
+| is_higher_better | boolean | no | Refund rate and revenue both go up. |
 | default_period | text | no |  |
 | owner | uuid | no |  |
 | scope_path | text | no |  |
@@ -1575,6 +1580,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | version | integer | no | Assigned by the server on each publish. |
+| domains | jsonb | no |  |
+| relationships | jsonb | no |  |
 | published_at | timestamptz | no |  |
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |

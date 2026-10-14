@@ -135,14 +135,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-824` | Gamification Command Center | B | 0 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-825` | Challenge Builder | A | 25 | 11 | 6 | 20 | 0 | 0 | — | notStarted (—) |
-| `BO-826` | Achievement & Badge Engine | A | 24 | 4 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-827` | Points & Activity Rules | A | 64 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-826` | Achievement & Badge Engine | A | 22 | 4 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-827` | Points & Activity Rules | A | 63 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-828` | Milestones & Reward Rules | A | 62 | 10 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-829` | Family, Team & Event Challenges | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-830` | Referral & Streak Management | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-831` | Progress, Leaderboards & Hub | D | 3 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-832` | AI Engagement Optimization | D | 0 | 0 | 6 | 9 | 0 | 0 | — | notStarted (—) |
-| `BO-833` | Gamification Analytics & Audit | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-832` | AI Engagement Optimization | D | 0 | 20 | 6 | 9 | 0 | 0 | — | notStarted (—) |
+| `BO-833` | Gamification Analytics & Audit | D | 0 | 40 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

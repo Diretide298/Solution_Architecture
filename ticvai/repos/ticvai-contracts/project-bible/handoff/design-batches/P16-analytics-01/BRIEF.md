@@ -125,16 +125,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-001` | Executive Command Center | A | 15 | 17 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
+| `ANL-001` | Executive Command Center | A | 15 | 37 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
 | `ANL-002` | Sales, Revenue & Channel | D | 6 | 1 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
 | `ANL-003` | Operational Performance | D | 11 | 27 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `ANL-004` | Product Performance | D | 9 | 15 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
 | `ANL-005` | Cost, Margin & Profitability | D | 6 | 5 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
 | `ANL-006` | Inventory & Waste Intelligence | D | 7 | 17 | 6 | 23 | 1 | 4 | — | notStarted (generated) |
 | `ANL-007` | Guest & Conversion Intelligence | D | 28 | 15 | 6 | 18 | 2 | 0 | — | notStarted (generated) |
-| `ANL-008` | Demand Forecasting | D | 4 | 1 | 6 | 39 | 2 | 0 | — | notStarted (generated) |
-| `ANL-009` | AI Assistant & Action Center | D | 30 | 30 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
-| `ANL-010` | Suggestions & Advice | D | 17 | 40 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
+| `ANL-008` | Demand Forecasting | D | 4 | 16 | 6 | 39 | 2 | 0 | — | notStarted (generated) |
+| `ANL-009` | AI Assistant & Action Center | D | 28 | 50 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
+| `ANL-010` | Suggestions & Advice | D | 16 | 40 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

@@ -5,6 +5,7 @@
   "module": "Overview",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "CASE_VIEW",
   "capability": "C32",
   "implementation": {
    "app": "venue-support-web",
@@ -45,7 +46,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
-  "purpose": "The screen this app sits on. Everything else is entered from here and returns to it.",
+  "purpose": "The support agent's home: the cases and conversations waiting, filtered by status, assignee, priority and breached SLA, the agents' availability, and the actions on the selected case.",
   "layout": {
    "template": "split",
    "regions": [
@@ -481,6 +482,7 @@
   "module": "Overview",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "capability": "C21",
   "implementation": {
    "app": "venue-support-web",

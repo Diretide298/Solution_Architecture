@@ -525,7 +525,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -1084,6 +1085,7 @@
   ]
  },
  "Wallet": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [
@@ -1258,6 +1260,7 @@
     "format": "uuid"
    },
    "walletId": {
+    "x-ticvai-references": "wallet.wallet",
     "type": "string",
     "format": "uuid"
    },
@@ -1419,6 +1422,7 @@
     "format": "uuid"
    },
    "walletId": {
+    "x-ticvai-references": "wallet.wallet",
     "type": "string",
     "format": "uuid"
    },

@@ -1586,7 +1586,7 @@ operations:
   writes: []
 - operation: listMultiParkCrossover2
   verb: GET
-  path: /multi-park-crossover
+  path: /multi-park-crossover-2
   scope: venue
   permission: SCOPE_VIEW
   audience:
@@ -2350,7 +2350,7 @@ operations:
   - cache:idempotency
 - operation: setAccessAttributeCatalog
   verb: PUT
-  path: /access-attribute-catalog
+  path: /access-attribute-catalog/{attributeKey}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2393,6 +2393,8 @@ operations:
   - access.gate_mode_change
   writes:
   - access.access_point
+  - access.configuration_change
+  - access.gate_mode_change
 - operation: setAccessPointGeofence
   verb: PUT
   path: /access-points/{accessPointId}/geofence
@@ -2410,7 +2412,7 @@ operations:
   - cache:idempotency
 - operation: setAccessPointGroup
   verb: PUT
-  path: /access-point-groups
+  path: /access-point-groups/{groupId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2457,7 +2459,7 @@ operations:
   - cache:idempotency
 - operation: setBiometricLifecycleRetention
   verb: PUT
-  path: /biometric-lifecycle-retention
+  path: /biometric-lifecycle-retention/{retentionSettingId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2533,7 +2535,7 @@ operations:
   - cache:idempotency
 - operation: setCredentialActivationDisplay
   verb: PUT
-  path: /credential-activation-display
+  path: /credential-activation-display/{credentialPolicyId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2696,7 +2698,7 @@ operations:
   - cache:idempotency
 - operation: setEntitlementConsumption
   verb: PUT
-  path: /entitlement-consumption
+  path: /entitlement-consumption/{ruleId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2724,7 +2726,7 @@ operations:
   - access.entry_rule_point
 - operation: setFaceMatchingVerification
   verb: PUT
-  path: /face-matching-verification
+  path: /face-matching-verification/{profileId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2754,7 +2756,7 @@ operations:
   - cache:idempotency
 - operation: setFaceTagTemporaryEnrollment
   verb: PUT
-  path: /face-tag-temporary
+  path: /face-tag-temporary/{profileId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2769,7 +2771,7 @@ operations:
   - cache:idempotency
 - operation: setFastPassProfile
   verb: PUT
-  path: /fast-pass-profiles
+  path: /fast-pass-profiles/{fastPassProfileId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2784,7 +2786,7 @@ operations:
   - cache:idempotency
 - operation: setFraudDetectionRule
   verb: PUT
-  path: /fraud-detection-rule
+  path: /fraud-detection-rule/{ruleId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2815,7 +2817,7 @@ operations:
   - cache:idempotency
 - operation: setGateModePolicy
   verb: PUT
-  path: /gate-mode-policies
+  path: /gate-mode-policies/{gateModePolicyId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2876,7 +2878,7 @@ operations:
   - cache:idempotency
 - operation: setGuestCompanionEligibility
   verb: PUT
-  path: /guest-companion-eligibility
+  path: /guest-companion-eligibility/{ruleId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2906,7 +2908,7 @@ operations:
   - cache:idempotency
 - operation: setHardwareModel
   verb: PUT
-  path: /hardware-models
+  path: /hardware-models/{modelId}
   scope: tenant
   permission: DEVICE_CONFIGURE
   audience:
@@ -2933,7 +2935,7 @@ operations:
   - access.hardware_certification
 - operation: setHotelWalletExternal
   verb: PUT
-  path: /hotel-wallet-external
+  path: /hotel-wallet-external/{integrationId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2948,7 +2950,7 @@ operations:
   - cache:idempotency
 - operation: setJourneyProfile
   verb: PUT
-  path: /journey-profiles
+  path: /journey-profiles/{journeyProfileId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2963,7 +2965,7 @@ operations:
   - cache:idempotency
 - operation: setJourneySequenceRule
   verb: PUT
-  path: /journey-sequence-rules
+  path: /journey-sequence-rules/{ruleId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -2997,7 +2999,7 @@ operations:
   - cache:idempotency
 - operation: setMediaBindingRule
   verb: PUT
-  path: /media-binding-rules
+  path: /media-binding-rules/{ruleId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -3013,7 +3015,7 @@ operations:
   - cache:idempotency
 - operation: setMediaIssuanceEncoding
   verb: PUT
-  path: /media-issuance-encoding
+  path: /media-issuance-encoding/{encodingProfileId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -3029,7 +3031,7 @@ operations:
   - cache:idempotency
 - operation: setMediaReplacementRevocation
   verb: PUT
-  path: /media-replacement-revocation
+  path: /media-replacement-revocation/{replacementReason}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -3044,7 +3046,7 @@ operations:
   - cache:idempotency
 - operation: setMediaTypeTechnology
   verb: PUT
-  path: /media-type-technology
+  path: /media-type-technology/{mediaTypeId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -3060,7 +3062,7 @@ operations:
   - cache:idempotency
 - operation: setOperatingCalendarEntry
   verb: PUT
-  path: /operating-calendar-entries
+  path: /operating-calendar-entries/{entryId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -3090,7 +3092,7 @@ operations:
   - cache:idempotency
 - operation: setParkingFacility
   verb: PUT
-  path: /parking-facilities
+  path: /parking-facilities/{parkingFacilityId}
   scope: venue
   permission: PARKING_CONFIGURE
   audience:
@@ -3120,7 +3122,7 @@ operations:
   - cache:idempotency
 - operation: setPodium
   verb: PUT
-  path: /podiums
+  path: /podiums/{podiumId}
   scope: venue
   permission: DEVICE_CONFIGURE
   audience:
@@ -3151,7 +3153,7 @@ operations:
   - cache:idempotency
 - operation: setPolicyScopeHierarchy
   verb: PUT
-  path: /policy-scope-hierarchy
+  path: /policy-scope-hierarchy/{policyId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:
@@ -3200,7 +3202,7 @@ operations:
   - cache:idempotency
 - operation: setReasonCode
   verb: PUT
-  path: /reason-codes
+  path: /reason-codes/{reasonCodeId}
   scope: venue
   permission: ACCESS_POINT_CONFIGURE
   audience:

@@ -127,12 +127,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-574` | Maintenance Command Center | D | 2 | 0 | 6 | 1 | 0 | 2 | — | notStarted (—) |
 | `BO-575` | Maintenance Rule & Service Plan Configuration | D | 8 | 0 | 6 | 4 | 1 | 2 | — | notStarted (—) |
 | `BO-576` | Maintenance Calendar & Scheduling | D | 7 | 30 | 6 | 10 | 3 | 2 | — | notStarted (—) |
-| `BO-577` | Maintenance Work Order | D | 29 | 20 | 6 | 22 | 3 | 2 | — | notStarted (—) |
-| `BO-578` | Technician Repair Workspace | D | 8 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `BO-577` | Maintenance Work Order | D | 29 | 40 | 6 | 22 | 3 | 2 | — | notStarted (—) |
+| `BO-578` | Technician Repair Workspace | D | 9 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `BO-579` | Parts, Cost & Maintenance Expense Tracking | D | 9 | 5 | 6 | 2 | 2 | 2 | — | notStarted (—) |
-| `BO-580` | Asset Maintenance History & Lifecycle | D | 0 | 0 | 6 | 5 | 1 | 2 | — | notStarted (—) |
+| `BO-580` | Asset Maintenance History & Lifecycle | D | 0 | 8 | 6 | 5 | 1 | 2 | — | notStarted (—) |
 | `BO-581` | Return-to-Service Inspection & Approval | D | 5 | 0 | 6 | 3 | 1 | 3 | — | notStarted (—) |
-| `BO-582` | Asset Retirement, Write-Off & Replacement Recommendation | D | 0 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `BO-582` | Asset Retirement, Write-Off & Replacement Recommendation | D | 0 | 8 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `BO-583` | Maintenance Intelligence & Predictive AI | D | 0 | 18 | 6 | 1 | 2 | 2 | — | notStarted (—) |
 
 ## Thin screens in this batch

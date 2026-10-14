@@ -91,13 +91,14 @@ screens:
   module: Shift
   requiresModule: core
   wave: 1
+  permission: SESSION_FORCE_LOGOUT
   capability: C11
   purpose: Authenticate the operator at the terminal and resolve the session every other screen on this
     app reads.
   implementation:
     app: venue-pos
     route: /sign-in
-    component: apps/venue-pos/src/routes/SignInTerminal.tsx
+    component: src/routes/SignInTerminal.tsx
     status: notStarted
   density: touchLarge
   pattern: form
@@ -281,8 +282,9 @@ screens:
     trigger: onAction
   - operationId: getCurrentSession
     contract: identity
-    purpose: Read the session the login just created
-    trigger: onAction
+    purpose: Read the session the login just created (role, venue and workstation every other screen reads),
+      with no tap of its own
+    trigger: background
   - operationId: createMfaChallenge
     contract: identity
     purpose: Second factor after login when the principal holds a permission in mfaRequiredForPermissions;
@@ -336,11 +338,12 @@ screens:
   module: Shift
   requiresModule: core
   wave: 1
+  permission: SHIFT_OPEN
   capability: C11
   implementation:
     app: venue-pos
     route: /shift/begin-shift
-    component: apps/venue-pos/src/routes/shift/BeginShiftWizard.tsx
+    component: src/routes/shift/BeginShiftWizard.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
@@ -757,11 +760,11 @@ screens:
     trigger: onAction
   - operationId: getWorkstationHealth
     contract: tenancy
-    purpose: getWorkstationHealth
+    purpose: Whether the till and its peripherals are well before the shift opens
     trigger: onLoad
   - operationId: listDenominations
     contract: shift
-    purpose: listDenominations
+    purpose: The notes and coins the opening float is counted in
     trigger: onLoad
   entryState:
     params:
@@ -825,11 +828,12 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: PRODUCT_VIEW
   capability: C01
   implementation:
     app: venue-pos
     route: /sell/sell-ticket-catalogue
-    component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
+    component: src/routes/sell/SellTicketCatalogueBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1978,7 +1982,7 @@ screens:
     - listProducts
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Put a product, with its date, session or seats, in the sale's cart
     trigger: onAction
     invalidates:
     - listProducts
@@ -2100,11 +2104,12 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: PRODUCT_VIEW
   capability: C81
   implementation:
     app: venue-pos
     route: /sell/sell-ticket-catalogue/timedentry
-    component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
+    component: src/routes/sell/SellTicketCatalogueBoard.tsx
     status: notStarted
     sectionOf: POS-002
   navigation:
@@ -2419,11 +2424,12 @@ screens:
   module: Sell
   requiresModule: seating
   wave: 1
+  permission: PRODUCT_VIEW
   capability: C51
   implementation:
     app: venue-pos
     route: /sell/sell-ticket-catalogue/seatmap
-    component: apps/venue-pos/src/routes/sell/SellTicketCatalogueBoard.tsx
+    component: src/routes/sell/SellTicketCatalogueBoard.tsx
     status: notStarted
     sectionOf: POS-002
   navigation:
@@ -2767,11 +2773,12 @@ screens:
   module: Payment
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   capability: C04
   implementation:
     app: venue-pos
     route: /payment/payment
-    component: apps/venue-pos/src/routes/payment/PaymentForm.tsx
+    component: src/routes/payment/PaymentForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3394,11 +3401,12 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   capability: C01
   implementation:
     app: venue-pos
     route: /sell/held-orders
-    component: apps/venue-pos/src/routes/sell/HeldOrdersBoard.tsx
+    component: src/routes/sell/HeldOrdersBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3413,17 +3421,17 @@ screens:
       trigger: Recall this held sale
       control: dataTable#heldList
       guard: sale.resume
+      operation: resumeOrder
       carries:
-      - cart
-      - cartHoldExpiresAt
-      - guest
-      - discount
-      - table
-      - orderType
+      - orderId
+      - subjectId
       returnsTo: POS-006
       provenance: board TICVAI POS Terminal · recall (4000). **The hold clock travels with the cart**
         — a destination that re-fetches the lines has lost the lease, and the guest's seats go back on
-        sale while they are standing at the till.
+        sale while they are standing at the till. **The parked cart is the held order** (CHG-SPO-015),
+        so the recall resumes it (`resumeOrder`) and carries its `orderId` and the guest's `subjectId`;
+        its lines, discounts, hold clock (`heldUntil`), table and order type are the order's own fields,
+        which POS-002 reads with the order (Block A audit, CHG-SCP-004).
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-006
@@ -3911,11 +3919,12 @@ screens:
   module: Shift
   requiresModule: core
   wave: 1
+  permission: SHIFT_OPEN
   capability: C11
   implementation:
     app: venue-pos
     route: /shift/close-shift
-    component: apps/venue-pos/src/routes/shift/CloseShiftWizard.tsx
+    component: src/routes/shift/CloseShiftWizard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4341,7 +4350,7 @@ screens:
     trigger: onLoad
   - operationId: listDenominations
     contract: shift
-    purpose: listDenominations
+    purpose: The notes and coins the drawer is counted in, blind
     trigger: onLoad
   - operationId: rejectShiftVariance
     contract: shift
@@ -4502,11 +4511,12 @@ screens:
   module: Reports
   requiresModule: analytics
   wave: 1
+  permission: REPORT_VIEW_VENUE
   capability: C21
   implementation:
     app: venue-pos
     route: /reports/reports
-    component: apps/venue-pos/src/routes/reports/ReportsDashboard.tsx
+    component: src/routes/reports/ReportsDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4572,6 +4582,8 @@ screens:
         operation: listReports
         provenance: contract reporting.yaml GET /reports
       - kind: metricTile
+        operation: runReport
+        bindsTo: ReportResult
         notes: Gross, tickets, average basket
         provenance: carried from the previous definition
       - kind: chart
@@ -4740,11 +4752,12 @@ screens:
   module: Shift
   requiresModule: core
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   capability: C11
   implementation:
     app: venue-pos
     route: /sell/staff-roster
-    component: apps/venue-pos/src/routes/sell/StaffRosterBoard.tsx
+    component: src/routes/sell/StaffRosterBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5025,11 +5038,12 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   capability: C01
   implementation:
     app: venue-pos
     route: /sell/add-to-existing-ticket
-    component: apps/venue-pos/src/routes/sell/AddToExistingTicketDetail.tsx
+    component: src/routes/sell/AddToExistingTicketDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5258,10 +5272,11 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-pos
     route: /sell/returns-refunds-exchanges
-    component: apps/venue-pos/src/routes/sell/ReturnsRefundsExchangesBoard.tsx
+    component: src/routes/sell/ReturnsRefundsExchangesBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5452,13 +5467,18 @@ screens:
     trigger: onAction
   - operationId: listSerialisedItems
     contract: inventory
-    purpose: listSerialisedItems
+    purpose: The serialised items a return takes back, found by serial
     trigger: onLoad
   - operationId: issueCreditMemo
     contract: finance
     purpose: Issue a credit memo
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listOrderRefunds
+    contract: orders
+    purpose: 'Follows createRefund (202) until what it started settles: List refunds against an order'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   entryState:
     params:
     - name: workstationId
@@ -5592,10 +5612,11 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/omnichannel-order-fulfilment-center
-    component: apps/venue-pos/src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx
+    component: src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5638,7 +5659,8 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getCurrentShift` reads one of them — list, select,
     act'
-  purpose: Omnichannel Order & Fulfilment Center — from the client design board, 20 August.
+  purpose: Hand over the orders waiting at this outlet (takeaway, delivery and collection), reserve merchandise
+    for a guest to collect, and hand dropped goods back to the guest.
   layout:
     template: split
     regions:
@@ -5942,10 +5964,11 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/mobile-pos-event-sales-offline-operations
-    component: apps/venue-pos/src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx
+    component: src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6200,10 +6223,11 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/sales-exceptions-controls-operational-actions
-    component: apps/venue-pos/src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx
+    component: src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6232,7 +6256,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`recordNoSale`, `voidOrder`, `applyManualDiscount`)
     and no read of a population — it is settings, not a list
-  purpose: Sales Exceptions, Controls & Operational Actions — from the client design board, 20 August.
+  purpose: 'Handle the till''s exceptions on an order: open the drawer without a sale, with a reason,
+    void an order, or apply a manual discount.'
   layout:
     template: form
     regions:
@@ -6391,10 +6416,11 @@ screens:
   module: Sell
   requiresModule: core
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   implementation:
     app: venue-pos
     route: /sell/cash-operations-dashboard
-    component: apps/venue-pos/src/routes/sell/CashOperationsDashboardBoard.tsx
+    component: src/routes/sell/CashOperationsDashboardBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6545,10 +6571,11 @@ screens:
   module: Sell
   requiresModule: core
   wave: 1
+  permission: DEVICE_VIEW
   implementation:
     app: venue-pos
     route: /sell/till-configuration
-    component: apps/venue-pos/src/routes/sell/TillConfigurationBoard.tsx
+    component: src/routes/sell/TillConfigurationBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6800,10 +6827,11 @@ screens:
   module: Sell
   requiresModule: core
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   implementation:
     app: venue-pos
     route: /sell/cash-in-cash-out-operations
-    component: apps/venue-pos/src/routes/sell/CashInCashOutOperationsBoard.tsx
+    component: src/routes/sell/CashInCashOutOperationsBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6833,7 +6861,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`createCashMovement`) and no read of a population —
     it is settings, not a list
-  purpose: Cash In / Cash Out Operations — from the client design board, 20 August.
+  purpose: Record cash added to or lifted from the drawer during the shift, counted by denomination and
+    with a reason, against the shift's movements so far.
   layout:
     template: form
     regions:
@@ -6937,10 +6966,11 @@ screens:
   module: Sell
   requiresModule: core
   wave: 1
+  permission: SHIFT_OPEN
   implementation:
     app: venue-pos
     route: /sell/safe-drop-cash-transfer-management
-    component: apps/venue-pos/src/routes/sell/SafeDropCashTransferManagementBoard.tsx
+    component: src/routes/sell/SafeDropCashTransferManagementBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7137,10 +7167,11 @@ screens:
   module: Sell
   requiresModule: core
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   implementation:
     app: venue-pos
     route: /sell/shift-templates-policies
-    component: apps/venue-pos/src/routes/sell/ShiftTemplatesPoliciesBoard.tsx
+    component: src/routes/sell/ShiftTemplatesPoliciesBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7355,10 +7386,11 @@ screens:
   module: Sell
   requiresModule: analytics
   wave: 1
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-pos
     route: /sell/shift-exceptions-alerts
-    component: apps/venue-pos/src/routes/sell/ShiftExceptionsAlertsBoard.tsx
+    component: src/routes/sell/ShiftExceptionsAlertsBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7401,7 +7433,8 @@ screens:
   pattern: approvalInbox
   patternReason: '`decideApprovalRequest` decides items that `listAlerts` queues — every row is waiting
     for a person, so the empty state is success'
-  purpose: Shift Exceptions & Alerts — from the client design board, 20 August.
+  purpose: Work the shift's alerts and the approval requests waiting for this supervisor, decide them,
+    and record a no-sale.
   gaps:
   - operation: recordNoSale
     why: '**A no-sale with no reason is the single most reliable indicator of till theft** (F32 step 5),
@@ -7670,10 +7703,11 @@ screens:
   module: Sell
   requiresModule: fnb
   wave: 1
+  permission: SCOPE_VIEW
   implementation:
     app: venue-pos
     route: /sell/sell---food-and-drink
-    component: apps/venue-pos/src/routes/sell/SellFoodDrinkBoard.tsx
+    component: src/routes/sell/SellFoodDrinkBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7831,7 +7865,7 @@ screens:
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Put a menu item, with its modifiers, in the basket
     trigger: onAction
   - operationId: evaluatePromotions
     contract: promotions
@@ -7976,10 +8010,11 @@ screens:
   module: Sell
   requiresModule: fnb
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/send-to-kitchen
-    component: apps/venue-pos/src/routes/sell/SendToKitchenBoard.tsx
+    component: src/routes/sell/SendToKitchenBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8049,6 +8084,8 @@ screens:
         operation: listKitchenTickets
         provenance: contract fnb.yaml GET /kitchen/tickets
       - kind: metricTile
+        operation: listKitchenTickets
+        bindsTo: KitchenTicket
         notes: Orders ahead, and the oldest. **A cashier quoting a wait needs the number the kitchen is
           actually working to.**
         provenance: carried from the previous definition
@@ -8254,10 +8291,11 @@ screens:
   module: Sell
   requiresModule: retail
   wave: 1
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-pos
     route: /sell/sell---merchandise
-    component: apps/venue-pos/src/routes/sell/SellMerchandiseBoard.tsx
+    component: src/routes/sell/SellMerchandiseBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8381,7 +8419,7 @@ screens:
     trigger: onAction
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Put a scanned or chosen item in the basket
     trigger: onAction
   - operationId: evaluatePromotions
     contract: promotions
@@ -8487,10 +8525,11 @@ screens:
   module: Sell
   requiresModule: fnb
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/outlet-setup
-    component: apps/venue-pos/src/routes/sell/OutletSetupBoard.tsx
+    component: src/routes/sell/OutletSetupBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8713,10 +8752,11 @@ screens:
   name: Till Home
   module: Sell
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   implementation:
     app: venue-pos
     route: /home
-    component: apps/venue-pos/src/routes/home/TillHomeBoard.tsx
+    component: src/routes/home/TillHomeBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8829,12 +8869,15 @@ screens:
       - kind: cardList
         label: Sale boards — tickets, F&B, retail
         bindsTo: SaleBoard
+        operation: listSaleBoards
       - kind: cardList
         label: Peripheral health
         bindsTo: DeviceBinding
+        operation: listDevices
       - kind: banner
         label: Alerts for this workstation
         bindsTo: Alert
+        operation: listAlerts
       - kind: detailPanel
         label: Last closed shift
         bindsTo: Shift
@@ -8886,8 +8929,9 @@ screens:
     trigger: onLoad
   - operationId: getWorkstationHealth
     contract: tenancy
-    purpose: Whether the till and its peripherals are well
-    trigger: onLoad
+    purpose: Whether the till and its peripherals are well, polled while the home is open; it feeds the
+      Peripheral health cards' state
+    trigger: onInterval
   - operationId: listAlerts
     contract: reporting
     purpose: Anything the cashier must see before selling
@@ -8982,10 +9026,11 @@ screens:
   name: Receipt & Reprint
   module: Sell
   wave: 1
+  permission: LEDGER_VIEW
   implementation:
     app: venue-pos
     route: /sell/receipt
-    component: apps/venue-pos/src/routes/sell/ReceiptReprintBoard.tsx
+    component: src/routes/sell/ReceiptReprintBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9211,10 +9256,11 @@ screens:
   name: Guest Lookup
   module: Sell
   wave: 1
+  permission: GUEST_VIEW
   implementation:
     app: venue-pos
     route: /sell/guests
-    component: apps/venue-pos/src/routes/sell/GuestLookupBoard.tsx
+    component: src/routes/sell/GuestLookupBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9380,10 +9426,11 @@ screens:
   name: Table Service
   module: Sell
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/tables
-    component: apps/venue-pos/src/routes/sell/TableServiceBoard.tsx
+    component: src/routes/sell/TableServiceBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9435,6 +9482,7 @@ screens:
       - kind: cardList
         label: The floor
         bindsTo: TableMap.tables
+        operation: getTableMap
         notes: '**Table states in the client''s words** (DI-336; CHG-CSA-012): Available, Ordered, **Table
           closed** (the contract''s `needsClearing`, after the visit is paid) and Reserved; never "Cleaning".
           A closed table shows **Make available** (`clearTable`). A table shows **Reserved** when a booking
@@ -9446,6 +9494,7 @@ screens:
       - kind: dataTable
         label: Reservations due
         bindsTo: TableReservation
+        operation: listTableReservations
       - kind: primaryButton
         label: Close visit & charge
       - kind: detailPanel
@@ -9711,10 +9760,11 @@ screens:
   name: Order Queue
   module: Sell
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/queue
-    component: apps/venue-pos/src/routes/sell/OrderQueueBoard.tsx
+    component: src/routes/sell/OrderQueueBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9943,7 +9993,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/journal
-    component: apps/venue-pos/src/routes/sell/SalesJournalBoard.tsx
+    component: src/routes/sell/SalesJournalBoard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10297,7 +10347,7 @@ screens:
   implementation:
     app: venue-pos
     route: /sell/reservations
-    component: apps/venue-pos/src/routes/sell/ReservationsGroupArrivalsBoard.tsx
+    component: src/routes/sell/ReservationsGroupArrivalsBoard.tsx
     status: notStarted
   navigation:
     entryFrom:

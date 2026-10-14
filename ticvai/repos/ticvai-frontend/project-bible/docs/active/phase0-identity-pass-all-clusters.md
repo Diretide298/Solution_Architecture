@@ -84,7 +84,7 @@ three product catalogues pull the other way.
 
 **This is a fifth architectural divergence** and belongs with the four in the response document.
 
-### 3. `marketing.data_subject_request` duplicates `platform.dsar_request`
+### 3. `marketing.data_subject_request` duplicates `sync.dsar_request`
 
 We have DSAR in `platform`. They have it in `marketing`. **One has to go**, and the choice is not
 cosmetic: a subject-access request has to reach every schema, so it belongs with the platform

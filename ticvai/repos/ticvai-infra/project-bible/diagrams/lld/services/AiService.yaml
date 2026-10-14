@@ -1073,7 +1073,7 @@ operationsByContract:
     writes: 2
   - operation: setAiProvider
     verb: PUT
-    path: /providers
+    path: /providers/{providerId}
     scope: region
     permission: AI_CONFIGURE
     offline: false
@@ -1121,7 +1121,7 @@ operationsByContract:
     writes: 2
   - operation: setIndexSource
     verb: PUT
-    path: /index-sources
+    path: /index-sources/{sourceId}
     scope: tenant
     permission: AI_CONFIGURE
     offline: false
@@ -1568,7 +1568,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.approval_request_score
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -1644,7 +1644,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.config_source
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -1672,7 +1672,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.decision_record
-  columns: 25
+  columns: 26
   store: postgres
   parent: null
   writtenBy:
@@ -1733,7 +1733,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.forecast_scenario
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -1768,14 +1768,14 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.guided_choice_suggestion
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
   - ai
   foreignWriters: null
 - table: ai.history_import
-  columns: 18
+  columns: 19
   store: postgres
   parent: null
   writtenBy:
@@ -1795,7 +1795,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: ai.incident
-  columns: 19
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -1878,7 +1878,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.model
-  columns: 19
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -1920,7 +1920,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.provider
-  columns: 27
+  columns: 28
   store: postgres
   parent: null
   writtenBy:
@@ -1969,7 +1969,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.risk_case
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -1989,7 +1989,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.risk_strategy
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -2043,7 +2043,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: ai.venue_settings
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2074,15 +2074,11 @@ readsFrom:
   operations: 1
 writesOutside: []
 screens:
-- P01:WEB-001 Home / Landing
 - P01:WEB-008 Add-ons & Upsell
-- P01:WEB-043 Loyalty & Rewards
 - P01:WEB-044 AI Concierge – Home
-- P02:GST-001 Home
 - P02:GST-031 AI Concierge – Home
 - P02:GST-032 AI Concierge – Chat
 - P02:GST-033 AI Concierge – Contextual Help
-- P02:GST-036 Loyalty & Rewards
 - P02:GST-048 Upsell / Cross-Sell
 - P02:GST-054 AI Planner
 - P02:GST-068 Help & My Cases
@@ -2168,11 +2164,9 @@ screens:
 - P09:ADM-489 AI Configuration Readiness Center
 - P09:ADM-490 Configuration Validation Results
 - P09:ADM-491 AI Recommendations & Best-Practice Review
-- P09:ADM-492 Configuration Approval Workflow
 - P09:ADM-493 AI Configuration Execution Center
 - P09:ADM-494 Execution Progress & Dependency Monitor
 - P09:ADM-495 Configuration Results & Object Mapping
-- P09:ADM-496 Configuration Change & Modification Assistant
 - P09:ADM-497 Configuration History, Versions & Rollback
 - P09:ADM-498 AI Configuration Audit & Governance
 - P09:ADM-499 Forecasting Command Center
@@ -2189,12 +2183,9 @@ screens:
 - P09:ADM-510 Capacity & Occupancy Forecast
 - P09:ADM-511 Attraction Utilization & Queue Forecast
 - P09:ADM-512 Entry, Access & Guest Flow Forecast
-- P09:ADM-513 Workforce Demand & Staffing Forecast
-- P09:ADM-514 POS, Kiosk & Frontline Service Forecast
 - P09:ADM-515 F&B, Retail & Inventory Demand Forecast
 - P09:ADM-516 Resource, Equipment & Facility Requirement Forecast
 - P09:ADM-517 Operational Scenario & Readiness Simulator
-- P09:ADM-518 Operational Forecast Review, Recommendations & Handover
 - P09:ADM-519 AI Governance Command Center
 - P09:ADM-520 AI Capability Registry & Ownership
 - P09:ADM-521 AI Risk Classification & Assessment
@@ -2206,7 +2197,6 @@ screens:
 - P09:ADM-527 AI Policy Testing & Governance Simulation
 - P09:ADM-528 AI Governance Policy Publication & Effective Policy Map
 - P09:ADM-529 AI Human Oversight Command Center
-- P09:ADM-530 AI Approval Requirement & Routing Configuration
 - P09:ADM-531 AI Approval Review Workspace
 - P09:ADM-532 Conditional Approval & Approval Conditions
 - P09:ADM-533 Human Review, Challenge & AI Clarification Workspace
@@ -2253,7 +2243,6 @@ screens:
 - P16:ANL-055 Anomaly Detection Center
 - P16:ANL-056 Root-Cause Analysis Explorer
 - P16:ANL-057 Forecasting & Predictive Analytics Studio
-- P16:ANL-058 AI Recommendation & Next-Best-Action Center
 - P16:ANL-059 AI Insight History, Evidence & Explainability
 - P16:ANL-060 AI Analytics Governance & Model Control
 - P16:ANL-070 Analytics Governance, Security & Audit Center

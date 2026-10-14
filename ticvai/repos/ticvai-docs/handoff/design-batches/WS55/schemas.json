@@ -337,6 +337,7 @@
   }
  },
  "ApprovalSlaPolicy": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "approvals.sla_policy",
   "description": "Approvals boards 5.5 and 5.6. **A target with no consequence is a number in a table**, so the reminder and breach behaviour are part of the policy.\n",
@@ -371,6 +372,8 @@
     "nullable": true
    },
    "reminders": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

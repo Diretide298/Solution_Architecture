@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/select-date-and-time",
-   "component": "apps/guest-app/src/routes/general/SelectDateAndTimeDetail.tsx",
+   "component": "src/screens/general/SelectDateAndTimeDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -231,8 +231,8 @@
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "The cart's `consentQuestions` after the time is added",
-    "trigger": "onAction"
+    "purpose": "Read by the screen right after addCartLine, not a control: the cart's consentQuestions, which open the consent questions pop-up; with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)",
+    "trigger": "background"
    },
    {
     "operationId": "recordConsentAnswers",
@@ -293,6 +293,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-007",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-007.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -393,7 +394,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/tickets-and-add-ons",
-   "component": "apps/guest-app/src/routes/general/TicketsAndAddOnsList.tsx",
+   "component": "src/screens/general/TicketsAndAddOnsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -629,6 +630,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-008",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-008.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -700,7 +702,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/upsell-cross-sell",
-   "component": "apps/guest-app/src/routes/general/UpsellCrossSellDetail.tsx",
+   "component": "src/screens/general/UpsellCrossSellDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -724,7 +726,7 @@
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getUpsellSuggestions` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "See upsell / cross-sell for this venue.",
+  "purpose": "Suggestions for the cart the guest is about to pay for, each added with one tap.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -788,7 +790,7 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add something",
+    "purpose": "Add a suggested item to the cart the suggestions are for",
     "trigger": "onAction"
    },
    {
@@ -801,14 +803,14 @@
    {
     "operationId": "recordRecommendationEvents",
     "contract": "ai",
-    "purpose": "Report what happened to recommended items",
-    "trigger": "onAction",
+    "purpose": "Sent by the Suggested for you list, not a control: impressions, clicks, add-to-cart and declines of the recommended items, batched",
+    "trigger": "background",
     "provenance": "build, 29 September 2026"
    },
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "Show the cart the suggestions are for",
+    "purpose": "Show the cart the suggestions are for, with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
@@ -902,7 +904,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/interactive-seat-selection",
-   "component": "apps/guest-app/src/routes/general/InteractiveSeatSelectionCanvas.tsx",
+   "component": "src/screens/general/InteractiveSeatSelectionCanvas.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -951,7 +953,7 @@
   ],
   "pattern": "statusTracker",
   "patternReason": "`getSeatAvailability` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "See interactive seat selection for this venue.",
+  "purpose": "Pick seats on the seat map for the chosen performance, or let the venue recommend them, and hold them.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -1052,8 +1054,8 @@
    {
     "operationId": "relinquishSeatHold",
     "contract": "seating",
-    "purpose": "Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold",
-    "trigger": "onAction"
+    "purpose": "Sent by the time bar when the guest switches time, not a control: releases the seats held for the old performance (decided 29 September), with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)",
+    "trigger": "background"
    }
   ],
   "entryState": {
@@ -1091,7 +1093,7 @@
     "differences": "The app runs the website seat engine (2D and 3D)."
    },
    "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
-   "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
+   "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing. Drawn frame: wireframes/incoming/P02-mobile-v4/gst-049.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json)."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
@@ -1179,7 +1181,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/resource-booking-cabana",
-   "component": "apps/guest-app/src/routes/general/ResourceBookingCabanaDetail.tsx",
+   "component": "src/screens/general/ResourceBookingCabanaDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1267,7 +1269,7 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add something",
+    "purpose": "Add the chosen cabana and time to the cart",
     "trigger": "onAction",
     "invalidates": [
      "listProducts"
@@ -1376,7 +1378,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/bundle-package",
-   "component": "apps/guest-app/src/routes/general/BundlePackageDetail.tsx",
+   "component": "src/screens/general/BundlePackageDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1411,7 +1413,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listCatalogueBundles` reads the population and `getBundle` reads one of them — list, select, act",
-  "purpose": "See bundle package for this venue.",
+  "purpose": "One bundle: what it includes and its price, added to the cart.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1467,7 +1469,7 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add something",
+    "purpose": "Add the bundle to the cart",
     "trigger": "onAction"
    }
   ],
@@ -1579,7 +1581,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/resource-availability-cabana",
-   "component": "apps/guest-app/src/routes/general/ResourceAvailabilityCabanaDetail.tsx",
+   "component": "src/screens/general/ResourceAvailabilityCabanaDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1743,7 +1745,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/account/share-group-booking",
-   "component": "apps/guest-app/src/routes/account/ShareGroupBooking.tsx",
+   "component": "src/screens/account/ShareGroupBooking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1759,10 +1761,7 @@
     {
      "to": "GST-039",
      "trigger": "Profile",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-072 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-039 declares entryState.params  and GST-072 holds none of them. The edge carries nothing: GST-039 needs nothing to open"
     }
    ]
   },
@@ -1885,7 +1884,7 @@
    {
     "operationId": "getGroupBooking",
     "contract": "orders",
-    "purpose": "getGroupBooking",
+    "purpose": "The group booking this guest belongs to: its leader, its name and who still has to give their name",
     "trigger": "onLoad"
    },
    {
@@ -2056,7 +2055,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/map-booking",
-   "component": "apps/guest-app/src/routes/general/MapBookingCanvas.tsx",
+   "component": "src/screens/general/MapBookingCanvas.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2378,7 +2377,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/space-by-the-hour",
-   "component": "apps/guest-app/src/routes/general/SpaceByTheHourWizard.tsx",
+   "component": "src/screens/general/SpaceByTheHourWizard.tsx",
    "status": "notStarted"
   },
   "navigation": {

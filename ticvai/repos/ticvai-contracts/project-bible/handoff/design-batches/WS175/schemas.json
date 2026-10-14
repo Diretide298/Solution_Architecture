@@ -323,6 +323,17 @@
   ],
   "x-ticvai-forecast-points": "**`forecastPoints` added 29 September (build pass, group G2; 8.2.55)**: one row per forecast point (`ai.forecast_point`) of a **published** forecast version (`ai.forecast_version` status `published`), with the definition it belongs to (`ai.forecast_definition`: subject, grain, unit), the period, the dimension key and the p10, p50 and p90 values. Draft, awaiting-approval and superseded versions are not reachable, and scenario points (`scenarioId` set) only with the scenario named as a filter: **a forecast leaves the platform as the one somebody published**. It is how a forecast is exported (`runReport` then `exportReportResult`, csv or xlsx), scheduled or put on a dashboard. Names no person, so `REPORT_EXPORT` is enough. Read from the reporting replica of the AI log database (design 2.4), never from the model service.\n"
  },
+ "ExecutionStatus": {
+  "type": "string",
+  "enum": [
+   "queued",
+   "running",
+   "completed",
+   "failed",
+   "cancelled",
+   "expired"
+  ]
+ },
  "ExportFormat": {
   "type": "string",
   "enum": [
@@ -656,6 +667,147 @@
    }
   ]
  },
+ "ReportExecution": {
+  "x-ticvai-persistence": "reporting.execution",
+  "type": "object",
+  "required": [
+   "id",
+   "reportId",
+   "definitionVersion",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "reportId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "reportName": {
+    "type": "string"
+   },
+   "definitionVersion": {
+    "type": "string",
+    "description": "The version this ran against. With the parameters and scope below, it is everything needed to reproduce the result.\n"
+   },
+   "status": {
+    "$ref": "#/components/schemas/ExecutionStatus"
+   },
+   "parameters": {
+    "type": "object",
+    "additionalProperties": true,
+    "description": "The parameters it ran with, keyed by `ReportParameter.key` of `definitionVersion` — defaults filled in, so the record is complete."
+   },
+   "scopeApplied": {
+    "type": "array",
+    "description": "Scope paths the caller held. What constrained the result.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "rowCount": {
+    "type": "integer",
+    "nullable": true
+   },
+   "durationMs": {
+    "type": "integer",
+    "nullable": true
+   },
+   "error": {
+    "type": "string",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "scheduleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "completedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "Results are retained for a limited period, then discarded."
+   }
+  }
+ },
+ "ReportExport": {
+  "x-ticvai-persistence": "reporting.export",
+  "type": "object",
+  "required": [
+   "id",
+   "executionId",
+   "format",
+   "status",
+   "requestedByPrincipalId",
+   "requestedAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "executionId": {
+    "type": "string"
+   },
+   "format": {
+    "$ref": "#/components/schemas/ExportFormat"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "queued",
+     "generating",
+     "ready",
+     "failed",
+     "expired"
+    ]
+   },
+   "includesPersonalData": {
+    "type": "boolean"
+   },
+   "purpose": {
+    "type": "string",
+    "nullable": true
+   },
+   "downloadUrl": {
+    "type": "string",
+    "nullable": true,
+    "description": "Signed and expiring. Present only while status is `ready`."
+   },
+   "sizeBytes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   }
+  }
+ },
  "ReportFilter": {
   "x-ticvai-persistence": "reporting.report_filter",
   "type": "object",
@@ -822,6 +974,7 @@
   }
  },
  "Seat": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "seating.seat",
   "x-ticvai-unique-together": [
    [
@@ -837,9 +990,15 @@
    "sectionCode",
    "rowLabel",
    "seatNumber",
-   "attribute"
+   "attribute",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -973,10 +1132,12 @@
     "format": "uuid"
    },
    "holdTypeId": {
+    "x-ticvai-references": "seating.hold_type",
     "type": "string",
     "format": "uuid"
    },
    "performanceId": {
+    "x-ticvai-references": "catalogue.performance",
     "type": "string",
     "format": "uuid"
    },
@@ -1113,6 +1274,7 @@
   }
  },
  "SeatPriceBand": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "seating.seat_price_band",
   "x-ticvai-unique-together": [
    [
@@ -1126,9 +1288,15 @@
    "code",
    "displayLabel",
    "amount",
-   "effectiveFrom"
+   "effectiveFrom",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",

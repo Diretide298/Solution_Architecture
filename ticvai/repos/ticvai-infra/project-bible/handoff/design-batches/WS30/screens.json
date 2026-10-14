@@ -5,6 +5,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/member-operations-command-center-bo-294",
-   "component": "apps/venue-management-web/src/routes/sell/MemberOperationsCommandCenter.tsx",
+   "component": "src/routes/sell/MemberOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -121,7 +122,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -151,7 +152,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -357,6 +358,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
+  "permission": "PLATFORM_CELL_MANAGE",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -366,7 +368,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/member-360-membership-account-workspace-bo-295",
-   "component": "apps/venue-management-web/src/routes/sell/Member360MembershipAccountWorkspace.tsx",
+   "component": "src/routes/sell/Member360MembershipAccountWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -567,6 +569,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -576,7 +579,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/membership-activation-assignment-credential-management-bo-296",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipActivationAssignmentCredentialManageme.tsx",
+   "component": "src/routes/sell/MembershipActivationAssignmentCredentialManageme.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -758,6 +761,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -767,7 +771,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/visit-admission-entitlement-usage-monitor-bo-297",
-   "component": "apps/venue-management-web/src/routes/sell/VisitAdmissionEntitlementUsageMonitor.tsx",
+   "component": "src/routes/sell/VisitAdmissionEntitlementUsageMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -797,7 +801,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -960,6 +964,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -969,7 +974,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/membership-freeze-suspension-reactivation-management-bo-298",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipFreezeSuspensionReactivationManagement.tsx",
+   "component": "src/routes/sell/MembershipFreezeSuspensionReactivationManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1164,6 +1169,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -1173,7 +1179,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/membership-upgrade-downgrade-product-migration-operation-bo-299",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipUpgradeDowngradeProductMigrationOperat.tsx",
+   "component": "src/routes/sell/MembershipUpgradeDowngradeProductMigrationOperat.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1328,6 +1334,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -1337,7 +1344,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/renewal-operations-auto-renewal-management-bo-300",
-   "component": "apps/venue-management-web/src/routes/sell/RenewalOperationsAutoRenewalManagement.tsx",
+   "component": "src/routes/sell/RenewalOperationsAutoRenewalManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1493,6 +1500,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -1502,7 +1510,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/member-exceptions-overrides-service-recovery-bo-301",
-   "component": "apps/venue-management-web/src/routes/sell/MemberExceptionsOverridesServiceRecovery.tsx",
+   "component": "src/routes/sell/MemberExceptionsOverridesServiceRecovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1695,6 +1703,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -1704,7 +1713,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/member-lifecycle-history-audit-case-timeline-bo-302",
-   "component": "apps/venue-management-web/src/routes/sell/MemberLifecycleHistoryAuditCaseTimeline.tsx",
+   "component": "src/routes/sell/MemberLifecycleHistoryAuditCaseTimeline.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1829,6 +1838,7 @@
   "module": "Sell",
   "requiresModule": "membership",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Membership___Annual_Pass_Management_Reference.pdf",
    "board": "2",
@@ -1838,7 +1848,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/membership-analytics-renewal-intelligence-ai-retention-c-bo-303",
-   "component": "apps/venue-management-web/src/routes/sell/MembershipAnalyticsRenewalIntelligenceAiRetentio.tsx",
+   "component": "src/routes/sell/MembershipAnalyticsRenewalIntelligenceAiRetentio.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1860,7 +1870,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {

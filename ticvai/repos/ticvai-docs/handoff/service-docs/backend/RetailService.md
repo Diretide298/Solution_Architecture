@@ -443,6 +443,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 
 **A guest gets the guest projection, not the stock record.** A staff caller receives `MerchandiseItem`. A guest caller receives `GuestMerchandiseItem`, which leaves out the inventory link, the catalogue variant, the stock count and the serial-number flag, and says only whether the item can be bought. The server chooses by the caller's audience; the client does not ask for one.
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Order.** Sorted by `name` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -1072,6 +1073,8 @@ Also the receipt lookup a returns desk starts from. Returns whether each line is
 
 **`GET /retail-sales`**: List retail sales
 
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -1334,7 +1337,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | order_id | uuid | no | The paid online order that created this collection (audit R236). |
 | entitlement_id | uuid | no | The ticket that claims these goods. |
 | subject_id | uuid | no |  |
-| collection_point_id | uuid | yes |  |
+| collection_location_id | uuid | yes |  |
 | collection_point_name | text | no |  |
 | status | text | yes |  |
 | dropped_at | timestamptz | no |  |

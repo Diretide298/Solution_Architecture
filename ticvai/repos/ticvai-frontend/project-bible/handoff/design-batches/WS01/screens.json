@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-control-command-center-bo-144",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessControlCommandCenter.tsx",
+   "component": "src/routes/access-venue/AccessControlCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -236,6 +237,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "1",
@@ -245,7 +247,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/venue-park-access-structure-bo-145",
-   "component": "apps/venue-management-web/src/routes/access-venue/VenueParkAccessStructure.tsx",
+   "component": "src/routes/access-venue/VenueParkAccessStructure.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -293,7 +295,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listVenueParkAccess",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listOrgUnits"
       },
       {
        "kind": "primaryButton",
@@ -449,6 +452,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "1",
@@ -458,7 +462,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-area-zone-builder-bo-146",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessAreaZoneBuilder.tsx",
+   "component": "src/routes/access-venue/AccessAreaZoneBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -611,6 +615,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "1",
@@ -620,7 +625,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/attraction-access-configuration-bo-147",
-   "component": "apps/venue-management-web/src/routes/access-venue/AttractionAccessConfiguration.tsx",
+   "component": "src/routes/access-venue/AttractionAccessConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -790,6 +795,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "1",
@@ -799,7 +805,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-point-directory-bo-148",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessPointDirectory.tsx",
+   "component": "src/routes/access-venue/AccessPointDirectory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -987,6 +993,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "1",
@@ -996,7 +1003,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/gate-lane-configuration-bo-149",
-   "component": "apps/venue-management-web/src/routes/access-venue/GateLaneConfiguration.tsx",
+   "component": "src/routes/access-venue/GateLaneConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1118,6 +1125,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "1",
@@ -1127,7 +1135,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-control-graphical-map-designer-bo-150",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessControlGraphicalMapDesigner.tsx",
+   "component": "src/routes/access-venue/AccessControlGraphicalMapDesigner.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1249,6 +1257,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "1",
@@ -1258,7 +1267,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-location-grouping-bo-151",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessLocationGrouping.tsx",
+   "component": "src/routes/access-venue/AccessLocationGrouping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1441,6 +1450,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "1",
@@ -1450,7 +1460,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/operating-calendar-special-access-days-bo-152",
-   "component": "apps/venue-management-web/src/routes/access-venue/OperatingCalendarSpecialAccessDays.tsx",
+   "component": "src/routes/access-venue/OperatingCalendarSpecialAccessDays.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1682,6 +1692,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "1",
@@ -1691,7 +1702,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/topology-validation-publication-bo-153",
-   "component": "apps/venue-management-web/src/routes/access-venue/TopologyValidationPublication.tsx",
+   "component": "src/routes/access-venue/TopologyValidationPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1742,7 +1753,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
-       "provenance": "authored — required by check-screens for publishTopologyValidation"
+       "provenance": "authored — required by check-screens for publishTopologyValidation",
+       "operation": "publishTopologyValidation"
       },
       {
        "kind": "secondaryButton",

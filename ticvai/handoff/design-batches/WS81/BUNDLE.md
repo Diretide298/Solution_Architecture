@@ -102,8 +102,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-426` | Deduction Priority & Funding Source Rules | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-427` | All Games & Rides Pass Configuration | D | 11 | 15 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-428` | Specific Game/Ride Unlimited Entitlement | D | 9 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-429` | Specific Game/Ride Limited Entitlement | D | 1 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-430` | Game Package Builder | D | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-429` | Specific Game/Ride Limited Entitlement | D | 17 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-430` | Game Package Builder | D | 0 | 15 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-431` | Entitlement Validity & Activation Rules | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-432` | Real-Time Gameplay Authorization | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-433` | Validation Simulator & Exception Analysis | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -286,6 +286,8 @@ feed:
 - `listGameplayTransactions` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -472,6 +474,8 @@ offline:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -636,6 +640,8 @@ split:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -786,6 +792,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Edge cases to draw
 
@@ -826,6 +833,8 @@ pass:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -857,7 +866,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-427?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -948,6 +957,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Edge cases to draw
 
@@ -986,6 +996,8 @@ entitlement:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1017,7 +1029,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (9), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-428?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1069,6 +1081,27 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|---|---|---|---|---|
 | Entitlement Name | select field | — | — | — | — | — | — |
 
+**Sent by *Create game entitlement*** (`createGameEntitlement`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `createGameEntitlement` body |
+| Code `code` | text field | required | — | — | — | — | `createGameEntitlement` body |
+| Name `name` | text field | optional | — | — | — | — | `createGameEntitlement` body |
+| Kind `kind` | radio group | required | — | All games pass · Unlimited single game · Limited single game · Package · Free play | — | — | `createGameEntitlement` body |
+| Games `gameIds` | multi-picker: choose games | optional | — | — | — | — | `createGameEntitlement` body |
+| Attraction types `attractionTypeIds` | multi-picker: choose attraction types | optional | — | — | — | — | `createGameEntitlement` body |
+| Includes games added later `includesGamesAddedLater` | toggle | optional | on | — | — | Whether a pass sold today covers a game added tomorrow (Chinmay, 2 October, workbook Q397: "venue configures; default yes"; CHG-CSA-028). | `createGameEntitlement` body |
+| Play count `playCount` | number field | optional | — | — | — | For `limitedSingleGame` and `package`. Null means unlimited. | `createGameEntitlement` body |
+| Validity kind `validityKind` | radio group | optional | — | Same day · Days · Until date · Until used | — | — | `createGameEntitlement` body |
+| Validity days `validityDays` | number field (days) | optional | — | — | — | — | `createGameEntitlement` body |
+| Activation kind `activationKind` | segmented control | optional | On first use | On purchase · On first use · On date | — | On first use is what a guest expects from a day pass bought the night before. On purchase is what a venue defaults to by accident, and it costs them a day. | `createGameEntitlement` body |
+| Daily play cap `dailyPlayCap` | number field | optional | — | — | — | — | `createGameEntitlement` body |
+| Cooldown minutes `cooldownMinutes` | number field (minutes) | optional | — | — | — | Unlimited does not mean continuous. A cooldown is how one child does not hold a popular ride all afternoon. | `createGameEntitlement` body |
+| Linked product `linkedProductId` | picker: choose a linked product | optional | — | — | shows names, sends the id | — | `createGameEntitlement` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `createGameEntitlement` body |
+| Is active `isActive` | toggle | optional | on | — | — | — | `createGameEntitlement` body |
+
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **entitlement name / product**: Name with Arabic variant; Product picker from the catalogue. *(source: screens/P08-venue-back-office.yaml#BO-428 / screens/P08-venue-back-office.yaml#BO-430)*
@@ -1082,7 +1115,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create game entitlement (primary button) | navigation or local | — | — | — | — |
+| Create game entitlement (primary button) | `createGameEntitlement` POST `/game-entitlements` | GameEntitlement | GameEntitlement | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
@@ -1108,6 +1141,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Edge cases to draw
 
@@ -1154,6 +1188,8 @@ usage:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1185,7 +1221,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (1), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-429?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Create game entitlement, Cancel.
@@ -1244,7 +1280,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listGameEntitlements`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Kind | chip: All games pass, Unlimited single game, Limited single game, Package, Free play | — |
+| Games | list or chips (count when long) | — |
+| Attraction types | list or chips (count when long) | — |
+| Includes games added later | yes / no (icon or chip) | Whether a pass sold today covers a game added tomorrow (Chinmay, 2 October, workbook Q397: "venue configures; default yes"; CHG-CSA-028). |
+| Play count | 1,234 | For `limitedSingleGame` and `package`. Null means unlimited. |
+| Validity kind | chip: Same day, Days, Until date, Until used | — |
+| Validity days | 1,234 | — |
+| Activation kind | chip: On purchase, On first use, On date | On first use is what a guest expects from a day pass bought the night before. On purchase is what a venue defaults to by accident, and it … |
+| Daily play cap | 1,234 | — |
+| Cooldown minutes | 1,234 | Unlimited does not mean continuous. A cooldown is how one child does not hold a popular ride all afternoon. |
+| Linked product | the name it points at, never the id | — |
+| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1281,6 +1335,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the game package are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Edge cases to draw
 
@@ -1328,6 +1383,8 @@ contents:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1359,8 +1416,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-430?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create game entitlement, Cancel.
 - [ ] Every transition is wired: `BO-424`.
@@ -1448,6 +1505,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the entitlement validity activation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Edge cases to draw
 
@@ -1479,6 +1537,8 @@ example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1504,7 +1564,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-431?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create game entitlement, Cancel.
@@ -1806,6 +1866,8 @@ rejected:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1952,8 +2014,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"GameEntitlement": {"type":"object","x-ticvai-persistence":"games.entitlement","description":"Board 4. **A right to play, not money** — consumed before money is.","required":["code","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["allGamesPass","unlimitedSingleGame","limitedSingleGame","package","freePlay"]},"gameIds":{"type":"array","items":{"type":"string","format":"uuid"}},"attractionTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"includesGamesAddedLater":{"type":"boolean","default":true,"description":"**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."},"playCount":{"type":"integer","nullable":true,"description":"For `limitedSingleGame` and `package`. Null means unlimited."},"validityKind":{"type":"string","enum":["sameDay","days","untilDate","untilUsed"]},"validityDays":{"type":"integer","nullable":true},"activationKind":{"type":"string","enum":["onPurchase","onFirstUse","onDate"],"default":"onFirstUse","description":"**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"},"dailyPlayCap":{"type":"integer","nullable":true},"cooldownMinutes":{"type":"integer","nullable":true,"description":"**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"},"linkedProductId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
-"GameplayAuthorisation": {"type":"object","x-ticvai-persistence":"games.authorisation","description":"Board 4.9. **The refusal reason is the product.**","properties":{"id":{"type":"string","format":"uuid"},"decision":{"type":"string","enum":["allow","refuse"]},"reason":{"type":"string","nullable":true,"enum":["ok","cardNotFound","cardExpired","cardBlocked","retapTooSoon","heightRestriction","ageRestriction","insufficientFunds","entitlementExhausted","entitlementNotValidHere","cooldownActive","dailyCapReached","readerNotConfigured","gameUnavailable"]},"guestMessage":{"type":"string","nullable":true,"description":"***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"},"chargedFrom":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementId":{"type":"string","format":"uuid","nullable":true},"remainingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"remainingPlays":{"type":"integer","nullable":true},"trace":{"type":"array","items":{"type":"object","properties":{"check":{"type":"string"},"passed":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"decidedOffline":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
+"GameEntitlement": {"type":"object","x-ticvai-persistence":"games.entitlement","description":"Board 4. **A right to play, not money** — consumed before money is.","required":["code","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["allGamesPass","unlimitedSingleGame","limitedSingleGame","package","freePlay"]},"gameIds":{"type":"array","items":{"type":"string","format":"uuid"}},"attractionTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"includesGamesAddedLater":{"type":"boolean","default":true,"description":"**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."},"playCount":{"type":"integer","nullable":true,"description":"For `limitedSingleGame` and `package`. Null means unlimited."},"validityKind":{"type":"string","enum":["sameDay","days","untilDate","untilUsed"]},"validityDays":{"type":"integer","nullable":true},"activationKind":{"type":"string","enum":["onPurchase","onFirstUse","onDate"],"default":"onFirstUse","description":"**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"},"dailyPlayCap":{"type":"integer","nullable":true},"cooldownMinutes":{"type":"integer","nullable":true,"description":"**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"},"linkedProductId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"GameplayAuthorisation": {"type":"object","x-ticvai-persistence":"games.authorisation","description":"Board 4.9. **The refusal reason is the product.**","properties":{"id":{"type":"string","format":"uuid"},"decision":{"type":"string","enum":["allow","refuse"]},"reason":{"type":"string","nullable":true,"enum":["ok","cardNotFound","cardExpired","cardBlocked","retapTooSoon","heightRestriction","ageRestriction","insufficientFunds","entitlementExhausted","entitlementNotValidHere","cooldownActive","dailyCapReached","readerNotConfigured","gameUnavailable"]},"guestMessage":{"type":"string","nullable":true,"description":"***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"},"chargedFrom":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementId":{"type":"string","format":"uuid","nullable":true},"remainingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"remainingPlays":{"type":"integer","nullable":true},"trace":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"check":{"type":"string"},"passed":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"decidedOffline":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "GameplayAuthorisationRequest": {"type":"object","required":["readerId"],"properties":{"readerId":{"type":"string","format":"uuid"},"cardId":{"type":"string","format":"uuid","nullable":true},"credentialIdentifier":{"type":"string","nullable":true},"gameId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time","nullable":true},"guestHeightCm":{"type":"integer","nullable":true},"offline":{"type":"boolean","default":false}}},
 "GameplayTransaction": {"type":"object","x-ticvai-persistence":"games.gameplay_transaction","description":"Boards 8.2 and 8.5. **The refused ones are the valuable half.**","properties":{"id":{"type":"string","format":"uuid"},"readerId":{"type":"string","format":"uuid"},"gameId":{"type":"string","format":"uuid","nullable":true},"cardId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time"},"outcome":{"type":"string","enum":["allowed","refused","reversed"]},"reason":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargedFrom":{"type":"string","nullable":true},"entitlementId":{"type":"string","format":"uuid","nullable":true},"ticketsEarned":{"type":"integer","nullable":true},"decidedOffline":{"type":"boolean","default":false},"syncedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
 "GameplayValidationRules": {"type":"object","x-ticvai-persistence":"games.validation_rules","description":"Boards 4.2 and 4.3. **Must be an answer, stated once**, rather than whatever the firmware happens to do.\n","properties":{"deductionOrder":{"type":"array","items":{"type":"string","enum":["entitlement","freePlay","bonusCredit","promotionalCredit","gameCredit","cashCredit","directPay"]}},"checkOrder":{"type":"array","items":{"type":"string","enum":["cardValid","cardNotExpired","cardNotBlocked","restrictionsMet","retapWindow","entitlementAvailable","fundsSufficient"]}},"allowPartialEntitlement":{"type":"boolean","default":false,"description":"**Whether an entitlement covering part of the price may be topped up with credit.** Usually no, because a guest who thinks they have a pass does not expect a charge.\n"},"refuseBelowBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"offlineDecisionAllowed":{"type":"boolean","default":true},"offlineMaximumValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"scopePath":{"type":"string"}}}

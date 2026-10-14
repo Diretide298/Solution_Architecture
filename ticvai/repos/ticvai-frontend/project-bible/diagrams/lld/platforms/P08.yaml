@@ -61,7 +61,7 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 531
 - service: TenancyService
-  operationCalls: 496
+  operationCalls: 497
 - service: OrderService
   operationCalls: 424
 - service: AccessService
@@ -71,15 +71,15 @@ servicesCalled:
 - service: WalletService
   operationCalls: 222
 - service: AiService
-  operationCalls: 117
+  operationCalls: 119
 - service: PlatformService
-  operationCalls: 98
+  operationCalls: 106
 - service: FnbService
   operationCalls: 95
-- service: LedgerService
-  operationCalls: 90
 - service: ReportingService
-  operationCalls: 88
+  operationCalls: 91
+- service: LedgerService
+  operationCalls: 91
 - service: InventoryService
   operationCalls: 82
 - service: IdentityService
@@ -4094,6 +4094,7 @@ screens:
   density: compact
   operations:
   - createCampaign
+  - getReportExecution
   - listCampaigns
   - listSegments
   - runReport
@@ -4107,6 +4108,7 @@ screens:
   entryParams:
   - venueId<-session
   - reportId<-deepLink
+  - executionId<-navigation
   goesTo:
   - BO-102
   - BO-126
@@ -15749,6 +15751,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getGoLiveReadiness
   - runGoLiveValidation
   states:
   - emptyFirstRun
@@ -15825,6 +15828,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getGoLiveReadiness
   - runGoLiveValidation
   states:
   - emptyFirstRun
@@ -15847,6 +15851,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getGoLiveReadiness
   - runGoLiveValidation
   states:
   - emptyFirstRun
@@ -15869,6 +15874,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getGoLiveReadiness
   - runGoLiveValidation
   states:
   - emptyFirstRun
@@ -15891,6 +15897,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getGoLiveReadiness
   - runGoLiveValidation
   states:
   - emptyFirstRun
@@ -15913,6 +15920,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getGoLiveReadiness
   - runGoLiveValidation
   states:
   - emptyFirstRun
@@ -15935,6 +15943,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getGoLiveReadiness
   - runGoLiveValidation
   states:
   - emptyFirstRun
@@ -15957,6 +15966,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getGoLiveReadiness
   - runGoLiveValidation
   states:
   - emptyFirstRun
@@ -19607,6 +19617,7 @@ screens:
   operations:
   - createSegment
   - decideProposedAction
+  - listProposedActions
   - previewSegment
   - proposeLookalikeSegment
   states:
@@ -20373,6 +20384,7 @@ screens:
   density: compact
   operations:
   - decideProposedAction
+  - listProposedActions
   - proposeMarketingContent
   - proposeTranslations
   states:
@@ -26878,6 +26890,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getReportExecution
   - getSeatInventory
   - runReport
   states:
@@ -26889,6 +26902,7 @@ screens:
   offlineState: false
   entryParams:
   - reportId<-navigation
+  - executionId<-navigation
   goesTo:
   - BO-1051
   boardFrames: null
@@ -26904,6 +26918,7 @@ screens:
   operations:
   - createReport
   - exportReportResult
+  - getReportExport
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -26913,6 +26928,7 @@ screens:
   offlineState: false
   entryParams:
   - executionId<-navigation
+  - exportId<-navigation
   goesTo:
   - BO-1051
   boardFrames: null
@@ -27119,6 +27135,7 @@ screens:
   density: compact
   operations:
   - deployConfigurationProfile
+  - listProfileDeployments
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -37986,6 +38003,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getSettlement
   - ingestSettlementFile
   - listReconciliationSources
   - setReconciliationSource
@@ -37996,7 +38014,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - settlementId<-navigation
   goesTo:
   - ADM-619
   - BO-100

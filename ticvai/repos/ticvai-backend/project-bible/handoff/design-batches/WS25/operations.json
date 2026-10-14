@@ -37,25 +37,6 @@
   "requestBody": null,
   "responds": "MediaAsset"
  },
- "configureAssistantProfile": {
-  "method": "PUT",
-  "path": "/assistant-profiles/{profileKey}",
-  "contract": "ai",
-  "summary": "Define an assistant profile",
-  "permission": "AI_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AiAssistantProfile",
-  "responds": "AiAssistantProfile"
- },
  "createCase": {
   "method": "POST",
   "path": "/cases",
@@ -538,7 +519,7 @@
  },
  "setOrderBookingTicket": {
   "method": "PUT",
-  "path": "/order-booking-ticket",
+  "path": "/order-booking-ticket/{serviceActionId}",
   "contract": "marketing-crm",
   "summary": "Evaluate or perform a service action on an order from a case",
   "permission": "CASE_MANAGE",
@@ -546,6 +527,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "serviceActionId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -557,7 +543,7 @@
  },
  "setRefundCompensationService": {
   "method": "PUT",
-  "path": "/refund-compensation-service",
+  "path": "/refund-compensation-service/{compensationRequestId}",
   "contract": "marketing-crm",
   "summary": "Raise or change a refund, compensation or policy-exception request on a case",
   "permission": "ORDER_REFUND",
@@ -565,6 +551,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "compensationRequestId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -580,7 +571,7 @@
   "contract": "marketing-crm",
   "summary": "Assign, reprioritise or resolve a case",
   "permission": "CASE_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

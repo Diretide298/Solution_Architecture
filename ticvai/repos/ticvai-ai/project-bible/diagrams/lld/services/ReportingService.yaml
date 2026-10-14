@@ -372,7 +372,7 @@ operationsByContract:
     writes: 8
   - operation: setAlertRule
     verb: PUT
-    path: /alert-rules
+    path: /alert-rules/{alertRuleId}
     scope: venue
     permission: REPORT_MANAGE
     offline: false
@@ -508,7 +508,7 @@ tables:
   - reporting
   foreignWriters: null
 - table: reporting.anomaly
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy: []
@@ -637,7 +637,7 @@ tables:
   - reporting
   foreignWriters: null
 - table: reporting.semantic_model
-  columns: 4
+  columns: 6
   store: postgres
   parent: null
   writtenBy:
@@ -651,7 +651,7 @@ tables:
   - reporting
   foreignWriters: null
 - table: reporting.subscription
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -704,7 +704,6 @@ screens:
 - P06:EMP-008 Shift summary
 - P06:EMP-020 AI assistant — answer
 - P06:EMP-060 Reservation & Table Performance
-- P06:EMP-061 Retail Inventory Command Center
 - P06:EMP-070 Inventory Exceptions, AI Replenishment & Action Center
 - P08:BO-005 Queue Monitor
 - P08:BO-010 Promotions & Coupons
@@ -798,9 +797,7 @@ screens:
 - P16:ANL-053 AI-Generated Dashboard Studio
 - P16:ANL-054 AI Report Generator
 - P16:ANL-056 Root-Cause Analysis Explorer
-- P16:ANL-057 Forecasting & Predictive Analytics Studio
 - P16:ANL-058 AI Recommendation & Next-Best-Action Center
-- P16:ANL-059 AI Insight History, Evidence & Explainability
 - P16:ANL-061 BI & Analytics Administration Command Center
 - P16:ANL-062 Enterprise KPI Library
 - P16:ANL-063 KPI Targets, Thresholds & Scorecards

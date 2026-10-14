@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Tenancy & Organisation
   version: 1.0.0
-  x-ticvai-screen-count: 47
+  x-ticvai-screen-count: 48
   x-ticvai-tier: spine
   x-ticvai-module: "Cross-cutting — organisation hierarchy"
   x-ticvai-capabilities: [C95, C20]
@@ -104,6 +104,193 @@ tags:
   - name: devices
   - name: tenancy
 
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  deadLetterRecords:
+    module: tenancy
+    table: platform.dead_letter
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.dead_letter rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A platform.dead_letter row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its platform.dead_letter rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  denominationRecords:
+    module: tenancy
+    table: platform.denomination
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.denomination rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A platform.denomination row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its platform.denomination rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Tenancy implements.
+    served: [in-process]
+  deviceRecords:
+    module: tenancy
+    table: platform.device
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.device rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/DeviceBinding'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its platform.device rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  outboxRecords:
+    module: tenancy
+    table: platform.outbox
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.outbox rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A platform.outbox row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its platform.outbox rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  outletRecords:
+    module: tenancy
+    table: platform.outlet
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.outlet rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Outlet'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its platform.outlet rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  regionSettingsRecords:
+    module: tenancy
+    table: platform.region_settings
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.region_settings rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/RegionSettings'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its platform.region_settings rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Tenancy implements, and asked from another
+      deployable through Tenancy's service route (serviceAuth).
+    served: [in-process, service]
+  tenantRecords:
+    module: tenancy
+    table: platform.tenant
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.tenant rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {type: object, description: 'A platform.tenant row: the columns handoff/schema-reference.json lists for it.'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its platform.tenant rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  venueSettingsRecords:
+    module: tenancy
+    table: platform.venue_settings
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.venue_settings rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/VenueSettings'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its platform.venue_settings rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Tenancy implements.
+    served: [in-process]
+  workstationRecords:
+    module: tenancy
+    table: platform.workstation
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The platform.workstation rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Workstation'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its platform.workstation rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Tenancy implements, and asked from another
+      deployable through Tenancy's service route (serviceAuth).
+    served: [in-process, service]
+  dataRetentionSettingRecords:
+    module: tenancy
+    table: tenancy.data_retention_setting
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The tenancy.data_retention_setting rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/TenantDataRetentionSetting'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its tenancy.data_retention_setting rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
 paths:
   /tenant-domains/{hostname}:
     parameters:
@@ -116,6 +303,10 @@ paths:
         maxLength: 253
     get:
       operationId: resolveTenantHost
+      x-ticvai-read-via:
+      - query: platform-ops#tenantDomainRecords
+        route: service
+        for: 'its read of control.tenant_domain, Platform''s data (CHG-MOD-001)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -163,6 +354,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTenantDomainMapping
+      x-ticvai-read-via:
+      - query: platform-ops#tenantDomainRecords
+        route: service
+        for: 'its read of control.tenant_domain, Platform''s data (CHG-MOD-001)'
+      - query: subscription#tenantRecords
+        route: service
+        for: 'its read of control.tenant, Platform''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: control.tenant_domain
         event: tenantDomain.mapped
@@ -234,6 +432,7 @@ paths:
         - "P09 ADM-412 Payment Method & Settlement Setup"
         - "P09 ADM-421 Venue & Operational Structure Creation"
         - "P13 CMS-016 Site Settings"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List scope nodes visible to the session
@@ -323,6 +522,10 @@ paths:
         - "P08 BO-503 Product Validation, Approval & Publication"
         - "P09 ADM-004 Platform Audit Log"
         - "P16 ANL-070 Analytics Governance, Security & Audit Center"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       summary: Who did what, where, and when
       description: >
         POS board 1 and 4, 24 August. **`platform.audit_record` existed and nothing read it** —
@@ -346,6 +549,8 @@ paths:
         fields this operation filters on, and the list is the shared `Page`. **Gated by
         `AUDIT_VIEW`, not `AI_AUDIT_VIEW`**: this is the platform trail of every principal's
         actions, and the AI key covers only what an assistant did.
+
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.
       tags: [tenancy]
       x-ticvai-permission: AUDIT_VIEW
       x-ticvai-audience: [staff]
@@ -414,6 +619,16 @@ paths:
       operationId: setRolePermissions
       x-ticvai-consumed-by:
         - "P08 BO-054 Role Assignment"
+      x-ticvai-read-via:
+      - query: identity#rolePermissionRecords
+        route: in-process
+        for: 'its read of identity.role_permission, Identity''s data (CHG-MOD-001)'
+      - query: identity#roleRecords
+        route: in-process
+        for: 'its read of identity.role, Identity''s data (CHG-MOD-001)'
+      - query: identity#segregationRuleRecords
+        route: in-process
+        for: 'its read of identity.segregation_rule, Identity''s data (CHG-MOD-001)'
       summary: What this role may do
       description: >
         POS board 4B. **`Role.permissions` was added on 20 August after Hrushikant found
@@ -569,6 +784,8 @@ paths:
 
         One row per profile, at its latest version. Earlier versions are read one at a time
         through `getConfigurationProfile` with `version`.
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.
       tags: [tenancy]
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-scope-level: tenant
@@ -598,6 +815,41 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+
+  /configuration-profiles/{profileId}:
+    parameters:
+      - name: profileId
+        in: path
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      operationId: getConfigurationProfile
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: One profile, at its latest version or at a named one
+      description: >
+        26 September, pull audit R206. **A workstation still running v2.3 must be able to say what
+        v2.3 was** — the contract promised that and had no read that could answer it. `version`
+        omitted returns the latest.
+      tags: [tenancy]
+      x-ticvai-permission: TENANT_CONFIGURE
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+        - name: version
+          in: query
+          schema: { type: integer, minimum: 1 }
+      responses:
+        '200':
+          description: The profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConfigurationProfile' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setConfigurationProfile
       x-ticvai-consumed-by:
@@ -662,44 +914,11 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
-  /configuration-profiles/{profileId}:
-    parameters:
-      - name: profileId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
-    get:
-      operationId: getConfigurationProfile
-      x-ticvai-audience: [staff]
-      x-ticvai-read-routing: replica
-      summary: One profile, at its latest version or at a named one
-      description: >
-        26 September, pull audit R206. **A workstation still running v2.3 must be able to say what
-        v2.3 was** — the contract promised that and had no read that could answer it. `version`
-        omitted returns the latest.
-      tags: [tenancy]
-      x-ticvai-permission: TENANT_CONFIGURE
-      x-ticvai-scope-level: tenant
-      x-ticvai-offline-capable: false
-      x-ticvai-conflict-policy: serverWins
-      parameters:
-        - name: version
-          in: query
-          schema: { type: integer, minimum: 1 }
-      responses:
-        '200':
-          description: The profile
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/ConfigurationProfile' }
-        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
-        '429':
-          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-
   /profile-deployments:
     get:
       operationId: listProfileDeployments
+      x-ticvai-consumed-by:
+        - "P08 BO-1068 Lifecycle & Environment Promotion"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Recent deployments, with a date, a target and an outcome
@@ -795,6 +1014,7 @@ paths:
             X-Consistency-Token: { $ref: '../shared/common.yaml#/components/headers/ConsistencyToken' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
+          x-ticvai-problem-types: [profile-version-draft, profile-version-not-found]
           description: >
             **The named version is not deployable** — it is still a `draft`, or this profile has no
             such version. Names the version and its status.
@@ -848,6 +1068,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-130 Offline Policy & Rules Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: What a workstation may do with no network, and for how long
       description: >
         Board 5 of the client's POS set, and **one of only two things in 36 board screens the package
@@ -938,6 +1160,8 @@ paths:
       operationId: setConnectivityThresholds
       x-ticvai-consumed-by:
         - "P08 BO-131 Connectivity & Auto-Switch Settings"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: When a workstation decides it is offline, and when it is back
       description: >
         Board 5 of the client's POS set, and the second genuine gap. **Nothing held a threshold**, so
@@ -1052,6 +1276,10 @@ paths:
         - "P08 BO-136 F&B Global Settings & Controls"
         - "P08 BO-187 Biometric Consent & Guardian Management"
         - "P08 BO-600 Venue, Calendar & Operational Setup"
+      x-ticvai-read-via:
+      - query: access#accessPointRecords
+        route: service
+        for: 'its read of access.access_point, Access''s data (CHG-MOD-001)'
       summary: Set support hours, quiet hours, segregated access and alerting
       description: >
         **The four things a venue answers and no other level can** (CF-100, CF-130, CF-134).
@@ -1159,6 +1387,8 @@ paths:
         - "P08 BO-1062 Tenant & Brand Context"
         - "P09 ADM-019 Global Configuration & Defaults"
         - "P09 ADM-426 Initial Configuration & Regional Defaults"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience: [staff]
       summary: Set the tenant's default for every venue setting
       description: >
@@ -1382,6 +1612,7 @@ paths:
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-129 Software, Configuration & Version Management"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List workstations
@@ -1938,6 +2169,7 @@ paths:
         - "P08 BO-405 Reader Directory"
         - "P08 BO-732 POS & Device Assignment"
         - "P16 ANL-003 Operational Performance"
+      x-ticvai-names-for-context: [access.device_placement]
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List registered devices
@@ -1955,6 +2187,8 @@ paths:
 
         **`pushToken` is never in a row** (pull audit R164). It is `writeOnly`: a push token is a
         credential, and a list at venue level is not where a credential is read back.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
       tags: [workstation]
       x-ticvai-permission: DEVICE_VIEW
       x-ticvai-scope-level: venue
@@ -2038,6 +2272,7 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
+          x-ticvai-problem-types: [identifier-bound-to-other-workstation, duplicate-serial]
           description: >
             Identifier already bound to another workstation, or `serialNumber` already registered in
             the tenant (`duplicate-serial`, moved here from access with the register, ADR-0067).
@@ -2045,6 +2280,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [workstation-id-required, workstation-id-not-allowed]
           description: >
             `workstationId` missing for a kind other than `mobileHandset`, or given for a
             `mobileHandset` (18.1.5).
@@ -2504,6 +2740,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-587 Terminal Health, Maintenance & Incident Center"
         - "P08 BO-129 Software, Configuration & Version Management"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: re-trace 16.6.30 and 16.6.33 (nothing wrote the table the rollout
         references); our build plan; shape follows startDeviceFirmwareRollout'
       summary: Register a firmware or software release before it is deployed
@@ -2552,6 +2792,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: A release with this `deviceKind` and `version` already exists
           content:
             application/problem+json:
@@ -2651,6 +2892,7 @@ paths:
                   - deprecated
                   - withdrawn
                 reason:
+                  x-ticvai-stored-as: tenancy.device_firmware.status_reason
                   type: string
                   maxLength: 500
                   description: Required with `deprecated` and `withdrawn`.
@@ -2667,6 +2909,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [firmware-transition-not-allowed]
           description: The move is not allowed from the release's current status (back to `draft`, out
             of `withdrawn`, or `deprecated` before `released`)
           content:
@@ -2674,6 +2917,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [reason-required]
           description: '`deprecated` or `withdrawn` without a `reason`.'
           content:
             application/problem+json:
@@ -2729,6 +2973,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [firmware-not-released]
           description: The firmware named by `firmwareId` is not `released`
           content:
             application/problem+json:
@@ -2798,6 +3043,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [previous-version-not-retained]
           description: The rollout kept no previous image (`previousVersionRetained` false), so there
             is nothing to roll back to
           content:
@@ -3022,7 +3268,6 @@ paths:
         - "P08 ADM-346 Approval Record Retention Policy"
         - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
         - "P08 BO-751 Retention & Anonymization"
-        - "P09 ADM-524 AI Data Access & Usage Policy"
         - "P16 ANL-050 Retention, Archive & Governance Policy"
       x-ticvai-agreed: '29 September: decided by Chinmay (all data retention is tenant configuration, one
         setting per data class); AI system design section 8 decision 5; ADR-0047; shape follows listDevices'
@@ -3036,7 +3281,9 @@ paths:
         from (`anchor`), what happens at expiry, and — where law sets a limit — the limit and its basis.
         See `TenantDataRetentionClass` for the classes and their defaults.
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - tenancy
       x-ticvai-permission: TENANT_VIEW
@@ -3083,7 +3330,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-346 Approval Record Retention Policy"
         - "P08 BO-751 Retention & Anonymization"
-        - "P09 ADM-524 AI Data Access & Usage Policy"
         - "P16 ANL-050 Retention, Archive & Governance Policy"
       x-ticvai-agreed: '29 September: decided by Chinmay (all data retention moves to tenant
         configuration, one setting per data class; the tenant may set longer or shorter, and only a legal
@@ -3151,6 +3397,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [period-below-legal-minimum, period-above-legal-maximum, period-not-settable-for-class, follows-data-class-loop]
           description: A period below the class's legal minimum or above its legal maximum, a period sent
             for `aiMetadataIndex`, or a `followsDataClass` chain that loops
           content:
@@ -3564,6 +3811,7 @@ components:
           maxLength: 253
           x-ticvai-unique: tenant
         tenantId:
+          readOnly: true
           type: string
           format: uuid
           x-ticvai-references: control.tenant
@@ -3841,6 +4089,7 @@ components:
         deviceKind:
           type: string
         version:
+          readOnly: true
           type: string
         vendor:
           type: string
@@ -3908,6 +4157,7 @@ components:
           format: uuid
           readOnly: true
         firmwareId:
+          x-ticvai-references: tenancy.device_firmware
           type: string
           format: uuid
         targetScopePath:
@@ -3919,6 +4169,8 @@ components:
             type: string
             format: uuid
         waves:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**A canary first.** Gate hardware failing across a venue at once is an
             evacuation problem rather than an IT one.
@@ -4073,6 +4325,7 @@ components:
           format: uuid
           readOnly: true
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           format: uuid
         kind:
@@ -4107,6 +4360,12 @@ components:
         scopePath:
           type: string
           readOnly: true
+        recordedAt:
+          type: string
+          format: date-time
+          description: '**When the device made the write** (R113; CHG-OFL-003). `recordDeviceTamperEvent` is offline-capable, so
+            the client sets this from its own clock and keeps it on replay; `created_at` is when the server
+            heard of it. Omitted online, the server sets it to the time it received the call.'
     OutletKind:
       type: string
       enum: [shop, restaurant, bar, cafe, kiosk, gameFloor, ticketOffice, mobile]
@@ -4174,7 +4433,7 @@ components:
         only reason to version a profile at all.
       required: [id, name, venueKindScope, version, status]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         name: { type: string }
         scopePath: { type: string }
         venueKindScope:
@@ -4217,11 +4476,13 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         profileId:
+          x-ticvai-references: platform.configuration_profile
           type: string
           format: uuid
           readOnly: true
           description: Taken from the path of `deployConfigurationProfile`.
         version:
+          readOnly: true
           type: integer
           description: The published version to deploy.
         targetWorkstationIds: { type: array, items: { type: string, format: uuid } }
@@ -4271,6 +4532,7 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         scopePath:
+          readOnly: true
           type: string
           pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
           description: >
@@ -4334,6 +4596,7 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         scopePath:
+          readOnly: true
           type: string
           pattern: '^[a-z0-9_]+(\.[a-z0-9_]+)*$'
           description: >
@@ -4591,6 +4854,7 @@ components:
                       on the till channel, or past its `onSaleTo`).
 
     RegisteredDevice:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by approveDevice, configureWorkstation, enrolDevice, getDevice and others
       x-ticvai-persistence: "platform.device"
       type: object
       description: >
@@ -4602,8 +4866,12 @@ components:
         versions, health and lifecycle, is now `access.device_placement` and holds only where an
         access-control device is placed. Tenancy owns and migrates this table; Access reads it only
         through this contract.
-      required: [id, kind, driver]
+      required: [id, kind, driver, scopePath]
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id: { type: string, format: uuid, readOnly: true }
         kind: { $ref: '#/components/schemas/DeviceKind' }
         driver:
@@ -4637,6 +4905,7 @@ components:
             The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the
             library; this names a model in it.
         serialNumber:
+          x-ticvai-unique: tenant
           type: string
           nullable: true
           maxLength: 100
@@ -4682,6 +4951,7 @@ components:
           readOnly: true
           description: Reported connectivity.
         pushToken:
+          x-ticvai-secret: field-encrypted
           type: string
           format: password
           nullable: true
@@ -5018,6 +5288,7 @@ components:
 
 
     VenueSettings:
+      x-ticvai-retired-columns: [org_unit_id]
       type: object
       x-ticvai-persistence: "platform.venue_settings"
       description: >
@@ -5994,6 +6265,7 @@ components:
             When true, the workstation refuses to open a shift if the device is absent.
 
     Workstation:
+      x-ticvai-retired-columns: [org_unit_id]
       x-ticvai-persistence: "platform.workstation"
       type: object
       required: [id, code, name, venueId, regionId, scopePath, saleBoard, currency, currencyScale, timeZone]

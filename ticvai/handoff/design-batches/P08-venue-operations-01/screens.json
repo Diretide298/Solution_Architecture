@@ -5,11 +5,12 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "DEVICE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/device-registry",
-   "component": "apps/venue-management-web/src/routes/venue-operations/DeviceRegistryDetail.tsx",
+   "component": "src/routes/venue-operations/DeviceRegistryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -324,7 +325,7 @@
    {
     "operationId": "getWorkstationHealth",
     "contract": "tenancy",
-    "purpose": "getWorkstationHealth",
+    "purpose": "A score a manager can sort by, and what is dragging it down",
     "trigger": "onAction"
    },
    {
@@ -430,11 +431,12 @@
   "module": "Venue Operations",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/f-b-outlets",
-   "component": "apps/venue-management-web/src/routes/venue-operations/FBOutletsDetail.tsx",
+   "component": "src/routes/venue-operations/FBOutletsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -768,13 +770,13 @@
    {
     "operationId": "getHaccpStatus",
     "contract": "fnb",
-    "purpose": "getHaccpStatus",
+    "purpose": "Where this venue stands, right now",
     "trigger": "onLoad"
    },
    {
     "operationId": "signCorrectiveAction",
     "contract": "fnb",
-    "purpose": "signCorrectiveAction",
+    "purpose": "Say what was done, and put a name to it",
     "trigger": "onAction",
     "invalidates": [
      "listOutlets"
@@ -1052,11 +1054,12 @@
   "module": "Venue Operations",
   "requiresModule": "analytics",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/reporting-home",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ReportingHomeDetail.tsx",
+   "component": "src/routes/venue-operations/ReportingHomeDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1547,11 +1550,12 @@
   "module": "Venue Operations",
   "requiresModule": "analytics",
   "wave": 2,
+  "permission": "REPORT_VIEW_VENUE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/attendance-footfall",
-   "component": "apps/venue-management-web/src/routes/venue-operations/AttendanceFootfallDetail.tsx",
+   "component": "src/routes/venue-operations/AttendanceFootfallDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2190,11 +2194,12 @@
   "module": "Venue Operations",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/zones-areas",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ZonesAreasDetail.tsx",
+   "component": "src/routes/venue-operations/ZonesAreasDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2604,11 +2609,12 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "DEVELOPER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/integrations",
-   "component": "apps/venue-management-web/src/routes/venue-operations/IntegrationsDetail.tsx",
+   "component": "src/routes/venue-operations/IntegrationsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2801,11 +2807,12 @@
   "module": "Venue Operations",
   "requiresModule": "maintenance",
   "wave": 2,
+  "permission": "WORK_ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/work-orders",
-   "component": "apps/venue-management-web/src/routes/venue-operations/WorkOrdersDetail.tsx",
+   "component": "src/routes/venue-operations/WorkOrdersDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2931,7 +2938,7 @@
      ]
     },
     {
-     "name": "contextPanel",
+     "name": "contextPanelSelection",
      "slot": "selection",
      "components": [
       {
@@ -3380,10 +3387,11 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/home",
-   "component": "apps/venue-management-web/src/routes/home/VenueHomeDashboard.tsx",
+   "component": "src/routes/home/VenueHomeDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -4686,7 +4694,8 @@
        "kind": "metricTile",
        "label": "Open shifts",
        "notes": "Open shifts today, from `listShifts`. **Items needing attention are dropped until a summary operation exists** (decided 28 September, audit R283).",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "getKpiValues"
       },
       {
        "kind": "cardList",
@@ -4834,10 +4843,11 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations",
-   "component": "apps/venue-management-web/src/routes/home/VenueOperationsList.tsx",
+   "component": "src/routes/home/VenueOperationsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -5240,10 +5250,11 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "SCOPE_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/live-workstation-health-monitor",
-   "component": "apps/venue-management-web/src/routes/ops/LiveWorkstationHealthMonitorList.tsx",
+   "component": "src/routes/ops/LiveWorkstationHealthMonitorList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -5383,7 +5394,7 @@
    {
     "operationId": "getWorkstationHealth",
     "contract": "tenancy",
-    "purpose": "getWorkstationHealth",
+    "purpose": "A score a manager can sort by, and what is dragging it down",
     "trigger": "onAction"
    },
    {

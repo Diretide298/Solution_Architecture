@@ -159,6 +159,11 @@ NOT_CONFIG = re.compile(
     # opt-ins a guest ticked at checkout into append-only consent records, one per order, channel and
     # purpose. It is what happened at a checkout, called by the event relay, not a setting anyone holds.
     r"recordCheckoutConsents|"
+    # **`recordConsentIdentifier` is the same case again** (14 October 2026, CHG-XDW-004, CHG-GTE-002): Identity's
+    # service-only write of the IP address and user agent a cookie decision was made from, called by
+    # `recordDeviceConsent` after the decision is recorded. It is what happened at one banner, not a setting anyone
+    # holds; the banner design it obeys (`recordIpAddress`) is the configuration, and that is scoped.
+    r"recordConsentIdentifier|"
     # **`recordDashboardView` is an event, not a setting** (29 September, writers pass): it logs that a
     # person opened a dashboard, for the most-viewed list. It matches `Dashboard`; it configures nothing.
     r"recordDashboardView", re.I)

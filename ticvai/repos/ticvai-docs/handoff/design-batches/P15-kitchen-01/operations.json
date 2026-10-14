@@ -350,7 +350,7 @@
   "contract": "fnb",
   "summary": "The kitchen calls the server to the pass",
   "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -388,7 +388,7 @@
   "contract": "fnb",
   "summary": "Move a ticket up the queue",
   "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

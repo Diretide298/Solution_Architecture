@@ -10,7 +10,7 @@ theTwoVocabularies:
   onOperations: 174
   inRolesYaml: 43
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 174 permission keys across 2633 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 174 permission keys across 2635 operations; `roles.yaml`
     grants 43, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
@@ -30,15 +30,14 @@ apps:
     - P02
     - P05
     screens: 144
-    operations: 230
-    permissions: 24
+    operations: 219
+    permissions: 23
     tiers:
       read:
       - GUEST_VIEW
       - LEDGER_VIEW
       - MARKETING_VIEW
       - ORDER_VIEW
-      - PAYMENT_VIEW
       - PRICE_VIEW
       - PRODUCT_VIEW
       - QUEUE_VIEW
@@ -86,22 +85,22 @@ apps:
     - generateVisitPlan
     - getCart
     - getCookieConsentRuntime
-    - getDeviceConsentHistory
-    - getGameCard
     - getGuestBill
     - getGuestConversation
     - getGuestMenu
     - getGuestOrderStatus
     - getGuestSession
     - getLoyaltyPosition
-    - getMyIdentityVerification
     - getNextTransportDeparture
     - getParkingEntitlement
     - getPublishedBookingFlow
     - getPublishedGuidedChoice
     - getPublishedKioskConfig
     - getPublishedTenantConfig
-    operationsWithNoPermissionCount: 114
+    - getTenantAppStatus
+    - getTransportDeparture
+    - getTransportFareTable
+    operationsWithNoPermissionCount: 106
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -111,8 +110,8 @@ apps:
     - P14
     - P17
     screens: 294
-    operations: 412
-    permissions: 65
+    operations: 400
+    permissions: 64
     tiers:
       read:
       - ACCREDITATION_VIEW
@@ -123,7 +122,6 @@ apps:
       - CASE_VIEW
       - DEVELOPER_VIEW
       - GUEST_VIEW
-      - LEDGER_VIEW
       - ORDER_VIEW
       - PARTNER_VIEW
       - PAYMENT_VIEW
@@ -159,7 +157,7 @@ apps:
       - REPORT_VIEW_VENUE
       - SETTLEMENT_RECONCILE
       configure:
-      - ACCOUNT_CONFIGURE
+      - ACCREDITATION_MANAGE
       - AI_CONFIGURE
       - APPROVAL_CONFIGURE
       - ASSET_LIBRARY_MANAGE
@@ -214,7 +212,7 @@ apps:
     - P13
     - P16
     screens: 1866
-    operations: 2101
+    operations: 2096
     permissions: 149
     tiers:
       read:
@@ -375,7 +373,6 @@ apps:
     - createMfaChallenge
     - enrolMfaMethod
     - getCurrentSession
-    - getGameCard
     - getPublishedBookingFlow
     - getPublishedKioskConfig
     - getTenantAppStatus
@@ -393,7 +390,7 @@ apps:
     - startSsoAuthorization
     - verifyMfaChallenge
     - verifyMfaEnrolment
-    operationsWithNoPermissionCount: 23
+    operationsWithNoPermissionCount: 22
   venue-pos:
     name: TICVAI POS
     platforms:
@@ -464,7 +461,7 @@ apps:
     - P06
     - P07
     screens: 107
-    operations: 232
+    operations: 231
     permissions: 57
     tiers:
       read:

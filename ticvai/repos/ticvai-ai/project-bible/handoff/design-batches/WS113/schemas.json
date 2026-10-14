@@ -117,6 +117,7 @@
     "type": "string"
    },
    "programmeId": {
+    "x-ticvai-references": "accreditation.programme",
     "type": "string",
     "format": "uuid"
    },
@@ -143,6 +144,7 @@
     "description": "Name, date of birth, nationality, contact — shaped by the requirements matrix."
    },
    "requirementStatus": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "items": {
@@ -267,6 +269,7 @@
     "type": "string"
    },
    "assetId": {
+    "x-ticvai-references": "assets.media_asset",
     "type": "string",
     "format": "uuid"
    },
@@ -318,6 +321,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -404,6 +408,20 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "statusEffectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the status `setAccreditationStatus` set takes effect."
+   },
+   "statusReviewAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the status is due for review (`setAccreditationStatus`)."
    }
   }
  },
@@ -421,6 +439,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -441,6 +460,8 @@
     }
    },
    "categories": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

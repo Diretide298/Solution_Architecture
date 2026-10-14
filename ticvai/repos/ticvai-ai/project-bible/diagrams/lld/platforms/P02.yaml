@@ -45,23 +45,23 @@ servicesCalled:
 - service: OrderService
   operationCalls: 70
 - service: MarketingService
-  operationCalls: 62
+  operationCalls: 57
 - service: CatalogueService
-  operationCalls: 58
+  operationCalls: 57
 - service: VenueOpsService
-  operationCalls: 55
-- service: IdentityService
-  operationCalls: 29
+  operationCalls: 53
 - service: AccessService
+  operationCalls: 26
+- service: IdentityService
   operationCalls: 26
 - service: WhiteLabelService
   operationCalls: 22
 - service: FnbService
   operationCalls: 22
 - service: AiService
-  operationCalls: 21
+  operationCalls: 16
 - service: WalletService
-  operationCalls: 9
+  operationCalls: 7
 - service: LedgerService
   operationCalls: 6
 - service: RetailService
@@ -80,7 +80,6 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - decideRecommendations
   - getCookieConsentRuntime
   - getMyProfile
   - getPublishedTenantConfig
@@ -88,8 +87,6 @@ screens:
   - listMyEntitlements
   - listProductCategories
   - listProducts
-  - recordDeviceConsent
-  - recordRecommendationEvents
   - recordStorefrontSessionEvents
   - searchCatalogue
   states:
@@ -482,11 +479,9 @@ screens:
   - getGameCard
   - getWallet
   - getWalletAutoReloadSetting
-  - getWalletExitBalance
   - listPaymentTokens
   - listWalletTransactions
   - setWalletAutoReloadSetting
-  - settleWalletAtExit
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -520,6 +515,7 @@ screens:
   - getEntitlementHistory
   - listEntitlements
   - listMyEntitlements
+  - listTicketTransfers
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -551,6 +547,7 @@ screens:
   - getEntitlement
   - getEntitlementCredential
   - getEntitlementHistory
+  - listTicketTransfers
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -608,13 +605,11 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - createInstalmentPlan
   - getBillingStatement
   - getMyMemberships
   - grantDelegation
   - listBillingStatements
   - listDelegations
-  - listInstalmentPlans
   - listMyPaymentIssues
   - listProducts
   - retryMyDunningPayment
@@ -1128,7 +1123,6 @@ screens:
   - getGuestConversation
   - getGuestOrderStatus
   - handoverToAgent
-  - recordAnswerFeedback
   - sendAiMessage
   - sendGuestConversationMessage
   states:
@@ -1241,14 +1235,12 @@ screens:
   density: comfortable
   operations:
   - createReferral
-  - decideRecommendations
   - getLoyaltyPosition
   - listCustomerBadges
   - listLeaderboard
   - listLoyaltyProgrammes
   - listPromotions
   - listRewards
-  - recordRecommendationEvents
   - redeemLoyaltyPoints
   - setLeaderboardNickname
   states:
@@ -1351,7 +1343,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - subjectId<-GST-001
+  - subjectId<-session
   goesTo:
   - GST-001
   - GST-002
@@ -1406,6 +1398,7 @@ screens:
   - applyCartPromoCode
   - checkoutCart
   - claimCart
+  - createCart
   - extendCart
   - getCart
   - getPerformance
@@ -1696,7 +1689,6 @@ screens:
   operations:
   - generateVisitPlan
   - getTenantAppStatus
-  - getWaitTimes
   - listProducts
   states:
   - emptyFirstRun
@@ -1752,10 +1744,8 @@ screens:
   density: comfortable
   operations:
   - bookVisitPlan
-  - getCart
   - getVisitPlan
   - getWaitTimes
-  - listProducts
   - listVisitPlanAlternatives
   - updateVisitPlan
   states:
@@ -2065,13 +2055,9 @@ screens:
   operations:
   - deleteGuestAccount
   - exportSubjectData
-  - getCookieConsentRuntime
-  - getDeviceConsentHistory
   - getGuestConsents
   - listConsentPurposes
-  - listPublishedTrackingTechnologies
   - recordConsent
-  - recordDeviceConsent
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2273,17 +2259,14 @@ screens:
   wave: 1
   density: comfortable
   operations:
-  - createMfaChallenge
   - enrolMfaMethod
   - getGuestSession
   - guestLogout
   - listGuestDevices
   - listMfaMethods
   - registerGuestDevice
-  - removeMfaMethod
   - revokeGuestDevice
   - verifyGuestEmail
-  - verifyMfaChallenge
   - verifyMfaEnrolment
   states:
   - emptyFirstRun
@@ -2407,7 +2390,6 @@ screens:
   - addCartLine
   - getTransportDeparture
   - getTransportFareTable
-  - getTransportRoute
   - getTransportRouteMap
   - quoteTransportFare
   - saveFavouriteRoute

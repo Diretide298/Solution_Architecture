@@ -1,6 +1,6 @@
 # WS66 — Unified BI Reporting and AI Analytics Platform board 1
 
-**9 screens · 10 operations · 23 schemas · 4 permissions**
+**9 screens · 9 operations · 19 schemas · 4 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -147,15 +147,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-012` | Live Operations Dashboard | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-012` | Live Operations Dashboard | D | 0 | 196 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-013` | Revenue Pulse | D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-014` | Attendance & Footfall Intelligence | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-015` | Capacity & Utilization Monitor | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-016` | Sales & Channel Performance | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-014` | Attendance & Footfall Intelligence | D | 0 | 210 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-015` | Capacity & Utilization Monitor | D | 0 | 112 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-016` | Sales & Channel Performance | D | 0 | 168 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ANL-017` | Customer, Membership & Loyalty Pulse | D | 2 | 30 | 6 | 0 | 2 | 2 | — | notStarted (—) |
 | `ANL-018` | Alerts & Exception Center | C | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-019` | AI Management Insights | D | 11 | 41 | 6 | 3 | 2 | 0 | — | notStarted (—) |
-| `ANL-020` | Multi-Site & Performance Comparison | D | 3 | 6 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-020` | Multi-Site & Performance Comparison | D | 3 | 90 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -212,11 +212,6 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Interval | radio group | — | Hour · Day · Week · Month | `getKpiValues` ?interval |
 | Group by | text field | — | — | `getKpiValues` ?groupBy |
 | Module | select | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | `getKpiValues` ?module |
-| Status | radio group | — | Raised · Acknowledged · Resolved · Expired | `listAlerts` ?status |
-| Severity | segmented control | — | Info · Warning · Critical | `listAlerts` ?severity |
-| Workstation | picker: choose a workstation | — | — | `listAlerts` ?workstationId |
-| Shift | picker: choose a shift | — | — | `listAlerts` ?shiftId |
-| Item | picker: choose an item | — | — | `listAlerts` ?itemId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -228,33 +223,271 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Visitors currently on-site** (metric tile)
+**Visitors currently on-site** (metric tile, from `getKpiValues`)
 
-**Entries today** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Exits today** (metric tile)
+**Entries today** (metric tile, from `getKpiValues`)
 
-**Current occupancy** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Capacity remaining** (metric tile)
+**Exits today** (metric tile, from `getKpiValues`)
 
-**Occupancy %** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Active gates** (metric tile)
+**Current occupancy** (metric tile, from `getKpiValues`)
 
-**Gate status** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Active POS terminals** (metric tile)
+**Capacity remaining** (metric tile, from `getKpiValues`)
 
-**Active sessions/timeslots** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Current queues** (metric tile)
+**Occupancy %** (metric tile, from `getKpiValues`)
 
-**Resource utilization** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Operational incidents** (metric tile)
+**Active gates** (metric tile, from `getKpiValues`)
 
-**System/device exceptions** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Gate status** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Active POS terminals** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Active sessions/timeslots** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Current queues** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Resource utilization** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Operational incidents** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**System/device exceptions** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -269,7 +502,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - **open a gate, occupancy or device tile**: Drill-through to the live access, occupancy or device screen with the venue carried; incidents open the alert centre. *(source: MATRIX 2.12.1 / MATRIX 16.9.58 / MATRIX 8.9.10 / MATRIX 8.7.28)*
 - **Presentation mode**: Full screen, large type, simplified controls, auto-refresh; for the control-room wall. *(source: MATRIX 8.7.23)*
 
-**Data it reads**: `getKpiValues` (onLoad, Live operational KPIs); `listAlerts` (onLoad, What needs attention)
+**Data it reads**: `getKpiValues` (onLoad, Live operational KPIs)
 
 **Where the user goes next**
 
@@ -317,9 +550,10 @@ incidents: 2 open · 1 device exception (Kiosk 4 printer)
 #### Permissions
 
 - `getKpiValues` → `REPORT_VIEW_VENUE` (operate) · staff
-- `listAlerts` → `REPORT_VIEW_VENUE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_VENUE`
 
 #### Requirements it meets
 
@@ -347,7 +581,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (196 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-012?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
@@ -573,6 +807,8 @@ byPayment: Card AED 1,986,400.00 · Cash AED 402,115.50 · Wallet AED 210,300.00
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -659,35 +895,290 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Total Visitors** (metric tile)
+**Total Visitors** (metric tile, from `getKpiValues`)
 
-**Current Visitors On-Site** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Entry Count** (metric tile)
+**Current Visitors On-Site** (metric tile, from `getKpiValues`)
 
-**Exit Count** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Hourly Footfall** (metric tile)
+**Entry Count** (metric tile, from `getKpiValues`)
 
-**Peak Entry Time** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Average Visit Duration** (metric tile)
+**Exit Count** (metric tile, from `getKpiValues`)
 
-**Attendance by Site** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Attendance by Attraction** (metric tile)
+**Hourly Footfall** (metric tile, from `getKpiValues`)
 
-**Attendance by Ticket Type** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Attendance by Product** (metric tile)
+**Peak Entry Time** (metric tile, from `getKpiValues`)
 
-**Attendance by Timeslot** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Repeat Visits** (metric tile)
+**Average Visit Duration** (metric tile, from `getKpiValues`)
 
-**No-Show %** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Ticketed vs Actual Attendance** (metric tile)
+**Attendance by Site** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Attendance by Attraction** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Attendance by Ticket Type** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Attendance by Product** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Attendance by Timeslot** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Repeat Visits** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**No-Show %** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Ticketed vs Actual Attendance** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -751,6 +1242,8 @@ forecast: Forecast Thu 01 Oct 8,900 (likely 8,100 – 9,650)
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -777,7 +1270,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (210 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-014?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
@@ -840,21 +1333,157 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Available Capacity** (metric tile)
+**Available Capacity** (metric tile, from `getKpiValues`)
 
-**Booked Capacity** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Used Capacity** (metric tile)
+**Booked Capacity** (metric tile, from `getKpiValues`)
 
-**Remaining Capacity** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Utilization %** (metric tile)
+**Used Capacity** (metric tile, from `getKpiValues`)
 
-**No-Show %** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Peak Utilization** (metric tile)
+**Remaining Capacity** (metric tile, from `getKpiValues`)
 
-**Forecast Utilization** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Utilization %** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**No-Show %** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Peak Utilization** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Forecast Utilization** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -915,6 +1544,8 @@ forecast: Forecast utilisation Sat 89% (likely 84% – 93%)
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -942,7 +1573,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (112 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
@@ -1010,29 +1641,233 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Gross Sales** (metric tile)
+**Gross Sales** (metric tile, from `getKpiValues`)
 
-**Net Sales** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Transactions** (metric tile)
+**Net Sales** (metric tile, from `getKpiValues`)
 
-**Tickets Sold** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Average Order Value** (metric tile)
+**Transactions** (metric tile, from `getKpiValues`)
 
-**Conversion Rate** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Discount Value** (metric tile)
+**Tickets Sold** (metric tile, from `getKpiValues`)
 
-**Refunds** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Cancellations** (metric tile)
+**Average Order Value** (metric tile, from `getKpiValues`)
 
-**Commission** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Upsell Revenue** (metric tile)
+**Conversion Rate** (metric tile, from `getKpiValues`)
 
-**Cross-Sell Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Discount Value** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Refunds** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Cancellations** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Commission** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Upsell Revenue** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Cross-Sell Revenue** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -1093,6 +1928,8 @@ channels:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1120,7 +1957,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (168 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-016?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
@@ -1195,7 +2032,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Shown**
 
-**Every customer membership loyalty** (data table)
+**Every customer membership loyalty** (data table, from `getKpiValues`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1215,7 +2052,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Outstanding loyalty liability | text | not in the schema: `Outstanding Loyalty Liability` |
 | Customer satisfaction score | text | not in the schema: `Customer Satisfaction Score` |
 
-**The selected customer membership loyalty** (detail panel)
+**The selected customer membership loyalty** (detail panel, from `getKpiValues`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1288,6 +2125,8 @@ inactive: 'Annual pass holders with no visit last quarter: 1,906'
 - `getDashboard` → `REPORT_VIEW_VENUE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_VENUE`
 
 #### Requirements it meets
 
@@ -1362,7 +2201,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every alerts exception** (data table)
+**Every alerts exception** (data table, from `listPromotionAlertException`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1378,7 +2217,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Status | text | not in the schema: `Status` |
 | Recommended action | text | not in the schema: `Recommended action` |
 
-**The selected alerts exception** (detail panel): The pack groups this record's detail under its own headings: “Alert Categories”, “Alert Workflow”.
+**The selected alerts exception** (detail panel, from `listPromotionAlertException`): The pack groups this record's detail under its own headings: “Alert Categories”, “Alert Workflow”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1425,6 +2264,8 @@ alert: Refunds at Main Gate till 3 are 4× the daily average · Fri 2 Oct
 - `listPromotionAlertException` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -1791,33 +2632,159 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Shown**
 
-**Net revenue** (metric tile): (CHG-FIN-002: never a bare "Revenue")
+**Net revenue** (metric tile, from `getAnalyticsBenchmark`): (CHG-FIN-002: never a bare "Revenue")
 
-**Revenue Growth** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
-**Attendance** (metric tile)
+**Revenue Growth** (metric tile, from `getAnalyticsBenchmark`)
 
-**Capacity Utilization** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
-**Revenue per Visitor** (metric tile)
+**Attendance** (metric tile, from `getAnalyticsBenchmark`)
 
-**Average Transaction Value** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
-**Conversion** (metric tile)
+**Capacity Utilization** (metric tile, from `getAnalyticsBenchmark`)
 
-**Refund %** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
-**Membership Conversion** (metric tile)
+**Revenue per Visitor** (metric tile, from `getAnalyticsBenchmark`)
 
-**Repeat Visitor %** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
-**Customer Satisfaction** (metric tile)
+**Average Transaction Value** (metric tile, from `getAnalyticsBenchmark`)
 
-**F&B Spend** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
-**Retail Spend** (metric tile)
+**Conversion** (metric tile, from `getAnalyticsBenchmark`)
 
-**Operational Exceptions** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
+
+**Refund %** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
+
+**Membership Conversion** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
+
+**Repeat Visitor %** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
+
+**Customer Satisfaction** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
+
+**F&B Spend** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
+
+**Retail Spend** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
+
+**Operational Exceptions** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
 **Every site normalisation basis** (data table, from `listSiteNormalisationBases`)
 
@@ -1892,6 +2859,8 @@ basis: 'Visitors: Aquaventure 284,100 · Motiongate 402,560 · House of Wisdom 3
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_TENANT`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1927,7 +2896,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (90 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-020?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-001`, `ANL-012`, `ANL-013`, `ANL-014`, `ANL-015`, `ANL-016`, `ANL-017`, `ANL-018`, `ANL-019`.
@@ -2029,7 +2998,6 @@ Method, path, parameters, request and response for every operation these screens
 "getDashboard": {"method":"GET","path":"/dashboards/{dashboardId}","contract":"reporting","summary":"Read a dashboard with tile data","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"refresh","in":"query","required":null}],"requestBody":null,"responds":"DashboardData"},
 "getKpiValues": {"method":"GET","path":"/kpi-values","contract":"reporting","summary":"Current values, against target, with movement","permission":"REPORT_VIEW_VENUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"kpiIds","in":"query","required":null},{"name":"kpiCodes","in":"query","required":null},{"name":"scopePath","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null},{"name":"interval","in":"query","required":null},{"name":"groupBy","in":"query","required":null},{"name":"module","in":"query","required":null}],"requestBody":null,"responds":"KpiValue"},
 "listAiInsights": {"method":"GET","path":"/insights","contract":"ai","summary":"Insights and anomalies","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"priority","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listAlerts": {"method":"GET","path":"/alerts","contract":"reporting","summary":"What is currently wrong","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"severity","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":"shiftId","in":"query","required":null},{"name":"itemId","in":"query","required":null}],"requestBody":null,"responds":"Alert"},
 "listPromotionAlertException": {"method":"GET","path":"/promotion-alert-exception","contract":"promotions","summary":"Promotion Alerts & Exception Center","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PromotionAlertsExceptionCenterView"},
 "listSiteNormalisationBases": {"method":"GET","path":"/site-normalisation-bases","contract":"reporting","summary":"The denominators each site is benchmarked by","permission":"REPORT_VIEW_TENANT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"scopePath","in":"query","required":null},{"name":"periodFrom","in":"query","required":null},{"name":"periodTo","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"}
 }
@@ -2045,16 +3013,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiEvidenceItemList": {"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"The evidence of one decision record, stored with it.","items":{"$ref":"#/components/schemas/AiEvidenceItem"}},
 "AiInsight": {"type":"object","x-ticvai-persistence":"ai.insight","description":"**An insight with a lifecycle** (AIP-181): new, reviewed, accepted or rejected, actioned, measured. Anomalies, forecast deviations, trends and opportunities land here; the narrative binds numbers to results, so a figure can only come from a query (design 8, 5.10).","required":["kind","title","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["anomaly","forecastDeviation","trend","opportunity","executiveSummary","rootCause","forecastThreshold","marketingRecommendation"]},"detectorId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.anomaly_detector"},"metricKey":{"type":"string","nullable":true},"subjectKind":{"type":"string","nullable":true,"enum":["campaign","journey","forecastDefinition","venue"],"description":"What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for `marketingRecommendation`, a forecast definition for `forecastThreshold`."},"subjectRef":{"type":"string","nullable":true},"recommendedAction":{"type":"object","additionalProperties":true,"nullable":true,"description":"For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. Applied by a person in the owning module, never here."},"expectedImpact":{"type":"object","additionalProperties":true,"nullable":true,"description":"A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6)."},"title":{"type":"string"},"narrative":{"type":"string","nullable":true},"evidence":{"$ref":"#/components/schemas/AiEvidenceItemList"},"magnitude":{"type":"number","nullable":true},"priority":{"type":"string","enum":["low","medium","high","critical"]},"correlationKey":{"type":"string","nullable":true},"status":{"type":"string","enum":["new","reviewed","accepted","rejected","actioned","measured"],"readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"actionRef":{"type":"string","nullable":true},"measuredImpact":{"type":"object","additionalProperties":true,"nullable":true,"readOnly":true},"decisionRecordId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"detectedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiMetricChangeExplanation": {"type":"object","x-ticvai-persistence":"none — computed; written as an ai.insight of kind rootCause when kept","description":"**Why a metric changed** (AIP-176..180, ANL-056): drivers with their contribution, computed from the semantic layer. The narrative binds every figure to a result placeholder (design 8, 5.10).","required":["metricKey","change","drivers"],"properties":{"metricKey":{"type":"string"},"period":{"type":"string"},"comparison":{"type":"string"},"change":{"type":"number"},"changePercent":{"type":"number","nullable":true},"drivers":{"type":"array","items":{"type":"object","properties":{"dimension":{"type":"string"},"member":{"type":"string"},"contribution":{"type":"number"},"evidence":{"$ref":"#/components/schemas/AiEvidenceItem"}}}},"narrative":{"type":"string","nullable":true},"reliability":{"type":"string","enum":["grounded","partial","conflictingSources","insufficientEvidence"]},"dataAsOf":{"type":"string","format":"date-time"}}},
-"Alert": {"type":"object","x-ticvai-persistence":"reporting.alert","description":"A raised alert. **Acknowledged rather than dismissed** — CF-134 asked for it markable, and the difference is that an acknowledgement records who saw it.\n","required":["id","ruleId","raisedAt","severity","status"],"properties":{"id":{"type":"string","format":"uuid"},"ruleId":{"type":"string","format":"uuid"},"ruleName":{"type":"string","description":"`AlertRule.name` as it stood when the alert was raised. **The line a person reads** — a list of rule ids is not an alert panel, and a screen should not need `listAlertRules` to label one.\n"},"metric":{"allOf":[{"$ref":"#/components/schemas/MetricSource"}],"description":"The rule's metric, carried so the alert says what went out of range."},"raisedAt":{"type":"string","format":"date-time"},"severity":{"$ref":"#/components/schemas/AlertSeverity"},"status":{"$ref":"#/components/schemas/AlertStatus"},"observedValue":{"$ref":"#/components/schemas/MetricValue"},"threshold":{"$ref":"#/components/schemas/MetricValue"},"scopePath":{"type":"string"},"workstationId":{"type":"string","format":"uuid","nullable":true,"description":"The workstation the reading was taken for, where the metric is measured per workstation (`salesByWorkstation`). Null otherwise. `listAlerts` filters on it."},"shiftId":{"type":"string","format":"uuid","nullable":true,"description":"The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. Null otherwise. `listAlerts` filters on it."},"itemId":{"x-ticvai-references":"inventory.inventory_item","type":"string","format":"uuid","nullable":true,"description":"The inventory item the reading is about, where the metric is measured per item (`stockAgeing`, `stockTurnover`, `wastageRate`, `inventoryValuation`). Null otherwise. **What a replenishment screen prefills a requisition from.**\n"},"acknowledgedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"acknowledgedAt":{"type":"string","format":"date-time","nullable":true},"acknowledgementNote":{"type":"string","maxLength":300,"nullable":true,"description":"The `note` given to `acknowledgeAlert`. Kept, because an acknowledgement that says what is being done about it is the one escalation can skip."},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"description":"**Set when the metric returns to range, automatically.** An alert that only a person can close is an alert list that only grows.\n"},"escalatedAt":{"type":"string","format":"date-time","nullable":true,"description":"Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. **A critical alert nobody acknowledged is the case escalation exists for.**\n"}}},
-"AlertSeverity": {"type":"string","description":"How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter.","enum":["info","warning","critical"]},
-"AlertStatus": {"type":"string","description":"Where a raised alert is. Shared by `Alert` and the `listAlerts` filter.","enum":["raised","acknowledged","resolved","expired"]},
 "BenchmarkNormalisation": {"type":"string","description":"The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`.","enum":["none","perVisitor","perOperatingHour","perStaffedPosition","perSquareMetre"]},
 "BenchmarkRow": {"type":"object","description":"BI board 10.4. **The normalisation travels with the comparison.**","properties":{"scopePath":{"type":"string"},"label":{"type":"string"},"value":{"$ref":"#/components/schemas/MetricValue"},"normalisedValue":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"normaliseBy":{"$ref":"#/components/schemas/BenchmarkNormalisation"},"rank":{"type":"integer"},"percentile":{"type":"number","nullable":true}}},
 "Dashboard": {"x-ticvai-persistence":"reporting.dashboard + reporting.dashboard_tile","allOf":[{"$ref":"#/components/schemas/CreateDashboardRequest"},{"type":"object","required":["id","ownerPrincipalId","aggregateCost","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"ownerPrincipalId":{"type":"string","format":"uuid"},"aggregateCost":{"type":"string","enum":["low","medium","high"],"description":"Combined refresh load of every tile."},"archivedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"},"createdAt":{"type":"string","format":"date-time"}}}]},
 "DashboardData": {"x-ticvai-persistence":"none — computed","allOf":[{"$ref":"#/components/schemas/Dashboard"},{"type":"object","properties":{"tileData":{"type":"array","items":{"type":"object","properties":{"tileId":{"type":"string","format":"uuid"},"result":{"$ref":"#/components/schemas/ReportResult"},"isCached":{"type":"boolean"},"error":{"type":"string","nullable":true}}}}}}]},
 "GeneratedQuery": {"x-ticvai-persistence":"none — embedded; stored whole in `reporting.natural_language_query`","type":"object","description":"The structured query a natural-language question produced — data source, columns, filters, grouping. Named on 26 September so the answer and the kept copy are one shape.\n","properties":{"dataSource":{"$ref":"#/components/schemas/DataSource"},"columns":{"type":"array","items":{"$ref":"#/components/schemas/ReportColumn"}},"filters":{"type":"array","items":{"$ref":"#/components/schemas/ReportFilter"}},"groupBy":{"type":"array","items":{"type":"string"}},"compiledSql":{"type":"string","nullable":true,"description":"The SQL the semantic spec compiled to, exactly as run on the analytical replica (29 September, design 5.7). The replica's row-level security applies beneath it, so it does not need to carry the caller's scope. Null on queries kept before the semantic compile.\n"}}},
 "KpiValue": {"type":"object","description":"BI board 10.3. **Value, target, variance, direction and freshness in one read.**","properties":{"kpiId":{"type":"string","format":"uuid"},"code":{"type":"string"},"bucketStart":{"type":"string","format":"date-time","nullable":true,"description":"The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."},"groupKey":{"type":"string","nullable":true,"description":"The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."},"name":{"type":"string"},"scopePath":{"type":"string"},"period":{"type":"string"},"value":{"$ref":"#/components/schemas/MetricValue"},"target":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"comparison":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"variancePercent":{"type":"number","nullable":true},"direction":{"type":"string","enum":["up","down","flat"]},"status":{"type":"string","enum":["green","amber","red","noTarget"]},"asOf":{"type":"string","format":"date-time"},"stale":{"type":"boolean","description":"**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"}}},
-"MetricSource": {"type":"string","description":"**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n","enum":["occupancy","capacityUtilisation","admissionRate","noShowRate","conversion","salesByOperator","salesByWorkstation","waitTime","throughput","abandonmentRate","inventoryValuation","stockTurnover","stockAgeing","wastageRate","resaleVolume","resaleCommission","salesByInstructor","resourceUtilisation","allocationUtilisation","channelAllocationBurn","membershipChurn","membershipRenewalRate","supplierDeliveryPerformance","revenuePerEntitlement","revenuePerVisitor","assetDowntime","meanTimeToRepair","challengeCompletionRate","attributedRevenue","loyaltyActiveMembers","loyaltyTierDistribution","loyaltyPointsLiability","loyaltyBreakageRate","loyaltyMemberRetention","challengeParticipationRate","gamificationLoyaltyImpact","gamificationMembershipImpact","gamificationRetention","accreditationApplications","accreditationTimeToDecision","accreditationCredentialsIssued","accreditationActiveHolders","accreditationRenewalsDue","staffingShortfall","grossSales","discounts","refunds","netRevenue","recognisedRevenue","deferredRevenue","taxCollected","takings"],"x-ticvai-money-valued":["grossSales","discounts","refunds","netRevenue","recognisedRevenue","deferredRevenue","taxCollected","takings","inventoryValuation","resaleCommission","revenuePerEntitlement","revenuePerVisitor","attributedRevenue","loyaltyPointsLiability"],"x-ticvai-extended-29-september":"**Fourteen metrics added 29 September (build pass)**, each checked against the schema of the contract that produces it.\n\n| Metric | Source | Requirement | |---|---|---| | `loyaltyActiveMembers` | `marketing.loyalty_position` members with a `marketing.loyalty_points` movement in the period | 5.4.27 | | `loyaltyTierDistribution` | `marketing.loyalty_position.tier_id` against `marketing.programme_tier`, members per tier | 5.4.27 | | `loyaltyPointsLiability` | the balance of `ledger.journal_line` on each programme's `pointsLiabilityAccountId`, where points post on accrual and release on redemption or expiry | 5.4.27 | | `loyaltyBreakageRate` | `marketing.loyalty_points` expiry movements over points earned, in the period | 5.4.27 | | `loyaltyMemberRetention` | members with a movement in the previous period who also have one in this period | 5.4.27 | | `challengeParticipationRate` | distinct `marketing.challenge_progress.subject_id` over active loyalty members | 22.6.20 | | `gamificationLoyaltyImpact` | points earned per member, challenge participants against non-participants (`marketing.loyalty_points` split by `marketing.challenge_progress`) | 22.6.20 | | `gamificationMembershipImpact` | joins and renewals in `identity.customer_membership`, participants against non-participants | 22.6.20 | | `gamificationRetention` | return visits (`access.scan_event`, in-direction) of participants against non-participants | 22.6.20 | | `accreditationApplications` | `accreditation.application` by `status` | 12.1.50 | | `accreditationTimeToDecision` | `accreditation.application.decided_at` minus `submitted_at` | 12.1.50 | | `accreditationCredentialsIssued` | `accreditation.credential.issued_at` | 12.1.50 | | `accreditationActiveHolders` | `accreditation.holder` `active`, by `category_code` | 12.1.50 | | `accreditationRenewalsDue` | `accreditation.holder.valid_to` inside `accreditation.validity.renewal_window_days` | 12.1.50 |\n\n**`staffingShortfall` added the same evening (build pass, group G2; 8.2.49)**: the largest gap in the window between the staff rostered and the staff the forecast requires, per venue and position, from `workforce.forecast_requirement` (the handed-over AI staff requirement) against `workforce.rota_assignment` and `workforce.open_shift`, computed as `workforce.getStaffingCoverage` with `basis` `forecastRequirement`. An `AlertRule` on it with `comparator` `above` and `threshold` 0 is the staffing shortage alert; `windowMinutes` looks ahead rather than back for this metric (the rota for the coming window), and `cooldownMinutes` stops one short shift alerting every quarter hour.\n\n**Points issued, points redeemed, campaign performance and reward redemption were already served** by the `loyalty` and `campaigns` sources, and challenge completion and revenue attribution by `challengeCompletionRate` and `attributedRevenue`.\n","x-ticvai-extended-2-october":"**Eight finance measures added 2 October 2026** (Chinmay; CHG-FIN-007, CHG-FIN-010), each with the source and formula of the seeded KPI of the same code in `ReportingSystemKpi`: `grossSales`, `discounts`, `refunds`, `netRevenue`, `recognisedRevenue`, `deferredRevenue`, `taxCollected` and `takings`, so an alert rule can watch them (a refund spike, takings below a target). Formulas are the D-185 default; client finance sign-off is pending.","x-ticvai-money-valued-note":"**`salesByOperator`, `salesByWorkstation` and `resaleVolume` are not listed because the package does not say whether they count sales or sum their value.** Until that is decided, a rule on them carries a plain number.\n","x-ticvai-extended":"18 August 2026","x-ticvai-extension-note":"**Nineteen metrics added when their upstream models landed**, which is how BL-053 was always going to close — not by changing `reporting` but by building the things it wanted to report on.\n`inventoryValuation`, `stockTurnover`, `stockAgeing` and `wastageRate` came from `inventory.StockBatch`; `resaleVolume` and `resaleCommission` from `orders.ResaleListing`; **`salesByInstructor` from `resources.Resource`, which was the one metric this enum deliberately refused to name in the morning** because nothing produced it. `allocationUtilisation` from `PartnerUser` and `ChannelListing`, `membershipChurn` from `Journey`, `supplierDeliveryPerformance` from `ProductionRun`, `assetDowntime` and `meanTimeToRepair` from `WorkOrder.downtimeMinutes`, `challengeCompletionRate` from `ChallengeProgress`, `attributedRevenue` from `AttributionTouch`.\n**Each was checked against the schema before being named.** That rule has not changed — naming a metric with no source is the defect this enum exists to prevent.\n"},
 "MetricValue": {"x-ticvai-persistence-column":"numeric(18,4)","description":"**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n","oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},
 "NaturalLanguageAnswer": {"x-ticvai-persistence":"none — computed","type":"object","required":["conversationId","question","interpretation","result","reliability"],"properties":{"conversationId":{"type":"string"},"question":{"type":"string"},"interpretation":{"type":"string","description":"What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."},"semanticSpec":{"allOf":[{"$ref":"#/components/schemas/ReportingSemanticQuerySpec"}],"nullable":true,"description":"What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"},"generatedQuery":{"allOf":[{"$ref":"#/components/schemas/GeneratedQuery"}],"nullable":true,"description":"The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"},"result":{"allOf":[{"$ref":"#/components/schemas/ReportResult"}],"nullable":true,"description":"Null when the question is outside the semantic model."},"dataAsOf":{"type":"string","format":"date-time","nullable":true,"description":"Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."},"reliability":{"$ref":"#/components/schemas/ReportingAnswerReliability"},"unavailableReason":{"allOf":[{"$ref":"#/components/schemas/ReportingUnavailableReason"}],"nullable":true,"description":"Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."},"confidence":{"type":"number","minimum":0,"maximum":1,"deprecated":true,"description":"Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."},"suggestedFollowUps":{"type":"array","items":{"type":"string"}},"modelVersion":{"type":"string"},"tokensUsed":{"type":"integer"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},

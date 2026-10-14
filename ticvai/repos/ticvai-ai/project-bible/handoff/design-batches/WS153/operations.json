@@ -23,6 +23,19 @@
   "requestBody": null,
   "responds": "ProviderEconomics"
  },
+ "getSettlement": {
+  "method": "GET",
+  "path": "/settlements/{settlementId}",
+  "contract": "finance",
+  "summary": "Settlement detail with match results",
+  "permission": "SETTLEMENT_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "region",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "Settlement"
+ },
  "getUnifiedReconciliation": {
   "method": "GET",
   "path": "/reconciliation/unified",
@@ -195,7 +208,7 @@
  },
  "setMerchantAccount": {
   "method": "PUT",
-  "path": "/merchant-accounts",
+  "path": "/merchant-accounts/{merchantAccountId}",
   "contract": "payments",
   "summary": "Bind a merchant account to entities, venues and a calendar",
   "permission": "PAYMENT_CONFIGURE",
@@ -203,6 +216,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "merchantAccountId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -243,7 +261,7 @@
  },
  "setReconciliationSource": {
   "method": "PUT",
-  "path": "/reconciliation-sources",
+  "path": "/reconciliation-sources/{sourceId}",
   "contract": "payments",
   "summary": "Define a settlement or statement feed",
   "permission": "PAYMENT_CONFIGURE",
@@ -251,6 +269,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "sourceId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

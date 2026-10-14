@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 7 permissions apply here:
   `INCIDENT_REPORT, INCIDENT_VIEW, ORDER_MODIFY, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **18 of these operations work offline**: chaseStation, fireCourse, getCourseRules, getFnbOrder, getHaccpStatus, getKitchenSla, holdCourse, list86Events
+- **20 of these operations work offline**: chaseStation, fireCourse, getCourseRules, getFnbOrder, getHaccpStatus, getKitchenSla, holdCourse, list86Events
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -130,15 +130,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KIT-001` | Kitchen Operations Command Center | A | 0 | 59 | 6 | 6 | 1 | 3 | — | notStarted (generated) |
-| `KIT-002` | Kitchen Display System (KDS) | A | 11 | 14 | 6 | 6 | 2 | 3 | — | notStarted (generated) |
-| `KIT-003` | Order Firing & Course Management | A | 18 | 0 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
-| `KIT-004` | Active Order Management & Fulfilment Journey | A | 0 | 22 | 6 | 8 | 1 | 6 | — | notStarted (generated) |
-| `KIT-005` | Kitchen Station Workload & Dynamic Routing | A | 11 | 16 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
-| `KIT-006` | Expeditor & Order Assembly | A | 14 | 14 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
-| `KIT-007` | Guest Collection, Buzzer & Digital Notification | A | 0 | 20 | 6 | 6 | 2 | 0 | — | notStarted (generated) |
+| `KIT-001` | Kitchen Operations Command Center | A | 0 | 79 | 6 | 6 | 1 | 3 | — | notStarted (generated) |
+| `KIT-002` | Kitchen Display System (KDS) | A | 11 | 34 | 6 | 6 | 2 | 3 | — | notStarted (generated) |
+| `KIT-003` | Order Firing & Course Management | A | 18 | 20 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
+| `KIT-004` | Active Order Management & Fulfilment Journey | A | 0 | 42 | 6 | 8 | 1 | 6 | — | notStarted (generated) |
+| `KIT-005` | Kitchen Station Workload & Dynamic Routing | A | 11 | 36 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
+| `KIT-006` | Expeditor & Order Assembly | A | 14 | 34 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `KIT-007` | Guest Collection, Buzzer & Digital Notification | A | 0 | 40 | 6 | 6 | 2 | 0 | — | notStarted (generated) |
 | `KIT-008` | Exceptions, Re-Fire & Unavailable Items | A | 14 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `KIT-009` | SLA, Priority & Service Rules | A | 0 | 15 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `KIT-009` | SLA, Priority & Service Rules | A | 0 | 55 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `KIT-010` | Kitchen Performance, AI & Operational Optimization | A | 4 | 1 | 6 | 1 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch

@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/terminal-card-present-command-center-t48-adm-579",
-   "component": "apps/venue-management-web/src/routes/commercial/TerminalCardPresentCommandCenterT48.tsx",
+   "component": "src/routes/commercial/TerminalCardPresentCommandCenterT48.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -96,7 +97,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -241,6 +242,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "3",
@@ -250,7 +252,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-terminal-device-inventory-t49-adm-580",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentTerminalDeviceInventoryT49.tsx",
+   "component": "src/routes/commercial/PaymentTerminalDeviceInventoryT49.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -413,6 +415,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "DEVICE_MANAGE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "3",
@@ -422,7 +425,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/terminal-provisioning-device-configuration-t51-adm-581",
-   "component": "apps/venue-management-web/src/routes/commercial/TerminalProvisioningDeviceConfigurationT51.tsx",
+   "component": "src/routes/commercial/TerminalProvisioningDeviceConfigurationT51.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -599,6 +602,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "3",
@@ -608,7 +612,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pos-kiosk-terminal-assignment-manager-t52-adm-582",
-   "component": "apps/venue-management-web/src/routes/commercial/PosKioskTerminalAssignmentManagerT52.tsx",
+   "component": "src/routes/commercial/PosKioskTerminalAssignmentManagerT52.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -667,7 +671,8 @@
        "derived": true,
        "impliedBy": "setDeviceAssignment",
        "label": "Save device assignment",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setDeviceAssignment"
       },
       {
        "kind": "secondaryButton",
@@ -804,6 +809,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "3",
@@ -813,7 +819,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/emv-card-present-processing-configuration-t53-adm-583",
-   "component": "apps/venue-management-web/src/routes/commercial/EmvCardPresentProcessingConfigurationT53.tsx",
+   "component": "src/routes/commercial/EmvCardPresentProcessingConfigurationT53.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -927,7 +933,14 @@
    "workshopBoard": "wireframes/WS89 Payment Payment Orchestration Board 3.dc.html#adm-583"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 52. 0 of 0 labels bound to a contract property; 8 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "session"
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -957,6 +970,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "3",
@@ -966,7 +980,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-server-terminal-connectivity-manager-t54-adm-584",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentServerTerminalConnectivityManagerT54.tsx",
+   "component": "src/routes/commercial/PaymentServerTerminalConnectivityManagerT54.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1039,7 +1053,8 @@
         "Provider ↔ Acquirer"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Architecture Example”, “Terminal Integration Layer”, “Payment Terminal”, “Payment Server / Provider”, “Depending on integration”, “Health Indicators”.",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 53 §Show"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 53 §Show",
+       "operation": "getDeviceTelemetry"
       }
      ]
     },
@@ -1122,6 +1137,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "3",
@@ -1131,7 +1147,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/card-present-transaction-monitor-operations-t55-adm-585",
-   "component": "apps/venue-management-web/src/routes/commercial/CardPresentTransactionMonitorOperationsT55.tsx",
+   "component": "src/routes/commercial/CardPresentTransactionMonitorOperationsT55.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1171,7 +1187,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -1224,7 +1240,7 @@
         "Status"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listPaymentTerminals",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 54 §Display"
       }
      ]
@@ -1320,6 +1336,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "3",
@@ -1329,7 +1346,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/degraded-offline-store-and-forward-manager-t56-adm-586",
-   "component": "apps/venue-management-web/src/routes/commercial/DegradedOfflineStoreAndForwardManagerT56.tsx",
+   "component": "src/routes/commercial/DegradedOfflineStoreAndForwardManagerT56.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1385,7 +1402,7 @@
         "Synchronization state"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listStoredForwardTransactions",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 55 §Show"
       }
      ]
@@ -1453,6 +1470,10 @@
     {
      "name": "terminalId",
      "from": "session"
+    },
+    {
+     "name": "deviceId",
+     "from": "session"
     }
    ]
   },
@@ -1491,6 +1512,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "3",
@@ -1500,7 +1522,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/terminal-health-maintenance-incident-center-t57-adm-587",
-   "component": "apps/venue-management-web/src/routes/commercial/TerminalHealthMaintenanceIncidentCenterT57.tsx",
+   "component": "src/routes/commercial/TerminalHealthMaintenanceIncidentCenterT57.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1659,6 +1681,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "3",
@@ -1668,7 +1691,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/terminal-simulator-certification-ai-operations-advisor-t-adm-588",
-   "component": "apps/venue-management-web/src/routes/commercial/TerminalSimulatorCertificationAiOperationsAdviso.tsx",
+   "component": "src/routes/commercial/TerminalSimulatorCertificationAiOperationsAdviso.tsx",
    "status": "notStarted"
   },
   "navigation": {

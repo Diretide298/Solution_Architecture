@@ -95,16 +95,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-469` | AI Configuration Home & Start | D | 6 | 36 | 7 | 3 | 1 | 0 | — | notStarted (—) |
+| `ADM-469` | AI Configuration Home & Start | D | 12 | 36 | 7 | 3 | 1 | 0 | — | notStarted (—) |
 | `ADM-470` | Setup Type & Business Intent Discovery | D | 21 | 6 | 7 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-471` | Venue & Business Model Discovery | D | 50 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-472` | Guided Question & Answer Workspace | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-473` | Product & Admission Model Discovery | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-474` | Operational Requirement Discovery | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-475` | Commercial Requirement Discovery | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-472` | Guided Question & Answer Workspace | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-473` | Product & Admission Model Discovery | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-474` | Operational Requirement Discovery | D | 6 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-475` | Commercial Requirement Discovery | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-476` | Required, Recommended & Optional Decisions | D | 10 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-477` | Missing Information & Clarification Center | D | 6 | 6 | 7 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-478` | Configuration Blueprint & Dependency Map | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-477` | Missing Information & Clarification Center | D | 6 | 106 | 7 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-478` | Configuration Blueprint & Dependency Map | D | 6 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ---
 
@@ -170,6 +170,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by *Create New Configuration*** (`startConfigurationSession`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Intent `intent` | radio group | required | — | Create · Modify · Extend · Clone | — | — | `startConfigurationSession` body |
+| Venue type `venueType` | text field | optional | — | — | — | — | `startConfigurationSession` body |
+| Source scope path `sourceScopePath` | text field | optional | — | — | — | For clone or extend: the setup to start from. | `startConfigurationSession` body |
+| Description `description` | text area | optional | — | max length 4000 | — | What the administrator wants, in their words. | `startConfigurationSession` body |
+| Conversation `conversationId` | picker: choose a conversation | optional | — | — | shows names, sends the id | — | `startConfigurationSession` body |
+| Locale `locale` | text field | optional | — | — | — | — | `startConfigurationSession` body |
+
 **Rules for these inputs** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **intent / venue type / description**: Four intent cards (Create new, Modify, Extend, Clone and adapt); venue type tiles (museum, theme park, water park, zoo, aquarium, theatre, stadium, indoor attraction, family entertainment centre, festival, conference, temporary event, start from scratch); a free description box. Clone and extend ask for the source setup. *(source: contracts/satellite/ai.yaml#startConfigurationSession / DI-279)*
@@ -190,7 +201,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Every home start** (data table)
+**Every home start** (data table, from `listConfigurationSessions`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -210,7 +221,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Session type progress last activity status | text | not in the schema: `Session Type Progress Last Activity Status` |
 | Summer festival event 100% yesterday blueprint ready | text | not in the schema: `Summer Festival Event 100% Yesterday Blueprint Ready` |
 
-**The selected home start** (detail panel): The pack groups this record's detail under its own headings: “The screen should immediately answer”, “Subtitle”, “Large conversational input”.
+**The selected home start** (detail panel, from `listConfigurationSessions`): The pack groups this record's detail under its own headings: “The screen should immediately answer”, “Subtitle”, “Large conversational input”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -235,7 +246,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-| Create New Configuration (primary button) | navigation or local | — | — | — | — |
+| Create New Configuration (primary button) | `startConfigurationSession` POST `/configuration-sessions` | inline | AiConfigurationSession | — | — |
 | Modify Existing Configuration (secondary button) | navigation or local | — | — | — | — |
 | Extend Existing Configuration (secondary button) | navigation or local | — | — | — | — |
 | Clone & Adapt Existing Setup (secondary button) | navigation or local | — | — | — | — |
@@ -289,12 +300,14 @@ session:
 
 - `startConfigurationSession` → `AI_USE` (operate) · staff
 - `listConfigurationSessions` → `AI_USE` (operate) · staff
-- `attachConfigurationSource` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `attachConfigurationSource` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -337,7 +350,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
 - [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-469?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, Create New Configuration, Modify Existing Configuration, Extend Existing Configuration, Clone & Adapt Existing Setup.
@@ -445,7 +458,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **understanding**: Chips like "Create · Venue · Museum · Existing organisation · Dubai · Permanent"; inferred ones dashed with "Confirm"; areas to configure as a checklist (venue, products, schedule, capacity, pricing, channels, ticket media, access). *(source: contracts/satellite/ai.yaml#answerConfigurationQuestion (extracted.provenance) / contracts/satellite/ai.yaml#/components/schemas/AiProvenance)*
 
-**Data it reads**: `listConfigurationSources` (onLoad, Attached documents with extraction status and what they …); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …); `listConfigurationSources` (onLoad, Attached documents with extraction status and what they …)
 
 **Where the user goes next**
 
@@ -462,7 +475,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer discovering (`session-not-open`), or the governance data policy refuses the document (`governance-blocked`).; 409 The session is no longer discovering (`session-not-open`).; 422 The asset is not a readable document or image (`unreadable-source`), for example a scan with no text layer the extractor could read. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer discovering (`session-not-open`), or the governance data policy refuses the document (`governance-blocked`).; 422 The asset is not a readable document or image (`unreadable-source`), for example a scan with no text layer the extractor could read. |
 
 #### Sample data for the mock-up
 
@@ -490,14 +503,15 @@ understanding:
 #### Permissions
 
 - `startConfigurationSession` → `AI_USE` (operate) · staff
-- `answerConfigurationQuestion` → `AI_USE` (operate) · staff
-- `attachConfigurationSource` → `AI_USE` (operate) · staff
-- `listConfigurationSources` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `attachConfigurationSource` → `AI_USE` (operate) · staff
+- `listConfigurationSources` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -610,8 +624,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | text field | — | — | `getConfigurationBlueprint` ?module |
-| Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -680,7 +692,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Confirm / Edit Understanding / Continue (primary button) | navigation or local | — | — | — | — |
 | Save venue AI profile (secondary button) | `setAiVenueSettings` PUT `/venues/{venueId}/ai-settings` | AiVenueSettings | AiVenueSettings | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
 
-**Data it reads**: `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -722,13 +734,14 @@ venue:
 #### Permissions
 
 - `answerConfigurationQuestion` → `AI_USE` (operate) · staff
-- `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `setAiVenueSettings` → `AI_CONFIGURE` (configure) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -826,6 +839,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`answerConfigurationQuestion`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Question key `questionKey` | text field | required | — | — | — | — | `answerConfigurationQuestion` body |
+| Text `text` | text area | optional | — | max length 4000 | — | — | `answerConfigurationQuestion` body |
+| Value `value` | key and value settings | optional | — | — | — | — | `answerConfigurationQuestion` body |
+
 **Rules for these inputs** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **answer**: Free text (up to 4,000 characters) or the structured control the question offers (date, number, choice); not streamed - a 10-second wait shows "Thinking" with the question kept on screen. *(source: contracts/satellite/ai.yaml#answerConfigurationQuestion)*
@@ -845,14 +866,37 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getConfigurationBlueprint`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Blueprint | grouped details | The blueprint (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. |
+| ID | the name it points at, never the id | — |
+| Session | the name it points at, never the id | — |
+| Readiness | chip: Not ready, Ready with warnings, Ready | — |
+| Required open | 1,234 | Required decisions not yet accepted or modified. |
+| Issues | list or chips (count when long) | The issues of one blueprint version, stored with it. |
+| Severity | chip: Blocking, Warning, Info | — |
+| Kind | chip: Missing, Contradictory, Ambiguous, Cross module, Dependency | — |
+| Decision key | text | — |
+| Module | text | — |
+| Message | text | — |
+| Dependency map | grouped details | Configuration objects and the order they depend on each other, by module. |
+| Summary | text | — |
+| Decisions | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Blueprint | the name it points at, never the id | — |
+| Decision key | text | — |
+| Module | text | — |
+| Decision class | chip: Required, Recommended, Optional | — |
+| Question | text | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `answerConfigurationQuestion` POST `/configuration-sessions/{sessionId}/answers` | inline | AiConfigurationTurn | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer discovering (`session-not-open`). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
@@ -910,6 +954,8 @@ turn:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -937,8 +983,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-472?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-469`.
@@ -1007,6 +1053,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`answerConfigurationQuestion`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Question key `questionKey` | text field | required | — | — | — | — | `answerConfigurationQuestion` body |
+| Text `text` | text area | optional | — | max length 4000 | — | — | `answerConfigurationQuestion` body |
+| Value `value` | key and value settings | optional | — | — | — | — | `answerConfigurationQuestion` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1022,14 +1076,37 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getConfigurationBlueprint`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Blueprint | grouped details | The blueprint (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. |
+| ID | the name it points at, never the id | — |
+| Session | the name it points at, never the id | — |
+| Readiness | chip: Not ready, Ready with warnings, Ready | — |
+| Required open | 1,234 | Required decisions not yet accepted or modified. |
+| Issues | list or chips (count when long) | The issues of one blueprint version, stored with it. |
+| Severity | chip: Blocking, Warning, Info | — |
+| Kind | chip: Missing, Contradictory, Ambiguous, Cross module, Dependency | — |
+| Decision key | text | — |
+| Module | text | — |
+| Message | text | — |
+| Dependency map | grouped details | Configuration objects and the order they depend on each other, by module. |
+| Summary | text | — |
+| Decisions | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Blueprint | the name it points at, never the id | — |
+| Decision key | text | — |
+| Module | text | — |
+| Decision class | chip: Required, Recommended, Optional | — |
+| Question | text | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `answerConfigurationQuestion` POST `/configuration-sessions/{sessionId}/answers` | inline | AiConfigurationTurn | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer discovering (`session-not-open`). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
@@ -1083,6 +1160,8 @@ products:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1110,8 +1189,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-473?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-469`.
@@ -1194,7 +1273,30 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getConfigurationBlueprint`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Blueprint | grouped details | The blueprint (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. |
+| ID | the name it points at, never the id | — |
+| Session | the name it points at, never the id | — |
+| Readiness | chip: Not ready, Ready with warnings, Ready | — |
+| Required open | 1,234 | Required decisions not yet accepted or modified. |
+| Issues | list or chips (count when long) | The issues of one blueprint version, stored with it. |
+| Severity | chip: Blocking, Warning, Info | — |
+| Kind | chip: Missing, Contradictory, Ambiguous, Cross module, Dependency | — |
+| Decision key | text | — |
+| Module | text | — |
+| Message | text | — |
+| Dependency map | grouped details | Configuration objects and the order they depend on each other, by module. |
+| Summary | text | — |
+| Decisions | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Blueprint | the name it points at, never the id | — |
+| Decision key | text | — |
+| Module | text | — |
+| Decision class | chip: Required, Recommended, Optional | — |
+| Question | text | — |
 
 **Actions and what each produces**
 
@@ -1248,6 +1350,8 @@ operations:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1276,7 +1380,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-474?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Confirm Operations / Add Requirement / …, Open access grant, Cancel.
 - [ ] Every transition is wired: `ADM-469`.
@@ -1340,6 +1444,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`answerConfigurationQuestion`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Question key `questionKey` | text field | required | — | — | — | — | `answerConfigurationQuestion` body |
+| Text `text` | text area | optional | — | max length 4000 | — | — | `answerConfigurationQuestion` body |
+| Value `value` | key and value settings | optional | — | — | — | — | `answerConfigurationQuestion` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1355,14 +1467,37 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getConfigurationBlueprint`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Blueprint | grouped details | The blueprint (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. |
+| ID | the name it points at, never the id | — |
+| Session | the name it points at, never the id | — |
+| Readiness | chip: Not ready, Ready with warnings, Ready | — |
+| Required open | 1,234 | Required decisions not yet accepted or modified. |
+| Issues | list or chips (count when long) | The issues of one blueprint version, stored with it. |
+| Severity | chip: Blocking, Warning, Info | — |
+| Kind | chip: Missing, Contradictory, Ambiguous, Cross module, Dependency | — |
+| Decision key | text | — |
+| Module | text | — |
+| Message | text | — |
+| Dependency map | grouped details | Configuration objects and the order they depend on each other, by module. |
+| Summary | text | — |
+| Decisions | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Blueprint | the name it points at, never the id | — |
+| Decision key | text | — |
+| Module | text | — |
+| Decision class | chip: Required, Recommended, Optional | — |
+| Question | text | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `answerConfigurationQuestion` POST `/configuration-sessions/{sessionId}/answers` | inline | AiConfigurationTurn | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer discovering (`session-not-open`). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
@@ -1416,6 +1551,8 @@ intent:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1443,8 +1580,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-475?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-469`.
@@ -1494,8 +1631,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | text field | — | — | `getConfigurationBlueprint` ?module |
-| Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -1542,7 +1677,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **three columns**: Required / Recommended / Optional with counts; each item shows the question, the proposed value, why (recommendation), and provenance. *(source: contracts/satellite/ai.yaml#getConfigurationBlueprint (decisionClass))*
 
-**Data it reads**: `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -1578,13 +1713,14 @@ optional:
 
 #### Permissions
 
-- `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -1691,15 +1827,130 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Required Missing** (metric tile)
+**Required Missing** (metric tile, from `getConfigurationBlueprint`)
 
-**Clarifications Needed** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Blueprint | grouped details | The blueprint (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. |
+| ID | the name it points at, never the id | — |
+| Session | the name it points at, never the id | — |
+| Readiness | chip: Not ready, Ready with warnings, Ready | — |
+| Required open | 1,234 | Required decisions not yet accepted or modified. |
+| Issues | list or chips (count when long) | The issues of one blueprint version, stored with it. |
+| Severity | chip: Blocking, Warning, Info | — |
+| Kind | chip: Missing, Contradictory, Ambiguous, Cross module, Dependency | — |
+| Decision key | text | — |
+| Module | text | — |
+| Message | text | — |
+| Dependency map | grouped details | Configuration objects and the order they depend on each other, by module. |
+| Summary | text | — |
+| Decisions | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Blueprint | the name it points at, never the id | — |
+| Decision key | text | — |
+| Module | text | — |
+| Decision class | chip: Required, Recommended, Optional | — |
+| Question | text | — |
 
-**Conflicts** (metric tile)
+**Clarifications Needed** (metric tile, from `getConfigurationBlueprint`)
 
-**Warnings** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Blueprint | grouped details | The blueprint (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. |
+| ID | the name it points at, never the id | — |
+| Session | the name it points at, never the id | — |
+| Readiness | chip: Not ready, Ready with warnings, Ready | — |
+| Required open | 1,234 | Required decisions not yet accepted or modified. |
+| Issues | list or chips (count when long) | The issues of one blueprint version, stored with it. |
+| Severity | chip: Blocking, Warning, Info | — |
+| Kind | chip: Missing, Contradictory, Ambiguous, Cross module, Dependency | — |
+| Decision key | text | — |
+| Module | text | — |
+| Message | text | — |
+| Dependency map | grouped details | Configuration objects and the order they depend on each other, by module. |
+| Summary | text | — |
+| Decisions | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Blueprint | the name it points at, never the id | — |
+| Decision key | text | — |
+| Module | text | — |
+| Decision class | chip: Required, Recommended, Optional | — |
+| Question | text | — |
 
-**Recommendations** (metric tile)
+**Conflicts** (metric tile, from `getConfigurationBlueprint`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Blueprint | grouped details | The blueprint (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. |
+| ID | the name it points at, never the id | — |
+| Session | the name it points at, never the id | — |
+| Readiness | chip: Not ready, Ready with warnings, Ready | — |
+| Required open | 1,234 | Required decisions not yet accepted or modified. |
+| Issues | list or chips (count when long) | The issues of one blueprint version, stored with it. |
+| Severity | chip: Blocking, Warning, Info | — |
+| Kind | chip: Missing, Contradictory, Ambiguous, Cross module, Dependency | — |
+| Decision key | text | — |
+| Module | text | — |
+| Message | text | — |
+| Dependency map | grouped details | Configuration objects and the order they depend on each other, by module. |
+| Summary | text | — |
+| Decisions | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Blueprint | the name it points at, never the id | — |
+| Decision key | text | — |
+| Module | text | — |
+| Decision class | chip: Required, Recommended, Optional | — |
+| Question | text | — |
+
+**Warnings** (metric tile, from `getConfigurationBlueprint`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Blueprint | grouped details | The blueprint (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. |
+| ID | the name it points at, never the id | — |
+| Session | the name it points at, never the id | — |
+| Readiness | chip: Not ready, Ready with warnings, Ready | — |
+| Required open | 1,234 | Required decisions not yet accepted or modified. |
+| Issues | list or chips (count when long) | The issues of one blueprint version, stored with it. |
+| Severity | chip: Blocking, Warning, Info | — |
+| Kind | chip: Missing, Contradictory, Ambiguous, Cross module, Dependency | — |
+| Decision key | text | — |
+| Module | text | — |
+| Message | text | — |
+| Dependency map | grouped details | Configuration objects and the order they depend on each other, by module. |
+| Summary | text | — |
+| Decisions | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Blueprint | the name it points at, never the id | — |
+| Decision key | text | — |
+| Module | text | — |
+| Decision class | chip: Required, Recommended, Optional | — |
+| Question | text | — |
+
+**Recommendations** (metric tile, from `getConfigurationBlueprint`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Blueprint | grouped details | The blueprint (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. |
+| ID | the name it points at, never the id | — |
+| Session | the name it points at, never the id | — |
+| Readiness | chip: Not ready, Ready with warnings, Ready | — |
+| Required open | 1,234 | Required decisions not yet accepted or modified. |
+| Issues | list or chips (count when long) | The issues of one blueprint version, stored with it. |
+| Severity | chip: Blocking, Warning, Info | — |
+| Kind | chip: Missing, Contradictory, Ambiguous, Cross module, Dependency | — |
+| Decision key | text | — |
+| Module | text | — |
+| Message | text | — |
+| Dependency map | grouped details | Configuration objects and the order they depend on each other, by module. |
+| Summary | text | — |
+| Decisions | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Blueprint | the name it points at, never the id | — |
+| Decision key | text | — |
+| Module | text | — |
+| Decision class | chip: Required, Recommended, Optional | — |
+| Question | text | — |
 
 **Actions and what each produces**
 
@@ -1715,7 +1966,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **Answer**: Resolves the item via the next question; counts update. *(source: contracts/satellite/ai.yaml#answerConfigurationQuestion)*
 
-**Data it reads**: `getConfigurationBlueprint` (onLoad, The blueprint so far); `listConfigurationSources` (onLoad, Attached documents with extraction status and what they …); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …); `listConfigurationSources` (onLoad, Attached documents with extraction status and what they …)
 
 **Where the user goes next**
 
@@ -1732,7 +1983,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer discovering (`session-not-open`), or the governance data policy refuses the document (`governance-blocked`).; 409 The session is no longer discovering (`session-not-open`).; 409 The session is no longer open for decisions (`session-not-open`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The session is no longer discovering (`session-not-open`), or the governance data policy refuses the document (`governance-blocked`).; 422 The asset is not a readable document or image (`unreadable-source`), for example a scan with no text layer the extractor could read. |
 
 #### Sample data for the mock-up
 
@@ -1745,16 +1996,16 @@ missing: No refund policy given for cabanas
 
 #### Permissions
 
-- `answerConfigurationQuestion` → `AI_USE` (operate) · staff
 - `getConfigurationBlueprint` → `AI_USE` (operate) · staff
-- `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
-- `attachConfigurationSource` → `AI_USE` (operate) · staff
-- `listConfigurationSources` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `attachConfigurationSource` → `AI_USE` (operate) · staff
+- `listConfigurationSources` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1786,7 +2037,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (106 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-477?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-469`.
@@ -1864,14 +2115,37 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getConfigurationBlueprint`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Blueprint | grouped details | The blueprint (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. |
+| ID | the name it points at, never the id | — |
+| Session | the name it points at, never the id | — |
+| Readiness | chip: Not ready, Ready with warnings, Ready | — |
+| Required open | 1,234 | Required decisions not yet accepted or modified. |
+| Issues | list or chips (count when long) | The issues of one blueprint version, stored with it. |
+| Severity | chip: Blocking, Warning, Info | — |
+| Kind | chip: Missing, Contradictory, Ambiguous, Cross module, Dependency | — |
+| Decision key | text | — |
+| Module | text | — |
+| Message | text | — |
+| Dependency map | grouped details | Configuration objects and the order they depend on each other, by module. |
+| Summary | text | — |
+| Decisions | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Blueprint | the name it points at, never the id | — |
+| Decision key | text | — |
+| Module | text | — |
+| Decision class | chip: Required, Recommended, Optional | — |
+| Question | text | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `buildConfigurationPlan` POST `/configuration-sessions/{sessionId}/plan` | — | AiActionPlanDetail | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The blueprint is not ready: a required decision is open or deferred (AIC-115). | produces a document or message: Compile the blueprint into a plan |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
@@ -1926,6 +2200,8 @@ blueprint:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1954,7 +2230,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-478?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-469`.
@@ -2070,15 +2346,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiConfigurationBlueprint": {"type":"object","x-ticvai-persistence":"ai.blueprint","description":"**The blueprint** (design 2.2 D step 2, ADM-478): decisions, severity-graded issues and a dependency map. **Never `ready` while a required decision is deferred** (AIC-115).","required":["sessionId","version","readiness"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"sessionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.config_session"},"version":{"type":"integer","minimum":1},"readiness":{"type":"string","enum":["notReady","readyWithWarnings","ready"],"readOnly":true},"requiredOpen":{"type":"integer","minimum":0,"readOnly":true,"description":"Required decisions not yet accepted or modified."},"issues":{"$ref":"#/components/schemas/AiBlueprintIssueList"},"dependencyMap":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Configuration objects and the order they depend on each other, by module."},"summary":{"type":"string","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiConfigurationQuestion": {"type":"object","x-ticvai-persistence":"none — chosen per turn from the configuration knowledge model","description":"**The next question, chosen by the configuration knowledge model, not by the language model** (design 2.2 D, AIC-111). The model only extracts a structured answer against `answerSchema`.","required":["questionKey","text","decisionClass"],"properties":{"questionKey":{"type":"string"},"text":{"type":"string"},"module":{"type":"string","nullable":true},"decisionClass":{"type":"string","enum":["required","recommended","optional"]},"answerType":{"type":"string","enum":["freeText","singleChoice","multiChoice","number","date","confirm"]},"options":{"type":"array","items":{"type":"string"}},"why":{"type":"string","nullable":true,"description":"Why it is asked: which configuration branch it opens or closes."},"answerSchema":{"type":"object","additionalProperties":true,"nullable":true,"description":"JSON Schema the extracted answer must satisfy."}}},
 "AiConfigurationSession": {"type":"object","x-ticvai-persistence":"ai.config_session","description":"**A configuration-assistant session** (design 2.2 D steps 1-2, C7; ADM-469..478). Discovery runs from the configuration knowledge model; every value carries provenance.","required":["intent","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"intent":{"type":"string","enum":["create","modify","extend","clone"]},"venueType":{"type":"string","nullable":true,"description":"Museum, theme park, water park, zoo, aquarium, theatre, stadium, festival, conference..."},"sourceScopePath":{"type":"string","nullable":true,"description":"The setup being cloned or extended."},"status":{"type":"string","enum":["discovering","blueprintReady","planned","executing","completed","abandoned"],"readOnly":true},"progressPercent":{"type":"integer","minimum":0,"maximum":100,"readOnly":true},"nextQuestion":{"allOf":[{"$ref":"#/components/schemas/AiConfigurationQuestion"}],"nullable":true,"readOnly":true},"conversationId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.conversation"},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan"},"locale":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"startedAt":{"type":"string","format":"date-time","readOnly":true},"lastActivityAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
-"AiConfigurationSource": {"type":"object","x-ticvai-persistence":"ai.config_source","description":"**A document attached to a configuration session** (1.3.31, 1.4.21, 2.6.50): the uploaded asset, what kind of source it is, and how its extraction went. The values it yields are blueprint decisions with provenance `inferred` and a citation back here. **Scoped through its session** (`platform.apply_parent_rls`).","required":["sessionId","assetId","sourceKind","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"sessionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.config_session"},"assetId":{"type":"string","format":"uuid","x-ticvai-references":"assets.MediaAsset"},"sourceKind":{"type":"string","enum":["brief","brochure","catalogue","priceList","spreadsheet","brandAsset"]},"note":{"type":"string","nullable":true},"status":{"type":"string","enum":["extracting","extracted","partial","failed"],"readOnly":true},"pageCount":{"type":"integer","nullable":true,"readOnly":true},"valuesExtracted":{"type":"integer","readOnly":true,"description":"Questions it pre-answered."},"unreadRegions":{"type":"array","items":{"type":"string"},"readOnly":true,"description":"Pages or regions it could not read, named so a person can answer by hand."},"attachedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"attachedAt":{"type":"string","format":"date-time","readOnly":true},"completedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
+"AiConfigurationSource": {"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"ai.config_source","description":"**A document attached to a configuration session** (1.3.31, 1.4.21, 2.6.50): the uploaded asset, what kind of source it is, and how its extraction went. The values it yields are blueprint decisions with provenance `inferred` and a citation back here. **Scoped through its session** (`platform.apply_parent_rls`).","required":["sessionId","assetId","sourceKind","status","scopePath"],"properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid","readOnly":true},"sessionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.config_session"},"assetId":{"type":"string","format":"uuid","x-ticvai-references":"assets.MediaAsset"},"sourceKind":{"type":"string","enum":["brief","brochure","catalogue","priceList","spreadsheet","brandAsset"]},"note":{"type":"string","nullable":true},"status":{"type":"string","enum":["extracting","extracted","partial","failed"],"readOnly":true},"pageCount":{"type":"integer","nullable":true,"readOnly":true},"valuesExtracted":{"type":"integer","readOnly":true,"description":"Questions it pre-answered."},"unreadRegions":{"type":"array","items":{"type":"string"},"readOnly":true,"description":"Pages or regions it could not read, named so a person can answer by hand."},"attachedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"attachedAt":{"type":"string","format":"date-time","readOnly":true},"completedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
 "AiConfigurationTurn": {"type":"object","x-ticvai-persistence":"none — the answer is written to ai.blueprint_decision and the session","description":"The result of one answer: what was extracted with its provenance, the next question and progress.","required":["session"],"properties":{"session":{"$ref":"#/components/schemas/AiConfigurationSession"},"extracted":{"type":"array","items":{"type":"object","properties":{"decisionKey":{"type":"string"},"value":{"type":"object","additionalProperties":true,"nullable":true},"provenance":{"$ref":"#/components/schemas/AiProvenance"}}}},"nextQuestion":{"allOf":[{"$ref":"#/components/schemas/AiConfigurationQuestion"}],"nullable":true},"clarificationsNeeded":{"type":"array","items":{"type":"string"}}}},
 "AiProvenance": {"type":"string","enum":["confirmed","aiRecommended","inferred","unknown"],"description":"**Where a configuration value came from** (design 2.2 D, AIC-111): said by the administrator, recommended by the assistant, inferred from other answers, or not known yet. Shown beside every value; no confidence number is shown for configuration (design 5.6)."},
-"AiVenueSettings": {"type":"object","x-ticvai-persistence":"ai.venue_settings","description":"**The venue AI profile** (29 September, AI functions review): the figures a venue gives at onboarding so every data-driven answer is useful before it has history. One row per venue; configuration, not history. Defaults come from the starting pattern for `venueType`, which TICVAI writes from published sources and made-up example curves, **never from another tenant's data** (AI-D01, AIP-149).","required":["venueId","venueType"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"type":"string","format":"uuid"},"venueType":{"type":"string","enum":["waterPark","themePark","familyEntertainmentCentre","museum","arena","zooAquarium","other"]},"isOutdoor":{"type":"boolean","default":true,"description":"Outdoor venues take the summer-heat and weather effects."},"capacity":{"type":"integer","minimum":1,"nullable":true},"openingHours":{"type":"array","description":"The usual week. Exceptions come from the venue calendar.","items":{"type":"object","properties":{"dayOfWeek":{"type":"integer","minimum":1,"maximum":7},"opensAt":{"type":"string"},"closesAt":{"type":"string"}}}},"typicalWeekdayAttendance":{"type":"integer","minimum":0,"nullable":true},"typicalWeekendAttendance":{"type":"integer","minimum":0,"nullable":true},"peakMonths":{"type":"array","items":{"type":"integer","minimum":1,"maximum":12}},"averageSpend":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"fnbAttachRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"staffProductivity":{"type":"object","additionalProperties":{"type":"number"},"description":"Per role, units per staff hour, e.g. `{\"cashier\": 40, \"gate\": 300}`. Defaults from the pattern."},"startingPatternKey":{"type":"string","readOnly":true,"description":"The pattern and version in use, e.g. `waterPark@3`."},"updatedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiVenueSettings": {"type":"object","x-ticvai-persistence":"ai.venue_settings","description":"**The venue AI profile** (29 September, AI functions review): the figures a venue gives at onboarding so every data-driven answer is useful before it has history. One row per venue; configuration, not history. Defaults come from the starting pattern for `venueType`, which TICVAI writes from published sources and made-up example curves, **never from another tenant's data** (AI-D01, AIP-149).","required":["venueId","venueType"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"type":"string","format":"uuid"},"venueType":{"type":"string","enum":["waterPark","themePark","familyEntertainmentCentre","museum","arena","zooAquarium","other"]},"isOutdoor":{"type":"boolean","default":true,"description":"Outdoor venues take the summer-heat and weather effects."},"capacity":{"type":"integer","minimum":1,"nullable":true},"openingHours":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"The usual week. Exceptions come from the venue calendar.","items":{"type":"object","properties":{"dayOfWeek":{"type":"integer","minimum":1,"maximum":7},"opensAt":{"type":"string"},"closesAt":{"type":"string"}}}},"typicalWeekdayAttendance":{"type":"integer","minimum":0,"nullable":true},"typicalWeekendAttendance":{"type":"integer","minimum":0,"nullable":true},"peakMonths":{"type":"array","items":{"type":"integer","minimum":1,"maximum":12}},"averageSpend":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"fnbAttachRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"staffProductivity":{"type":"object","additionalProperties":{"type":"number"},"description":"Per role, units per staff hour, e.g. `{\"cashier\": 40, \"gate\": 300}`. Defaults from the pattern."},"startingPatternKey":{"type":"string","readOnly":true,"description":"The pattern and version in use, e.g. `waterPark@3`."},"updatedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Permission": {"type":"string","enum":["SESSION_FORCE_LOGOUT","USER_MANAGE","ROLE_MANAGE","PERMISSION_GRANT","PERMISSION_VIEW","PERMISSION_MANAGE","PLATFORM_TENANT_VIEW","PLATFORM_TENANT_MANAGE","PLATFORM_TENANT_TERMINATE","PLATFORM_PLAN_MANAGE","PLATFORM_CELL_VIEW","PLATFORM_CELL_MANAGE","PLATFORM_BILLING_VIEW","PLATFORM_AI_MANAGE","PLATFORM_BILLING_MANAGE","PLATFORM_RELEASE_VIEW","PLATFORM_RELEASE_MANAGE","PLATFORM_RELEASE_PROMOTE","PLATFORM_MIGRATION_VIEW","PLATFORM_MIGRATION_APPLY","PLATFORM_TENANT_ACCESS","TENANT_CONFIGURE","TENANT_VIEW","TENANT_PUBLISH","SCOPE_VIEW","SCOPE_MANAGE","REGION_CONFIGURE","WORKSTATION_CONFIGURE","PRODUCT_VIEW","PRODUCT_CONFIGURE","PRODUCT_APPROVE","PRODUCT_PUBLISH","PRICE_VIEW","PRICE_CONFIGURE","EVENT_CONFIGURE","PERFORMANCE_CONFIGURE","CAPACITY_CONFIGURE","ORDER_VIEW","ORDER_VIEW_OTHER","ORDER_CREATE","ORDER_MODIFY","ORDER_DISCOUNT","ORDER_CANCEL","ORDER_VOID","ORDER_REFUND","ORDER_REFUND_APPROVE","ORDER_REFUND_BULK","ORDER_EXCHANGE","ORDER_RESCHEDULE","ORDER_REPRINT","PRICE_OVERRIDE","DISCOUNT_APPLY","CREDIT_MANAGE","CREDIT_OVERRIDE","WALLET_VIEW","WALLET_OPERATE","WALLET_CONFIGURE","PAYMENT_VIEW","PAYMENT_CONFIGURE","PAYMENT_PROVIDER_MANAGE","PAYMENT_DISPUTE","SHIFT_OPEN","SHIFT_CLOSE","SHIFT_SUSPEND","SHIFT_CLOSE_OTHER","SHIFT_APPROVE_OPEN","SHIFT_APPROVE_CLOSE","SHIFT_REOPEN","CASH_LIFT","CASH_ADD","CASH_NO_SALE","DEPOSIT_BOX_MODIFY_OWN","DEPOSIT_BOX_MODIFY_OTHER","OVERSHORT_ACCEPT","ACCESS_VALIDATE","ACCESS_OVERRIDE","ACCESS_POINT_CONFIGURE","TURNSTILE_MODE_SET","TICKET_LOOKUP","ACCREDITATION_VIEW","ACCREDITATION_APPLY","ACCREDITATION_APPROVE","ACCREDITATION_ISSUE","ACCREDITATION_MANAGE","ACCREDITATION_CONFIGURE","REPORT_VIEW_OWN","REPORT_VIEW_WORKSTATION","REPORT_VIEW_VENUE","REPORT_VIEW_REGION","REPORT_VIEW_TENANT","REPORT_EXPORT","REPORT_EXPORT_PII","REPORT_MANAGE","REPORT_SCHEDULE","LEDGER_VIEW","LEDGER_POST","LEDGER_APPROVE","TAX_CONFIGURE","ACCOUNT_CONFIGURE","SETTLEMENT_VIEW","SETTLEMENT_RECONCILE","GUEST_VIEW","GUEST_VIEW_PII","GUEST_MANAGE","VENUE_MAP_VIEW","VENUE_MAP_MANAGE","VENUE_MAP_PUBLISH","RESOURCE_VIEW","RESOURCE_BOOK","RESOURCE_MANAGE","RESOURCE_CONFIGURE","RENTAL_VIEW","RENTAL_BOOK","RENTAL_OPERATE","RENTAL_MANAGE","RENTAL_CONFIGURE","RENTAL_PRICE","RENTAL_APPROVE","RENTAL_OVERRIDE","DEVELOPER_VIEW","DEVELOPER_MANAGE","DEVELOPER_ADMIN","LOYALTY_ACCRUE","LOYALTY_REDEEM","LOYALTY_ADJUST","MARKETING_VIEW","MARKETING_MANAGE","MARKETING_SEND","CASE_VIEW","CASE_MANAGE","ASSET_LIBRARY_VIEW","ASSET_LIBRARY_MANAGE","ASSET_LIBRARY_APPROVE","ASSET_LIBRARY_SHARE","QUEUE_VIEW","QUEUE_MANAGE","QUEUE_REDEEM","QUEUE_OVERRIDE","TRANSPORT_VIEW","TRANSPORT_MANAGE","TRANSPORT_PRICE","ASSET_VIEW","ASSET_MANAGE","WORK_ORDER_VIEW","WORK_ORDER_MANAGE","WORK_ORDER_VERIFY","INSPECTION_VIEW","INSPECTION_SUBMIT","INSPECTION_MANAGE","INCIDENT_REPORT","INCIDENT_VIEW","INCIDENT_MANAGE","KIOSK_ATTEND","DEVICE_VIEW","DEVICE_CONFIGURE","DEVICE_MANAGE","APPROVAL_ACT","APPROVAL_DELEGATE","AI_USE","AI_CONFIGURE","AI_APPROVE","AI_AUDIT_VIEW","RISK_REVIEW","RISK_INVESTIGATE","AUDIT_VIEW","APPROVAL_VIEW","APPROVAL_REQUEST","APPROVAL_DECIDE","APPROVAL_CONFIGURE","MAINTENANCE_EXECUTE","MAINTENANCE_APPROVE","WORKFORCE_VIEW","WORKFORCE_MANAGE","ATTENDANCE_RECORD","ANNOUNCEMENT_PUBLISH","ANNOUNCEMENT_EMERGENCY","PARTNER_VIEW","PARTNER_MANAGE","PARKING_CONFIGURE","PAYMENT_VOID","PROCUREMENT_VIEW","PROCUREMENT_REQUEST","PROCUREMENT_MANAGE","PROCUREMENT_RECEIVE","CORE_AI_PUBLISH","TICKETING_AI_PUBLISH","ACCESS_AI_PUBLISH","FNB_AI_PUBLISH","RETAIL_AI_PUBLISH","INVENTORY_AI_PUBLISH","SEATING_AI_PUBLISH","MEMBERSHIP_AI_PUBLISH","MARKETING_AI_PUBLISH","RESOURCES_AI_PUBLISH","QUEUE_AI_PUBLISH","TRANSPORT_AI_PUBLISH","GAMES_AI_PUBLISH","MAINTENANCE_AI_PUBLISH","ACCREDITATION_AI_PUBLISH","PARTNER_AI_PUBLISH","ANALYTICS_AI_PUBLISH","BIOMETRIC_IMAGE_VIEW","ACCESS_DIRECTION_SET","REPORT_GOVERNANCE_MANAGE"]},
-"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
+"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"x-ticvai-references":"identity.principal","type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
 "SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
-"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "TenantStatus": {"type":"string","enum":["onboarding","active","suspended","terminating","terminated"]}
 }
 ```

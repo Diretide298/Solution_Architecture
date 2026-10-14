@@ -171,6 +171,7 @@
     "description": "The movement this line counts, where `countKind` is `movement`. How `listCashMovements` rebuilds each movement's `denominations`.\n"
    },
    "denominationId": {
+    "x-ticvai-references": "platform.denomination",
     "type": "string",
     "format": "uuid",
     "description": "References `platform.denomination` — face value, kind and sort order live there."
@@ -353,6 +354,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -659,6 +661,7 @@
     "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
+    "x-ticvai-references": "catalogue.variant",
     "type": "string",
     "format": "uuid"
    },
@@ -795,11 +798,13 @@
     "description": "Null for an anonymous sale. Identity and entitlement are separate."
    },
    "guestLinkId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells."
    },
    "catalogueBundleVersion": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
    },
@@ -1056,6 +1061,7 @@
     "$ref": "#/components/schemas/DeliveryLocationKind"
    },
    "label": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "description": "What a runner is told. \"Cabana 12\", \"Row H Seat 4\", \"Lawn — north gate\"."
    },
@@ -1183,6 +1189,7 @@
      ],
      "properties": {
       "denominationId": {
+       "x-ticvai-references": "platform.denomination",
        "type": "string",
        "format": "uuid",
        "description": "References `platform.denomination`, as `CashCountLine.denominationId` does. Until 26 September this was `denomination: number` — a face value as a JSON float, which naming-and-style 5.1 forbids and which could disagree with the note it named (pull audit R122).\n"
@@ -1280,6 +1287,11 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the device made the write** (R113; CHG-OFL-003): for an allocation, the same moment as `allocatedAt`, kept in `recorded_at`, the column every offline-written table carries for the sync to order replays by. Omitted online, the server sets it to the time it received the call."
    }
   }
  },
@@ -1646,6 +1658,7 @@
   ]
  },
  "LegalEntity": {
+  "x-ticvai-rls": "read-beneath",
   "x-ticvai-persistence": "ledger.legal_entity",
   "type": "object",
   "description": "Also the `createLegalEntity` body. **`id` and `scopePath` are server-owned** (`readOnly`) and ignored if sent.\n",
@@ -1665,6 +1678,7 @@
     "readOnly": true
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -1789,7 +1803,8 @@
    },
    "barcode": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "x-ticvai-unique": "venue"
    },
    "name": {
     "type": "string"
@@ -2200,7 +2215,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -3110,13 +3126,15 @@
     "type": "string",
     "format": "uuid",
     "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164).",
     "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
    },
    "approvedByPrincipalId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164)."
    },
    "responsibleDepartmentId": {
     "type": "string",
@@ -3222,6 +3240,8 @@
     "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 6,
     "items": {
@@ -4903,7 +4923,8 @@
       },
       "principalId": {
        "type": "string",
-       "format": "uuid"
+       "format": "uuid",
+       "x-ticvai-references": "identity.principal"
       },
       "at": {
        "type": "string",
@@ -5045,7 +5066,8 @@
    },
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "platform.scope"
    },
    "scopePath": {
     "type": "string",
@@ -5168,6 +5190,9 @@
   }
  },
  "VenueSettings": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",

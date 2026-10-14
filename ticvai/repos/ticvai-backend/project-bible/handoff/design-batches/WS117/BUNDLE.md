@@ -1,6 +1,6 @@
 # WS117 — AI Configuration Assistant board 2
 
-**10 screens · 8 operations · 13 schemas · 3 permissions**
+**10 screens · 7 operations · 13 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -95,15 +95,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-479` | AI Configuration Build Command Center | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-480` | Venue & Organization Configuration | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-481` | Product Configuration Assistant | D | 6 | 6 | 7 | 1 | 2 | 3 | — | notStarted (—) |
-| `ADM-482` | Schedule, Capacity & Availability Configuration | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-479` | AI Configuration Build Command Center | D | 6 | 166 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-480` | Venue & Organization Configuration | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-481` | Product Configuration Assistant | D | 9 | 26 | 7 | 1 | 2 | 3 | — | notStarted (—) |
+| `ADM-482` | Schedule, Capacity & Availability Configuration | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-483` | Pricing & Commercial Configuration | D | 6 | 16 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-484` | Promotion, Bundle & Upsell Configuration | D | 6 | 6 | 7 | 1 | 0 | 2 | — | notStarted (—) |
-| `ADM-485` | Seating, Access & Operational Configuration | D | 6 | 6 | 7 | 1 | 0 | 6 | — | notStarted (—) |
-| `ADM-486` | Channel, Media & Fulfillment Configuration | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-487` | Cross-Module Conflict & Dependency Validation | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-484` | Promotion, Bundle & Upsell Configuration | D | 9 | 26 | 7 | 1 | 0 | 2 | — | notStarted (—) |
+| `ADM-485` | Seating, Access & Operational Configuration | D | 9 | 26 | 7 | 1 | 0 | 6 | — | notStarted (—) |
+| `ADM-486` | Channel, Media & Fulfillment Configuration | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-487` | Cross-Module Conflict & Dependency Validation | D | 6 | 126 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-488` | Configuration Preview & Impact Analysis | D | 24 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ---
@@ -178,21 +178,205 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Configuration Areas** (metric tile)
+**Configuration Areas** (metric tile, from `getActionPlan`)
 
-**Objects Proposed** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
-**Ready** (metric tile)
+**Objects Proposed** (metric tile, from `getActionPlan`)
 
-**Warnings** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
-**Conflicts** (metric tile)
+**Ready** (metric tile, from `getActionPlan`)
 
-**Missing Configuration** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
-**AI Recommendations** (metric tile)
+**Warnings** (metric tile, from `getActionPlan`)
 
-**Approval Required** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+
+**Conflicts** (metric tile, from `getActionPlan`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+
+**Missing Configuration** (metric tile, from `getActionPlan`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+
+**AI Recommendations** (metric tile, from `getActionPlan`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+
+**Approval Required** (metric tile, from `getActionPlan`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -230,7 +414,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The blueprint is not ready: a required decision is open or deferred (AIC-115). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
 #### Sample data for the mock-up
 
@@ -250,12 +434,13 @@ tiles:
 
 - `getActionPlan` → `AI_USE` (operate) · staff
 - `getConfigurationBlueprint` → `AI_USE` (operate) · staff
-- `buildConfigurationPlan` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -294,8 +479,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (166 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-479?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-002`, `ADM-480`, `ADM-481`, `ADM-482`, `ADM-483`, `ADM-484`, `ADM-485`, `ADM-486`, `ADM-487`, `ADM-488`.
@@ -339,8 +524,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | text field | — | — | `getConfigurationBlueprint` ?module |
-| Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -358,6 +541,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`decideBlueprintRecommendation`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Accept · Modify · Reject · Defer | — | — | `decideBlueprintRecommendation` body |
+| Value `value` | key and value settings | optional | — | — | — | — | `decideBlueprintRecommendation` body |
+| Note `note` | text area | optional | — | max length 1000 | — | — | `decideBlueprintRecommendation` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -373,21 +564,44 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getActionPlan`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `decideBlueprintRecommendation` POST `/configuration-sessions/{sessionId}/decisions/{decisionKey}` | inline | AiBlueprintDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer open for decisions (`session-not-open`). | produces a document or message: Accept, modify, reject or defer a blueprint decision |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **proposed objects**: Field, proposed value, provenance, status; accept / modify / reject per field or object. *(source: contracts/satellite/ai.yaml#decideBlueprintRecommendation / contracts/satellite/ai.yaml#getActionPlan)*
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -424,13 +638,14 @@ venue:
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
-- `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -459,8 +674,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-480?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
@@ -504,8 +719,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | text field | — | — | `getConfigurationBlueprint` ?module |
-| Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -523,6 +736,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`decideBlueprintRecommendation`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Accept · Modify · Reject · Defer | — | — | `decideBlueprintRecommendation` body |
+| Value `value` | key and value settings | optional | — | — | — | — | `decideBlueprintRecommendation` body |
+| Note `note` | text area | optional | — | max length 1000 | — | — | `decideBlueprintRecommendation` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -538,21 +759,44 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getActionPlan`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `decideBlueprintRecommendation` POST `/configuration-sessions/{sessionId}/decisions/{decisionKey}` | inline | AiBlueprintDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer open for decisions (`session-not-open`). | produces a document or message: Accept, modify, reject or defer a blueprint decision |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **product drafts**: One card per product with its fields, provenance and citation; required fields missing shown as questions, not blanks. *(source: DI-937 / TRACKER Actions row 125 / contracts/satellite/ai.yaml#getConfigurationBlueprint)*
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -586,13 +830,14 @@ product:
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
-- `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -626,8 +871,8 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-481?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
@@ -671,8 +916,6 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | text field | — | — | `getConfigurationBlueprint` ?module |
-| Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -690,6 +933,14 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`decideBlueprintRecommendation`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Accept · Modify · Reject · Defer | — | — | `decideBlueprintRecommendation` body |
+| Value `value` | key and value settings | optional | — | — | — | — | `decideBlueprintRecommendation` body |
+| Note `note` | text area | optional | — | max length 1000 | — | — | `decideBlueprintRecommendation` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -705,21 +956,44 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getActionPlan`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `decideBlueprintRecommendation` POST `/configuration-sessions/{sessionId}/decisions/{decisionKey}` | inline | AiBlueprintDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer open for decisions (`session-not-open`). | produces a document or message: Accept, modify, reject or defer a blueprint decision |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **schedule proposal**: Calendar view of opening days and slots with capacity; conflicts flagged against venue capacity. *(source: contracts/satellite/ai.yaml#getConfigurationBlueprint / MoM 18 Sep 4.6)*
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -749,13 +1023,14 @@ slots: 'Cabanas: full day, 40 per day; Dolphin show: 12:00 and 16:00, 400 seats 
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
-- `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -784,8 +1059,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-482?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
@@ -835,8 +1110,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | text field | — | — | `getConfigurationBlueprint` ?module |
-| Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -879,7 +1152,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | AED 120 | text | not in the schema: `AED 120` |
 | AED 20 | text | not in the schema: `AED 20` |
 
-**The selected pricing commercial** (detail panel): The pack groups this record's detail under its own headings: “Child AED 80 AED 95”, “Customer Eligibility”, “Dynamic Pricing”.
+**The selected pricing commercial** (detail panel, from `getActionPlan`): The pack groups this record's detail under its own headings: “Child AED 80 AED 95”, “Customer Eligibility”, “Dynamic Pricing”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -900,7 +1173,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 - **price proposal**: Product × guest category × day type × channel grid with proposed price in AED, VAT shown (5% UAE) and the source of each price (price list, recommendation). *(source: contracts/spine/catalogue.yaml#setChannelPricingCommercial / ADR-0050 / MoM 18 Sep 4.1)*
 - **simulation**: "Adult / Saturday / B2C: AED 120 base + AED 20 weekend = AED 140" style worked examples. *(source: screens/P09-platform-admin-console.yaml#ADM-483)*
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -936,13 +1209,14 @@ grid:
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
-- `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1018,8 +1292,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | text field | — | — | `getConfigurationBlueprint` ?module |
-| Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -1037,6 +1309,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`decideBlueprintRecommendation`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Accept · Modify · Reject · Defer | — | — | `decideBlueprintRecommendation` body |
+| Value `value` | key and value settings | optional | — | — | — | — | `decideBlueprintRecommendation` body |
+| Note `note` | text area | optional | — | max length 1000 | — | — | `decideBlueprintRecommendation` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1052,21 +1332,44 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getActionPlan`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `decideBlueprintRecommendation` POST `/configuration-sessions/{sessionId}/decisions/{decisionKey}` | inline | AiBlueprintDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer open for decisions (`session-not-open`). | produces a document or message: Accept, modify, reject or defer a blueprint decision |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **proposals**: Bundle, upsell path or cross-sell relationship with the products involved, price effect and why recommended; provenance per item. *(source: contracts/satellite/ai.yaml#getConfigurationBlueprint / ADR-0052)*
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -1103,13 +1406,14 @@ proposals:
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
-- `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1139,8 +1443,8 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-484?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
@@ -1184,8 +1488,6 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | text field | — | — | `getConfigurationBlueprint` ?module |
-| Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -1203,6 +1505,14 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`decideBlueprintRecommendation`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Accept · Modify · Reject · Defer | — | — | `decideBlueprintRecommendation` body |
+| Value `value` | key and value settings | optional | — | — | — | — | `decideBlueprintRecommendation` body |
+| Note `note` | text area | optional | — | max length 1000 | — | — | `decideBlueprintRecommendation` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1218,21 +1528,44 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getActionPlan`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `decideBlueprintRecommendation` POST `/configuration-sessions/{sessionId}/decisions/{decisionKey}` | inline | AiBlueprintDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer open for decisions (`session-not-open`). | produces a document or message: Accept, modify, reject or defer a blueprint decision |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **adaptive sections**: Only seating (seated venues), access gates and validation rules, re-entry, ID checks as the blueprint requires. *(source: screens/P09-platform-admin-console.yaml#ADM-485 (purpose) / contracts/satellite/ai.yaml#getConfigurationBlueprint)*
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -1267,13 +1600,14 @@ access:
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
-- `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1307,8 +1641,8 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-485?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
@@ -1352,8 +1686,6 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Module | text field | — | — | `getConfigurationBlueprint` ?module |
-| Decision class | segmented control | — | Required · Recommended · Optional | `getConfigurationBlueprint` ?decisionClass |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -1371,6 +1703,14 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`decideBlueprintRecommendation`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Accept · Modify · Reject · Defer | — | — | `decideBlueprintRecommendation` body |
+| Value `value` | key and value settings | optional | — | — | — | — | `decideBlueprintRecommendation` body |
+| Note `note` | text area | optional | — | max length 1000 | — | — | `decideBlueprintRecommendation` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1386,21 +1726,44 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getActionPlan`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `decideBlueprintRecommendation` POST `/configuration-sessions/{sessionId}/decisions/{decisionKey}` | inline | AiBlueprintDecision | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The session is no longer open for decisions (`session-not-open`). | produces a document or message: Accept, modify, reject or defer a blueprint decision |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **product × channel matrix**: Ticks per channel with media; a missing price on a ticked channel is a red dependency linking to pricing. *(source: MoM 18 Sep 4.6 / contracts/satellite/ai.yaml#getConfigurationBlueprint)*
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `getConfigurationBlueprint` (onLoad, The blueprint so far); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -1435,13 +1798,14 @@ row:
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
-- `getConfigurationBlueprint` → `AI_USE` (operate) · staff
 - `decideBlueprintRecommendation` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1470,8 +1834,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-486?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-479`.
@@ -1547,17 +1911,155 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Configuration Objects** (metric tile)
+**Configuration Objects** (metric tile, from `getActionPlan`)
 
-**Passed** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
-**Warnings** (metric tile)
+**Passed** (metric tile, from `getActionPlan`)
 
-**Conflicts** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
-**Missing Dependencies** (metric tile)
+**Warnings** (metric tile, from `getActionPlan`)
 
-**Approval Requirements** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+
+**Conflicts** (metric tile, from `getActionPlan`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+
+**Missing Dependencies** (metric tile, from `getActionPlan`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+
+**Approval Requirements** (metric tile, from `getActionPlan`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -1594,7 +2096,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The plan is executing or finished; simulate a rollback plan instead. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
 #### Sample data for the mock-up
 
@@ -1611,12 +2113,13 @@ issue:
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
-- `simulateActionPlan` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1645,8 +2148,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (126 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-487?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, Link Existing, Configure Later, Ask AI.
 - [ ] Every transition is wired: `ADM-479`.
@@ -1753,7 +2256,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 - **business view**: Plain-language summary per product line; values marked User provided / AI recommended / System derived / Existing configuration. *(source: contracts/satellite/ai.yaml#/components/schemas/AiProvenance / screens/P09-platform-admin-console.yaml#ADM-498)*
 - **impact**: Affected channels and future bookings counted; higher-risk changes can take effect from a chosen future date. *(source: TRACKER Actions row 194 / MoM 18 Sep 4.2)*
 
-**Data it reads**: `getActionPlan` (onLoad, A plan with its steps); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -1783,13 +2286,14 @@ summary: Guests can buy Day Passes (AED 120 weekdays, AED 140 weekends) and the 
 
 #### Permissions
 
-- `getActionPlan` → `AI_USE` (operate) · staff
 - `simulateActionPlan` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -1907,7 +2411,6 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"buildConfigurationPlan": {"method":"POST","path":"/configuration-sessions/{sessionId}/plan","contract":"ai","summary":"Compile the blueprint into a plan","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiActionPlanDetail"},
 "decideBlueprintRecommendation": {"method":"POST","path":"/configuration-sessions/{sessionId}/decisions/{decisionKey}","contract":"ai","summary":"Accept, modify, reject or defer a blueprint decision","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiBlueprintDecision"},
 "getActionPlan": {"method":"GET","path":"/action-plans/{planId}","contract":"ai","summary":"A plan with its steps","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AiActionPlanDetail"},
 "getConfigurationBlueprint": {"method":"GET","path":"/configuration-sessions/{sessionId}/blueprint","contract":"ai","summary":"The blueprint so far","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"module","in":"query","required":null},{"name":"decisionClass","in":"query","required":null}],"requestBody":null,"responds":"AiBlueprintView"},
@@ -1933,9 +2436,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiProvenance": {"type":"string","enum":["confirmed","aiRecommended","inferred","unknown"],"description":"**Where a configuration value came from** (design 2.2 D, AIC-111): said by the administrator, recommended by the assistant, inferred from other answers, or not known yet. Shown beside every value; no confidence number is shown for configuration (design 5.6)."},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Permission": {"type":"string","enum":["SESSION_FORCE_LOGOUT","USER_MANAGE","ROLE_MANAGE","PERMISSION_GRANT","PERMISSION_VIEW","PERMISSION_MANAGE","PLATFORM_TENANT_VIEW","PLATFORM_TENANT_MANAGE","PLATFORM_TENANT_TERMINATE","PLATFORM_PLAN_MANAGE","PLATFORM_CELL_VIEW","PLATFORM_CELL_MANAGE","PLATFORM_BILLING_VIEW","PLATFORM_AI_MANAGE","PLATFORM_BILLING_MANAGE","PLATFORM_RELEASE_VIEW","PLATFORM_RELEASE_MANAGE","PLATFORM_RELEASE_PROMOTE","PLATFORM_MIGRATION_VIEW","PLATFORM_MIGRATION_APPLY","PLATFORM_TENANT_ACCESS","TENANT_CONFIGURE","TENANT_VIEW","TENANT_PUBLISH","SCOPE_VIEW","SCOPE_MANAGE","REGION_CONFIGURE","WORKSTATION_CONFIGURE","PRODUCT_VIEW","PRODUCT_CONFIGURE","PRODUCT_APPROVE","PRODUCT_PUBLISH","PRICE_VIEW","PRICE_CONFIGURE","EVENT_CONFIGURE","PERFORMANCE_CONFIGURE","CAPACITY_CONFIGURE","ORDER_VIEW","ORDER_VIEW_OTHER","ORDER_CREATE","ORDER_MODIFY","ORDER_DISCOUNT","ORDER_CANCEL","ORDER_VOID","ORDER_REFUND","ORDER_REFUND_APPROVE","ORDER_REFUND_BULK","ORDER_EXCHANGE","ORDER_RESCHEDULE","ORDER_REPRINT","PRICE_OVERRIDE","DISCOUNT_APPLY","CREDIT_MANAGE","CREDIT_OVERRIDE","WALLET_VIEW","WALLET_OPERATE","WALLET_CONFIGURE","PAYMENT_VIEW","PAYMENT_CONFIGURE","PAYMENT_PROVIDER_MANAGE","PAYMENT_DISPUTE","SHIFT_OPEN","SHIFT_CLOSE","SHIFT_SUSPEND","SHIFT_CLOSE_OTHER","SHIFT_APPROVE_OPEN","SHIFT_APPROVE_CLOSE","SHIFT_REOPEN","CASH_LIFT","CASH_ADD","CASH_NO_SALE","DEPOSIT_BOX_MODIFY_OWN","DEPOSIT_BOX_MODIFY_OTHER","OVERSHORT_ACCEPT","ACCESS_VALIDATE","ACCESS_OVERRIDE","ACCESS_POINT_CONFIGURE","TURNSTILE_MODE_SET","TICKET_LOOKUP","ACCREDITATION_VIEW","ACCREDITATION_APPLY","ACCREDITATION_APPROVE","ACCREDITATION_ISSUE","ACCREDITATION_MANAGE","ACCREDITATION_CONFIGURE","REPORT_VIEW_OWN","REPORT_VIEW_WORKSTATION","REPORT_VIEW_VENUE","REPORT_VIEW_REGION","REPORT_VIEW_TENANT","REPORT_EXPORT","REPORT_EXPORT_PII","REPORT_MANAGE","REPORT_SCHEDULE","LEDGER_VIEW","LEDGER_POST","LEDGER_APPROVE","TAX_CONFIGURE","ACCOUNT_CONFIGURE","SETTLEMENT_VIEW","SETTLEMENT_RECONCILE","GUEST_VIEW","GUEST_VIEW_PII","GUEST_MANAGE","VENUE_MAP_VIEW","VENUE_MAP_MANAGE","VENUE_MAP_PUBLISH","RESOURCE_VIEW","RESOURCE_BOOK","RESOURCE_MANAGE","RESOURCE_CONFIGURE","RENTAL_VIEW","RENTAL_BOOK","RENTAL_OPERATE","RENTAL_MANAGE","RENTAL_CONFIGURE","RENTAL_PRICE","RENTAL_APPROVE","RENTAL_OVERRIDE","DEVELOPER_VIEW","DEVELOPER_MANAGE","DEVELOPER_ADMIN","LOYALTY_ACCRUE","LOYALTY_REDEEM","LOYALTY_ADJUST","MARKETING_VIEW","MARKETING_MANAGE","MARKETING_SEND","CASE_VIEW","CASE_MANAGE","ASSET_LIBRARY_VIEW","ASSET_LIBRARY_MANAGE","ASSET_LIBRARY_APPROVE","ASSET_LIBRARY_SHARE","QUEUE_VIEW","QUEUE_MANAGE","QUEUE_REDEEM","QUEUE_OVERRIDE","TRANSPORT_VIEW","TRANSPORT_MANAGE","TRANSPORT_PRICE","ASSET_VIEW","ASSET_MANAGE","WORK_ORDER_VIEW","WORK_ORDER_MANAGE","WORK_ORDER_VERIFY","INSPECTION_VIEW","INSPECTION_SUBMIT","INSPECTION_MANAGE","INCIDENT_REPORT","INCIDENT_VIEW","INCIDENT_MANAGE","KIOSK_ATTEND","DEVICE_VIEW","DEVICE_CONFIGURE","DEVICE_MANAGE","APPROVAL_ACT","APPROVAL_DELEGATE","AI_USE","AI_CONFIGURE","AI_APPROVE","AI_AUDIT_VIEW","RISK_REVIEW","RISK_INVESTIGATE","AUDIT_VIEW","APPROVAL_VIEW","APPROVAL_REQUEST","APPROVAL_DECIDE","APPROVAL_CONFIGURE","MAINTENANCE_EXECUTE","MAINTENANCE_APPROVE","WORKFORCE_VIEW","WORKFORCE_MANAGE","ATTENDANCE_RECORD","ANNOUNCEMENT_PUBLISH","ANNOUNCEMENT_EMERGENCY","PARTNER_VIEW","PARTNER_MANAGE","PARKING_CONFIGURE","PAYMENT_VOID","PROCUREMENT_VIEW","PROCUREMENT_REQUEST","PROCUREMENT_MANAGE","PROCUREMENT_RECEIVE","CORE_AI_PUBLISH","TICKETING_AI_PUBLISH","ACCESS_AI_PUBLISH","FNB_AI_PUBLISH","RETAIL_AI_PUBLISH","INVENTORY_AI_PUBLISH","SEATING_AI_PUBLISH","MEMBERSHIP_AI_PUBLISH","MARKETING_AI_PUBLISH","RESOURCES_AI_PUBLISH","QUEUE_AI_PUBLISH","TRANSPORT_AI_PUBLISH","GAMES_AI_PUBLISH","MAINTENANCE_AI_PUBLISH","ACCREDITATION_AI_PUBLISH","PARTNER_AI_PUBLISH","ANALYTICS_AI_PUBLISH","BIOMETRIC_IMAGE_VIEW","ACCESS_DIRECTION_SET","REPORT_GOVERNANCE_MANAGE"]},
-"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
+"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"x-ticvai-references":"identity.principal","type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
 "SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
-"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "TenantStatus": {"type":"string","enum":["onboarding","active","suspended","terminating","terminated"]}
 }
 ```

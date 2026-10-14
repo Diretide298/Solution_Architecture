@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/biometric-access-command-center-bo-184",
-   "component": "apps/venue-management-web/src/routes/access-venue/BiometricAccessCommandCenter.tsx",
+   "component": "src/routes/access-venue/BiometricAccessCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -106,7 +107,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -291,6 +292,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "5",
@@ -300,7 +302,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/biometric-verification-profile-builder-bo-185",
-   "component": "apps/venue-management-web/src/routes/access-venue/BiometricVerificationProfileBuilder.tsx",
+   "component": "src/routes/access-venue/BiometricVerificationProfileBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -459,6 +461,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "5",
@@ -468,7 +471,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/face-pass-enrollment-configuration-bo-186",
-   "component": "apps/venue-management-web/src/routes/access-venue/FacePassEnrollmentConfiguration.tsx",
+   "component": "src/routes/access-venue/FacePassEnrollmentConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -684,6 +687,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "5",
@@ -693,7 +697,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/biometric-consent-guardian-management-bo-187",
-   "component": "apps/venue-management-web/src/routes/access-venue/BiometricConsentGuardianManagement.tsx",
+   "component": "src/routes/access-venue/BiometricConsentGuardianManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -867,6 +871,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "5",
@@ -876,7 +881,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/face-tag-temporary-enrollment-bo-188",
-   "component": "apps/venue-management-web/src/routes/access-venue/FaceTagTemporaryEnrollment.tsx",
+   "component": "src/routes/access-venue/FaceTagTemporaryEnrollment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1006,6 +1011,16 @@
    }
   ],
   "notes": "**Face Tag has its own enrolment operation (`enrolFaceTag`), separate from Face Pass, and it may capture at the entry gate** as the pack and the minutes say; the \"never at a gate\" rule is Face Pass's (CHG-CSP-018, DEC-236).",
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listFaceTagTemporary`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1035,6 +1050,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "5",
@@ -1044,7 +1060,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/face-matching-verification-thresholds-bo-189",
-   "component": "apps/venue-management-web/src/routes/access-venue/FaceMatchingVerificationThresholds.tsx",
+   "component": "src/routes/access-venue/FaceMatchingVerificationThresholds.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1209,6 +1225,16 @@
     "provenance": "contract access.yaml PUT /face-matching-verification"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "profileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listFaceMatchingVerification`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1238,6 +1264,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "5",
@@ -1247,7 +1274,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/face-change-re-enrollment-identity-protection-bo-190",
-   "component": "apps/venue-management-web/src/routes/access-venue/FaceChangeReEnrollmentIdentityProtection.tsx",
+   "component": "src/routes/access-venue/FaceChangeReEnrollmentIdentityProtection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1448,6 +1475,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "5",
@@ -1457,7 +1485,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/biometric-validation-at-gate-bo-191",
-   "component": "apps/venue-management-web/src/routes/access-venue/BiometricValidationAtGate.tsx",
+   "component": "src/routes/access-venue/BiometricValidationAtGate.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1576,6 +1604,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "5",
@@ -1585,7 +1614,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/biometric-lifecycle-retention-deletion-bo-192",
-   "component": "apps/venue-management-web/src/routes/access-venue/BiometricLifecycleRetentionDeletion.tsx",
+   "component": "src/routes/access-venue/BiometricLifecycleRetentionDeletion.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1689,6 +1718,16 @@
    "workshopBoard": "wireframes/WS22 Access Control Board 5.dc.html#bo-192"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 66. 0 of 0 labels bound to a contract property; 4 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "retentionSettingId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listDataRetentionSettings`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1718,6 +1757,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "AUDIT_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "5",
@@ -1727,7 +1767,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/biometric-simulation-audit-publication-bo-193",
-   "component": "apps/venue-management-web/src/routes/access-venue/BiometricSimulationAuditPublication.tsx",
+   "component": "src/routes/access-venue/BiometricSimulationAuditPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {

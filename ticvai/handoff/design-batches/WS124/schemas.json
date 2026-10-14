@@ -80,6 +80,7 @@
   }
  },
  "AiCapabilityRegistration": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "ai.capability",
   "description": "**An entry in the capability registry** (design 3.1 Registry, AIC-144, AIC-145; ADM-520). Nothing becomes an operational AI capability without a row here: owner, function, risk class, autonomy, data categories and lifecycle per environment. `autonomyCeiling` is the platform ceiling for the tenant; a tenant or venue may lower `autonomyLevel`, never raise it (AIC-151).",
@@ -638,6 +639,8 @@
     "description": "The linked operational incident, where both apply (AIC-250)."
    },
    "containment": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -712,6 +715,7 @@
   }
  },
  "AiRelease": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "ai.release",
   "description": "**The release pointer per capability and tenant** (design 3.5): draft, offline evaluation, shadow, canary, production, monitored. Rollback is a pointer switch. **A model goes live only when a person promotes it** (design 3.12, decided 29 September).",
@@ -1419,6 +1423,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -1505,6 +1510,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

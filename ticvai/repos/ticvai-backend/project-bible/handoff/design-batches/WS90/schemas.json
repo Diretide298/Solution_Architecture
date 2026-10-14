@@ -108,6 +108,8 @@
   "description": "Boards 3.2, 3.3 and 3.9. **The hold-release rule is the one that quietly loses stock.**\n",
   "properties": {
    "operatingWindows": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -146,6 +148,15 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "rental.product",
+    "x-ticvai-unique": "tenant",
+    "description": "The rental product these rules are for (one set per product), from the path."
    }
   }
  },
@@ -234,6 +245,15 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "rental.product",
+    "x-ticvai-unique": "tenant",
+    "description": "The rental product these rules are for (one set per product), from the path."
    }
   }
  },
@@ -252,6 +272,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

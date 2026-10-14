@@ -160,7 +160,7 @@
  },
  "setApprovalMatrix": {
   "method": "PUT",
-  "path": "/approval-matrices",
+  "path": "/approval-matrices/{matrixId}",
   "contract": "approvals",
   "summary": "Configure what requires approval",
   "permission": "APPROVAL_CONFIGURE",
@@ -168,6 +168,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "matrixId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -179,7 +184,7 @@
  },
  "setApprovalSlaPolicy": {
   "method": "PUT",
-  "path": "/approval-sla-policies",
+  "path": "/approval-sla-policies/{slaPolicyId}",
   "contract": "approvals",
   "summary": "How long a decision may take, and what happens when it does not",
   "permission": "APPROVAL_CONFIGURE",
@@ -187,6 +192,11 @@
   "conflictPolicy": null,
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "slaPolicyId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

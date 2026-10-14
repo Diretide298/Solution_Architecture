@@ -388,7 +388,7 @@
   "contract": "maintenance",
   "summary": "Record parts consumed",
   "permission": "WORK_ORDER_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -621,7 +621,7 @@
   "contract": "maintenance",
   "summary": "Supervisor verification",
   "permission": "WORK_ORDER_VERIFY",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

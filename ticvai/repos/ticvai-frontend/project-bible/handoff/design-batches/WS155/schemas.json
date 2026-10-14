@@ -1,5 +1,6 @@
 {
  "ApprovalControlPolicy": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "approvals.control_policy",
   "description": "Approvals boards 6.2 and 6.3. **Which decisions one person may not take alone** — distinct from which roles one person may not hold, which is `identity.setSegregationRules`.\n",
@@ -389,10 +390,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -473,10 +476,49 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003). `kind` is the fixed family a type belongs to; this is the tenant's own type within it, and the `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it."
+   },
+   "lifecycleState": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ResourceLifecycleState"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The lifecycle state `setResourceLifecycleState` set."
+   },
+   "lifecycleEffectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the lifecycle state takes effect (`setResourceLifecycleState`)."
+   },
+   "lifecycleReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the lifecycle state changed (`setResourceLifecycleState`)."
+   },
+   "replacementResourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "resources.resource",
+    "description": "The resource that replaces this one, where it was retired for a replacement."
+   },
+   "disposal": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "How a disposed resource left (`setResourceLifecycleState`), as given."
    }
   }
  },
  "ResourceAttributeDefinition": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "resources.attribute_definition",
   "description": "Board 1.05. **A typed, validated field the customer adds.** The alternative was a column per customer request, which is a release per customer.\n",
@@ -491,6 +533,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "label": {
@@ -678,6 +721,7 @@
   }
  },
  "ResourceCategory": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "resources.resource_category",
   "description": "Board 1.03. Beneath the type — *Equipment → AV → Lighting*, *Rental → Towels*. **Configuration cascades down the tree**, which is the reason it is a tree.\n",
@@ -691,6 +735,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -938,6 +983,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -1003,6 +1049,7 @@
   ],
   "properties": {
    "resourceId": {
+    "x-ticvai-references": "resources.resource",
     "type": "string",
     "format": "uuid"
    },
@@ -1105,6 +1152,7 @@
   }
  },
  "ResourceType": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "resources.resource_type",
   "description": "Board 1.02. **The class, and the ten switches that decide which parts of the platform a resource of this class touches.** `Resource.kind` was an enum and this is the table behind it — a customer adding \"Golf Buggy\" does not need a release.\n",
@@ -1118,6 +1166,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -1230,6 +1279,7 @@
   ],
   "properties": {
    "primaryVenueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
@@ -1268,6 +1318,14 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "resources.resource",
+    "description": "The resource assigned, from the path of `setResourceVenueAssignment`."
    }
   }
  }

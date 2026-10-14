@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_CONFIGURE",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/promotion-rule-builder-adm-148",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
+   "component": "src/routes/venue-operations/PromotionsCouponsDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-010"
   },
@@ -194,6 +195,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "2",
@@ -203,7 +205,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/percentage-fixed-discount-configurator-adm-149",
-   "component": "apps/venue-management-web/src/routes/commercial/PercentageFixedDiscountConfigurator.tsx",
+   "component": "src/routes/commercial/PercentageFixedDiscountConfigurator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -352,6 +354,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "2",
@@ -361,7 +364,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/cart-transaction-threshold-rules-adm-150",
-   "component": "apps/venue-management-web/src/routes/commercial/CartTransactionThresholdRules.tsx",
+   "component": "src/routes/commercial/CartTransactionThresholdRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -476,6 +479,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "2",
@@ -485,7 +489,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/volume-bulk-tier-discount-configurator-adm-151",
-   "component": "apps/venue-management-web/src/routes/commercial/VolumeBulkTierDiscountConfigurator.tsx",
+   "component": "src/routes/commercial/VolumeBulkTierDiscountConfigurator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -600,6 +604,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "2",
@@ -609,7 +614,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/time-based-seasonal-discount-rules-adm-152",
-   "component": "apps/venue-management-web/src/routes/commercial/TimeBasedSeasonalDiscountRules.tsx",
+   "component": "src/routes/commercial/TimeBasedSeasonalDiscountRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -724,6 +729,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "2",
@@ -733,7 +739,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/customer-membership-segment-discount-rules-adm-153",
-   "component": "apps/venue-management-web/src/routes/commercial/CustomerMembershipSegmentDiscountRules.tsx",
+   "component": "src/routes/commercial/CustomerMembershipSegmentDiscountRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -852,6 +858,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "2",
@@ -861,7 +868,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-method-bank-partner-discount-rules-adm-154",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentMethodBankPartnerDiscountRules.tsx",
+   "component": "src/routes/commercial/PaymentMethodBankPartnerDiscountRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1021,6 +1028,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "2",
@@ -1030,7 +1038,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/special-price-guest-offer-configurator-adm-155",
-   "component": "apps/venue-management-web/src/routes/commercial/SpecialPriceGuestOfferConfigurator.tsx",
+   "component": "src/routes/commercial/SpecialPriceGuestOfferConfigurator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1189,6 +1197,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "2",
@@ -1198,7 +1207,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/discount-limits-guardrails-commercial-controls-adm-156",
-   "component": "apps/venue-management-web/src/routes/commercial/DiscountLimitsGuardrailsCommercialControls.tsx",
+   "component": "src/routes/commercial/DiscountLimitsGuardrailsCommercialControls.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1342,6 +1351,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "2",
@@ -1351,7 +1361,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/rule-test-simulation-ai-recommendation-workspace-adm-157",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
+   "component": "src/routes/venue-operations/PromotionsCouponsDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-010"
   },

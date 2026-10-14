@@ -5,6 +5,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "2",
@@ -171,41 +172,49 @@
       {
        "kind": "metricTile",
        "label": "Configuration Areas",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Objects Proposed",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Ready",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Warnings",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Conflicts",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Missing Configuration",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "AI Recommendations",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Approval Required",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 24 §Header KPIs"
       }
      ]
@@ -233,13 +242,6 @@
     "contract": "ai",
     "purpose": "The blueprint so far",
     "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "buildConfigurationPlan",
-    "contract": "ai",
-    "purpose": "Compile the blueprint into a plan",
-    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -340,6 +342,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "2",
@@ -375,6 +378,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Convert the discovered business structure into the actual organizational and venue configuration required by TICVAI.",
+  "division": "Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-481, ADM-482, ADM-483, ADM-484, ADM-485, ADM-486; this screen is Venue & Organization Configuration (pack AI_Configuration_Assistant_Reference.pdf, board 2.2, page 26): convert the discovered business structure into the actual organizational and venue configuration required by TICVAI.",
   "gaps": [
    {
     "operation": null,
@@ -431,12 +435,14 @@
       },
       {
        "kind": "detailPanel",
+       "operation": "getActionPlan",
        "derived": true,
        "impliedBy": "getActionPlan",
        "notes": "One record, read-only."
       },
       {
        "kind": "primaryButton",
+       "operation": "decideBlueprintRecommendation",
        "derived": true,
        "impliedBy": "decideBlueprintRecommendation",
        "notes": "The act the screen exists for."
@@ -465,13 +471,6 @@
     "operationId": "getActionPlan",
     "contract": "ai",
     "purpose": "A plan with its steps",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getConfigurationBlueprint",
-    "contract": "ai",
-    "purpose": "The blueprint so far",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -584,6 +583,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "2",
@@ -619,6 +619,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Convert Board 1 product requirements into actual proposed TICVAI ticket products and associated product rules. This screen should connect directly to the existing Ticketing module architecture, not create a separate AI product model.",
+  "division": "Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-482, ADM-483, ADM-484, ADM-485, ADM-486; this screen is Product Configuration Assistant (pack AI_Configuration_Assistant_Reference.pdf, board 2.3, page 27): convert Board 1 product requirements into actual proposed TICVAI ticket products and associated product rules. This screen should connect directly to the existing Ticketing module architecture, not create a separate AI product model.",
   "gaps": [
    {
     "operation": null,
@@ -675,12 +676,14 @@
       },
       {
        "kind": "detailPanel",
+       "operation": "getActionPlan",
        "derived": true,
        "impliedBy": "getActionPlan",
        "notes": "One record, read-only."
       },
       {
        "kind": "primaryButton",
+       "operation": "decideBlueprintRecommendation",
        "derived": true,
        "impliedBy": "decideBlueprintRecommendation",
        "notes": "The act the screen exists for."
@@ -709,13 +712,6 @@
     "operationId": "getActionPlan",
     "contract": "ai",
     "purpose": "A plan with its steps",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getConfigurationBlueprint",
-    "contract": "ai",
-    "purpose": "The blueprint so far",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -828,6 +824,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "2",
@@ -863,6 +860,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Translate operating requirements into actual schedules, timeslots, reservation windows, and capacity structures.",
+  "division": "Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-483, ADM-484, ADM-485, ADM-486; this screen is Schedule, Capacity & Availability Configuration (pack AI_Configuration_Assistant_Reference.pdf, board 2.4, page 29): translate operating requirements into actual schedules, timeslots, reservation windows, and capacity structures.",
   "gaps": [
    {
     "operation": null,
@@ -919,12 +917,14 @@
       },
       {
        "kind": "detailPanel",
+       "operation": "getActionPlan",
        "derived": true,
        "impliedBy": "getActionPlan",
        "notes": "One record, read-only."
       },
       {
        "kind": "primaryButton",
+       "operation": "decideBlueprintRecommendation",
        "derived": true,
        "impliedBy": "decideBlueprintRecommendation",
        "notes": "The act the screen exists for."
@@ -953,13 +953,6 @@
     "operationId": "getActionPlan",
     "contract": "ai",
     "purpose": "A plan with its steps",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getConfigurationBlueprint",
-    "contract": "ai",
-    "purpose": "The blueprint so far",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -1072,6 +1065,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "2",
@@ -1107,6 +1101,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Convert commercial requirements into proposed pricing, tax, fee, and commercial rules using TICVAI's existing Pricing architecture.",
+  "division": "Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-482, ADM-484, ADM-485, ADM-486; this screen is Pricing & Commercial Configuration (pack AI_Configuration_Assistant_Reference.pdf, board 2.5, page 30): convert commercial requirements into proposed pricing, tax, fee, and commercial rules using TICVAI's existing Pricing architecture.",
   "gaps": [
    {
     "operation": null,
@@ -1195,7 +1190,8 @@
         "AED 20"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Child AED 80 AED 95”, “Customer Eligibility”, “Dynamic Pricing”.",
-       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 30 §Show"
+       "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 30 §Show",
+       "operation": "getActionPlan"
       }
      ]
     }
@@ -1214,13 +1210,6 @@
     "operationId": "getActionPlan",
     "contract": "ai",
     "purpose": "A plan with its steps",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getConfigurationBlueprint",
-    "contract": "ai",
-    "purpose": "The blueprint so far",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -1340,6 +1329,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "2",
@@ -1375,6 +1365,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Convert identified commercial opportunities into proposed promotion, package, bundle, upsell, and cross- sell configuration. This screen should only become prominent when relevant.",
+  "division": "Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-482, ADM-483, ADM-485, ADM-486; this screen is Promotion, Bundle & Upsell Configuration (pack AI_Configuration_Assistant_Reference.pdf, board 2.6, page 32): convert identified commercial opportunities into proposed promotion, package, bundle, upsell, and cross- sell configuration. This screen should only become prominent when relevant.",
   "gaps": [
    {
     "operation": null,
@@ -1431,12 +1422,14 @@
       },
       {
        "kind": "detailPanel",
+       "operation": "getActionPlan",
        "derived": true,
        "impliedBy": "getActionPlan",
        "notes": "One record, read-only."
       },
       {
        "kind": "primaryButton",
+       "operation": "decideBlueprintRecommendation",
        "derived": true,
        "impliedBy": "decideBlueprintRecommendation",
        "notes": "The act the screen exists for."
@@ -1465,13 +1458,6 @@
     "operationId": "getActionPlan",
     "contract": "ai",
     "purpose": "A plan with its steps",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getConfigurationBlueprint",
-    "contract": "ai",
-    "purpose": "The blueprint so far",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -1584,6 +1570,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "2",
@@ -1619,6 +1606,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure the operational rules required to fulfill and validate the products. The screen should adapt depending on venue type. For the museum example, seating is irrelevant and should not consume UI attention.",
+  "division": "Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-482, ADM-483, ADM-484, ADM-486; this screen is Seating, Access & Operational Configuration (pack AI_Configuration_Assistant_Reference.pdf, board 2.7, page 33): configure the operational rules required to fulfill and validate the products. The screen should adapt depending on venue type. For the museum example, seating is irrelevant and should not consume UI attention.",
   "gaps": [
    {
     "operation": null,
@@ -1675,12 +1663,14 @@
       },
       {
        "kind": "detailPanel",
+       "operation": "getActionPlan",
        "derived": true,
        "impliedBy": "getActionPlan",
        "notes": "One record, read-only."
       },
       {
        "kind": "primaryButton",
+       "operation": "decideBlueprintRecommendation",
        "derived": true,
        "impliedBy": "decideBlueprintRecommendation",
        "notes": "The act the screen exists for."
@@ -1709,13 +1699,6 @@
     "operationId": "getActionPlan",
     "contract": "ai",
     "purpose": "A plan with its steps",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getConfigurationBlueprint",
-    "contract": "ai",
-    "purpose": "The blueprint so far",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -1828,6 +1811,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "2",
@@ -1863,6 +1847,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine how the proposed products are sold, delivered, and fulfilled across TICVAI channels.",
+  "division": "Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-482, ADM-483, ADM-484, ADM-485; this screen is Channel, Media & Fulfillment Configuration (pack AI_Configuration_Assistant_Reference.pdf, board 2.8, page 34): determine how the proposed products are sold, delivered, and fulfilled across TICVAI channels.",
   "gaps": [
    {
     "operation": null,
@@ -1919,12 +1904,14 @@
       },
       {
        "kind": "detailPanel",
+       "operation": "getActionPlan",
        "derived": true,
        "impliedBy": "getActionPlan",
        "notes": "One record, read-only."
       },
       {
        "kind": "primaryButton",
+       "operation": "decideBlueprintRecommendation",
        "derived": true,
        "impliedBy": "decideBlueprintRecommendation",
        "notes": "The act the screen exists for."
@@ -1953,13 +1940,6 @@
     "operationId": "getActionPlan",
     "contract": "ai",
     "purpose": "A plan with its steps",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getConfigurationBlueprint",
-    "contract": "ai",
-    "purpose": "The blueprint so far",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -2072,6 +2052,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "2",
@@ -2160,31 +2141,37 @@
       {
        "kind": "metricTile",
        "label": "Configuration Objects",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Passed",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Warnings",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Conflicts",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Missing Dependencies",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Approval Requirements",
+       "operation": "getActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 36 §Header KPIs"
       }
      ]
@@ -2226,13 +2213,6 @@
     "contract": "ai",
     "purpose": "A plan with its steps",
     "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "simulateActionPlan",
-    "contract": "ai",
-    "purpose": "Validate and simulate a plan without changing anything",
-    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -2329,6 +2309,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "2",
@@ -2410,91 +2391,109 @@
       {
        "kind": "selectField",
        "label": "👤 User Provided",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §Three Sources of Configuration"
       },
       {
        "kind": "textField",
        "label": "1. AI Configuration Build Command Center",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "2. Venue & Organization Configuration",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "3. Product Configuration Assistant",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "4. Schedule, Capacity & Availability Configuration",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "5. Pricing & Commercial Configuration",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "6. Promotion, Bundle & Upsell Configuration",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "7. Seating, Access & Operational Configuration",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "8. Channel, Media & Fulfillment Configuration",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "9. Cross-Module Conflict & Dependency Validation",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "10. Configuration Preview & Impact Analysis",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "“Tell TICVAI what your business needs.”",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "selectField",
        "label": "↓",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "“Govern, approve, and safely execute those changes.”",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "selectField",
        "label": "& Continuous Configuration",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "Module: AI Configuration Assistant",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "textField",
        "label": "Board: 3 of 3",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       },
       {
        "kind": "selectField",
        "label": "Screens: 10",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder & Validation"
       }
      ]
@@ -2510,13 +2509,6 @@
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
-   {
-    "operationId": "getActionPlan",
-    "contract": "ai",
-    "purpose": "A plan with its steps",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
    {
     "operationId": "simulateActionPlan",
     "contract": "ai",

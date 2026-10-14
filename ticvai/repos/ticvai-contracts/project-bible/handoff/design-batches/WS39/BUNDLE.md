@@ -114,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-103` | Market, Tourism, Holiday & Contextual Signal Hub | B | 24 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-104` | AI Demand Forecasting & Booking Curve Studio | B | 0 | 12 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
 | `ADM-105` | Price Elasticity & Revenue Response Intelligence | B | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `ADM-106` | AI Pricing Recommendation & Explainability Center | B | 5 | 0 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `ADM-106` | AI Pricing Recommendation & Explainability Center | A | 5 | 0 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `ADM-107` | AI Signal Registry, Data Quality & Model Governance | B | 18 | 48 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -266,6 +266,8 @@ signal:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -395,6 +397,8 @@ signal:
 - `listInternalDemandBooking` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -553,6 +557,8 @@ impact:
 - `setDemandSignalConfiguration` → `PRICE_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -727,6 +733,8 @@ event:
 - `setDemandSignalConfiguration` → `PRICE_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -906,6 +914,8 @@ row:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1059,6 +1069,8 @@ signal:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1211,6 +1223,8 @@ forecast:
 - `listDemandBookingCurve` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -1368,6 +1382,8 @@ elasticity:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1414,7 +1430,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block B · ticket #29755 (VM-ADM-106) |
+| Block | Block A · ticket #29755 (VM-ADM-106) |
 | Who uses it | venue staff holding `AI_APPROVE`, `PRODUCT_VIEW` (1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1512,6 +1528,8 @@ recommendation:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1576,7 +1594,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Monitor; Track) and no metric row |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `signalId` (navigation) |
 | Route | `/commercial/ai-signal-registry-data-quality-model-governance-adm-107` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
@@ -1618,6 +1636,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Deployed at `deployedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setSignalRegistryPolicy` body |
 | Training window `trainingWindow` | text field | optional | — | max length 60 | — | — | `setSignalRegistryPolicy` body |
 | Validation result `validationResult` | text field | optional | — | — | — | — | `setSignalRegistryPolicy` body |
+
+Carried, not typed: `signalId`
 
 Errors to draw in the form: 422 `trustTooLow`.
 
@@ -1693,7 +1713,7 @@ Errors to draw in the form: 422 `trustTooLow`.
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save signal registry policy (primary button) | `setSignalRegistryPolicy` PUT `/signal-registry` | SignalRegistryEntry | SignalRegistryEntry | 422 `trustTooLow`. | gated `AI_CONFIGURE`; opens modal first |
+| Save signal registry policy (primary button) | `setSignalRegistryPolicy` PUT `/signal-registry/{signalId}` | SignalRegistryEntry | SignalRegistryEntry | 422 `trustTooLow`. | gated `AI_CONFIGURE`; opens modal first |
 
 **Data it reads**: `listSignalDataQuality` (onLoad, AI Signal Registry, Data Quality & Model Governance)
 
@@ -1729,6 +1749,8 @@ signal:
 - `setSignalRegistryPolicy` → `AI_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -1870,7 +1892,7 @@ Method, path, parameters, request and response for every operation these screens
 "listSignalDataQuality": {"method":"GET","path":"/signal-data-quality","contract":"catalogue","summary":"AI Signal Registry, Data Quality & Model Governance","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"registryKind","in":"query","required":false},{"name":"internalExternal","in":"query","required":false},{"name":"trustLevel","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listWeatherDemandImpact": {"method":"GET","path":"/weather-demand-impact","contract":"catalogue","summary":"Weather Intelligence & Demand Impact Configuration","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venue","in":"query","required":false},{"name":"venueExposure","in":"query","required":false},{"name":"forecastHorizon","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setDemandSignalConfiguration": {"method":"PUT","path":"/demand-signals/{signalId}","contract":"catalogue","summary":"Enter a calendar signal or configure how a demand signal is used","permission":"PRICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DemandSignal","responds":"DemandSignal"},
-"setSignalRegistryPolicy": {"method":"PUT","path":"/signal-registry","contract":"catalogue","summary":"Register a signal or model and set how far AI may trust it","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SignalRegistryEntry","responds":"SignalRegistryEntry"}
+"setSignalRegistryPolicy": {"method":"PUT","path":"/signal-registry/{signalId}","contract":"catalogue","summary":"Register a signal or model and set how far AI may trust it","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"signalId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"SignalRegistryEntry","responds":"SignalRegistryEntry"}
 }
 ```
 
@@ -1893,9 +1915,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "NearbyEventExhibitionLocalDemandIntelligenceView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Nearby Event, Exhibition & Local Demand Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"eventName":{"type":"string","description":"Event Name"},"venue":{"type":"string","description":"External venue hosting the event"},"location":{"type":"string","description":"Location (address or area)"},"distanceKm":{"type":"number","description":"Distance from the TICVAI venue, km"},"expectedAttendance":{"type":"integer","description":"Expected Attendance"},"eventType":{"type":"string","description":"Event Type","enum":["exhibition","conference","concert","sportsEvent","festival","tradeShow","convention","publicCelebration","majorAttractionEvent","schoolEvent","customLocalEvent"]},"audienceType":{"type":"string","description":"Audience Type (decided 29 September, readiness close-out)","enum":["family","business","youth","general","tourist","other"]},"source":{"type":"string","description":"Source: name of the event feed or 'manual' (vendor-neutral)"},"confidence":{"type":"number","description":"Confidence that the event and its attendance are accurate, percent"},"externalEventId":{"type":"string","description":"External event id"},"ticvaiVenue":{"type":"string","description":"TICVAI venue whose monitoring radius the event falls in"},"monitoringRadiusKm":{"type":"number","description":"Geographic Radius configured for that venue: 1, 3, 5, 10 or custom km; default 5 (decided 29 September, readiness close-out)"},"startDate":{"type":"string","description":"Start date","format":"date"},"endDate":{"type":"string","description":"End date","format":"date"},"startTime":{"type":"string","description":"Start time (HH:mm)","nullable":true},"endTime":{"type":"string","description":"End time (HH:mm)","nullable":true},"historicalCorrelation":{"type":"number","description":"Historical correlation: demand change seen at the venue for similar past events, percent"},"predictedImpactMin":{"type":"number","description":"Predicted demand impact, low end, percent"},"predictedImpactMax":{"type":"number","description":"Predicted demand impact, high end, percent"},"impactWindows":{"type":"array","items":{"type":"string","enum":["beforeEvent","duringEvent","lunchPeriod","afterEvent","evening","followingDay"]},"description":"Timing Intelligence: when the impact is expected"},"audienceMatch":{"type":"string","description":"Audience Matching between the event and the TICVAI venue","enum":["low","medium","high"]}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PriceElasticityRevenueResponseIntelligenceView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Price Elasticity & Revenue Response Intelligence displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"price":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price tested on the curve"},"demand":{"type":"integer","description":"Expected demand at this price"},"conversion":{"type":"number","description":"Expected conversion, percent"},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Expected revenue"},"margin":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Expected margin"},"occupancy":{"type":"number","description":"Expected occupancy, percent"},"customerSegment":{"type":"string","description":"Customer segment (e.g. tourist, resident, family, VIP)","nullable":true},"channel":{"$ref":"#/components/schemas/Channel","description":"Channel"},"time":{"type":"string","description":"Time context of the curve: weekday/weekend, peak/off-peak or season label"},"product":{"type":"string","description":"Product id"},"venue":{"type":"string","description":"Venue id"},"priceSensitivity":{"type":"string","description":"Price sensitivity of the segment","enum":["low","medium","high"]},"elasticityCoefficient":{"type":"number","description":"Estimated price elasticity of demand (negative)","nullable":true},"elasticityConfidence":{"type":"string","description":"Elasticity Confidence","enum":["low","medium","high"]},"inRecommendedRevenueZone":{"type":"boolean","description":"Price lies inside the Recommended Revenue Zone"},"revenueZoneMin":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Optimal revenue range, low end"},"revenueZoneMax":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Optimal revenue range, high end"}}},
-"PricingRecommendationDecision": {"type":"object","x-ticvai-persistence":"catalogue.pricing_recommendation_decision","description":"**One human decision on one AI pricing recommendation** (decided 29 September, readiness close-out). New table: the queue row `AiRecommendationReviewDecisionQueueView` reads its decision fields from here. Written once by `decidePricingRecommendation` and never edited; a changed mind is a new recommendation.\n","required":["id","recommendationId","decision","decidedByPrincipalId","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"recommendationId":{"type":"string","format":"uuid","description":"A `catalogue.pricing_recommendation` (29 September, data model DM3)."},"decision":{"type":"string","enum":["accept","modify","reject","schedule","sendForApproval"]},"rejectionReason":{"type":"string","nullable":true,"enum":["commercialJudgment","brandPositioning","customerSensitivity","eventStrategy","incorrectSignal","dataConcern","other",null]},"rejectionNote":{"type":"string","nullable":true},"recommendedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"humanSelectedPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"scheduledFor":{"type":"string","format":"date-time","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"description":"The approvals request opened by `sendForApproval`."},"executionId":{"type":"string","nullable":true,"readOnly":true,"description":"The `createLiveDynamicPrice` execution that carried it out, once it has."},"decidedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"decidedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true}}},
+"PricingRecommendationDecision": {"type":"object","x-ticvai-persistence":"catalogue.pricing_recommendation_decision","description":"**One human decision on one AI pricing recommendation** (decided 29 September, readiness close-out). New table: the queue row `AiRecommendationReviewDecisionQueueView` reads its decision fields from here. Written once by `decidePricingRecommendation` and never edited; a changed mind is a new recommendation.\n","required":["id","recommendationId","decision","decidedByPrincipalId","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"recommendationId":{"x-ticvai-references":"catalogue.pricing_recommendation","type":"string","format":"uuid","description":"A `catalogue.pricing_recommendation` (29 September, data model DM3)."},"decision":{"type":"string","enum":["accept","modify","reject","schedule","sendForApproval"]},"rejectionReason":{"type":"string","nullable":true,"enum":["commercialJudgment","brandPositioning","customerSensitivity","eventStrategy","incorrectSignal","dataConcern","other",null]},"rejectionNote":{"type":"string","nullable":true},"recommendedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"humanSelectedPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"scheduledFor":{"type":"string","format":"date-time","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"description":"The approvals request opened by `sendForApproval`."},"executionId":{"type":"string","nullable":true,"readOnly":true,"description":"The `createLiveDynamicPrice` execution that carried it out, once it has."},"decidedByPrincipalId":{"x-ticvai-references":"identity.principal","type":"string","format":"uuid","readOnly":true},"decidedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true}}},
 "PricingRecommendationDecisionInput": {"type":"object","x-ticvai-persistence":"none — request only","description":"What `decidePricingRecommendation` takes (decided 29 September, readiness close-out).","required":["decision"],"properties":{"decision":{"type":"string","enum":["accept","modify","reject","schedule","sendForApproval"]},"rejectionReason":{"type":"string","enum":["commercialJudgment","brandPositioning","customerSensitivity","eventStrategy","incorrectSignal","dataConcern","other"],"description":"Required for reject."},"rejectionNote":{"type":"string","maxLength":2000},"humanSelectedPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Required for modify; must sit inside the strategy's guardrails."},"scheduledFor":{"type":"string","format":"date-time","description":"Required for schedule; in the future."}}},
-"SignalRegistryEntry": {"type":"object","x-ticvai-persistence":"catalogue.signal_registry","description":"**The registry of AI signals and models, with their trust and quality** (29 September, data model DM3). ADM-106 and ADM-118. A signal or model not `approved` for a use in `aiUsePermissions` is not used for it.","required":["id","scopePath","registryKind","name","trustLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `tenant` scope."},"registryKind":{"type":"string","enum":["signal","model"]},"name":{"type":"string","maxLength":200},"category":{"type":"string","enum":["internalSales","inventory","weather","nearbyEvents","competitor","tourism","calendar","transport","market","other",null],"nullable":true},"provider":{"type":"string","maxLength":100,"nullable":true},"source":{"type":"string","maxLength":100,"nullable":true},"internalExternal":{"type":"string","enum":["internal","external",null],"nullable":true},"marketCode":{"type":"string","maxLength":40,"nullable":true},"refreshFrequency":{"type":"string","enum":["realTime","minutes10","hourly","daily","weekly","manual",null],"nullable":true},"trustLevel":{"type":"string","enum":["approved","experimental","advisoryOnly","blocked"],"default":"experimental"},"aiUsePermissions":{"type":"array","items":{"type":"string","enum":["forecasting","recommendations","simulation","automatedPricing"]}},"fallbackPolicy":{"type":"string","enum":["useHistoricalValue","ignore","substitute","reduceConfidence","stopAiRecommendation",null],"nullable":true},"status":{"type":"string","maxLength":40,"nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"version":{"type":"string","maxLength":40,"nullable":true,"description":"Models."},"purpose":{"type":"string","nullable":true},"deployedAt":{"type":"string","format":"date-time","nullable":true},"trainingWindow":{"type":"string","maxLength":60,"nullable":true},"validationResult":{"type":"string","nullable":true},"lastUpdateAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"qualityCounts":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Signals: `{missingData, delayedData, outliers, invalidValues, unexpectedChanges, sourceFailure, duplicateData}`."},"performance":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Models: `{forecastAccuracy, bias, recommendationAccuracy, revenuePerformance, drift}` and the per-segment learning metrics."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"SignalRegistryEntry": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"catalogue.signal_registry","description":"**The registry of AI signals and models, with their trust and quality** (29 September, data model DM3). ADM-106 and ADM-118. A signal or model not `approved` for a use in `aiUsePermissions` is not used for it.","required":["id","scopePath","registryKind","name","trustLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `tenant` scope."},"registryKind":{"type":"string","enum":["signal","model"]},"name":{"type":"string","maxLength":200},"category":{"type":"string","enum":["internalSales","inventory","weather","nearbyEvents","competitor","tourism","calendar","transport","market","other",null],"nullable":true},"provider":{"type":"string","maxLength":100,"nullable":true},"source":{"type":"string","maxLength":100,"nullable":true},"internalExternal":{"type":"string","enum":["internal","external",null],"nullable":true},"marketCode":{"type":"string","maxLength":40,"nullable":true},"refreshFrequency":{"type":"string","enum":["realTime","minutes10","hourly","daily","weekly","manual",null],"nullable":true},"trustLevel":{"type":"string","enum":["approved","experimental","advisoryOnly","blocked"],"default":"experimental"},"aiUsePermissions":{"type":"array","items":{"type":"string","enum":["forecasting","recommendations","simulation","automatedPricing"]}},"fallbackPolicy":{"type":"string","enum":["useHistoricalValue","ignore","substitute","reduceConfidence","stopAiRecommendation",null],"nullable":true},"status":{"type":"string","maxLength":40,"nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"version":{"type":"string","maxLength":40,"nullable":true,"description":"Models."},"purpose":{"type":"string","nullable":true},"deployedAt":{"type":"string","format":"date-time","nullable":true},"trainingWindow":{"type":"string","maxLength":60,"nullable":true},"validationResult":{"type":"string","nullable":true},"lastUpdateAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"qualityCounts":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Signals: `{missingData, delayedData, outliers, invalidValues, unexpectedChanges, sourceFailure, duplicateData}`."},"performance":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Models: `{forecastAccuracy, bias, recommendationAccuracy, revenuePerformance, drift}` and the per-segment learning metrics."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "WeatherIntelligenceDemandImpactConfigurationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Weather Intelligence & Demand Impact Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"temperature":{"type":"number","description":"Temperature, degrees C"},"feelsLikeTemperature":{"type":"number","description":"Feels-Like Temperature, degrees C"},"rain":{"type":"number","description":"Rain, mm in the last hour"},"rainProbability":{"type":"number","description":"Rain Probability, percent"},"humidity":{"type":"number","description":"Humidity, percent"},"wind":{"type":"number","description":"Wind speed, km/h"},"visibility":{"type":"number","description":"Visibility, km"},"storm":{"type":"boolean","description":"Storm warning in force"},"extremeHeat":{"type":"boolean","description":"Extreme Heat: temperature at or above the venue's configured heat threshold"},"currentConditions":{"type":"string","description":"Current Conditions summary as reported by the source"},"hourlyForecast":{"type":"array","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time","description":"Hour"},"temperature":{"type":"number","description":"Degrees C"},"rainProbability":{"type":"number","description":"Percent"},"conditions":{"type":"string","description":"Conditions"}}},"description":"Hourly Forecast"},"dailyForecast":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string","format":"date","description":"Day"},"minTemperature":{"type":"number","description":"Degrees C"},"maxTemperature":{"type":"number","description":"Degrees C"},"rainProbability":{"type":"number","description":"Percent"},"conditions":{"type":"string","description":"Conditions"}}},"description":"Daily Forecast"},"weatherForecastConfidence":{"type":"number","description":"Weather Forecast Confidence, percent"},"estimatedDemandImpactMin":{"type":"number","description":"Estimated Demand Impact, low end of the range, percent"},"venue":{"type":"string","description":"TICVAI venue id"},"venueExposure":{"type":"string","description":"Venue Sensitivity: Indoor / Outdoor / Mixed","enum":["indoor","outdoor","mixed"]},"weatherSensitivity":{"type":"string","description":"Weather sensitivity of the venue; default medium (decided 29 September, readiness close-out)","enum":["low","medium","high"]},"airQualityIndex":{"type":"integer","description":"Air quality index where available","nullable":true},"conditionImpacts":{"type":"array","items":{"type":"object","properties":{"condition":{"type":"string","enum":["temperature","feelsLikeTemperature","rain","rainProbability","humidity","wind","visibility","storm","extremeHeat","airQuality","heavyRain","highTemperature"],"description":"Weather condition"},"threshold":{"type":"number","nullable":true,"description":"Threshold in the condition's unit, e.g. 42 (degrees C)"},"demandImpactPercent":{"type":"number","description":"Modelled demand impact, e.g. +8 indoor / -17 outdoor"}}},"description":"Weather Impact Model: condition -> demand impact rules for this venue"},"estimatedDemandImpactMax":{"type":"number","description":"Estimated Demand Impact, high end of the range, percent"},"forecastHorizon":{"type":"string","description":"Forecast Horizon","enum":["today","hours24","days3","days7","custom"]},"forecastWindowDays":{"type":"integer","description":"Configurable future window in days when forecastHorizon is custom; max 14 (decided 29 September, readiness close-out)","nullable":true},"dataFailurePolicy":{"type":"string","description":"What happens when weather data is unavailable; default reduceConfidence (decided 29 September, readiness close-out)","enum":["useLastValidSignal","useHistoricalBaseline","reduceConfidence","ignoreWeather","suspendWeatherDrivenRecommendation"]},"historicalInsights":{"type":"array","items":{"type":"string"},"description":"Historical Learning, e.g. similar weather historically gave +11% indoor demand. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"},"weatherSource":{"type":"string","description":"Name of the configured weather data source (vendor-neutral: the provider is data in the signal registry)"},"lastUpdated":{"type":"string","description":"When the source last refreshed","format":"date-time"}}}
 }
 ```

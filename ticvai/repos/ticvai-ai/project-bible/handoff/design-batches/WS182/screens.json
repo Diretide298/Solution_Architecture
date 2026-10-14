@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/cross-sell-command-center-adm-659",
-   "component": "apps/venue-management-web/src/routes/commercial/CrossSellCommandCenter.tsx",
+   "component": "src/routes/commercial/CrossSellCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -103,7 +104,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -124,7 +125,9 @@
       {
        "kind": "metricTile",
        "label": "Recommendations Accepted",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards",
+       "operation": "listUpsellCrossSell",
+       "bindsTo": "UpsellCrossSellAttachRateAnalyticsView.recommendedOfferAcceptance"
       },
       {
        "kind": "metricTile",
@@ -134,7 +137,9 @@
       {
        "kind": "metricTile",
        "label": "Cross-Sell Revenue",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards",
+       "operation": "listUpsellCrossSell",
+       "bindsTo": "UpsellCrossSellAttachRateAnalyticsView.crossSellRevenue"
       },
       {
        "kind": "metricTile",
@@ -144,12 +149,16 @@
       {
        "kind": "metricTile",
        "label": "Attach Rate",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards",
+       "operation": "listUpsellCrossSell",
+       "bindsTo": "UpsellCrossSellAttachRateAnalyticsView.attachRate"
       },
       {
        "kind": "metricTile",
        "label": "Items per Transaction",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §KPI Cards",
+       "operation": "listUpsellCrossSell",
+       "bindsTo": "UpsellCrossSellAttachRateAnalyticsView.itemsPerTransaction"
       },
       {
        "kind": "metricTile",
@@ -179,7 +188,7 @@
         "Recommendations → Acceptances → Purchases → Revenue"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listUpsellCrossSell",
        "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §Show"
       }
      ]
@@ -196,7 +205,8 @@
         "Recommendations → Acceptances → Purchases → Revenue"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Break down by”, “Relationships classified”.",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §Show"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 64 §Show",
+       "operation": "getRecommendationPerformance"
       }
      ]
     }
@@ -259,6 +269,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "3",
@@ -268,7 +279,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/cross-sell-relationship-builder-adm-660",
-   "component": "apps/venue-management-web/src/routes/commercial/CrossSellRelationshipBuilder.tsx",
+   "component": "src/routes/commercial/CrossSellRelationshipBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -292,6 +303,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Identify) and no metric row",
   "purpose": "Allow administrators to manually define governed complementary-product relationships.",
+  "division": "Shares `listProductRelationships`, `setProductRelationships` with ADM-642, ADM-650, ADM-663, ADM-664; this screen is Cross-Sell Relationship Builder (pack Upsell,CrossSellEngine.pdf, board 3.2, page 66): allow administrators to manually define governed complementary-product relationships.",
   "gaps": [
    {
     "operation": null,
@@ -460,6 +472,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "3",
@@ -469,7 +482,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/product-affinity-matrix-relationship-map-adm-661",
-   "component": "apps/venue-management-web/src/routes/commercial/ProductAffinityMatrixRelationshipMap.tsx",
+   "component": "src/routes/commercial/ProductAffinityMatrixRelationshipMap.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -582,6 +595,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "3",
@@ -591,7 +605,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/frequently-bought-together-basket-pattern-engine-adm-662",
-   "component": "apps/venue-management-web/src/routes/commercial/FrequentlyBoughtTogetherBasketPatternEngine.tsx",
+   "component": "src/routes/commercial/FrequentlyBoughtTogetherBasketPatternEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -665,7 +679,8 @@
         "Post-purchase additions"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Water Park Admission”, “Purchase Rate”, “Photo”, “Package”, “Suggested new relationship”.",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 70 §Analyze"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 70 §Analyze",
+       "operation": "getProductAffinity"
       }
      ]
     }
@@ -732,6 +747,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "3",
@@ -741,7 +757,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/cross-category-recommendation-manager-adm-663",
-   "component": "apps/venue-management-web/src/routes/commercial/CrossCategoryRecommendationManager.tsx",
+   "component": "src/routes/commercial/CrossCategoryRecommendationManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -765,6 +781,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage recommendations across TICVAI's different commercial modules. This is especially important because TICVAI is not only a ticketing platform.",
+  "division": "Shares `listProductRelationships`, `setProductRelationships` with ADM-642, ADM-650, ADM-660, ADM-664; this screen is Cross-Category Recommendation Manager (pack Upsell,CrossSellEngine.pdf, board 3.5, page 71): manage recommendations across TICVAI's different commercial modules. This is especially important because TICVAI is not only a ticketing platform.",
   "gaps": [
    {
     "operation": null,
@@ -875,6 +892,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "3",
@@ -884,7 +902,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/multi-attraction-destination-partner-cross-sell-adm-664",
-   "component": "apps/venue-management-web/src/routes/commercial/MultiAttractionDestinationPartnerCrossSell.tsx",
+   "component": "src/routes/commercial/MultiAttractionDestinationPartnerCrossSell.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -908,6 +926,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Support cross-selling beyond the original venue or attraction. This addresses the matrix requirements around multi-destination and external product combinations.",
+  "division": "Shares `listProductRelationships`, `setProductRelationships` with ADM-642, ADM-650, ADM-660, ADM-663; this screen is Multi-Attraction, Destination & Partner Cross-Sell (pack Upsell,CrossSellEngine.pdf, board 3.6, page 73): support cross-selling beyond the original venue or attraction. This addresses the matrix requirements around multi-destination and external product combinations.",
   "gaps": [
    {
     "operation": null,
@@ -1013,6 +1032,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "3",
@@ -1022,7 +1042,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/basket-aware-cross-sell-duplicate-prevention-adm-665",
-   "component": "apps/venue-management-web/src/routes/commercial/BasketAwareCrossSellDuplicatePrevention.tsx",
+   "component": "src/routes/commercial/BasketAwareCrossSellDuplicatePrevention.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1046,6 +1066,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Make cross-selling aware of the customer's complete current basket. This is critical because basic recommendation engines often recommend something the customer already owns.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Basket-Aware Cross-Sell & Duplicate Prevention (pack Upsell,CrossSellEngine.pdf, board 3.7, page 74): make cross-selling aware of the customer's complete current basket. This is critical because basic recommendation engines often recommend something the customer already owns.",
   "gaps": [
    {
     "operation": null,
@@ -1160,6 +1181,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "3",
@@ -1169,7 +1191,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/availability-inventory-capacity-aware-cross-sell-adm-666",
-   "component": "apps/venue-management-web/src/routes/commercial/AvailabilityInventoryCapacityAwareCrossSell.tsx",
+   "component": "src/routes/commercial/AvailabilityInventoryCapacityAwareCrossSell.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1193,6 +1215,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Ensure recommendations reflect actual operational availability.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Availability, Inventory & Capacity-Aware Cross-Sell (pack Upsell,CrossSellEngine.pdf, board 3.8, page 76): ensure recommendations reflect actual operational availability.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1302,6 +1325,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "3",
@@ -1311,7 +1335,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ai-cross-sell-discovery-scoring-ranking-engine-adm-667",
-   "component": "apps/venue-management-web/src/routes/commercial/AiCrossSellDiscoveryScoringRankingEngine.tsx",
+   "component": "src/routes/commercial/AiCrossSellDiscoveryScoringRankingEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1407,6 +1431,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "3",
@@ -1416,7 +1441,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/cross-sell-simulator-ai-opportunity-advisor-adm-668",
-   "component": "apps/venue-management-web/src/routes/commercial/CrossSellSimulatorAiOpportunityAdvisor.tsx",
+   "component": "src/routes/commercial/CrossSellSimulatorAiOpportunityAdvisor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1440,6 +1465,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track) and no metric row",
   "purpose": "Allow administrators to test cross-sell strategies and AI recommendations before activation. ↓",
+  "division": "Shares `listRecommendationStrategies`, `simulateRecommendationStrategy` with ADM-648, ADM-658, ADM-688, ADM-698; this screen is Cross-Sell Simulator & AI Opportunity Advisor (pack Upsell,CrossSellEngine.pdf, board 3.10, page 79): allow administrators to test cross-sell strategies and AI recommendations before activation. ↓.",
   "gaps": [
    {
     "operation": null,

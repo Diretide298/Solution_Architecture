@@ -339,10 +339,8 @@ screens:
         and GST-037 opens on its own'
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-001 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-001 holds none of them. The edge
+        carries nothing: GST-039 needs nothing to open'
     - to: GST-040
       trigger: Help & Support
       provenance: 'derived — GST-040 declares entryState.params caseId and GST-001 holds none of them.
@@ -746,8 +744,8 @@ screens:
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   - operation: decideRecommendations
     removed: true
-    why: The client-approved Home has no recommendation slot, so nothing shows a decision;
-      recommendations show in the cart slot (WEB-008, GST-048).
+    why: The client-approved Home has no recommendation slot, so nothing shows a decision; recommendations
+      show in the cart slot (WEB-008, GST-048).
     source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
   - operation: recordRecommendationEvents
@@ -797,10 +795,11 @@ screens:
     - to: GST-004
       trigger: Attraction Details
       carries:
+      - bundleId
       - eventId
       - productId
       provenance: derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-002
-        holds eventId, productId, so an edge into it carries them
+        holds bundleId, eventId, productId, so an edge into it carries them
     - to: GST-063
       trigger: Searches (results in place)
       provenance: decided 29 September 2026, MOB-1
@@ -953,10 +952,11 @@ screens:
     - to: GST-004
       trigger: Attraction Details
       carries:
+      - bundleId
       - eventId
       - productId
       provenance: derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-003
-        holds eventId, productId, so an edge into it carries them
+        holds bundleId, eventId, productId, so an edge into it carries them
     - to: GST-007
       trigger: 'Book (a dated product: date, then time, then tickets)'
       carries:
@@ -1666,8 +1666,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getPerformance` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: 'One event or exhibition: what it is, and the performance being booked, before choosing
-    tickets.'
+  purpose: 'One event or exhibition: what it is, and the performance being booked, before choosing tickets.'
   layout:
     template: detail
     regions:
@@ -3341,8 +3340,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getEntitlement` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: 'One ticket: its code to scan, what remains on it and every scan against it; send it to
-    another guest or bind it to this phone.'
+  purpose: 'One ticket: its code to scan, what remains on it and every scan against it; send it to another
+    guest or bind it to this phone.'
   gaps:
   - operation: getEntitlementCredential
     why: '**`getEntitlementCredential` declares its response inline**, so the component that shows it
@@ -4982,11 +4981,10 @@ screens:
         nor the weak-GPS state (weakGps, "Position approximate") is drawn: both pending in design: specified,
         and built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md).'
     derivedFrom: wireframes/reference/Seat Board 4.dc.html
-    note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to
-      `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen
-      has been designed once and is not starting from nothing. Drawn frame:
-      wireframes/incoming/P02-mobile-v4/gst-021.html, captured from the prototype view below
-      (wireframes/incoming/P02-mobile-v4/manifest.json).'
+    note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing. Drawn frame: wireframes/incoming/P02-mobile-v4/gst-021.html, captured from the prototype
+      view below (wireframes/incoming/P02-mobile-v4/manifest.json).'
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -6008,8 +6006,8 @@ screens:
     trigger: onLoad
   - operationId: getParkingEntitlement
     contract: access
-    purpose: 'Load the parking entitlement being changed. Only when signed in: a signed-out guest is
-      offered sign-in and brought back here (GFIX-4)'
+    purpose: 'Load the parking entitlement being changed. Only when signed in: a signed-out guest is offered
+      sign-in and brought back here (GFIX-4)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
@@ -6649,8 +6647,7 @@ screens:
   - operationId: createAiConversation
     contract: ai
     purpose: 'Opened silently on the first message; the scope comes from the session, never a module the
-      guest picks. Only when signed in: the conversation is the guest''s own (x-ticvai-self-scoped
-      subject)'
+      guest picks. Only when signed in: the conversation is the guest''s own (x-ticvai-self-scoped subject)'
     trigger: background
   - operationId: handoverToAgent
     contract: marketing-crm
@@ -6658,12 +6655,11 @@ screens:
     trigger: onAction
   - operationId: requestSuggestion
     contract: ai
-    purpose: 'From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen''s
-      production plan; an itinerary is asked on the Plan tab); never a kind picker. Later
-      (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions
-      (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows
-      ''Later''. Only when signed in: the conversation is the guest''s own (x-ticvai-self-scoped
-      subject)'
+    purpose: 'From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen''s production
+      plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time
+      and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay,
+      3 October); until then the control shows ''Later''. Only when signed in: the conversation is the
+      guest''s own (x-ticvai-self-scoped subject)'
     trigger: background
   - operationId: listAiConversations
     contract: ai
@@ -6683,8 +6679,8 @@ screens:
     contract: marketing-crm
     purpose: 'The agent''s replies, the queue position and the wait after a handover, polled every 5 s
       while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay,
-      3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the
-      guest''s own (x-ticvai-self-scoped subject)'
+      3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the guest''s
+      own (x-ticvai-self-scoped subject)'
     trigger: onInterval
     pollSeconds: 5
     pollSecondsHidden: 30
@@ -6899,8 +6895,8 @@ screens:
     contract: marketing-crm
     purpose: 'The agent''s replies, the queue position and the wait after a handover, polled every 5 s
       while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay,
-      3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the
-      guest''s own (x-ticvai-self-scoped subject)'
+      3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the guest''s
+      own (x-ticvai-self-scoped subject)'
     trigger: onInterval
     pollSeconds: 5
     pollSecondsHidden: 30
@@ -7143,8 +7139,8 @@ screens:
     trigger: onAction
   - operationId: listAiConversations
     contract: ai
-    purpose: 'Show the guest''s earlier conversations with the assistant. Only when signed in: a
-      signed-out guest is offered sign-in and brought back here (GFIX-4)'
+    purpose: 'Show the guest''s earlier conversations with the assistant. Only when signed in: a signed-out
+      guest is offered sign-in and brought back here (GFIX-4)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
@@ -7475,8 +7471,7 @@ screens:
   - operationId: getForm
     contract: marketing-crm
     purpose: 'A triggered survey opened from its link. Read once the guest is signed in (getForm needs
-      the guest session): a signed-out guest opening the link is offered sign-in and brought back
-      (GFIX-4)'
+      the guest session): a signed-out guest opening the link is offered sign-in and brought back (GFIX-4)'
     trigger: onLoad
   - operationId: submitForm
     contract: marketing-crm
@@ -7484,8 +7479,8 @@ screens:
     trigger: onAction
   - operationId: listMyOrders
     contract: orders
-    purpose: 'The recent visits a review can be about. Only when signed in: a signed-out guest is
-      offered sign-in and brought back here (GFIX-4)'
+    purpose: 'The recent visits a review can be about. Only when signed in: a signed-out guest is offered
+      sign-in and brought back here (GFIX-4)'
     trigger: onLoad
   wireframe:
     status: notStarted
@@ -9129,8 +9124,8 @@ screens:
     - getGuestSession
   - operationId: createMfaChallenge
     contract: identity
-    purpose: 'Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step
-      verification on (action signIn), not a control: the code is then typed in Verification code'
+    purpose: 'Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step verification
+      on (action signIn), not a control: the code is then typed in Verification code'
     trigger: background
   - operationId: verifyMfaChallenge
     contract: identity
@@ -10119,11 +10114,10 @@ screens:
       view: Union Arena → Buy tickets → Direct seat map → 2D plan → section 104 (← Whole map)
       differences: The app runs the website seat engine (2D and 3D).
     derivedFrom: wireframes/reference/Seat Board 4.dc.html
-    note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to
-      `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen
-      has been designed once and is not starting from nothing. Drawn frame:
-      wireframes/incoming/P02-mobile-v4/gst-049.html, captured from the prototype view below
-      (wireframes/incoming/P02-mobile-v4/manifest.json).'
+    note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing. Drawn frame: wireframes/incoming/P02-mobile-v4/gst-049.html, captured from the prototype
+      view below (wireframes/incoming/P02-mobile-v4/manifest.json).'
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10536,8 +10530,7 @@ screens:
   gaps:
   - operation: getWaitTimes
     removed: true
-    why: The client-approved Plan questions show no wait time; the plan is built from them by
-      generateVisitPlan.
+    why: The client-approved Plan questions show no wait time; the plan is built from them by generateVisitPlan.
     source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-052
@@ -10949,14 +10942,12 @@ screens:
   gaps:
   - operation: getCart
     removed: true
-    why: The client-approved Your Plan shows no cart; Book this plan returns the cart and opens it
-      (GST-041).
+    why: The client-approved Your Plan shows no cart; Book this plan returns the cart and opens it (GST-041).
     source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
   - operation: listProducts
     removed: true
-    why: Nothing on the client-approved Your Plan lists products; swaps and additions come from
-      listVisitPlanAlternatives.
+    why: Nothing on the client-approved Your Plan lists products; swaps and additions come from listVisitPlanAlternatives.
     source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-054
@@ -11126,8 +11117,8 @@ screens:
     provenance: decided 29 September 2026, MOB-6
   - operationId: createAiConversation
     contract: ai
-    purpose: Opened by the screen on the first message to the planner, not a control, and only when
-      signed in; never on opening the Plan tab (a conversation is billed)
+    purpose: Opened by the screen on the first message to the planner, not a control, and only when signed
+      in; never on opening the Plan tab (a conversation is billed)
     trigger: background
     provenance: decided 29 September 2026, MOB-6
   - operationId: requestSuggestion
@@ -12461,10 +12452,9 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-066 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-066 holds none of them. The edge
+        carries nothing: GST-066 is opened from GST-039, so this edge is the way back and GST-039 keeps
+        its own state'
   notes: '**A guest can legally demand their data and its erasure, and had nowhere to ask.** `exportSubjectData`
     and `deleteGuestAccount` existed as guest-callable operations reachable from no guest surface — a
     promise the contracts made and the product did not keep.
@@ -12650,10 +12640,8 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-067 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-067 holds none of them. The edge
+        carries nothing: GST-039 needs nothing to open'
   notes: '**A guest could buy a ticket and not ask for their money back.** `createRefundRequest` and `createResaleListing`
     were back-office only, so every refund began as a phone call.
 
@@ -12796,10 +12784,8 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-068 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-068 holds none of them. The edge
+        carries nothing: GST-039 needs nothing to open'
   notes: '**A guest could not raise a complaint.** Twelve case operations existed and every one of them
     was staff-side — a guest with a problem had to find somebody.
 
@@ -12960,10 +12946,9 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-069 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-069 holds none of them. The edge
+        carries nothing: GST-069 is opened from GST-039, so this edge is the way back and GST-039 keeps
+        its own state'
   notes: '🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by
     a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else
     operating the screen.
@@ -13170,10 +13155,8 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-070 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-070 holds none of them. The edge
+        carries nothing: GST-039 needs nothing to open'
     - to: GST-041
       trigger: Pay the deposit (only when the venue requires one)
       operation: addCartLine
@@ -13442,10 +13425,9 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-071 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-071 holds none of them. The edge
+        carries nothing: GST-071 is opened from GST-039, so this edge is the way back and GST-039 keeps
+        its own state'
   notes: '**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens`
     and `storePaymentToken` were guest-callable with no guest screen.
 
@@ -13700,10 +13682,8 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-072 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-072 holds none of them. The edge
+        carries nothing: GST-039 needs nothing to open'
   notes: '**A guest buying eight tickets could not give seven of them away.** `shareEntitlement`, `getGroupBooking`
     and `respondToInvitation` had no surface, so a group booking was one person holding eight barcodes.
 
@@ -13931,10 +13911,9 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-073 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-073 holds none of them. The edge
+        carries nothing: GST-073 is opened from GST-039, so this edge is the way back and GST-039 keeps
+        its own state'
   notes: '**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a
     guest reaches after losing a phone. **Two-step verification, per venue** (decided 29 September, rev
     3 GAP-B1, per venue, superseding the second part of audit R167, which had removed it on 28 September):
@@ -14956,8 +14935,7 @@ screens:
   gaps:
   - operation: getTransportRoute
     removed: true
-    why: 'Nothing on the client-approved screen shows it: the stops and the map come from
-      getTransportRouteMap.'
+    why: 'Nothing on the client-approved screen shows it: the stops and the map come from getTransportRouteMap.'
     source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-078

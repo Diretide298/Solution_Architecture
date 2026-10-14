@@ -1,6 +1,6 @@
 # WS100 — Subscription Licensing AI Self Service board 3
 
-**10 screens · 9 operations · 10 schemas · 3 permissions**
+**10 screens · 10 operations · 12 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `PLATFORM_BILLING_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -96,10 +96,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-389` | Commercial Rules Engine Overview | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-389` | Commercial Rules Engine Overview | B | 0 | 90 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-390` | VSI Model Builder | B | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-391` | VSI Scoring & Tier Threshold Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-392` | Subscription Tier Configuration | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-392` | Subscription Tier Configuration | B | 0 | 20 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-393` | Tier Included Allowances | B | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-394` | Commercial & Licensing Model Configuration | B | 23 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-395` | Billable Unit, Minimum Guarantee & Enforcement Rules | B | 17 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29343 (APP-CONSOLE-ADM-389) |
-| Who uses it | ticvai staff holding `PLATFORM_PLAN_MANAGE` (1 configure); in the flows as platform admin |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW`, `PLATFORM_PLAN_MANAGE` (1 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
@@ -139,33 +139,161 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Codes | text field | — | — | `getCommercialMetrics` ?codes |
+| Period | text field | — | — | `getCommercialMetrics` ?period |
+| Compare to | segmented control | — | Previous period · Same period last year | `getCommercialMetrics` ?compareTo |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Active Commercial Models** (metric tile)
+**Active Commercial Models** (metric tile, from `getCommercialMetrics`)
 
-**Active Tiers** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Active VSI Model** (metric tile)
+**Active Tiers** (metric tile, from `getCommercialMetrics`)
 
-**Customers by Commercial Model** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Average VSI** (metric tile)
+**Active VSI Model** (metric tile, from `getCommercialMetrics`)
 
-**Customers Near Threshold** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Customers Above Allowance** (metric tile)
+**Customers by Commercial Model** (metric tile, from `getCommercialMetrics`)
 
-**Per-Ticket Contracts** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Minimum Guarantee Contracts** (metric tile)
+**Average VSI** (metric tile, from `getCommercialMetrics`)
 
-**Pending Rule Changes** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Data it reads**: `listLicensingModels` (onLoad, The rules engine)
+**Customers Near Threshold** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Customers Above Allowance** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Per-Ticket Contracts** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Minimum Guarantee Contracts** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Pending Rule Changes** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Data it reads**: `getCommercialMetrics` (onLoad, The commercial figures the tiles show, one value per metric …); `listLicensingModels` (onLoad, The rules engine)
 
 **Where the user goes next**
 
@@ -190,6 +318,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commercial rules overview are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown metric code or a malformed period |
 
 #### Sample data for the mock-up
 
@@ -211,9 +340,12 @@ metric tiles:
 
 #### Permissions
 
+- `getCommercialMetrics` → `PLATFORM_BILLING_VIEW` (read) · staff
 - `listLicensingModels` → `PLATFORM_PLAN_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -248,12 +380,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (90 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-389?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-002`, `ADM-390`, `ADM-391`, `ADM-392`, `ADM-393`, `ADM-394`, `ADM-395`, `ADM-396`, `ADM-397`, `ADM-398`.
-- [ ] Every gated control is gated: `PLATFORM_PLAN_MANAGE`.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_VIEW`, `PLATFORM_PLAN_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -343,6 +475,8 @@ form example:
 - `setVsiModel` → `PLATFORM_PLAN_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_PLAN_MANAGE`
 
 #### Requirements it meets
 
@@ -445,6 +579,8 @@ thresholds:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -516,7 +652,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listPlans`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Description | text | — |
+| Cell tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
+| Licensed modules | list or chips (count when long) | A closed set as of 24 August. `moduleKey` was a free string, so nothing could join a licence to a screen — a tenant without an F&B licence … |
+| Limits | list or chips (count when long) | — |
+| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
+| Limit | 1,234 | Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure … |
+| Overage allowed | yes / no (icon or chip) | — |
+| Overage unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Base price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Billing period | chip: Monthly, Quarterly, Annual | — |
+| Includes branded app | yes / no (icon or chip) | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
+| Included AI tokens | 1,234 | AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 … |
+| Request limits | grouped details | The limits section of a plan: every tenant has a request budget (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 … |
+| Guest | grouped details | One audience's bucket (ADR-0064). `guest` covers `public` and `anonymous` callers too; shedding order stays ADR-0032's, `guest` first and … |
+| Sustained per second | 1,234 | Requests per second the bucket refills at. |
+| Burst multiplier | 1,234.5 | How far above the sustained rate a burst may go (2 is twice the rate). |
+| Burst seconds | 1,234 | How long a burst may last. |
+| Staff | grouped details | One audience's bucket (ADR-0064). `guest` covers `public` and `anonymous` callers too; shedding order stays ADR-0032's, `guest` first and … |
 
 **Actions and what each produces**
 
@@ -541,7 +700,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the subscription tier are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 `offeredToTenantId` on a standard package, or a tenant that does not exist |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 422 `offeredToTenantId` on a standard package, or a tenant that does not exist |
 
 #### Edge cases to draw
 
@@ -577,6 +736,8 @@ listPlans (Plan):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -607,8 +768,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-392?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create plan, Cancel.
 - [ ] Every transition is wired: `ADM-389`.
@@ -632,7 +793,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration per Allowance) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `licensingModelId` (navigation) |
 | Route | `/tenants-licensing/tier-included-allowances-adm-393` |
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** What each tier includes: metric, quantity, period, warning threshold, enforcement, overage.
@@ -697,6 +858,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -746,7 +909,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Commercial Configuration Fields; Separately configure) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `licensingModelId` (navigation) |
 | Route | `/tenants-licensing/commercial-licensing-model-configuration-adm-394` |
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** How TICVAI charges a customer (commercial model) separately from how it licenses them technically: charging unit, rate, currency, guarantee, base fee, module charging, and the technical limits.
@@ -830,6 +993,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -879,7 +1044,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration should support; Commercial rule can specify; Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `licensingModelId` (navigation) |
 | Route | `/tenants-licensing/billable-unit-minimum-guarantee-enforcement-rules-adm-395` |
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** What counts as billable and what happens at contractual or technical thresholds (minimum guarantee, carry forward).
@@ -957,6 +1122,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1006,7 +1173,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Pack Configuration) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `licensingModelId` (navigation) |
 | Route | `/tenants-licensing/overage-pricing-capacity-packs-adm-396` |
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** Overage prices and purchasable capacity packs.
@@ -1075,6 +1242,8 @@ form example:
 - `addCapacityPack` → `PLATFORM_BILLING_MANAGE` (configure) · staff, prospect
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_PLAN_MANAGE`
 
 #### Requirements it meets
 
@@ -1229,6 +1398,8 @@ Every commercial model rule:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1314,7 +1485,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rule versioning approval are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 `offeredToTenantId` on a standard package, or a tenant that does not exist |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 422 `offeredToTenantId` on a standard package, or a tenant that does not exist |
 
 #### Edge cases to draw
 
@@ -1335,6 +1506,8 @@ effectiveFrom: 01/11/2026
 - `createPlanVersion` → `PLATFORM_PLAN_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_PLAN_MANAGE`
 
 #### Requirements it meets
 
@@ -1361,7 +1534,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-398?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create plan version, Cancel.
@@ -1449,10 +1622,11 @@ Method, path, parameters, request and response for every operation these screens
 "addCapacityPack": {"method":"POST","path":"/capacity-packs","contract":"subscription","summary":"Buy headroom without changing tier","permission":"PLATFORM_BILLING_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CapacityPack","responds":"CapacityPack"},
 "createPlan": {"method":"POST","path":"/plans","contract":"subscription","summary":"Create a subscription plan","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreatePlanRequest","responds":"Plan"},
 "createPlanVersion": {"method":"POST","path":"/plans/{planId}","contract":"subscription","summary":"Publish a new version of a plan","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreatePlanRequest","responds":"Plan"},
+"getCommercialMetrics": {"method":"GET","path":"/commercial-metrics","contract":"subscription","summary":"The commercial figures across the customer portfolio, by code","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"codes","in":"query","required":null},{"name":"tenantId","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null}],"requestBody":null,"responds":"CommercialMetricSet"},
 "getVsiModel": {"method":"GET","path":"/vsi-models","contract":"subscription","summary":"How a customer's scale is scored into a tier","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[],"requestBody":null,"responds":"VsiModel"},
 "listLicensingModels": {"method":"GET","path":"/licensing-models","contract":"subscription","summary":"Billable units, minimum guarantees and overage","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[],"requestBody":null,"responds":"LicensingModel"},
 "listPlans": {"method":"GET","path":"/plans","contract":"subscription","summary":"List subscription plans","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"offeredToTenantId","in":"query","required":false},{"name":"packageKind","in":"query","required":false}],"requestBody":null,"responds":"Plan"},
-"setLicensingModel": {"method":"PUT","path":"/licensing-models","contract":"subscription","summary":"Define the billable unit and what happens at the edges","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"LicensingModel","responds":"LicensingModel"},
+"setLicensingModel": {"method":"PUT","path":"/licensing-models/{licensingModelId}","contract":"subscription","summary":"Define the billable unit and what happens at the edges","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"licensingModelId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"LicensingModel","responds":"LicensingModel"},
 "setVsiModel": {"method":"PUT","path":"/vsi-models","contract":"subscription","summary":"Weights, thresholds and the tiers they map to","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"VsiModel","responds":"VsiModel"},
 "simulateCommercialPackage": {"method":"POST","path":"/package-simulations","contract":"subscription","summary":"What this package would cost, and what it would provision","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PackageSimulationRequest","responds":"PackageSimulation"}
 }
@@ -1464,15 +1638,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"CapacityPack": {"type":"object","x-ticvai-persistence":"subscription.capacity_pack","description":"Board 3.8. **A good season should not require renegotiating a contract in August.**\n","required":["tenantId","unit","quantity"],"properties":{"id":{"type":"string","format":"uuid"},"tenantId":{"type":"string","format":"uuid"},"unit":{"type":"string"},"quantity":{"type":"integer"},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date","nullable":true},"temporary":{"type":"boolean","default":true},"approvedBy":{"type":"string","format":"uuid","nullable":true},"invoiceId":{"type":"string","format":"uuid","nullable":true}}},
+"CapacityPack": {"type":"object","x-ticvai-persistence":"subscription.capacity_pack","description":"Board 3.8. **A good season should not require renegotiating a contract in August.**\n","required":["tenantId","unit","quantity"],"properties":{"id":{"type":"string","format":"uuid"},"tenantId":{"x-ticvai-references":"none","type":"string","format":"uuid"},"unit":{"type":"string"},"quantity":{"type":"integer"},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date","nullable":true},"temporary":{"type":"boolean","default":true},"approvedBy":{"type":"string","format":"uuid","nullable":true},"invoiceId":{"type":"string","format":"uuid","nullable":true}}},
 "CellTier": {"type":"string","enum":["shared","dedicated","isolated","clientHosted"]},
-"CreatePlanRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","cellTier","licensedModules","limits","basePrice"],"properties":{"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"cellTier":{"$ref":"#/components/schemas/CellTier"},"licensedModules":{"type":"array","minItems":1,"description":"**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n","items":{"$ref":"#/components/schemas/subscription::ModuleKey"}},"limits":{"type":"array","items":{"$ref":"#/components/schemas/EntitlementLimit"}},"basePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"billingPeriod":{"type":"string","enum":["monthly","quarterly","annual"]},"includesBrandedApp":{"type":"boolean","description":"Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"},"includedAiTokens":{"type":"integer","nullable":true,"description":"AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."},"requestLimits":{"$ref":"#/components/schemas/PlanRequestLimits"},"packageKind":{"type":"string","enum":["standard","custom"],"default":"standard","description":"**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."},"offeredToTenantId":{"type":"string","format":"uuid","nullable":true,"description":"**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422 `plan-not-offered`). Null for a package any tenant may buy. Custom packages only."}}},
+"CommercialMetric": {"type":"object","description":"One commercial figure. Money-valued codes carry a `Money`; counts, rates and days a number (naming-and-style 5.1: money is never a float).","required":["code","value"],"properties":{"code":{"type":"string"},"groupKey":{"type":"string","nullable":true,"description":"The band, profile or model this row is for, on a code split by one; null otherwise."},"unit":{"type":"string","enum":["count","currency","percent","days"]},"value":{"oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},"comparison":{"nullable":true,"oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},"direction":{"type":"string","enum":["up","down","flat"]}}},
+"CommercialMetricSet": {"type":"object","description":"The commercial command centres' figures, one row per metric code (getCommercialMetrics).","properties":{"tenantId":{"type":"string","format":"uuid","nullable":true,"description":"The customer the figures are for; null for the whole portfolio."},"period":{"type":"string"},"asOf":{"type":"string","format":"date-time"},"metrics":{"type":"array","items":{"$ref":"#/components/schemas/CommercialMetric"}}}},
+"CreatePlanRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","cellTier","licensedModules","limits","basePrice"],"properties":{"code":{"x-ticvai-unique":"tenant","type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"cellTier":{"$ref":"#/components/schemas/CellTier"},"licensedModules":{"type":"array","minItems":1,"description":"**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n","items":{"$ref":"#/components/schemas/subscription::ModuleKey"}},"limits":{"type":"array","items":{"$ref":"#/components/schemas/EntitlementLimit"}},"basePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"billingPeriod":{"type":"string","enum":["monthly","quarterly","annual"]},"includesBrandedApp":{"type":"boolean","description":"Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"},"includedAiTokens":{"type":"integer","nullable":true,"description":"AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."},"requestLimits":{"$ref":"#/components/schemas/PlanRequestLimits"},"packageKind":{"type":"string","enum":["standard","custom"],"default":"standard","description":"**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."},"offeredToTenantId":{"type":"string","format":"uuid","nullable":true,"description":"**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422 `plan-not-offered`). Null for a package any tenant may buy. Custom packages only."}}},
 "EntitlementLimit": {"type":"object","required":["metric","limit"],"properties":{"metric":{"$ref":"#/components/schemas/UsageMetric"},"limit":{"type":"integer","nullable":true,"x-ticvai-column":"limit_value","description":"Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."},"overageAllowed":{"type":"boolean","default":false},"overageUnitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},
-"LicensingModel": {"type":"object","x-ticvai-persistence":"subscription.licensing_model","description":"Boards 3.6 and 3.7. **The single most consequential commercial decision in the product.**\n","required":["code","billableUnit"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"billableUnit":{"type":"string","enum":["perVenue","perAdmission","perTransaction","perActiveUser","perDevice","perModule","flatFee","revenueShare"]},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"revenueSharePercent":{"type":"number","nullable":true},"minimumGuarantee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"minimumGuaranteePeriod":{"type":"string","enum":["monthly","quarterly","annual"],"nullable":true},"onBelowMinimum":{"type":"string","enum":["chargeMinimum","carryForward","waive"],"default":"chargeMinimum","description":"**A minimum guarantee with no enforcement rule is a number in a contract.**"},"includedAllowances":{"type":"object","additionalProperties":{"type":"integer"}},"overagePricing":{"type":"array","items":{"type":"object","properties":{"unit":{"type":"string"},"fromQuantity":{"type":"integer"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"tierCode":{"type":"string","nullable":true},"effectiveFrom":{"type":"string","format":"date","nullable":true}}},
+"LicensingModel": {"type":"object","x-ticvai-persistence":"subscription.licensing_model","description":"Boards 3.6 and 3.7. **The single most consequential commercial decision in the product.**\n","required":["code","billableUnit"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"billableUnit":{"type":"string","enum":["perVenue","perAdmission","perTransaction","perActiveUser","perDevice","perModule","flatFee","revenueShare"]},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"revenueSharePercent":{"type":"number","nullable":true},"minimumGuarantee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"minimumGuaranteePeriod":{"type":"string","enum":["monthly","quarterly","annual"],"nullable":true},"onBelowMinimum":{"type":"string","enum":["chargeMinimum","carryForward","waive"],"default":"chargeMinimum","description":"**A minimum guarantee with no enforcement rule is a number in a contract.**"},"includedAllowances":{"type":"object","additionalProperties":{"type":"integer"}},"overagePricing":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"unit":{"type":"string"},"fromQuantity":{"type":"integer"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"tierCode":{"type":"string","nullable":true},"effectiveFrom":{"type":"string","format":"date","nullable":true}}},
 "PackageSimulation": {"type":"object","description":"Boards 3.9 and 4.8. **Refused at quote time rather than at go-live.**","properties":{"lines":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["baseTier","module","addOn","capacityPack","overage","professionalServices","discount"]},"label":{"type":"string"},"quantity":{"type":"number","nullable":true},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"recurringTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"oneOffTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"contractTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"minimumGuarantee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning","advisory"]},"code":{"type":"string"},"message":{"type":"string"}}}},"provisionable":{"type":"boolean"}}},
 "PackageSimulationRequest": {"type":"object","required":["tierCode"],"properties":{"tierCode":{"type":"string"},"licensingModelId":{"type":"string","format":"uuid","nullable":true},"moduleCodes":{"type":"array","items":{"type":"string"}},"venueCount":{"type":"integer","default":1},"projectedVolumes":{"type":"object","additionalProperties":{"type":"integer"}},"contractMonths":{"type":"integer","default":12},"billingCycle":{"type":"string","nullable":true},"currency":{"type":"string","nullable":true}}},
 "Plan": {"x-ticvai-persistence":"subscription.plan + subscription.plan_module + subscription.plan_limit","description":"**A plan's modules and limits are rows, keyed on `plan_id`.** `licensedModules` and `limits` are required on every plan, and `subscription.plan` alone had no column for either — so the licence position, the downgrade check and every module gate had nothing to read. `plan_module` holds one row per licensed `ModuleKey`; `plan_limit` one row per `EntitlementLimit`. Both belong to the plan version the row is, so a subscriber on an earlier version keeps the modules and limits they were sold.","allOf":[{"$ref":"#/components/schemas/CreatePlanRequest"},{"type":"object","required":["id","version","isActive","subscriberCount"],"properties":{"id":{"type":"string","format":"uuid"},"version":{"type":"string","description":"Existing subscribers stay on the version they were sold. A price change never applies retroactively.\n"},"isActive":{"type":"boolean"},"subscriberCount":{"type":"integer"},"publishedAt":{"type":"string","format":"date-time"}}}]},
 "PlanRequestLimits": {"type":"object","nullable":true,"x-ticvai-persistence":"none — embedded in subscription.plan as its request_limits jsonb column","description":"**The limits section of a plan: every tenant has a request budget** (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 deferred). A token bucket per tenant and audience in the kernel middleware of `commerce`, `access` and `operations`, counted in Azure Managed Redis so every replica agrees; a guest browse never spends a till's budget. Over budget, the call is refused `429` with `Retry-After` and the `RateLimit-*` headers (every operation declares it).\n\n**Null takes the platform default**, which starts at twice the tenant's expected peak from its sizing tier (`handoff/sizing.json` venue tiers) and is recalibrated after the benchmark and after four weeks of production. **A tenant may use the whole platform when others are quiet**: the per-replica share (`replicaSharePercent`) is enforced only above `shareEnforcedAbovePercent` of the replica's limit. If Redis is unavailable each replica falls back to its own buckets (the limit divided by the replica count); the request path never fails because the limiter's store did.","properties":{"guest":{"$ref":"#/components/schemas/RequestBudget"},"staff":{"$ref":"#/components/schemas/RequestBudget"},"service":{"$ref":"#/components/schemas/RequestBudget"},"partner":{"$ref":"#/components/schemas/RequestBudget"},"replicaSharePercent":{"type":"integer","minimum":1,"maximum":100,"default":25,"description":"The most of one replica's request slots one tenant may hold while the share is enforced."},"shareEnforcedAbovePercent":{"type":"integer","minimum":1,"maximum":100,"default":70,"description":"The replica load, as a percent of its limit, above which the share is enforced."}}},
-"VsiModel": {"type":"object","x-ticvai-persistence":"subscription.vsi_model","description":"Board 3.2. **The number the whole commercial model hangs on**, and configurable so a prospect reaches a package without a sales call.\n","properties":{"version":{"type":"integer"},"factors":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","enum":["annualVisitors","peakDailyCapacity","venueCount","salesChannels","moduleCount","integrationComplexity","seasonality","operatingHours","staffCount"]},"label":{"type":"string"},"weight":{"type":"number"},"bands":{"type":"array","items":{"type":"object","properties":{"upTo":{"type":"number","nullable":true},"points":{"type":"number"}}}}}}},"tiers":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"minimumScore":{"type":"number"},"maximumScore":{"type":"number","nullable":true}}}},"publishedAt":{"type":"string","format":"date-time","nullable":true}}}
+"VsiModel": {"type":"object","x-ticvai-persistence":"subscription.vsi_model","description":"Board 3.2. **The number the whole commercial model hangs on**, and configurable so a prospect reaches a package without a sales call.\n","properties":{"version":{"type":"integer"},"factors":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string","enum":["annualVisitors","peakDailyCapacity","venueCount","salesChannels","moduleCount","integrationComplexity","seasonality","operatingHours","staffCount"]},"label":{"type":"string"},"weight":{"type":"number"},"bands":{"type":"array","items":{"type":"object","properties":{"upTo":{"type":"number","nullable":true},"points":{"type":"number"}}}}}}},"tiers":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"minimumScore":{"type":"number"},"maximumScore":{"type":"number","nullable":true}}}},"publishedAt":{"type":"string","format":"date-time","nullable":true}}}
 }
 ```

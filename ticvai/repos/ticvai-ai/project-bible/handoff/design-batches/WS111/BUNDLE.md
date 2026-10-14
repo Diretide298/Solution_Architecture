@@ -97,13 +97,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-644` | Credential Issuance Command Center | D | 0 | 41 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `BO-645` | Credential Generation Workspace | D | 14 | 0 | 6 | 4 | 1 | 0 | — | notStarted (—) |
+| `BO-644` | Credential Issuance Command Center | D | 0 | 43 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `BO-645` | Credential Generation Workspace | D | 14 | 13 | 6 | 4 | 1 | 0 | — | notStarted (—) |
 | `BO-646` | Credential Media Configuration | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-647` | Badge Template Designer | D | 0 | 11 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-648` | Badge Printing & Print Queue | D | 9 | 10 | 6 | 1 | 1 | 6 | — | notStarted (—) |
 | `BO-649` | Digital & Mobile Credential Management | D | 0 | 13 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-650` | NFC & RFID Credential Encoding | D | 2 | 31 | 6 | 10 | 0 | 0 | — | notStarted (—) |
+| `BO-650` | NFC & RFID Credential Encoding | D | 2 | 33 | 6 | 10 | 0 | 0 | — | notStarted (—) |
 | `BO-651` | Credential Activation & Delivery | D | 0 | 13 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-653` | Credential Registry & Credential History | D | 0 | 25 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
@@ -209,6 +209,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Valid from | 1 Oct 2026 | — |
 | Valid to | 1 Oct 2026 | — |
 | Completeness percent | 1,234 | — |
+| Status effective from | 1 Oct 2026, 14:30 | When the status `setAccreditationStatus` set takes effect. |
+| Status review at | 1 Oct 2026 | When the status is due for review (`setAccreditationStatus`). |
 
 **Print queue** (data table, from `listBadgePrintJobs`)
 
@@ -312,6 +314,8 @@ queue:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -355,7 +359,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-644?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-645`, `BO-646`, `BO-647`, `BO-648`, `BO-649`, `BO-650`, `BO-651`, `BO-027`, `BO-653`.
@@ -441,7 +445,23 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAccreditationCredentials`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Holder | the name it points at, never the id | — |
+| Kind | chip: Printed badge, Mobile credential, QR, NFC card, RFID card, Wristband | — |
+| Symbology | chip: QR, Data matrix, Pdf417, Aztec, Code128, NFC ndef… | 12.1.22. How `encodedIdentifier` is carried, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a … |
+| Serial number | text | — |
+| Encoded identifier | text | — |
+| Badge template | the name it points at, never the id | — |
+| Issued at | 1 Oct 2026, 14:30 | — |
+| Issued by | the name it points at, never the id | — |
+| Activated at | 1 Oct 2026, 14:30 | — |
+| Status | chip: Pending print, Issued, Active, Lost, Replaced, Revoked… | — |
+| Replaces credential | the name it points at, never the id | — |
+| Replacement count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -515,6 +535,8 @@ template: Media orange
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -548,7 +570,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-645?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Key requirement: 12.1.4, Generate credential.
 - [ ] Every transition is wired: `BO-644`.
@@ -718,7 +740,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `badgeTemplateId` (navigation) |
 | Route | `/access-venue/badge-template-designer-bo-647` |
 
 **Known gaps.** **Badge Template Designer declares no operation that writes anything** — its only declared call is `none`, a read. The name promises authoring and the contract offers none, so either the write … **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
@@ -837,6 +859,8 @@ template:
 - `listBadgeTemplates` → `ACCREDITATION_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ACCREDITATION_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1027,6 +1051,8 @@ jobs:
 - `createBadgePrintJob` → `ACCREDITATION_ISSUE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ACCREDITATION_ISSUE`
 
 #### Requirements it meets
 
@@ -1223,6 +1249,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1322,6 +1350,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Reason `reason` | select | required | — | Lost · Stolen · Damaged · Name change · Photo change · Access change | — | — | `replaceAccreditationCredential` body |
 | Charge fee `chargeFee` | toggle | optional | off | — | — | — | `replaceAccreditationCredential` body |
 
+Errors to draw in the form: 409 The credential was already `replaced` (`accreditation-credential-already-replaced`), or is `revoked` or `expired` …
+
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **holder**: First step is "Select holder": search by name, accreditation number or organisation, showing photo, category and accreditation status. Only holders whose accreditation is approved and active can be picked; others show greyed with the reason ("Accreditation suspended", "Approval not complete"). Opening from a holder (BO-626 or BO-645) skips this step with the holder pre-selected. *(source: screens/P08-venue-back-office.yaml#BO-650 / screens/P08-venue-back-office.yaml#BO-653 / contracts/satellite/accreditation.yaml#listAccreditationHolders)*
@@ -1356,6 +1386,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Valid from | 1 Oct 2026 | — |
 | Valid to | 1 Oct 2026 | — |
 | Completeness percent | 1,234 | — |
+| Status effective from | 1 Oct 2026, 14:30 | When the status `setAccreditationStatus` set takes effect. |
+| Status review at | 1 Oct 2026 | When the status is due for review (`setAccreditationStatus`). |
 
 **Existing credentials** (data table, from `listAccreditationCredentials`)
 
@@ -1381,7 +1413,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|---|---|---|
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
-| Replace medium (secondary button) | `replaceAccreditationCredential` POST `/accreditation-credentials/{credentialId}/replace` | inline | AccreditationCredential | — | opens modal first |
+| Replace medium (secondary button) | `replaceAccreditationCredential` POST `/accreditation-credentials/{credentialId}/replace` | inline | AccreditationCredential | 409 The credential was already `replaced` (`accreditation-credential-already-replaced`), or is `revoked` or `expired` … | opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1411,6 +1443,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the nfc rfid credential are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The credential was already `replaced` (`accreditation-credential-already-replaced`), or is `revoked` or `expired` … |
 
 #### Edge cases to draw
 
@@ -1459,6 +1492,8 @@ existingCredentials:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 10 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1495,8 +1530,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-650?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel, Replace medium.
 - [ ] Every transition is wired: `BO-644`.
@@ -1668,6 +1703,8 @@ rows:
 - `listAccreditationCredentials` → `ACCREDITATION_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ACCREDITATION_VIEW`
 
 #### Requirements it meets
 
@@ -1866,6 +1903,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -2013,7 +2052,7 @@ Method, path, parameters, request and response for every operation these screens
 "listBadgePrintJobs": {"method":"GET","path":"/badge-print-jobs","contract":"accreditation","summary":"The print queue, and what failed","permission":"ACCREDITATION_ISSUE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BadgePrintJob"},
 "listBadgeTemplates": {"method":"GET","path":"/badge-templates","contract":"accreditation","summary":"Badge designs, and what prints on each","permission":"ACCREDITATION_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"BadgeTemplate"},
 "replaceAccreditationCredential": {"method":"POST","path":"/accreditation-credentials/{credentialId}/replace","contract":"accreditation","summary":"Reissue after loss, damage or a name change","permission":"ACCREDITATION_ISSUE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccreditationCredential"},
-"setBadgeTemplate": {"method":"PUT","path":"/badge-templates","contract":"accreditation","summary":"Design a badge","permission":"ACCREDITATION_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"BadgeTemplate","responds":"BadgeTemplate"}
+"setBadgeTemplate": {"method":"PUT","path":"/badge-templates/{badgeTemplateId}","contract":"accreditation","summary":"Design a badge","permission":"ACCREDITATION_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"badgeTemplateId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"BadgeTemplate","responds":"BadgeTemplate"}
 }
 ```
 
@@ -2024,10 +2063,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "AccreditationAuditRecord": {"type":"object","x-ticvai-persistence":"accreditation.audit","description":"Board 8.7. **Who gave this person access to that place, when, and on whose authority.**\n","properties":{"id":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"holderId":{"type":"string","format":"uuid","nullable":true},"action":{"type":"string"},"actorPrincipalId":{"type":"string","format":"uuid","nullable":true},"previousValue":{"nullable":true},"newValue":{"nullable":true},"reason":{"type":"string","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"previousRecordHash":{"type":"string","nullable":true},"recordHash":{"type":"string"},"integrity":{"type":"string","readOnly":true,"enum":["intact","broken","unverifiable"]},"scopePath":{"type":"string"}}},
-"AccreditationCredential": {"type":"object","x-ticvai-persistence":"accreditation.credential","description":"Board 4. **Not the accreditation** — reissuing one re-vets nobody.","required":["holderId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["printedBadge","mobileCredential","qr","nfcCard","rfidCard","wristband"]},"symbology":{"type":"string","nullable":true,"description":"12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n","enum":["qr","dataMatrix","pdf417","aztec","code128","nfcNdef","rfidEpc","none"]},"serialNumber":{"type":"string","nullable":true},"encodedIdentifier":{"type":"string","nullable":true},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"issuedBy":{"type":"string","format":"uuid"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["pendingPrint","issued","active","lost","replaced","revoked","expired"]},"replacesCredentialId":{"type":"string","format":"uuid","nullable":true},"replacementCount":{"type":"integer","default":0},"scopePath":{"type":"string"}}},
-"AccreditationCredentialDelivery": {"type":"object","x-ticvai-persistence":"accreditation.mobile_credential_delivery","description":"12.1.21. **Issuing a mobile credential and getting it onto a phone are two acts**, and the second is recorded so *\"I never got it\"* has an answer. Written by `deliverAccreditationCredential` (the accreditation team sends it) and `issueMyAccreditationWalletPass` (the holder adds it to a wallet).\n","required":["credentialId","channel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"credentialId":{"type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","readOnly":true},"channel":{"type":"string","enum":["email","sms","holderApp","appleWallet","googleWallet"]},"destinationMasked":{"type":"string","nullable":true,"readOnly":true,"description":"The address or number used, masked (`j***@agency.com`). Always the holder's own"},"walletPassSerial":{"type":"string","nullable":true,"readOnly":true},"walletPassUrl":{"type":"string","nullable":true,"readOnly":true,"description":"Signed and expiring; adds the pass to the wallet"},"status":{"type":"string","readOnly":true,"enum":["queued","sent","delivered","opened","failed","superseded"]},"failureReason":{"type":"string","nullable":true,"readOnly":true},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time","readOnly":true},"deliveredAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}},
-"AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
-"BadgePrintJob": {"type":"object","x-ticvai-persistence":"accreditation.print_job","description":"Board 4.5. **Printing fails mid-batch and the operator needs to know which landed.**","properties":{"id":{"type":"string","format":"uuid"},"credentialIds":{"type":"array","items":{"type":"string","format":"uuid"}},"printerDeviceId":{"type":"string","format":"uuid","nullable":true},"queuedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["queued","printing","completed","partiallyFailed","failed"]},"printed":{"type":"integer","readOnly":true},"failed":{"type":"integer","readOnly":true},"failures":{"type":"array","items":{"type":"object","properties":{"credentialId":{"type":"string","format":"uuid"},"reason":{"type":"string"}}}},"scopePath":{"type":"string"}}},
+"AccreditationCredential": {"type":"object","x-ticvai-persistence":"accreditation.credential","description":"Board 4. **Not the accreditation** — reissuing one re-vets nobody.","required":["holderId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"x-ticvai-references":"accreditation.holder","type":"string","format":"uuid"},"kind":{"type":"string","enum":["printedBadge","mobileCredential","qr","nfcCard","rfidCard","wristband"]},"symbology":{"type":"string","nullable":true,"description":"12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n","enum":["qr","dataMatrix","pdf417","aztec","code128","nfcNdef","rfidEpc","none"]},"serialNumber":{"type":"string","nullable":true},"encodedIdentifier":{"type":"string","nullable":true},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"issuedBy":{"type":"string","format":"uuid"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["pendingPrint","issued","active","lost","replaced","revoked","expired"]},"replacesCredentialId":{"type":"string","format":"uuid","nullable":true},"replacementCount":{"type":"integer","default":0},"scopePath":{"type":"string"}}},
+"AccreditationCredentialDelivery": {"type":"object","x-ticvai-persistence":"accreditation.mobile_credential_delivery","description":"12.1.21. **Issuing a mobile credential and getting it onto a phone are two acts**, and the second is recorded so *\"I never got it\"* has an answer. Written by `deliverAccreditationCredential` (the accreditation team sends it) and `issueMyAccreditationWalletPass` (the holder adds it to a wallet).\n","required":["credentialId","channel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"credentialId":{"x-ticvai-references":"accreditation.credential","type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","readOnly":true},"channel":{"type":"string","enum":["email","sms","holderApp","appleWallet","googleWallet"]},"destinationMasked":{"type":"string","nullable":true,"readOnly":true,"description":"The address or number used, masked (`j***@agency.com`). Always the holder's own"},"walletPassSerial":{"type":"string","nullable":true,"readOnly":true},"walletPassUrl":{"type":"string","nullable":true,"readOnly":true,"description":"Signed and expiring; adds the pass to the wallet"},"status":{"type":"string","readOnly":true,"enum":["queued","sent","delivered","opened","failed","superseded"]},"failureReason":{"type":"string","nullable":true,"readOnly":true},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time","readOnly":true},"deliveredAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}},
+"AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"},"statusEffectiveFrom":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the status `setAccreditationStatus` set takes effect."},"statusReviewAt":{"type":"string","format":"date","nullable":true,"readOnly":true,"description":"When the status is due for review (`setAccreditationStatus`)."}}},
+"BadgePrintJob": {"type":"object","x-ticvai-persistence":"accreditation.print_job","description":"Board 4.5. **Printing fails mid-batch and the operator needs to know which landed.**","properties":{"id":{"type":"string","format":"uuid"},"credentialIds":{"type":"array","items":{"type":"string","format":"uuid"}},"printerDeviceId":{"type":"string","format":"uuid","nullable":true},"queuedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["queued","printing","completed","partiallyFailed","failed"]},"printed":{"type":"integer","readOnly":true},"failed":{"type":"integer","readOnly":true},"failures":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"credentialId":{"type":"string","format":"uuid"},"reason":{"type":"string"}}}},"scopePath":{"type":"string"}}},
 "BadgeTemplate": {"type":"object","x-ticvai-persistence":"accreditation.badge_template","description":"Board 4.4. **A security artefact as much as a printed card.**","required":["code"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"size":{"type":"string","nullable":true},"showPhoto":{"type":"boolean","default":true},"showZones":{"type":"boolean","default":true},"colourStripe":{"type":"string","nullable":true,"description":"**What a security officer checks at a glance.** The stripe is the control that works at ten metres in the dark.\n"},"showOrganisation":{"type":"boolean","default":true},"showValidity":{"type":"boolean","default":true},"backgroundAssetId":{"type":"string","format":"uuid","nullable":true},"securityFeatures":{"type":"array","items":{"type":"string"}},"scopePath":{"type":"string"}}}
 }
 ```

@@ -334,14 +334,14 @@ paths:
         format: uuid
     get:
       operationId: getStockTransfer
-      x-ticvai-read-via:
-      - query: fnb#coldChainEventRecords
-        route: in-process
-        for: 'its read of fnb.cold_chain_event, F&B''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-064 Store-to-Store & Warehouse Transfers"
         - "P06 EMP-065 Receiving"
         - "P08 BO-080 Stock Transfers"
+      x-ticvai-read-via:
+      - query: fnb#coldChainEventRecords
+        route: in-process
+        for: 'its read of fnb.cold_chain_event, F&B''s data (CHG-MOD-001)'
       summary: One transfer, its manifest and where it is
       description: 'Retail board 4E. **`createStockTransfer`, `receiveStockTransfer` and `closeTransferShort`
         existed and nothing read a transfer** — the receiving store could accept a delivery it could not
@@ -476,10 +476,10 @@ paths:
   /stock-counts/daily:
     put:
       operationId: setDailyCount
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per stock location, the one the body''s `locationId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P06 EMP-066 Stock Count & Cycle Count Management"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per stock location, the one the body''s `locationId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Which items get counted every day
       description: 'Board 2H. **A full count is a shift; a daily count is twenty items and ten minutes.**
         The package had `startStockCount` for the first and nothing for the second, so venues either counted
@@ -752,11 +752,11 @@ paths:
   /inventory-items:
     get:
       operationId: listInventoryItems
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-048 Retail Products"
         - "P08 BO-081 Inventory Items"
         - "P08 BO-082 Stock Movements"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1016,7 +1016,6 @@ paths:
   /stock:
     get:
       operationId: getStockPositions
-      description: '**Order.** Sorted by `itemId` descending (a UUIDv7, so newest first).'
       x-ticvai-consumed-by:
         - "P06 EMP-061 Retail Inventory Command Center"
         - "P06 EMP-062 Store Stock & SKU Availability"
@@ -1027,6 +1026,7 @@ paths:
         - "P08 BO-452 Direct-Pay / Crane & Prize Machine Configuration"
         - "P08 BO-507 Pooled Inventory Management"
         - "P08 BO-513 Inventory Intelligence & Rebalancing"
+      description: '**Order.** Sorted by `itemId` descending (a UUIDv7, so newest first).'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -1171,14 +1171,14 @@ paths:
   /stock/valuation:
     get:
       operationId: getStockValuation
-      x-ticvai-read-via:
-      - query: finance#accountRecords
-        route: service
-        for: 'its read of ledger.account, Ledger''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-049 Stock Levels"
         - "P08 BO-050 Stock Position & Valuation"
         - "P16 ANL-005 Cost, Margin & Profitability"
+      x-ticvai-read-via:
+      - query: finance#accountRecords
+        route: service
+        for: 'its read of ledger.account, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -1351,10 +1351,10 @@ paths:
   /stock-counts:
     get:
       operationId: listStockCounts
-      description: '**Order.** Newest first, by `startedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-066 Stock Count & Cycle Count Management"
         - "P08 BO-079 Stock Count"
+      description: '**Order.** Newest first, by `startedAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2097,10 +2097,10 @@ paths:
   /requisitions:
     get:
       operationId: listRequisitions
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-063 Requisition & Smart Store Replenishment"
         - "P08 BO-078 Requisitions"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2673,11 +2673,11 @@ paths:
   /purchase-orders:
     get:
       operationId: listPurchaseOrders
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-065 Receiving"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-052 Goods Receipt"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3095,9 +3095,9 @@ paths:
   /goods-receipts:
     get:
       operationId: listGoodsReceipts
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-052 Goods Receipt"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3294,10 +3294,10 @@ paths:
   /stock-reservations:
     get:
       operationId: listStockReservations
-      x-ticvai-names-for-context: [rental.agreement_item]
       x-ticvai-consumed-by:
         - "P06 EMP-005 Task detail"
         - "P08 BO-579 Parts, Cost & Maintenance Expense Tracking"
+      x-ticvai-names-for-context: [rental.agreement_item]
       summary: Soft holds on stock
       description: >
         **A reservation is not a batch and not a movement.** `rental.agreement_item` points here:

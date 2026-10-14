@@ -914,6 +914,7 @@
     "description": "marketing.message_dispatch id."
    },
    "subjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -1138,6 +1139,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -1442,6 +1444,8 @@
     ]
    },
    "providers": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Tried in order; a provider below minimum health is skipped.",
     "items": {
@@ -1559,6 +1563,7 @@
     "description": "ISO 3166-1 alpha-2 (required for sms and whatsapp)."
    },
    "providerId": {
+    "x-ticvai-references": "marketing.communication_provider",
     "type": "string",
     "format": "uuid",
     "description": "The marketing.communication_provider row this identity is registered with."

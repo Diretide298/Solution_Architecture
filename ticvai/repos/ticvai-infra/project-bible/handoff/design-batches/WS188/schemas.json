@@ -217,6 +217,7 @@
     "format": "uuid"
    },
    "creditTypeId": {
+    "x-ticvai-references": "wallet.credit_type",
     "type": "string",
     "format": "uuid"
    },
@@ -273,6 +274,7 @@
   }
  },
  "CreditType": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "wallet.credit_type",
   "description": "Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n",
@@ -286,6 +288,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -410,6 +413,8 @@
     "nullable": true
    },
    "findings": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

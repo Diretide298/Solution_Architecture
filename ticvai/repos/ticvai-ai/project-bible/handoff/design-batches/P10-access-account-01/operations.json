@@ -159,7 +159,7 @@
   "permission": null,
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
+  "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
   "responds": "Session"

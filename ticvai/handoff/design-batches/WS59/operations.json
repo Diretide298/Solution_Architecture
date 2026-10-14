@@ -342,7 +342,7 @@
  },
  "setMediaBindingRule": {
   "method": "PUT",
-  "path": "/media-binding-rules",
+  "path": "/media-binding-rules/{ruleId}",
   "contract": "access",
   "summary": "Create or replace a multi-media binding rule",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -361,7 +361,7 @@
  },
  "setMediaReplacementRevocation": {
   "method": "PUT",
-  "path": "/media-replacement-revocation",
+  "path": "/media-replacement-revocation/{replacementReason}",
   "contract": "access",
   "summary": "Save a media replacement rule",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -369,6 +369,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "replacementReason",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

@@ -100,16 +100,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-081` | Active Rental Operations Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-082` | Active Rental Detail & Live Timeline | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-083` | Rental Extension Request | D | 2 | 8 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-084` | Extension Pricing & Confirmation | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-085` | Equipment Swap / Replacement | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-086` | Rental Incident & Operational Exception | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-087` | Due Soon & Customer Notification Management | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-088` | Overdue Rental Management | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-089` | Active Group Rental Management | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-090` | Active Rental Intelligence & Operational Alerts | D | 0 | 9 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-081` | Active Rental Operations Command Center | C | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-082` | Active Rental Detail & Live Timeline | C | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-083` | Rental Extension Request | C | 2 | 8 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-084` | Extension Pricing & Confirmation | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-085` | Equipment Swap / Replacement | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-086` | Rental Incident & Operational Exception | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-087` | Due Soon & Customer Notification Management | C | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-088` | Overdue Rental Management | C | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-089` | Active Group Rental Management | C | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-090` | Active Rental Intelligence & Operational Alerts | C | 0 | 9 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task APP-STAFF-EMP-081 |
+| Block | Block C · task APP-STAFF-EMP-081 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | commandCentre (comfortable density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -252,6 +252,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -300,7 +302,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task APP-STAFF-EMP-082 |
+| Block | Block C · task APP-STAFF-EMP-082 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -326,7 +328,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getRentalBooking`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Reference | text | — |
+| Product | the name it points at, never the id | — |
+| Location | the name it points at, never the id | — |
+| Return location | the name it points at, never the id | — |
+| Customer | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| From | 1 Oct 2026, 14:30 | — |
+| To | 1 Oct 2026, 14:30 | — |
+| Quantity | 1,234 | — |
+| Status | chip: Draft, Confirmed, Awaiting arrival, Checked out, Overdue, Partially returned… | — |
+| Checked out at | 1 Oct 2026, 14:30 | — |
+| Due back at | 1 Oct 2026, 14:30 | — |
+| Returned at | 1 Oct 2026, 14:30 | — |
+| Deposit authorisation | the name it points at, never the id | The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). |
+| Accrued late fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Readiness | list or chips (count when long) | Computed, not stored — agreement, requirements, deposit, equipment. |
+| Check | text | — |
+| Satisfied | yes / no (icon or chip) | — |
+| Detail | text | — |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -371,6 +396,8 @@ timeline:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -400,7 +427,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-082?state=<state>`: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `EMP-081`.
@@ -419,7 +446,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task APP-STAFF-EMP-083 |
+| Block | Block C · task APP-STAFF-EMP-083 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -531,6 +558,8 @@ answer: Available until 12:00
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -579,7 +608,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task APP-STAFF-EMP-084 |
+| Block | Block C · task APP-STAFF-EMP-084 |
 | Who uses it | venue staff holding `RENTAL_OPERATE`, `RENTAL_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -659,6 +688,8 @@ extension:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -702,7 +733,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task APP-STAFF-EMP-085 |
+| Block | Block C · task APP-STAFF-EMP-085 |
 | Who uses it | venue staff holding `RENTAL_OPERATE` (1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -754,6 +785,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the equipment swap replacement untouched. |
 | Loading (`?state=loading`) | The equipment swap replacement list. |
 | Offline (`?state=offline`) | TODO — not decided. Rental Management does not say what a staff device does here without a connection, and no minute has decided it. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The booking is not out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`; `rental-booking-not-checked-out`), or is already settled … |
 
 #### Consistency with other screens
 
@@ -779,6 +811,8 @@ timeRule: Clock unchanged - due 12:15; free time +15 min granted
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_OPERATE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -802,7 +836,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-085?state=<state>`: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
@@ -822,7 +856,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task APP-STAFF-EMP-086 |
+| Block | Block C · task APP-STAFF-EMP-086 |
 | Who uses it | venue staff holding `RENTAL_OPERATE` (1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -897,6 +931,8 @@ incident:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_OPERATE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -945,7 +981,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task APP-STAFF-EMP-087 |
+| Block | Block C · task APP-STAFF-EMP-087 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -978,7 +1014,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listOverdueRentals`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Reference | text | — |
+| Product | the name it points at, never the id | — |
+| Location | the name it points at, never the id | — |
+| Return location | the name it points at, never the id | — |
+| Customer | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| From | 1 Oct 2026, 14:30 | — |
+| To | 1 Oct 2026, 14:30 | — |
+| Quantity | 1,234 | — |
+| Status | chip: Draft, Confirmed, Awaiting arrival, Checked out, Overdue, Partially returned… | — |
+| Checked out at | 1 Oct 2026, 14:30 | — |
+| Due back at | 1 Oct 2026, 14:30 | — |
+| Returned at | 1 Oct 2026, 14:30 | — |
+| Deposit authorisation | the name it points at, never the id | The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). |
+| Accrued late fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Readiness | list or chips (count when long) | Computed, not stored — agreement, requirements, deposit, equipment. |
+| Check | text | — |
+| Satisfied | yes / no (icon or chip) | — |
+| Detail | text | — |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -1025,6 +1084,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1049,7 +1110,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-087?state=<state>`: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `EMP-081`.
@@ -1068,7 +1129,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task APP-STAFF-EMP-088 |
+| Block | Block C · task APP-STAFF-EMP-088 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1099,7 +1160,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listOverdueRentals`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Reference | text | — |
+| Product | the name it points at, never the id | — |
+| Location | the name it points at, never the id | — |
+| Return location | the name it points at, never the id | — |
+| Customer | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| From | 1 Oct 2026, 14:30 | — |
+| To | 1 Oct 2026, 14:30 | — |
+| Quantity | 1,234 | — |
+| Status | chip: Draft, Confirmed, Awaiting arrival, Checked out, Overdue, Partially returned… | — |
+| Checked out at | 1 Oct 2026, 14:30 | — |
+| Due back at | 1 Oct 2026, 14:30 | — |
+| Returned at | 1 Oct 2026, 14:30 | — |
+| Deposit authorisation | the name it points at, never the id | The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). |
+| Accrued late fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Readiness | list or chips (count when long) | Computed, not stored — agreement, requirements, deposit, equipment. |
+| Check | text | — |
+| Satisfied | yes / no (icon or chip) | — |
+| Detail | text | — |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -1150,6 +1234,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1179,7 +1265,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-088?state=<state>`: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `EMP-081`.
@@ -1197,7 +1283,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task APP-STAFF-EMP-089 |
+| Block | Block C · task APP-STAFF-EMP-089 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1219,7 +1305,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getRentalBooking`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Reference | text | — |
+| Product | the name it points at, never the id | — |
+| Location | the name it points at, never the id | — |
+| Return location | the name it points at, never the id | — |
+| Customer | the name it points at, never the id | — |
+| Order | the name it points at, never the id | — |
+| From | 1 Oct 2026, 14:30 | — |
+| To | 1 Oct 2026, 14:30 | — |
+| Quantity | 1,234 | — |
+| Status | chip: Draft, Confirmed, Awaiting arrival, Checked out, Overdue, Partially returned… | — |
+| Checked out at | 1 Oct 2026, 14:30 | — |
+| Due back at | 1 Oct 2026, 14:30 | — |
+| Returned at | 1 Oct 2026, 14:30 | — |
+| Deposit authorisation | the name it points at, never the id | The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). |
+| Accrued late fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Readiness | list or chips (count when long) | Computed, not stored — agreement, requirements, deposit, equipment. |
+| Check | text | — |
+| Satisfied | yes / no (icon or chip) | — |
+| Detail | text | — |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -1260,6 +1369,8 @@ summary: 8 out, 2 returned early (Omar Ziad BIKE-014, Fatima Al Suwaidi BIKE-022
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1289,7 +1400,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-089?state=<state>`: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `EMP-081`.
@@ -1307,7 +1418,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task APP-STAFF-EMP-090 |
+| Block | Block C · task APP-STAFF-EMP-090 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1340,7 +1451,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every active rental intelligence** (data table)
+**Every active rental intelligence** (data table, from `listOverdueRentals`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1398,6 +1509,8 @@ strip: 9 due back in the next hour - 3 overdue
 - `listOverdueRentals` → `RENTAL_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_VIEW`
 
 #### Requirements it meets
 
@@ -1539,10 +1652,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "RentalAvailability": {"type":"object","description":"Board 3. **A pooled product answers with a count, a serialised one with assets.**","properties":{"productId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid","nullable":true},"windows":{"type":"array","items":{"type":"object","properties":{"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"availableQuantity":{"type":"integer"},"availableAssetIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"blockedWindows":{"type":"array","items":{"type":"object","properties":{"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"reason":{"type":"string","enum":["booked","turnaround","maintenance","blackout","closed","buffer","held"]}}}}}},
-"RentalBooking": {"type":"object","x-ticvai-persistence":"rental.booking","description":"Board 5. **The booking outlives the order** — an order completes at payment and the rental is still out.\n","required":["id","productId","from","to","status"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"productId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"returnLocationId":{"type":"string","format":"uuid","nullable":true},"customerId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer"},"status":{"type":"string","enum":["draft","confirmed","awaitingArrival","checkedOut","overdue","partiallyReturned","completed","completedWithDamage","notReturned","cancelled","noShow"]},"checkedOutAt":{"type":"string","format":"date-time","nullable":true},"dueBackAt":{"type":"string","format":"date-time","nullable":true},"returnedAt":{"type":"string","format":"date-time","nullable":true},"depositAuthorisationId":{"type":"string","format":"uuid","nullable":true,"description":"The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."},"accruedLateFee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"readiness":{"type":"array","readOnly":true,"description":"**Computed, not stored** — agreement, requirements, deposit, equipment.","items":{"type":"object","properties":{"check":{"type":"string"},"satisfied":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"participants":{"type":"array","items":{"$ref":"#/components/schemas/RentalParticipant"}},"scopePath":{"type":"string"}}},
-"RentalIncident": {"type":"object","x-ticvai-persistence":"rental.incident","description":"Board 7.6. **Distinct from damage** — an incident may carry no charge and still be the most important thing that happened.\n","required":["kind","description"],"properties":{"id":{"type":"string","format":"uuid"},"bookingId":{"type":"string","format":"uuid","nullable":true},"assetId":{"type":"string","format":"uuid","nullable":true},"kind":{"type":"string","enum":["injury","loss","theft","complaint","equipmentFailure","safetyBreach","other"]},"description":{"type":"string"},"severity":{"type":"string","enum":["low","medium","high","critical"]},"reportedBy":{"type":"string","format":"uuid"},"reportedAt":{"type":"string","format":"date-time"},"photoAssetIds":{"type":"array","items":{"type":"string","format":"uuid"}},"workOrderId":{"type":"string","format":"uuid","nullable":true},"authorityNotified":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
-"RentalParticipant": {"type":"object","x-ticvai-persistence":"rental.participant","description":"Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"isPrimaryRenter":{"type":"boolean","default":false},"dateOfBirth":{"type":"string","format":"date","nullable":true},"idNumber":{"type":"string","nullable":true},"guardianName":{"type":"string","nullable":true},"emergencyContact":{"type":"string","nullable":true},"hasSignedWaiver":{"type":"boolean","readOnly":true},"customFields":{"type":"object","additionalProperties":true}}},
-"RentalQuote": {"type":"object","x-ticvai-persistence":"rental.quote","description":"Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n**Consumed by `acceptedQuoteId`** on `createRentalBooking` and the extension. A quote is not deleted when it is used or expires: a nightly job removes quotes 30 days past `expiresAt` that no booking references, so a booking can always show the quote it was priced at (decided 29 September, writers pass; DM4).\n","required":["quoteId","productId","from","to","rentalAmount","depositAmount"],"properties":{"quoteId":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid","description":"The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted."},"locationId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer","default":1},"customerId":{"type":"string","format":"uuid","nullable":true},"rentalAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"addOnAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discountAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalPayable":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"depositAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"depositInstrument":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005), written at `venue` scope."}}},
+"RentalBooking": {"type":"object","x-ticvai-persistence":"rental.booking","description":"Board 5. **The booking outlives the order** — an order completes at payment and the rental is still out.\n","required":["id","productId","from","to","status"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"productId":{"x-ticvai-references":"rental.product","type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"returnLocationId":{"type":"string","format":"uuid","nullable":true},"customerId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer"},"status":{"type":"string","enum":["draft","confirmed","awaitingArrival","checkedOut","overdue","partiallyReturned","completed","completedWithDamage","notReturned","cancelled","noShow"]},"checkedOutAt":{"type":"string","format":"date-time","nullable":true},"dueBackAt":{"type":"string","format":"date-time","nullable":true},"returnedAt":{"type":"string","format":"date-time","nullable":true},"depositAuthorisationId":{"x-ticvai-references":"orders.stored_value_authorisation","type":"string","format":"uuid","nullable":true,"description":"The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."},"accruedLateFee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"readiness":{"x-ticvai-persisted":false,"type":"array","readOnly":true,"description":"**Computed, not stored** — agreement, requirements, deposit, equipment.","items":{"type":"object","properties":{"check":{"type":"string"},"satisfied":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"participants":{"type":"array","items":{"$ref":"#/components/schemas/RentalParticipant"}},"scopePath":{"type":"string"},"changeReason":{"type":"string","nullable":true,"readOnly":true,"description":"Why the booking was last changed (`updateRentalBooking`)."}}},
+"RentalIncident": {"type":"object","x-ticvai-persistence":"rental.incident","description":"Board 7.6. **Distinct from damage** — an incident may carry no charge and still be the most important thing that happened.\n","required":["kind","description"],"properties":{"id":{"type":"string","format":"uuid"},"bookingId":{"type":"string","format":"uuid","nullable":true},"assetId":{"type":"string","format":"uuid","nullable":true},"kind":{"type":"string","enum":["injury","loss","theft","complaint","equipmentFailure","safetyBreach","other"]},"description":{"type":"string"},"severity":{"type":"string","enum":["low","medium","high","critical"]},"reportedBy":{"type":"string","format":"uuid"},"reportedAt":{"type":"string","format":"date-time"},"photoAssetIds":{"type":"array","items":{"type":"string","format":"uuid"}},"workOrderId":{"type":"string","format":"uuid","nullable":true},"authorityNotified":{"type":"boolean","default":false},"scopePath":{"type":"string"},"recordedAt":{"type":"string","format":"date-time","description":"**When the device made the write** (R113; CHG-OFL-003). `reportRentalIncident` is offline-capable, so the client sets this from its own clock and keeps it on replay; `created_at` is when the server heard of it. Omitted online, the server sets it to the time it received the call."}}},
+"RentalParticipant": {"required":["scopePath"],"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"rental.participant","description":"Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n","properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"isPrimaryRenter":{"type":"boolean","default":false},"dateOfBirth":{"type":"string","format":"date","nullable":true},"idNumber":{"type":"string","nullable":true},"guardianName":{"type":"string","nullable":true},"emergencyContact":{"type":"string","nullable":true},"hasSignedWaiver":{"type":"boolean","readOnly":true},"customFields":{"type":"object","additionalProperties":true}}},
+"RentalQuote": {"type":"object","x-ticvai-persistence":"rental.quote","description":"Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n**Consumed by `acceptedQuoteId`** on `createRentalBooking` and the extension. A quote is not deleted when it is used or expires: a nightly job removes quotes 30 days past `expiresAt` that no booking references, so a booking can always show the quote it was priced at (decided 29 September, writers pass; DM4).\n","required":["quoteId","productId","from","to","rentalAmount","depositAmount"],"properties":{"quoteId":{"type":"string","format":"uuid"},"productId":{"x-ticvai-references":"rental.product","type":"string","format":"uuid","description":"The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted."},"locationId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer","default":1},"customerId":{"type":"string","format":"uuid","nullable":true},"rentalAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"addOnAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discountAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalPayable":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"depositAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"depositInstrument":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005), written at `venue` scope."}}},
 "RentalQuoteRequest": {"type":"object","required":["productId","from","to"],"properties":{"productId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer","default":1},"salesChannel":{"type":"string","nullable":true},"customerId":{"type":"string","format":"uuid","nullable":true},"promotionCode":{"type":"string","nullable":true}}}
 }
 ```

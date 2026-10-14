@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-649` | Upsell & Upgrade Command Center | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-649` | Upsell & Upgrade Command Center | C | 0 | 20 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-650` | Upgrade Path & Product Ladder Builder | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-651` | Upsell Eligibility & Qualification Rules | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-652` | Upgrade Price Difference & Value Proposition Manager | C | 9 | 9 | 6 | 11 | 0 | 0 | — | notStarted (—) |

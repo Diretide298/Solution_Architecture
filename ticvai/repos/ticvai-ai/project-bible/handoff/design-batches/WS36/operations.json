@@ -305,7 +305,7 @@
  },
  "setCurrencyRoundingRule": {
   "method": "PUT",
-  "path": "/rounding-profiles",
+  "path": "/rounding-profiles/{roundingProfileId}",
   "contract": "catalogue",
   "summary": "Set precision and rounding for a currency",
   "permission": "PRICE_CONFIGURE",
@@ -313,6 +313,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "roundingProfileId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -324,7 +329,7 @@
  },
  "setEInvoicingProvider": {
   "method": "PUT",
-  "path": "/e-invoicing/providers",
+  "path": "/e-invoicing/providers/{providerId}",
   "contract": "finance",
   "summary": "Connect a legal entity to its accredited e-invoicing service provider",
   "permission": "TAX_CONFIGURE",
@@ -332,6 +337,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "providerId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -362,7 +372,7 @@
  },
  "setFeeDefinition": {
   "method": "PUT",
-  "path": "/fees",
+  "path": "/fees/{feeId}",
   "contract": "catalogue",
   "summary": "Create or update a fee or surcharge",
   "permission": "PRICE_CONFIGURE",
@@ -370,6 +380,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "feeId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -381,7 +396,7 @@
  },
  "setPriceCalculationPolicy": {
   "method": "PUT",
-  "path": "/calculation-profiles",
+  "path": "/calculation-profiles/{calculationProfileId}",
   "contract": "catalogue",
   "summary": "Save a price calculation sequence, whole",
   "permission": "PRICE_CONFIGURE",
@@ -389,6 +404,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "calculationProfileId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -400,7 +420,7 @@
  },
  "setTaxInvoiceTemplate": {
   "method": "PUT",
-  "path": "/tax-invoice-templates",
+  "path": "/tax-invoice-templates/{invoiceTemplateId}",
   "contract": "finance",
   "summary": "Set a legal entity's template and number series for one document kind",
   "permission": "TAX_CONFIGURE",
@@ -408,6 +428,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "invoiceTemplateId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

@@ -118,6 +118,101 @@ tags:
   description: Decision records, explanation, evidence and replay (design C12)
 - name: monitoring
   description: Governance alerts, incidents, risk register and controls (design C13)
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  activityRecords:
+    module: ai
+    table: ai.activity
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.activity rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as AI stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AiInteraction'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). AI answers with its ai.activity rows, as it stores them and as the caller's scope lets it see
+      them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with
+      a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through AI's service route (serviceAuth).
+    served: [service]
+  policyRecords:
+    module: ai
+    table: ai.policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as AI stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AiPolicy'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). AI answers with its ai.policy rows, as it stores them and as the caller's scope lets it see them
+      (the table's row-level security, under the caller's connection and transaction). It decides nothing: an
+      asker that refuses or chooses on these rows states that rule in its own operation, and a question with a
+      rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through AI's service route (serviceAuth).
+    served: [service]
+  proposedActionRecords:
+    module: ai
+    table: ai.proposed_action
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.proposed_action rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as AI stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ProposedAction'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). AI answers with its ai.proposed_action rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through AI's service route (serviceAuth).
+    served: [service]
+  providerRecords:
+    module: ai
+    table: ai.provider
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.provider rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as AI stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AiProvider'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). AI answers with its ai.provider rows, as it stores them and as the caller's scope lets it see
+      them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with
+      a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through AI's service route (serviceAuth).
+    served: [service]
+  suggestionRecords:
+    module: ai
+    table: ai.suggestion
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ai.suggestion rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as AI stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Suggestion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). AI answers with its ai.suggestion rows, as it stores them and as the caller's scope lets it see
+      them (the table's row-level security, under the caller's connection and transaction). It decides nothing:
+      an asker that refuses or chooses on these rows states that rule in its own operation, and a question with
+      a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from another
+      deployable through AI's service route (serviceAuth).
+    served: [service]
 paths:
   /ai/translate:
     post:
@@ -126,6 +221,16 @@ paths:
         - "P08 BO-785 Template Library"
         - "P08 BO-793 AI Content, Translation & Audit"
         - "P13 CMS-011 Translations"
+      x-ticvai-read-via:
+      - query: marketing-crm#messageTemplateRecords
+        route: service
+        for: 'its read of marketing.message_template, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#messageTemplateVersionRecords
+        route: service
+        for: 'its read of marketing.message_template_version, Marketing''s data (CHG-MOD-001)'
+      - query: platform-ops#contentBlockRecords
+        route: service
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: Fill translation gaps with a first pass, for a human to edit
       description: |-
         BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps` reports content missing a version. What was absent is filling it.
@@ -248,6 +353,37 @@ paths:
         - "P08 BO-793 AI Content, Translation & Audit"
         - "P13 CMS-007 Page Builder"
         - "P13 CMS-008 Content Blocks"
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#campaignRecords
+        route: service
+        for: 'its read of marketing.campaign, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#messageTemplateRecords
+        route: service
+        for: 'its read of marketing.message_template, Marketing''s data (CHG-MOD-001)'
+      - query: platform-ops#contentBlockRecords
+        route: service
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
+      - query: promotions#promotionRecords
+        route: service
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
+      - query: white-label#bannerRecords
+        route: service
+        for: 'its read of whitelabel.banner, WhiteLabel''s data (CHG-MOD-001)'
+      - query: white-label#contentPageRecords
+        route: service
+        for: 'its read of whitelabel.content_page, WhiteLabel''s data (CHG-MOD-001)'
+      - query: white-label#homepageSectionRecords
+        route: service
+        for: 'its read of whitelabel.homepage_section, WhiteLabel''s data (CHG-MOD-001)'
+      - query: white-label#promoBlockRecords
+        route: service
+        for: 'its read of whitelabel.promo_block, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: AI system design 2.3 generate, 3.3 (language model through the gateway,
         no per-tenant training), 3.8 (L2 prepare for campaigns); our build plan, shape follows proposeTranslations'
       summary: Draft marketing content for a person to edit and apply
@@ -408,6 +544,28 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-761 AI Audience Discovery"
         - "P08 BO-762 Predictive Audiences"
+      x-ticvai-read-via:
+      - query: marketing-crm#audienceListRecords
+        route: service
+        for: 'its read of marketing.audience_list, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#consentRecords
+        route: service
+        for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#guestProfileRecords
+        route: service
+        for: 'its read of marketing.guest_profile, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#loyaltyPositionRecords
+        route: service
+        for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentCriterionRecords
+        route: service
+        for: 'its read of marketing.segment_criterion, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: AI system design 3.10 (rules-first), 4.2 (per-tenant isolation, no pooled
         data); our build plan, shape follows generateConfiguration'
       summary: Propose a lookalike segment from a seed, for a person to save
@@ -518,6 +676,37 @@ paths:
         - "P16 ANL-001 Executive Command Center"
         - "P16 ANL-006 Inventory & Waste Intelligence"
         - "P16 ANL-010 Suggestions & Advice"
+      x-ticvai-read-via:
+      - query: fnb#productionPlanRecords
+        route: service
+        for: 'its read of fnb.production_plan, F&B''s data (CHG-MOD-001)'
+      - query: inventory#movementRecords
+        route: service
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
+      - query: inventory#stockBatchRecords
+        route: service
+        for: 'its read of inventory.stock_batch, Inventory''s data (CHG-MOD-001)'
+      - query: marketing-crm#attributionTouchRecords
+        route: service
+        for: 'its read of marketing.attribution_touch, Marketing''s data (CHG-MOD-001)'
+      - query: marketing-crm#segmentRecords
+        route: service
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: queue#queueRecords
+        route: service
+        for: 'its read of queue.queue, VenueOps''s data (CHG-MOD-001)'
+      - query: queue#readingRecords
+        route: service
+        for: 'its read of queue.reading, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#pointRecords
+        route: service
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#visitPlanItemRecords
+        route: service
+        for: 'its read of venuemap.visit_plan_item, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#visitPlanRecords
+        route: service
+        for: 'its read of venuemap.visit_plan, VenueOps''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -731,6 +920,8 @@ paths:
   /ai/suggestion-providers:
     put:
       operationId: setSuggestionProvider
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: Point a question at a rule, a model, or both
       description: '**The swap, and it is a configuration change.** Per `SuggestionKind`: which producer
         answers it, at which version, and with what guard rails.
@@ -816,6 +1007,16 @@ paths:
       operationId: proposeWalkways
       x-ticvai-consumed-by:
         - "P08 BO-093 Map Import & Labelling"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#importJobRecords
+        route: service
+        for: 'its read of venuemap.import_job, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#mapRecords
+        route: service
+        for: 'its read of venuemap.map, VenueOps''s data (CHG-MOD-001)'
       summary: Find walkable space in a drawing that has no vectors
       description: '**The last resort, and it says so.** Walkable space is normally derived by subtraction
         — the site minus buildings, seating, water and keep-out — which is exact, repeatable and needs
@@ -890,6 +1091,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/WalkwayProposal'
         '409':
+          x-ticvai-problem-types: [map-has-vector-geometry]
           description: '**The map has vector geometry.** Refused deliberately — subtraction is available
             and better, and running a model where geometry exists is how a worse answer gets preferred
             because it arrived in a nicer format.
@@ -922,6 +1124,13 @@ paths:
       operationId: proposeVenueLabels
       x-ticvai-consumed-by:
         - "P08 BO-093 Map Import & Labelling"
+      x-ticvai-read-via:
+      - query: venue-map#importJobRecords
+        route: service
+        for: 'its read of venuemap.import_job, VenueOps''s data (CHG-MOD-001)'
+      - query: venue-map#pointRecords
+        route: service
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
       summary: Suggest what each extracted shape is
       description: '1.4.24 and 8.8.13. **Reads shapes that `venue-map.importVenueGeometry` already extracted
         and proposes what each one is.** A polygon on the toilet layer beside an entrance is probably
@@ -986,6 +1195,28 @@ paths:
         - "P08 BO-970 AI Numbering & Labeling"
         - "P08 BO-975 Event-Specific Layout"
         - "P08 BO-982 Approval, Publish & Rollback"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: seating#accessibleRecords
+        route: service
+        for: 'its read of seating.accessible, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatCategoryRecords
+        route: service
+        for: 'its read of seating.seat_category, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatMapRecords
+        route: service
+        for: 'its read of seating.seat_map, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatRecords
+        route: service
+        for: 'its read of seating.seat, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#sectionRecords
+        route: service
+        for: 'its read of seating.section, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#zoneRecords
+        route: service
+        for: 'its read of seating.zone, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: AI system design 2.2 D (plan, validate-only, approval, execute), 3.8 (L3
         execute with approval); our build plan, shape follows proposeVenueLabels'
       summary: Propose changes to an existing seat map, as a plan a person approves
@@ -1169,6 +1400,7 @@ paths:
       operationId: setAiCredential
       x-ticvai-consumed-by:
         - "P09 ADM-037 AI Provider & Credentials"
+      x-ticvai-names-for-context: [ai.activity]
       x-ticvai-audience:
       - staff
       summary: Store or rotate a provider key
@@ -1180,7 +1412,7 @@ paths:
         becomes one secret per tenant and provider in the cell''s Azure Key Vault (the tenant''s own secret, never
         shared between tenants), encrypted at rest under the vault''s HSM-backed key; only the AI gateway''s workload
         identity may read it. It is write-only: never returned, never shown again, never logged, never in an audit
-        record or an `ai.interaction`; a reader sees `credentialHint` (the last four characters) and
+        record or an `ai.activity`; a reader sees `credentialHint` (the last four characters) and
         `credentialRotatedAt`. A new key resets `AiProvider.compatibility` to `notTested`; an active provider keeps
         serving on the previous key through the grace window while `testAiProvider` re-runs.
 
@@ -1217,9 +1449,11 @@ paths:
               - secret
               properties:
                 secret:
+                  x-ticvai-stored-as: ai.provider.credential_ref
+                  x-ticvai-secret: vault-reference
                   type: string
                   format: password
-                  description: '**Write-only, never returned, never logged, never in an `ai.interaction`.**
+                  description: '**Write-only, never returned, never logged, never in an `ai.activity`.**
                     Masked in any audit record of this call.
 
                     '
@@ -1228,6 +1462,7 @@ paths:
                   format: date-time
                   nullable: true
                 graceMinutes:
+                  x-ticvai-persisted: false
                   type: integer
                   minimum: 0
                   maximum: 1440
@@ -1367,7 +1602,9 @@ paths:
         assistant conversations; another guest''s conversation is refused exactly as one that does not exist,
         never returned. `AI_USE` is what a staff caller must hold to act for any guest (ADR-0025).
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - assist
       x-ticvai-permission: AI_USE
@@ -1495,7 +1732,6 @@ paths:
         - "P08 BO-928 AI Conflict Resolution Assistant"
         - "P08 BO-929 Automatic Schedule Optimization"
         - "P08 BO-932 Conversational AI Resource Copilot"
-        - "P09 ADM-533 Human Review, Challenge & AI Clarification Workspace"
         - "P13 CMS-104 App Build & Store Publishing"
       security:
       - guestAuth: []
@@ -1657,6 +1893,13 @@ paths:
         - "P12 SUP-006 Knowledge Base Search"
         - "P13 CMS-010 Media Library"
         - "P13 CMS-062 Central Digital Asset Library"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Search meaning, not words
@@ -1869,6 +2112,55 @@ paths:
         - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
         - "P08 BO-597 AI Configuration Workspace"
         - "P08 BO-598 AI Draft Review & Approval"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceRecords
+        route: service
+        for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#variantDimensionRecords
+        route: service
+        for: 'its read of catalogue.variant_dimension, Catalogue''s data (CHG-MOD-001)'
+      - query: marketing-crm#loyaltyProgrammeRecords
+        route: service
+        for: 'its read of marketing.loyalty_programme, Marketing''s data (CHG-MOD-001)'
+      - query: promotions#promotionRecords
+        route: service
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatCategoryRecords
+        route: service
+        for: 'its read of seating.seat_category, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatMapRecords
+        route: service
+        for: 'its read of seating.seat_map, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatRecords
+        route: service
+        for: 'its read of seating.seat, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#seatingRulesRecords
+        route: service
+        for: 'its read of seating.seating_rules, Catalogue''s data (CHG-MOD-001)'
+      - query: seating#sectionRecords
+        route: service
+        for: 'its read of seating.section, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: service
+        for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Draft a configuration from a description
@@ -1957,6 +2249,10 @@ paths:
   /generate/venue-layout:
     post:
       operationId: generateVenueLayout
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Draft a seat map from an uploaded plan
@@ -2015,6 +2311,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LayoutDraft'
         '422':
+          x-ticvai-problem-types: [plan-not-interpretable]
           description: The plan could not be interpreted. The reason is specific enough to act on
           content:
             application/problem+json:
@@ -2044,7 +2341,9 @@ paths:
         part of a governed decision, so ADM-004 opens the full trace (`getAiDecisionTrace`). A guest FAQ
         answer has no decision record, only this row (design 3.9).
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - governance
       x-ticvai-permission: AI_AUDIT_VIEW
@@ -2096,11 +2395,14 @@ paths:
       operationId: listProposedActions
       x-ticvai-consumed-by:
         - "P08 BO-093 Map Import & Labelling"
+        - "P08 BO-762 Predictive Audiences"
+        - "P08 BO-793 AI Content, Translation & Audit"
         - "P08 BO-928 AI Conflict Resolution Assistant"
         - "P08 BO-929 Automatic Schedule Optimization"
-        - "P09 ADM-492 Configuration Approval Workflow"
         - "P09 ADM-529 AI Human Oversight Command Center"
         - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
+        - "P13 CMS-007 Page Builder"
+        - "P13 CMS-008 Content Blocks"
         - "P16 ANL-009 AI Assistant & Action Center"
       x-ticvai-audience:
       - staff
@@ -2152,8 +2454,6 @@ paths:
         - "P08 BO-929 Automatic Schedule Optimization"
         - "P08 BO-970 AI Numbering & Labeling"
         - "P08 BO-975 Event-Specific Layout"
-        - "P09 ADM-492 Configuration Approval Workflow"
-        - "P09 ADM-531 AI Approval Review Workspace"
         - "P09 ADM-532 Conditional Approval & Approval Conditions"
         - "P13 CMS-007 Page Builder"
         - "P13 CMS-008 Content Blocks"
@@ -2365,6 +2665,7 @@ paths:
                   $ref: '#/components/schemas/AiProvider'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /providers/{providerId}:
     put:
       operationId: setAiProvider
       x-ticvai-consumed-by:
@@ -2443,6 +2744,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: providerId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2561,6 +2867,8 @@ paths:
       operationId: setAiPolicy
       x-ticvai-consumed-by:
         - "P08 BO-091 AI Policy & Spend"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set the policy
@@ -2710,6 +3018,7 @@ paths:
   /index-sources:
     get:
       operationId: listIndexSources
+      x-ticvai-names-for-context: [catalogue.product]
       x-ticvai-audience:
       - staff
       summary: What is indexed, and how current it is
@@ -2743,6 +3052,7 @@ paths:
                   $ref: '#/components/schemas/IndexSource'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /index-sources/{sourceId}:
     put:
       operationId: setIndexSource
       x-ticvai-audience:
@@ -2770,6 +3080,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: sourceId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2805,6 +3120,40 @@ paths:
         format: uuid
     post:
       operationId: reindexSource
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: fnb#menuItemRecords
+        route: service
+        for: 'its read of fnb.menu_item, F&B''s data (CHG-MOD-001)'
+      - query: maintenance#inspectionTemplateRecords
+        route: service
+        for: 'its read of maintenance.inspection_template, VenueOps''s data (CHG-MOD-001)'
+      - query: marketing-crm#caseRecords
+        route: service
+        for: 'its read of marketing.case, Marketing''s data (CHG-MOD-001)'
+      - query: reporting#reportDefinitionRecords
+        route: service
+        for: 'its read of reporting.report_definition, Reporting''s data (CHG-MOD-001)'
+      - query: retail#merchandiseRecords
+        route: service
+        for: 'its read of retail.merchandise, Retail''s data (CHG-MOD-001)'
+      - query: white-label#contentPageRecords
+        route: service
+        for: 'its read of whitelabel.content_page, WhiteLabel''s data (CHG-MOD-001)'
+      - query: white-label#faqEntryRecords
+        route: service
+        for: 'its read of whitelabel.faq_entry, WhiteLabel''s data (CHG-MOD-001)'
+      - query: white-label#policyRecords
+        route: service
+        for: 'its read of whitelabel.policy, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Rebuild a source
@@ -2855,6 +3204,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/IndexJob'
         '409':
+          x-ticvai-problem-types: [reindex-in-progress]
           description: Already rebuilding
           content:
             application/problem+json:
@@ -3006,9 +3356,7 @@ paths:
         - "P09 ADM-519 AI Governance Command Center"
         - "P09 ADM-520 AI Capability Registry & Ownership"
         - "P09 ADM-521 AI Risk Classification & Assessment"
-        - "P09 ADM-522 AI Autonomy Level Configuration"
         - "P09 ADM-536 Human Override & Manual Control Center"
-        - "P16 ANL-060 AI Analytics Governance & Model Control"
       x-ticvai-agreed: '29 September: AI system design 2.3 governance, 3.1 Registry; our build plan, shape follows
         listAiProviders'
       summary: The capability registry
@@ -3016,7 +3364,9 @@ paths:
         ADM-519..522). Owner, family, risk class, the autonomy level in force against its ceiling, data categories,
         lifecycle per environment and whether it is paused. The P09 governance area and ANL-060 read this first.
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - governance
       x-ticvai-permission: AI_USE
@@ -3073,7 +3423,6 @@ paths:
         - "P09 ADM-520 AI Capability Registry & Ownership"
         - "P09 ADM-521 AI Risk Classification & Assessment"
         - "P09 ADM-522 AI Autonomy Level Configuration"
-        - "P16 ANL-060 AI Analytics Governance & Model Control"
       x-ticvai-agreed: '29 September: AI system design 2.3 governance (setAiCapability), 3.8; our build plan, shape
         follows setAiProvider'
       summary: Register a capability, or change its owner, risk class or autonomy
@@ -3140,12 +3489,10 @@ paths:
       operationId: getEffectiveAiPolicy
       x-ticvai-consumed-by:
         - "P08 BO-091 AI Policy & Spend"
-        - "P09 ADM-489 AI Configuration Readiness Center"
         - "P09 ADM-522 AI Autonomy Level Configuration"
         - "P09 ADM-525 Environment, Tenant & Scope Governance"
         - "P09 ADM-526 AI Policy Conflict, Exception & Override Management"
         - "P09 ADM-528 AI Governance Policy Publication & Effective Policy Map"
-        - "P16 ANL-060 AI Analytics Governance & Model Control"
       x-ticvai-agreed: '29 September: AI system design 2.3 governance, 3.8; our build plan, shape follows getAiPolicy'
       summary: The policy in force for a capability at a scope
       description: '**What the governance decision point would apply, resolved and explained** (AIC-153, AIC-161,
@@ -3197,8 +3544,6 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-523 AI Action & Permission Policy Builder"
         - "P09 ADM-524 AI Data Access & Usage Policy"
-        - "P09 ADM-525 Environment, Tenant & Scope Governance"
-        - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
       x-ticvai-agreed: '29 September: AI system design 2.3 governance (draftAiGovernancePolicy), 3.1 Governance;
         our build plan, shape follows createKnowledgeCollection'
       summary: Draft a governance policy, or a new version of one
@@ -3406,16 +3751,16 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-523 AI Action & Permission Policy Builder"
         - "P09 ADM-524 AI Data Access & Usage Policy"
-        - "P09 ADM-526 AI Policy Conflict, Exception & Override Management"
         - "P09 ADM-527 AI Policy Testing & Governance Simulation"
         - "P09 ADM-528 AI Governance Policy Publication & Effective Policy Map"
-        - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
       x-ticvai-agreed: '29 September: AI system design 2.3 governance; our build plan, shape follows listAiInteractions'
       summary: Governance policies and their versions
       description: 'Every version of every governance policy at the scope, newest first (ADM-523, ADM-526..528).
         Filter by `policyId` for one policy''s history, or by `status` for what is in force.
 
-        '
+        
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.'
       tags:
       - governance
       x-ticvai-permission: AI_USE
@@ -3584,7 +3929,6 @@ paths:
       operationId: pauseAiCapability
       x-ticvai-consumed-by:
         - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
-        - "P09 ADM-519 AI Governance Command Center"
         - "P09 ADM-536 Human Override & Manual Control Center"
         - "P09 ADM-556 AI Incident & Remediation Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 governance, 3.2 events; our build plan, shape follows
@@ -3813,16 +4157,12 @@ paths:
         - "P09 ADM-485 Seating, Access & Operational Configuration"
         - "P09 ADM-486 Channel, Media & Fulfillment Configuration"
         - "P09 ADM-487 Cross-Module Conflict & Dependency Validation"
-        - "P09 ADM-488 Configuration Preview & Impact Analysis"
         - "P09 ADM-489 AI Configuration Readiness Center"
         - "P09 ADM-490 Configuration Validation Results"
-        - "P09 ADM-492 Configuration Approval Workflow"
         - "P09 ADM-493 AI Configuration Execution Center"
         - "P09 ADM-494 Execution Progress & Dependency Monitor"
         - "P09 ADM-495 Configuration Results & Object Mapping"
         - "P09 ADM-497 Configuration History, Versions & Rollback"
-        - "P09 ADM-529 AI Human Oversight Command Center"
-        - "P09 ADM-531 AI Approval Review Workspace"
         - "P09 ADM-532 Conditional Approval & Approval Conditions"
         - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
         - "P09 ADM-535 Live AI Execution Oversight & Human Intervention"
@@ -3868,11 +4208,9 @@ paths:
     post:
       operationId: simulateActionPlan
       x-ticvai-consumed-by:
-        - "P09 ADM-487 Cross-Module Conflict & Dependency Validation"
         - "P09 ADM-488 Configuration Preview & Impact Analysis"
         - "P09 ADM-490 Configuration Validation Results"
         - "P09 ADM-531 AI Approval Review Workspace"
-        - "P09 ADM-538 Human Oversight Workflow Simulator & Readiness Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 actions, 2.2 D; our build plan, shape follows simulateRecommendationStrategy'
       summary: Validate and simulate a plan without changing anything
       description: '**Validate, then simulate** (design 2.2 D step 4; ADM-487, ADM-488, ADM-490). Each step is validated
@@ -3925,7 +4263,6 @@ paths:
       operationId: pauseActionPlan
       x-ticvai-consumed-by:
         - "P09 ADM-493 AI Configuration Execution Center"
-        - "P09 ADM-494 Execution Progress & Dependency Monitor"
         - "P09 ADM-535 Live AI Execution Oversight & Human Intervention"
         - "P09 ADM-536 Human Override & Manual Control Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 actions, 3.8; our build plan, shape follows decideProposedAction'
@@ -3989,7 +4326,6 @@ paths:
     post:
       operationId: resumeActionPlan
       x-ticvai-consumed-by:
-        - "P09 ADM-494 Execution Progress & Dependency Monitor"
         - "P09 ADM-535 Live AI Execution Oversight & Human Intervention"
       x-ticvai-agreed: '29 September: AI system design 2.3 actions, 3.7; our build plan, shape follows decideProposedAction'
       summary: Resume a paused plan
@@ -4175,7 +4511,6 @@ paths:
     post:
       operationId: rollbackActionPlan
       x-ticvai-consumed-by:
-        - "P09 ADM-495 Configuration Results & Object Mapping"
         - "P09 ADM-497 Configuration History, Versions & Rollback"
         - "P09 ADM-535 Live AI Execution Oversight & Human Intervention"
       x-ticvai-agreed: '29 September: AI system design 2.3 actions, 2.2 D step 8; our build plan, shape follows
@@ -4244,7 +4579,6 @@ paths:
     post:
       operationId: overrideAiDecision
       x-ticvai-consumed-by:
-        - "P09 ADM-533 Human Review, Challenge & AI Clarification Workspace"
         - "P09 ADM-536 Human Override & Manual Control Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 actions, 3.9; our build plan, shape follows recordSuggestionOutcome'
       summary: Override an AI decision
@@ -4298,14 +4632,15 @@ paths:
       operationId: listAiTools
       x-ticvai-consumed-by:
         - "P09 ADM-523 AI Action & Permission Policy Builder"
-        - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
       x-ticvai-agreed: '29 September: AI system design 2.3 actions, 3.1 Registry; our build plan, shape follows
         listAiProviders'
       summary: The tool registry
       description: 'What the executor may call, and on what terms (AIC-088, AIC-089): target operation and version,
         effect, risk, permission, reversibility, compensation, timeout (ADM-523, ADM-530).
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - actions
       x-ticvai-permission: AI_USE
@@ -4411,7 +4746,6 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-469 AI Configuration Home & Start"
         - "P09 ADM-470 Setup Type & Business Intent Discovery"
-        - "P09 ADM-496 Configuration Change & Modification Assistant"
       x-ticvai-agreed: '29 September: AI system design 2.3 configure, 2.2 D; our build plan, shape follows createAiConversation'
       summary: Start the configuration assistant
       description: '**Discovery, not a chat** (design 2.2 D step 1, AIC-108..115; ADM-469, ADM-470, ADM-496). Create,
@@ -4486,7 +4820,9 @@ paths:
       summary: Configuration-assistant sessions
       description: 'Sessions at the scope with progress, last activity and status (ADM-469 home, ADM-497 history).
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - configure
       x-ticvai-permission: AI_USE
@@ -4546,14 +4882,11 @@ paths:
     post:
       operationId: answerConfigurationQuestion
       x-ticvai-consumed-by:
-        - "P09 ADM-470 Setup Type & Business Intent Discovery"
         - "P09 ADM-471 Venue & Business Model Discovery"
         - "P09 ADM-472 Guided Question & Answer Workspace"
         - "P09 ADM-473 Product & Admission Model Discovery"
         - "P09 ADM-474 Operational Requirement Discovery"
         - "P09 ADM-475 Commercial Requirement Discovery"
-        - "P09 ADM-477 Missing Information & Clarification Center"
-        - "P09 ADM-496 Configuration Change & Modification Assistant"
       x-ticvai-agreed: '29 September: AI system design 2.3 configure, 2.2 D; our build plan, shape follows sendAiMessage'
       summary: Answer the current question
       description: 'One turn (ADM-470..477): the answer is extracted against the question''s schema, each value
@@ -4633,6 +4966,10 @@ paths:
         - "P09 ADM-469 AI Configuration Home & Start"
         - "P09 ADM-470 Setup Type & Business Intent Discovery"
         - "P09 ADM-477 Missing Information & Clarification Center"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: AI system design 2.2 D step 1 (extraction with provenance), 3.3; our build
         plan, shape follows answerConfigurationQuestion'
       summary: Seed a configuration session from an uploaded document
@@ -4734,7 +5071,9 @@ paths:
       description: 'Each attached document with its extraction status, how many questions it answered and what
         it could not read.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - configure
       x-ticvai-permission: AI_USE
@@ -4776,22 +5115,13 @@ paths:
     get:
       operationId: getConfigurationBlueprint
       x-ticvai-consumed-by:
-        - "P09 ADM-471 Venue & Business Model Discovery"
         - "P09 ADM-472 Guided Question & Answer Workspace"
         - "P09 ADM-473 Product & Admission Model Discovery"
         - "P09 ADM-474 Operational Requirement Discovery"
         - "P09 ADM-475 Commercial Requirement Discovery"
-        - "P09 ADM-476 Required, Recommended & Optional Decisions"
         - "P09 ADM-477 Missing Information & Clarification Center"
         - "P09 ADM-478 Configuration Blueprint & Dependency Map"
         - "P09 ADM-479 AI Configuration Build Command Center"
-        - "P09 ADM-480 Venue & Organization Configuration"
-        - "P09 ADM-481 Product Configuration Assistant"
-        - "P09 ADM-482 Schedule, Capacity & Availability Configuration"
-        - "P09 ADM-483 Pricing & Commercial Configuration"
-        - "P09 ADM-484 Promotion, Bundle & Upsell Configuration"
-        - "P09 ADM-485 Seating, Access & Operational Configuration"
-        - "P09 ADM-486 Channel, Media & Fulfillment Configuration"
         - "P09 ADM-491 AI Recommendations & Best-Practice Review"
       x-ticvai-agreed: '29 September: AI system design 2.3 configure; our build plan, shape follows getAiPolicy'
       summary: The blueprint so far
@@ -4850,7 +5180,6 @@ paths:
       operationId: decideBlueprintRecommendation
       x-ticvai-consumed-by:
         - "P09 ADM-476 Required, Recommended & Optional Decisions"
-        - "P09 ADM-477 Missing Information & Clarification Center"
         - "P09 ADM-480 Venue & Organization Configuration"
         - "P09 ADM-481 Product Configuration Assistant"
         - "P09 ADM-482 Schedule, Capacity & Availability Configuration"
@@ -4858,7 +5187,6 @@ paths:
         - "P09 ADM-484 Promotion, Bundle & Upsell Configuration"
         - "P09 ADM-485 Seating, Access & Operational Configuration"
         - "P09 ADM-486 Channel, Media & Fulfillment Configuration"
-        - "P09 ADM-491 AI Recommendations & Best-Practice Review"
       x-ticvai-agreed: '29 September: AI system design 2.3 configure; our build plan, shape follows decideProposedAction'
       summary: Accept, modify, reject or defer a blueprint decision
       description: 'Each recommendation is decided by a person (design 2.2 D step 2; ADM-476, ADM-491). Modifying
@@ -4933,8 +5261,6 @@ paths:
       operationId: buildConfigurationPlan
       x-ticvai-consumed-by:
         - "P09 ADM-478 Configuration Blueprint & Dependency Map"
-        - "P09 ADM-479 AI Configuration Build Command Center"
-        - "P09 ADM-496 Configuration Change & Modification Assistant"
       x-ticvai-agreed: '29 September: AI system design 2.3 configure, 2.2 D; our build plan, shape follows generateConfiguration'
       summary: Compile the blueprint into a plan
       description: '**The plan step of flow D** (design 2.2 D step 3; ADM-478, ADM-479). A DAG of steps, each bound
@@ -4988,7 +5314,9 @@ paths:
         counted, newest first. Analytics questions outside the semantic model appear here too, as `kind: analytics`
         (design 5.7).
 
-        '
+        
+
+        **Order.** Newest first, by `lastAskedAt` descending, then by `id`.'
       tags:
       - knowledge
       x-ticvai-permission: AI_USE
@@ -5053,9 +5381,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-031 AI Concierge – Home"
-        - "P02 GST-032 AI Concierge – Chat"
         - "P02 GST-033 AI Concierge – Contextual Help"
-        - "P05 KSK-015 Assistant"
         - "P06 EMP-020 AI assistant — answer"
       security:
       - guestAuth: []
@@ -5118,6 +5444,13 @@ paths:
                 $ref: '#/components/schemas/AiAnswerFeedback'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'This person has already labelled this answer; it takes one label per message per person (AIC-062). Nothing changes.'
+          x-ticvai-problem-types: [answer-feedback-already-recorded]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /assistant-profiles/{profileKey}:
@@ -5131,7 +5464,6 @@ paths:
       operationId: configureAssistantProfile
       x-ticvai-consumed-by:
         - "P08 BO-091 AI Policy & Spend"
-        - "P12 SUP-018 AI Customer Service Copilot & Knowledge Workspace"
       x-ticvai-agreed: '29 September: AI system design 2.3 knowledge (setAssistantProfile), 5.10; our build plan,
         shape follows setIndexSource'
       summary: Define an assistant profile
@@ -5200,7 +5532,9 @@ paths:
       summary: Assistant profiles
       description: 'Guest concierge, support chatbot and staff profiles by role, at the scope.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - knowledge
       x-ticvai-permission: AI_USE
@@ -5241,13 +5575,8 @@ paths:
     get:
       operationId: listAiInsights
       x-ticvai-consumed-by:
-        - "P09 ADM-502 Attendance & Visitation Forecast"
-        - "P09 ADM-510 Capacity & Occupancy Forecast"
         - "P16 ANL-001 Executive Command Center"
         - "P16 ANL-019 AI Management Insights"
-        - "P16 ANL-055 Anomaly Detection Center"
-        - "P16 ANL-058 AI Recommendation & Next-Best-Action Center"
-        - "P16 ANL-059 AI Insight History, Evidence & Explainability"
       x-ticvai-agreed: '29 September: AI system design 2.3 insights, 3.1 Insights; our build plan, shape follows
         listAiInteractions'
       summary: Insights and anomalies
@@ -5255,7 +5584,9 @@ paths:
         and executive summaries with their lifecycle (AIP-181). One situation produces one insight through the correlation
         key (AIP-090).
 
-        '
+        
+
+        **Order.** Newest first, by `detectedAt` descending, then by `id`.'
       tags:
       - insights
       x-ticvai-permission: AI_USE
@@ -5336,7 +5667,6 @@ paths:
         - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-782 AI Journey Optimization"
         - "P16 ANL-019 AI Management Insights"
-        - "P16 ANL-059 AI Insight History, Evidence & Explainability"
       x-ticvai-agreed: '29 September: AI system design 2.3 insights; our build plan, shape follows recordSuggestionOutcome'
       summary: Review, accept, reject or mark an insight actioned
       description: 'Moves an insight along new → reviewed → accepted/rejected → actioned (AIP-181); `measured` is
@@ -5493,7 +5823,9 @@ paths:
         measured like any other. **A person applies it** in marketing-crm (`updateCampaign`, `createJourney`, `activateJourney`);
         nothing here changes a campaign (autonomy L2, design 3.8).
 
-        '
+        
+
+        **Order.** Newest first, by `detectedAt` descending, then by `decisionRecordId`.'
       tags:
       - insights
       x-ticvai-permission: AI_USE
@@ -5558,7 +5890,6 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-502 Attendance & Visitation Forecast"
         - "P09 ADM-510 Capacity & Occupancy Forecast"
-        - "P16 ANL-055 Anomaly Detection Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 insights (setAnomalyDetector), 3.10; our build plan,
         shape follows setIndexSource'
       summary: Set up anomaly detection on a KPI
@@ -5626,7 +5957,9 @@ paths:
       summary: Anomaly detectors
       description: 'Detectors at the scope with their method and measured false-alarm rate.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - insights
       x-ticvai-permission: AI_USE
@@ -5670,13 +6003,14 @@ paths:
         - "P09 ADM-504 Channel & Booking Pace Forecast"
         - "P09 ADM-505 Revenue & Commercial Forecast"
         - "P09 ADM-506 Forecast Drivers, Confidence & Explainability"
-        - "P16 ANL-057 Forecasting & Predictive Analytics Studio"
       x-ticvai-agreed: '29 September: AI system design 2.3 forecast, 5.2; our build plan, shape follows listIndexSources'
       summary: What is forecast
       description: 'Forecast definitions at the scope (ADM-500): subject, grain, horizon, cadence, the live producer
         and its shadow.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -5864,7 +6198,9 @@ paths:
       summary: Forecast versions
       description: 'Immutable versions (AIP-032) with basis, producer, data cut-off, quality checks and status (ADM-508).
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -5927,8 +6263,6 @@ paths:
         - "P09 ADM-510 Capacity & Occupancy Forecast"
         - "P09 ADM-511 Attraction Utilization & Queue Forecast"
         - "P09 ADM-512 Entry, Access & Guest Flow Forecast"
-        - "P09 ADM-513 Workforce Demand & Staffing Forecast"
-        - "P09 ADM-514 POS, Kiosk & Frontline Service Forecast"
         - "P09 ADM-515 F&B, Retail & Inventory Demand Forecast"
         - "P09 ADM-516 Resource, Equipment & Facility Requirement Forecast"
         - "P16 ANL-008 Demand Forecasting"
@@ -6101,7 +6435,6 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-499 Forecasting Command Center"
         - "P09 ADM-508 Forecast Accuracy, Review & Publication Center"
-        - "P16 ANL-057 Forecasting & Predictive Analytics Studio"
       x-ticvai-agreed: '29 September: AI system design 2.3 forecast, 5.2 (BI reads published versions); our build
         plan, shape follows exportAiEvidencePackage'
       summary: Export a forecast version as a file
@@ -6186,8 +6519,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-919 AI Event Resource Forecasting"
         - "P08 BO-931 Operational Scenario Simulator & Digital Twin"
-        - "P09 ADM-507 Forecast Scenario & What-If Simulator"
-        - "P09 ADM-517 Operational Scenario & Readiness Simulator"
         - "P16 ANL-057 Forecasting & Predictive Analytics Studio"
       x-ticvai-agreed: '29 September: AI system design 2.3 forecast; our build plan, shape follows generateVenueLayout
         (202)'
@@ -6229,7 +6560,6 @@ paths:
       operationId: compareForecastScenarios
       x-ticvai-consumed-by:
         - "P08 BO-931 Operational Scenario Simulator & Digital Twin"
-        - "P09 ADM-507 Forecast Scenario & What-If Simulator"
         - "P09 ADM-517 Operational Scenario & Readiness Simulator"
       x-ticvai-agreed: '29 September: AI system design 2.3 forecast; our build plan, shape follows semanticSearch'
       summary: Compare scenarios
@@ -6288,7 +6618,9 @@ paths:
         and interval coverage against the baseline rule, per producer. These are the figures the promotion gate
         reads.
 
-        '
+        
+
+        **Order.** Soonest first, by `periodStart` ascending, then by `id`.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -6340,7 +6672,9 @@ paths:
       summary: Forecast signals and their freshness
       description: 'Weather, holidays, calendars and events with coverage and freshness (AIP-199..203, ADM-501).
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -6448,22 +6782,15 @@ paths:
         - "P08 BO-925 AI Staff Recommendation & Workforce Matching"
         - "P08 BO-926 Resource Demand Forecasting"
         - "P08 BO-927 AI Staffing Requirement Forecast"
-        - "P09 ADM-509 Operational Forecasting Command Center"
         - "P09 ADM-510 Capacity & Occupancy Forecast"
-        - "P09 ADM-511 Attraction Utilization & Queue Forecast"
-        - "P09 ADM-512 Entry, Access & Guest Flow Forecast"
-        - "P09 ADM-513 Workforce Demand & Staffing Forecast"
-        - "P09 ADM-514 POS, Kiosk & Frontline Service Forecast"
-        - "P09 ADM-515 F&B, Retail & Inventory Demand Forecast"
-        - "P09 ADM-516 Resource, Equipment & Facility Requirement Forecast"
-        - "P09 ADM-517 Operational Scenario & Readiness Simulator"
-        - "P09 ADM-518 Operational Forecast Review, Recommendations & Handover"
       x-ticvai-agreed: '29 September: AI system design 2.3 forecast; our build plan, shape follows listProposedActions'
       summary: Requirements derived from the forecast
       description: '**Staff, POS, gates, F&B, stock and resources** derived from a published version with the tenant''s
         productivity standards (design 2.2 C step 6, AIP-067; ADM-509..518, BO-919, BO-925..927).
 
-        '
+        
+
+        **Order.** Soonest first, by `periodStart` ascending, then by `id`.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -6545,7 +6872,6 @@ paths:
       operationId: decideOperationalRequirement
       x-ticvai-consumed-by:
         - "P08 BO-927 AI Staffing Requirement Forecast"
-        - "P09 ADM-518 Operational Forecast Review, Recommendations & Handover"
       x-ticvai-agreed: '29 September: AI system design 2.3 forecast, 3.2 events; our build plan, shape follows decideProposedAction'
       summary: Accept, modify or reject a requirement
       description: '**Autonomy L2: prepare** (design 3.8). Accepting hands the requirement to the owning module
@@ -6738,6 +7064,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AiTransactionRiskScore'
         '422':
+          x-ticvai-problem-types: [order-or-wallet-required]
           description: Neither `orderId` nor `walletId` was sent
           content:
             application/problem+json:
@@ -6793,6 +7120,8 @@ paths:
       operationId: configureRiskStrategy
       x-ticvai-consumed-by:
         - "P08 ADM-637 AI Fraud, Anomaly & Payment Intelligence Center"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-agreed: '29 September: AI system design 2.3 risk (setRiskStrategy), 8 decision 6; our build plan,
         shape follows setAiPolicy'
       summary: Set the risk strategy
@@ -7455,6 +7784,13 @@ paths:
         format: uuid
     post:
       operationId: scoreApprovalRequest
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: approvals#slaPolicyRecords
+        route: service
+        for: 'its read of approvals.sla_policy, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: minutes of 8 September (AI in approvals is context only and never recommends
         or influences approve or reject); AI system design 3.10 (rules-first); our build plan, shape follows scoreTransactionRisk
         (service)'
@@ -7528,6 +7864,13 @@ paths:
                 $ref: '#/components/schemas/AiApprovalRequestScore'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The request is no longer `pending` or `escalated` (decided, withdrawn, cancelled or expired); there is no reviewer left to inform. No score is written.'
+          x-ticvai-problem-types: [approval-request-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
@@ -7570,11 +7913,7 @@ paths:
     post:
       operationId: decideRecommendations
       x-ticvai-consumed-by:
-        - "P01 WEB-001 Home / Landing"
         - "P01 WEB-008 Add-ons & Upsell"
-        - "P01 WEB-043 Loyalty & Rewards"
-        - "P02 GST-001 Home"
-        - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-048 Upsell / Cross-Sell"
         - "P08 BO-102 Sell"
         - "P08 BO-1048 Seat Upsell Recommendations"
@@ -7725,11 +8064,7 @@ paths:
     post:
       operationId: recordRecommendationEvents
       x-ticvai-consumed-by:
-        - "P01 WEB-001 Home / Landing"
         - "P01 WEB-008 Add-ons & Upsell"
-        - "P01 WEB-043 Loyalty & Rewards"
-        - "P02 GST-001 Home"
-        - "P02 GST-036 Loyalty & Rewards"
         - "P02 GST-048 Upsell / Cross-Sell"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -7824,7 +8159,6 @@ paths:
         - "P08 ADM-687 AI Explainability, Confidence & Model Governance"
         - "P08 ADM-696 AI Risk, Fairness, Explainability & Safety Center"
         - "P08 ADM-697 Recommendation Audit, Decision Trace & Investigation"
-        - "P09 ADM-543 Candidate, Rule & Decision Path Trace"
       x-ticvai-agreed: '29 September: AI system design 2.3 recommend, 3.9; our build plan, shape follows listAiInteractions'
       summary: Why these recommendations
       description: '**Explanation at three depths, each gated** (AIC-195, AIR-193..202): `business` with `AI_USE`;
@@ -7992,7 +8326,9 @@ paths:
       description: 'Platform and tenant models with capabilities, context size, tool calling, structured output,
         region, cost profile and lifecycle (AIC-013, AIC-026; ADM-037, ADM-544).
 
-        '
+        
+
+        **Order.** Sorted by `rank` ascending, then by `id`.'
       tags:
       - models
       x-ticvai-permission: AI_USE
@@ -8118,12 +8454,13 @@ paths:
       operationId: listPromptTemplates
       x-ticvai-consumed-by:
         - "P09 ADM-037 AI Provider & Credentials"
-        - "P16 ANL-060 AI Analytics Governance & Model Control"
       x-ticvai-agreed: '29 September: AI system design 2.3 models; our build plan, shape follows listAiProviders'
       summary: The prompt registry
       description: 'Prompt templates by task with their versions and status (AIC-022).
 
-        '
+        
+
+        **Order.** Newest first, by `publishedAt` descending, then by `id`.'
       tags:
       - models
       x-ticvai-permission: AI_USE
@@ -8248,7 +8585,6 @@ paths:
       operationId: runAiEvaluation
       x-ticvai-consumed-by:
         - "P09 ADM-554 AI Quality, Behavior & Governance Drift Monitoring"
-        - "P16 ANL-060 AI Analytics Governance & Model Control"
       x-ticvai-agreed: '29 September: AI system design 2.3 models, 3.5; our build plan, shape follows reindexSource'
       summary: Evaluate a candidate
       description: 'Offline golden set, backtest or shadow comparison of a candidate against its baseline (design
@@ -8311,12 +8647,13 @@ paths:
       operationId: listAiEvaluations
       x-ticvai-consumed-by:
         - "P09 ADM-554 AI Quality, Behavior & Governance Drift Monitoring"
-        - "P16 ANL-060 AI Analytics Governance & Model Control"
       x-ticvai-agreed: '29 September: AI system design 2.3 models; our build plan, shape follows listIndexJobs'
       summary: Evaluation runs
       description: 'Runs with metrics and gate results, newest first.
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - models
       x-ticvai-permission: AI_USE
@@ -8375,7 +8712,6 @@ paths:
     post:
       operationId: promoteAiRelease
       x-ticvai-consumed-by:
-        - "P09 ADM-519 AI Governance Command Center"
         - "P09 ADM-554 AI Quality, Behavior & Governance Drift Monitoring"
       x-ticvai-agreed: '29 September: AI system design 2.3 models, 3.5, 3.12; our build plan, shape follows decideProposedAction'
       summary: Promote a release to its next stage (a person)
@@ -8546,7 +8882,9 @@ paths:
         outcome, subject, trace id, policy or model version and period. Auditors scoped to a venue see only that
         venue''s records (design 3.1, RLS on the log database).
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - audit
       x-ticvai-permission: AI_AUDIT_VIEW
@@ -8641,7 +8979,6 @@ paths:
     get:
       operationId: getAiDecisionTrace
       x-ticvai-consumed-by:
-        - "P09 ADM-004 Platform Audit Log"
         - "P09 ADM-498 AI Configuration Audit & Governance"
         - "P09 ADM-533 Human Review, Challenge & AI Clarification Workspace"
         - "P09 ADM-537 Approval & Intervention History / Decision Timeline"
@@ -8651,7 +8988,6 @@ paths:
         - "P09 ADM-543 Candidate, Rule & Decision Path Trace"
         - "P09 ADM-544 Model, Provider & AI Runtime Trace"
         - "P09 ADM-545 Governance, Approval & Human Decision Trace"
-        - "P09 ADM-546 Execution & Business Outcome Trace"
         - "P09 ADM-548 AI Trace Investigation & Replay Simulator"
       x-ticvai-agreed: '29 September: AI system design 2.3 audit, 3.9; our build plan, shape follows getAiPolicy'
       summary: The full trace of a decision
@@ -8821,13 +9157,11 @@ paths:
     get:
       operationId: listAiGovernanceAlerts
       x-ticvai-consumed-by:
-        - "P09 ADM-519 AI Governance Command Center"
         - "P09 ADM-549 AI Governance Monitoring Command Center"
         - "P09 ADM-552 AI Policy Compliance & Violation Monitoring"
         - "P09 ADM-553 AI Data, Privacy & Usage Compliance Monitoring"
         - "P09 ADM-554 AI Quality, Behavior & Governance Drift Monitoring"
         - "P09 ADM-555 AI Governance Alert & Detection Center"
-        - "P09 ADM-558 AI Governance Review, Action Plan & Continuous Improvement"
       x-ticvai-agreed: '29 September: AI system design 2.3 monitoring, 3.12, 4.4; our build plan, shape follows
         listAiInteractions'
       summary: Governance alerts
@@ -8835,7 +9169,9 @@ paths:
         including `promotionReady` when a shadow model passes its gate (design 3.12), which the P09 governance area
         shows as a tile.
 
-        '
+        
+
+        **Order.** Newest first, by `raisedAt` descending, then by `id`.'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -8915,8 +9251,6 @@ paths:
     post:
       operationId: decideAiGovernanceAlert
       x-ticvai-consumed-by:
-        - "P09 ADM-552 AI Policy Compliance & Violation Monitoring"
-        - "P09 ADM-553 AI Data, Privacy & Usage Compliance Monitoring"
         - "P09 ADM-555 AI Governance Alert & Detection Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 monitoring; our build plan, shape follows decideProposedAction'
       summary: Acknowledge, dismiss, resolve, or open an incident
@@ -8991,7 +9325,9 @@ paths:
       description: 'Governance incidents from detection to closure (ADM-549, ADM-556), linked to operational incidents
         where both apply (AIC-250).
 
-        '
+        
+
+        **Order.** Newest first, by `openedAt` descending, then by `id`.'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -9042,7 +9378,6 @@ paths:
     post:
       operationId: openAiIncident
       x-ticvai-consumed-by:
-        - "P09 ADM-555 AI Governance Alert & Detection Center"
         - "P09 ADM-556 AI Incident & Remediation Management"
       x-ticvai-agreed: '29 September: AI system design 2.3 monitoring, 3.2 events; our build plan, shape follows
         createKnowledgeCollection'
@@ -9286,7 +9621,9 @@ paths:
       summary: The AI risk register
       description: 'Ongoing AI risks with likelihood, impact, controls and residual rating (ADM-550, ADM-557, ADM-558).
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -9340,6 +9677,7 @@ paths:
   /risk-register/{entryId}:
     parameters:
     - name: entryId
+      x-ticvai-column: ai.risk_register.id
       in: path
       required: true
       schema:
@@ -9399,12 +9737,13 @@ paths:
       operationId: listAiControls
       x-ticvai-consumed-by:
         - "P09 ADM-551 AI Governance Control Library & Control Effectiveness"
-        - "P09 ADM-557 AI Compliance, Assurance & Governance Reporting"
       x-ticvai-agreed: '29 September: AI system design 2.3 monitoring, 4.4; our build plan, shape follows listIndexSources'
       summary: Governance controls
       description: 'The control library with effectiveness and last test (AIC-219, ADM-551, ADM-557).
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -9828,6 +10167,10 @@ paths:
       operationId: importVenueHistory
       x-ticvai-consumed-by:
         - "P16 ANL-071 AI Maturity & Learning"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: AI functions review, packageFindings 7 (no historical import existed); shape follows
         importVenueGeometry (a job)'
       summary: Import the venue's own historical exports for the AI baselines
@@ -9931,7 +10274,11 @@ paths:
       summary: The venue's history imports
       description: 'Imports of the venue''s own history, newest first, with the months each covered and its result.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`failed`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - forecast
       x-ticvai-permission: AI_USE
@@ -10013,7 +10360,9 @@ paths:
         the next stage needs. Stages move by themselves from `starting` to `established` as data arrives, each move
         recorded; `learned` only when an admin promotes a trained model (AI-D16).
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -10068,7 +10417,9 @@ paths:
         promotion gate raises a `promotionReady` governance alert to the admin; **nothing switches by itself** (AI-D16).
         Runs are scheduled by the platform; this reads them.
 
-        '
+        
+
+        **Order.** Newest first, by `startedAt` descending, then by `id`.'
       tags:
       - models
       x-ticvai-permission: AI_USE
@@ -10127,7 +10478,9 @@ paths:
         `getAiUsage` grouped by `agent`, which says which agents spend the most and on what. Computed from the gateway
         telemetry and `ai.activity` over the last hour; nothing is stored here.
 
-        '
+        
+
+        **Order.** Newest first, by `measuredAt` descending.'
       tags:
       - monitoring
       x-ticvai-permission: AI_USE
@@ -10318,6 +10671,8 @@ components:
           minimum: 1
           nullable: true
         openingHours:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: The usual week. Exceptions come from the venue calendar.
           items:
@@ -10388,6 +10743,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         dataKind:
@@ -10447,6 +10803,8 @@ components:
           type: integer
           readOnly: true
         findings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           items:
@@ -10507,6 +10865,7 @@ components:
           format: uuid
           x-ticvai-references: ai.history_import
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         dataKind:
@@ -11040,6 +11399,7 @@ components:
           nullable: true
           description: JSON Schema the extracted answer must satisfy.
     AiCapabilityRegistration:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by buildConfigurationPlan, getEffectiveAiPolicy, listAiCapabilities, listAiCapabilityMaturity and others
       type: object
       x-ticvai-persistence: ai.capability
       description: '**An entry in the capability registry** (design 3.1 Registry, AIC-144, AIC-145; ADM-520). Nothing
@@ -11154,6 +11514,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiModel:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by setAiProvider
       type: object
       x-ticvai-persistence: ai.model
       description: '**The model catalogue** (design 3.1 Registry, 3.3; AIC-013, AIC-026). One row per model a task
@@ -11305,6 +11666,8 @@ components:
             $ref: ../shared/common.yaml#/components/schemas/AiResidencyClass
           description: The tenant residency classes whose calls this model may serve (CHG-CSA-002).
         taskFitness:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           description: '**Evaluated fitness per task** (21 September minutes, M21-09, our proposal): a score from
@@ -11346,6 +11709,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiPromptTemplate:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeMarketingContent, suggestGuidedChoice
       type: object
       x-ticvai-persistence: ai.prompt_template
       description: '**The prompt registry** (design 3.1 Registry, AIC-022). Versioned and **immutable once published**:
@@ -11414,6 +11778,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiTool:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by buildConfigurationPlan, generateConfiguration, proposeRiskAction, proposeSeatMapChanges and others
       type: object
       x-ticvai-persistence: ai.tool
       description: '**The tool registry** (design 3.1 Registry, 3.8; AIC-088, AIC-089). The executor calls owning
@@ -11658,6 +12023,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiGovernancePolicy:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by getEffectiveAiPolicy
       type: object
       x-ticvai-persistence: ai.governance_policy
       description: '**A governance policy** (design 3.1 Governance, 3.8; ADM-523..528). Its rules live on versions:
@@ -11710,6 +12076,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiGovernancePolicyVersion:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by attachConfigurationSource, buildConfigurationPlan, getEffectiveAiPolicy, proposeMarketingContent and others
       type: object
       x-ticvai-persistence: ai.governance_policy_version
       description: 'One version of a governance policy. **Published versions are never edited**: a change is a new
@@ -11775,6 +12142,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiPolicyException:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by getEffectiveAiPolicy
       type: object
       x-ticvai-persistence: ai.policy_exception
       description: '**A temporary, recorded exception to a governance policy** (AIC-162, ADM-526): an expiry, an
@@ -12536,6 +12904,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiAssistantProfile:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by sendAiMessage
       type: object
       x-ticvai-persistence: ai.assistant_profile
       description: '**One assistant runtime, many profiles** (design 5.10, C5; AIC-069..080). The profile decides
@@ -13012,6 +13381,8 @@ components:
           format: uuid
           x-ticvai-references: ai.forecast_version
         changes:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -13564,6 +13935,8 @@ components:
               maximum: 100
               nullable: true
         outcomeMap:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -13978,6 +14351,8 @@ components:
           - high
           - critical
         entities:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -14481,6 +14856,8 @@ components:
           - suggested
           description: '`approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit).'
         annotations:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -14738,6 +15115,8 @@ components:
           nullable: true
           description: The linked operational incident, where both apply (AIC-250).
         containment:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -15115,6 +15494,7 @@ components:
           description: '**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths`
             (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1).'
     AiRelease:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by decideRecommendations, requestSuggestion
       type: object
       x-ticvai-persistence: ai.release
       description: '**The release pointer per capability and tenant** (design 3.5): draft, offline evaluation, shadow,
@@ -15243,6 +15623,8 @@ components:
           format: uuid
           readOnly: true
         tenantId:
+          readOnly: true
+          x-ticvai-references: none
           type: string
           format: uuid
         enabled:
@@ -15324,6 +15706,7 @@ components:
           format: uuid
           readOnly: true
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
         trigger:
@@ -15347,6 +15730,8 @@ components:
           minimum: 0
           readOnly: true
         questions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -16184,6 +16569,7 @@ components:
           type: string
           format: uuid
     AiConfigurationSource:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by attachConfigurationSource, getConfigurationBlueprint, listConfigurationSources
       type: object
       x-ticvai-persistence: ai.config_source
       description: '**A document attached to a configuration session** (1.3.31, 1.4.21, 2.6.50): the uploaded asset,
@@ -16194,7 +16580,12 @@ components:
       - assetId
       - sourceKind
       - status
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -16476,6 +16867,8 @@ components:
               nullable: true
           description: A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy.
         signals:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -16811,9 +17204,11 @@ components:
       - decision
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         suggestionId:
+          x-ticvai-references: ai.suggestion
           type: string
           format: uuid
         decision:
@@ -17068,6 +17463,8 @@ components:
             model comes from TICVAI''s curated range** (`AiModel.curatedRange`, CHG-CSA-001): the client cannot pick
             a model outside it.'
         fitnessWarnings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           description: '**The model-fitness check at the last write** (21 September minutes, M21-09). For each task
@@ -17092,6 +17489,7 @@ components:
                 - overpowered
                 - unscored
     AiPolicy:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by answerConfigurationQuestion, askReportingQuestion, attachConfigurationSource, explainMetricChange and others
       type: object
       x-ticvai-persistence: ai.policy
       required:
@@ -17116,6 +17514,7 @@ components:
           - venue
           description: Tenant sets the default; a venue may narrow it and never widen it.
         scopePath:
+          readOnly: true
           type: string
           description: '**The node this row belongs to, and the key it is written under** — the tenant''s
             node where `scopeLevel` is `tenant`, a venue''s where it is `venue`. One row per `scopePath`;
@@ -17660,6 +18059,7 @@ components:
           type: string
           format: date-time
     ProposedAction:
+      x-ticvai-retired-columns: [interaction_id]
       type: object
       x-ticvai-persistence: ai.proposed_action
       required:
@@ -17674,6 +18074,8 @@ components:
           type: string
           format: uuid
         interactionId:
+          x-ticvai-references: ai.activity
+          x-ticvai-column: activity_id
           type: string
           format: uuid
         translationJobId:
@@ -18153,6 +18555,7 @@ components:
           format: date-time
           nullable: true
     KnowledgeCollection:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by semanticSearch
       type: object
       x-ticvai-persistence: ai.knowledge_collection
       required:
@@ -18237,6 +18640,7 @@ components:
         isActive:
           type: boolean
     KnowledgeDocument:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by generateConfiguration, semanticSearch, sendAiMessage
       type: object
       x-ticvai-persistence: ai.knowledge_document
       required:

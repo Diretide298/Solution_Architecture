@@ -96,12 +96,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-032` | Commercial Agreement Command Center | B | 2 | 30 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-032` | Commercial Agreement Command Center | B | 2 | 270 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `PTR-033` | Agreement & Contract Terms Builder | B | 26 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-034` | Partner Rate & Net Pricing Configuration | B | 10 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-038` | Payment Terms, Billing & Account Configuration | B | 1 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-040` | Booking Limits, Commercial Exceptions & Approval | B | 22 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-041` | Commercial Agreement 360°, Health & AI Review | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-041` | Commercial Agreement 360°, Health & AI Review | B | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -166,29 +166,305 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Shown**
 
-**Active Agreements** (metric tile)
+**Active Agreements** (metric tile, from `listCommercialAgreement`)
 
-**Draft Agreements** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
 
-**Pending Approval** (metric tile)
+**Draft Agreements** (metric tile, from `listCommercialAgreement`)
 
-**Agreements Expiring Soon** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
 
-**Expired Agreements** (metric tile)
+**Pending Approval** (metric tile, from `listCommercialAgreement`)
 
-**Partners on Credit Hold** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
 
-**Total Approved Credit** (metric tile)
+**Agreements Expiring Soon** (metric tile, from `listCommercialAgreement`)
 
-**Current Credit Exposure** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
 
-**Outstanding Receivables** (metric tile)
+**Expired Agreements** (metric tile, from `listCommercialAgreement`)
 
-**Active Commercial Allocations** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
 
-**Agreements With Exceptions** (metric tile)
+**Partners on Credit Hold** (metric tile, from `listCommercialAgreement`)
 
-**Commercial Risk Alerts** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
+
+**Total Approved Credit** (metric tile, from `listCommercialAgreement`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
+
+**Current Credit Exposure** (metric tile, from `listCommercialAgreement`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
+
+**Outstanding Receivables** (metric tile, from `listCommercialAgreement`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
+
+**Active Commercial Allocations** (metric tile, from `listCommercialAgreement`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
+
+**Agreements With Exceptions** (metric tile, from `listCommercialAgreement`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
+
+**Commercial Risk Alerts** (metric tile, from `listCommercialAgreement`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Agreement | the name it points at, never the id | Agreement ID |
+| Partner | text | Partner trading name |
+| Agreement type | text | Agreement Type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate, distribution, apiCommercial (pack p.26) |
+| Brand venue | text | Brand/Venue summary of the agreement scope |
+| Market | text | Market |
+| Valid from | 1 Oct 2026 | Effective From |
+| Valid to | 1 Oct 2026 | Effective To; empty for open-ended |
+| Pricing model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Pricing Model (pack p.27) |
+| Commission model | chip: Fixed percentage, Fixed amount, Product specific, Tiered, Volume based, Revenue … | Commission Model (pack p.29); none for a net-rate agreement |
+| Credit term days | 1,234 | Payment Terms in days (0 = due immediately; Net 7/15/30/45 or custom) |
+| Credit limit | AED 1,234.50 | Credit Limit; empty unless the payment model is creditAccount |
+| Current exposure | AED 1,234.50 | Current Exposure |
+| Allocation model | chip: Guaranteed, On request, Shared, Fixed quantity, Percentage, Rolling… | Allocation Model (pack p.35) |
+| Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
+| Commercial owner | text | Commercial Owner |
+| Partner | the name it points at, never the id | Partner |
+| Rate mode | chip: Net rate, Commission | Net rate or commission, as on PartnerAgreement |
+| Payment model | chip: Credit account, Prepaid, Pay per transaction | Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells to an approved credit ceiling, invoiced … |
+| Risk rating | chip: Low, Medium, High, Critical | Commercial risk |
 
 **Every commercial agreement** (data table, from `listCommercialAgreement`)
 
@@ -210,7 +486,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Agreement status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Agreement Status |
 | Commercial owner | text | Commercial Owner |
 
-**The selected commercial agreement** (detail panel)
+**The selected commercial agreement** (detail panel, from `listCommercialAgreement`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -287,6 +563,8 @@ Every commercial agreement:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -320,7 +598,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (270 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-032?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-033`, `PTR-034`, `PTR-038`, `PTR-040`, `PTR-041`.
@@ -433,9 +711,11 @@ form example:
 
 #### Permissions
 
-- `setAgreementContractTerm` → `PLATFORM_CELL_MANAGE` (configure) · partner, prospect
+- `setAgreementContractTerm` → `PLATFORM_CELL_MANAGE` (configure) · staff, partner, prospect
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_CELL_MANAGE`
 
 #### Requirements it meets
 
@@ -559,6 +839,8 @@ form example:
 - `setPartnerRateNet` → `PLATFORM_CELL_MANAGE` (configure) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_CELL_MANAGE`
 
 #### Requirements it meets
 
@@ -692,6 +974,8 @@ outstanding: AED 64,200.00
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_CELL_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -813,7 +1097,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, first run (`?state=emptyFirstRun`) | No booking-limit exception waiting: nothing to approve, which is good news. Offers no create action. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The challenge was already completed; a challenge is single-use, so ask for a new one.; 422 A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
 
 #### Sample data for the mock-up
 
@@ -845,6 +1129,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_CELL_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -875,7 +1161,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (410, 422).
+- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (409, 410, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-040?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Price Exception, Credit Exception, Allocation Exception, Booking Limit Exception, Email me a code instead.
@@ -927,7 +1213,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Start Renewal, Request Commercial Review, Change Terms, Request Credit Review, Create Exception, Suspend Commercial Access. Each needs attaching to the control it gates, or the screen needs the control.
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listCommercialAgreementHealth`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Contract status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | Contract status |
+| Renewal | text | Renewal: manual or auto, and whether a renewal workflow is open |
+| Rate model | chip: Retail price, Net rate, Discount from retail, Markup, Derived rate | Rate model |
+| Average discount | 1,234.5 | Average discount from retail, percent |
+| Current commission percent | 1,234.5 | Current commission, percent |
+| Incentives | list or chips (count when long) | Active incentives |
+| Credit limit | AED 1,234.50 | Credit limit |
+| Credit exposure | AED 1,234.50 | Credit exposure |
+| Available credit | AED 1,234.50 | Available credit |
+| Deposit guarantee | AED 1,234.50 | Deposit/guarantee held |
+| Security expiry | 1 Oct 2026 | Security expiry |
+| Credit term days | 1,234 | Payment terms in days |
+| Outstanding balance | AED 1,234.50 | Outstanding balance |
+| Overdue amount | AED 1,234.50 | Overdue amount |
+| Contractual allocation | 1,234 | Contractual allocation, units |
+| Utilization | 1,234.5 | Allocation utilisation, percent |
+| Minimum sales | 1,234 | Minimum sales commitment, units |
+| Achievement | 1,234.5 | Commitment achievement, percent |
+| Active approved exceptions | 1,234 | Active approved exceptions |
 
 **Data it reads**: `listCommercialAgreementHealth` (onLoad, Commercial Agreement 360°, Health & AI Review)
 
@@ -964,6 +1273,8 @@ listCommercialAgreementHealth (CommercialAgreement360HealthAiReviewView):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -990,7 +1301,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-041?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] No transition is declared; back returns where the user came from.

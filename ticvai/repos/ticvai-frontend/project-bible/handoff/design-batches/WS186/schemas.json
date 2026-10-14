@@ -1,5 +1,6 @@
 {
  "CreditType": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "wallet.credit_type",
   "description": "Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n",
@@ -13,6 +14,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -118,6 +120,7 @@
     "format": "uuid"
    },
    "walletId": {
+    "x-ticvai-references": "wallet.wallet",
     "type": "string",
     "format": "uuid"
    },
@@ -168,6 +171,7 @@
   ],
   "properties": {
    "subjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -230,6 +234,7 @@
   }
  },
  "Wallet": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [
@@ -358,6 +363,8 @@
     "nullable": true
    },
    "findings": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -398,6 +405,7 @@
     "format": "uuid"
    },
    "walletId": {
+    "x-ticvai-references": "wallet.wallet",
     "type": "string",
     "format": "uuid"
    },
@@ -442,6 +450,11 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the device made the write** (R113; CHG-OFL-003). `linkWalletCredential` is offline-capable, so the client sets this from its own clock and keeps it on replay; `created_at` is when the server heard of it. Omitted online, the server sets it to the time it received the call."
    }
   }
  },
@@ -493,6 +506,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

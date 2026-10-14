@@ -25,11 +25,7 @@ platform:
   screenCount: 77
   app: guest-app
   appStatus: scaffolded
-  packages:
-  - design-tokens
-  - ui
-  - api-client
-  - offline-core
+  packages: []
   deployment:
     target: iOS / Android native
     distribution: App Store + Play, tenant developer account
@@ -107,7 +103,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/home-default
-    component: apps/guest-app/src/routes/general/HomeDefaultDashboard.tsx
+    component: src/screens/general/HomeDefaultDashboard.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
@@ -343,10 +339,8 @@ screens:
         and GST-037 opens on its own'
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-001 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-001 holds none of them. The edge
+        carries nothing: GST-039 needs nothing to open'
     - to: GST-040
       trigger: Help & Support
       provenance: 'derived — GST-040 declares entryState.params caseId and GST-001 holds none of them.
@@ -672,28 +666,14 @@ screens:
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)
   - operationId: getCookieConsentRuntime
     contract: marketing-crm
-    purpose: Tracking consent prompt on first launch and the SDK gate
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: recordDeviceConsent
-    contract: marketing-crm
-    purpose: Accept, reject or customise tracking on first launch
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: decideRecommendations
-    contract: ai
-    purpose: 'Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)'
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: recordRecommendationEvents
-    contract: ai
-    purpose: Report impressions, clicks and declines of recommended items
-    trigger: onAction
+    purpose: 'Read by the app shell, not a control: which tracking categories this device has granted,
+      so SDKs and the tag loader start only for those (none until granted)'
+    trigger: background
     provenance: build, 29 September 2026
   - operationId: recordStorefrontSessionEvents
     contract: white-label
     purpose: App-shell beacon of hashed browsing behaviour for fraud prevention
-    trigger: onLoad
+    trigger: background
     provenance: build, 29 September 2026
   - operationId: listProducts
     contract: catalogue
@@ -723,6 +703,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-001
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-001.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -760,6 +742,24 @@ screens:
     why: Replaced by `getMyProfile`, the guest's own profile; `getGuestProfile` is the staff read by subject
       and returns the CRM fields (engagement score, lifetime value, tags).
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+  - operation: decideRecommendations
+    removed: true
+    why: The client-approved Home has no recommendation slot, so nothing shows a decision; recommendations
+      show in the cart slot (WEB-008, GST-048).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: recordRecommendationEvents
+    removed: true
+    why: 'Goes with decideRecommendations: no recommended item is shown here to report on.'
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: recordDeviceConsent
+    removed: true
+    why: The client-approved UI has no tracking-consent banner or prompt, so nothing records a decision
+      here and tracking stays off (getCookieConsentRuntime). A consent prompt needs a design the client
+      approves.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-002
   name: Explore
   module: Discovery & Browse
@@ -769,7 +769,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/explore-categories
-    component: apps/guest-app/src/routes/general/ExploreCategoriesList.tsx
+    component: src/screens/general/ExploreCategoriesList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -795,10 +795,11 @@ screens:
     - to: GST-004
       trigger: Attraction Details
       carries:
+      - bundleId
       - eventId
       - productId
       provenance: derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-002
-        holds eventId, productId, so an edge into it carries them
+        holds bundleId, eventId, productId, so an edge into it carries them
     - to: GST-063
       trigger: Searches (results in place)
       provenance: decided 29 September 2026, MOB-1
@@ -906,6 +907,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-002
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-002.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -924,7 +927,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/buy-tickets
-    component: apps/guest-app/src/routes/general/BuyTicketsList.tsx
+    component: src/screens/general/BuyTicketsList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -949,10 +952,11 @@ screens:
     - to: GST-004
       trigger: Attraction Details
       carries:
+      - bundleId
       - eventId
       - productId
       provenance: derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-003
-        holds eventId, productId, so an edge into it carries them
+        holds bundleId, eventId, productId, so an edge into it carries them
     - to: GST-007
       trigger: 'Book (a dated product: date, then time, then tickets)'
       carries:
@@ -1141,6 +1145,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-003
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-003.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -1159,7 +1165,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/item-detail
-    component: apps/guest-app/src/routes/general/ItemDetail.tsx
+    component: src/screens/general/ItemDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1444,6 +1450,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-004
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-004.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -1462,7 +1470,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/whats-on
-    component: apps/guest-app/src/routes/general/WhatsOnList.tsx
+    component: src/screens/general/WhatsOnList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1504,7 +1512,8 @@ screens:
   pattern: listDetail
   patternReason: '`listPerformances` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Find what's on for this venue.
+  purpose: 'What is on at this venue over the dates the guest picks: each performance and the products
+    that run.'
   layout:
     template: split
     regions:
@@ -1618,7 +1627,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/event-exhibition-details
-    component: apps/guest-app/src/routes/general/EventExhibitionDetailsDetail.tsx
+    component: src/screens/general/EventExhibitionDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1657,7 +1666,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getPerformance` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: See event / exhibition details for this venue.
+  purpose: 'One event or exhibition: what it is, and the performance being booked, before choosing tickets.'
   layout:
     template: detail
     regions:
@@ -1719,6 +1728,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-006
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-006.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -1737,7 +1748,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/select-date-and-time
-    component: apps/guest-app/src/routes/general/SelectDateAndTimeDetail.tsx
+    component: src/screens/general/SelectDateAndTimeDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1962,8 +1973,10 @@ screens:
     trigger: onAction
   - operationId: getCart
     contract: orders
-    purpose: The cart's `consentQuestions` after the time is added
-    trigger: onAction
+    purpose: 'Read by the screen right after addCartLine, not a control: the cart''s consentQuestions,
+      which open the consent questions pop-up; with the guest session the device already holds: signed
+      in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
+    trigger: background
   - operationId: recordConsentAnswers
     contract: marketing-crm
     purpose: Record the answers to the booking's consent questions
@@ -2007,6 +2020,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-007
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-007.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -2070,7 +2085,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/tickets-and-add-ons
-    component: apps/guest-app/src/routes/general/TicketsAndAddOnsList.tsx
+    component: src/screens/general/TicketsAndAddOnsList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2290,6 +2305,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-008
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-008.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -2330,7 +2347,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/review-and-payment
-    component: apps/guest-app/src/routes/general/ReviewAndPaymentForm.tsx
+    component: src/screens/general/ReviewAndPaymentForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2633,7 +2650,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/booking-confirmation
-    component: apps/guest-app/src/routes/general/BookingConfirmationDetail.tsx
+    component: src/screens/general/BookingConfirmationDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2842,7 +2859,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/wallet-overview
-    component: apps/guest-app/src/routes/general/WalletOverviewDashboard.tsx
+    component: src/screens/general/WalletOverviewDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2930,7 +2947,7 @@ screens:
       - kind: toggle
         label: Auto top-up
         bindsTo: WalletAutoReloadSetting.enabled
-        operation: setWalletAutoReloadSetting
+        operation: getWalletAutoReloadSetting
         provenance: contract wallet.yaml WalletAutoReloadSetting.enabled (defined 4 October 2026, CHG-FXS-003)
       - kind: numberField
         label: When the balance falls below
@@ -2988,16 +3005,6 @@ screens:
     purpose: Set auto top-up
     trigger: onAction
     provenance: build, 29 September 2026
-  - operationId: getWalletExitBalance
-    contract: wallet
-    purpose: Balance due / refundable at exit
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: settleWalletAtExit
-    contract: wallet
-    purpose: Settle the wallet at exit
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: getGameCard
     contract: games
     purpose: Balance on a game card
@@ -3048,6 +3055,17 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  gaps:
+  - operation: getWalletExitBalance
+    removed: true
+    why: The client-approved wallet screen shows no balance due or refundable at exit.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: settleWalletAtExit
+    removed: true
+    why: The client-approved wallet screen has no control to settle the wallet at exit.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-012
   name: My Tickets
   module: Account & Self-Service
@@ -3057,7 +3075,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/my-tickets
-    component: apps/guest-app/src/routes/general/MyTicketsList.tsx
+    component: src/screens/general/MyTicketsList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3096,7 +3114,8 @@ screens:
   pattern: listDetail
   patternReason: '`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list,
     select, act'
-  purpose: Find my tickets for this venue.
+  purpose: 'The guest''s tickets and passes, current and past: open one to see its code and history, or
+    send it to another guest.'
   gaps:
   - operation: getEntitlementCredential
     why: '**`getEntitlementCredential` declares its response inline**, so the component that shows it
@@ -3222,6 +3241,12 @@ screens:
     contract: access
     purpose: Every entitlement this guest holds, including expired
     trigger: onLoad
+  - operationId: listTicketTransfers
+    contract: orders
+    purpose: 'Re-read by the screen after transferOrderTickets answers 202, not a control: the guest''s
+      transfers, so the ticket shows as offered, then claimed or returned when the offer lapses'
+    trigger: background
+    provenance: 'Block A audit, 14 October 2026: S-ASYNC-POLL (CHG-SCG-005)'
   entryState:
     params:
     - name: subjectId
@@ -3244,6 +3269,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-012
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-012.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -3278,7 +3305,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ticket-details
-    component: apps/guest-app/src/routes/general/TicketDetailsDetail.tsx
+    component: src/screens/general/TicketDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3313,7 +3340,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getEntitlement` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Find ticket details for this venue.
+  purpose: 'One ticket: its code to scan, what remains on it and every scan against it; send it to another
+    guest or bind it to this phone.'
   gaps:
   - operation: getEntitlementCredential
     why: '**`getEntitlementCredential` declares its response inline**, so the component that shows it
@@ -3405,6 +3433,12 @@ screens:
     - getEntitlement
     - getEntitlementCredential
     - getEntitlementHistory
+  - operationId: listTicketTransfers
+    contract: orders
+    purpose: 'Re-read by the screen after transferOrderTickets answers 202, not a control: the guest''s
+      transfers, so the ticket shows as offered, then claimed or returned when the offer lapses'
+    trigger: background
+    provenance: 'Block A audit, 14 October 2026: S-ASYNC-POLL (CHG-SCG-005)'
   entryState:
     params:
     - name: subjectId
@@ -3479,7 +3513,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ticket-transfer
-    component: apps/guest-app/src/routes/general/TicketTransferDetail.tsx
+    component: src/screens/general/TicketTransferDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3506,7 +3540,7 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Work with ticket transfer for this venue.
+  purpose: Send tickets from one of the guest's orders to another guest, and claim tickets someone sent.
   layout:
     template: split
     regions:
@@ -3631,7 +3665,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/memberships
-    component: apps/guest-app/src/routes/general/MembershipsDetail.tsx
+    component: src/screens/general/MembershipsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3681,7 +3715,8 @@ screens:
   pattern: listDetail
   patternReason: '`listDelegations` reads the population and `getMyMemberships` reads one of them — list,
     select, act'
-  purpose: Find memberships for this venue.
+  purpose: 'The guest''s membership: plans, statements, payments that need them, and family members who
+    may use it.'
   layout:
     template: split
     regions:
@@ -3835,16 +3870,6 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  - operationId: listInstalmentPlans
-    contract: payments
-    purpose: Instalment plans and schedule
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: createInstalmentPlan
-    contract: payments
-    purpose: Pay in instalments
-    trigger: onAction
-    provenance: build, 29 September 2026
   entryState:
     params:
     - name: guestLinkId
@@ -3938,6 +3963,16 @@ screens:
     removed: true
     why: The staff-shaped membership list; the guest's own are `getMyMemberships`.
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
+  - operation: listInstalmentPlans
+    removed: true
+    why: The client-approved membership screen shows no instalment plans.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: createInstalmentPlan
+    removed: true
+    why: The client-approved membership screen has no control to pay in instalments.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-016
   name: My Reservations
   module: Ticketing
@@ -3947,7 +3982,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/my-reservations
-    component: apps/guest-app/src/routes/general/MyReservationsDetail.tsx
+    component: src/screens/general/MyReservationsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3976,7 +4011,7 @@ screens:
   pattern: listDetail
   patternReason: '`listReservations` reads the population and `getReservation` reads one of them — list,
     select, act'
-  purpose: Find my reservations for this venue.
+  purpose: The guest's reservations, each opened to see it or cancel it.
   layout:
     template: split
     regions:
@@ -4098,7 +4133,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/reservation-details
-    component: apps/guest-app/src/routes/general/ReservationDetailsDetail.tsx
+    component: src/screens/general/ReservationDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4125,7 +4160,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getReservation` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: See reservation details for this venue.
+  purpose: One reservation, read and cancellable.
   layout:
     template: detail
     regions:
@@ -4214,7 +4249,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/add-to-calendar-reminders
-    component: apps/guest-app/src/routes/general/AddToCalendarRemindersDetail.tsx
+    component: src/screens/general/AddToCalendarRemindersDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4236,7 +4271,7 @@ screens:
   density: comfortable
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrder` reads one of them — list, select, act'
-  purpose: Find add to calendar / reminders for this venue.
+  purpose: Put a booked visit in the phone's calendar or wallet, and turn its visit reminder on or off.
   layout:
     template: split
     regions:
@@ -4388,7 +4423,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/order-history-wallet
-    component: apps/guest-app/src/routes/general/OrderHistoryWalletDashboard.tsx
+    component: src/screens/general/OrderHistoryWalletDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4626,7 +4661,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/saved-items-wishlist
-    component: apps/guest-app/src/routes/general/SavedItemsWishlistList.tsx
+    component: src/screens/general/SavedItemsWishlistList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4747,7 +4782,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/interactive-map
-    component: apps/guest-app/src/routes/general/InteractiveMapCanvas.tsx
+    component: src/screens/general/InteractiveMapCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4948,7 +4983,8 @@ screens:
     derivedFrom: wireframes/reference/Seat Board 4.dc.html
     note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
-      from nothing.'
+      from nothing. Drawn frame: wireframes/incoming/P02-mobile-v4/gst-021.html, captured from the prototype
+      view below (wireframes/incoming/P02-mobile-v4/manifest.json).'
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -4961,7 +4997,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/attraction-wait-times
-    component: apps/guest-app/src/routes/general/AttractionWaitTimesDetail.tsx
+    component: src/screens/general/AttractionWaitTimesDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5005,7 +5041,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getWaitTimes` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: See attraction wait times for this venue.
+  purpose: How long each attraction's queue is right now.
   layout:
     template: detail
     regions:
@@ -5044,6 +5080,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-022
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-022.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -5062,7 +5100,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/virtual-queue-join-queue
-    component: apps/guest-app/src/routes/general/VirtualQueueJoinQueueDetail.tsx
+    component: src/screens/general/VirtualQueueJoinQueueDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5241,7 +5279,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/fandb-browse-and-order
-    component: apps/guest-app/src/routes/general/FandbBrowseAndOrderList.tsx
+    component: src/screens/general/FandbBrowseAndOrderList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5479,7 +5517,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/fandb-order-tracking
-    component: apps/guest-app/src/routes/general/FandbOrderTrackingDetail.tsx
+    component: src/screens/general/FandbOrderTrackingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5606,7 +5644,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/retail-merchandise
-    component: apps/guest-app/src/routes/general/RetailMerchandiseDetail.tsx
+    component: src/screens/general/RetailMerchandiseDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5826,7 +5864,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/parking-reserve-and-pay
-    component: apps/guest-app/src/routes/general/ParkingReserveAndPayDetail.tsx
+    component: src/screens/general/ParkingReserveAndPayDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5968,7 +6006,8 @@ screens:
     trigger: onLoad
   - operationId: getParkingEntitlement
     contract: access
-    purpose: Load the parking entitlement being changed
+    purpose: 'Load the parking entitlement being changed. Only when signed in: a signed-out guest is offered
+      sign-in and brought back here (GFIX-4)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
@@ -6048,7 +6087,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/parking-reservation-confirmed
-    component: apps/guest-app/src/routes/general/ParkingReservationConfirmedDetail.tsx
+    component: src/screens/general/ParkingReservationConfirmedDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6220,7 +6259,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/venue-info-and-services
-    component: apps/guest-app/src/routes/general/VenueInfoAndServicesDetail.tsx
+    component: src/screens/general/VenueInfoAndServicesDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6352,7 +6391,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/in-venue-notifications
-    component: apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx
+    component: src/screens/general/InVenueNotificationsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6388,7 +6427,8 @@ screens:
   pattern: configEditor
   patternReason: '`listMyNotifications` reads the feed (decided 29 September, rev 3 GAP-C1); the location-session
     claim stays a form on the same screen, so the pattern is kept until the screen is redrawn'
-  purpose: Work with in-venue notifications for this venue.
+  purpose: 'The guest''s in-venue notifications, newest first: queue calls, order ready, booking changes
+    and venue alerts, marked read once seen.'
   layout:
     template: form
     regions:
@@ -6464,7 +6504,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ai-concierge-home
-    component: apps/guest-app/src/routes/general/AiConciergeHomeDashboard.tsx
+    component: src/screens/general/AiConciergeHomeDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6606,8 +6646,8 @@ screens:
     trigger: onAction
   - operationId: createAiConversation
     contract: ai
-    purpose: Opened silently on the first message; the scope comes from the session, never a module the
-      guest picks
+    purpose: 'Opened silently on the first message; the scope comes from the session, never a module the
+      guest picks. Only when signed in: the conversation is the guest''s own (x-ticvai-self-scoped subject)'
     trigger: background
   - operationId: handoverToAgent
     contract: marketing-crm
@@ -6618,11 +6658,13 @@ screens:
     purpose: 'From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen''s production
       plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time
       and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay,
-      3 October); until then the control shows ''Later''.'
+      3 October); until then the control shows ''Later''. Only when signed in: the conversation is the
+      guest''s own (x-ticvai-self-scoped subject)'
     trigger: background
   - operationId: listAiConversations
     contract: ai
-    purpose: The guest's own earlier conversations
+    purpose: 'The guest''s own earlier conversations. Only when signed in: a signed-out guest is offered
+      sign-in and brought back here (GFIX-4)'
     trigger: onLoad
   - operationId: recordAnswerFeedback
     contract: ai
@@ -6635,9 +6677,10 @@ screens:
     trigger: onAction
   - operationId: getGuestConversation
     contract: marketing-crm
-    purpose: The agent's replies, the queue position and the wait after a handover, polled every 5 s while
-      the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October
-      2026, r1 additions; CHG-RONEC-003)
+    purpose: 'The agent''s replies, the queue position and the wait after a handover, polled every 5 s
+      while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay,
+      3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the guest''s
+      own (x-ticvai-self-scoped subject)'
     trigger: onInterval
     pollSeconds: 5
     pollSecondsHidden: 30
@@ -6689,7 +6732,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ai-concierge-chat
-    component: apps/guest-app/src/routes/general/AiConciergeChatDetail.tsx
+    component: src/screens/general/AiConciergeChatDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6833,7 +6876,7 @@ screens:
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add what the assistant offers in the chat to the guest's cart
     trigger: onAction
   - operationId: checkoutCart
     contract: orders
@@ -6850,9 +6893,10 @@ screens:
     trigger: onAction
   - operationId: getGuestConversation
     contract: marketing-crm
-    purpose: The agent's replies, the queue position and the wait after a handover, polled every 5 s while
-      the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October
-      2026, r1 additions; CHG-RONEC-003)
+    purpose: 'The agent''s replies, the queue position and the wait after a handover, polled every 5 s
+      while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay,
+      3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the guest''s
+      own (x-ticvai-self-scoped subject)'
     trigger: onInterval
     pollSeconds: 5
     pollSecondsHidden: 30
@@ -6861,11 +6905,6 @@ screens:
     contract: marketing-crm
     purpose: Pass an assistant conversation to a person
     trigger: onAction
-  - operationId: recordAnswerFeedback
-    contract: ai
-    purpose: Say whether an answer helped
-    trigger: onAction
-    provenance: build, 29 September 2026
   entryState:
     params:
     - name: cartId
@@ -6979,6 +7018,12 @@ screens:
       - summary
       - preferredQueueId
     provenance: client-verified
+  gaps:
+  - operation: recordAnswerFeedback
+    removed: true
+    why: The client-approved screen has no Helpful / Not helpful control (GST-031 has it).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-033
   name: AI Concierge – Contextual Help
   module: Engagement & Support
@@ -6988,7 +7033,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ai-concierge-contextual-help
-    component: apps/guest-app/src/routes/general/AiConciergeContextualHelpDetail.tsx
+    component: src/screens/general/AiConciergeContextualHelpDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7081,7 +7126,8 @@ screens:
     trigger: onAction
   - operationId: createAiConversation
     contract: ai
-    purpose: Opened silently on the first question; the scope comes from the session
+    purpose: 'Opened silently on the first question; the scope comes from the session. Only when signed
+      in: the conversation is the guest''s own (x-ticvai-self-scoped subject)'
     trigger: background
   - operationId: handoverToAgent
     contract: marketing-crm
@@ -7093,7 +7139,8 @@ screens:
     trigger: onAction
   - operationId: listAiConversations
     contract: ai
-    purpose: Show the guest's earlier conversations with the assistant
+    purpose: 'Show the guest''s earlier conversations with the assistant. Only when signed in: a signed-out
+      guest is offered sign-in and brought back here (GFIX-4)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
@@ -7129,7 +7176,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/lost-and-found
-    component: apps/guest-app/src/routes/general/LostAndFoundDetail.tsx
+    component: src/screens/general/LostAndFoundDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7162,7 +7209,7 @@ screens:
   pattern: listDetail
   patternReason: '`listMyCases` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: See lost & found for this venue.
+  purpose: Report a lost item, follow the guest's lost-property cases and reply on them.
   layout:
     template: split
     regions:
@@ -7327,7 +7374,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/feedback-and-ratings
-    component: apps/guest-app/src/routes/general/FeedbackAndRatingsList.tsx
+    component: src/screens/general/FeedbackAndRatingsList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7423,7 +7470,8 @@ screens:
     trigger: onAction
   - operationId: getForm
     contract: marketing-crm
-    purpose: A triggered survey opened from its link
+    purpose: 'A triggered survey opened from its link. Read once the guest is signed in (getForm needs
+      the guest session): a signed-out guest opening the link is offered sign-in and brought back (GFIX-4)'
     trigger: onLoad
   - operationId: submitForm
     contract: marketing-crm
@@ -7431,7 +7479,8 @@ screens:
     trigger: onAction
   - operationId: listMyOrders
     contract: orders
-    purpose: The recent visits a review can be about
+    purpose: 'The recent visits a review can be about. Only when signed in: a signed-out guest is offered
+      sign-in and brought back here (GFIX-4)'
     trigger: onLoad
   wireframe:
     status: notStarted
@@ -7481,7 +7530,7 @@ screens:
   implementation:
     app: guest-app
     route: /loyalty-rewards
-    component: apps/guest-app/src/routes/LoyaltyRewards.tsx
+    component: src/screens/LoyaltyRewards.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7520,6 +7569,17 @@ screens:
     why: '**`getLoyaltyPosition` declares its response inline**, so the component that shows it names
       fields but binds to no schema. The contract should name the shape.'
     source: contract marketing-crm.yaml GET /loyalty/position
+  - operation: decideRecommendations
+    removed: true
+    why: The client-approved Loyalty & Rewards has no recommendation slot, so nothing shows a decision;
+      recommendations show in the cart slot (WEB-008, GST-048).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: recordRecommendationEvents
+    removed: true
+    why: 'Goes with decideRecommendations: no recommended item is shown here to report on.'
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
   layout:
     template: split
     regions:
@@ -7615,16 +7675,6 @@ screens:
     contract: promotions
     purpose: List promotions
     trigger: onLoad
-  - operationId: decideRecommendations
-    contract: ai
-    purpose: 'Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)'
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: recordRecommendationEvents
-    contract: ai
-    purpose: Report impressions, clicks and declines of recommended items
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listRewards
     contract: marketing-crm
     purpose: What points can be turned into
@@ -7719,7 +7769,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/offers-and-promotions
-    component: apps/guest-app/src/routes/general/OffersAndPromotionsDetail.tsx
+    component: src/screens/general/OffersAndPromotionsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7748,7 +7798,7 @@ screens:
   pattern: listDetail
   patternReason: '`listPromotions` reads the population and `getPromotion` reads one of them — list, select,
     act'
-  purpose: Find offers & promotions for this venue.
+  purpose: The offers running at this venue, one opened in detail, and a code the guest typed checked.
   layout:
     template: split
     regions:
@@ -7869,7 +7919,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/at-the-venue
-    component: apps/guest-app/src/routes/general/AtTheVenueDetail.tsx
+    component: src/screens/general/AtTheVenueDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8020,6 +8070,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-038
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-038.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -8042,7 +8094,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/profile
-    component: apps/guest-app/src/routes/general/ProfileDashboard.tsx
+    component: src/screens/general/ProfileDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8175,7 +8227,7 @@ screens:
   entryState:
     params:
     - name: subjectId
-      from: GST-001
+      from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   wireframe:
     status: notStarted
@@ -8230,7 +8282,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/help-and-support
-    component: apps/guest-app/src/routes/general/HelpAndSupportDetail.tsx
+    component: src/screens/general/HelpAndSupportDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8451,7 +8503,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/checkout-entry
-    component: apps/guest-app/src/routes/general/CheckoutEntryForm.tsx
+    component: src/screens/general/CheckoutEntryForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8685,6 +8737,13 @@ screens:
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
+  - operationId: createCart
+    contract: orders
+    purpose: 'Started by the runtime the first time a line is added, against the guest or the anonymous
+      cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already
+      holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
+    trigger: background
+    provenance: 'Block A audit, 14 October 2026: N-TWIN-OPS, as WEB-010 (CHG-SCG-008)'
   entryState:
     params:
     - name: cartId
@@ -8714,6 +8773,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-041
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-041.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -8746,7 +8807,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/simple-registration-and-otp
-    component: apps/guest-app/src/routes/general/SimpleRegistrationAndOtpDetail.tsx
+    component: src/screens/general/SimpleRegistrationAndOtpDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9063,9 +9124,9 @@ screens:
     - getGuestSession
   - operationId: createMfaChallenge
     contract: identity
-    purpose: 'Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at
-      a venue with guest two-step verification on'
-    trigger: onAction
+    purpose: 'Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step verification
+      on (action signIn), not a control: the code is then typed in Verification code'
+    trigger: background
   - operationId: verifyMfaChallenge
     contract: identity
     purpose: Check the code and release the session
@@ -9074,8 +9135,9 @@ screens:
     - getGuestSession
   - operationId: claimDeviceConsent
     contract: marketing-crm
-    purpose: Attach this device's tracking decision to the guest after sign-in or registration
-    trigger: onAction
+    purpose: 'Sent by the screen after sign-in or registration, not a control: attaches this device''s
+      tracking decision to the guest'
+    trigger: background
     provenance: build, 29 September 2026
   entryState:
     params:
@@ -9123,7 +9185,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/arabic-rtl-experience
-    component: apps/guest-app/src/routes/general/ArabicRtlExperienceDetail.tsx
+    component: src/screens/general/ArabicRtlExperienceDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9199,7 +9261,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/multi-currency-and-pricing
-    component: apps/guest-app/src/routes/general/MultiCurrencyAndPricingDetail.tsx
+    component: src/screens/general/MultiCurrencyAndPricingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9359,7 +9421,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ticket-delivery-and-sharing
-    component: apps/guest-app/src/routes/general/TicketDeliveryAndSharingDetail.tsx
+    component: src/screens/general/TicketDeliveryAndSharingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9388,7 +9450,7 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`transferOrderTickets`) and no read of a population
     — it is settings, not a list
-  purpose: Find ticket delivery & sharing for this venue.
+  purpose: Send some of the guest's tickets to someone else, and see the tickets sent and received.
   layout:
     template: form
     regions:
@@ -9490,7 +9552,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/branded-queue-waiting-room
-    component: apps/guest-app/src/routes/general/BrandedQueueWaitingRoomDetail.tsx
+    component: src/screens/general/BrandedQueueWaitingRoomDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9603,7 +9665,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/maintenance-page
-    component: apps/guest-app/src/routes/general/MaintenancePageDetail.tsx
+    component: src/screens/general/MaintenancePageDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9724,7 +9786,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/upsell-cross-sell
-    component: apps/guest-app/src/routes/general/UpsellCrossSellDetail.tsx
+    component: src/screens/general/UpsellCrossSellDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9745,7 +9807,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getUpsellSuggestions` reads one record and nothing reads a population — the screen
     is about that one thing'
-  purpose: See upsell / cross-sell for this venue.
+  purpose: Suggestions for the cart the guest is about to pay for, each added with one tap.
   layout:
     template: detail
     regions:
@@ -9801,7 +9863,7 @@ screens:
   apis:
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add a suggested item to the cart the suggestions are for
     trigger: onAction
   - operationId: decideRecommendations
     contract: ai
@@ -9810,12 +9872,14 @@ screens:
     provenance: build, 29 September 2026
   - operationId: recordRecommendationEvents
     contract: ai
-    purpose: Report what happened to recommended items
-    trigger: onAction
+    purpose: 'Sent by the Suggested for you list, not a control: impressions, clicks, add-to-cart and
+      declines of the recommended items, batched'
+    trigger: background
     provenance: build, 29 September 2026
   - operationId: getCart
     contract: orders
-    purpose: Show the cart the suggestions are for
+    purpose: 'Show the cart the suggestions are for, with the guest session the device already holds:
+      signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
@@ -9874,7 +9938,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/interactive-seat-selection
-    component: apps/guest-app/src/routes/general/InteractiveSeatSelectionCanvas.tsx
+    component: src/screens/general/InteractiveSeatSelectionCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9931,7 +9995,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getSeatAvailability` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: See interactive seat selection for this venue.
+  purpose: Pick seats on the seat map for the chosen performance, or let the venue recommend them, and
+    hold them.
   layout:
     template: detail
     regions:
@@ -10017,9 +10082,10 @@ screens:
     trigger: onLoad
   - operationId: relinquishSeatHold
     contract: seating
-    purpose: Release the seats held for the old performance when the guest switches time on the time bar
-      (decided 29 September, rev 3 REV3-6); a guest releases only their own hold
-    trigger: onAction
+    purpose: 'Sent by the time bar when the guest switches time, not a control: releases the seats held
+      for the old performance (decided 29 September), with the guest session the device already holds:
+      signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)'
+    trigger: background
   entryState:
     params:
     - name: performanceId
@@ -10050,7 +10116,8 @@ screens:
     derivedFrom: wireframes/reference/Seat Board 4.dc.html
     note: '**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
-      from nothing.'
+      from nothing. Drawn frame: wireframes/incoming/P02-mobile-v4/gst-049.html, captured from the prototype
+      view below (wireframes/incoming/P02-mobile-v4/manifest.json).'
   apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -10098,7 +10165,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/resource-booking-cabana
-    component: apps/guest-app/src/routes/general/ResourceBookingCabanaDetail.tsx
+    component: src/screens/general/ResourceBookingCabanaDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10191,7 +10258,7 @@ screens:
   apis:
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add the chosen cabana and time to the cart
     trigger: onAction
     invalidates:
     - listProducts
@@ -10261,7 +10328,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/plan-your-adventure-start
-    component: apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx
+    component: src/screens/general/PlanYourAdventureStartDetail.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
@@ -10425,10 +10492,6 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: getWaitTimes
-    contract: queue
-    purpose: Wait times across a venue
-    trigger: onLoad
   - operationId: listProducts
     contract: catalogue
     purpose: List products
@@ -10453,6 +10516,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-051
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-051.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -10462,6 +10527,12 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  gaps:
+  - operation: getWaitTimes
+    removed: true
+    why: The client-approved Plan questions show no wait time; the plan is built from them by generateVisitPlan.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-052
   name: Suggested Itineraries
   module: Engagement & Support
@@ -10471,7 +10542,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/suggested-itineraries
-    component: apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx
+    component: src/screens/general/SuggestedItinerariesDetail.tsx
     status: notStarted
   navigation:
     inferred: false
@@ -10613,7 +10684,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/your-plan
-    component: apps/guest-app/src/routes/general/YourPlanDetail.tsx
+    component: src/screens/general/YourPlanDetail.tsx
     status: notStarted
   navigation:
     inferred: false
@@ -10813,16 +10884,6 @@ screens:
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: getCart
-    contract: orders
-    purpose: 'The cart, priced and checked, right now With the guest session the device already holds:
-      signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided
-      2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)).'
-    trigger: onLoad
-  - operationId: listProducts
-    contract: catalogue
-    purpose: List products
-    trigger: onLoad
   - operationId: getWaitTimes
     contract: queue
     purpose: Wait times across a venue
@@ -10867,6 +10928,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-053
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-053.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -10876,6 +10939,17 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  gaps:
+  - operation: getCart
+    removed: true
+    why: The client-approved Your Plan shows no cart; Book this plan returns the cart and opens it (GST-041).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: listProducts
+    removed: true
+    why: Nothing on the client-approved Your Plan lists products; swaps and additions come from listVisitPlanAlternatives.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-054
   name: AI Planner
   module: Engagement & Support
@@ -10885,7 +10959,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ai-planner
-    component: apps/guest-app/src/routes/general/AIPlannerDetail.tsx
+    component: src/screens/general/AIPlannerDetail.tsx
     status: notStarted
   navigation:
     inferred: false
@@ -11043,17 +11117,15 @@ screens:
     provenance: decided 29 September 2026, MOB-6
   - operationId: createAiConversation
     contract: ai
-    purpose: Opened on the first message to the planner, never on opening the Plan tab (a conversation
-      is billed); the plan loads without it
-    trigger: onAction
+    purpose: Opened by the screen on the first message to the planner, not a control, and only when signed
+      in; never on opening the Plan tab (a conversation is billed)
+    trigger: background
     provenance: decided 29 September 2026, MOB-6
   - operationId: requestSuggestion
     contract: ai
-    purpose: 'A suggestion of kind `itinerary` (guest-allowed since 29 September): the planner agent''s
-      proposal for the plan, applied through `updateVisitPlan`. Later (CHG-RONEP-010): the planner agent''s
-      refinement in chat (AI-ENGINE-PLANNER); the rules plan still answers in A1 ships in Block A2 (Chinmay,
-      3 October); until then the control shows ''Later''.'
-    trigger: onAction
+    purpose: 'Read by the Ask the planner panel after an answer, not a control, and only when signed in:
+      the planner''s itinerary proposal that Apply this change applies'
+    trigger: background
     provenance: decided 29 September 2026, MOB-6
   entryState:
     params:
@@ -11070,6 +11142,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-054
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-054.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -11129,7 +11203,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/dynamic-qr-ticket
-    component: apps/guest-app/src/routes/general/DynamicQrTicketCanvas.tsx
+    component: src/screens/general/DynamicQrTicketCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11296,7 +11370,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/bundle-package
-    component: apps/guest-app/src/routes/general/BundlePackageDetail.tsx
+    component: src/screens/general/BundlePackageDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11330,7 +11404,7 @@ screens:
   pattern: listDetail
   patternReason: '`listCatalogueBundles` reads the population and `getBundle` reads one of them — list,
     select, act'
-  purpose: See bundle package for this venue.
+  purpose: 'One bundle: what it includes and its price, added to the cart.'
   layout:
     template: split
     regions:
@@ -11376,7 +11450,7 @@ screens:
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add the bundle to the cart
     trigger: onAction
   entryState:
     params:
@@ -11450,7 +11524,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/accessibility-information
-    component: apps/guest-app/src/routes/general/AccessibilityInformationForm.tsx
+    component: src/screens/general/AccessibilityInformationForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11562,7 +11636,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/resource-availability-cabana
-    component: apps/guest-app/src/routes/general/ResourceAvailabilityCabanaDetail.tsx
+    component: src/screens/general/ResourceAvailabilityCabanaDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11700,7 +11774,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/plan-my-day-in-progress
-    component: apps/guest-app/src/routes/general/PlanMyDayInProgressDetail.tsx
+    component: src/screens/general/PlanMyDayInProgressDetail.tsx
     status: notStarted
   navigation:
     inferred: false
@@ -11861,7 +11935,7 @@ screens:
   implementation:
     app: guest-app
     route: /in-venue-experience/menu-item-detail
-    component: apps/guest-app/src/routes/in-venue-experience/MenuItemDetail.tsx
+    component: src/screens/in-venue-experience/MenuItemDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12001,7 +12075,7 @@ screens:
   implementation:
     app: guest-app
     route: /in-venue-experience/shop-and-drop-collection
-    component: apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx
+    component: src/screens/in-venue-experience/ShopAndDropCollectionList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12109,7 +12183,7 @@ screens:
   implementation:
     app: guest-app
     route: /search
-    component: apps/guest-app/src/routes/Search.tsx
+    component: src/screens/Search.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12199,6 +12273,8 @@ screens:
     status: notStarted
     provenance: client-verified
     board: wireframes/P02 Guest App.dc.html#gst-063
+    note: 'Drawn frame: wireframes/incoming/P02-mobile-v4/gst-063.html, captured from the prototype view
+      below (wireframes/incoming/P02-mobile-v4/manifest.json).'
     prototype:
       file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: mobile v4 (30 September build)
@@ -12217,7 +12293,7 @@ screens:
   implementation:
     app: guest-app
     route: /newsletter-preferences
-    component: apps/guest-app/src/routes/NewsletterPreferences.tsx
+    component: src/screens/NewsletterPreferences.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12363,7 +12439,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/privacy-my-data
-    component: apps/guest-app/src/routes/account/PrivacyMyData.tsx
+    component: src/screens/account/PrivacyMyData.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12376,10 +12452,9 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-066 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-066 holds none of them. The edge
+        carries nothing: GST-066 is opened from GST-039, so this edge is the way back and GST-039 keeps
+        its own state'
   notes: '**A guest can legally demand their data and its erasure, and had nowhere to ask.** `exportSubjectData`
     and `deleteGuestAccount` existed as guest-callable operations reachable from no guest surface — a
     promise the contracts made and the product did not keep.
@@ -12476,26 +12551,6 @@ screens:
     contract: marketing-crm
     purpose: Read a guest's consent state
     trigger: onLoad
-  - operationId: getCookieConsentRuntime
-    contract: marketing-crm
-    purpose: 'Tracking preferences: categories and the current decision'
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listPublishedTrackingTechnologies
-    contract: marketing-crm
-    purpose: Each SDK and tracker the app uses
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getDeviceConsentHistory
-    contract: marketing-crm
-    purpose: My tracking decisions so far
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: recordDeviceConsent
-    contract: marketing-crm
-    purpose: Change or withdraw tracking preferences
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: recordConsent
     contract: marketing-crm
     purpose: 'Withdraw or give a consent from the privacy page: withdrawal as easy as granting'
@@ -12534,6 +12589,35 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  gaps:
+  - operation: getCookieConsentRuntime
+    removed: true
+    why: The client-approved privacy screen has no tracking preference centre (categories, the trackers,
+      past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client
+      approves.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: listPublishedTrackingTechnologies
+    removed: true
+    why: The client-approved privacy screen has no tracking preference centre (categories, the trackers,
+      past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client
+      approves.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: getDeviceConsentHistory
+    removed: true
+    why: The client-approved privacy screen has no tracking preference centre (categories, the trackers,
+      past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client
+      approves.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: recordDeviceConsent
+    removed: true
+    why: The client-approved privacy screen has no tracking preference centre (categories, the trackers,
+      past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client
+      approves.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-067
   name: Refunds & Resale
   module: Account & Self-Service
@@ -12543,7 +12627,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/refunds-resale
-    component: apps/guest-app/src/routes/account/RefundsResale.tsx
+    component: src/screens/account/RefundsResale.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12556,10 +12640,8 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-067 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-067 holds none of them. The edge
+        carries nothing: GST-039 needs nothing to open'
   notes: '**A guest could buy a ticket and not ask for their money back.** `createRefundRequest` and `createResaleListing`
     were back-office only, so every refund began as a phone call.
 
@@ -12689,7 +12771,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/help-my-cases
-    component: apps/guest-app/src/routes/account/HelpMyCases.tsx
+    component: src/screens/account/HelpMyCases.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12702,10 +12784,8 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-068 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-068 holds none of them. The edge
+        carries nothing: GST-039 needs nothing to open'
   notes: '**A guest could not raise a complaint.** Twelve case operations existed and every one of them
     was staff-side — a guest with a problem had to find somebody.
 
@@ -12853,7 +12933,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/face-pass
-    component: apps/guest-app/src/routes/account/FacePass.tsx
+    component: src/screens/account/FacePass.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12866,10 +12946,9 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-069 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-069 holds none of them. The edge
+        carries nothing: GST-069 is opened from GST-039, so this edge is the way back and GST-039 keeps
+        its own state'
   notes: '🔴 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable by
     a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody else
     operating the screen.
@@ -13062,7 +13141,7 @@ screens:
   implementation:
     app: guest-app
     route: /reserve-table
-    component: apps/guest-app/src/routes/ReserveTable.tsx
+    component: src/screens/ReserveTable.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -13076,10 +13155,8 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-070 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-070 holds none of them. The edge
+        carries nothing: GST-039 needs nothing to open'
     - to: GST-041
       trigger: Pay the deposit (only when the venue requires one)
       operation: addCartLine
@@ -13335,7 +13412,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/payment-methods
-    component: apps/guest-app/src/routes/account/PaymentMethods.tsx
+    component: src/screens/account/PaymentMethods.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -13348,10 +13425,9 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-071 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-071 holds none of them. The edge
+        carries nothing: GST-071 is opened from GST-039, so this edge is the way back and GST-039 keeps
+        its own state'
   notes: '**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens`
     and `storePaymentToken` were guest-callable with no guest screen.
 
@@ -13593,7 +13669,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/share-group-booking
-    component: apps/guest-app/src/routes/account/ShareGroupBooking.tsx
+    component: src/screens/account/ShareGroupBooking.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -13606,10 +13682,8 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-072 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-072 holds none of them. The edge
+        carries nothing: GST-039 needs nothing to open'
   notes: '**A guest buying eight tickets could not give seven of them away.** `shareEntitlement`, `getGroupBooking`
     and `respondToInvitation` had no surface, so a group booking was one person holding eight barcodes.
 
@@ -13713,7 +13787,8 @@ screens:
     trigger: onAction
   - operationId: getGroupBooking
     contract: orders
-    purpose: getGroupBooking
+    purpose: 'The group booking this guest belongs to: its leader, its name and who still has to give
+      their name'
     trigger: onLoad
   - operationId: respondToInvitation
     contract: marketing-crm
@@ -13823,7 +13898,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/security-sign-in
-    component: apps/guest-app/src/routes/account/SecuritySignIn.tsx
+    component: src/screens/account/SecuritySignIn.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -13836,10 +13911,9 @@ screens:
     transitions:
     - to: GST-039
       trigger: Profile
-      carries:
-      - subjectId
-      provenance: derived — GST-039 declares entryState.params subjectId and GST-073 holds subjectId,
-        so an edge into it carries them
+      provenance: 'derived — GST-039 declares entryState.params  and GST-073 holds none of them. The edge
+        carries nothing: GST-073 is opened from GST-039, so this edge is the way back and GST-039 keeps
+        its own state'
   notes: '**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a
     guest reaches after losing a phone. **Two-step verification, per venue** (decided 29 September, rev
     3 GAP-B1, per venue, superseding the second part of audit R167, which had removed it on 28 September):
@@ -13969,20 +14043,6 @@ screens:
     trigger: onAction
     invalidates:
     - listMfaMethods
-  - operationId: removeMfaMethod
-    contract: identity
-    purpose: Remove a method
-    trigger: onAction
-    invalidates:
-    - listMfaMethods
-  - operationId: createMfaChallenge
-    contract: identity
-    purpose: Step-up before a sensitive act at a venue that has it on
-    trigger: onAction
-  - operationId: verifyMfaChallenge
-    contract: identity
-    purpose: Check the step-up code
-    trigger: onAction
   entryState:
     params:
     - name: subjectId
@@ -14058,6 +14118,24 @@ screens:
       discards:
       - methodId
     provenance: client-verified
+  gaps:
+  - operation: removeMfaMethod
+    removed: true
+    why: The client-approved screen has no control to remove a two-step method.
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: createMfaChallenge
+    removed: true
+    why: The client-approved Security & Sign-in screen asks for no step-up code; sign-in asks for the
+      second factor (GST-042).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
+  - operation: verifyMfaChallenge
+    removed: true
+    why: The client-approved Security & Sign-in screen asks for no step-up code; sign-in asks for the
+      second factor (GST-042).
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-074
   name: Map Booking — Cabanas & Spots
   module: Booking & Selection
@@ -14066,7 +14144,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/map-booking
-    component: apps/guest-app/src/routes/general/MapBookingCanvas.tsx
+    component: src/screens/general/MapBookingCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14321,7 +14399,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/space-by-the-hour
-    component: apps/guest-app/src/routes/general/SpaceByTheHourWizard.tsx
+    component: src/screens/general/SpaceByTheHourWizard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14482,7 +14560,7 @@ screens:
   implementation:
     app: guest-app
     route: /transport/route-and-schedule
-    component: apps/guest-app/src/routes/transport/RouteAndScheduleList.tsx
+    component: src/screens/transport/RouteAndScheduleList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14670,7 +14748,7 @@ screens:
   implementation:
     app: guest-app
     route: /transport/route-and-passengers
-    component: apps/guest-app/src/routes/transport/RouteAndPassengersDetail.tsx
+    component: src/screens/transport/RouteAndPassengersDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14803,10 +14881,6 @@ screens:
       readable with their age; the street map needs the connection. Searching departures, buying a trip
       or a pass and saving a favourite route need the connection.'
   apis:
-  - operationId: getTransportRoute
-    contract: transport
-    purpose: The route and its stops
-    trigger: onLoad
   - operationId: getTransportRouteMap
     contract: transport
     purpose: Stop list, line and bounds for the map
@@ -14858,6 +14932,12 @@ screens:
         the passengers sit under the departures on the same screen (Plan your trip).
   apisNote: Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in
     `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).
+  gaps:
+  - operation: getTransportRoute
+    removed: true
+    why: 'Nothing on the client-approved screen shows it: the stops and the map come from getTransportRouteMap.'
+    source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
+      reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: GST-078
   name: Intercity Trip — Multi-trip Passes
   module: Transport
@@ -14866,7 +14946,7 @@ screens:
   implementation:
     app: guest-app
     route: /transport/multi-trip-passes
-    component: apps/guest-app/src/routes/transport/MultiTripPassesList.tsx
+    component: src/screens/transport/MultiTripPassesList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15002,7 +15082,7 @@ screens:
   implementation:
     app: guest-app
     route: /transport/favourite-routes
-    component: apps/guest-app/src/routes/transport/FavouriteRoutesList.tsx
+    component: src/screens/transport/FavouriteRoutesList.tsx
     status: notStarted
   navigation:
     entryFrom:

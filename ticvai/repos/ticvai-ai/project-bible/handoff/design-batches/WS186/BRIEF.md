@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1089` | Wallet Feature Profile | C | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1090` | Wallet Lifecycle Configuration | C | 11 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1091` | Wallet Numbering, Identity & Digital Credentials | C | 17 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-1092` | Wallet Configuration Preview, Validation & Publication | C | 18 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1092` | Wallet Configuration Preview, Validation & Publication | C | 20 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

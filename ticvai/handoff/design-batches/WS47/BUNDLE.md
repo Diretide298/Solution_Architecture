@@ -109,9 +109,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-158` | Coupon & Promo Code Command Center | B–D | 0 | 16 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
 | `ADM-159` | Coupon & Promo Code Builder | B–D | 9 | 20 | 5 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-160` | Unique Code Generation & Batch Manager | B | 14 | 12 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `ADM-161` | Code Eligibility & Restriction Manager | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-161` | Code Eligibility & Restriction Manager | B | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-162` | Usage, Capacity & Frequency Control | B | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-163` | Validity, Date & Time Control | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-163` | Validity, Date & Time Control | B | 0 | 6 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-164` | Code Distribution & Assignment Manager | A | 12 | 54 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-165` | Redemption Monitor & Code Lookup | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-166` | Code Security, Fraud & Exception Center | B | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -268,6 +268,8 @@ campaign:
 - `listCouponCodes` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -437,6 +439,8 @@ campaign:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -601,6 +605,8 @@ batch:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -676,7 +682,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listCodeEligibilityRestriction`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Partner | text | Partner |
+| Business entity | text | Business entity |
+| Venue | text | Venue |
+| Location | text | Location |
+| Operating area | text | Operating area |
+| Product scopes | list or chips (count when long) | Products the code is restricted to. |
+| Customer scopes | list or chips (count when long) | Customers the code is restricted to. |
+| Channels | list or chips (count when long) | Channels the code is valid on. |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -713,6 +730,8 @@ restriction: 'INSTA-DUNE: Dune Park only, Website and App, Day Pass products, ne
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -737,7 +756,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-161?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-158`.
@@ -840,6 +859,8 @@ limits:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -909,7 +930,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listValidityDateTime`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Blackout dates | text | Blackout dates |
+| Holidays | text | Holidays |
+| Selected timeslots | text | Selected timeslots |
+| Selected events | text | Selected events |
+| Seasonal calendars | text | Seasonal calendars |
+| Expiration grace period | 1 Oct 2026, 14:30 | Expiration grace period |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -950,6 +980,8 @@ validity:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -974,7 +1006,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-163?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-158`.
@@ -1176,6 +1208,8 @@ distribution:
 
 **A refused user sees:** Shown when the caller lacks `PRICE_VIEW`, which `listCouponCodes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `setCodeDistributionManager`.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1327,6 +1361,8 @@ lookup:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1445,6 +1481,8 @@ signal:
 - `listCodeSecurityFraud` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -1593,6 +1631,8 @@ campaign:
 - `listRedemption` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -1747,9 +1787,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CodeSecurityFraudExceptionCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Code Security, Fraud & Exception Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"levelsType":{"type":"string","enum":["low","medium","high","critical"],"description":"Vocabulary listed under Risk Levels."},"signalType":{"type":"string","enum":["excessiveRedemptionVelocity","repeatedFailedAttempts","multipleCustomersUsingCustomerSpecificCode","unusualGeographicUsage","highVolumeRedemptionFromOneDevice","suspiciousPosOperatorActivity","codeEnumerationAttempts","partnerCodeLeakage","redemptionAboveExpectedCampaignPattern"],"description":"The fraud signal monitored."},"codeId":{"type":"string","description":"Code or batch ID"},"detectedAt":{"type":"string","format":"date-time","description":"When detected"},"details":{"type":"string","description":"What was observed"}}},
 "CouponCampaign": {"x-ticvai-persistence":"promotions.coupon_campaign","allOf":[{"$ref":"#/components/schemas/CreateCouponCampaignRequest"},{"type":"object","required":["id","generatedCount","redeemedCount"],"properties":{"id":{"type":"string","format":"uuid"},"generatedCount":{"type":"integer"},"redeemedCount":{"type":"integer"},"isActive":{"type":"boolean"}}}]},
 "CouponCode": {"x-ticvai-persistence":"promotions.coupon_code","type":"object","required":["code","campaignId","status"],"properties":{"code":{"type":"string"},"campaignId":{"x-ticvai-references":"promotions.coupon_campaign","type":"string","format":"uuid"},"batchId":{"type":"string","format":"uuid","nullable":true,"description":"The `generateCouponCodes` batch that issued this code. Null where no batch did."},"status":{"$ref":"#/components/schemas/CouponStatus"},"assignedSubjectId":{"type":"string","format":"uuid","nullable":true},"redemptionCount":{"type":"integer"},"maxRedemptions":{"type":"integer"},"discount":{"$ref":"#/components/schemas/Discount"},"invalidReason":{"type":"string","nullable":true,"description":"Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`.\n","enum":["expired","alreadyRedeemed","voided","notYetValid","wrongVenue","conditionsNotMet","notAssignedToGuest"]},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"redeemedAt":{"type":"string","format":"date-time","nullable":true},"redeemedOrderId":{"type":"string","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"},"assignmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `CouponCodeAssignment` that assigned this code (4 October 2026, CHG-FXC-005)."},"distributionStatus":{"type":"string","nullable":true,"readOnly":true,"enum":["pending","sent","delivered","viewed","cancelled"],"description":"**How far the code got to its holder** (4 October 2026, CHG-FXC-005). `pending` when assigned, `sent` when the channel accepted it, `delivered` on the channel's delivery receipt, `viewed` when the holder opened it, `cancelled` when the assignment was withdrawn. Null for a code never assigned. Kept apart from `status`, which is the code's redemption life (issued, assigned, redeemed, expired, voided)."}}},
-"CouponCodeBatch": {"x-ticvai-persistence":"promotions.coupon_code_batch","type":"object","description":"One run of `generateCouponCodes`. **The batch is a row** because its status is read after the request that queued it has returned, and its codes point back at it.\n","required":["id","campaignId","quantity","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"The `batchId` that `generateCouponCodes` returned."},"campaignId":{"type":"string","format":"uuid"},"quantity":{"type":"integer","description":"Codes requested."},"generatedCount":{"type":"integer","description":"Codes generated so far."},"prefix":{"type":"string","maxLength":16,"nullable":true},"length":{"type":"integer"},"status":{"type":"string","enum":["queued","generating","complete","failed"]},"failureReason":{"type":"string","nullable":true,"description":"Present only where status is `failed`."},"requestedByPrincipalId":{"type":"string","format":"uuid"},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"downloadUrl":{"type":"string","nullable":true,"x-ticvai-persisted":false,"description":"The exported file of the batch's codes. Signed and expiring, issued on each read, so it is not stored. Present only while status is `complete`."}}},
+"CouponCodeBatch": {"x-ticvai-persistence":"promotions.coupon_code_batch","type":"object","description":"One run of `generateCouponCodes`. **The batch is a row** because its status is read after the request that queued it has returned, and its codes point back at it.\n","required":["id","campaignId","quantity","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"The `batchId` that `generateCouponCodes` returned."},"campaignId":{"x-ticvai-references":"promotions.campaign","type":"string","format":"uuid"},"quantity":{"type":"integer","description":"Codes requested."},"generatedCount":{"type":"integer","description":"Codes generated so far."},"prefix":{"type":"string","maxLength":16,"nullable":true},"length":{"type":"integer"},"status":{"type":"string","enum":["queued","generating","complete","failed"]},"failureReason":{"type":"string","nullable":true,"description":"Present only where status is `failed`."},"requestedByPrincipalId":{"type":"string","format":"uuid"},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"downloadUrl":{"type":"string","nullable":true,"x-ticvai-persisted":false,"description":"The exported file of the batch's codes. Signed and expiring, issued on each read, so it is not stored. Present only while status is `complete`."}}},
 "CouponStatus": {"type":"string","enum":["issued","assigned","redeemed","expired","voided"]},
-"CreateCouponCampaignRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","venueId","discount","validFrom"],"properties":{"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"discount":{"$ref":"#/components/schemas/Discount"},"conditions":{"$ref":"#/components/schemas/PromotionConditions"},"isSingleUse":{"type":"boolean","default":true,"description":"True generates individually redeemable codes. False issues one shared code with a redemption limit.\n"},"maxRedemptionsPerCode":{"type":"integer","default":1},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"campaignId":{"type":"string","format":"uuid","nullable":true,"description":"The commercial campaign (`promotions.campaign`) the codes are issued under, as the Coupon & Promo Code Builder names it. (DM5, 29 September: data model for the agreed operations)"}}},
+"CreateCouponCampaignRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","venueId","discount","validFrom"],"properties":{"code":{"x-ticvai-unique":"tenant","type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"discount":{"$ref":"#/components/schemas/Discount"},"conditions":{"$ref":"#/components/schemas/PromotionConditions"},"isSingleUse":{"type":"boolean","default":true,"description":"True generates individually redeemable codes. False issues one shared code with a redemption limit.\n"},"maxRedemptionsPerCode":{"type":"integer","default":1},"validFrom":{"type":"string","format":"date-time"},"validTo":{"type":"string","format":"date-time"},"campaignId":{"type":"string","format":"uuid","nullable":true,"description":"The commercial campaign (`promotions.campaign`) the codes are issued under, as the Coupon & Promo Code Builder names it. (DM5, 29 September: data model for the agreed operations)"}}},
 "Discount": {"x-ticvai-persistence":"none — embedded in promotion","type":"object","required":["kind"],"properties":{"kind":{"$ref":"#/components/schemas/DiscountKind"},"percentage":{"type":"number","minimum":0,"maximum":100},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fixedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"buyQuantity":{"type":"integer","minimum":1},"getQuantity":{"type":"integer","minimum":1},"getDiscountPercentage":{"type":"number","minimum":0,"maximum":100,"description":"100 makes the free items actually free; lower values give a partial discount."},"tiers":{"type":"array","description":"For `tieredPercentage` — more units, larger discount.","items":{"type":"object","required":["minQuantity","percentage"],"properties":{"minQuantity":{"type":"integer","minimum":1},"percentage":{"type":"number","minimum":0,"maximum":100}}}},"maxDiscountAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Cap on a percentage discount. Prevents an unbounded discount on a large basket."},"rewardVariantIds":{"type":"array","nullable":true,"items":{"type":"string","format":"uuid"},"description":"The reward products, where the reward is not the qualifying product: the free gift of `freeItem`, the \"different product\" of a `buyXGetY` (createPromotion; the builders setGiftFreeProduct and setBuyGetBogo were retired in r2, CHG-CLN-001). Absent means the reward is taken from the qualifying lines. (DM5, 29 September: data model for the agreed operations)"},"maxApplicationsPerBasket":{"type":"integer","minimum":1,"nullable":true,"description":"How many times the offer repeats in one basket: the \"maximum repetitions\" of an N-for-X offer (createPromotion; setFixedPriceOffer was retired in r2, CHG-CLN-001). Null repeats for every complete set. (DM5, 29 September: data model for the agreed operations)"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "RedemptionAnalyticsAuditAiOptimizationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Redemption Analytics, Audit & AI Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"codesGenerated":{"type":"string","description":"Codes generated"},"codesDistributed":{"type":"string","description":"Codes distributed"},"codesRedeemed":{"type":"string","description":"Codes redeemed"},"redemptionRate":{"type":"number","description":"Redemption rate"},"conversionRate":{"type":"number","description":"Conversion rate"},"revenueGenerated":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue generated"},"discountGranted":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discount granted"},"incrementalRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Incremental revenue"},"aovUplift":{"type":"number","description":"AOV uplift"},"costPerRedemption":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Cost per redemption"},"marginImpact":{"type":"number","description":"Margin impact"},"expiredUnusedCodes":{"type":"integer","description":"Expired unused codes"},"user":{"type":"string","description":"User"},"timestamp":{"type":"string","format":"date-time","description":"Timestamp"},"previousValue":{"type":"string","description":"Previous value"},"newValue":{"type":"integer","description":"New value"},"reason":{"type":"string","description":"Reason"},"approvalReference":{"type":"string","description":"Approval reference"},"auditEvent":{"type":"string","enum":["created","modified","assigned","suspended","reactivated","cancelled"],"description":"Code audit event."}}},

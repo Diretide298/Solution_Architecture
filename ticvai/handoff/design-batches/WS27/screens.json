@@ -5,6 +5,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-sales-command-center-bo-264",
-   "component": "apps/venue-management-web/src/routes/sell/GroupSalesCommandCenter.tsx",
+   "component": "src/routes/sell/GroupSalesCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -99,6 +100,7 @@
   },
   "density": "compact",
   "purposeNote": "The Group Sales team can manage its complete direct-sales pipeline and immediately identify opportunities requiring commercial action.",
+  "division": "Shares `listGroupSale`, `listGroupSale2` with BO-283; this screen is Group Sales Command Center (pack Group_Sales___Corporate_Booking_Management_Reference.pdf, board 1.9.1.1, page 4): provide the Group Sales team with a centralized commercial workspace showing the entire group-sales pipeline.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display; Show) and a per-row directory (§Each opportunity should display) — counts over a population, then the population",
   "purpose": "Provide the Group Sales team with a centralized commercial workspace showing the entire group-sales pipeline.",
@@ -106,7 +108,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -325,6 +327,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "1",
@@ -334,7 +337,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-enquiry-opportunity-capture-bo-265",
-   "component": "apps/venue-management-web/src/routes/sell/GroupEnquiryOpportunityCapture.tsx",
+   "component": "src/routes/sell/GroupEnquiryOpportunityCapture.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -589,6 +592,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "1",
@@ -598,7 +602,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-customer-organization-profile-bo-266",
-   "component": "apps/venue-management-web/src/routes/sell/GroupCustomerOrganizationProfile.tsx",
+   "component": "src/routes/sell/GroupCustomerOrganizationProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -721,6 +725,14 @@
     "GroupCustomerOrganizationProfileView.totalGuests",
     "GroupCustomerOrganizationProfileView.revenue",
     "GroupCustomerOrganizationProfileView.cancellationHistory"
+   ],
+   "params": [
+    {
+     "name": "organisationId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listGroupCustomerOrganization`."
+    }
    ]
   },
   "wireframe": {
@@ -759,6 +771,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "1",
@@ -768,7 +781,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-requirements-availability-capacity-planner-bo-267",
-   "component": "apps/venue-management-web/src/routes/sell/GroupRequirementsAvailabilityCapacityPlanner.tsx",
+   "component": "src/routes/sell/GroupRequirementsAvailabilityCapacityPlanner.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -904,6 +917,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "1",
@@ -913,7 +927,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-package-experience-builder-bo-268",
-   "component": "apps/venue-management-web/src/routes/sell/GroupPackageExperienceBuilder.tsx",
+   "component": "src/routes/sell/GroupPackageExperienceBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1087,6 +1101,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "1",
@@ -1096,7 +1111,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-quotation-builder-proposal-generation-bo-269",
-   "component": "apps/venue-management-web/src/routes/sell/GroupQuotationBuilderProposalGeneration.tsx",
+   "component": "src/routes/sell/GroupQuotationBuilderProposalGeneration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1256,6 +1271,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "1",
@@ -1265,7 +1281,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/quote-revision-negotiation-version-management-bo-270",
-   "component": "apps/venue-management-web/src/routes/sell/QuoteRevisionNegotiationVersionManagement.tsx",
+   "component": "src/routes/sell/QuoteRevisionNegotiationVersionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1392,6 +1408,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "1",
@@ -1401,7 +1418,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-discount-exception-approval-workflow-bo-271",
-   "component": "apps/venue-management-web/src/routes/sell/GroupDiscountExceptionApprovalWorkflow.tsx",
+   "component": "src/routes/sell/GroupDiscountExceptionApprovalWorkflow.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1523,6 +1540,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "1",
@@ -1532,7 +1550,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/quote-to-booking-conversion-confirmation-bo-272",
-   "component": "apps/venue-management-web/src/routes/sell/QuoteToBookingConversionConfirmation.tsx",
+   "component": "src/routes/sell/QuoteToBookingConversionConfirmation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1682,6 +1700,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "1",
@@ -1691,7 +1710,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-booking-360-handover-workspace-bo-273",
-   "component": "apps/venue-management-web/src/routes/sell/GroupBooking360HandoverWorkspace.tsx",
+   "component": "src/routes/sell/GroupBooking360HandoverWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {

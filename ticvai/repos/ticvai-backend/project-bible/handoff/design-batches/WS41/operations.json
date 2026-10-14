@@ -18,6 +18,30 @@
   "requestBody": "PrivacyConfigurationTestingApprovalPublicationInput",
   "responds": "PrivacyConfigurationTestingApprovalPublicationView"
  },
+ "listConsentPurposes": {
+  "method": "GET",
+  "path": "/consent-purposes",
+  "contract": "marketing-crm",
+  "summary": "Configured consent purposes",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listCookieBannerPreference": {
   "method": "GET",
   "path": "/cookie-banner-preference",
@@ -452,7 +476,7 @@
  },
  "setCookieBannerDesign": {
   "method": "PUT",
-  "path": "/cookie-banner-preference",
+  "path": "/cookie-banner-preference/{bannerDesignId}",
   "contract": "marketing-crm",
   "summary": "Save a cookie banner design as a new version",
   "permission": "GUEST_MANAGE",
@@ -460,6 +484,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "bannerDesignId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -471,7 +500,7 @@
  },
  "setCookieScanPolicy": {
   "method": "PUT",
-  "path": "/cookie-scan-policy",
+  "path": "/cookie-scan-policy/{scanPolicyId}",
   "contract": "marketing-crm",
   "summary": "Set how often a channel is scanned and who is alerted",
   "permission": "GUEST_MANAGE",
@@ -479,6 +508,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "scanPolicyId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -490,7 +524,7 @@
  },
  "setDataProcessingPurpose": {
   "method": "PUT",
-  "path": "/data-processing-purpose",
+  "path": "/data-processing-purpose/{purposeId}",
   "contract": "marketing-crm",
   "summary": "Create or change a processing purpose",
   "permission": "GUEST_MANAGE",
@@ -498,6 +532,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "purposeId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -528,7 +567,7 @@
  },
  "setPrivacyNoticePolicyGovernance": {
   "method": "PUT",
-  "path": "/privacy-notice-policy",
+  "path": "/privacy-notice-policy/{governanceId}",
   "contract": "marketing-crm",
   "summary": "Set the privacy governance of one version of a privacy document",
   "permission": "GUEST_MANAGE",
@@ -536,6 +575,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "governanceId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -547,7 +591,7 @@
  },
  "setTrackingTechnology": {
   "method": "PUT",
-  "path": "/cookie-tracking-digital",
+  "path": "/cookie-tracking-digital/{technologyId}",
   "contract": "marketing-crm",
   "summary": "Add, classify or retire a tracking technology",
   "permission": "GUEST_MANAGE",
@@ -555,6 +599,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "technologyId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

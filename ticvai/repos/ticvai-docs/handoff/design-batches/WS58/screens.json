@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-operations-command-center-adm-268",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelOperationsCommandCenter.tsx",
+   "component": "src/routes/commercial/ChannelOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -108,7 +109,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -309,6 +310,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "2",
@@ -318,7 +320,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-connection-integration-manager-adm-269",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelConnectionIntegrationManager.tsx",
+   "component": "src/routes/commercial/ChannelConnectionIntegrationManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -608,6 +610,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "2",
@@ -617,7 +620,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/product-price-availability-synchronization-adm-270",
-   "component": "apps/venue-management-web/src/routes/commercial/ProductPriceAvailabilitySynchronization.tsx",
+   "component": "src/routes/commercial/ProductPriceAvailabilitySynchronization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -851,6 +854,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "2",
@@ -860,7 +864,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/real-time-channel-availability-inventory-monitor-adm-271",
-   "component": "apps/venue-management-web/src/routes/commercial/RealTimeChannelAvailabilityInventoryMonitor.tsx",
+   "component": "src/routes/commercial/RealTimeChannelAvailabilityInventoryMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1003,6 +1007,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "2",
@@ -1012,7 +1017,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-allocation-rebalancing-operations-adm-272",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelAllocationRebalancingOperations.tsx",
+   "component": "src/routes/commercial/ChannelAllocationRebalancingOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1202,6 +1207,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "2",
@@ -1211,7 +1217,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-exceptions-incidents-recovery-adm-273",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelExceptionsIncidentsRecovery.tsx",
+   "component": "src/routes/commercial/ChannelExceptionsIncidentsRecovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1477,6 +1483,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "2",
@@ -1486,7 +1493,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-performance-commercial-analytics-adm-274",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelPerformanceCommercialAnalytics.tsx",
+   "component": "src/routes/commercial/ChannelPerformanceCommercialAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1517,7 +1524,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -1594,7 +1601,9 @@
       {
        "kind": "metricTile",
        "label": "Refund Rate",
-       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 29 §Measure"
+       "provenance": "pack Sales_Channel_Management_Reference.pdf, page 29 §Measure",
+       "operation": "listChannelPerformanceCommercial",
+       "bindsTo": "ChannelPerformanceCommercialAnalyticsView.refundRate"
       },
       {
        "kind": "metricTile",
@@ -1681,6 +1690,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "2",
@@ -1690,7 +1700,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-audit-logs-transaction-traceability-adm-275",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelAuditLogsTransactionTraceability.tsx",
+   "component": "src/routes/commercial/ChannelAuditLogsTransactionTraceability.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1721,7 +1731,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -1842,6 +1852,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "2",
@@ -1851,7 +1862,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-governance-sla-partner-control-adm-276",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelGovernanceSlaPartnerControl.tsx",
+   "component": "src/routes/commercial/ChannelGovernanceSlaPartnerControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2001,6 +2012,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "2",
@@ -2010,7 +2022,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ai-channel-optimization-intelligence-center-adm-277",
-   "component": "apps/venue-management-web/src/routes/commercial/AiChannelOptimizationIntelligenceCenter.tsx",
+   "component": "src/routes/commercial/AiChannelOptimizationIntelligenceCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {

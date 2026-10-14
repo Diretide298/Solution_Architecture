@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-689` | Recommendation Performance Command Center | C | 2 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-690` | Recommendation Strategy & Placement Analytics | C | 0 | 30 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-691` | Recommendation Experiment & A/B Test Studio | C | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-692` | Experiment Results & Winner Decision Workspace | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-692` | Experiment Results & Winner Decision Workspace | C | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-693` | Recommendation Attribution & Incrementality Analytics | C | 5 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-694` | AI Model Performance & Drift Monitor | C | 0 | 24 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-695` | Recommendation Governance & Deployment Control | C | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |

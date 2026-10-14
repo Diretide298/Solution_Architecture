@@ -87,6 +87,7 @@
     "description": "Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -180,6 +181,12 @@
      "format": "uuid"
     },
     "description": "3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"
+   },
+   "statusReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the policy's state last changed (`setAuthorisationPolicyState`)."
    }
   }
  },
@@ -376,6 +383,7 @@
     ]
    },
    "eligibility": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "items": {
@@ -428,6 +436,7 @@
     "type": "object",
     "properties": {
      "derivatives": {
+      "x-ticvai-persisted": false,
       "type": "array",
       "description": "Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n",
       "items": {
@@ -459,6 +468,7 @@
       }
      },
      "collections": {
+      "x-ticvai-persisted": false,
       "type": "array",
       "items": {
        "type": "object",
@@ -474,6 +484,7 @@
       }
      },
      "previousVersions": {
+      "x-ticvai-persisted": false,
       "type": "array",
       "items": {
        "type": "object",
@@ -692,16 +703,6 @@
    }
   }
  },
- "MediaStatus": {
-  "type": "string",
-  "enum": [
-   "processing",
-   "ready",
-   "quarantined",
-   "failed",
-   "archived"
-  ]
- },
  "MediaUsage": {
   "x-ticvai-persistence": "assets.media_usage",
   "type": "object",
@@ -747,39 +748,6 @@
    "isLive": {
     "type": "boolean",
     "description": "True where the referencing surface is published to guests."
-   }
-  }
- },
- "MediaUsageRow": {
-  "type": "object",
-  "description": "Boards 1.10 and 4.9. **Assets never used is the number that justifies the library.**",
-  "properties": {
-   "key": {
-    "type": "string"
-   },
-   "label": {
-    "type": "string"
-   },
-   "assetCount": {
-    "type": "integer"
-   },
-   "storageBytes": {
-    "type": "integer"
-   },
-   "downloads": {
-    "type": "integer"
-   },
-   "views": {
-    "type": "integer"
-   },
-   "shares": {
-    "type": "integer"
-   },
-   "neverUsedCount": {
-    "type": "integer"
-   },
-   "unclassifiedCount": {
-    "type": "integer"
    }
   }
  },

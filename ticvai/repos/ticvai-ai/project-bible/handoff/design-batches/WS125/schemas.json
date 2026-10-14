@@ -102,6 +102,7 @@
   }
  },
  "EventType": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "catalogue.event_type",
   "description": "Event board 1.2. **The type decides behaviour, not just a label.**",

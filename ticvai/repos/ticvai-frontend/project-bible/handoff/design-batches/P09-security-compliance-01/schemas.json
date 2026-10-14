@@ -455,6 +455,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -578,6 +579,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -691,6 +693,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },

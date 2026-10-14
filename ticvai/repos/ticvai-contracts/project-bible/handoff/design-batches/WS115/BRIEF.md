@@ -152,15 +152,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-684` | Accreditation Executive Dashboard | D | 0 | 14 | 6 | 3 | 1 | 6 | — | notStarted (—) |
-| `BO-685` | Accreditation Status & Portfolio Reporting | D | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-685` | Accreditation Status & Portfolio Reporting | D | 0 | 20 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 | `BO-686` | Accreditation Utilization Analytics | D | 0 | 22 | 6 | 3 | 1 | 6 | — | notStarted (—) |
-| `BO-687` | Accreditation Access Activity Reporting | D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
+| `BO-687` | Accreditation Access Activity Reporting | D | 0 | 8 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-688` | Accreditation Trend & Comparative Analysis | D | 4 | 15 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-689` | Accreditation Audit Reporting | D | 0 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
+| `BO-689` | Accreditation Audit Reporting | D | 0 | 12 | 6 | 2 | 0 | 6 | — | notStarted (—) |
 | `BO-690` | Immutable Accreditation Audit Log | D | 14 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
-| `BO-691` | Accreditation API Management | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-691` | Accreditation API Management | B | 0 | 15 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-692` | Accreditation Webhook Management | B | 7 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-693` | Integration & Data Exchange Monitor | D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-693` | Integration & Data Exchange Monitor | D | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

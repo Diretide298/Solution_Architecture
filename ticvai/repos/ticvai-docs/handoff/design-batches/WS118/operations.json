@@ -1,42 +1,4 @@
 {
- "answerConfigurationQuestion": {
-  "method": "POST",
-  "path": "/configuration-sessions/{sessionId}/answers",
-  "contract": "ai",
-  "summary": "Answer the current question",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiConfigurationTurn"
- },
- "buildConfigurationPlan": {
-  "method": "POST",
-  "path": "/configuration-sessions/{sessionId}/plan",
-  "contract": "ai",
-  "summary": "Compile the blueprint into a plan",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiActionPlanDetail"
- },
  "cancelActionPlan": {
   "method": "POST",
   "path": "/action-plans/{planId}/cancel",
@@ -55,44 +17,6 @@
   ],
   "requestBody": null,
   "responds": "AiActionPlan"
- },
- "decideBlueprintRecommendation": {
-  "method": "POST",
-  "path": "/configuration-sessions/{sessionId}/decisions/{decisionKey}",
-  "contract": "ai",
-  "summary": "Accept, modify, reject or defer a blueprint decision",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiBlueprintDecision"
- },
- "decideProposedAction": {
-  "method": "POST",
-  "path": "/proposed-actions/{actionId}/decide",
-  "contract": "ai",
-  "summary": "Approve or reject a proposal",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "ProposedAction"
  },
  "getActionPlan": {
   "method": "GET",
@@ -163,35 +87,6 @@
   "requestBody": null,
   "responds": "AiBlueprintView"
  },
- "getEffectiveAiPolicy": {
-  "method": "GET",
-  "path": "/governance/effective-policy",
-  "contract": "ai",
-  "summary": "The policy in force for a capability at a scope",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "capabilityKey",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "scopePath",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "environment",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiEffectivePolicy"
- },
  "listConfigurationSessions": {
   "method": "GET",
   "path": "/configuration-sessions",
@@ -255,19 +150,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listProposedActions": {
-  "method": "GET",
-  "path": "/proposed-actions",
-  "contract": "ai",
-  "summary": "What the assistant has proposed and nobody has decided",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "ProposedAction"
- },
  "listTenants": {
   "method": "GET",
   "path": "/tenants",
@@ -326,25 +208,6 @@
   "path": "/action-plans/{planId}/pause",
   "contract": "ai",
   "summary": "Pause an executing plan",
-  "permission": "AI_APPROVE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiActionPlan"
- },
- "resumeActionPlan": {
-  "method": "POST",
-  "path": "/action-plans/{planId}/resume",
-  "contract": "ai",
-  "summary": "Resume a paused plan",
   "permission": "AI_APPROVE",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -503,24 +366,5 @@
   ],
   "requestBody": null,
   "responds": "AiActionPlanDetail"
- },
- "startConfigurationSession": {
-  "method": "POST",
-  "path": "/configuration-sessions",
-  "contract": "ai",
-  "summary": "Start the configuration assistant",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiConfigurationSession"
  }
 }

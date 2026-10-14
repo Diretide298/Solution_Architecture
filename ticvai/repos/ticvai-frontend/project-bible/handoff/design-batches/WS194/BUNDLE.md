@@ -232,7 +232,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | − expirations | text | not in the schema: `− Expirations` |
 | … 3 more | | `schemas.json` |
 
-**The selected wallet finance liability** (detail panel): The pack groups this record's detail under its own headings: “Highlight”.
+**The selected wallet finance liability** (detail panel, from `getWalletLiability`): The pack groups this record's detail under its own headings: “Highlight”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -313,6 +313,8 @@ kpis:
 - `getWalletLiability` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -455,6 +457,8 @@ mapping:
 - `setWalletAccountingMapping` → `WALLET_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_CONFIGURE`
 
 #### Requirements it meets
 
@@ -626,6 +630,8 @@ entry:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -789,6 +795,8 @@ sources:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -875,7 +883,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Owner | text | not in the schema: `Owner` |
 | Status | text | not in the schema: `Status` |
 
-**The selected reconciliation exception resolution** (detail panel): The pack groups this record's detail under its own headings: “Workflow”.
+**The selected reconciliation exception resolution** (detail panel, from `getWalletReconciliation`): The pack groups this record's detail under its own headings: “Workflow”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -912,6 +920,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the reconciliation exception resolution are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The wallet is `closed`; its balance is final and takes no adjustment. Nothing changes. |
 
 #### Sample data for the mock-up
 
@@ -929,6 +938,8 @@ exception:
 - `adjustWallet` → `WALLET_OPERATE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -960,7 +971,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 409).
 - [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1167?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1036,7 +1047,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Corporate program | text | not in the schema: `Corporate program` |
 | Aging analysis | text | not in the schema: `Aging Analysis` |
 
-**The selected gift card liability** (detail panel)
+**The selected gift card liability** (detail panel, from `getWalletLiability`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1098,6 +1109,8 @@ liability:
 - `getWalletLiability` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -1222,6 +1235,8 @@ rule:
 - `setWalletAccountingMapping` → `WALLET_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1433,6 +1448,8 @@ checks: 'Settlements reconciled: 2 open exceptions · No open shifts: passed · 
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `LEDGER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1536,7 +1553,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Guest | text | not in the schema: `Guest` |
 | AI insights | text | not in the schema: `AI Insights` |
 
-**The selected wallet analytics reporting** (detail panel)
+**The selected wallet analytics reporting** (detail panel, from `getWalletLiability`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1594,6 +1611,8 @@ kpis:
 - `getWalletLiability` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -1693,7 +1712,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every finance validation reporting** (data table)
+**Every finance validation reporting** (data table, from `listFiscalPeriods`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1792,6 +1811,8 @@ approval: Requested by Omar Haddad 1 Oct 10:12 · awaiting Fatima Al Mansoori
 - `listFiscalPeriods` → `LEDGER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -1958,18 +1979,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "FiscalPeriod": {"x-ticvai-persistence":"ledger.fiscal_period + ledger.fiscal_period_event","type":"object","description":"`startDate` and `endDate` are days in the region's time zone: a posting belongs to the period when its `postedAt`, in that zone, falls on or between them.\n","required":["id","legalEntityId","name","startDate","endDate","status"],"properties":{"id":{"type":"string","format":"uuid"},"legalEntityId":{"type":"string","format":"uuid"},"name":{"type":"string"},"startDate":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"endDate":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"status":{"$ref":"#/components/schemas/PeriodStatus"},"closedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"closedAt":{"type":"string","format":"date-time","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The approval request a close or reopen is waiting on (`approvals`), routed to a finance approver (decided 28 September, audit R144). Null when nothing is waiting."},"events":{"type":"array","description":"**Every step of the period's close, oldest first**: begin, abandon, close and reopen, each with who, when and (for abandon and reopen) why. A reopened period restates figures somebody has already reported, so the reason is kept, not just the latest status.\n","items":{"$ref":"#/components/schemas/FiscalPeriodEvent"}}}},
-"FiscalPeriodEvent": {"type":"object","description":"One step in a fiscal period's close. Written by the operation that took the step; never edited.","required":["action","principalId","occurredAt"],"properties":{"action":{"type":"string","enum":["beginClose","abandonClose","close","reopen"]},"reason":{"type":"string","nullable":true,"description":"Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps."},"principalId":{"type":"string","format":"uuid","description":"Who took the step."},"approverPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The approver of a `reopen`. Null for the other steps."},"occurredAt":{"type":"string","format":"date-time"}}},
+"FiscalPeriodEvent": {"type":"object","description":"One step in a fiscal period's close. Written by the operation that took the step; never edited.","required":["action","principalId","occurredAt"],"properties":{"action":{"type":"string","enum":["beginClose","abandonClose","close","reopen"]},"reason":{"type":"string","nullable":true,"description":"Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps."},"principalId":{"x-ticvai-references":"identity.principal","type":"string","format":"uuid","description":"Who took the step."},"approverPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The approver of a `reopen`. Null for the other steps."},"occurredAt":{"type":"string","format":"date-time"}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PeriodCloseResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["fiscalPeriodId","dryRun","passed","checks"],"properties":{"fiscalPeriodId":{"type":"string","format":"uuid"},"dryRun":{"type":"boolean"},"passed":{"type":"boolean"},"checks":{"type":"array","items":{"type":"object","required":["check","passed"],"properties":{"check":{"type":"string","description":"**What each check is, and what fails it** (4 October 2026, CHG-FXC-009; the Sprint 1-2 judging found the values and\nno definition). Each runs over the period's legal entity and dates; `blockingCount` is what fails it.\n- `trialBalanceBalances`: posted `ledger.journal_line` debits equal credits for the period, per currency. Blocking:\n  currencies out of balance.\n- `noUnapprovedJournals`: no `ledger.journal_entry` dated in the period is `draft` or awaiting approval. Blocking: those\n  entries.\n- `noOpenShifts`: no POS shift with a business date (`Shift.businessDate`, closing at the venue's `businessDayCutoff`;\n  CHG-R6-032) in the period is still open, suspended or awaiting close approval, at or beneath the legal entity's\n  scope path. Asked of Orders' `shift#unclosedShiftsInPeriod` in process, which states the rule (ADAM CR-085,\n  CHG-FIN-012); Ledger never reads `orders.pos_shift`. Blocking: those shifts.\n- `settlementsReconciled`: every `ledger.settlement` in the period is reconciled and no `ledger.settlement_exception`\n  on it is open. Blocking: unreconciled settlements plus open exceptions.\n- `recognitionRunComplete`: nothing earned on or before the period end is still deferred: the computation\n  `runRecognition` makes for this period, run dry inside the close, would move nothing (`entryCount` 0).\n  `ledger.recognition_schedule` holds the recognition rules, not lines to count, so the run's own answer is the\n  test (ADAM CR-085, CHG-FIN-012; lead to confirm). Blocking: that `entryCount`.\n- `priorPeriodClosed`: the legal entity's previous `ledger.fiscal_period` is `closed`. Blocking: 1 or 0.\n- `varianceExceptionsReviewed`: no `ledger.price_variance` in the period is unreviewed. Blocking: those variances.\nThe close fails (409, `PeriodCloseProblem.failedChecks` and `failedWalletChecks`) when any check or wallet check fails; a dry run reports the\nsame list and locks nothing. Each run, dry or not, appends one `ledger.fiscal_period_event` with the results.","enum":["trialBalanceBalances","noUnapprovedJournals","noOpenShifts","settlementsReconciled","recognitionRunComplete","priorPeriodClosed","varianceExceptionsReviewed"]},"passed":{"type":"boolean"},"detail":{"type":"string"},"blockingCount":{"type":"integer"}}}},"walletChecks":{"type":"array","description":"**The wallet pre-close checks** (decided 2 October 2026, Chinmay, batch 6 #220, BO-1170; DEC-220; CHG-CSP-040). Beside `checks`, whose values clients built at r1 already switch on, so no value is added there. `passed` is false while any of these fails. Empty where the tenant has no wallet module. Asked of Wallet's `wallet#periodCloseChecks` in process, which maps Wallet's own pre-close checks onto these five and says what \"no wallet module\" means (ADAM CR-085, CHG-FIN-012); a failure is listed in `PeriodCloseProblem.failedWalletChecks`.","items":{"type":"object","required":["check","passed"],"properties":{"check":{"type":"string","enum":["walletRollForwardTies","walletLiabilityMatchesLedger","noPendingWalletAuthorisations","expiredBalancesReleased","walletDisputesReviewed"],"description":"`walletRollForwardTies`: opening liability plus top-ups, minus spend, refunds and expiry, equals closing liability. `walletLiabilityMatchesLedger`: that closing liability equals the wallet liability account. `noPendingWalletAuthorisations`: no authorisation is still held open in the period. `expiredBalancesReleased`: balances past expiry were released to breakage. `walletDisputesReviewed`: no wallet dispute raised in the period is unreviewed."},"passed":{"type":"boolean"},"detail":{"type":"string"},"blockingCount":{"type":"integer"}}}},"walletRollForward":{"type":"object","nullable":true,"description":"**The period's wallet movement summary, as the close checked it** (DEC-220; CHG-CSP-040): read from wallet `getWalletMovementSummary` so BO-1170 shows the roll-forward beside the ledger checks. Null where the tenant has no wallet module.","properties":{"openingLiability":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"toppedUp":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"spent":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refunded":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expired":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"closingLiability":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"ledgerLiability":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"The wallet liability account's balance, to compare with `closingLiability`."}}}}},
 "PeriodStatus": {"type":"string","enum":["open","closing","closed"]},
 "UnifiedReconciliation": {"type":"object","description":"4.2.19. **Four sources and the variances between them.** A view showing each balanced against itself has not reconciled anything.\n","properties":{"from":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"to":{"type":"string","format":"date","description":"A day in the region's time zone, local midnight to local midnight."},"sources":{"type":"array","items":{"type":"object","properties":{"source":{"type":"string","enum":["pos","gateway","bank","wallet","ledger"]},"providerName":{"type":"string","nullable":true},"total":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"transactionCount":{"type":"integer"}}}},"variances":{"type":"array","description":"**Where two sources disagree, named.** A discrepancy is usually the gap between two of them rather than inside one, and *\"out by 240\"* without saying between what is not actionable.\n","items":{"type":"object","properties":{"between":{"type":"array","description":"The two sources that disagree, as named in `sources[].source`.","minItems":2,"maxItems":2,"items":{"type":"string","enum":["pos","gateway","bank","wallet","ledger"]}},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"likelyCause":{"type":"string","nullable":true}}}}}},
-"Wallet": {"x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money","x-ticvai-column":"balance_amount"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},
-"WalletAccountingMapping": {"type":"object","x-ticvai-persistence":"wallet.accounting_mapping","description":"Boards 9.2 and 9.3. **Different credit types are different liabilities.**","properties":{"mappings":{"type":"array","items":{"type":"object","properties":{"creditTypeId":{"type":"string","format":"uuid"},"liabilityAccountCode":{"type":"string"},"breakageRevenueAccountCode":{"type":"string","nullable":true},"costAccountCode":{"type":"string","nullable":true,"description":"**For credit the venue gave away.** Promotional credit is a marketing cost already incurred, not money owed back, and booking it as a liability overstates what the venue owes by whatever marketing did last quarter.\n"}}}},"breakagePolicy":{"type":"object","properties":{"recogniseAfterMonths":{"type":"integer","nullable":true,"description":"**Recognised on a policy, not on the expiry date.** Some jurisdictions require the liability to be held long after the printed expiry.\n"},"requiresApproval":{"type":"boolean","default":true}}},"scopePath":{"type":"string"}}},
+"Wallet": {"x-ticvai-rls":"grant-holder-read","x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money","x-ticvai-column":"balance_amount"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},
+"WalletAccountingMapping": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"wallet.accounting_mapping","description":"Boards 9.2 and 9.3. **Different credit types are different liabilities.**","properties":{"mappings":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"creditTypeId":{"type":"string","format":"uuid"},"liabilityAccountCode":{"type":"string"},"breakageRevenueAccountCode":{"type":"string","nullable":true},"costAccountCode":{"type":"string","nullable":true,"description":"**For credit the venue gave away.** Promotional credit is a marketing cost already incurred, not money owed back, and booking it as a liability overstates what the venue owes by whatever marketing did last quarter.\n"}}}},"breakagePolicy":{"type":"object","properties":{"recogniseAfterMonths":{"type":"integer","nullable":true,"description":"**Recognised on a policy, not on the expiry date.** Some jurisdictions require the liability to be held long after the printed expiry.\n"},"requiresApproval":{"type":"boolean","default":true}}},"scopePath":{"type":"string"}}},
 "WalletLiabilityRow": {"type":"object","description":"Boards 9.5 and 9.6. **The number the finance director asks for.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"outstanding":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expiringThisPeriod":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"breakageRecognised":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"walletCount":{"type":"integer"},"oldestLotAt":{"type":"string","format":"date","nullable":true}}},
 "WalletMovementSummary": {"type":"object","x-ticvai-persistence":"none — aggregated from wallet.transaction and wallet.credit_lot","description":"One row of the wallet roll-forward (`getWalletMovementSummary`, CHG-CSA-027). Every amount is in the base currency.","properties":{"groupKey":{"type":"string","nullable":true},"opening":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"topUps":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundsIn":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"transfersIn":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"adjustmentsIn":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"spend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"transfersOut":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"adjustmentsOut":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundsOut":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"expired":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"breakageRecognised":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"closing":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"tiesOut":{"type":"boolean","description":"Opening plus every movement equals closing."}}},
 "WalletPreCloseCheck": {"type":"object","x-ticvai-persistence":"none — computed at the call","description":"One wallet check before a period closes (`getWalletPreCloseChecks`, CHG-CSA-027).","properties":{"code":{"type":"string","enum":["rollForwardTies","subLedgerTiesToLedger","noExpiredHoldsOpen","noPendingExpiryRun","noOverdueDisputes","reconciliationSourcesMatched"]},"outcome":{"type":"string","enum":["pass","warn","fail"]},"detail":{"type":"string"},"difference":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true}}},
 "WalletReconciliation": {"type":"object","description":"Board 9.4. **Three sources, and the exception names which pair disagrees.**","properties":{"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"subLedgerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"generalLedgerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"acquirerTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"exceptions":{"type":"array","items":{"type":"object","properties":{"pair":{"type":"string","enum":["subLedgerVsGeneralLedger","subLedgerVsAcquirer","generalLedgerVsAcquirer"]},"difference":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"transactionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"likelyCause":{"type":"string","nullable":true}}}}}},
-"WalletReconciliationSources": {"type":"object","x-ticvai-persistence":"wallet.reconciliation_source","description":"Board 9, p.105. **What `getWalletReconciliation` compares.** `walletLedger` is always on.","required":["sources"],"properties":{"sources":{"type":"array","minItems":1,"items":{"type":"object","required":["kind","enabled"],"properties":{"kind":{"type":"string","enum":["walletLedger","pos","paymentGateway","paymentServer","giftCard","finance"]},"enabled":{"type":"boolean","default":true},"matchKeys":{"type":"array","description":"Fields a movement is matched on, e.g. transactionId, authorisationCode, terminalId, amount, businessDate.","items":{"type":"string"}},"toleranceAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"A pair differing by no more than this is agreed. Default zero."},"schedule":{"type":"string","enum":["realTime","hourly","daily","endOfBusinessDay"],"default":"endOfBusinessDay","description":"`endOfBusinessDay` runs when the venue's business day closes, at its `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."}}}},"scopePath":{"type":"string"}}}
+"WalletReconciliationSources": {"type":"object","x-ticvai-persistence":"wallet.reconciliation_source","description":"Board 9, p.105. **What `getWalletReconciliation` compares.** `walletLedger` is always on.","required":["sources"],"properties":{"sources":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","minItems":1,"items":{"type":"object","required":["kind","enabled"],"properties":{"kind":{"type":"string","enum":["walletLedger","pos","paymentGateway","paymentServer","giftCard","finance"]},"enabled":{"type":"boolean","default":true},"matchKeys":{"type":"array","description":"Fields a movement is matched on, e.g. transactionId, authorisationCode, terminalId, amount, businessDate.","items":{"type":"string"}},"toleranceAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"A pair differing by no more than this is agreed. Default zero."},"schedule":{"type":"string","enum":["realTime","hourly","daily","endOfBusinessDay"],"default":"endOfBusinessDay","description":"`endOfBusinessDay` runs when the venue's business day closes, at its `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."}}}},"scopePath":{"type":"string"}}}
 }
 ```

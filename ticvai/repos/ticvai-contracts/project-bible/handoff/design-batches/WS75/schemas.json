@@ -163,6 +163,7 @@
     "type": "boolean"
    },
    "usageImpact": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "items": {
@@ -249,6 +250,14 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "assetId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "assets.media_asset",
+    "description": "The media asset this is a rendition of, from the path of `requestMediaRendition`."
    }
   }
  },

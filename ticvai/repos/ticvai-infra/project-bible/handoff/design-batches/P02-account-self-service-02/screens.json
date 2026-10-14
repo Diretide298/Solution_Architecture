@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/account/refunds-resale",
-   "component": "apps/guest-app/src/routes/account/RefundsResale.tsx",
+   "component": "src/screens/account/RefundsResale.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -25,10 +25,7 @@
     {
      "to": "GST-039",
      "trigger": "Profile",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-067 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-039 declares entryState.params  and GST-067 holds none of them. The edge carries nothing: GST-039 needs nothing to open"
     }
    ]
   },
@@ -212,7 +209,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/account/face-pass",
-   "component": "apps/guest-app/src/routes/account/FacePass.tsx",
+   "component": "src/screens/account/FacePass.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -228,10 +225,7 @@
     {
      "to": "GST-039",
      "trigger": "Profile",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-069 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-039 declares entryState.params  and GST-069 holds none of them. The edge carries nothing: GST-069 is opened from GST-039, so this edge is the way back and GST-039 keeps its own state"
     }
    ]
   },
@@ -452,7 +446,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/account/payment-methods",
-   "component": "apps/guest-app/src/routes/account/PaymentMethods.tsx",
+   "component": "src/screens/account/PaymentMethods.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -468,10 +462,7 @@
     {
      "to": "GST-039",
      "trigger": "Profile",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-071 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-039 declares entryState.params  and GST-071 holds none of them. The edge carries nothing: GST-071 is opened from GST-039, so this edge is the way back and GST-039 keeps its own state"
     }
    ]
   },
@@ -789,7 +780,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/account/security-sign-in",
-   "component": "apps/guest-app/src/routes/account/SecuritySignIn.tsx",
+   "component": "src/screens/account/SecuritySignIn.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -805,10 +796,7 @@
     {
      "to": "GST-039",
      "trigger": "Profile",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-073 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-039 declares entryState.params  and GST-073 holds none of them. The edge carries nothing: GST-073 is opened from GST-039, so this edge is the way back and GST-039 keeps its own state"
     }
    ]
   },
@@ -958,27 +946,6 @@
     "invalidates": [
      "listMfaMethods"
     ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove a method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "createMfaChallenge",
-    "contract": "identity",
-    "purpose": "Step-up before a sensitive act at a venue that has it on",
-    "trigger": "onAction"
-   },
-   {
-    "operationId": "verifyMfaChallenge",
-    "contract": "identity",
-    "purpose": "Check the step-up code",
-    "trigger": "onAction"
    }
   ],
   "entryState": {
@@ -1062,6 +1029,26 @@
      ]
     },
     "provenance": "client-verified"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "removeMfaMethod",
+    "removed": true,
+    "why": "The client-approved screen has no control to remove a two-step method.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "createMfaChallenge",
+    "removed": true,
+    "why": "The client-approved Security & Sign-in screen asks for no step-up code; sign-in asks for the second factor (GST-042).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "verifyMfaChallenge",
+    "removed": true,
+    "why": "The client-approved Security & Sign-in screen asks for no step-up code; sign-in asks for the second factor (GST-042).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "_platform": {

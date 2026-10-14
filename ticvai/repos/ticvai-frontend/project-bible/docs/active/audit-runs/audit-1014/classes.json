@@ -1,0 +1,1374 @@
+{
+ "due_by": "2026-10-28",
+ "classes": [
+  {
+   "check": "check-ticket-scope",
+   "rule": "S-FEATURE-OP-UNUSED",
+   "what": "a feature ticket lists an operation none of its screens calls (#27741, CHG-SWP-001)",
+   "findings": 741,
+   "baselined": 689,
+   "new": 52,
+   "strict": 4,
+   "tickets": 1080,
+   "due_soon": 500,
+   "id": "check-ticket-scope/S-FEATURE-OP-UNUSED"
+  },
+  {
+   "check": "check-frontend-repos",
+   "rule": "FR-OLD-PATH",
+   "what": "a screen with a repository names its component under the old apps/<app>/ workspace (CHG-SWP-003)",
+   "findings": 1935,
+   "baselined": 1935,
+   "new": 0,
+   "strict": 0,
+   "tickets": 972,
+   "due_soon": 443,
+   "id": "check-frontend-repos/FR-OLD-PATH"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-SCREEN-PERMISSION",
+   "what": "permissioned operations and a no-access state, but no screen permission (R255)",
+   "findings": 2202,
+   "baselined": 2202,
+   "new": 0,
+   "strict": 0,
+   "tickets": 917,
+   "due_soon": 428,
+   "id": "check-screen-wiring/S-SCREEN-PERMISSION"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-OP-UNREACHED",
+   "what": "a declared operation no component, overlay or transition reaches (R273)",
+   "findings": 2171,
+   "baselined": 2171,
+   "new": 0,
+   "strict": 0,
+   "tickets": 858,
+   "due_soon": 365,
+   "id": "check-screen-wiring/S-OP-UNREACHED"
+  },
+  {
+   "check": "check-cross-module-reads",
+   "rule": "XR-UNCOVERED",
+   "what": "a read of another module's table that is neither a view named for the reader nor covered by a readVia to the owner's declared query (ADR-0055 rule 2, amended 14 Oct; CHG-GEN-009)",
+   "findings": 921,
+   "baselined": 921,
+   "new": 0,
+   "strict": 0,
+   "tickets": 758,
+   "due_soon": 341,
+   "id": "check-cross-module-reads/XR-UNCOVERED"
+  },
+  {
+   "check": "check-storage-promises",
+   "rule": "SP-KEY-UNDECLARED",
+   "what": "a NOT NULL key into its own database is a naming convention, not declared (CR-069, CR-013)",
+   "findings": 389,
+   "baselined": 389,
+   "new": 0,
+   "strict": 0,
+   "tickets": 561,
+   "due_soon": 268,
+   "id": "check-storage-promises/SP-KEY-UNDECLARED"
+  },
+  {
+   "check": "check-wireframe-coverage",
+   "rule": "W-NO-DESIGN",
+   "what": "a screen with no design source of any kind (R252)",
+   "findings": 300,
+   "baselined": 300,
+   "new": 0,
+   "strict": 0,
+   "tickets": 474,
+   "due_soon": 257,
+   "id": "check-wireframe-coverage/W-NO-DESIGN"
+  },
+  {
+   "check": "check-parameter-columns",
+   "rule": "P-PARAM-NO-COLUMN",
+   "what": "an <x>Id path or query parameter that no table in the operation's lineage can match (Sprint 1-2 judging, 4 October 2026)",
+   "findings": 102,
+   "baselined": 102,
+   "new": 0,
+   "strict": 0,
+   "tickets": 468,
+   "due_soon": 235,
+   "id": "check-parameter-columns/P-PARAM-NO-COLUMN"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-ERROR-PROBLEM-TYPE",
+   "what": "an inline error response names no problem type (R075 R133)",
+   "findings": 569,
+   "baselined": 569,
+   "new": 0,
+   "strict": 0,
+   "tickets": 490,
+   "due_soon": 212,
+   "id": "check-contract-shapes/C-ERROR-PROBLEM-TYPE"
+  },
+  {
+   "check": "check-request-fields-stored",
+   "rule": "RF-REQUEST-NOT-STORED",
+   "what": "a configuration write's request field is not on its persisted resource, has no column in a table it writes, and is not marked x-ticvai-persisted: false (CR-082)",
+   "findings": 68,
+   "baselined": 68,
+   "new": 0,
+   "strict": 0,
+   "tickets": 419,
+   "due_soon": 211,
+   "id": "check-request-fields-stored/RF-REQUEST-NOT-STORED"
+  },
+  {
+   "check": "check-rls-scope-fit",
+   "rule": "RF-TENANT-ROOT",
+   "what": "an operation below tenant reads or writes a table only the tenant root may (CR-076, CHG-GEN-010)",
+   "findings": 782,
+   "baselined": 781,
+   "new": 1,
+   "strict": 0,
+   "tickets": 511,
+   "due_soon": 198,
+   "id": "check-rls-scope-fit/RF-TENANT-ROOT"
+  },
+  {
+   "check": "check-contract-storage",
+   "rule": "ST-FIELD-NO-COLUMN",
+   "what": "a persisted schema's field has no column or child table (R086 R099 R107 ... R248)",
+   "findings": 171,
+   "baselined": 171,
+   "new": 0,
+   "strict": 0,
+   "tickets": 356,
+   "due_soon": 171,
+   "id": "check-contract-storage/ST-FIELD-NO-COLUMN"
+  },
+  {
+   "check": "check-parameter-columns",
+   "rule": "P-NAMED-TABLE",
+   "what": "a table the operation's description names that its lineage neither reads nor writes",
+   "findings": 61,
+   "baselined": 57,
+   "new": 4,
+   "strict": 0,
+   "tickets": 342,
+   "due_soon": 159,
+   "id": "check-parameter-columns/P-NAMED-TABLE"
+  },
+  {
+   "check": "check-storage-promises",
+   "rule": "SP-ARRAY-NOWHERE",
+   "what": "a persisted schema's array of objects has no column and no child table (CR-073, R179)",
+   "findings": 138,
+   "baselined": 138,
+   "new": 0,
+   "strict": 0,
+   "tickets": 337,
+   "due_soon": 155,
+   "id": "check-storage-promises/SP-ARRAY-NOWHERE"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-PAGED-ORDER",
+   "what": "a cursor-paged list that states no order naming the field it sorts on (R154, CHG-GEN-002)",
+   "findings": 403,
+   "baselined": 403,
+   "new": 0,
+   "strict": 0,
+   "tickets": 449,
+   "due_soon": 134,
+   "id": "check-contract-shapes/C-PAGED-ORDER"
+  },
+  {
+   "check": "check-stored-request-fields",
+   "rule": "SR-STORED-NO-COLUMN",
+   "what": "a request field the contract says is stored reaches no column the lineage writes (ADAM CR-078, 14 October 2026)",
+   "findings": 12,
+   "baselined": 12,
+   "new": 0,
+   "strict": 0,
+   "tickets": 242,
+   "due_soon": 131,
+   "id": "check-stored-request-fields/SR-STORED-NO-COLUMN"
+  },
+  {
+   "check": "check-ddl-conventions",
+   "rule": "D-NAMING",
+   "what": "a boolean not read as an assertion, or an index/FK name off naming-and-style 6.1 (R093 R119)",
+   "findings": 211,
+   "baselined": 211,
+   "new": 0,
+   "strict": 0,
+   "tickets": 290,
+   "due_soon": 122,
+   "id": "check-ddl-conventions/D-NAMING"
+  },
+  {
+   "check": "check-storage-promises",
+   "rule": "SP-KEY-TENANT-FALLBACK",
+   "what": "an undeclared key left a table written below tenant at the tenant-root policy while its parent is scoped (CR-090)",
+   "findings": 45,
+   "baselined": 43,
+   "new": 2,
+   "strict": 2,
+   "tickets": 271,
+   "due_soon": 120,
+   "id": "check-storage-promises/SP-KEY-TENANT-FALLBACK"
+  },
+  {
+   "check": "check-parameter-columns",
+   "rule": "P-DRAFTED-UNMAPPED",
+   "what": "a drafted write whose request schema says no table stores it while its lineage writes one",
+   "findings": 65,
+   "baselined": 65,
+   "new": 0,
+   "strict": 0,
+   "tickets": 212,
+   "due_soon": 115,
+   "id": "check-parameter-columns/P-DRAFTED-UNMAPPED"
+  },
+  {
+   "check": "check-audience-match",
+   "rule": "AM-TICKET-OP",
+   "what": "an app's feature ticket lists an operation that app's audience may not call (#27741, CHG-SWP-002)",
+   "findings": 142,
+   "baselined": 137,
+   "new": 5,
+   "strict": 1,
+   "tickets": 196,
+   "due_soon": 114,
+   "id": "check-audience-match/AM-TICKET-OP"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-NO-ADDRESS",
+   "what": "a PUT/PATCH/DELETE with no path key and no x-ticvai-singleton (R162 R103)",
+   "findings": 363,
+   "baselined": 363,
+   "new": 0,
+   "strict": 0,
+   "tickets": 220,
+   "due_soon": 104,
+   "id": "check-contract-shapes/C-NO-ADDRESS"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-STATE-BOILERPLATE",
+   "what": "empty-state text promises a create action, filter or permission the screen lacks (R250)",
+   "findings": 2331,
+   "baselined": 2331,
+   "new": 0,
+   "strict": 0,
+   "tickets": 180,
+   "due_soon": 101,
+   "id": "check-screen-wiring/S-STATE-BOILERPLATE"
+  },
+  {
+   "check": "check-navigation",
+   "rule": "N-TWIN-OPS",
+   "what": "guest web and app twins call different operations, unsanctioned (R281)",
+   "findings": 30,
+   "baselined": 30,
+   "new": 0,
+   "strict": 0,
+   "tickets": 225,
+   "due_soon": 96,
+   "id": "check-navigation/N-TWIN-OPS"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-PURPOSE-BOILERPLATE",
+   "what": "a screen purpose that is a generator template or a pasted board placeholder (CHG-WIR-003)",
+   "findings": 81,
+   "baselined": 81,
+   "new": 0,
+   "strict": 0,
+   "tickets": 238,
+   "due_soon": 93,
+   "id": "check-screen-wiring/S-PURPOSE-BOILERPLATE"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-PURPOSE-TEMPLATE",
+   "what": "an api purpose that is the operationId, empty, or template text (R260)",
+   "findings": 40,
+   "baselined": 40,
+   "new": 0,
+   "strict": 0,
+   "tickets": 203,
+   "due_soon": 92,
+   "id": "check-screen-wiring/S-PURPOSE-TEMPLATE"
+  },
+  {
+   "check": "check-ddl-conventions",
+   "rule": "D-FK-TARGET-NAME",
+   "what": "a declared key whose column names a different table than it references (R082)",
+   "findings": 12,
+   "baselined": 12,
+   "new": 0,
+   "strict": 0,
+   "tickets": 164,
+   "due_soon": 86,
+   "id": "check-ddl-conventions/D-FK-TARGET-NAME"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-BUTTON-FORM",
+   "what": "a button calls an operation with a required body and nothing collects it (R264)",
+   "findings": 67,
+   "baselined": 67,
+   "new": 0,
+   "strict": 0,
+   "tickets": 182,
+   "due_soon": 78,
+   "id": "check-screen-wiring/S-BUTTON-FORM"
+  },
+  {
+   "check": "check-error-sources",
+   "rule": "E-READ-VIA",
+   "what": "a 4xx naming another module's entity has an x-ticvai-read-via to that module's query (ADAM CR-084)",
+   "findings": 88,
+   "baselined": 88,
+   "new": 0,
+   "strict": 0,
+   "tickets": 160,
+   "due_soon": 68,
+   "id": "check-error-sources/E-READ-VIA"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-ACTION-409",
+   "what": "a POST action on an item declares no 409 for the wrong state (R078 R095)",
+   "findings": 121,
+   "baselined": 121,
+   "new": 0,
+   "strict": 0,
+   "tickets": 168,
+   "due_soon": 67,
+   "id": "check-contract-shapes/C-ACTION-409"
+  },
+  {
+   "check": "check-rls-scope-fit",
+   "rule": "RF-OWNED-ABOVE",
+   "what": "an operation below tenant reads a scope_path table written only at tenant, without read-beneath (R183, CR-076)",
+   "findings": 127,
+   "baselined": 126,
+   "new": 1,
+   "strict": 0,
+   "tickets": 209,
+   "due_soon": 66,
+   "id": "check-rls-scope-fit/RF-OWNED-ABOVE"
+  },
+  {
+   "check": "check-error-sources",
+   "rule": "E-PROBLEM-TYPE",
+   "what": "a 4xx naming another module's entity declares x-ticvai-problem-types (ADAM CR-084)",
+   "findings": 60,
+   "baselined": 60,
+   "new": 0,
+   "strict": 0,
+   "tickets": 138,
+   "due_soon": 61,
+   "id": "check-error-sources/E-PROBLEM-TYPE"
+  },
+  {
+   "check": "check-cross-module-reads",
+   "rule": "XR-FOUNDATION",
+   "what": "Identity reads a module above it other than through a projection (ADR-0028 tiers)",
+   "findings": 7,
+   "baselined": 7,
+   "new": 0,
+   "strict": 0,
+   "tickets": 103,
+   "due_soon": 60,
+   "id": "check-cross-module-reads/XR-FOUNDATION"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-ASYNC-POLL",
+   "what": "a 202 operation with no read on the screen to follow it (R288)",
+   "findings": 44,
+   "baselined": 44,
+   "new": 0,
+   "strict": 0,
+   "tickets": 125,
+   "due_soon": 53,
+   "id": "check-screen-wiring/S-ASYNC-POLL"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-DUP-REGION",
+   "what": "a region name used twice on one screen (R253)",
+   "findings": 212,
+   "baselined": 212,
+   "new": 0,
+   "strict": 0,
+   "tickets": 118,
+   "due_soon": 52,
+   "id": "check-screen-wiring/S-DUP-REGION"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-OFFLINE-REFUSED",
+   "what": "an offline app's screen refuses offline a write its contract marks offline-capable (4.4, CHG-SWP-004)",
+   "findings": 19,
+   "baselined": 19,
+   "new": 0,
+   "strict": 0,
+   "tickets": 112,
+   "due_soon": 45,
+   "id": "check-screen-wiring/S-OFFLINE-REFUSED"
+  },
+  {
+   "check": "check-contract-storage",
+   "rule": "ST-SECRET-FORM",
+   "what": "a stored write-only token, secret, credential, password or PIN that does not say how it is stored (x-ticvai-secret; ADR-0063, ADR-0071) (CHG-MKT-001, CR-086)",
+   "findings": 17,
+   "baselined": 17,
+   "new": 0,
+   "strict": 0,
+   "tickets": 68,
+   "due_soon": 45,
+   "id": "check-contract-storage/ST-SECRET-FORM"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-OFFLINE-QUEUED",
+   "what": "a screen promises to queue a write that is not offline-capable, or a web app's screen queues (4.4, CHG-SWP-004)",
+   "findings": 29,
+   "baselined": 29,
+   "new": 0,
+   "strict": 0,
+   "tickets": 120,
+   "due_soon": 43,
+   "id": "check-screen-wiring/S-OFFLINE-QUEUED"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-WORKSTATION-OP",
+   "what": "a workstation-scoped operation on a platform nobody signs a workstation into (R100)",
+   "findings": 41,
+   "baselined": 41,
+   "new": 0,
+   "strict": 0,
+   "tickets": 73,
+   "due_soon": 42,
+   "id": "check-screen-wiring/S-WORKSTATION-OP"
+  },
+  {
+   "check": "adam-pull",
+   "rule": "links ADAM cannot resolve",
+   "what": "links ADAM cannot resolve",
+   "findings": 55,
+   "baselined": 0,
+   "new": 55,
+   "strict": 0,
+   "tickets": 55,
+   "due_soon": 38,
+   "id": "adam-pull/links ADAM cannot resolve"
+  },
+  {
+   "check": "adam-pull",
+   "rule": "feature: nothing linked",
+   "what": "feature: nothing linked",
+   "findings": 123,
+   "baselined": 0,
+   "new": 123,
+   "strict": 0,
+   "tickets": 123,
+   "due_soon": 34,
+   "id": "adam-pull/feature: nothing linked"
+  },
+  {
+   "check": "check-storage-promises",
+   "rule": "SP-KEY-GUESSED",
+   "what": "a convention key the name rule pointed into another module's table (CR-070, CR-013)",
+   "findings": 10,
+   "baselined": 10,
+   "new": 0,
+   "strict": 0,
+   "tickets": 83,
+   "due_soon": 34,
+   "id": "check-storage-promises/SP-KEY-GUESSED"
+  },
+  {
+   "check": "check-preauth-session",
+   "rule": "PS-UNDECLARED-SIGNIN",
+   "what": "pre-sign-in screen loads the guest's own record without declaring sign-in",
+   "findings": 18,
+   "baselined": 0,
+   "new": 18,
+   "strict": 0,
+   "tickets": 100,
+   "due_soon": 33,
+   "id": "check-preauth-session/PS-UNDECLARED-SIGNIN"
+  },
+  {
+   "check": "check-wireframe-coverage",
+   "rule": "W-INCOMING-UNLINKED",
+   "what": "a drawn frame in wireframes/incoming/ its screen record never names (R258)",
+   "findings": 17,
+   "baselined": 17,
+   "new": 0,
+   "strict": 0,
+   "tickets": 73,
+   "due_soon": 33,
+   "id": "check-wireframe-coverage/W-INCOMING-UNLINKED"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-CODE-409",
+   "what": "a create that takes a business code declares no 409 for a duplicate (R108, CHG-R4-015)",
+   "findings": 39,
+   "baselined": 39,
+   "new": 0,
+   "strict": 0,
+   "tickets": 67,
+   "due_soon": 33,
+   "id": "check-contract-shapes/C-CODE-409"
+  },
+  {
+   "check": "check-navigation",
+   "rule": "N-CARRIES-HELD",
+   "what": "a transition carries an id the source screen does not hold (R251 R262)",
+   "findings": 7,
+   "baselined": 7,
+   "new": 0,
+   "strict": 0,
+   "tickets": 51,
+   "due_soon": 33,
+   "id": "check-navigation/N-CARRIES-HELD"
+  },
+  {
+   "check": "check-contract-storage",
+   "rule": "ST-REQUIRED-MISMATCH",
+   "what": "a required field in a nullable column, or NOT NULL for an optional one (R089)",
+   "findings": 33,
+   "baselined": 33,
+   "new": 0,
+   "strict": 0,
+   "tickets": 76,
+   "due_soon": 32,
+   "id": "check-contract-storage/ST-REQUIRED-MISMATCH"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-OFFLINE-CLAIM",
+   "what": "an offline state promising queued writes no operation is offline-capable for (R257)",
+   "findings": 19,
+   "baselined": 19,
+   "new": 0,
+   "strict": 0,
+   "tickets": 59,
+   "due_soon": 30,
+   "id": "check-screen-wiring/S-OFFLINE-CLAIM"
+  },
+  {
+   "check": "check-ddl-conventions",
+   "rule": "D-DOUBLE-KEY",
+   "what": "a second key to one parent for one concept, or a key named for a renamed table (R102 R160)",
+   "findings": 2,
+   "baselined": 2,
+   "new": 0,
+   "strict": 0,
+   "tickets": 40,
+   "due_soon": 29,
+   "id": "check-ddl-conventions/D-DOUBLE-KEY"
+  },
+  {
+   "check": "check-error-sources",
+   "rule": "E-SCHEMA-READ-VIA",
+   "what": "a 4xx defined in its response schema by another module's entity declares problem types and a read-via to that module's query (ADAM CR-085)",
+   "findings": 12,
+   "baselined": 12,
+   "new": 0,
+   "strict": 0,
+   "tickets": 43,
+   "due_soon": 27,
+   "id": "check-error-sources/E-SCHEMA-READ-VIA"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-PAGED-STATUS",
+   "what": "a paged list of items whose status can end (revoked, cancelled ...) that says neither which statuses it returns nor takes a status filter (ADAM CR-088, CHG-MKT-003)",
+   "findings": 30,
+   "baselined": 30,
+   "new": 0,
+   "strict": 0,
+   "tickets": 81,
+   "due_soon": 26,
+   "id": "check-contract-shapes/C-PAGED-STATUS"
+  },
+  {
+   "check": "adam-pull",
+   "rule": "task: nothing linked",
+   "what": "task: nothing linked",
+   "findings": 29,
+   "baselined": 0,
+   "new": 29,
+   "strict": 0,
+   "tickets": 29,
+   "due_soon": 26,
+   "id": "adam-pull/task: nothing linked"
+  },
+  {
+   "check": "check-error-sources",
+   "rule": "E-UNFED",
+   "what": "a projection-served query's projection hears of every change that moves a record in or out (CHG-GDL-003)",
+   "findings": 1,
+   "baselined": 1,
+   "new": 0,
+   "strict": 0,
+   "tickets": 50,
+   "due_soon": 25,
+   "id": "check-error-sources/E-UNFED"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-REQUEST-SERVER-FIELDS",
+   "what": "a write body requires server-owned fields not marked readOnly (R079)",
+   "findings": 96,
+   "baselined": 96,
+   "new": 0,
+   "strict": 0,
+   "tickets": 86,
+   "due_soon": 24,
+   "id": "check-contract-shapes/C-REQUEST-SERVER-FIELDS"
+  },
+  {
+   "check": "check-ddl-conventions",
+   "rule": "D-CHILD-PARENT",
+   "what": "an item, line, amendment or media table whose key to its parent is not a NOT NULL declared reference (CHG-R6-004..006, CR-007 CR-009 CR-010)",
+   "findings": 5,
+   "baselined": 5,
+   "new": 0,
+   "strict": 0,
+   "tickets": 53,
+   "due_soon": 24,
+   "id": "check-ddl-conventions/D-CHILD-PARENT"
+  },
+  {
+   "check": "check-ddl-conventions",
+   "rule": "D-RENAME-RESIDUE",
+   "what": "a DDL comment or contract description naming a table by its pre-rename name (R160)",
+   "findings": 5,
+   "baselined": 5,
+   "new": 0,
+   "strict": 0,
+   "tickets": 48,
+   "due_soon": 24,
+   "id": "check-ddl-conventions/D-RENAME-RESIDUE"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-METRIC-NO-OP",
+   "what": "a metric tile with no operation and no binding (R283)",
+   "findings": 1058,
+   "baselined": 1058,
+   "new": 0,
+   "strict": 0,
+   "tickets": 74,
+   "due_soon": 22,
+   "id": "check-screen-wiring/S-METRIC-NO-OP"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-PANEL-ENTITY",
+   "what": "a list and its detail panel bound to different entities (R256)",
+   "findings": 8,
+   "baselined": 8,
+   "new": 0,
+   "strict": 0,
+   "tickets": 29,
+   "due_soon": 19,
+   "id": "check-screen-wiring/S-PANEL-ENTITY"
+  },
+  {
+   "check": "check-contract-storage",
+   "rule": "ST-OFFLINE-RECORDED-AT",
+   "what": "an offline-capable write persists to a table with no recorded_at (R113)",
+   "findings": 9,
+   "baselined": 9,
+   "new": 0,
+   "strict": 0,
+   "tickets": 31,
+   "due_soon": 17,
+   "id": "check-contract-storage/ST-OFFLINE-RECORDED-AT"
+  },
+  {
+   "check": "check-stored-request-fields",
+   "rule": "SR-STUB-WRITE",
+   "what": "a write into a table holding only keys, with request fields that reach no written column (ADAM CR-078: createPrincipal.initialCredential, mustChangeCredential)",
+   "findings": 7,
+   "baselined": 7,
+   "new": 0,
+   "strict": 0,
+   "tickets": 21,
+   "due_soon": 15,
+   "id": "check-stored-request-fields/SR-STUB-WRITE"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-DUP-SCREEN",
+   "what": "two screens on one platform with the same operations and no stated division (R276)",
+   "findings": 74,
+   "baselined": 74,
+   "new": 0,
+   "strict": 0,
+   "tickets": 40,
+   "due_soon": 14,
+   "id": "check-screen-wiring/S-DUP-SCREEN"
+  },
+  {
+   "check": "check-preauth-session",
+   "rule": "PS-LOAD-NEEDS-SESSION",
+   "what": "pre-sign-in screen loads an operation that needs a session",
+   "findings": 5,
+   "baselined": 0,
+   "new": 5,
+   "strict": 0,
+   "tickets": 43,
+   "due_soon": 13,
+   "id": "check-preauth-session/PS-LOAD-NEEDS-SESSION"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-UPLOAD",
+   "what": "a write takes a file reference and the screen has no upload (R196)",
+   "findings": 32,
+   "baselined": 32,
+   "new": 0,
+   "strict": 0,
+   "tickets": 58,
+   "due_soon": 11,
+   "id": "check-screen-wiring/S-UPLOAD"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-GUEST-INTERNAL",
+   "what": "a guest-callable read returns principal ids or internal fields (R164)",
+   "findings": 2,
+   "baselined": 2,
+   "new": 0,
+   "strict": 0,
+   "tickets": 28,
+   "due_soon": 11,
+   "id": "check-contract-shapes/C-GUEST-INTERNAL"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-ONLOAD-WRITE",
+   "what": "a write operation triggered onLoad (R268)",
+   "findings": 3,
+   "baselined": 3,
+   "new": 0,
+   "strict": 0,
+   "tickets": 22,
+   "due_soon": 9,
+   "id": "check-screen-wiring/S-ONLOAD-WRITE"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-NO-READ",
+   "what": "a screen that edits (PUT/PATCH) and reads nothing (R265)",
+   "findings": 223,
+   "baselined": 223,
+   "new": 0,
+   "strict": 0,
+   "tickets": 11,
+   "due_soon": 9,
+   "id": "check-screen-wiring/S-NO-READ"
+  },
+  {
+   "check": "check-storage-promises",
+   "rule": "SP-DUPLICATE-409",
+   "what": "a 409 for a code already in use has no x-ticvai-unique at the level it names (CR-068, CR-074)",
+   "findings": 15,
+   "baselined": 15,
+   "new": 0,
+   "strict": 0,
+   "tickets": 22,
+   "due_soon": 8,
+   "id": "check-storage-promises/SP-DUPLICATE-409"
+  },
+  {
+   "check": "check-plan-owners",
+   "rule": "O-SELF-TEST",
+   "what": "a module test owned by its app-module's main builder (block-test-strategy; CHG-R4-005)",
+   "findings": 22,
+   "baselined": 20,
+   "new": 2,
+   "strict": 0,
+   "tickets": 20,
+   "due_soon": 8,
+   "id": "check-plan-owners/O-SELF-TEST"
+  },
+  {
+   "check": "check-plan-closure",
+   "rule": "C-REACH",
+   "what": "a Block A screen is reached from its app's entry only through screens outside Block A (CHG-RONEP-006)",
+   "findings": 17,
+   "baselined": 0,
+   "new": 17,
+   "strict": 0,
+   "tickets": 18,
+   "due_soon": 6,
+   "id": "check-plan-closure/C-REACH"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-PATCH-FULL-BODY",
+   "what": "a PATCH body is the full resource schema with its required list (ADAM CR-089, CHG-CNS-001)",
+   "findings": 4,
+   "baselined": 4,
+   "new": 0,
+   "strict": 0,
+   "tickets": 10,
+   "due_soon": 6,
+   "id": "check-contract-shapes/C-PATCH-FULL-BODY"
+  },
+  {
+   "check": "check-contract-storage",
+   "rule": "ST-TYPE-MISMATCH",
+   "what": "a field and its column disagree on type (integer[] vs text[], boolean vs text) (R227)",
+   "findings": 1,
+   "baselined": 1,
+   "new": 0,
+   "strict": 0,
+   "tickets": 6,
+   "due_soon": 6,
+   "id": "check-contract-storage/ST-TYPE-MISMATCH"
+  },
+  {
+   "check": "check-ddl-conventions",
+   "rule": "D-STUB-TABLE",
+   "what": "a table holding only keys (R087); one the lineage writes cannot be baselined (CHG-GEN-003, CR-078 CR-080)",
+   "findings": 4,
+   "baselined": 4,
+   "new": 0,
+   "strict": 0,
+   "tickets": 10,
+   "due_soon": 5,
+   "id": "check-ddl-conventions/D-STUB-TABLE"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-SEARCH-PARAM",
+   "what": "a search/q parameter that says nothing about what it matches (R182)",
+   "findings": 3,
+   "baselined": 3,
+   "new": 0,
+   "strict": 0,
+   "tickets": 16,
+   "due_soon": 4,
+   "id": "check-contract-shapes/C-SEARCH-PARAM"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-EXPORT",
+   "what": "an Export control with no operation behind it (R293)",
+   "findings": 9,
+   "baselined": 9,
+   "new": 0,
+   "strict": 0,
+   "tickets": 9,
+   "due_soon": 4,
+   "id": "check-screen-wiring/S-EXPORT"
+  },
+  {
+   "check": "check-contract-storage",
+   "rule": "ST-ENUM-CHECK",
+   "what": "an enum field stored in a text column with no CHECK (R151)",
+   "findings": 2,
+   "baselined": 2,
+   "new": 0,
+   "strict": 0,
+   "tickets": 9,
+   "due_soon": 4,
+   "id": "check-contract-storage/ST-ENUM-CHECK"
+  },
+  {
+   "check": "check-plan-closure",
+   "rule": "C-GONE",
+   "what": "an artefact the last released plan built is built by no task, with no recorded reason (CHG-RONEP-002)",
+   "findings": 4,
+   "baselined": 0,
+   "new": 4,
+   "strict": 0,
+   "tickets": 7,
+   "due_soon": 4,
+   "id": "check-plan-closure/C-GONE"
+  },
+  {
+   "check": "check-ticket-scope",
+   "rule": "S-SCREEN-OP-UNBUILT",
+   "what": "a frontend ticket's screen calls an operation neither its feature nor its dependencies build (CHG-SWP-001)",
+   "findings": 6,
+   "baselined": 6,
+   "new": 0,
+   "strict": 0,
+   "tickets": 6,
+   "due_soon": 4,
+   "id": "check-ticket-scope/S-SCREEN-OP-UNBUILT"
+  },
+  {
+   "check": "check-stored-request-fields",
+   "rule": "SR-SECRET-UNHASHED",
+   "what": "a writeOnly credential field neither compared-only nor stored as a *_hash column (ADR-0071)",
+   "findings": 1,
+   "baselined": 1,
+   "new": 0,
+   "strict": 0,
+   "tickets": 4,
+   "due_soon": 4,
+   "id": "check-stored-request-fields/SR-SECRET-UNHASHED"
+  },
+  {
+   "check": "check-audience-match",
+   "rule": "AM-GUEST-SECURITY",
+   "what": "operation declares a guest audience its security lets no guest call",
+   "findings": 4,
+   "baselined": 4,
+   "new": 0,
+   "strict": 0,
+   "tickets": 6,
+   "due_soon": 3,
+   "id": "check-audience-match/AM-GUEST-SECURITY"
+  },
+  {
+   "check": "check-audience-match",
+   "rule": "AM-STAFF-OP",
+   "what": "staff screen binds an operation staff may not call",
+   "findings": 6,
+   "baselined": 6,
+   "new": 0,
+   "strict": 0,
+   "tickets": 4,
+   "due_soon": 3,
+   "id": "check-audience-match/AM-STAFF-OP"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-STAFF-AUDIENCE",
+   "what": "a staff screen calls an operation whose audience has no staff: guest-, device-, service- or partner-only (R254, CHG-WIR-001)",
+   "findings": 6,
+   "baselined": 6,
+   "new": 0,
+   "strict": 0,
+   "tickets": 4,
+   "due_soon": 3,
+   "id": "check-screen-wiring/S-STAFF-AUDIENCE"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-UNTYPED-BODY",
+   "what": "a request or 2xx body that is a bare object (R088)",
+   "findings": 8,
+   "baselined": 8,
+   "new": 0,
+   "strict": 0,
+   "tickets": 4,
+   "due_soon": 1,
+   "id": "check-contract-shapes/C-UNTYPED-BODY"
+  },
+  {
+   "check": "check-ddl-conventions",
+   "rule": "D-MIG-ORDER",
+   "what": "a MIG ticket Follows a migration that MIGRATIONS.md orders after it (R051 R056)",
+   "findings": 1,
+   "baselined": 1,
+   "new": 0,
+   "strict": 0,
+   "tickets": 1,
+   "due_soon": 1,
+   "id": "check-ddl-conventions/D-MIG-ORDER"
+  },
+  {
+   "check": "check-starter-fit",
+   "rule": "SF-DONE-GATES",
+   "what": "a Done-when gate names a command or runner the starter cannot run (R027 R032 R034)",
+   "findings": 1,
+   "baselined": 1,
+   "new": 0,
+   "strict": 0,
+   "tickets": 1,
+   "due_soon": 1,
+   "id": "check-starter-fit/SF-DONE-GATES"
+  },
+  {
+   "check": "check-migration-tickets",
+   "rule": "M-FILE-ORDER",
+   "what": "a migration depends on one with a higher file number (CHG-TBF-002)",
+   "findings": 7,
+   "baselined": 0,
+   "new": 7,
+   "strict": 0,
+   "tickets": 4,
+   "due_soon": 0,
+   "id": "check-migration-tickets/M-FILE-ORDER"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-TWO-IDEMPOTENCY",
+   "what": "a body idempotency key beside the Idempotency-Key header (R153)",
+   "findings": 3,
+   "baselined": 3,
+   "new": 0,
+   "strict": 0,
+   "tickets": 1,
+   "due_soon": 0,
+   "id": "check-contract-shapes/C-TWO-IDEMPOTENCY"
+  },
+  {
+   "check": "check-glossary-terms",
+   "rule": "G-BANNED-NAME",
+   "what": "a contract schema, field or operation named with a word the glossary bans (R131 R145 R147 R155 R156 R165 R190 R193 R194 R195 R210 R211 R220 R221)",
+   "findings": 202,
+   "baselined": 202,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-glossary-terms/G-BANNED-NAME"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-ENUM-OTHER",
+   "what": "an enum carries 'other' with no note field beside it (R222, decided 28 Sep)",
+   "findings": 98,
+   "baselined": 98,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-contract-shapes/C-ENUM-OTHER"
+  },
+  {
+   "check": "check-cited-sources",
+   "rule": "CS-MISSING",
+   "what": "a decision document cites a file git does not track",
+   "findings": 26,
+   "baselined": 26,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-cited-sources/CS-MISSING"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-MONEY-NUMBER",
+   "what": "a money-named field typed number/integer, not Money (R122 R177)",
+   "findings": 12,
+   "baselined": 12,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-contract-shapes/C-MONEY-NUMBER"
+  },
+  {
+   "check": "check-cited-sources",
+   "rule": "CS-OUTSIDE-GIT",
+   "what": "a decision document cites a path under audit/ or a scratchpad (outside git)",
+   "findings": 8,
+   "baselined": 8,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-cited-sources/CS-OUTSIDE-GIT"
+  },
+  {
+   "check": "check-device-tiers",
+   "rule": "D-TIER-A-UNPLANNED",
+   "what": "an ADR-0015 Tier A device class no planned task builds and no deferral explains (CHG-R4-002)",
+   "findings": 8,
+   "baselined": 8,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-device-tiers/D-TIER-A-UNPLANNED"
+  },
+  {
+   "check": "check-frontend-repos",
+   "rule": "FR-LAYOUT-UNCONFIRMED",
+   "what": "a repository's layout is assumed and nothing observed is recorded (CHG-SWP-003)",
+   "findings": 6,
+   "baselined": 6,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-frontend-repos/FR-LAYOUT-UNCONFIRMED"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-COLOUR-PATTERN",
+   "what": "a colour field typed string with no pattern (R246)",
+   "findings": 4,
+   "baselined": 4,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-contract-shapes/C-COLOUR-PATTERN"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-NAME-LOCALISED",
+   "what": "an entity localises other text but not its name (CHG-R4-011)",
+   "findings": 4,
+   "baselined": 4,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-contract-shapes/C-NAME-LOCALISED"
+  },
+  {
+   "check": "check-contract-shapes",
+   "rule": "C-ENUM-NON-STRING",
+   "what": "an enum value that YAML reads as a boolean (R238)",
+   "findings": 1,
+   "baselined": 1,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-contract-shapes/C-ENUM-NON-STRING"
+  },
+  {
+   "check": "check-screen-wiring",
+   "rule": "S-GUEST-AUDIENCE",
+   "what": "a guest screen calls an operation whose audience has no guest (R167 R289 R072)",
+   "findings": 1,
+   "baselined": 1,
+   "new": 0,
+   "strict": 0,
+   "tickets": 0,
+   "due_soon": 0,
+   "id": "check-screen-wiring/S-GUEST-AUDIENCE"
+  }
+ ],
+ "other_checks": [
+  {
+   "script": "check-ai-residency.py",
+   "rc": 0,
+   "lines": 1
+  },
+  {
+   "script": "check-authored-inputs.py",
+   "rc": 1,
+   "lines": 28
+  },
+  {
+   "script": "check-backlog.py",
+   "rc": 0,
+   "lines": 4
+  },
+  {
+   "script": "check-binding-ratchet.py",
+   "rc": 1,
+   "lines": 11
+  },
+  {
+   "script": "check-bindings.py",
+   "rc": 1,
+   "lines": 56
+  },
+  {
+   "script": "check-board-flows.py",
+   "rc": 0,
+   "lines": 13
+  },
+  {
+   "script": "check-business-rules.py",
+   "rc": 0,
+   "lines": 20
+  },
+  {
+   "script": "check-changelog.py",
+   "rc": 0,
+   "lines": 15
+  },
+  {
+   "script": "check-channel-config.py",
+   "rc": 0,
+   "lines": 2
+  },
+  {
+   "script": "check-config-scope.py",
+   "rc": 1,
+   "lines": 10
+  },
+  {
+   "script": "check-console-grant.py",
+   "rc": 0,
+   "lines": 1
+  },
+  {
+   "script": "check-contract-compat.py",
+   "rc": 0,
+   "lines": 68
+  },
+  {
+   "script": "check-contract-split.py",
+   "rc": 0,
+   "lines": 233
+  },
+  {
+   "script": "check-cross-deployable-writes.py",
+   "rc": 0,
+   "lines": 2
+  },
+  {
+   "script": "check-design-notes.py",
+   "rc": 0,
+   "lines": 1
+  },
+  {
+   "script": "check-doc-tables.py",
+   "rc": 1,
+   "lines": 18
+  },
+  {
+   "script": "check-finance-rules.py",
+   "rc": 0,
+   "lines": 1
+  },
+  {
+   "script": "check-flow-briefs.py",
+   "rc": 0,
+   "lines": 11
+  },
+  {
+   "script": "check-flows.py",
+   "rc": 0,
+   "lines": 326
+  },
+  {
+   "script": "check-frontend.py",
+   "rc": 0,
+   "lines": 19
+  },
+  {
+   "script": "check-key-stability.py",
+   "rc": 1,
+   "lines": 89
+  },
+  {
+   "script": "check-lineage.py",
+   "rc": 0,
+   "lines": 10
+  },
+  {
+   "script": "check-load-targets.py",
+   "rc": 0,
+   "lines": 2
+  },
+  {
+   "script": "check-migration-freeze.py",
+   "rc": 0,
+   "lines": 15
+  },
+  {
+   "script": "check-migrations.py",
+   "rc": 0,
+   "lines": 361
+  },
+  {
+   "script": "check-output-paths.py",
+   "rc": 0,
+   "lines": 49
+  },
+  {
+   "script": "check-package.py",
+   "rc": 1,
+   "lines": 29
+  },
+  {
+   "script": "check-problem-types.py",
+   "rc": 0,
+   "lines": 1
+  },
+  {
+   "script": "check-promises-kept.py",
+   "rc": 0,
+   "lines": 2
+  },
+  {
+   "script": "check-r1-additions.py",
+   "rc": 0,
+   "lines": 8
+  },
+  {
+   "script": "check-rfp-coverage.py",
+   "rc": 0,
+   "lines": 176
+  },
+  {
+   "script": "check-screen-patterns.py",
+   "rc": 1,
+   "lines": 80
+  },
+  {
+   "script": "check-screen-permissions.py",
+   "rc": 0,
+   "lines": 2
+  },
+  {
+   "script": "check-screen-redundancy.py",
+   "rc": 0,
+   "lines": 50
+  },
+  {
+   "script": "check-screens.py",
+   "rc": 0,
+   "lines": 1371
+  },
+  {
+   "script": "check-session-entry.py",
+   "rc": 0,
+   "lines": 9
+  },
+  {
+   "script": "check-spec-coverage.py",
+   "rc": 0,
+   "lines": 144
+  },
+  {
+   "script": "check-states.py",
+   "rc": 0,
+   "lines": 558
+  },
+  {
+   "script": "check-step-up.py",
+   "rc": 0,
+   "lines": 53
+  },
+  {
+   "script": "check-terraform-pools.py",
+   "rc": 0,
+   "lines": 2
+  },
+  {
+   "script": "check-traceability.py",
+   "rc": 0,
+   "lines": 5
+  },
+  {
+   "script": "check-wireframes.py",
+   "rc": 0,
+   "lines": 5
+  },
+  {
+   "script": "check-write-lineage.py",
+   "rc": 0,
+   "lines": 13
+  }
+ ]
+}

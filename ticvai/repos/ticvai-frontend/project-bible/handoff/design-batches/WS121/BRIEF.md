@@ -1,6 +1,6 @@
 # WS121 — AI Governance board 1
 
-**10 screens · 19 operations · 25 schemas · 7 permissions**
+**10 screens · 14 operations · 21 schemas · 5 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 7 permissions apply here:
-  `AI_APPROVE, AI_CONFIGURE, AI_USE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW, TENANT_CONFIGURE, TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_APPROVE, AI_CONFIGURE, AI_USE, PLATFORM_TENANT_ACCESS, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -95,12 +95,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-519` | AI Governance Command Center | D | 6 | 10 | 7 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-519` | AI Governance Command Center | D | 6 | 210 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-520` | AI Capability Registry & Ownership | D | 20 | 21 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-521` | AI Risk Classification & Assessment | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-521` | AI Risk Classification & Assessment | D | 20 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-522` | AI Autonomy Level Configuration | D | 15 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-523` | AI Action & Permission Policy Builder | A | 30 | 19 | 7 | 1 | 0 | 5 | — | notStarted (—) |
-| `ADM-524` | AI Data Access & Usage Policy | D | 6 | 6 | 7 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-524` | AI Data Access & Usage Policy | D | 22 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-525` | Environment, Tenant & Scope Governance | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-526` | AI Policy Conflict, Exception & Override Management | D | 13 | 33 | 7 | 1 | 2 | 0 | — | notStarted (—) |
 | `ADM-527` | AI Policy Testing & Governance Simulation | A | 9 | 11 | 7 | 1 | 1 | 0 | — | notStarted (—) |

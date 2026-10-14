@@ -338,7 +338,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listContentPages · createContentPage · updateContentPage · getHomepageLayout +10</div>
+          <div><b>OPERATIONS</b> &middot; listContentPages · createContentPage · updateContentPage · getHomepageLayout +11</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; pageId&larr;navigation, actionId&larr;navigation, blockId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-012">CMS-012</a>  &mdash; <i>Previews in both directions</i></div>
@@ -368,7 +368,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createBanner · updateBanner · createPromoBlock · updatePromoBlock +6</div>
+          <div><b>OPERATIONS</b> &middot; createBanner · updateBanner · createPromoBlock · updatePromoBlock +7</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; bannerId&larr;navigation, promoBlockId&larr;navigation, actionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i></div>
@@ -610,7 +610,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getBookingFlowConfig · setBookingFlowConfig · listOrgUnits · listAnalyticsProviders +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyNoResults · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; analyticsProviderId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Tenant Workspace</i><br><a href="#cms-002">CMS-002</a>  &mdash; <i>Brand Kit</i><br><a href="#cms-003">CMS-003</a>  &mdash; <i>Typography</i><br><a href="#cms-013">CMS-013</a> <br><a href="#cms-017">CMS-017</a>  &mdash; <i>Domain &amp; Certificate</i><br><a href="#cms-018">CMS-018</a>  &mdash; <i>Consent &amp; Legal</i><br><a href="#cms-101">CMS-101</a>  &mdash; <i>Help me choose</i><br><a href="#cms-103">CMS-103</a>  &mdash; <i>Booking flows</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetBookingFlowConfig &middot; <i>Save booking flow config</i> &middot; <b>Save booking flow config</b> &middot; Cancel <span class="dis">discards preset · stepIndicator · cartLayout · cardLayout · cardSize · seatPicker · mapView · density · embedMode · heroBanner · searchInBanner · singleEventPage · quantitiesOnAddOns · cartSideInRtl · eventBannerDates · timesPerPage · dayPartFilter · dayPartBoundaries · seatViewPosition · seatTimeBar · ticketCategories · ticketTags · cardInfo · conciergeMascot · showInfoOnly · locationSwitcher · guestContactFields · dateStripDays · venueOverrides</span></div><div class="ov"><b>modal</b> formSetAnalyticsProvider &middot; <i>Save analytics platform</i> &middot; <b>Save analytics platform</b> &middot; Cancel</div></div>
@@ -880,7 +880,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listDataProcessingPurpose · setDataProcessingPurpose</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; purposeId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetDataProcessingPurpose &middot; <i>Save purpose</i> &middot; <b>Save purpose</b> &middot; Cancel</div></div>
@@ -908,7 +908,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setConsentPurposes</div>
+          <div><b>OPERATIONS</b> &middot; setConsentPurposes · listConsentPurposes</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -970,7 +970,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listCookieTrackingDigital · setTrackingTechnology · recordCookieScan · listCookieScans +4</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; scanRunId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; scanRunId&larr;navigation, scanPolicyId&larr;navigation, technologyId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetTrackingTechnology &middot; <i>Add technology</i> &middot; <b>Add technology</b> &middot; Cancel</div><div class="ov"><b>modal</b> formRecordCookieScan &middot; <i>Upload scan report</i> &middot; <b>Upload scan report</b> &middot; Cancel</div><div class="ov"><b>modal</b> formSetCookieScanPolicy &middot; <i>Save scan schedule</i> &middot; <b>Save scan schedule</b> &middot; Cancel</div></div>
@@ -1000,7 +1000,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listCookieBannerPreference · setCookieBannerDesign</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; bannerDesignId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmSetCookieBannerDesign &middot; <i>Save version</i> &middot; <b>Save version</b> &middot; Cancel</div></div>
@@ -1060,7 +1060,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listPrivacyNoticePolicy · setPrivacyNoticePolicyGovernance</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; governanceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPrivacyNoticePolicyGovernance &middot; <i>Save privacy notice policy governance</i> &middot; <b>Save privacy notice policy governance</b> &middot; Cancel <span class="dis">discards policyId · documentType · status · changeClassification · requiresReAcceptance · requiresNotification · ownerPrincipalId · approvedByPrincipalId · approvedAt</span></div></div>
@@ -1120,7 +1120,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; approvePrivacyTesting · setPrivacyNoticePolicyGovernance</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; governanceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-021">CMS-021</a> </div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetPrivacyNoticePolicyGovernance &middot; <i>Save privacy notice policy governance</i> &middot; <b>Save privacy notice policy governance</b> &middot; Cancel <span class="dis">discards policyId · documentType · status · changeClassification · requiresReAcceptance · requiresNotification · ownerPrincipalId · approvedByPrincipalId · approvedAt</span></div></div>
@@ -1330,7 +1330,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listDataRetentionExpiry · runDataRetention · setLegalHold</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; holdId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-031">CMS-031</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmDelete &middot; <i>Delete</i></div><div class="ov"><b>confirmDialog</b> confirmArchive &middot; <i>Archive</i></div><div class="ov"><b>modal</b> formRunDataRetention &middot; <i>Run retention</i> &middot; <b>Run retention</b> &middot; Cancel</div><div class="ov"><b>modal</b> formSetLegalHold &middot; <i>Place or release hold</i> &middot; <b>Place or release hold</b> &middot; Cancel</div></div>
@@ -1360,7 +1360,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setPrivacyComplianceException · listPrivacyComplianceExceptions</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; exceptionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-031">CMS-031</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -1568,7 +1568,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setSignatorySignatureGuardian</div>
+          <div><b>OPERATIONS</b> &middot; setSignatorySignatureGuardian · getSignatorySignatureGuardian</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-041">CMS-041</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
@@ -1870,7 +1870,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setWaiverVerificationValidation · listWaiverVerificationQueue</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; verificationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-051">CMS-051</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -2078,7 +2078,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; searchMedia · listCollections · semanticSearch</div>
+          <div><b>OPERATIONS</b> &middot; searchMedia · semanticSearch</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-061">CMS-061</a>  &mdash; <i>Back to Digital Asset Management Command Cen</i></div>
@@ -2378,7 +2378,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; analyseMediaAsset · setMediaAssetTags</div>
+          <div><b>OPERATIONS</b> &middot; setMediaAssetTags · analyseMediaAsset</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; assetId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-071">CMS-071</a>  &mdash; <i>Back to AI Asset Intelligence Command Center</i></div>
@@ -2648,7 +2648,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getExpiringRights · getMediaUsageAnalytics</div>
+          <div><b>OPERATIONS</b> &middot; getExpiringRights</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#cms-001">CMS-001</a>  &mdash; <i>Back to Tenant Workspace</i><br><a href="#cms-082">CMS-082</a>  &mdash; <i>Asset Ownership &amp; Responsibility Management</i><br><a href="#cms-083">CMS-083</a>  &mdash; <i>Rights, License &amp; Usage Policy Management</i> <span class="car">assetId</span><br><a href="#cms-084">CMS-084</a>  &mdash; <i>Asset Approval Workflow Management</i> <span class="car">assetId</span><br><a href="#cms-085">CMS-085</a>  &mdash; <i>Publication Eligibility &amp; Governance Validat</i> <span class="car">assetId</span><br><a href="#cms-086">CMS-086</a>  &mdash; <i>Role-Based Asset Access &amp; Permission Managem</i><br><a href="#cms-087">CMS-087</a>  &mdash; <i>Secure Internal &amp; External Sharing</i><br><a href="#cms-088">CMS-088</a>  &mdash; <i>Rights Expiry, Renewal &amp; Usage Impact</i> <span class="car">assetId</span><br><a href="#cms-089">CMS-089</a>  &mdash; <i>Governance Audit Trail &amp; Compliance Evidence</i> <span class="car">assetId</span><br><a href="#cms-090">CMS-090</a>  &mdash; <i>Governance Risk, Compliance &amp; AI Recommendat</i></div>
@@ -2678,7 +2678,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; updateMediaAsset · getMediaAsset</div>
+          <div><b>OPERATIONS</b> &middot; getMediaAsset</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; mediaId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-081">CMS-081</a>  &mdash; <i>Back to DAM Governance &amp; Rights Command Cent</i></div>
@@ -2858,7 +2858,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getExpiringRights · setMediaAssetRights</div>
+          <div><b>OPERATIONS</b> &middot; getExpiringRights</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; assetId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-081">CMS-081</a>  &mdash; <i>Back to DAM Governance &amp; Rights Command Cent</i></div>
@@ -3010,7 +3010,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setMediaDistributionChannels</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; code&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-091">CMS-091</a>  &mdash; <i>Back to Asset Distribution &amp; Delivery Comman</i></div>
           
           
@@ -3038,7 +3038,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setMediaDistributionChannels · listMediaRenditions</div>
+          <div><b>OPERATIONS</b> &middot; listMediaRenditions</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; assetId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-091">CMS-091</a>  &mdash; <i>Back to Asset Distribution &amp; Delivery Comman</i></div>
@@ -3068,7 +3068,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; replaceMediaAsset · getMediaDistribution</div>
+          <div><b>OPERATIONS</b> &middot; getMediaDistribution</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; mediaId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-091">CMS-091</a>  &mdash; <i>Back to Asset Distribution &amp; Delivery Comman</i></div>
@@ -3100,7 +3100,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setMediaDistributionChannels</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; code&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#cms-091">CMS-091</a>  &mdash; <i>Back to Asset Distribution &amp; Delivery Comman</i></div>
           
           

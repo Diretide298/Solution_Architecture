@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "11",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/seat-analytics-command-center-bo-1051",
-   "component": "apps/venue-management-web/src/routes/access-venue/SeatAnalyticsCommandCenter.tsx",
+   "component": "src/routes/access-venue/SeatAnalyticsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -118,7 +119,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeats",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeats"
       }
      ]
     }
@@ -185,6 +187,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "11",
@@ -194,7 +197,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/occupancy-reporting-bo-1052",
-   "component": "apps/venue-management-web/src/routes/access-venue/OccupancyReporting.tsx",
+   "component": "src/routes/access-venue/OccupancyReporting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -255,7 +258,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -376,6 +379,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "11",
@@ -385,7 +389,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/zone-performance-reporting-bo-1053",
-   "component": "apps/venue-management-web/src/routes/access-venue/ZonePerformanceReporting.tsx",
+   "component": "src/routes/access-venue/ZonePerformanceReporting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -446,7 +450,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -554,6 +558,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "11",
@@ -563,7 +568,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/revenue-by-section-bo-1054",
-   "component": "apps/venue-management-web/src/routes/access-venue/RevenueBySection.tsx",
+   "component": "src/routes/access-venue/RevenueBySection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -624,7 +629,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -739,6 +744,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "11",
@@ -748,7 +754,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/revenue-by-seat-category-bo-1055",
-   "component": "apps/venue-management-web/src/routes/access-venue/RevenueBySeatCategory.tsx",
+   "component": "src/routes/access-venue/RevenueBySeatCategory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -793,7 +799,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatCategories",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatCategories"
       }
      ]
     }
@@ -849,6 +856,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "11",
@@ -858,7 +866,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/seat-utilization-analytics-bo-1056",
-   "component": "apps/venue-management-web/src/routes/access-venue/SeatUtilizationAnalytics.tsx",
+   "component": "src/routes/access-venue/SeatUtilizationAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -912,7 +920,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1033,6 +1041,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "11",
@@ -1042,7 +1051,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/hold-inventory-reporting-bo-1057",
-   "component": "apps/venue-management-web/src/routes/access-venue/HoldInventoryReporting.tsx",
+   "component": "src/routes/access-venue/HoldInventoryReporting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1152,6 +1161,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "11",
@@ -1161,7 +1171,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/sales-pace-pick-curves-bo-1058",
-   "component": "apps/venue-management-web/src/routes/access-venue/SalesPacePickCurves.tsx",
+   "component": "src/routes/access-venue/SalesPacePickCurves.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1206,7 +1216,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listDemandBookingCurve",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listDemandBookingCurve"
       }
      ]
     }
@@ -1263,6 +1274,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "11",
@@ -1272,7 +1284,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/heat-maps-drill-down-bo-1059",
-   "component": "apps/venue-management-web/src/routes/access-venue/HeatMapsDrillDown.tsx",
+   "component": "src/routes/access-venue/HeatMapsDrillDown.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1351,6 +1363,13 @@
     "purpose": "Drill down",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getReportExecution",
+    "contract": "reporting",
+    "purpose": "Follows runReport (202) until what it started settles: Execution status, and where its result is",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -1366,6 +1385,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+    },
+    {
+     "name": "executionId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, `runReport` answers 202 with it and `getReportExecution` follows it."
     }
    ]
   },
@@ -1398,6 +1423,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "REPORT_EXPORT",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "11",
@@ -1407,7 +1433,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/report-builder-export-audit-bo-1060",
-   "component": "apps/venue-management-web/src/routes/access-venue/ReportBuilderExportAudit.tsx",
+   "component": "src/routes/access-venue/ReportBuilderExportAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1492,6 +1518,13 @@
     "purpose": "Export it",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getReportExport",
+    "contract": "reporting",
+    "purpose": "Follows exportReportResult (202) until what it started settles: Export status and download link",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -1507,6 +1540,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `exportReportResult` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+    },
+    {
+     "name": "exportId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, `exportReportResult` answers 202 with it and `getReportExport` follows it."
     }
    ]
   },

@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 211 |
-| Operations | 276 |
+| Operations | 267 |
 | Contracts | 15 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 102 |
+| Operations with no screen | 101 |
 | Waves | wave1 28 · wave2 13 · wave3 170 |
 
 ## Gaps
 
-### 102 operations with no screen here
+### 101 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
-| … | | | 62 more |
+| … | | | 61 more |
 
 ### 8 modules split across waves
 
@@ -100,12 +100,12 @@
 | `ADM-001` | Platform Login / MFA | Access & Identity | 1 | 11 | yes |
 | `ADM-002` | Platform Dashboard | Overview & Health | 1 | 5 | yes |
 | `ADM-003` | Cross-Tenant Health Dashboard | Overview & Health | 1 | 8 | yes |
-| `ADM-004` | Platform Audit Log | Overview & Health | 2 | 6 | yes |
+| `ADM-004` | Platform Audit Log | Overview & Health | 2 | 5 | yes |
 | `ADM-005` | Tenant Directory | Tenants & Licensing | 1 | 17 | yes |
 | `ADM-006` | Tenant Hierarchy Explorer | Tenants & Licensing | 1 | 10 | yes |
 | `ADM-007` | Module & Feature Entitlement | Tenants & Licensing | 1 | 8 | yes |
 | `ADM-008` | Subscription & Plan Management | Tenants & Licensing | 1 | 15 | yes |
-| `ADM-009` | Tenant Billing & Invoicing | Tenants & Licensing | 2 | 8 | yes |
+| `ADM-009` | Tenant Billing & Invoicing | Tenants & Licensing | 2 | 7 | yes |
 | `ADM-010` | Usage Metering | Tenants & Licensing | 2 | 6 | yes |
 | `ADM-011` | Licence & Seat Management | Tenants & Licensing | 2 | 9 | yes |
 | `ADM-012` | Tenant Isolation & Resource Pool | Tenants & Licensing | 1 | 7 | yes |
@@ -134,16 +134,16 @@
 | `ADM-035` | Support & Escalation Console | Support & Communications | 3 | 2 | yes |
 | `ADM-036` | Platform Notification Broadcast | Support & Communications | 3 | 2 | yes |
 | `ADM-037` | AI Provider & Credentials | AI | 1 | 14 | yes |
-| `ADM-068` | Tax, Fee & Calculation Command Center | Commercial | 3 | 6 | yes |
+| `ADM-068` | Tax, Fee & Calculation Command Center | Commercial | 3 | 4 | yes |
 | `ADM-318` | Dead Letters | Platform Ops | 1 | 6 | yes |
-| `ADM-369` | Commercial Command Center | Tenants & Licensing | 3 | 2 | yes |
+| `ADM-369` | Commercial Command Center | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-370` | Customer Subscription & Commercial Portfolio | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-371` | Customer Commercial 360° | Tenants & Licensing | 3 | 2 | yes |
-| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-373` | Revenue & Commercial Model Analytics | Tenants & Licensing | 3 | 1 | yes |
+| `ADM-371` | Customer Commercial 360° | Tenants & Licensing | 3 | 1 | yes |
+| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | Tenants & Licensing | 3 | 2 | yes |
+| `ADM-373` | Revenue & Commercial Model Analytics | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-374` | Trial & Conversion Monitor | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-375` | Renewal & Retention Center | Tenants & Licensing | 3 | 0 | yes |
-| `ADM-376` | Commercial Optimization & Expansion Opportunities | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-375` | Renewal & Retention Center | Tenants & Licensing | 3 | 1 | yes |
+| `ADM-376` | Commercial Optimization & Expansion Opportunities | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-377` | Subscription Exceptions & Commercial Alerts | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-378` | Executive AI Commercial Intelligence | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-379` | Welcome & Start Your TICVAI Journey | Tenants & Licensing | 3 | 0 | yes |
@@ -156,7 +156,7 @@
 | `ADM-386` | Additional Business Module Assessment | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-387` | Integration, Payment & Technical Readiness | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-388` | AI Assessment Summary & Handoff | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-389` | Commercial Rules Engine Overview | Tenants & Licensing | 3 | 1 | yes |
+| `ADM-389` | Commercial Rules Engine Overview | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-390` | VSI Model Builder | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-391` | VSI Scoring & Tier Threshold Configuration | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-392` | Subscription Tier Configuration | Tenants & Licensing | 3 | 2 | yes |
@@ -178,7 +178,7 @@
 | `ADM-408` | Final Package Approval & Handoff | Tenants & Licensing | 3 | 0 | yes |
 | `ADM-409` | Purchase / Trial Journey Selection | Tenants & Licensing | 3 | 0 | yes |
 | `ADM-410` | Contract & Billing Cycle Selection | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-411` | Billing & Legal Entity Information | Tenants & Licensing | 3 | 6 | yes |
+| `ADM-411` | Billing & Legal Entity Information | Tenants & Licensing | 3 | 5 | yes |
 | `ADM-412` | Payment Method & Settlement Setup | Tenants & Licensing | 1 | 6 | yes |
 | `ADM-413` | Trial Configuration & Conversion Rules | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-414` | Order & Commercial Pricing Review | Tenants & Licensing | 3 | 1 | yes |
@@ -189,7 +189,7 @@
 | `ADM-419` | Provisioning Command Center | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-420` | Tenant & Organization Provisioning | Tenants & Licensing | 3 | 5 | yes |
 | `ADM-421` | Venue & Operational Structure Creation | Tenants & Licensing | 3 | 5 | yes |
-| `ADM-422` | Administrator & Security Initialization | Tenants & Licensing | 3 | 7 | yes |
+| `ADM-422` | Administrator & Security Initialization | Tenants & Licensing | 3 | 6 | yes |
 | `ADM-423` | License & Entitlement Activation | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-424` | Module Activation & Dependency Validation | Tenants & Licensing | 1 | 7 | yes |
 | `ADM-425` | Venue Template Application | Tenants & Licensing | 3 | 4 | yes |
@@ -198,113 +198,113 @@
 | `ADM-449` | Usage & License Command Center | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-450` | Entitlement & License Inventory | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-451` | Commercial Consumption & Billable Event Metering | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-452` | Operational Usage & Threshold Monitor | Tenants & Licensing | 3 | 2 | yes |
+| `ADM-452` | Operational Usage & Threshold Monitor | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-453` | License Enforcement & Decision Engine | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-454` | Minimum Guarantee & Variable Consumption Monitor | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-455` | Overage, Capacity & Temporary Exception Management | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-456` | Usage Alerts, Reconciliation & Exception Center | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-457` | AI Usage Forecast & Commercial Optimization | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-458` | License, Metering & Commercial Synchronization Audit | Tenants & Licensing | 3 | 1 | yes |
-| `ADM-459` | Billing & Commercial Command Center | Tenants & Licensing | 3 | 1 | yes |
+| `ADM-459` | Billing & Commercial Command Center | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-460` | Billing Calculation & Charge Breakdown | Tenants & Licensing | 3 | 3 | yes |
 | `ADM-461` | Consumption Reconciliation & Billing Approval | Tenants & Licensing | 3 | 2 | yes |
-| `ADM-462` | Invoice & Payment Management | Tenants & Licensing | 3 | 4 | yes |
-| `ADM-463` | Subscription & Commercial Change Management | Tenants & Licensing | 3 | 2 | yes |
-| `ADM-464` | Renewal Management Center | Tenants & Licensing | 3 | 0 | yes |
+| `ADM-462` | Invoice & Payment Management | Tenants & Licensing | 3 | 3 | yes |
+| `ADM-463` | Subscription & Commercial Change Management | Tenants & Licensing | 3 | 1 | yes |
+| `ADM-464` | Renewal Management Center | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-465` | AI Upgrade, Downgrade & Commercial Right-Sizing | Tenants & Licensing | 3 | 2 | yes |
 | `ADM-466` | Commercial Scenario Simulator | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-467` | Discount, Credit & Commercial Override Management | Tenants & Licensing | 3 | 4 | yes |
 | `ADM-468` | Renewal Approval, Activation & Commercial Handoff | Tenants & Licensing | 3 | 1 | yes |
 | `ADM-469` | AI Configuration Home & Start | Platform | 3 | 6 | yes |
-| `ADM-470` | Setup Type & Business Intent Discovery | Platform | 3 | 7 | yes |
-| `ADM-471` | Venue & Business Model Discovery | Platform | 3 | 6 | yes |
+| `ADM-470` | Setup Type & Business Intent Discovery | Platform | 3 | 6 | yes |
+| `ADM-471` | Venue & Business Model Discovery | Platform | 3 | 5 | yes |
 | `ADM-472` | Guided Question & Answer Workspace | Platform | 3 | 5 | yes |
 | `ADM-473` | Product & Admission Model Discovery | Platform | 3 | 5 | yes |
 | `ADM-474` | Operational Requirement Discovery | Platform | 3 | 5 | yes |
 | `ADM-475` | Commercial Requirement Discovery | Platform | 3 | 5 | yes |
-| `ADM-476` | Required, Recommended & Optional Decisions | Platform | 3 | 5 | yes |
-| `ADM-477` | Missing Information & Clarification Center | Platform | 3 | 8 | yes |
+| `ADM-476` | Required, Recommended & Optional Decisions | Platform | 3 | 4 | yes |
+| `ADM-477` | Missing Information & Clarification Center | Platform | 3 | 6 | yes |
 | `ADM-478` | Configuration Blueprint & Dependency Map | Platform | 3 | 5 | yes |
-| `ADM-479` | AI Configuration Build Command Center | Platform | 3 | 6 | yes |
-| `ADM-480` | Venue & Organization Configuration | Platform | 3 | 6 | yes |
-| `ADM-481` | Product Configuration Assistant | Platform | 3 | 6 | yes |
-| `ADM-482` | Schedule, Capacity & Availability Configuration | Platform | 3 | 6 | yes |
-| `ADM-483` | Pricing & Commercial Configuration | Platform | 3 | 6 | yes |
-| `ADM-484` | Promotion, Bundle & Upsell Configuration | Platform | 3 | 6 | yes |
-| `ADM-485` | Seating, Access & Operational Configuration | Platform | 3 | 6 | yes |
-| `ADM-486` | Channel, Media & Fulfillment Configuration | Platform | 3 | 6 | yes |
-| `ADM-487` | Cross-Module Conflict & Dependency Validation | Platform | 3 | 5 | yes |
-| `ADM-488` | Configuration Preview & Impact Analysis | Platform | 3 | 5 | yes |
-| `ADM-489` | AI Configuration Readiness Center | Platform | 3 | 7 | yes |
+| `ADM-479` | AI Configuration Build Command Center | Platform | 3 | 5 | yes |
+| `ADM-480` | Venue & Organization Configuration | Platform | 3 | 5 | yes |
+| `ADM-481` | Product Configuration Assistant | Platform | 3 | 5 | yes |
+| `ADM-482` | Schedule, Capacity & Availability Configuration | Platform | 3 | 5 | yes |
+| `ADM-483` | Pricing & Commercial Configuration | Platform | 3 | 5 | yes |
+| `ADM-484` | Promotion, Bundle & Upsell Configuration | Platform | 3 | 5 | yes |
+| `ADM-485` | Seating, Access & Operational Configuration | Platform | 3 | 5 | yes |
+| `ADM-486` | Channel, Media & Fulfillment Configuration | Platform | 3 | 5 | yes |
+| `ADM-487` | Cross-Module Conflict & Dependency Validation | Platform | 3 | 4 | yes |
+| `ADM-488` | Configuration Preview & Impact Analysis | Platform | 3 | 4 | yes |
+| `ADM-489` | AI Configuration Readiness Center | Platform | 3 | 6 | yes |
 | `ADM-490` | Configuration Validation Results | Platform | 3 | 5 | yes |
-| `ADM-491` | AI Recommendations & Best-Practice Review | Platform | 3 | 5 | yes |
-| `ADM-492` | Configuration Approval Workflow | Platform | 3 | 6 | yes |
+| `ADM-491` | AI Recommendations & Best-Practice Review | Platform | 3 | 4 | yes |
+| `ADM-492` | Configuration Approval Workflow | Platform | 3 | 3 | yes |
 | `ADM-493` | AI Configuration Execution Center | Platform | 3 | 6 | yes |
-| `ADM-494` | Execution Progress & Dependency Monitor | Platform | 3 | 7 | yes |
-| `ADM-495` | Configuration Results & Object Mapping | Platform | 3 | 5 | yes |
-| `ADM-496` | Configuration Change & Modification Assistant | Platform | 3 | 6 | yes |
+| `ADM-494` | Execution Progress & Dependency Monitor | Platform | 3 | 5 | yes |
+| `ADM-495` | Configuration Results & Object Mapping | Platform | 3 | 4 | yes |
+| `ADM-496` | Configuration Change & Modification Assistant | Platform | 3 | 3 | yes |
 | `ADM-497` | Configuration History, Versions & Rollback | Platform | 3 | 6 | yes |
 | `ADM-498` | AI Configuration Audit & Governance | Platform | 3 | 5 | yes |
 | `ADM-499` | Forecasting Command Center | Analytics | 3 | 6 | yes |
 | `ADM-500` | Forecast Configuration & Forecasting Strategy | Analytics | 1 | 6 | yes |
 | `ADM-501` | Forecast Data & Signal Configuration | Analytics | 3 | 6 | yes |
-| `ADM-502` | Attendance & Visitation Forecast | Analytics | 3 | 6 | yes |
+| `ADM-502` | Attendance & Visitation Forecast | Analytics | 3 | 5 | yes |
 | `ADM-503` | Ticket, Product & Timeslot Demand Forecast | Analytics | 3 | 6 | yes |
 | `ADM-504` | Channel & Booking Pace Forecast | Analytics | 3 | 5 | yes |
 | `ADM-505` | Revenue & Commercial Forecast | Analytics | 3 | 6 | yes |
 | `ADM-506` | Forecast Drivers, Confidence & Explainability | Analytics | 1 | 8 | yes |
-| `ADM-507` | Forecast Scenario & What-If Simulator | Analytics | 3 | 6 | yes |
+| `ADM-507` | Forecast Scenario & What-If Simulator | Analytics | 3 | 4 | yes |
 | `ADM-508` | Forecast Accuracy, Review & Publication Center | AI | 1 | 8 | yes |
-| `ADM-509` | Operational Forecasting Command Center | Analytics | 3 | 5 | yes |
-| `ADM-510` | Capacity & Occupancy Forecast | Analytics | 3 | 7 | yes |
-| `ADM-511` | Attraction Utilization & Queue Forecast | Analytics | 3 | 6 | yes |
-| `ADM-512` | Entry, Access & Guest Flow Forecast | Analytics | 3 | 5 | yes |
-| `ADM-513` | Workforce Demand & Staffing Forecast | Analytics | 3 | 6 | yes |
-| `ADM-514` | POS, Kiosk & Frontline Service Forecast | Analytics | 3 | 5 | yes |
-| `ADM-515` | F&B, Retail & Inventory Demand Forecast | Analytics | 3 | 5 | yes |
-| `ADM-516` | Resource, Equipment & Facility Requirement Forecast | Analytics | 3 | 5 | yes |
-| `ADM-517` | Operational Scenario & Readiness Simulator | Analytics | 3 | 6 | yes |
-| `ADM-518` | Operational Forecast Review, Recommendations & Handover | Analytics | 3 | 5 | yes |
-| `ADM-519` | AI Governance Command Center | Platform | 3 | 8 | yes |
+| `ADM-509` | Operational Forecasting Command Center | Analytics | 3 | 4 | yes |
+| `ADM-510` | Capacity & Occupancy Forecast | Analytics | 3 | 6 | yes |
+| `ADM-511` | Attraction Utilization & Queue Forecast | Analytics | 3 | 5 | yes |
+| `ADM-512` | Entry, Access & Guest Flow Forecast | Analytics | 3 | 4 | yes |
+| `ADM-513` | Workforce Demand & Staffing Forecast | Analytics | 3 | 4 | yes |
+| `ADM-514` | POS, Kiosk & Frontline Service Forecast | Analytics | 3 | 3 | yes |
+| `ADM-515` | F&B, Retail & Inventory Demand Forecast | Analytics | 3 | 4 | yes |
+| `ADM-516` | Resource, Equipment & Facility Requirement Forecast | Analytics | 3 | 4 | yes |
+| `ADM-517` | Operational Scenario & Readiness Simulator | Analytics | 3 | 4 | yes |
+| `ADM-518` | Operational Forecast Review, Recommendations & Handover | Analytics | 3 | 3 | yes |
+| `ADM-519` | AI Governance Command Center | Platform | 3 | 5 | yes |
 | `ADM-520` | AI Capability Registry & Ownership | Platform | 3 | 5 | yes |
 | `ADM-521` | AI Risk Classification & Assessment | Platform | 3 | 5 | yes |
-| `ADM-522` | AI Autonomy Level Configuration | Platform | 3 | 6 | yes |
+| `ADM-522` | AI Autonomy Level Configuration | Platform | 3 | 5 | yes |
 | `ADM-523` | AI Action & Permission Policy Builder | Platform | 1 | 6 | yes |
-| `ADM-524` | AI Data Access & Usage Policy | Platform | 3 | 7 | yes |
-| `ADM-525` | Environment, Tenant & Scope Governance | Platform | 3 | 5 | yes |
-| `ADM-526` | AI Policy Conflict, Exception & Override Management | Platform | 3 | 7 | yes |
+| `ADM-524` | AI Data Access & Usage Policy | Platform | 3 | 5 | yes |
+| `ADM-525` | Environment, Tenant & Scope Governance | Platform | 3 | 4 | yes |
+| `ADM-526` | AI Policy Conflict, Exception & Override Management | Platform | 3 | 6 | yes |
 | `ADM-527` | AI Policy Testing & Governance Simulation | Platform | 1 | 5 | yes |
 | `ADM-528` | AI Governance Policy Publication & Effective Policy Map | Platform | 1 | 6 | yes |
-| `ADM-529` | AI Human Oversight Command Center | Platform | 3 | 5 | yes |
-| `ADM-530` | AI Approval Requirement & Routing Configuration | Platform | 3 | 9 | yes |
-| `ADM-531` | AI Approval Review Workspace | Platform | 3 | 6 | yes |
+| `ADM-529` | AI Human Oversight Command Center | Platform | 3 | 4 | yes |
+| `ADM-530` | AI Approval Requirement & Routing Configuration | Platform | 3 | 6 | yes |
+| `ADM-531` | AI Approval Review Workspace | Platform | 3 | 4 | yes |
 | `ADM-532` | Conditional Approval & Approval Conditions | Platform | 3 | 7 | yes |
-| `ADM-533` | Human Review, Challenge & AI Clarification Workspace | Platform | 3 | 6 | yes |
+| `ADM-533` | Human Review, Challenge & AI Clarification Workspace | Platform | 3 | 4 | yes |
 | `ADM-534` | Escalation, Delegation & Approval SLA Management | Platform | 3 | 9 | yes |
 | `ADM-535` | Live AI Execution Oversight & Human Intervention | Platform | 3 | 8 | yes |
 | `ADM-536` | Human Override & Manual Control Center | Platform | 3 | 10 | yes |
 | `ADM-537` | Approval & Intervention History / Decision Timeline | Platform | 3 | 5 | yes |
-| `ADM-538` | Human Oversight Workflow Simulator & Readiness Center | Platform | 3 | 5 | yes |
+| `ADM-538` | Human Oversight Workflow Simulator & Readiness Center | Platform | 3 | 4 | yes |
 | `ADM-539` | AI Explainability & Audit Command Center | Platform | 3 | 4 | yes |
 | `ADM-540` | AI Decision Explorer & Search | Platform | 3 | 5 | yes |
 | `ADM-541` | AI Decision Explanation Workspace | Platform | 3 | 4 | yes |
 | `ADM-542` | Data, Feature & Evidence Provenance | Platform | 3 | 4 | yes |
-| `ADM-543` | Candidate, Rule & Decision Path Trace | Platform | 3 | 5 | yes |
+| `ADM-543` | Candidate, Rule & Decision Path Trace | Platform | 3 | 4 | yes |
 | `ADM-544` | Model, Provider & AI Runtime Trace | Platform | 3 | 5 | yes |
 | `ADM-545` | Governance, Approval & Human Decision Trace | Platform | 3 | 4 | yes |
-| `ADM-546` | Execution & Business Outcome Trace | Platform | 3 | 5 | yes |
+| `ADM-546` | Execution & Business Outcome Trace | Platform | 3 | 4 | yes |
 | `ADM-547` | AI Audit Record & Evidence Package | Platform | 3 | 5 | yes |
 | `ADM-548` | AI Trace Investigation & Replay Simulator | Platform | 3 | 5 | yes |
 | `ADM-549` | AI Governance Monitoring Command Center | Platform | 3 | 7 | yes |
 | `ADM-550` | AI Risk Register & Risk Exposure Management | Platform | 3 | 5 | yes |
 | `ADM-551` | AI Governance Control Library & Control Effectiveness | Platform | 3 | 5 | yes |
-| `ADM-552` | AI Policy Compliance & Violation Monitoring | Platform | 3 | 5 | yes |
-| `ADM-553` | AI Data, Privacy & Usage Compliance Monitoring | Platform | 3 | 5 | yes |
+| `ADM-552` | AI Policy Compliance & Violation Monitoring | Platform | 3 | 4 | yes |
+| `ADM-553` | AI Data, Privacy & Usage Compliance Monitoring | Platform | 3 | 4 | yes |
 | `ADM-554` | AI Quality, Behavior & Governance Drift Monitoring | Platform | 1 | 9 | yes |
-| `ADM-555` | AI Governance Alert & Detection Center | Platform | 3 | 6 | yes |
+| `ADM-555` | AI Governance Alert & Detection Center | Platform | 3 | 5 | yes |
 | `ADM-556` | AI Incident & Remediation Management | Platform | 1 | 9 | yes |
-| `ADM-557` | AI Compliance, Assurance & Governance Reporting | Platform | 3 | 6 | yes |
-| `ADM-558` | AI Governance Review, Action Plan & Continuous Improvement | Platform | 3 | 5 | yes |
+| `ADM-557` | AI Compliance, Assurance & Governance Reporting | Platform | 3 | 5 | yes |
+| `ADM-558` | AI Governance Review, Action Plan & Continuous Improvement | Platform | 3 | 4 | yes |
 | `ADM-619` | Reconciliation & Settlement Command Center | Commercial | 3 | 5 | yes |
 | `ADM-699` | My Account & Security | Access & Identity | 1 | 9 | yes |
 | `ADM-700` | Configuration Promotion | Releases & Environments | 2 | 6 | yes |

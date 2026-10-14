@@ -106,8 +106,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-721` | Activity Performance & Slot Template Configuration | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-722` | Prepaid Minute Package & Customer Balance Configuration | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-721` | Activity Performance & Slot Template Configuration | B | 0 | 18 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-722` | Prepaid Minute Package & Customer Balance Configuration | B | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-723` | Peak, Off-Peak & Super Prime Time Configuration | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-724` | Walk-In / There-and-Then Booking Configuration | B | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 
@@ -134,7 +134,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `performanceTemplateId` (navigation) |
 | Route | `/sell/activity-session-slot-template-configuration-bo-721` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
@@ -159,7 +159,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listPerformanceTemplates`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Space | the name it points at, never the id | — |
+| Slot minutes | 1,234 | — |
+| Turnaround minutes | 1,234 | — |
+| Concurrent capacity | 1,234 | — |
+| Bands | list or chips (count when long) | — |
+| Kind | chip: Off peak, Standard, Peak, Super prime | — |
+| Days of week | list or chips (count when long) | — |
+| From | text | — |
+| To | text | — |
+| Price multiplier | 1,234.5 | — |
+| Minute multiplier | 1,234.5 | — |
+| Walk in | grouped details | Configured, not assumed. It decides whether a family turning up on a Sunday is turned away. |
+| Allowed | yes / no (icon or chip) | — |
+| Held back percent | 1,234 | — |
+| Cutoff minutes before | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -212,6 +233,8 @@ template:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PERFORMANCE_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -244,7 +267,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-721?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save session template, Cancel.
 - [ ] Every transition is wired: `BO-100`, `BO-722`, `BO-723`, `BO-724`.
@@ -267,7 +290,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `prepaidMinutesId` (navigation) |
 | Route | `/sell/prepaid-minute-package-customer-balance-configuration-bo-722` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
@@ -293,7 +316,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listCreditTypes`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Category | chip: Cash, Refund, Bonus, Promotional, Gift card, Membership… | — |
+| Monetary | yes / no (icon or chip) | Loyalty points are not money. A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency … |
+| Conversion rate | 12.5% | — |
+| Refundable | yes / no (icon or chip) | Promotional credit is not refundable and cash credit is. A venue that refunds promotional credit to a card has converted marketing spend … |
+| Transferable | yes / no (icon or chip) | — |
+| Expires | yes / no (icon or chip) | — |
+| Validity days | 1,234 | — |
+| Breakage eligible | yes / no (icon or chip) | — |
+| Ledger account code | text | — |
+| Priority | 1,234 | — |
+| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -341,6 +381,8 @@ package:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -365,7 +407,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-722?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
 - [ ] Every transition is wired: `BO-721`.
@@ -388,7 +430,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Configure KPI by; Display) and no metric row |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `performanceTemplateId` (navigation) |
 | Route | `/sell/peak-off-peak-super-prime-time-configuration-bo-723` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
@@ -479,6 +521,8 @@ bands:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PERFORMANCE_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -526,7 +570,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `performanceTemplateId` (navigation) |
 | Route | `/sell/walk-in-there-and-then-booking-configuration-bo-724` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
@@ -611,6 +655,8 @@ walkIn:
 - `listPerformanceTemplates` → `PERFORMANCE_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PERFORMANCE_CONFIGURE`
 
 #### Requirements it meets
 
@@ -752,8 +798,8 @@ Method, path, parameters, request and response for every operation these screens
 {
 "listCreditTypes": {"method":"GET","path":"/credit-types","contract":"wallet","summary":"The kinds of value that may sit in a wallet","permission":"WALLET_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"CreditType"},
 "listPerformanceTemplates": {"method":"GET","path":"/performance-templates","contract":"catalogue","summary":"Slot templates, peak bands and walk-in rules","permission":"PERFORMANCE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"PerformanceTemplate"},
-"setPerformanceTemplate": {"method":"PUT","path":"/performance-templates","contract":"catalogue","summary":"Define slot length, capacity, bands and walk-in policy","permission":"PERFORMANCE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PerformanceTemplate","responds":"PerformanceTemplate"},
-"setPrepaidMinutePackage": {"method":"PUT","path":"/prepaid-minute-packages","contract":"catalogue","summary":"Time bought in advance and drawn down per visit","permission":"PRICE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PrepaidMinutePackage","responds":"PrepaidMinutePackage"}
+"setPerformanceTemplate": {"method":"PUT","path":"/performance-templates/{performanceTemplateId}","contract":"catalogue","summary":"Define slot length, capacity, bands and walk-in policy","permission":"PERFORMANCE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"performanceTemplateId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"PerformanceTemplate","responds":"PerformanceTemplate"},
+"setPrepaidMinutePackage": {"method":"PUT","path":"/prepaid-minute-packages/{prepaidMinutesId}","contract":"catalogue","summary":"Time bought in advance and drawn down per visit","permission":"PRICE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"prepaidMinutesId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"PrepaidMinutePackage","responds":"PrepaidMinutePackage"}
 }
 ```
 
@@ -763,8 +809,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"CreditType": {"type":"object","x-ticvai-persistence":"wallet.credit_type","description":"Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"category":{"type":"string","enum":["cash","refund","bonus","promotional","giftCard","membership","loyalty","ride","attraction","redemption","fnb","retail","parking","event","other"]},"monetary":{"type":"boolean","default":true,"description":"**Loyalty points are not money.** A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet.\n"},"conversionRate":{"type":"number","nullable":true},"refundable":{"type":"boolean","default":false,"description":"**Promotional credit is not refundable and cash credit is.** A venue that refunds promotional credit to a card has converted marketing spend into cash.\n"},"transferable":{"type":"boolean","default":false},"expires":{"type":"boolean","default":false},"validityDays":{"type":"integer","nullable":true},"breakageEligible":{"type":"boolean","default":false},"ledgerAccountCode":{"type":"string","nullable":true},"priority":{"type":"integer","default":0},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
-"PerformanceTemplate": {"type":"object","x-ticvai-persistence":"catalogue.performance_template","description":"Event board 8. **An activity venue sells time, not seats.** Each slot the template produces is a Performance. Formerly `SessionTemplate` on `catalogue.session_template`: a session is a Performance (decided 28 September, audit R165).","required":["code"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"spaceId":{"type":"string","format":"uuid","nullable":true},"slotMinutes":{"type":"integer"},"turnaroundMinutes":{"type":"integer","default":0},"concurrentCapacity":{"type":"integer"},"bands":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["offPeak","standard","peak","superPrime"]},"daysOfWeek":{"type":"array","items":{"type":"string"}},"from":{"type":"string"},"to":{"type":"string"},"priceMultiplier":{"type":"number","nullable":true},"minuteMultiplier":{"type":"number","nullable":true}}}},"walkIn":{"type":"object","description":"**Configured, not assumed.** It decides whether a family turning up on a Sunday is turned away.\n","properties":{"allowed":{"type":"boolean","default":true},"heldBackPercent":{"type":"integer","default":0},"cutoffMinutesBefore":{"type":"integer","nullable":true}}},"scopePath":{"type":"string"}}},
+"CreditType": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"wallet.credit_type","description":"Board 1.6. **What value sits inside a wallet** — the second vocabulary, and the one the acceptance condition requires to be a table.\n","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"category":{"type":"string","enum":["cash","refund","bonus","promotional","giftCard","membership","loyalty","ride","attraction","redemption","fnb","retail","parking","event","other"]},"monetary":{"type":"boolean","default":true,"description":"**Loyalty points are not money.** A non-monetary credit has a conversion rate to money or it cannot be spent, and treating points as currency puts them on the balance sheet.\n"},"conversionRate":{"type":"number","nullable":true},"refundable":{"type":"boolean","default":false,"description":"**Promotional credit is not refundable and cash credit is.** A venue that refunds promotional credit to a card has converted marketing spend into cash.\n"},"transferable":{"type":"boolean","default":false},"expires":{"type":"boolean","default":false},"validityDays":{"type":"integer","nullable":true},"breakageEligible":{"type":"boolean","default":false},"ledgerAccountCode":{"type":"string","nullable":true},"priority":{"type":"integer","default":0},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"PerformanceTemplate": {"type":"object","x-ticvai-persistence":"catalogue.performance_template","description":"Event board 8. **An activity venue sells time, not seats.** Each slot the template produces is a Performance. Formerly `SessionTemplate` on `catalogue.session_template`: a session is a Performance (decided 28 September, audit R165).","required":["code"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"spaceId":{"type":"string","format":"uuid","nullable":true},"slotMinutes":{"type":"integer"},"turnaroundMinutes":{"type":"integer","default":0},"concurrentCapacity":{"type":"integer"},"bands":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["offPeak","standard","peak","superPrime"]},"daysOfWeek":{"type":"array","items":{"type":"string"}},"from":{"type":"string"},"to":{"type":"string"},"priceMultiplier":{"type":"number","nullable":true},"minuteMultiplier":{"type":"number","nullable":true}}}},"walkIn":{"type":"object","description":"**Configured, not assumed.** It decides whether a family turning up on a Sunday is turned away.\n","properties":{"allowed":{"type":"boolean","default":true},"heldBackPercent":{"type":"integer","default":0},"cutoffMinutesBefore":{"type":"integer","nullable":true}}},"scopePath":{"type":"string"}}},
 "PrepaidMinutePackage": {"type":"object","x-ticvai-persistence":"catalogue.prepaid_minutes","description":"Event board 8.2. **Minutes are a `wallet` credit type; this is the product that sells them.**\n","required":["code","minutes"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"minutes":{"type":"integer"},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"creditTypeId":{"type":"string","format":"uuid","description":"The `wallet` credit type the minutes are issued into."},"roundingMinutes":{"type":"integer","default":1},"minimumDrawMinutes":{"type":"integer","default":0},"bandMultipliersApply":{"type":"boolean","default":true,"description":"**An hour at prime time drawing ninety minutes is a legitimate mechanic**, and a system that can only deduct elapsed time cannot express it.\n"},"validityMonths":{"type":"integer","nullable":true},"transferableWithinHousehold":{"type":"boolean","default":false},"applicableSpaceIds":{"type":"array","items":{"type":"string","format":"uuid"}},"scopePath":{"type":"string"}}}
 }
 ```

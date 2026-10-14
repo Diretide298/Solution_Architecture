@@ -122,7 +122,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-474` | Reader Integration Command Center | D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-475` | Reader Manufacturer & Model Profile | C | 24 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-475` | Reader Manufacturer & Model Profile | C | 22 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-476` | Communication Protocol Configuration | D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-477` | Reader Command & Event Mapping | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-478` | Reader Configuration Deployment & Synchronization | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |

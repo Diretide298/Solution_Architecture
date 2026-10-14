@@ -62,7 +62,7 @@
   "contract": "maintenance",
   "summary": "Cancel a work order",
   "permission": "WORK_ORDER_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -100,7 +100,7 @@
   "contract": "maintenance",
   "summary": "Administratively closed",
   "permission": "MAINTENANCE_APPROVE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -216,7 +216,7 @@
   "permission": null,
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
-  "scopeLevel": "workstation",
+  "scopeLevel": "tenant",
   "parameters": [],
   "requestBody": null,
   "responds": "Session"
@@ -634,7 +634,7 @@
   "contract": "maintenance",
   "summary": "Record notification to an external authority",
   "permission": "INCIDENT_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
@@ -653,7 +653,7 @@
   "contract": "maintenance",
   "summary": "Record parts consumed",
   "permission": "WORK_ORDER_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -862,7 +862,7 @@
   "contract": "maintenance",
   "summary": "Investigate, escalate, close or reopen an incident",
   "permission": "INCIDENT_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
@@ -893,6 +893,25 @@
   ],
   "requestBody": null,
   "responds": "WorkOrder"
+ },
+ "uploadIncidentMedia": {
+  "method": "POST",
+  "path": "/incidents/{incidentId}/media",
+  "contract": "maintenance",
+  "summary": "Add a photo, video or document to an incident",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UploadIncidentMediaRequest",
+  "responds": "IncidentMedia"
  },
  "validateAccess": {
   "method": "POST",
@@ -932,30 +951,6 @@
   "requestBody": null,
   "responds": "ValidationResult"
  },
- "verifyAccreditationCredential": {
-  "method": "GET",
-  "path": "/accreditation-credentials/verify",
-  "contract": "accreditation",
-  "summary": "Who holds this credential, and where may they go",
-  "permission": "ACCESS_VALIDATE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "identifier",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "zoneId",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AccreditationCredentialVerification"
- },
  "verifyMfaChallenge": {
   "method": "POST",
   "path": "/auth/mfa/challenge/{challengeId}/verify",
@@ -981,7 +976,7 @@
   "contract": "maintenance",
   "summary": "Supervisor verification",
   "permission": "WORK_ORDER_VERIFY",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

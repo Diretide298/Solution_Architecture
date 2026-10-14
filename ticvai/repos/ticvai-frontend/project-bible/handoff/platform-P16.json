@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 71,
-  "operations": 94,
+  "operations": 84,
   "contracts": 10,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 115
+  "operationsWithNoScreen": 114
  },
  "waves": {
   "wave1": 4,
@@ -34,14 +34,14 @@
  "contracts": [
   {
    "contract": "reporting",
-   "operations": 43
+   "operations": 42
   },
   {
    "contract": "ai",
-   "operations": 30
+   "operations": 21
   },
   {
-   "contract": "identity",
+   "contract": "tenancy",
    "operations": 4
   },
   {
@@ -49,16 +49,20 @@
    "operations": 4
   },
   {
-   "contract": "tenancy",
+   "contract": "identity",
    "operations": 4
+  },
+  {
+   "contract": "marketing-crm",
+   "operations": 3
   },
   {
    "contract": "inventory",
    "operations": 3
   },
   {
-   "contract": "marketing-crm",
-   "operations": 3
+   "contract": "orders",
+   "operations": 1
   },
   {
    "contract": "catalogue",
@@ -66,10 +70,6 @@
   },
   {
    "contract": "promotions",
-   "operations": 1
-  },
-  {
-   "contract": "orders",
    "operations": 1
   }
  ],
@@ -170,7 +170,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/live-operations-dashboard-anl-012",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -251,7 +251,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/dashboard-library-anl-021",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -323,7 +323,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/dashboard-access-publishing-versioning-anl-029",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -332,7 +332,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/dashboard-preview-validation-health-anl-030",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -413,7 +413,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/report-preview-test-validation-anl-039",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -422,7 +422,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/save-run-report-results-viewer-anl-040",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -431,7 +431,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/reporting-governance-command-center-anl-041",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -467,7 +467,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/export-download-center-anl-045",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -557,7 +557,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/anomaly-detection-center-anl-055",
-   "operations": 3,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -575,7 +575,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/forecasting-predictive-analytics-studio-anl-057",
-   "operations": 5,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -584,7 +584,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-recommendation-next-best-action-center-anl-058",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -593,7 +593,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-insight-history-evidence-explainability-anl-059",
-   "operations": 5,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -602,7 +602,7 @@
    "module": "Analytics",
    "wave": 3,
    "route": "/analytics/ai-analytics-governance-model-control-anl-060",
-   "operations": 7,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1393,12 +1393,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Devices that report having been interfered with"
-   },
-   {
-    "operation": "listProfileDeployments",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Recent deployments, with a date, a target and an outcome"
    },
    {
     "operation": "recordDeviceTamperEvent",

@@ -107,15 +107,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-258` | Sales Channel Command Center | B | 0 | 24 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-259` | Channel Creation & Profile Configuration | B | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-260` | Product & Catalogue Assignment | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-261` | Channel Pricing & Commercial Profile Assignment | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-259` | Channel Creation & Profile Configuration | A | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-260` | Product & Catalogue Assignment | A | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-261` | Channel Pricing & Commercial Profile Assignment | A | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-262` | Inventory, Capacity & Channel Allocation | B | 0 | 14 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
-| `ADM-263` | Channel Sales Schedule & Availability Windows | B | 46 | 140 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-263` | Channel Sales Schedule & Availability Windows | A | 46 | 140 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-264` | Customer & Eligibility Rules by Channel | B | 51 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-265` | Channel Sales Rules, Limits & Restrictions | B | 63 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-266` | Channel Fees, Payment & Fulfillment Configuration | B | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-267` | Channel Publication, Readiness & AI Validation | B | 1 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-266` | Channel Fees, Payment & Fulfillment Configuration | A | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-267` | Channel Publication, Readiness & AI Validation | A | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

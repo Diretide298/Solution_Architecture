@@ -1,6 +1,6 @@
 # WS69 — Unified BI Reporting and AI Analytics Platform board 4
 
-**10 screens · 13 operations · 15 schemas · 8 permissions**
+**10 screens · 12 operations · 15 schemas · 8 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -128,9 +128,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ANL-041` | Reporting Governance Command Center | D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-042` | Report Scheduler | D | 23 | 0 | 5 | 4 | 1 | 0 | — | notStarted (—) |
-| `ANL-043` | Subscription Manager | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-043` | Subscription Manager | D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-044` | Distribution & Delivery Configuration | D | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-045` | Export & Download Center | D | 0 | 22 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `ANL-045` | Export & Download Center | D | 0 | 22 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-046` | Report API & Data Delivery Manager | D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-047` | Report Access & Sharing Control | B | 39 | 18 | 6 | 7 | 0 | 0 | — | notStarted (—) |
 | `ANL-048` | Delivery Monitoring & Failure Management | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |

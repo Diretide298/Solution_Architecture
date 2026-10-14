@@ -5,6 +5,7 @@
   "module": "Infrastructure & Resilience",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_CELL_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -283,6 +284,7 @@
   "module": "Infrastructure & Resilience",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_CELL_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -530,6 +532,7 @@
   "module": "Infrastructure & Resilience",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "PLATFORM_CELL_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -756,6 +759,7 @@
   "module": "Infrastructure & Resilience",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_CELL_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",

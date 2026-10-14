@@ -128,6 +128,10 @@ python3 tools/derive-entrystate-params.py --apply
 # was available and nothing ran it. Same lesson as index-boards: a derive tool outside this
 # script is a number nobody is keeping true.
 python3 tools/derive-components.py --apply
+# **The invisible wiring, derived from the operations** (Block A audit, 14 October 2026, CHG-SCR-*): the permission a
+# screen is gated on, which declared operation a control binds to, api purposes, poll reads, internal region ids and
+# wireframe links. Never a visible field (state text included, CHG-SCR-021): check-approved-ui holds that.
+python3 tools/derive-screen-wiring.py --apply
 
 # **Before the boards are drawn, so every screen knows where it was drawn.** Five P04 screens
 # added by hand from the client-approved POS prototype carried no `wireframe` block at all, and a
@@ -360,6 +364,11 @@ echo
 # **The change log's index is derived** (council of 2 October): one entry file per change in changes/entries/,
 # so parallel branches never conflict, and the index is written here rather than committed from a branch.
 python3 tools/build-changelog-index.py
+# **What a pull serves is gated, not only what the package says** (14 October 2026, CHG-GRD-001..003): the run-checks
+# list includes check-ticket-links (reads adam-links.json, what ADAM loads; adam-links.py writes it per release, not
+# here, so the release gate runs adam-links.py first: docs/active/release-runbook.md section 4) and
+# check-approved-ui (screens/ against handoff/approved-ui.json; its --snapshot <ref> is an act, run by hand when the
+# client approves a new UI, never here).
 python3 tools/run-checks.py
 
 # **Coverage is a number that can quietly go down.** A regeneration that dropped transitions would
@@ -407,6 +416,7 @@ ticket_done                                                        # imported by
 resolution_cache                                                   # imported by derive-lineage, derive-diagrams and check-write-lineage (the cache key a writer bumps), no main (4 October, CHG-FXC-001)
 frontend_repos                                                     # imported by build-service-docs, derive-frontend, op-descriptions, op-release, check-ticket-text and check-frontend-repos (the app -> repository map), no main (13 October, CHG-R6-059)
 ticket_features                                                    # imported by check-ticket-scope and check-audience-match (a feature's screens and operations), no main (14 October, CHG-SWP-001)
+apply-repo-layout                                                  # writes screens' component paths and ADAM setup's repository table from frontend-repos.yaml profiles: authored inputs, run by hand when a profile changes; check-frontend-repos holds both (14 October, CHG-RPO-002)
 audit-screen-promises                                              # ranks screen promises for an AI sample, by hand (--out); decides nothing (14 October, CHG-SWP-005)
 build-tracker-index                                                # intake: reads the two task-tracker workbooks at the repository root, outside git, once per tracker drop (1 October)
 push-openproject op-release op-release-api op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild

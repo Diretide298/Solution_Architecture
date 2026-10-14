@@ -5,6 +5,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "1",
@@ -194,7 +195,7 @@
         "Summer Festival Event 100% Yesterday Blueprint Ready"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listConfigurationSessions",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 4 §Show intelligent cards such as"
       }
      ]
@@ -207,6 +208,7 @@
        "kind": "detailPanel",
        "label": "The selected home start",
        "bindsTo": null,
+       "operation": "listConfigurationSessions",
        "columns": [
         "Museum",
         "Theme Park",
@@ -236,6 +238,7 @@
       {
        "kind": "primaryButton",
        "label": "Create New Configuration",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 4 §Allow"
       },
       {
@@ -281,13 +284,6 @@
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "attachConfigurationSource",
-    "contract": "ai",
-    "purpose": "Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listTenants",
     "contract": "subscription",
     "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
@@ -307,6 +303,13 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "attachConfigurationSource",
+    "contract": "ai",
+    "purpose": "Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -389,6 +392,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "1",
@@ -477,76 +481,91 @@
       {
        "kind": "selectField",
        "label": "Action: Create",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup"
       },
       {
        "kind": "selectField",
        "label": "Object: Venue",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup"
       },
       {
        "kind": "selectField",
        "label": "Venue Type: Museum",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup"
       },
       {
        "kind": "selectField",
        "label": "Organization: Existing",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup"
       },
       {
        "kind": "selectField",
        "label": "Location: Dubai",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup"
       },
       {
        "kind": "selectField",
        "label": "Operation Type: Permanent",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup"
       },
       {
        "kind": "selectField",
        "label": "Confidence: 96%",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup"
       },
       {
        "kind": "selectField",
        "label": "✓ Venue",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas"
       },
       {
        "kind": "selectField",
        "label": "✓ Products",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas"
       },
       {
        "kind": "selectField",
        "label": "✓ Schedule",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas"
       },
       {
        "kind": "selectField",
        "label": "✓ Capacity",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas"
       },
       {
        "kind": "selectField",
        "label": "✓ Pricing",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas"
       },
       {
        "kind": "selectField",
        "label": "✓ Sales Channels",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas"
       },
       {
        "kind": "selectField",
        "label": "✓ Ticket Media",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas"
       },
       {
        "kind": "selectField",
        "label": "✓ Access",
+       "operation": "startConfigurationSession",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas"
       }
      ]
@@ -570,27 +589,6 @@
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "answerConfigurationQuestion",
-    "contract": "ai",
-    "purpose": "Answer the current question",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "attachConfigurationSource",
-    "contract": "ai",
-    "purpose": "Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listConfigurationSources",
-    "contract": "ai",
-    "purpose": "Attached documents with extraction status and what they could not read",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listTenants",
     "contract": "subscription",
     "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
@@ -610,6 +608,20 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "attachConfigurationSource",
+    "contract": "ai",
+    "purpose": "Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listConfigurationSources",
+    "contract": "ai",
+    "purpose": "Attached documents with extraction status and what they could not read",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -684,6 +696,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "1",
@@ -772,151 +785,181 @@
       {
        "kind": "selectField",
        "label": "Venue Name",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Venue Type",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Country",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "City",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Time Zone",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Currency",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Operating Model",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "textField",
        "label": "Permanent / Seasonal / Temporary",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "textField",
        "label": "Indoor / Outdoor / Mixed",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Number of Locations",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "textField",
        "label": "Number of Attractions / Experiences",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Business Model Discovery",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "General Admission",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Dated Admission",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Open-Dated Admission",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Timeslot Admission",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Assigned Seating",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Multi-Day Admission",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Membership",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Subscription",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Pass",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Attraction / Ride-Based",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Mixed Model",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Conditional Logic",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Venue = Theatre",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Performances",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Seat Map",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Sections",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Price Categories",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       },
       {
        "kind": "selectField",
        "label": "Show Schedule",
+       "operation": "answerConfigurationQuestion",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant"
       }
      ]
@@ -954,13 +997,6 @@
     "contract": "ai",
     "purpose": "Answer the current question",
     "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getConfigurationBlueprint",
-    "contract": "ai",
-    "purpose": "The blueprint so far",
-    "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -1083,6 +1119,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "1",
@@ -1118,6 +1155,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the main adaptive AI interview workspace. This is the core screen of Board 1. It should feel conversational but remain structured and controlled.",
+  "division": "Shares `answerConfigurationQuestion`, `getConfigurationBlueprint` with ADM-473, ADM-474, ADM-475; this screen is Guided Question & Answer Workspace (pack AI_Configuration_Assistant_Reference.pdf, board 1.4, page 9): provide the main adaptive AI interview workspace. This is the core screen of Board 1. It should feel conversational but remain structured and controlled.",
   "gaps": [
    {
     "operation": null,
@@ -1174,12 +1212,14 @@
       },
       {
        "kind": "primaryButton",
+       "operation": "answerConfigurationQuestion",
        "derived": true,
        "impliedBy": "answerConfigurationQuestion",
        "notes": "The act the screen exists for."
       },
       {
        "kind": "detailPanel",
+       "operation": "getConfigurationBlueprint",
        "derived": true,
        "impliedBy": "getConfigurationBlueprint",
        "notes": "One record, read-only."
@@ -1312,6 +1352,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "1",
@@ -1347,6 +1388,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine what the venue sells and how each product provides admission or entitlement.",
+  "division": "Shares `answerConfigurationQuestion`, `getConfigurationBlueprint` with ADM-472, ADM-474, ADM-475; this screen is Product & Admission Model Discovery (pack AI_Configuration_Assistant_Reference.pdf, board 1.5, page 10): determine what the venue sells and how each product provides admission or entitlement.",
   "gaps": [
    {
     "operation": null,
@@ -1403,12 +1445,14 @@
       },
       {
        "kind": "primaryButton",
+       "operation": "answerConfigurationQuestion",
        "derived": true,
        "impliedBy": "answerConfigurationQuestion",
        "notes": "The act the screen exists for."
       },
       {
        "kind": "detailPanel",
+       "operation": "getConfigurationBlueprint",
        "derived": true,
        "impliedBy": "getConfigurationBlueprint",
        "notes": "One record, read-only."
@@ -1541,6 +1585,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "1",
@@ -1576,6 +1621,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Understand the operational rules needed to deliver the configured products.",
+  "division": "Shares `answerConfigurationQuestion`, `getConfigurationBlueprint` with ADM-472, ADM-473, ADM-475; this screen is Operational Requirement Discovery (pack AI_Configuration_Assistant_Reference.pdf, board 1.6, page 12): understand the operational rules needed to deliver the configured products.",
   "gaps": [
    {
     "operation": null,
@@ -1648,6 +1694,7 @@
       },
       {
        "kind": "detailPanel",
+       "operation": "getConfigurationBlueprint",
        "derived": true,
        "impliedBy": "getConfigurationBlueprint",
        "notes": "One record, read-only."
@@ -1780,6 +1827,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "1",
@@ -1815,6 +1863,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Understand how the venue intends to sell and commercially manage its products without actually configuring pricing yet.",
+  "division": "Shares `answerConfigurationQuestion`, `getConfigurationBlueprint` with ADM-472, ADM-473, ADM-474; this screen is Commercial Requirement Discovery (pack AI_Configuration_Assistant_Reference.pdf, board 1.7, page 13): understand how the venue intends to sell and commercially manage its products without actually configuring pricing yet.",
   "gaps": [
    {
     "operation": null,
@@ -1871,12 +1920,14 @@
       },
       {
        "kind": "primaryButton",
+       "operation": "answerConfigurationQuestion",
        "derived": true,
        "impliedBy": "answerConfigurationQuestion",
        "notes": "The act the screen exists for."
       },
       {
        "kind": "detailPanel",
+       "operation": "getConfigurationBlueprint",
        "derived": true,
        "impliedBy": "getConfigurationBlueprint",
        "notes": "One record, read-only."
@@ -2009,6 +2060,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "1",
@@ -2090,21 +2142,25 @@
       {
        "kind": "selectField",
        "label": "Configure Now",
+       "operation": "decideBlueprintRecommendation",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 14 §Options"
       },
       {
        "kind": "selectField",
        "label": "Use Recommended Policy",
+       "operation": "decideBlueprintRecommendation",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 14 §Options"
       },
       {
        "kind": "selectField",
        "label": "Decide Later",
+       "operation": "decideBlueprintRecommendation",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 14 §Options"
       },
       {
        "kind": "selectField",
        "label": "Required Rule",
+       "operation": "decideBlueprintRecommendation",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 14 §Options"
       }
      ]
@@ -2120,13 +2176,6 @@
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
-   {
-    "operationId": "getConfigurationBlueprint",
-    "contract": "ai",
-    "purpose": "The blueprint so far",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
    {
     "operationId": "decideBlueprintRecommendation",
     "contract": "ai",
@@ -2234,6 +2283,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "1",
@@ -2315,26 +2365,31 @@
       {
        "kind": "metricTile",
        "label": "Required Missing",
+       "operation": "getConfigurationBlueprint",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 16 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Clarifications Needed",
+       "operation": "getConfigurationBlueprint",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 16 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Conflicts",
+       "operation": "getConfigurationBlueprint",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 16 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Warnings",
+       "operation": "getConfigurationBlueprint",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 16 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Recommendations",
+       "operation": "getConfigurationBlueprint",
        "provenance": "pack AI_Configuration_Assistant_Reference.pdf, page 16 §Header KPIs"
       }
      ]
@@ -2351,37 +2406,9 @@
   },
   "apis": [
    {
-    "operationId": "answerConfigurationQuestion",
-    "contract": "ai",
-    "purpose": "Answer the current question",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "getConfigurationBlueprint",
     "contract": "ai",
     "purpose": "The blueprint so far",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "decideBlueprintRecommendation",
-    "contract": "ai",
-    "purpose": "Accept, modify, reject or defer a blueprint decision",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "attachConfigurationSource",
-    "contract": "ai",
-    "purpose": "Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listConfigurationSources",
-    "contract": "ai",
-    "purpose": "Attached documents with extraction status and what they could not read",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -2405,6 +2432,20 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "attachConfigurationSource",
+    "contract": "ai",
+    "purpose": "Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listConfigurationSources",
+    "contract": "ai",
+    "purpose": "Attached documents with extraction status and what they could not read",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -2485,6 +2526,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Configuration_Assistant_Reference.pdf",
    "board": "1",
@@ -2576,12 +2618,14 @@
       },
       {
        "kind": "detailPanel",
+       "operation": "getConfigurationBlueprint",
        "derived": true,
        "impliedBy": "getConfigurationBlueprint",
        "notes": "One record, read-only."
       },
       {
        "kind": "primaryButton",
+       "operation": "buildConfigurationPlan",
        "derived": true,
        "impliedBy": "buildConfigurationPlan",
        "notes": "The act the screen exists for."

@@ -1,6 +1,6 @@
 # WS68 — Unified BI Reporting and AI Analytics Platform board 3
 
-**10 screens · 10 operations · 18 schemas · 3 permissions**
+**10 screens · 9 operations · 17 schemas · 3 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -110,8 +110,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ANL-036` | Grouping, Aggregation & Calculation Builder | D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-037` | Cross-Domain Report Composer | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-038` | Report Layout & Formatting Designer | D | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-039` | Report Preview, Test & Validation | D | 0 | 16 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `ANL-040` | Save, Run & Report Results Viewer | D | 0 | 4 | 6 | 5 | 2 | 0 | — | notStarted (—) |
+| `ANL-039` | Report Preview, Test & Validation | D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-040` | Save, Run & Report Results Viewer | D | 0 | 92 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -168,7 +168,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every report catalogue** (data table)
+**Every report catalogue** (data table, from `listReports`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -186,7 +186,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Status | text | not in the schema: `Status` |
 | Usage count | text | not in the schema: `Usage Count` |
 
-**The selected report catalogue** (detail panel): The pack groups this record's detail under its own headings: “Report Categories”, “Report Types”.
+**The selected report catalogue** (detail panel, from `listReports`): The pack groups this record's detail under its own headings: “Report Categories”, “Report Types”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -291,6 +291,8 @@ rows:
 - `listSeededReports` → `REPORT_VIEW_VENUE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_VENUE`
 
 #### Requirements it meets
 
@@ -441,6 +443,8 @@ basics:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_MANAGE`
+
 #### Requirements it meets
 
 82 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -535,7 +539,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every data domain dataset** (data table)
+**Every data domain dataset** (data table, from `getSemanticModel`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -548,7 +552,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Data owner | text | not in the schema: `Data Owner` |
 | Security classification | text | not in the schema: `Security Classification` |
 
-**The selected data domain dataset** (detail panel): The pack groups this record's detail under its own headings: “Ticketing”, “Sales”, “Finance”, “Payments”, “Access”, “Customer”.
+**The selected data domain dataset** (detail panel, from `getSemanticModel`): The pack groups this record's detail under its own headings: “Ticketing”, “Sales”, “Finance”, “Payments”, “Access”, “Customer”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -623,6 +627,8 @@ datasets:
 - `getSemanticModel` → `REPORT_VIEW_TENANT` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_TENANT`
 
 #### Requirements it meets
 
@@ -773,6 +779,8 @@ columns:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -921,6 +929,8 @@ filters:
 - `updateReport` → `REPORT_MANAGE` (configure) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_MANAGE`
 
 #### Requirements it meets
 
@@ -1075,6 +1085,8 @@ result:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1212,6 +1224,8 @@ example: 'Spend per guest by visit day - Aquaventure Waterpark, September 2026: 
 - `updateReport` → `REPORT_MANAGE` (configure) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_TENANT`
 
 #### Requirements it meets
 
@@ -1369,6 +1383,8 @@ arabicHeading: تقرير الإغلاق اليومي
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1446,7 +1462,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every report preview test** (data table)
+**Every report preview test** (data table, from `getReportExecution`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1459,7 +1475,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Execution time | text | not in the schema: `Execution Time` |
 | Data refresh time | text | not in the schema: `Data Refresh Time` |
 
-**The selected report preview test** (detail panel)
+**The selected report preview test** (detail panel, from `getReportExecution`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1497,7 +1513,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the report preview test are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 409 Already completed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Already completed |
 
 #### Edge cases to draw
 
@@ -1529,23 +1545,16 @@ checks:
 
 #### Permissions
 
-- `runReport` → `REPORT_VIEW_VENUE` (operate) · staff, partner
 - `getReportExecution` → `REPORT_VIEW_VENUE` (operate) · staff
 - `cancelReportExecution` → `REPORT_VIEW_VENUE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
-5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 6.1.19 | The system should have ability for reporting ranges which allow for specific beginning/end points; e.g., date-to-date as well as month, or guest name list | Retail POS | CONTRACTED | `runReport` |
-| 6.1.43 | The system should be able to report on Historical records up to 5 years for internal reporting requirements or as required by finance operation team for Audit purpose. | Retail POS | CONTRACTED | `runReport` |
-| 8.7.24 | System shall support historical analytics. | Unified Operations Dashboard | CONTRACTED | `runReport` |
-| 8.7.25 | System shall support trend analysis. | Unified Operations Dashboard | CONTRACTED | `runReport` |
-| 13.3.14 | APIs shall expose operational, financial, attendance, membership and sales reporting data. | Developer & API Management | CONTRACTED | `runReport` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -1566,7 +1575,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-039?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1618,21 +1627,133 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Report Name** (metric tile)
+**Report Name** (metric tile, from `getReportResult`)
 
-**Description** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Execution | text | — |
+| Columns | list or chips (count when long) | — |
+| Key | text | — |
+| Label | text | — |
+| Type | chip: String, Integer, Decimal, Money, Boolean, Date… | — |
+| Rows | list or chips (count when long) | Open on purpose; the shape is `columns`. Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a … |
+| Totals | grouped details | Aggregated columns only, keyed and typed as a row is. |
+| Row count | 1,234 | — |
+| Next cursor | text | — |
+| Generated at | 1 Oct 2026, 14:30 | — |
+| Data as of | 1 Oct 2026, 14:30 | Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it … |
 
-**Owner** (metric tile)
+**Description** (metric tile, from `getReportResult`)
 
-**Last Run** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Execution | text | — |
+| Columns | list or chips (count when long) | — |
+| Key | text | — |
+| Label | text | — |
+| Type | chip: String, Integer, Decimal, Money, Boolean, Date… | — |
+| Rows | list or chips (count when long) | Open on purpose; the shape is `columns`. Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a … |
+| Totals | grouped details | Aggregated columns only, keyed and typed as a row is. |
+| Row count | 1,234 | — |
+| Next cursor | text | — |
+| Generated at | 1 Oct 2026, 14:30 | — |
+| Data as of | 1 Oct 2026, 14:30 | Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it … |
 
-**Data Refresh** (metric tile)
+**Owner** (metric tile, from `getReportResult`)
 
-**Applied Parameters** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Execution | text | — |
+| Columns | list or chips (count when long) | — |
+| Key | text | — |
+| Label | text | — |
+| Type | chip: String, Integer, Decimal, Money, Boolean, Date… | — |
+| Rows | list or chips (count when long) | Open on purpose; the shape is `columns`. Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a … |
+| Totals | grouped details | Aggregated columns only, keyed and typed as a row is. |
+| Row count | 1,234 | — |
+| Next cursor | text | — |
+| Generated at | 1 Oct 2026, 14:30 | — |
+| Data as of | 1 Oct 2026, 14:30 | Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it … |
 
-**Reporting Period** (metric tile)
+**Last Run** (metric tile, from `getReportResult`)
 
-**Visual management dashboards Detailed reporting** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Execution | text | — |
+| Columns | list or chips (count when long) | — |
+| Key | text | — |
+| Label | text | — |
+| Type | chip: String, Integer, Decimal, Money, Boolean, Date… | — |
+| Rows | list or chips (count when long) | Open on purpose; the shape is `columns`. Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a … |
+| Totals | grouped details | Aggregated columns only, keyed and typed as a row is. |
+| Row count | 1,234 | — |
+| Next cursor | text | — |
+| Generated at | 1 Oct 2026, 14:30 | — |
+| Data as of | 1 Oct 2026, 14:30 | Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it … |
+
+**Data Refresh** (metric tile, from `getReportResult`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Execution | text | — |
+| Columns | list or chips (count when long) | — |
+| Key | text | — |
+| Label | text | — |
+| Type | chip: String, Integer, Decimal, Money, Boolean, Date… | — |
+| Rows | list or chips (count when long) | Open on purpose; the shape is `columns`. Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a … |
+| Totals | grouped details | Aggregated columns only, keyed and typed as a row is. |
+| Row count | 1,234 | — |
+| Next cursor | text | — |
+| Generated at | 1 Oct 2026, 14:30 | — |
+| Data as of | 1 Oct 2026, 14:30 | Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it … |
+
+**Applied Parameters** (metric tile, from `getReportResult`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Execution | text | — |
+| Columns | list or chips (count when long) | — |
+| Key | text | — |
+| Label | text | — |
+| Type | chip: String, Integer, Decimal, Money, Boolean, Date… | — |
+| Rows | list or chips (count when long) | Open on purpose; the shape is `columns`. Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a … |
+| Totals | grouped details | Aggregated columns only, keyed and typed as a row is. |
+| Row count | 1,234 | — |
+| Next cursor | text | — |
+| Generated at | 1 Oct 2026, 14:30 | — |
+| Data as of | 1 Oct 2026, 14:30 | Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it … |
+
+**Reporting Period** (metric tile, from `getReportResult`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Execution | text | — |
+| Columns | list or chips (count when long) | — |
+| Key | text | — |
+| Label | text | — |
+| Type | chip: String, Integer, Decimal, Money, Boolean, Date… | — |
+| Rows | list or chips (count when long) | Open on purpose; the shape is `columns`. Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a … |
+| Totals | grouped details | Aggregated columns only, keyed and typed as a row is. |
+| Row count | 1,234 | — |
+| Next cursor | text | — |
+| Generated at | 1 Oct 2026, 14:30 | — |
+| Data as of | 1 Oct 2026, 14:30 | Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it … |
+
+**Visual management dashboards Detailed reporting** (metric tile, from `getReportResult`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Execution | text | — |
+| Columns | list or chips (count when long) | — |
+| Key | text | — |
+| Label | text | — |
+| Type | chip: String, Integer, Decimal, Money, Boolean, Date… | — |
+| Rows | list or chips (count when long) | Open on purpose; the shape is `columns`. Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a … |
+| Totals | grouped details | Aggregated columns only, keyed and typed as a row is. |
+| Row count | 1,234 | — |
+| Next cursor | text | — |
+| Generated at | 1 Oct 2026, 14:30 | — |
+| Data as of | 1 Oct 2026, 14:30 | Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it … |
 
 **Every save run report** (data table)
 
@@ -1676,7 +1797,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the save run report are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 409 Execution has not completed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Execution has not completed |
 
 #### Edge cases to draw
 
@@ -1720,22 +1841,15 @@ totals:
 
 #### Permissions
 
-- `runReport` → `REPORT_VIEW_VENUE` (operate) · staff, partner
 - `getReportResult` → `REPORT_VIEW_VENUE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
-5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 6.1.19 | The system should have ability for reporting ranges which allow for specific beginning/end points; e.g., date-to-date as well as month, or guest name list | Retail POS | CONTRACTED | `runReport` |
-| 6.1.43 | The system should be able to report on Historical records up to 5 years for internal reporting requirements or as required by finance operation team for Audit purpose. | Retail POS | CONTRACTED | `runReport` |
-| 8.7.24 | System shall support historical analytics. | Unified Operations Dashboard | CONTRACTED | `runReport` |
-| 8.7.25 | System shall support trend analysis. | Unified Operations Dashboard | CONTRACTED | `runReport` |
-| 13.3.14 | APIs shall expose operational, financial, attendance, membership and sales reporting data. | Developer & API Management | CONTRACTED | `runReport` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -1759,8 +1873,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 409).
-- [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (92 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-040?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-031`.
@@ -1862,7 +1976,6 @@ Method, path, parameters, request and response for every operation these screens
 "listReportFields": {"method":"GET","path":"/report-fields","contract":"reporting","summary":"Fields available for a data source","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"dataSource","in":"query","required":true}],"requestBody":null,"responds":"ReportField"},
 "listReports": {"method":"GET","path":"/reports","contract":"reporting","summary":"List available report definitions","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"category","in":"query","required":null},{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSeededReports": {"method":"GET","path":"/reports/seeded","contract":"reporting","summary":"The reports every venue starts with","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"SeededReport"},
-"runReport": {"method":"POST","path":"/reports/{reportId}/run","contract":"reporting","summary":"Run a report","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RunReportRequest","responds":"ReportResult"},
 "updateReport": {"method":"PUT","path":"/reports/{reportId}","contract":"reporting","summary":"Publish a new version of a definition","permission":"REPORT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateReportRequest","responds":"ReportDefinition"}
 }
 ```
@@ -1888,8 +2001,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ReportFilter": {"x-ticvai-persistence":"reporting.report_filter","type":"object","required":["field","operator"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"field":{"type":"string"},"operator":{"type":"string","enum":["equals","notEquals","greaterThan","lessThan","between","in","notIn","contains","isNull","isNotNull"]},"value":{"description":"**Open on purpose; its type is the field's.** One value, of the `FieldType` that `listReportFields` gives for `field` — a string, number, boolean, or a date, date-time or uuid as a string. Absent for `in`, `notIn`, `between`, `isNull` and `isNotNull`.\n"},"values":{"type":"array","description":"The values for `in` and `notIn`, or exactly two (from, to) for `between`. Each of the field's `FieldType`, as `value`.","items":{}},"isParameter":{"type":"boolean","default":false,"description":"Prompted at run time rather than fixed. Parameters narrow the result; they never widen scope.\n"}}},
 "ReportParameter": {"x-ticvai-persistence":"reporting.report_parameter","type":"object","required":["key","label","type","isRequired"],"properties":{"key":{"type":"string"},"label":{"type":"string"},"type":{"$ref":"#/components/schemas/FieldType"},"isRequired":{"type":"boolean"},"defaultValue":{"description":"Open on purpose. A value of this parameter's `type`, used when a run supplies none."}}},
 "ReportResult": {"x-ticvai-persistence":"none — result set, cached in object storage","type":"object","required":["executionId","columns","rows"],"properties":{"executionId":{"type":"string"},"columns":{"type":"array","items":{"type":"object","properties":{"key":{"type":"string"},"label":{"type":"string"},"type":{"$ref":"#/components/schemas/FieldType"}}}},"rows":{"type":"array","description":"**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n","items":{"type":"object","additionalProperties":true}},"totals":{"type":"object","additionalProperties":true,"description":"Aggregated columns only, keyed and typed as a row is."},"rowCount":{"type":"integer"},"nextCursor":{"type":"string","nullable":true},"generatedAt":{"type":"string","format":"date-time"},"dataAsOf":{"type":"string","format":"date-time","description":"Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"}}},
-"RunReportRequest": {"x-ticvai-persistence":"none — request only","type":"object","properties":{"parameters":{"type":"object","additionalProperties":true,"description":"**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"},"venueId":{"type":"string","format":"uuid","description":"Narrows to one venue. Omitting it returns everything the caller's scope permits — it cannot be used to reach beyond that.\n"},"dateFrom":{"type":"string","format":"date","description":"Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158). A business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."},"dateTo":{"type":"string","format":"date","description":"Defaults to today in the venue's time zone when not sent (audit R158)."},"forceAsync":{"type":"boolean","default":false,"description":"Queue regardless of size, for a result to be collected later."}}},
 "SeededReport": {"type":"object","description":"BL-053. **`ReportDefinition.isSystem` existed and nothing populated it.** Twenty-eight requirements asked for dashboards and analyses over data that was already there, and the answer to every one of them was *\"the builder can do that\"* — which is true and is not a deliverable.\n**A venue opening on Monday does not want a report builder. It wants the eight reports every venue runs**, and the ability to change them.\nSeeded at provisioning, `isSystem` true, and **clone-only (decided 28 September, audit R096)**: `updateReport` and `deleteReport` refuse a system report with 409, and a venue that wants one different clones it with `createReport`. The eight codes are listed on `listSeededReports` (proposed, audit R282).\n","required":["code","name","category","dataSource"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"category":{"$ref":"#/components/schemas/ReportCategory"},"dataSource":{"$ref":"#/components/schemas/DataSource"},"appliesToVenueKinds":{"type":"array","description":"**A water park does not need a theatre's seat-utilisation report.** Empty means every venue kind.\n","items":{"type":"string"}},"defaultSchedule":{"$ref":"#/components/schemas/Cadence"},"rationale":{"type":"string","description":"**Why this report ships, in words a venue manager reads.** A seeded report with no rationale is one somebody deletes as clutter in the first week.\n"}}},
-"SemanticModel": {"type":"object","x-ticvai-persistence":"reporting.semantic_model","description":"BI boards 3.3 and 10.6. **A vocabulary, not a schema.** Exposing joins to report authors produces reports that are wrong invisibly.\n","properties":{"version":{"type":"integer","readOnly":true,"description":"Assigned by the server on each publish."},"domains":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"datasets":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"grain":{"type":"string","description":"**What one row means.** The single most common cause of a wrong report is a join that silently multiplied the grain.\n"},"fields":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"dataType":{"$ref":"#/components/schemas/FieldType"},"aggregation":{"allOf":[{"$ref":"#/components/schemas/Aggregation"}],"nullable":true,"description":"The default aggregation for the field, where it has one."},"sensitive":{"type":"boolean","default":false},"description":{"type":"string","nullable":true}}}}}}}}}},"relationships":{"type":"array","items":{"type":"object","properties":{"fromDataset":{"type":"string"},"toDataset":{"type":"string"},"cardinality":{"type":"string","enum":["oneToOne","oneToMany","manyToOne","manyToMany"]}}}},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}}
+"SemanticModel": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"reporting.semantic_model","description":"BI boards 3.3 and 10.6. **A vocabulary, not a schema.** Exposing joins to report authors produces reports that are wrong invisibly.\n","properties":{"version":{"type":"integer","readOnly":true,"description":"Assigned by the server on each publish."},"domains":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"datasets":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"grain":{"type":"string","description":"**What one row means.** The single most common cause of a wrong report is a join that silently multiplied the grain.\n"},"fields":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"dataType":{"$ref":"#/components/schemas/FieldType"},"aggregation":{"allOf":[{"$ref":"#/components/schemas/Aggregation"}],"nullable":true,"description":"The default aggregation for the field, where it has one."},"sensitive":{"type":"boolean","default":false},"description":{"type":"string","nullable":true}}}}}}}}}},"relationships":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"fromDataset":{"type":"string"},"toDataset":{"type":"string"},"cardinality":{"type":"string","enum":["oneToOne","oneToMany","manyToOne","manyToMany"]}}}},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}}
 }
 ```

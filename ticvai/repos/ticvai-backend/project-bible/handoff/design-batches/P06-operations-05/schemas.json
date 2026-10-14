@@ -271,7 +271,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "authority": {
     "type": "string",
@@ -387,7 +388,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "note": {
     "type": "string",
@@ -446,7 +448,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "kind": {
     "type": "string",
@@ -500,6 +503,100 @@
    "environmental",
    "other"
   ]
+ },
+ "IncidentMedia": {
+  "x-ticvai-persistence": "maintenance.incident_media",
+  "type": "object",
+  "description": "**One photo, video or document on an incident** (`uploadIncidentMedia`; CHG-RUL-013). The file is in the media store; this row links it to the incident.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "kind",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "incidentId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "photo",
+     "video",
+     "document"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "awaitingUpload",
+     "stored"
+    ],
+    "readOnly": true,
+    "description": "`stored` once the media store confirmed the transfer and `assetRef` is set."
+   },
+   "assetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "assets.media_asset"
+   },
+   "caption": {
+    "type": "string",
+    "nullable": true
+   },
+   "capturedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "upload": {
+    "type": "object",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The signed upload, as `assets.createUpload` returns it; only on the 201.",
+    "properties": {
+     "uploadUrl": {
+      "type": "string"
+     },
+     "method": {
+      "type": "string",
+      "enum": [
+       "PUT",
+       "POST"
+      ]
+     },
+     "headers": {
+      "type": "object",
+      "additionalProperties": {
+       "type": "string"
+      }
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  }
  },
  "IncidentSeverity": {
   "type": "string",
@@ -736,11 +833,13 @@
    },
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "tenant"
    },
    "name": {
     "type": "string",
@@ -888,6 +987,9 @@
   }
  },
  "ScanEvent": {
+  "x-ticvai-retired-columns": [
+   "ticket_id"
+  ],
   "x-ticvai-append-only": "recordedAt",
   "x-ticvai-persistence": "access.scan_event",
   "type": "object",
@@ -917,6 +1019,8 @@
     "type": "string"
    },
    "ticketId": {
+    "x-ticvai-references": "access.entitlement",
+    "x-ticvai-column": "entitlement_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1098,7 +1202,8 @@
    },
    "templateId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.inspection_template"
    },
    "venueId": {
     "type": "string",
@@ -1146,6 +1251,46 @@
    "recordedAt": {
     "type": "string",
     "format": "date-time"
+   }
+  }
+ },
+ "UploadIncidentMediaRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "kind",
+   "filename",
+   "contentType",
+   "sizeBytes"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "photo",
+     "video",
+     "document"
+    ]
+   },
+   "filename": {
+    "type": "string",
+    "maxLength": 256
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "capturedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the photo or video was taken."
+   },
+   "caption": {
+    "type": "string",
+    "maxLength": 500
    }
   }
  },

@@ -123,6 +123,31 @@ def main() -> int:
     for cmd in sorted(set(re.findall(r"`pnpm (\w+)`", blob))):
         if cmd not in scripts:
             guard.add("SF-DONE-GATES", f"pnpm:{cmd}", f"tickets ask for `pnpm {cmd}`; frontend package.json has no {cmd} script")
+    # CHG-RPO-003: a screen built in a repository whose layout was read is gated by that repository's own package
+    # manager and scripts (frontend_repos.profile), not the one-workspace starter's: #27741's guest app is npm with no
+    # typecheck script, and its tickets asked for `pnpm typecheck`.
+    sys.path.insert(0, str(g.ROOT / "tools"))
+    import frontend_repos as fr  # noqa: E402
+    idx = fr.screen_index()
+    for key, text in sorted(desc.items()):
+        gates = [l for l in str(text).splitlines() if l.startswith("- [ ]") and
+                 re.search(r"\bpnpm\b|\bnpm\b|\byarn\b|typecheck|scripts pass", l)]
+        if not gates:
+            continue
+        for sid in sorted(set(re.findall(r"^### ([A-Z]{2,5}-\d{3,4}) ", str(text), re.M))):
+            p = fr.profile((idx.get(sid) or {}).get("platform") or "")
+            if not p.get("read"):
+                continue
+            pm = str(p.get("packageManager") or "")
+            lack = [k for k, v in (p.get("scripts") or {}).items() if v in ("none", False)]
+            for l in gates:
+                other = [m for m in re.findall(r"`(pnpm|npm|yarn)\b", l) if m != pm]
+                missing = [k for k in lack if re.search(rf"`[a-z]+ (run )?{k}`", l)]
+                if other or missing:
+                    guard.add("SF-DONE-GATES", f"{key}:{sid}",
+                              f"ticket {key} ({sid}) gates {p['repo']} with {l[6:90]!r}; the repository uses {pm}"
+                              + (f" and has no {', '.join(missing)} script" if missing else ""))
+                    break
     tests = [p for p in be.rglob("*.csproj") if "Tests" in p.stem and "/obj/" not in p.as_posix()]
     if "dotnet test" in blob and not tests:
         guard.add("SF-DONE-GATES", "dotnet:test", "tickets ask for `dotnet test`; the backend starter has no test project")

@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-700` | Venue & Space Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-700` | Venue & Space Command Center | B | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-701` | Venue Master Configuration | B | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-702` | Space Access Rules Configuration | B | 0 | 17 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
@@ -154,7 +154,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listSpaces`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Venue | the name it points at, never the id | — |
+| Venue map zone | the name it points at, never the id | — |
+| Resource | the name it points at, never the id | Where the space is also a bookable `resources` resource, so its calendar and conflict detection come from there rather than a second … |
+| Parent space | the name it points at, never the id | — |
+| Maximum capacity | 1,234 | — |
+| Safe capacity | 1,234 | — |
+| Setup minutes | 1,234 | — |
+| Teardown minutes | 1,234 | — |
+| Access rules | grouped details | — |
+| Bookable | yes / no (icon or chip) | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -199,6 +215,8 @@ spaces:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `EVENT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -226,7 +244,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-700?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-701`, `BO-702`.
@@ -249,7 +267,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `spaceId` (navigation) |
 | Route | `/sell/venue-master-configuration-bo-701` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
@@ -333,6 +351,8 @@ space:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `EVENT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -380,7 +400,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `spaceId` (navigation) |
 | Route | `/sell/space-access-rules-configuration-bo-702` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
@@ -470,6 +490,8 @@ rules:
 - `listSpaces` → `EVENT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `EVENT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -603,7 +625,7 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "listSpaces": {"method":"GET","path":"/spaces","contract":"catalogue","summary":"Halls, rooms and areas an event can occupy","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Space"},
-"setSpace": {"method":"PUT","path":"/spaces","contract":"catalogue","summary":"Define a space, its capacity and its access rules","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Space","responds":"Space"}
+"setSpace": {"method":"PUT","path":"/spaces/{spaceId}","contract":"catalogue","summary":"Define a space, its capacity and its access rules","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"spaceId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"Space","responds":"Space"}
 }
 ```
 
@@ -613,6 +635,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"Space": {"type":"object","x-ticvai-persistence":"catalogue.space","description":"Event board 3.2. **Bookable, as distinct from navigable** — `venue-map` owns the geometry.\n","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"venueMapZoneId":{"type":"string","format":"uuid","nullable":true},"resourceId":{"type":"string","format":"uuid","nullable":true,"description":"**Where the space is also a bookable `resources` resource**, so its calendar and conflict detection come from there rather than a second scheduler.\n"},"parentSpaceId":{"type":"string","format":"uuid","nullable":true},"maximumCapacity":{"type":"integer","nullable":true},"safeCapacity":{"type":"integer","nullable":true},"setupMinutes":{"type":"integer","default":0},"teardownMinutes":{"type":"integer","default":0},"accessRules":{"type":"object","nullable":true,"additionalProperties":true},"bookable":{"type":"boolean","default":true},"scopePath":{"type":"string"}}}
+"Space": {"type":"object","x-ticvai-persistence":"catalogue.space","description":"Event board 3.2. **Bookable, as distinct from navigable** — `venue-map` owns the geometry.\n","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"venueMapZoneId":{"x-ticvai-references":"none","type":"string","format":"uuid","nullable":true},"resourceId":{"type":"string","format":"uuid","nullable":true,"description":"**Where the space is also a bookable `resources` resource**, so its calendar and conflict detection come from there rather than a second scheduler.\n"},"parentSpaceId":{"type":"string","format":"uuid","nullable":true},"maximumCapacity":{"type":"integer","nullable":true},"safeCapacity":{"type":"integer","nullable":true},"setupMinutes":{"type":"integer","default":0},"teardownMinutes":{"type":"integer","default":0},"accessRules":{"type":"object","nullable":true,"additionalProperties":true},"bookable":{"type":"boolean","default":true},"scopePath":{"type":"string"}}}
 }
 ```

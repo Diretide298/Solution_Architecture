@@ -41,7 +41,7 @@ modulesUsed:
   screens: 10
 servicesCalled:
 - service: FnbService
-  operationCalls: 33
+  operationCalls: 34
 - service: ReportingService
   operationCalls: 4
 coverage:
@@ -316,6 +316,7 @@ screens:
   operations:
   - getCourseRules
   - getKitchenSla
+  - listKitchenTickets
   - setKitchenSla
   states:
   - emptyFirstRun

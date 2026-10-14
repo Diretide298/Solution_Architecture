@@ -80,6 +80,40 @@
   "requestBody": null,
   "responds": "BillingReconciliation"
  },
+ "getCommercialMetrics": {
+  "method": "GET",
+  "path": "/commercial-metrics",
+  "contract": "subscription",
+  "summary": "The commercial figures across the customer portfolio, by code",
+  "permission": "PLATFORM_BILLING_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "codes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CommercialMetricSet"
+ },
  "getPlanRecommendations": {
   "method": "GET",
   "path": "/plan-recommendations",
@@ -267,25 +301,6 @@
   ],
   "requestBody": null,
   "responds": null
- },
- "setSubscription": {
-  "method": "PUT",
-  "path": "/tenants/{tenantId}/subscription",
-  "contract": "subscription",
-  "summary": "Assign or change a subscription",
-  "permission": "PLATFORM_TENANT_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "SetSubscriptionRequest",
-  "responds": "Subscription"
  },
  "settleAiUsage": {
   "method": "POST",

@@ -106,14 +106,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-993` | Experience Command Center | C | 0 | 0 | 6 | 8 | 0 | 0 | — | notStarted (—) |
-| `BO-994` | Choose My Seats | C | 0 | 0 | 6 | 12 | 1 | 6 | — | notStarted (—) |
+| `BO-993` | Experience Command Center | C | 0 | 9 | 6 | 8 | 0 | 0 | — | notStarted (—) |
+| `BO-994` | Choose My Seats | C | 0 | 20 | 6 | 12 | 1 | 6 | — | notStarted (—) |
 | `BO-995` | Find Seats For Me | C | 0 | 20 | 6 | 18 | 2 | 6 | — | notStarted (—) |
-| `BO-996` | Filters & Interactive Legend | C | 0 | 0 | 6 | 8 | 0 | 0 | — | notStarted (—) |
+| `BO-996` | Filters & Interactive Legend | C | 0 | 20 | 6 | 8 | 0 | 0 | — | notStarted (—) |
 | `BO-997` | Real-Time Availability & Locking | C | 0 | 17 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-998` | Lock Timeout & Concurrency | B | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-999` | Cart & Multi-Seat Management | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1000` | Mobile & Accessible Selection | C | 0 | 0 | 6 | 8 | 0 | 0 | — | notStarted (—) |
+| `BO-999` | Cart & Multi-Seat Management | C | 0 | 10 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1000` | Mobile & Accessible Selection | C | 0 | 20 | 6 | 8 | 0 | 0 | — | notStarted (—) |
 | `BO-1001` | View Preview, Compare & Heat Map | C | 0 | 20 | 6 | 20 | 0 | 0 | — | notStarted (—) |
 | `BO-1002` | AI Conversational Seat Assistant | C | 0 | 20 | 6 | 20 | 0 | 6 | — | notStarted (—) |
 
@@ -159,7 +159,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSeatingRules`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Seat map | the name it points at, never the id | — |
+| Buffer seats | 1,234 | Seats kept empty either side of a sold party. |
+| Buffer rows | 1,234 | — |
+| Prevent orphan seats | yes / no (icon or chip) | Refuse a selection that would leave a single unsellable seat between parties. Operators want this and rarely ask for it by name. |
+| Max party size | 1,234 | — |
+| Require contiguous | yes / no (icon or chip) | A party must sit together or the selection is refused. |
+| Accessible companion count | 1,234 | Companion seats sold alongside each accessible space. |
+| Allow split across rows | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -210,6 +222,8 @@ rules:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -255,7 +269,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-993?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save seating rules, Cancel.
 - [ ] Every transition is wired: `BO-100`, `BO-994`, `BO-995`, `BO-996`, `BO-997`, `BO-998`, `BO-999`, `BO-1000`, `BO-1001`, `BO-1002`.
@@ -293,7 +307,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSeatAvailability`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Performance | the name it points at, never the id | — |
+| Seat map | the name it points at, never the id | — |
+| Render mode | chip: Graphical, List | The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat … |
+| Totals | grouped details | — |
+| Total | 1,234 | — |
+| Available | 1,234 | — |
+| Held | 1,234 | — |
+| Sold | 1,234 | — |
+| Blocked | 1,234 | — |
+| Buffered | 1,234 | — |
+| By category | list or chips (count when long) | — |
+| Category | the name it points at, never the id | — |
+| Available | 1,234 | — |
+| Sold | 1,234 | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Sections | list or chips (count when long) | The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the … |
+| Code | text | — |
+| Name | text | — |
+| View image | the image or video | As `Section.viewAssetId`. Null means render the view from geometry. |
+| Boundary | list or chips (count when long) | As `Section.boundary`. Null when `renderMode` is `list`. |
 
 **Actions and what each produces**
 
@@ -346,6 +383,8 @@ selection:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -395,7 +434,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-994?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create seat hold, Cancel.
 - [ ] Every transition is wired: `BO-993`.
@@ -515,6 +554,8 @@ request:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 18 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -602,7 +643,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSeatAvailability`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Performance | the name it points at, never the id | — |
+| Seat map | the name it points at, never the id | — |
+| Render mode | chip: Graphical, List | The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat … |
+| Totals | grouped details | — |
+| Total | 1,234 | — |
+| Available | 1,234 | — |
+| Held | 1,234 | — |
+| Sold | 1,234 | — |
+| Blocked | 1,234 | — |
+| Buffered | 1,234 | — |
+| By category | list or chips (count when long) | — |
+| Category | the name it points at, never the id | — |
+| Available | 1,234 | — |
+| Sold | 1,234 | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Sections | list or chips (count when long) | The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the … |
+| Code | text | — |
+| Name | text | — |
+| View image | the image or video | As `Section.viewAssetId`. Null means render the view from geometry. |
+| Boundary | list or chips (count when long) | As `Section.boundary`. Null when `renderMode` is `list`. |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -640,6 +704,8 @@ filter:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -676,7 +742,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-996?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-993`.
@@ -783,6 +849,8 @@ locks:
 - `getSeatInventory` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `CAPACITY_CONFIGURE`
 
 #### Requirements it meets
 
@@ -951,13 +1019,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSeatHold`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | text | — |
+| Performance | the name it points at, never the id | — |
+| Seats | list or chips (count when long) | — |
+| Buffered seats | list or chips (count when long) | Neighbours implicitly held by a seating rule. |
+| Status | chip: Held, Converted, Released, Expired | — |
+| Total price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Held by principal | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Extension count | 1,234 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (destructive button) | navigation or local | — | — | — | — |
+|  (destructive button) | `relinquishSeatHold` DELETE `/seat-holds/{holdId}` | — | — | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The hold is no longer active (`holdNotActive`) - converted to an order, already released or expired. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -997,6 +1078,8 @@ hold:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1026,7 +1109,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-999?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-993`.
@@ -1070,7 +1153,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSeatAvailability`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Performance | the name it points at, never the id | — |
+| Seat map | the name it points at, never the id | — |
+| Render mode | chip: Graphical, List | The mode the server actually used. With `mode=auto` this is how a client knows what it got: `list` means the map has no geometry (the seat … |
+| Totals | grouped details | — |
+| Total | 1,234 | — |
+| Available | 1,234 | — |
+| Held | 1,234 | — |
+| Sold | 1,234 | — |
+| Blocked | 1,234 | — |
+| Buffered | 1,234 | — |
+| By category | list or chips (count when long) | — |
+| Category | the name it points at, never the id | — |
+| Available | 1,234 | — |
+| Sold | 1,234 | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Sections | list or chips (count when long) | The map's sections with what a guest screen needs to show the view from each (decided 29 September, rev 3 23SEP-14): the photo where the … |
+| Code | text | — |
+| Name | text | — |
+| View image | the image or video | As `Section.viewAssetId`. Null means render the view from geometry. |
+| Boundary | list or chips (count when long) | As `Section.boundary`. Null when `renderMode` is `list`. |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1111,6 +1217,8 @@ seat:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `CAPACITY_CONFIGURE`
+
 #### Requirements it meets
 
 8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1147,7 +1255,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1000?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-993`.
@@ -1266,6 +1374,8 @@ options:
 - `getSeatAvailability` → `PRODUCT_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -1424,6 +1534,8 @@ query: 4 seats together, aisle, under AED 400 each
 - `getSeatAvailability` → `PRODUCT_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -1596,7 +1708,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AccessibleSeating": {"type":"object","x-ticvai-persistence":"seating.accessible","description":"Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n","properties":{"seatMapId":{"type":"string","format":"uuid"},"spaces":{"type":"array","items":{"type":"object","properties":{"seatId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["wheelchairSpace","transferSeat","ambulant","easyAccess","assistanceDog","hearingLoop","visuallyImpaired"]},"routeDescription":{"type":"string","nullable":true},"stepFree":{"type":"boolean","default":true},"nearestAccessibleWc":{"type":"string","nullable":true}}}},"eligibility":{"type":"string","enum":["open","selfDeclared","verifiedOnce","verifiedEachTime"],"default":"selfDeclared","description":"**Contested in both directions.** Open sale leaves none for the guests who need them; hard gating turns people away at the door.\n"},"minimumProvisionPercent":{"type":"number","nullable":true},"scopePath":{"type":"string"}}},
+"AccessibleSeating": {"type":"object","x-ticvai-persistence":"seating.accessible","description":"Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n","properties":{"seatMapId":{"type":"string","format":"uuid"},"spaces":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"seatId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["wheelchairSpace","transferSeat","ambulant","easyAccess","assistanceDog","hearingLoop","visuallyImpaired"]},"routeDescription":{"type":"string","nullable":true},"stepFree":{"type":"boolean","default":true},"nearestAccessibleWc":{"type":"string","nullable":true}}}},"eligibility":{"type":"string","enum":["open","selfDeclared","verifiedOnce","verifiedEachTime"],"default":"selfDeclared","description":"**Contested in both directions.** Open sale leaves none for the guests who need them; hard gating turns people away at the door.\n"},"minimumProvisionPercent":{"type":"number","nullable":true},"scopePath":{"type":"string"}}},
 "CreateSeatHoldRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","performanceId","seatIds"],"properties":{"id":{"type":"string","format":"uuid"},"performanceId":{"type":"string","format":"uuid"},"seatIds":{"type":"array","minItems":1,"maxItems":50,"description":"50 is the ceiling of the venue setting, not the limit a caller gets. On a guest channel the limit is `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50, decided 29 September, rev 3 REV3-7); on a staff channel it stays 10 per sale (audit R080 (c)), as POS-002 shows. Either is refused with `422` `seat-limit-exceeded`.\n","items":{"type":"string"}},"ttlSeconds":{"type":"integer","minimum":60,"maximum":1800,"default":480,"description":"**8 minutes by default, extendable to 30 in all** (decided 28 September, audit R169). Left out, the hold lasts 480 seconds. No hold, first grant or extended, outlives 1800 seconds from its creation.\n"},"subjectId":{"type":"string","format":"uuid"}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Point": {"type":"object","required":["x","y"],"properties":{"x":{"type":"number"},"y":{"type":"number"}}},

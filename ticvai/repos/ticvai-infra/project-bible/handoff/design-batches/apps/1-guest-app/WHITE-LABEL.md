@@ -498,20 +498,20 @@ Set on `CMS-001` Tenant Workspace through `setMaintenanceMode`. Reaches the scre
 
 | Element | Control | Required | Allowed values and rules | Default | Reaches | What it changes | When it goes live |
 |---|---|---|---|---|---|---|---|
-| Is in maintenance `maintenance.isInMaintenance` | toggle | yes | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Availability and maintenance message `maintenance.message` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | Keyed by ISO 639-1 code. Every enabled language should be present. | on publish (CMS-014): web at once, the app on its next launch |
-| Expected back at `maintenance.expectedBackAt` | date and time picker | no | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Minimum app version `maintenance.minimumAppVersion` | group | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | The oldest guest app build still allowed to run (decided 28 September, audit R073). | on publish (CMS-014): web at once, the app on its next launch |
-| Minimum app version: ios `maintenance.minimumAppVersion.ios` | text field | no | pattern `^\d+\.\d+\.\d+$` | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Minimum app version: android `maintenance.minimumAppVersion.android` | text field | no | pattern `^\d+\.\d+\.\d+$` | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Is in maintenance `maintenance.isInMaintenance` | toggle | yes | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Availability and maintenance message `maintenance.message` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | Keyed by ISO 639-1 code. Every enabled language should be present. | on publish (CMS-014): web at once, the app on its next launch |
+| Expected back at `maintenance.expectedBackAt` | date and time picker | no | 1 Oct 2026, 14:30 (venue time zone) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Minimum app version `maintenance.minimumAppVersion` | group | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | The oldest guest app build still allowed to run (decided 28 September, audit R073). | on publish (CMS-014): web at once, the app on its next launch |
+| Minimum app version: ios `maintenance.minimumAppVersion.ios` | text field | no | pattern `^\d+\.\d+\.\d+$` | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Minimum app version: android `maintenance.minimumAppVersion.android` | text field | no | pattern `^\d+\.\d+\.\d+$` | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | — | on publish (CMS-014): web at once, the app on its next launch |
 | Contact `maintenance.contact` | group | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). | on publish (CMS-014): web at once, the app on its next launch |
-| Contact: phone `maintenance.contact.phone` | phone field | no | +971 5X XXX XXXX (E.164) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Contact: email `maintenance.contact.email` | email field | no | name@example.ae | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Contact: whatsapp `maintenance.contact.whatsapp` | text field | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | — | on publish (CMS-014): web at once, the app on its next launch |
-| Contact: address `maintenance.contact.address` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | Keyed by ISO 639-1 code. Every enabled language should be present. | on publish (CMS-014): web at once, the app on its next launch |
-| Contact: opening hours `maintenance.contact.openingHours` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | Prose, as the guest reads it. The bookable hours are the catalogue's. | on publish (CMS-014): web at once, the app on its next launch |
-| Availability `maintenance.availability` | segmented control | no | Open · Sold out · Closed | Open | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | The sold-out or closed signal (decided 28 September, audit R073). `open` is the normal state. | on publish (CMS-014): web at once, the app on its next launch |
-| Availability message `maintenance.availabilityMessage` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13) | Keyed by ISO 639-1 code. Every enabled language should be present. | on publish (CMS-014): web at once, the app on its next launch |
+| Contact: phone `maintenance.contact.phone` | phone field | no | +971 5X XXX XXXX (E.164) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Contact: email `maintenance.contact.email` | email field | no | name@example.ae | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Contact: whatsapp `maintenance.contact.whatsapp` | text field | no | — | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | — | on publish (CMS-014): web at once, the app on its next launch |
+| Contact: address `maintenance.contact.address` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | Keyed by ISO 639-1 code. Every enabled language should be present. | on publish (CMS-014): web at once, the app on its next launch |
+| Contact: opening hours `maintenance.contact.openingHours` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | Prose, as the guest reads it. The bookable hours are the catalogue's. | on publish (CMS-014): web at once, the app on its next launch |
+| Availability `maintenance.availability` | segmented control | no | Open · Sold out · Closed | Open | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | The sold-out or closed signal (decided 28 September, audit R073). `open` is the normal state. | on publish (CMS-014): web at once, the app on its next launch |
+| Availability message `maintenance.availabilityMessage` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14) | Keyed by ISO 639-1 code. Every enabled language should be present. | on publish (CMS-014): web at once, the app on its next launch |
 
 ### Custom domain
 
@@ -549,28 +549,28 @@ Set on `CMS-026` Cookie Banner & Preference Center Designer through `setCookieBa
 
 | Element | Control | Required | Allowed values and rules | Default | Reaches | What it changes | When it goes live |
 |---|---|---|---|---|---|---|---|
-| Brand `cookieBanner.brandId` | picker: choose a brand | no | shows names, sends the id | — | GST-001, GST-066, WEB-001, WEB-024 | Null for the corporate design every brand inherits. | on publish (CMS-014): web at once, the app on its next launch |
-| Inherits from `cookieBanner.inheritsFromId` | picker: choose an inherits from | no | shows names, sends the id | — | GST-001, GST-066, WEB-001, WEB-024 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Cookie banner channel `cookieBanner.channel` | select | yes | B2C website · Customer portal · Mobile app · Embedded checkout · White label site · Partner microsite | — | GST-001, GST-066, WEB-001, WEB-024 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Logo `cookieBanner.logoAssetId` | upload, or pick from the media library | no | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-001, GST-066, WEB-001, WEB-024 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Cookie banner title `cookieBanner.title` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-066, WEB-001, WEB-024 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
-| Body `cookieBanner.body` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-066, WEB-001, WEB-024 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
-| Position `cookieBanner.position` | radio group | yes | Top · Bottom · Popup · Modal | — | GST-001, GST-066, WEB-001, WEB-024 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Theme `cookieBanner.themeId` | text field | no | — | — | GST-001, GST-066, WEB-001, WEB-024 | The white-label theme it takes colours and fonts from. | on publish (CMS-014): web at once, the app on its next launch |
-| Buttons `cookieBanner.buttons` | repeatable rows | no | — | — | GST-001, GST-066, WEB-001, WEB-024 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Buttons: action `cookieBanner.buttons[].action` | radio group | yes | Accept all · Reject non essential · Manage preferences · Save preferences · Do not sell or share | — | GST-001, GST-042, GST-066, WEB-001, WEB-016, WEB-024 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Buttons: label `cookieBanner.buttons[].label` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-066, WEB-001, WEB-024 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
-| Reject is one click `cookieBanner.rejectIsOneClick` | toggle | yes | — | on | GST-001, GST-066, WEB-001, WEB-024 | Must be true. | on publish (CMS-014): web at once, the app on its next launch |
-| Links `cookieBanner.links` | repeatable rows | no | — | — | GST-001, GST-066, WEB-001, WEB-024 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Links: label `cookieBanner.links[].label` | text, one per language | yes | English and Arabic (Arabic right to left) | — | GST-001, GST-066, WEB-001, WEB-024 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
-| Links: policy kind `cookieBanner.links[].policyKind` | segmented control | yes | Privacy · Cookie · Terms and conditions | — | GST-001, GST-066, WEB-001, WEB-024 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Categories `cookieBanner.categories` | repeatable rows | yes | at least 1 | — | GST-001, GST-066, WEB-001, WEB-024 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Categories: category `cookieBanner.categories[].category` | radio group | yes | Strictly necessary · Functional · Analytics · Personalisation · Marketing | — | GST-001, GST-066, WEB-001, WEB-024 | — | on publish (CMS-014): web at once, the app on its next launch |
-| Categories: description `cookieBanner.categories[].description` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, GST-066, WEB-001, WEB-024 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
-| Categories: default on `cookieBanner.categories[].defaultOn` | toggle | yes | True only for `strictlyNecessary`, which is always active. | — | GST-001, GST-066, WEB-001, WEB-024 | True only for `strictlyNecessary`, which is always active. | on publish (CMS-014): web at once, the app on its next launch |
-| Cookie banner languages `cookieBanner.languages` | list of values (chips) | yes | at least 1 | — | GST-001, GST-066, WEB-001, WEB-024 | Every language the storefront serves; Arabic renders right to left. | on publish (CMS-014): web at once, the app on its next launch |
-| Regulatory regimes `cookieBanner.regulatoryRegimes` | multi-select chips | no | Gdpr · E privacy · Ccpa cpra · Lgpd · Uae pdpl · Saudi pdpl | — | GST-001, GST-066, WEB-001, WEB-024 | 2.6.60 (29 September, build). The laws this design is published to satisfy, so compliance is stated rather than assumed. | on publish (CMS-014): web at once, the app on its next launch |
-| Record ip address `cookieBanner.recordIpAddress` | toggle | no | — | off | GST-001, GST-066, WEB-001, WEB-024 | 2.6.55, "if legally permitted" (29 September, build). On, `recordDeviceConsent` writes the IP address and user agent to `pii.consent_identifier`; off, they are not kept anywhere. | on publish (CMS-014): web at once, the app on its next launch |
+| Brand `cookieBanner.brandId` | picker: choose a brand | no | shows names, sends the id | — | GST-001, WEB-001 | Null for the corporate design every brand inherits. | on publish (CMS-014): web at once, the app on its next launch |
+| Inherits from `cookieBanner.inheritsFromId` | picker: choose an inherits from | no | shows names, sends the id | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Cookie banner channel `cookieBanner.channel` | select | yes | B2C website · Customer portal · Mobile app · Embedded checkout · White label site · Partner microsite | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Logo `cookieBanner.logoAssetId` | upload, or pick from the media library | no | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Cookie banner title `cookieBanner.title` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
+| Body `cookieBanner.body` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
+| Position `cookieBanner.position` | radio group | yes | Top · Bottom · Popup · Modal | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Theme `cookieBanner.themeId` | text field | no | — | — | GST-001, WEB-001 | The white-label theme it takes colours and fonts from. | on publish (CMS-014): web at once, the app on its next launch |
+| Buttons `cookieBanner.buttons` | repeatable rows | no | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Buttons: action `cookieBanner.buttons[].action` | radio group | yes | Accept all · Reject non essential · Manage preferences · Save preferences · Do not sell or share | — | GST-001, WEB-001, WEB-016 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Buttons: label `cookieBanner.buttons[].label` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
+| Reject is one click `cookieBanner.rejectIsOneClick` | toggle | yes | — | on | GST-001, WEB-001 | Must be true. | on publish (CMS-014): web at once, the app on its next launch |
+| Links `cookieBanner.links` | repeatable rows | no | — | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Links: label `cookieBanner.links[].label` | text, one per language | yes | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
+| Links: policy kind `cookieBanner.links[].policyKind` | segmented control | yes | Privacy · Cookie · Terms and conditions | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Categories `cookieBanner.categories` | repeatable rows | yes | at least 1 | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Categories: category `cookieBanner.categories[].category` | radio group | yes | Strictly necessary · Functional · Analytics · Personalisation · Marketing | — | GST-001, WEB-001 | — | on publish (CMS-014): web at once, the app on its next launch |
+| Categories: description `cookieBanner.categories[].description` | text, one per language | no | English and Arabic (Arabic right to left) | — | GST-001, WEB-001 | Text keyed by locale code, one entry per locale the venue publishes. | on publish (CMS-014): web at once, the app on its next launch |
+| Categories: default on `cookieBanner.categories[].defaultOn` | toggle | yes | True only for `strictlyNecessary`, which is always active. | — | GST-001, WEB-001 | True only for `strictlyNecessary`, which is always active. | on publish (CMS-014): web at once, the app on its next launch |
+| Cookie banner languages `cookieBanner.languages` | list of values (chips) | yes | at least 1 | — | GST-001, WEB-001 | Every language the storefront serves; Arabic renders right to left. | on publish (CMS-014): web at once, the app on its next launch |
+| Regulatory regimes `cookieBanner.regulatoryRegimes` | multi-select chips | no | Gdpr · E privacy · Ccpa cpra · Lgpd · Uae pdpl · Saudi pdpl | — | GST-001, WEB-001 | 2.6.60 (29 September, build). The laws this design is published to satisfy, so compliance is stated rather than assumed. | on publish (CMS-014): web at once, the app on its next launch |
+| Record ip address `cookieBanner.recordIpAddress` | toggle | no | — | off | GST-001, WEB-001 | 2.6.55, "if legally permitted" (29 September, build). On, `recordDeviceConsent` writes the IP address and user agent to `pii.consent_identifier`; off, they are not kept anywhere. | on publish (CMS-014): web at once, the app on its next launch |
 
 ### Analytics providers
 
@@ -679,7 +679,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `GST-039` Profile | the shell only |
 | `GST-040` Help & Support | Availability and maintenance (14) |
 | `GST-041` Checkout Entry | Booking settings (tenant, with per-venue overrides) (61); Booking flows (16) |
-| `GST-042` Simple Registration & OTP | Booking settings (tenant, with per-venue overrides) (2); Cookie banner (1) |
+| `GST-042` Simple Registration & OTP | Booking settings (tenant, with per-venue overrides) (2) |
 | `GST-043` Arabic / RTL Experience | the shell only |
 | `GST-044` Multi-Currency & Pricing | the shell only |
 | `GST-045` Ticket Delivery & Sharing | the shell only |
@@ -701,7 +701,7 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `GST-062` Shop & Drop Collection | the shell only |
 | `GST-063` Explore – Search Results | Booking settings (tenant, with per-venue overrides) (2) |
 | `GST-065` Newsletter & Preferences | the shell only |
-| `GST-066` Privacy & My Data | Cookie banner (22) |
+| `GST-066` Privacy & My Data | the shell only |
 | `GST-067` Refunds & Resale | the shell only |
 | `GST-068` Help & My Cases | the shell only |
 | `GST-069` Face Pass | the shell only |
@@ -755,11 +755,11 @@ Every guest screen takes the shell-wide parts (brand, theme, fonts, header, navi
 | `WEB-021` Wallet & Gift Cards | the shell only |
 | `WEB-022` Membership Plans | the shell only |
 | `WEB-023` Membership Management | the shell only |
-| `WEB-024` Devices, Wishlist & Consent | Cookie banner (22) |
+| `WEB-024` Devices, Wishlist & Consent | the shell only |
 | `WEB-025` Help Centre / FAQ | Availability and maintenance (14) |
 | `WEB-026` Survey & Feedback | the shell only |
 | `WEB-027` Newsletter Subscription | the shell only |
-| `WEB-028` Contact & Venue Information | Availability and maintenance (1) |
+| `WEB-028` Contact & Venue Information | Availability and maintenance (14) |
 | `WEB-029` Error / Sold Out / Maintenance | Availability and maintenance (14) |
 | `WEB-030` Ticket Transfer | the shell only |
 | `WEB-031` My Reservations | the shell only |

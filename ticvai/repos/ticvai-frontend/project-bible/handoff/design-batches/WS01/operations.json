@@ -316,7 +316,7 @@
  },
  "setAccessPointGroup": {
   "method": "PUT",
-  "path": "/access-point-groups",
+  "path": "/access-point-groups/{groupId}",
   "contract": "access",
   "summary": "Create or replace an access-point group",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -373,7 +373,7 @@
  },
  "setOperatingCalendarEntry": {
   "method": "PUT",
-  "path": "/operating-calendar-entries",
+  "path": "/operating-calendar-entries/{entryId}",
   "contract": "access",
   "summary": "Create or replace an operating calendar entry",
   "permission": "ACCESS_POINT_CONFIGURE",

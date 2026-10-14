@@ -460,6 +460,7 @@
   "module": "Access & Account",
   "requiresModule": "partner",
   "wave": 2,
+  "permission": "USER_MANAGE",
   "capability": "C56",
   "implementation": {
    "app": "partner-web",
@@ -713,6 +714,7 @@
   "module": "Access & Account",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "capability": "C59",
   "implementation": {
    "app": "partner-web",
@@ -879,6 +881,7 @@
   "module": "Access & Account",
   "requiresModule": "developerApi",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "implementation": {
    "app": "partner-web",
    "route": "/general/api-credentials-and-integration",
@@ -1198,6 +1201,7 @@
   "module": "Access & Account",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PERMISSION_VIEW",
   "capability": "C56",
   "implementation": {
    "app": "partner-web",

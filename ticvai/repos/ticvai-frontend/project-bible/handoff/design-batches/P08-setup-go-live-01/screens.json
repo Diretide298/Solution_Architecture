@@ -5,6 +5,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/environment-ready-handoff-to-ai-setup-bo-594",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/EnvironmentReadyHandoffToAiSetup.tsx",
+   "component": "src/routes/setup-go-live/EnvironmentReadyHandoffToAiSetup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -62,7 +63,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listTenants",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listTenants"
       }
      ]
     }
@@ -123,7 +125,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup/organisation",
-   "component": "apps/venue-management-web/src/routes/setup/Organisation.tsx",
+   "component": "src/routes/setup/Organisation.tsx",
    "status": "notStarted"
   },
   "navigation": {

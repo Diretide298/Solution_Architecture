@@ -91,6 +91,7 @@ screens:
   module: Shift
   requiresModule: core
   wave: 1
+  permission: SESSION_FORCE_LOGOUT
   capability: C11
   purpose: Authenticate the operator at the terminal and resolve the session every other screen on this
     app reads.
@@ -281,8 +282,8 @@ screens:
     trigger: onAction
   - operationId: getCurrentSession
     contract: identity
-    purpose: 'Read the session the login just created (role, venue and workstation every other
-      screen reads), with no tap of its own'
+    purpose: Read the session the login just created (role, venue and workstation every other screen reads),
+      with no tap of its own
     trigger: background
   - operationId: createMfaChallenge
     contract: identity
@@ -337,6 +338,7 @@ screens:
   module: Shift
   requiresModule: core
   wave: 1
+  permission: SHIFT_OPEN
   capability: C11
   implementation:
     app: venue-pos
@@ -758,11 +760,11 @@ screens:
     trigger: onAction
   - operationId: getWorkstationHealth
     contract: tenancy
-    purpose: 'Whether the till and its peripherals are well before the shift opens'
+    purpose: Whether the till and its peripherals are well before the shift opens
     trigger: onLoad
   - operationId: listDenominations
     contract: shift
-    purpose: 'The notes and coins the opening float is counted in'
+    purpose: The notes and coins the opening float is counted in
     trigger: onLoad
   entryState:
     params:
@@ -826,6 +828,7 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: PRODUCT_VIEW
   capability: C01
   implementation:
     app: venue-pos
@@ -1979,7 +1982,7 @@ screens:
     - listProducts
   - operationId: addCartLine
     contract: orders
-    purpose: 'Put a product, with its date, session or seats, in the sale''s cart'
+    purpose: Put a product, with its date, session or seats, in the sale's cart
     trigger: onAction
     invalidates:
     - listProducts
@@ -2101,6 +2104,7 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: PRODUCT_VIEW
   capability: C81
   implementation:
     app: venue-pos
@@ -2420,6 +2424,7 @@ screens:
   module: Sell
   requiresModule: seating
   wave: 1
+  permission: PRODUCT_VIEW
   capability: C51
   implementation:
     app: venue-pos
@@ -2768,6 +2773,7 @@ screens:
   module: Payment
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   capability: C04
   implementation:
     app: venue-pos
@@ -3395,6 +3401,7 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   capability: C01
   implementation:
     app: venue-pos
@@ -3421,10 +3428,10 @@ screens:
       returnsTo: POS-006
       provenance: board TICVAI POS Terminal · recall (4000). **The hold clock travels with the cart**
         — a destination that re-fetches the lines has lost the lease, and the guest's seats go back on
-        sale while they are standing at the till. **The parked cart is the held order** (CHG-SPO-015), so
-        the recall resumes it (`resumeOrder`) and carries its `orderId` and the guest's `subjectId`; its
-        lines, discounts, hold clock (`heldUntil`), table and order type are the order's own fields, which
-        POS-002 reads with the order (Block A audit, CHG-SCP-004).
+        sale while they are standing at the till. **The parked cart is the held order** (CHG-SPO-015),
+        so the recall resumes it (`resumeOrder`) and carries its `orderId` and the guest's `subjectId`;
+        its lines, discounts, hold clock (`heldUntil`), table and order type are the order's own fields,
+        which POS-002 reads with the order (Block A audit, CHG-SCP-004).
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-006
@@ -3912,6 +3919,7 @@ screens:
   module: Shift
   requiresModule: core
   wave: 1
+  permission: SHIFT_OPEN
   capability: C11
   implementation:
     app: venue-pos
@@ -4342,7 +4350,7 @@ screens:
     trigger: onLoad
   - operationId: listDenominations
     contract: shift
-    purpose: 'The notes and coins the drawer is counted in, blind'
+    purpose: The notes and coins the drawer is counted in, blind
     trigger: onLoad
   - operationId: rejectShiftVariance
     contract: shift
@@ -4503,6 +4511,7 @@ screens:
   module: Reports
   requiresModule: analytics
   wave: 1
+  permission: REPORT_VIEW_VENUE
   capability: C21
   implementation:
     app: venue-pos
@@ -4743,6 +4752,7 @@ screens:
   module: Shift
   requiresModule: core
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   capability: C11
   implementation:
     app: venue-pos
@@ -5028,6 +5038,7 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   capability: C01
   implementation:
     app: venue-pos
@@ -5261,6 +5272,7 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-pos
     route: /sell/returns-refunds-exchanges
@@ -5455,13 +5467,18 @@ screens:
     trigger: onAction
   - operationId: listSerialisedItems
     contract: inventory
-    purpose: 'The serialised items a return takes back, found by serial'
+    purpose: The serialised items a return takes back, found by serial
     trigger: onLoad
   - operationId: issueCreditMemo
     contract: finance
     purpose: Issue a credit memo
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listOrderRefunds
+    contract: orders
+    purpose: 'Follows createRefund (202) until what it started settles: List refunds against an order'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   entryState:
     params:
     - name: workstationId
@@ -5595,6 +5612,7 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/omnichannel-order-fulfilment-center
@@ -5641,8 +5659,8 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getCurrentShift` reads one of them — list, select,
     act'
-  purpose: 'Hand over the orders waiting at this outlet (takeaway, delivery and collection), reserve
-    merchandise for a guest to collect, and hand dropped goods back to the guest.'
+  purpose: Hand over the orders waiting at this outlet (takeaway, delivery and collection), reserve merchandise
+    for a guest to collect, and hand dropped goods back to the guest.
   layout:
     template: split
     regions:
@@ -5946,6 +5964,7 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/mobile-pos-event-sales-offline-operations
@@ -6204,6 +6223,7 @@ screens:
   module: Sell
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/sales-exceptions-controls-operational-actions
@@ -6236,8 +6256,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`recordNoSale`, `voidOrder`, `applyManualDiscount`)
     and no read of a population — it is settings, not a list
-  purpose: 'Handle the till''s exceptions on an order: open the drawer without a sale, with a
-    reason, void an order, or apply a manual discount.'
+  purpose: 'Handle the till''s exceptions on an order: open the drawer without a sale, with a reason,
+    void an order, or apply a manual discount.'
   layout:
     template: form
     regions:
@@ -6396,6 +6416,7 @@ screens:
   module: Sell
   requiresModule: core
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   implementation:
     app: venue-pos
     route: /sell/cash-operations-dashboard
@@ -6550,6 +6571,7 @@ screens:
   module: Sell
   requiresModule: core
   wave: 1
+  permission: DEVICE_VIEW
   implementation:
     app: venue-pos
     route: /sell/till-configuration
@@ -6805,6 +6827,7 @@ screens:
   module: Sell
   requiresModule: core
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   implementation:
     app: venue-pos
     route: /sell/cash-in-cash-out-operations
@@ -6838,8 +6861,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`createCashMovement`) and no read of a population —
     it is settings, not a list
-  purpose: 'Record cash added to or lifted from the drawer during the shift, counted by denomination
-    and with a reason, against the shift''s movements so far.'
+  purpose: Record cash added to or lifted from the drawer during the shift, counted by denomination and
+    with a reason, against the shift's movements so far.
   layout:
     template: form
     regions:
@@ -6943,6 +6966,7 @@ screens:
   module: Sell
   requiresModule: core
   wave: 1
+  permission: SHIFT_OPEN
   implementation:
     app: venue-pos
     route: /sell/safe-drop-cash-transfer-management
@@ -7143,6 +7167,7 @@ screens:
   module: Sell
   requiresModule: core
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   implementation:
     app: venue-pos
     route: /sell/shift-templates-policies
@@ -7361,6 +7386,7 @@ screens:
   module: Sell
   requiresModule: analytics
   wave: 1
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-pos
     route: /sell/shift-exceptions-alerts
@@ -7407,8 +7433,8 @@ screens:
   pattern: approvalInbox
   patternReason: '`decideApprovalRequest` decides items that `listAlerts` queues — every row is waiting
     for a person, so the empty state is success'
-  purpose: 'Work the shift''s alerts and the approval requests waiting for this supervisor, decide
-    them, and record a no-sale.'
+  purpose: Work the shift's alerts and the approval requests waiting for this supervisor, decide them,
+    and record a no-sale.
   gaps:
   - operation: recordNoSale
     why: '**A no-sale with no reason is the single most reliable indicator of till theft** (F32 step 5),
@@ -7677,6 +7703,7 @@ screens:
   module: Sell
   requiresModule: fnb
   wave: 1
+  permission: SCOPE_VIEW
   implementation:
     app: venue-pos
     route: /sell/sell---food-and-drink
@@ -7838,7 +7865,7 @@ screens:
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
-    purpose: 'Put a menu item, with its modifiers, in the basket'
+    purpose: Put a menu item, with its modifiers, in the basket
     trigger: onAction
   - operationId: evaluatePromotions
     contract: promotions
@@ -7983,6 +8010,7 @@ screens:
   module: Sell
   requiresModule: fnb
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/send-to-kitchen
@@ -8263,6 +8291,7 @@ screens:
   module: Sell
   requiresModule: retail
   wave: 1
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-pos
     route: /sell/sell---merchandise
@@ -8390,7 +8419,7 @@ screens:
     trigger: onAction
   - operationId: addCartLine
     contract: orders
-    purpose: 'Put a scanned or chosen item in the basket'
+    purpose: Put a scanned or chosen item in the basket
     trigger: onAction
   - operationId: evaluatePromotions
     contract: promotions
@@ -8496,6 +8525,7 @@ screens:
   module: Sell
   requiresModule: fnb
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/outlet-setup
@@ -8722,6 +8752,7 @@ screens:
   name: Till Home
   module: Sell
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   implementation:
     app: venue-pos
     route: /home
@@ -8898,8 +8929,8 @@ screens:
     trigger: onLoad
   - operationId: getWorkstationHealth
     contract: tenancy
-    purpose: 'Whether the till and its peripherals are well, polled while the home is open; it feeds
-      the Peripheral health cards'' state'
+    purpose: Whether the till and its peripherals are well, polled while the home is open; it feeds the
+      Peripheral health cards' state
     trigger: onInterval
   - operationId: listAlerts
     contract: reporting
@@ -8995,6 +9026,7 @@ screens:
   name: Receipt & Reprint
   module: Sell
   wave: 1
+  permission: LEDGER_VIEW
   implementation:
     app: venue-pos
     route: /sell/receipt
@@ -9224,6 +9256,7 @@ screens:
   name: Guest Lookup
   module: Sell
   wave: 1
+  permission: GUEST_VIEW
   implementation:
     app: venue-pos
     route: /sell/guests
@@ -9393,6 +9426,7 @@ screens:
   name: Table Service
   module: Sell
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/tables
@@ -9726,6 +9760,7 @@ screens:
   name: Order Queue
   module: Sell
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-pos
     route: /sell/queue

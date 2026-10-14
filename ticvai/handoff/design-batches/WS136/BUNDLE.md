@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-744` | Data Governance Center | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-744` | Data Governance Center | D | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-745` | Identity Resolution Rules | D | 2 | 3 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-746` | Duplicate Review & Merge | D | 0 | 0 | 6 | 0 | 4 | 2 | — | notStarted (—) |
-| `BO-747` | Consent Policy Configuration | D | 24 | 20 | 6 | 76 | 1 | 4 | — | notStarted (—) |
+| `BO-746` | Duplicate Review & Merge | D | 0 | 18 | 6 | 0 | 4 | 2 | — | notStarted (—) |
+| `BO-747` | Consent Policy Configuration | D | 24 | 30 | 6 | 76 | 1 | 4 | — | notStarted (—) |
 | `BO-748` | Consent Capture & Versions | D | 0 | 7 | 6 | 10 | 0 | 4 | — | notStarted (—) |
-| `BO-749` | Guest Preference Center | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-750` | Data Subject Requests | D | 17 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-751` | Retention & Anonymization | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-752` | Privacy & AI Governance | D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (—) |
-| `BO-753` | Compliance Audit Dashboard | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-749` | Guest Preference Center | D | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-750` | Data Subject Requests | D | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-751` | Retention & Anonymization | B | 0 | 19 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-752` | Privacy & AI Governance | D | 0 | 20 | 6 | 0 | 0 | 4 | — | notStarted (—) |
+| `BO-753` | Compliance Audit Dashboard | D | 0 | 19 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -168,7 +168,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listPrivacyCompliance`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Consent rate | 12.5% | Granted over presented. |
+| Withdrawal rate | 12.5% | — |
+| Marketing opt in rate | 12.5% | — |
+| Cookie acceptance by category | list or chips (count when long) | — |
+| Category | chip: Functional, Analytics, Personalisation, Marketing, Other | — |
+| Acceptance rate | 12.5% | — |
+| Privacy requests | 1,234 | Requests submitted in the period. |
+| Privacy requests by type | list or chips (count when long) | — |
+| Request type | text | — |
+| Count | 1,234 | — |
+| Average resolution seconds | 1,234 | — |
+| Sla compliance rate | 12.5% | Completed within `dueAt`, over completed requests that had one. |
+| Deletion completion rate | 12.5% | — |
+| Retention compliance rate | 12.5% | Records actioned by their due date, over records due. |
+| Policy acceptance rate | 12.5% | — |
+| Guardian consent completion rate | 12.5% | — |
+| Privacy exceptions | 1,234 | — |
+| Consent propagation failures | 1,234 | — |
+| Consent funnel | list or chips (count when long) | In order, each step's count and rate over the first step. |
+| Step | text | e.g. privacyNoticeDisplayed, marketingConsentPresented, emailOptIn. |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -226,6 +249,8 @@ tiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -264,7 +289,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-744?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-745`, `BO-746`, `BO-747`, `BO-748`, `BO-749`, `BO-750`, `BO-751`, `BO-752`, `BO-753`.
@@ -378,6 +403,8 @@ thresholds:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -457,7 +484,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. **Only unverified matches arrive here** (decided 28 September, audit R120 (b)): a verified contact match attaches the order to the guest automatically at checkout, so this queue holds the matches no guest has proved.
+**Data table** (data table, from `listDuplicateCandidates`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. **Only unverified matches arrive here** (decided 28 September, audit R120 (b)): a verified contact match attaches the order to the guest automatically at checkout, so this queue holds the matches no guest has proved.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Subjects | list or chips (count when long) | The profiles proposed as one person. |
+| Score | 1,234.5 | — |
+| Band | chip: Match, Possible match | — |
+| Matched on | list or chips (count when long) | — |
+| Conflicts | list or chips (count when long) | — |
+| Field | text | — |
+| Values | list or chips (count when long) | — |
+| Recommended | text | — |
+| Confidence | 1,234.5 | — |
+| Provenance | text | — |
+| Linked record counts | grouped details | Tickets, bookings, memberships, loyalty, wallet, cases, consents, documents — previewed before anything is committed, because merging is … |
+| Status | chip: Pending, Merged, Rejected, Split | — |
+| Decided by | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -521,6 +569,8 @@ guestResponse: Notified by WhatsApp 28 Sep 2026 - not answered
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -551,7 +601,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-746?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-744`.
@@ -634,7 +684,20 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listConsentPurposes`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Purpose | chip: Marketing, Personalisation, Profiling, Third party sharing, AI processing … | — |
+| Display name | text | — |
+| Description | text | — |
+| Channels | list or chips (count when long) | — |
+| Notice version | text | Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured. |
+| Is required for service | yes / no (icon or chip) | True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently. |
+| Expires after months | 1,234 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Consent forms** (data table, from `listForms`): **Consent-form builder in Venue Management (decided 2 October 2026 by Chinmay, DEC-549; CHG-CSA-026):** the existing form builder extended to `consentForm` forms (biometric, marketing, waiver and other consents), not a second builder. Face Pass and Face Tag (BO-186, BO-188), marketing and waivers pick their form here.
 
@@ -715,6 +778,8 @@ purposes:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 76 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -761,7 +826,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (24), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-747?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save consent purposes, Cancel, New consent form.
 - [ ] Every transition is wired: `BO-744`.
@@ -877,6 +942,8 @@ evidence:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `TENANT_CONFIGURE`
+
 #### Requirements it meets
 
 10 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -960,7 +1027,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getGuestConsents`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Subject | the name it points at, never the id | — |
+| Purposes | list or chips (count when long) | — |
+| Purpose | chip: Marketing, Personalisation, Profiling, Third party sharing, AI processing … | — |
+| Decision | chip: Granted, Withdrawn, Not asked | — |
+| Channels | list or chips (count when long) | — |
+| Notice version | text | — |
+| Requires renewal | yes / no (icon or chip) | True where the notice has been superseded since consent was given. |
+| Decided at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -1011,6 +1089,8 @@ cap: 2 marketing messages a week
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1036,7 +1116,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-749?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
 - [ ] Every transition is wired: `BO-744`.
@@ -1059,7 +1139,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `requestId` (navigation) |
 | Route | `/engagement-support/data-subject-requests-bo-750` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
@@ -1107,13 +1187,38 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Case `caseId` | picker: choose a case | optional | — | — | shows names, sends the id | The customer-service case it came in through, if any. | `setPrivacyRequest` body |
 | Notes `notes` | text area | optional | — | max length 4000 | — | — | `setPrivacyRequest` body |
 
+Carried, not typed: `requestId`
+
 Errors to draw in the form: 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Completion while the cross-cell DSAR fan-out is not `completed`, or a change to a completed request.; 422 Progressed past verification without a verified identity, completed without an outcome, or an unknown request type.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listDataSubjectCustomer`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Request | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | The person the request is about. |
+| Request type | text | A configured request type code (`setPrivacyRequestTypes`), e.g. `access`, `dataExport`, `correction`, `deletion`, `anonymisation` … |
+| Source | chip: Customer portal, B2C, Mobile app, Email manual, Customer service, POS… | — |
+| Requester role | chip: Self, Guardian, Authorised representative | — |
+| Requester subject | the name it points at, never the id | The guardian or representative, when not `self`; verified like the subject. |
+| Jurisdiction | text | Selects the response period configured for this request type. |
+| Submitted at | 1 Oct 2026, 14:30 | — |
+| Due at | 1 Oct 2026, 14:30 | `submittedAt` plus the jurisdiction's configured response period; null when none is configured. |
+| Deadline configured | yes / no (icon or chip) | — |
+| Days remaining | 1,234 | Negative once overdue; null without a deadline. |
+| At risk | yes / no (icon or chip) | Inside the request type's configured warning window before `dueAt`. |
+| Sla state | chip: On track, At risk, Overdue, Escalated, No deadline | — |
+| Priority | chip: P1, P2, P3, P4 | — |
+| Owner principal | the name it points at, never the id | — |
+| Verification method | chip: Account login, OTP, Email verification, Mobile verification, ID review, Manual … | One of the methods the request type allows. |
+| Verification status | chip: Not started, Pending, Verified, Failed | — |
+| Status | chip: Submitted, In progress, Completed | MoM 20 Aug lifecycle. |
+| Stage | text | The configured workflow step within `inProgress` (a stage code of the request type). |
 
 **Actions and what each produces**
 
@@ -1121,7 +1226,7 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 |---|---|---|---|---|---|
 | Save data discovery access (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
-| Update request (secondary button) | `setPrivacyRequest` PUT `/data-subject-customer` | DataSubjectCustomerPrivacyRequestManagementView | DataSubjectCustomerPrivacyRequestManagementView | 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Completion while the cross-cell DSAR fan-out is not `completed`, or a change to a … | opens modal first |
+| Update request (secondary button) | `setPrivacyRequest` PUT `/data-subject-customer/{requestId}` | DataSubjectCustomerPrivacyRequestManagementView | DataSubjectCustomerPrivacyRequestManagementView | 400 Validation failed; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Completion while the cross-cell DSAR fan-out is not `completed`, or a change to a … | opens modal first |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -1172,6 +1277,8 @@ requests:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1199,7 +1306,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (17), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-750?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save data discovery access, Cancel, Update request.
 - [ ] Every transition is wired: `BO-744`.
@@ -1249,7 +1356,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listDataRetentionSettings`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Data class | chip: Guest profile, Payment record, Financial record, Audit record, Approval record … | One row per class per tenant. On a write it comes from the path; a body value is ignored. |
+| Retain amount | 1,234 | The tenant's period. Null with no `followsDataClass` means the platform default applies. |
+| Retain unit | chip: Days, Months, Years | Required with `retainAmount`. |
+| Follows data class | chip: Guest profile, Payment record, Financial record, Audit record, Approval record … | Keep this class for as long as another class is kept. Set by default for `aiDecisionRecords` (follows `auditRecord`), `facePassBiometric` … |
+| On expiry | chip: Archive, Anonymise, Delete | ADR-0047's stages. `archive` moves the data to the archive instance, from where it is erased on the class's own schedule; derived stores … |
+| Anchor | chip: Created at, Last activity, Decided at, Ticket expiry | What the period is counted from. Fixed per class by the platform. |
+| Effective amount | 1,234 | The period actually applied, after follows and defaults are resolved. |
+| Effective unit | chip: Days, Months, Years | — |
+| Is default | yes / no (icon or chip) | True when the tenant has not set this class and the platform default applies. |
+| Default amount | 1,234 | — |
+| Default unit | chip: Days, Months, Years | — |
+| Legal minimum amount | 1,234 | A floor the law sets. A shorter period is refused (`422`). |
+| Legal maximum amount | 1,234 | A maximum the law sets. A longer period is refused (`422`). |
+| Legal limit unit | chip: Days, Months, Years | — |
+| Legal basis | text | The law or requirement the limit comes from, e.g. `4.3.4`. |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1300,6 +1429,8 @@ classes:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `TENANT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1331,7 +1462,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-751?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-744`.
@@ -1386,7 +1517,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listPrivacy`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Total customer privacy profiles | 1,234 | — |
+| Active consent records | 1,234 | — |
+| Withdrawn consents | 1,234 | — |
+| Marketing opt ins | 1,234 | — |
+| Marketing opt outs | 1,234 | — |
+| Pending data rights requests | 1,234 | Requests not yet `completed`. |
+| Overdue requests | 1,234 | — |
+| Requests without deadline | 1,234 | Open requests whose jurisdiction has no configured response period. |
+| Pending deletion actions | 1,234 | — |
+| Pending anonymization | 1,234 | — |
+| Retention actions due | 1,234 | Records inside the 90-day notice window before their retention action (ADR-0047 §6). |
+| Consent evidence exceptions | 1,234 | — |
+| Privacy incidents exceptions | 1,234 | Open privacy exceptions plus open privacy incidents. |
+| Policy re acceptance pending | 1,234 | Customers whose accepted notice version has been superseded. |
+| Consent health | list or chips (count when long) | — |
+| Category | chip: Email marketing, SMS marketing, Whatsapp marketing, Push marketing … | — |
+| Other label | text | The configured purpose name, when `category` is `other`. |
+| Granted | 1,234 | — |
+| Withdrawn | 1,234 | — |
+| Declined | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -1437,6 +1591,8 @@ aiUse: Churn scoring - approved - no health data - human review for any offer ab
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1464,7 +1620,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-752?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-744`.
@@ -1514,7 +1670,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listPrivacyEvidenceCompliance`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Event | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Action | chip: Consent granted, Consent withdrawn, Preference changed, Policy accepted, Privacy … | — |
+| Actor type | chip: Customer, Guardian, Staff, System, AI | — |
+| Actor principal | the name it points at, never the id | — |
+| Actor role | text | The role the actor held at the time. |
+| Source | chip: Core, Ticketing, Access, Fnb, Retail, Inventory… | What a tenant buys, and what a screen belongs to. One vocabulary for both sides of the join, because two lists that must agree are one list … |
+| Channel | text | A `ConsentSource` value or the staff surface it came through. |
+| Occurred at | 1 Oct 2026, 14:30 | — |
+| Before | grouped details | The changed fields before, masked where the field is sensitive. |
+| After | grouped details | — |
+| Reason | text | — |
+| Approval reference | text | The approval that authorised it (privacy action approval, hold approval, package approval). |
+| Related request | the name it points at, never the id | — |
+| Related case | the name it points at, never the id | — |
+| Evidence reference | text | e.g. the consent evidence id, the policy version, the export asset id. |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -1558,6 +1736,8 @@ kpis:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AUDIT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1582,7 +1762,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-753?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-744`.
@@ -1708,7 +1888,7 @@ Method, path, parameters, request and response for every operation these screens
 "setDataRetentionSetting": {"method":"PUT","path":"/data-retention-settings/{dataClass}","contract":"tenancy","summary":"Set how long the tenant keeps one class of data","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TenantDataRetentionSetting","responds":"TenantDataRetentionSetting"},
 "setGuestMatchPolicy": {"method":"PUT","path":"/guest-match-policy","contract":"marketing-crm","summary":"Set how returning guests are recognised","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GuestMatchPolicy","responds":"GuestMatchPolicy"},
 "setIdentityResolutionRules": {"method":"PUT","path":"/identity-resolution-rules","contract":"marketing-crm","summary":"Matching weights, thresholds and survivorship","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"IdentityResolutionRules","responds":"IdentityResolutionRules"},
-"setPrivacyRequest": {"method":"PUT","path":"/data-subject-customer","contract":"marketing-crm","summary":"Raise or progress a privacy request","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DataSubjectCustomerPrivacyRequestManagementView","responds":"DataSubjectCustomerPrivacyRequestManagementView"}
+"setPrivacyRequest": {"method":"PUT","path":"/data-subject-customer/{requestId}","contract":"marketing-crm","summary":"Raise or progress a privacy request","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"requestId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"DataSubjectCustomerPrivacyRequestManagementView","responds":"DataSubjectCustomerPrivacyRequestManagementView"}
 }
 ```
 
@@ -1722,26 +1902,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CommunicationPreferenceMarketingPermissionConfiguratView": {"x-ticvai-persistence":"marketing.communication_preference_type","description":"A stored communication preference category.","allOf":[{"$ref":"#/components/schemas/CommunicationPreferenceMarketingPermissionConfiguratInput"},{"type":"object","required":["id","version"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"version":{"type":"integer","minimum":1,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}}]},
 "ConsentDecision": {"type":"string","enum":["granted","withdrawn","notAsked"]},
 "ConsentPurpose": {"type":"string","enum":["marketing","personalisation","profiling","thirdPartySharing","aiProcessing","transactional"]},
-"ConsentPurposeConfig": {"x-ticvai-persistence":"marketing.consent_purpose + marketing.consent_purpose_channel","type":"object","required":["purpose","channels","noticeVersion","isRequiredForService"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"displayName":{"type":"string"},"description":{"type":"string"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string","description":"Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"},"isRequiredForService":{"type":"boolean","description":"True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"},"expiresAfterMonths":{"type":"integer","nullable":true}}},
+"ConsentPurposeConfig": {"x-ticvai-rls":"grant-holder-read","x-ticvai-persistence":"marketing.consent_purpose + marketing.consent_purpose_channel","type":"object","required":["purpose","channels","noticeVersion","isRequiredForService"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"displayName":{"type":"string"},"description":{"type":"string"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string","description":"Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured.\n"},"isRequiredForService":{"type":"boolean","description":"True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently.\n"},"expiresAfterMonths":{"type":"integer","nullable":true}}},
 "ConsentSource": {"type":"string","enum":["guestApp","website","kiosk","pos","callCentre","import","agentRecorded","cookieBanner","checkout"],"description":"`checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` and recorded by `recordCheckoutConsents`, bound to the order and the verified contact. `cookieBanner` (29 September, build; BL-073 §4b): a decision made on the cookie banner or preference centre and moved onto the guest by `claimDeviceConsent`. Kept apart from `website`, a form submission, because the audit trail (2.6.56) has to tell the two apart."},
 "ConsentState": {"x-ticvai-persistence":"none — projection over consent_record","type":"object","required":["subjectId","purposes"],"properties":{"subjectId":{"type":"string","format":"uuid"},"purposes":{"type":"array","items":{"type":"object","required":["purpose","decision","requiresRenewal"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"decision":{"$ref":"#/components/schemas/ConsentDecision"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string","nullable":true},"requiresRenewal":{"type":"boolean","description":"True where the notice has been superseded since consent was given."},"decidedAt":{"type":"string","format":"date-time","nullable":true}}}}}},
-"DataDiscoveryAccessExportCorrectionWorkspaceInput": {"type":"object","x-ticvai-persistence":"marketing.privacy_export_package","description":"What a privacy user sends for one request (pack 17.2.5 Data Discovery, Export Package, Correction, Review).","required":["requestId"],"properties":{"requestId":{"type":"string","format":"uuid","description":"The privacy request (`setPrivacyRequest`); the natural key."},"identifiers":{"type":"array","description":"Extra identifiers to search by; the request's subject is always included.","items":{"type":"object","required":["type","value"],"properties":{"type":{"type":"string","enum":["customerId","email","mobile","membershipId","orderId","participantId","other"]},"value":{"type":"string","maxLength":200}}}},"sources":{"type":"array","description":"Sources to search; empty means all.","items":{"type":"string","enum":["customerProfile","orders","tickets","membership","loyalty","wallet","crm","marketing","paymentReferences","waiverRecords","resourceBookings","eventRegistrations","consentRecords","credentialReferences","connectedApplications"]}},"exportPackage":{"type":"object","nullable":true,"description":"Present to generate or progress the export package.","properties":{"includedSources":{"type":"array","items":{"type":"string","description":"A value of `sources`."}},"includedCategories":{"type":"array","items":{"type":"string","maxLength":80}},"exclusions":{"type":"array","items":{"type":"string","maxLength":200},"description":"Records withheld, each with a reason (e.g. another person's data, a legal hold)."},"sensitiveFieldHandling":{"type":"string","enum":["include","mask","exclude"],"default":"mask"},"format":{"type":"string","enum":["json","csv","pdf"],"default":"json"},"language":{"type":"string","description":"BCP 47 tag for the cover letter and field labels."},"passwordProtected":{"type":"boolean","default":true},"expiresAt":{"type":"string","format":"date-time"},"reviewAction":{"type":"string","nullable":true,"enum":["submitForReview","approve","reject","deliver"],"description":"Moves the package through generated -> privacyReview -> approved -> delivered."}}},"corrections":{"type":"array","description":"Correction requests to route to the system of record.","items":{"type":"object","required":["field","proposedValue"],"properties":{"field":{"type":"string","maxLength":100,"description":"e.g. `email`, `dateOfBirth`."},"proposedValue":{"type":"string","maxLength":500},"note":{"type":"string","maxLength":500,"nullable":true}}}}}},
-"DataDiscoveryAccessExportCorrectionWorkspaceView": {"type":"object","x-ticvai-persistence":"marketing.privacy_export_package","description":"One request's discovery results, export package and routed corrections.","required":["requestId","results"],"properties":{"requestId":{"type":"string","format":"uuid"},"discoveredAt":{"type":"string","format":"date-time","readOnly":true},"results":{"type":"array","description":"Record counts per source; the records themselves go only into the export package.","items":{"type":"object","required":["source","recordCount"],"properties":{"source":{"type":"string","description":"A value of the input's `sources`."},"systemName":{"type":"string","nullable":true},"recordCount":{"type":"integer","minimum":0},"searchFailed":{"type":"boolean","default":false}}}},"exportPackage":{"type":"object","nullable":true,"readOnly":true,"properties":{"status":{"type":"string","enum":["generating","generated","privacyReview","approved","rejected","delivered","expired"]},"format":{"type":"string","enum":["json","csv","pdf"]},"generatedAt":{"type":"string","format":"date-time","nullable":true},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"deliveredAt":{"type":"string","format":"date-time","nullable":true},"expiresAt":{"type":"string","format":"date-time"},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"The encrypted package in the asset store."},"dsarRequestId":{"type":"string","nullable":true,"description":"The cross-region fan-out that assembled it."}}},"corrections":{"type":"array","readOnly":true,"items":{"type":"object","required":["field","systemOfRecord","status"],"properties":{"field":{"type":"string"},"systemOfRecord":{"type":"string","description":"The owning contract/table, e.g. `pii.subject_contact`."},"operation":{"type":"string","nullable":true,"description":"The operation that performs it, e.g. `updateGuestProfile`."},"status":{"type":"string","enum":["routed","applied","rejected","manualActionRequired"]},"updatedAt":{"type":"string","format":"date-time"}}}},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"DataSubjectCustomerPrivacyRequestManagementView": {"type":"object","x-ticvai-persistence":"marketing.privacy_request","description":"One customer privacy request (pack 17.2.4 Case Information). The case layer over the cross-region `sync.dsar_request` fan-out, which it references when it raises one.","required":["subjectId","requestType","source","requesterRole","jurisdiction"],"properties":{"requestId":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid","description":"The person the request is about."},"requestType":{"type":"string","maxLength":60,"description":"A configured request type code (`setPrivacyRequestTypes`), e.g. `access`, `dataExport`, `correction`, `deletion`, `anonymisation`, `restriction`, `objection`, `consentWithdrawal`, `marketingOptOut`."},"source":{"type":"string","enum":["customerPortal","b2c","mobileApp","emailManual","customerService","pos","api"]},"requesterRole":{"type":"string","enum":["self","guardian","authorisedRepresentative"]},"requesterSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"The guardian or representative, when not `self`; verified like the subject."},"jurisdiction":{"type":"string","pattern":"^[A-Z]{2}$","description":"Selects the response period configured for this request type."},"submittedAt":{"type":"string","format":"date-time","readOnly":true},"dueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"`submittedAt` plus the jurisdiction's configured response period; null when none is configured."},"deadlineConfigured":{"type":"boolean","readOnly":true},"daysRemaining":{"type":"integer","nullable":true,"readOnly":true,"description":"Negative once overdue; null without a deadline."},"atRisk":{"type":"boolean","readOnly":true,"description":"Inside the request type's configured warning window before `dueAt`."},"slaState":{"type":"string","readOnly":true,"enum":["onTrack","atRisk","overdue","escalated","noDeadline"]},"priority":{"type":"string","enum":["P1","P2","P3","P4"],"default":"P3"},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"verificationMethod":{"type":"string","nullable":true,"enum":["accountLogin","otp","emailVerification","mobileVerification","idReview","manualVerification"],"description":"One of the methods the request type allows."},"verificationStatus":{"type":"string","enum":["notStarted","pending","verified","failed"],"default":"notStarted"},"status":{"type":"string","enum":["submitted","inProgress","completed"],"default":"submitted","description":"MoM 20 Aug lifecycle."},"stage":{"type":"string","maxLength":60,"nullable":true,"description":"The configured workflow step within `inProgress` (a stage code of the request type)."},"outcome":{"type":"string","nullable":true,"enum":["fulfilled","partiallyFulfilled","refused","withdrawnByRequester"],"description":"Required to complete. `refused` and `partiallyFulfilled` need `outcomeReason`."},"outcomeReason":{"type":"string","maxLength":1000,"nullable":true},"escalated":{"type":"boolean","default":false},"dsarRequestId":{"type":"string","nullable":true,"readOnly":true,"description":"The cross-region `DsarRequest.requestId`, when fulfilment fanned out."},"caseId":{"type":"string","format":"uuid","nullable":true,"description":"The customer-service case it came in through, if any."},"notes":{"type":"string","maxLength":4000,"nullable":true},"completedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"DuplicateCandidate": {"type":"object","x-ticvai-persistence":"marketing.duplicate_candidate","x-ticvai-retired-columns":["guest_ids"],"description":"Board 2.3. **Rejection is as valuable as merging**, or the same pair returns weekly.","properties":{"id":{"type":"string","format":"uuid"},"subjectIds":{"type":"array","description":"The profiles proposed as one person.","items":{"type":"string","format":"uuid"}},"score":{"type":"number"},"band":{"type":"string","enum":["match","possibleMatch"]},"matchedOn":{"type":"array","items":{"type":"string"}},"conflicts":{"type":"array","items":{"type":"object","properties":{"field":{"type":"string"},"values":{"type":"array","items":{"type":"string"}},"recommended":{"type":"string","nullable":true},"confidence":{"type":"number","nullable":true},"provenance":{"type":"string","nullable":true}}}},"linkedRecordCounts":{"type":"object","additionalProperties":{"type":"integer"},"description":"Tickets, bookings, memberships, loyalty, wallet, cases, consents, documents — **previewed before anything is committed**, because merging is not reversible in practice.\n"},"status":{"type":"string","enum":["pending","merged","rejected","split"]},"decidedBy":{"type":"string","format":"uuid","nullable":true},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
+"DataDiscoveryAccessExportCorrectionWorkspaceInput": {"type":"object","x-ticvai-persistence":"marketing.privacy_export_package","description":"What a privacy user sends for one request (pack 17.2.5 Data Discovery, Export Package, Correction, Review).","required":["requestId"],"properties":{"requestId":{"type":"string","format":"uuid","description":"The privacy request (`setPrivacyRequest`); the natural key."},"identifiers":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"Extra identifiers to search by; the request's subject is always included.","items":{"type":"object","required":["type","value"],"properties":{"type":{"type":"string","enum":["customerId","email","mobile","membershipId","orderId","participantId","other"]},"value":{"type":"string","maxLength":200}}}},"sources":{"type":"array","description":"Sources to search; empty means all.","items":{"type":"string","enum":["customerProfile","orders","tickets","membership","loyalty","wallet","crm","marketing","paymentReferences","waiverRecords","resourceBookings","eventRegistrations","consentRecords","credentialReferences","connectedApplications"]}},"exportPackage":{"type":"object","nullable":true,"description":"Present to generate or progress the export package.","properties":{"includedSources":{"type":"array","items":{"type":"string","description":"A value of `sources`."}},"includedCategories":{"type":"array","items":{"type":"string","maxLength":80}},"exclusions":{"type":"array","items":{"type":"string","maxLength":200},"description":"Records withheld, each with a reason (e.g. another person's data, a legal hold)."},"sensitiveFieldHandling":{"type":"string","enum":["include","mask","exclude"],"default":"mask"},"format":{"type":"string","enum":["json","csv","pdf"],"default":"json"},"language":{"type":"string","description":"BCP 47 tag for the cover letter and field labels."},"passwordProtected":{"type":"boolean","default":true},"expiresAt":{"type":"string","format":"date-time"},"reviewAction":{"type":"string","nullable":true,"enum":["submitForReview","approve","reject","deliver"],"description":"Moves the package through generated -> privacyReview -> approved -> delivered."}}},"corrections":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"Correction requests to route to the system of record.","items":{"type":"object","required":["field","proposedValue"],"properties":{"field":{"type":"string","maxLength":100,"description":"e.g. `email`, `dateOfBirth`."},"proposedValue":{"type":"string","maxLength":500},"note":{"type":"string","maxLength":500,"nullable":true}}}}}},
+"DataDiscoveryAccessExportCorrectionWorkspaceView": {"type":"object","x-ticvai-persistence":"marketing.privacy_export_package","description":"One request's discovery results, export package and routed corrections.","required":["requestId","results"],"properties":{"requestId":{"x-ticvai-references":"marketing.privacy_request","type":"string","format":"uuid"},"discoveredAt":{"type":"string","format":"date-time","readOnly":true},"results":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"Record counts per source; the records themselves go only into the export package.","items":{"type":"object","required":["source","recordCount"],"properties":{"source":{"type":"string","description":"A value of the input's `sources`."},"systemName":{"type":"string","nullable":true},"recordCount":{"type":"integer","minimum":0},"searchFailed":{"type":"boolean","default":false}}}},"exportPackage":{"type":"object","nullable":true,"readOnly":true,"properties":{"status":{"type":"string","enum":["generating","generated","privacyReview","approved","rejected","delivered","expired"]},"format":{"type":"string","enum":["json","csv","pdf"]},"generatedAt":{"type":"string","format":"date-time","nullable":true},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"deliveredAt":{"type":"string","format":"date-time","nullable":true},"expiresAt":{"type":"string","format":"date-time"},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"The encrypted package in the asset store."},"dsarRequestId":{"type":"string","nullable":true,"description":"The cross-region fan-out that assembled it."}}},"corrections":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","readOnly":true,"items":{"type":"object","required":["field","systemOfRecord","status"],"properties":{"field":{"type":"string"},"systemOfRecord":{"type":"string","description":"The owning contract/table, e.g. `pii.subject_contact`."},"operation":{"type":"string","nullable":true,"description":"The operation that performs it, e.g. `updateGuestProfile`."},"status":{"type":"string","enum":["routed","applied","rejected","manualActionRequired"]},"updatedAt":{"type":"string","format":"date-time"}}}},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"DataSubjectCustomerPrivacyRequestManagementView": {"type":"object","x-ticvai-persistence":"marketing.privacy_request","description":"One customer privacy request (pack 17.2.4 Case Information). The case layer over the cross-region `sync.dsar_request` fan-out, which it references when it raises one.","required":["subjectId","requestType","source","requesterRole","jurisdiction"],"properties":{"requestId":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"x-ticvai-references":"pii.subject","type":"string","format":"uuid","description":"The person the request is about."},"requestType":{"type":"string","maxLength":60,"description":"A configured request type code (`setPrivacyRequestTypes`), e.g. `access`, `dataExport`, `correction`, `deletion`, `anonymisation`, `restriction`, `objection`, `consentWithdrawal`, `marketingOptOut`."},"source":{"type":"string","enum":["customerPortal","b2c","mobileApp","emailManual","customerService","pos","api"]},"requesterRole":{"type":"string","enum":["self","guardian","authorisedRepresentative"]},"requesterSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"The guardian or representative, when not `self`; verified like the subject."},"jurisdiction":{"type":"string","pattern":"^[A-Z]{2}$","description":"Selects the response period configured for this request type."},"submittedAt":{"type":"string","format":"date-time","readOnly":true},"dueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"`submittedAt` plus the jurisdiction's configured response period; null when none is configured."},"deadlineConfigured":{"type":"boolean","readOnly":true},"daysRemaining":{"type":"integer","nullable":true,"readOnly":true,"description":"Negative once overdue; null without a deadline."},"atRisk":{"type":"boolean","readOnly":true,"description":"Inside the request type's configured warning window before `dueAt`."},"slaState":{"type":"string","readOnly":true,"enum":["onTrack","atRisk","overdue","escalated","noDeadline"]},"priority":{"type":"string","enum":["P1","P2","P3","P4"],"default":"P3"},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true},"verificationMethod":{"type":"string","nullable":true,"enum":["accountLogin","otp","emailVerification","mobileVerification","idReview","manualVerification"],"description":"One of the methods the request type allows."},"verificationStatus":{"type":"string","enum":["notStarted","pending","verified","failed"],"default":"notStarted"},"status":{"type":"string","enum":["submitted","inProgress","completed"],"default":"submitted","description":"MoM 20 Aug lifecycle."},"stage":{"type":"string","maxLength":60,"nullable":true,"description":"The configured workflow step within `inProgress` (a stage code of the request type)."},"outcome":{"type":"string","nullable":true,"enum":["fulfilled","partiallyFulfilled","refused","withdrawnByRequester"],"description":"Required to complete. `refused` and `partiallyFulfilled` need `outcomeReason`."},"outcomeReason":{"type":"string","maxLength":1000,"nullable":true},"escalated":{"type":"boolean","default":false},"dsarRequestId":{"type":"string","nullable":true,"readOnly":true,"description":"The cross-region `DsarRequest.requestId`, when fulfilment fanned out."},"caseId":{"type":"string","format":"uuid","nullable":true,"description":"The customer-service case it came in through, if any."},"notes":{"type":"string","maxLength":4000,"nullable":true},"completedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"DuplicateCandidate": {"type":"object","x-ticvai-persistence":"marketing.duplicate_candidate","x-ticvai-retired-columns":["guest_ids"],"description":"Board 2.3. **Rejection is as valuable as merging**, or the same pair returns weekly.","properties":{"id":{"type":"string","format":"uuid"},"subjectIds":{"type":"array","description":"The profiles proposed as one person.","items":{"type":"string","format":"uuid"}},"score":{"type":"number"},"band":{"type":"string","enum":["match","possibleMatch"]},"matchedOn":{"type":"array","items":{"type":"string"}},"conflicts":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"field":{"type":"string"},"values":{"type":"array","items":{"type":"string"}},"recommended":{"type":"string","nullable":true},"confidence":{"type":"number","nullable":true},"provenance":{"type":"string","nullable":true}}}},"linkedRecordCounts":{"type":"object","additionalProperties":{"type":"integer"},"description":"Tickets, bookings, memberships, loyalty, wallet, cases, consents, documents — **previewed before anything is committed**, because merging is not reversible in practice.\n"},"status":{"type":"string","enum":["pending","merged","rejected","split"]},"decidedBy":{"type":"string","format":"uuid","nullable":true},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
 "FormDefinition": {"type":"object","x-ticvai-persistence":"marketing.form_definition + marketing.form_definition_field","description":"CF-129, CL-04. **A waiver, a survey and a data-capture form are one mechanism.**\nA waiver is this form with a signature. A survey is this form with a scale. A demographic capture is this form at the point of sale. They were raised as three separate gaps and share every part: field configuration, conditional display, versioning, an acceptance record and a stored artefact.\n**Three implementations would drift on the version rule first.** A waiver signed against version 3 must stay bound to version 3, and that is the same requirement a survey has when question wording changes mid-campaign — **an NPS score means nothing if you cannot say which question produced it.**\n","required":["id","name","kind","version","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string","enum":["waiver","survey","dataCapture","consentForm","incidentReport","registration"]},"consentPurposes":{"type":"array","description":"**What a `consentForm` consents to** (Chinmay, 2 October, batch 4; follows BO-188: biometric capture needs consent on the venue's own form; CHG-CSA-026). A guardian-signed form for a minor carries the guardian fields of the waiver builder (workbook Q237: guardian consent, configurable per country). Empty for any other kind.","items":{"type":"string","enum":["facePass","faceTag","marketing","photography","waiver"]}},"version":{"readOnly":true,"type":"integer","description":"**Set by the server** — 1 on `createForm`, the next number on every change. **Immutable once anything is submitted against it.** A change creates a new version, and the old one stays readable forever — 2.15.13 requires the exact accepted version retained, which is legal evidence rather than a nicety.\n"},"fields":{"type":"array","items":{"$ref":"#/components/schemas/FormField"}},"requiresSignature":{"type":"boolean","default":false,"description":"**What makes it a waiver.** And 2.15.9 makes ticket issuance conditional on one, which puts this in the purchase path rather than beside it.\n"},"signatureKind":{"type":"string","enum":["drawn","typed","checkbox","none"],"default":"none"},"scoreScale":{"type":"string","nullable":true,"enum":["nps","csat","ces","likert5","likert7","stars"],"description":"**What makes it a survey.** Named rather than free-form because a score whose scale is unknown cannot be compared to last quarter's.\n"},"appliesToProductIds":{"type":"array","items":{"type":"string","format":"uuid"}},"validForMonths":{"type":"integer","nullable":true,"description":"**How long an acceptance lasts.** A waiver signed last summer may or may not still hold, and 2.15.x asks for a returning participant not to sign again — which only works if the expiry is stated.\n"},"minimumAge":{"type":"integer","nullable":true},"requiresGuardianForMinors":{"type":"boolean","default":true,"description":"**A minor cannot waive their own rights.** A guardian signs, and the record has to name them — an unsigned or self-signed minor waiver is worth nothing at the moment it matters.\n"},"status":{"readOnly":true,"type":"string","enum":["draft","published","superseded","retired"]},"legalReviewedBy":{"type":"string","nullable":true},"legalReviewedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "FormField": {"type":"object","description":"One field. **Conditional display is the shared requirement** — a survey branching on an answer and a waiver revealing a medical question on a yes are the same mechanism.\n","required":["key","label","type"],"properties":{"key":{"type":"string"},"label":{"type":"string"},"labelLocalised":{"type":"object","additionalProperties":{"type":"string"}},"type":{"type":"string","enum":["text","longText","number","date","select","multiSelect","boolean","scale","signature","file","phone","email"]},"options":{"type":"array","items":{"type":"string"}},"isRequired":{"type":"boolean","default":false},"isPersonalData":{"type":"boolean","default":false,"description":"**Marked at the field, because retention is decided at the field.** A survey answer and a medical condition on the same form have different lifetimes, and a form-level flag makes the whole thing as sensitive as its most sensitive field.\n"},"consentPurposeId":{"type":"string","format":"uuid","nullable":true},"showWhen":{"type":"object","nullable":true,"properties":{"field":{"type":"string"},"equals":{"type":"string"}}}}},
 "GuestMatchPolicy": {"type":"object","x-ticvai-persistence":"marketing.guest_match_policy","description":"How a guest checking out without an account is recognised. One per venue. **The rev 3 Config controls map here unchanged** (decided 29 September, rev 3 DG-1, no change): *Match returning guests by* is `matchBy`; *Guest checkout (code proof)* is the white-label FeatureToggle `guestCheckout`, off by default, with the code proved through `identity` and the match offered by `checkGuestCheckoutMatch` and `decideGuestCheckoutMatch`.\n","required":["matchBy"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"matchBy":{"type":"string","enum":["email","mobile","emailOrMobile"],"default":"email","description":"The key a returning guest is matched on. Design control: *Match returning guests by*."},"offerAtCheckout":{"type":"boolean","default":true,"description":"Whether a verified contact is matched at the payment step. On, a verified match attaches the order automatically (audit R120 (b)). Off means staff merge later only, and `checkGuestCheckoutMatch` skips the lookup entirely (audit R149)."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."}}},
-"IdentityResolutionRules": {"type":"object","x-ticvai-persistence":"marketing.identity_rules","description":"Board 2.2. **Three thresholds, and the middle band is the point.**","properties":{"matchers":{"type":"array","items":{"type":"object","properties":{"field":{"type":"string","enum":["email","phone","name","dateOfBirth","membershipNumber","loyaltyNumber","passportNumber","externalId","address"]},"comparison":{"type":"string","enum":["exact","normalised","fuzzy","phonetic"]},"weight":{"type":"number"},"required":{"type":"boolean","default":false}}}},"matchThreshold":{"type":"number"},"possibleMatchThreshold":{"type":"number"},"survivorship":{"type":"array","items":{"type":"object","properties":{"field":{"type":"string"},"rule":{"type":"string","enum":["mostRecent","oldest","highestSourcePriority","mostComplete","verifiedFirst","manual"]}}},"description":"**Per field, not per record.** The newer record has the better phone number and the older one has the loyalty history.\n"},"excludedSources":{"type":"array","items":{"type":"string"}},"jurisdictionRestrictions":{"type":"array","items":{"type":"string"}},"autoMergeAllowed":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
+"IdentityResolutionRules": {"type":"object","x-ticvai-persistence":"marketing.identity_rules","description":"Board 2.2. **Three thresholds, and the middle band is the point.**","properties":{"matchers":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"field":{"type":"string","enum":["email","phone","name","dateOfBirth","membershipNumber","loyaltyNumber","passportNumber","externalId","address"]},"comparison":{"type":"string","enum":["exact","normalised","fuzzy","phonetic"]},"weight":{"type":"number"},"required":{"type":"boolean","default":false}}}},"matchThreshold":{"type":"number"},"possibleMatchThreshold":{"type":"number"},"survivorship":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"field":{"type":"string"},"rule":{"type":"string","enum":["mostRecent","oldest","highestSourcePriority","mostComplete","verifiedFirst","manual"]}}},"description":"**Per field, not per record.** The newer record has the better phone number and the older one has the loyalty history.\n"},"excludedSources":{"type":"array","items":{"type":"string"}},"jurisdictionRestrictions":{"type":"array","items":{"type":"string"}},"autoMergeAllowed":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "LocalisedRichText": {"x-ticvai-persistence":"none — jsonb column","type":"object","description":"Keyed by language code. Values are sanitised HTML.","additionalProperties":{"type":"string"}},
 "MergeResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["survivingSubjectId","absorbedSubjectId","transferred"],"properties":{"survivingSubjectId":{"type":"string","format":"uuid"},"absorbedSubjectId":{"type":"string","format":"uuid"},"transferred":{"type":"object","properties":{"orders":{"type":"integer"},"cases":{"type":"integer"},"loyaltyPoints":{"type":"integer","description":"The total points moved across every programme. The per-programme outcome is `loyaltyProgrammes`."}}},"loyaltyProgrammes":{"type":"array","description":"**One entry per loyalty programme either record belonged to (decided 28 September, audit R149).** Points are added and the higher tier is kept, per programme — a single points number cannot say which programme it belongs to.\n","items":{"type":"object","required":["programmeId","pointsAdded","resultingPoints"],"properties":{"programmeId":{"type":"string","format":"uuid"},"pointsAdded":{"type":"integer","description":"The absorbed record's balance in this programme, added to the survivor's."},"resultingPoints":{"type":"integer"},"tierKept":{"type":"string","nullable":true,"description":"The higher of the two records' tiers in this programme."}}}},"consentOutcome":{"type":"array","description":"Per purpose, the resulting position. Where the two profiles disagreed, the more restrictive position won.\n","items":{"type":"object","properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"result":{"$ref":"#/components/schemas/ConsentDecision"},"wasRestricted":{"type":"boolean"}}}}}},
-"MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
+"MessageChannel": {"x-ticvai-rls":"grant-holder-read","type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Policy": {"x-ticvai-persistence":"whitelabel.policy","type":"object","required":["kind","version","body","effectiveFrom","publishedAt"],"properties":{"kind":{"$ref":"#/components/schemas/PolicyKind"},"title":{"type":"string","description":"The heading a guest sees, and the field a refund question retrieves against.\n"},"version":{"type":"string","description":"Immutable. A guest who consented to version 3 consented to version 3, and a policy that changes under a recorded consent is a compliance failure.\n"},"body":{"$ref":"#/components/schemas/LocalisedRichText"},"requiresReconsent":{"type":"boolean"},"effectiveFrom":{"type":"string","format":"date"},"publishedByPrincipalId":{"type":"string","format":"uuid"},"publishedAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
 "PolicyKind": {"type":"string","enum":["privacy","termsAndConditions","refund","cookie","accessibility"]},
 "PrivacyAnalyticsAiComplianceIntelligenceView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.consent_record, marketing.privacy_request (new), marketing.privacy_action (new), marketing.retention_policy, marketing.privacy_exception (new), marketing.consent_propagation (new), marketing.tracking_technology","description":"Privacy KPIs for a period (pack 17.2.10). Rates are 0-1 over the period's denominators.","required":["consentRate","withdrawalRate","marketingOptInRate"],"properties":{"consentRate":{"type":"number","minimum":0,"maximum":1,"description":"Granted over presented."},"withdrawalRate":{"type":"number","minimum":0,"maximum":1},"marketingOptInRate":{"type":"number","minimum":0,"maximum":1},"cookieAcceptanceByCategory":{"type":"array","items":{"type":"object","required":["category","acceptanceRate"],"properties":{"category":{"type":"string","enum":["functional","analytics","personalisation","marketing","other"]},"acceptanceRate":{"type":"number","minimum":0,"maximum":1}}}},"privacyRequests":{"type":"integer","minimum":0,"description":"Requests submitted in the period."},"privacyRequestsByType":{"type":"array","items":{"type":"object","properties":{"requestType":{"type":"string"},"count":{"type":"integer","minimum":0}}}},"averageResolutionSeconds":{"type":"integer","minimum":0,"nullable":true},"slaComplianceRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Completed within `dueAt`, over completed requests that had one."},"deletionCompletionRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"retentionComplianceRate":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Records actioned by their due date, over records due."},"policyAcceptanceRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"guardianConsentCompletionRate":{"type":"number","minimum":0,"maximum":1,"nullable":true},"privacyExceptions":{"type":"integer","minimum":0},"consentPropagationFailures":{"type":"integer","minimum":0},"consentFunnel":{"type":"array","description":"In order, each step's count and rate over the first step.","items":{"type":"object","required":["step","count"],"properties":{"step":{"type":"string","maxLength":80,"description":"e.g. privacyNoticeDisplayed, marketingConsentPresented, emailOptIn."},"count":{"type":"integer","minimum":0},"rate":{"type":"number","minimum":0,"maximum":1}}}},"riskFindings":{"type":"array","description":"AI findings for human investigation; none is acted on automatically.","items":{"type":"object","required":["kind","summary"],"properties":{"kind":{"type":"string","enum":["trendAnomaly","abandonmentByLanguage","supersededPolicyInUse","configurationMismatch","other"]},"summary":{"type":"string","maxLength":500},"severity":{"type":"string","enum":["low","medium","high"]},"detectedAt":{"type":"string","format":"date-time"},"exceptionId":{"type":"string","format":"uuid","nullable":true,"description":"Set once someone raised an exception from it."}}}},"asOf":{"type":"string","format":"date-time"}}},
-"PrivacyAuditEvidenceComplianceReportingView": {"type":"object","x-ticvai-persistence":"marketing.privacy_audit_event","description":"One privacy audit event (pack 17.2.9 Audit Fields). Append-only; written by the operation that performed the event, never through an API.","required":["eventId","action","occurredAt"],"properties":{"eventId":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"action":{"type":"string","enum":["consentGranted","consentWithdrawn","preferenceChanged","policyAccepted","privacyRequestCreated","identityVerified","dataExportGenerated","correctionRequested","deletionApproved","anonymisationExecuted","retentionAction","legalHold","administrativeOverride","configurationChange"]},"actorType":{"type":"string","enum":["customer","guardian","staff","system","ai"]},"actorPrincipalId":{"type":"string","format":"uuid","nullable":true},"actorRole":{"type":"string","nullable":true,"description":"The role the actor held at the time."},"source":{"$ref":"#/components/schemas/common::ModuleKey"},"channel":{"type":"string","nullable":true,"description":"A `ConsentSource` value or the staff surface it came through."},"occurredAt":{"type":"string","format":"date-time"},"before":{"type":"object","nullable":true,"additionalProperties":true,"description":"The changed fields before, masked where the field is sensitive."},"after":{"type":"object","nullable":true,"additionalProperties":true},"reason":{"type":"string","maxLength":1000,"nullable":true},"approvalReference":{"type":"string","nullable":true,"description":"The approval that authorised it (privacy action approval, hold approval, package approval)."},"relatedRequestId":{"type":"string","format":"uuid","nullable":true},"relatedCaseId":{"type":"string","format":"uuid","nullable":true},"evidenceReference":{"type":"string","nullable":true,"description":"e.g. the consent evidence id, the policy version, the export asset id."}}},
-"PrivacyIncident": {"type":"object","x-ticvai-persistence":"marketing.privacy_incident","description":"BL-176. **A personal-data breach has a regulator clock**, and UAE PDPL gives 72 hours from discovery. Nothing in the package recorded one.\n**Modelled on the maintenance incident pattern**, because the shape is the same — discovery, assessment, containment, notification, closure — and **the field that matters is the one that starts the clock.**\n","required":["id","discoveredAt","severity","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"discoveredAt":{"type":"string","format":"date-time","description":"**The clock starts here, not at occurrence.** 72 hours runs from discovery, which is why this is separate from `occurredAt` and why a discovery nobody recorded is a deadline nobody is counting.\n"},"occurredAt":{"type":"string","format":"date-time","nullable":true},"severity":{"type":"string","enum":["low","medium","high","critical"]},"affectedSubjectCount":{"type":"integer","nullable":true},"dataCategories":{"type":"array","items":{"type":"string","enum":["contact","identity","financial","biometric","health","location","behavioural","credentials"]}},"containedAt":{"type":"string","format":"date-time","nullable":true},"regulatorNotifiedAt":{"type":"string","format":"date-time","nullable":true,"description":"**Or a recorded reason for not notifying.** Deciding a breach is not notifiable is a legitimate decision and an undocumented one is indistinguishable from having missed it.\n"},"subjectsNotifiedAt":{"type":"string","format":"date-time","nullable":true},"notNotifiedRationale":{"type":"string","nullable":true},"status":{"type":"string","enum":["open","assessing","contained","notified","closed"]},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
+"PrivacyAuditEvidenceComplianceReportingView": {"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"marketing.privacy_audit_event","description":"One privacy audit event (pack 17.2.9 Audit Fields). Append-only; written by the operation that performed the event, never through an API.","required":["eventId","action","occurredAt"],"properties":{"eventId":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"action":{"type":"string","enum":["consentGranted","consentWithdrawn","preferenceChanged","policyAccepted","privacyRequestCreated","identityVerified","dataExportGenerated","correctionRequested","deletionApproved","anonymisationExecuted","retentionAction","legalHold","administrativeOverride","configurationChange"]},"actorType":{"type":"string","enum":["customer","guardian","staff","system","ai"]},"actorPrincipalId":{"type":"string","format":"uuid","nullable":true},"actorRole":{"type":"string","nullable":true,"description":"The role the actor held at the time."},"source":{"$ref":"#/components/schemas/common::ModuleKey"},"channel":{"type":"string","nullable":true,"description":"A `ConsentSource` value or the staff surface it came through."},"occurredAt":{"type":"string","format":"date-time"},"before":{"type":"object","nullable":true,"additionalProperties":true,"description":"The changed fields before, masked where the field is sensitive."},"after":{"type":"object","nullable":true,"additionalProperties":true},"reason":{"type":"string","maxLength":1000,"nullable":true},"approvalReference":{"type":"string","nullable":true,"description":"The approval that authorised it (privacy action approval, hold approval, package approval)."},"relatedRequestId":{"type":"string","format":"uuid","nullable":true},"relatedCaseId":{"type":"string","format":"uuid","nullable":true},"evidenceReference":{"type":"string","nullable":true,"description":"e.g. the consent evidence id, the policy version, the export asset id."}}},
+"PrivacyIncident": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"marketing.privacy_incident","description":"BL-176. **A personal-data breach has a regulator clock**, and UAE PDPL gives 72 hours from discovery. Nothing in the package recorded one.\n**Modelled on the maintenance incident pattern**, because the shape is the same — discovery, assessment, containment, notification, closure — and **the field that matters is the one that starts the clock.**\n","required":["id","discoveredAt","severity","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"discoveredAt":{"type":"string","format":"date-time","description":"**The clock starts here, not at occurrence.** 72 hours runs from discovery, which is why this is separate from `occurredAt` and why a discovery nobody recorded is a deadline nobody is counting.\n"},"occurredAt":{"type":"string","format":"date-time","nullable":true},"severity":{"type":"string","enum":["low","medium","high","critical"]},"affectedSubjectCount":{"type":"integer","nullable":true},"dataCategories":{"type":"array","items":{"type":"string","enum":["contact","identity","financial","biometric","health","location","behavioural","credentials"]}},"containedAt":{"type":"string","format":"date-time","nullable":true},"regulatorNotifiedAt":{"type":"string","format":"date-time","nullable":true,"description":"**Or a recorded reason for not notifying.** Deciding a breach is not notifiable is a legitimate decision and an undocumented one is indistinguishable from having missed it.\n"},"subjectsNotifiedAt":{"type":"string","format":"date-time","nullable":true},"notNotifiedRationale":{"type":"string","nullable":true},"status":{"readOnly":true,"type":"string","enum":["open","assessing","contained","notified","closed"]},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
 "PrivacyOperationsCommandCenterView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.guest_profile, marketing.consent_record, marketing.privacy_request (new), marketing.privacy_action (new), marketing.retention_policy, marketing.privacy_exception (new), marketing.privacy_incident","description":"The privacy operations position for the caller's scope and filters (pack 17.2.1).","required":["totalCustomerPrivacyProfiles","consentHealth","requestQueue"],"properties":{"totalCustomerPrivacyProfiles":{"type":"integer","minimum":0},"activeConsentRecords":{"type":"integer","minimum":0},"withdrawnConsents":{"type":"integer","minimum":0},"marketingOptIns":{"type":"integer","minimum":0},"marketingOptOuts":{"type":"integer","minimum":0},"pendingDataRightsRequests":{"type":"integer","minimum":0,"description":"Requests not yet `completed`."},"overdueRequests":{"type":"integer","minimum":0},"requestsWithoutDeadline":{"type":"integer","minimum":0,"description":"Open requests whose jurisdiction has no configured response period."},"pendingDeletionActions":{"type":"integer","minimum":0},"pendingAnonymization":{"type":"integer","minimum":0},"retentionActionsDue":{"type":"integer","minimum":0,"description":"Records inside the 90-day notice window before their retention action (ADR-0047 §6)."},"consentEvidenceExceptions":{"type":"integer","minimum":0},"privacyIncidentsExceptions":{"type":"integer","minimum":0,"description":"Open privacy exceptions plus open privacy incidents."},"policyReAcceptancePending":{"type":"integer","minimum":0,"description":"Customers whose accepted notice version has been superseded."},"consentHealth":{"type":"array","items":{"type":"object","required":["category","granted","withdrawn","declined"],"properties":{"category":{"type":"string","enum":["emailMarketing","smsMarketing","whatsappMarketing","pushMarketing","personalisation","analytics","location","biometrics","other"]},"otherLabel":{"type":"string","nullable":true,"description":"The configured purpose name, when `category` is `other`."},"granted":{"type":"integer","minimum":0},"withdrawn":{"type":"integer","minimum":0},"declined":{"type":"integer","minimum":0},"requiresRenewal":{"type":"integer","minimum":0}}}},"requestQueue":{"type":"array","description":"Open and recently completed requests by status and configured stage.","items":{"type":"object","required":["status","count"],"properties":{"status":{"type":"string","enum":["submitted","inProgress","completed"]},"stage":{"type":"string","nullable":true},"count":{"type":"integer","minimum":0},"atRisk":{"type":"integer","minimum":0},"overdue":{"type":"integer","minimum":0}}}},"alerts":{"type":"array","items":{"type":"object","required":["kind","count"],"properties":{"kind":{"type":"string","enum":["requestsApproachingDeadline","requestsOverdue","requestsWithoutDeadline","supersededNoticeAccepted","withdrawnConsentInMarketingExport","consentPropagationFailed","retentionActionFailed"]},"count":{"type":"integer","minimum":0},"detail":{"type":"string","maxLength":300,"nullable":true}}}},"asOf":{"type":"string","format":"date-time"}}},
 "RecordConsentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["purpose","decision","noticeVersion","source","recordedAt"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"decision":{"$ref":"#/components/schemas/ConsentDecision"},"channels":{"type":"array","description":"Omit to apply to every channel the purpose covers.","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string"},"source":{"$ref":"#/components/schemas/ConsentSource"},"recordedAt":{"type":"string","format":"date-time"}}},
 "RetentionRunResult": {"type":"object","x-ticvai-persistence":"marketing.retention_run","description":"Board 2.8. **Completion evidence is the half that gets forgotten until an audit.**","properties":{"runId":{"type":"string","format":"uuid","x-ticvai-column":"id","description":"The run, stored as `marketing.retention_run`; `PrivacyAction.retentionRunId` points here. Preview runs are stored too, so an executed pass can be compared with what it previewed."},"policyId":{"type":"string","format":"uuid"},"mode":{"type":"string","enum":["preview","execute"]},"recordsAffected":{"type":"integer"},"byAction":{"type":"object","additionalProperties":{"type":"integer"}},"heldBack":{"type":"integer"},"heldBackReasons":{"type":"object","additionalProperties":{"type":"integer"}},"dependencies":{"type":"array","x-ticvai-persisted":false,"description":"Computed for the response; the executed run's detail is in the evidence asset.","items":{"type":"object","properties":{"surface":{"type":"string"},"count":{"type":"integer"},"consequence":{"type":"string"}}}},"evidenceAssetId":{"type":"string","format":"uuid","nullable":true},"completedAt":{"type":"string","format":"date-time","nullable":true}}},

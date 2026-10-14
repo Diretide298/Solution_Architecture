@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "VENUE_MAP_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/platform-command-center-bo-1061",
-   "component": "apps/venue-management-web/src/routes/access-venue/PlatformCommandCenter.tsx",
+   "component": "src/routes/access-venue/PlatformCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -113,7 +114,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listVenueMaps",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listVenueMaps"
       }
      ]
     }
@@ -178,6 +180,7 @@
   "module": "Access & Venue",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -187,7 +190,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/tenant-brand-context-bo-1062",
-   "component": "apps/venue-management-web/src/routes/access-venue/TenantBrandContext.tsx",
+   "component": "src/routes/access-venue/TenantBrandContext.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -400,6 +403,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "TENANT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -409,7 +413,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/venue-specific-configuration-bo-1063",
-   "component": "apps/venue-management-web/src/routes/access-venue/VenueSpecificConfiguration.tsx",
+   "component": "src/routes/access-venue/VenueSpecificConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -563,6 +567,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -572,7 +577,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/naming-numbering-localization-bo-1064",
-   "component": "apps/venue-management-web/src/routes/access-venue/NamingNumberingLocalization.tsx",
+   "component": "src/routes/access-venue/NamingNumberingLocalization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -624,7 +629,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getRegionSettings",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getRegionSettings"
       },
       {
        "kind": "secondaryButton",
@@ -711,6 +717,7 @@
   "module": "Setup",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "SHIFT_OPEN",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -720,7 +727,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/currency-timezone-channels-bo-1065",
-   "component": "apps/venue-management-web/src/routes/access-venue/CurrencyTimezoneChannels.tsx",
+   "component": "src/routes/access-venue/CurrencyTimezoneChannels.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -992,6 +999,7 @@
   "module": "Access & Venue",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PERMISSION_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -1001,7 +1009,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/roles-permissions-masking-bo-1066",
-   "component": "apps/venue-management-web/src/routes/access-venue/RolesPermissionsMasking.tsx",
+   "component": "src/routes/access-venue/RolesPermissionsMasking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1329,6 +1337,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -1338,7 +1347,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/seat-approval-workflows-bo-1067",
-   "component": "apps/venue-management-web/src/routes/access-venue/SeatApprovalWorkflows.tsx",
+   "component": "src/routes/access-venue/SeatApprovalWorkflows.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1448,6 +1457,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -1457,7 +1467,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/lifecycle-environment-promotion-bo-1068",
-   "component": "apps/venue-management-web/src/routes/access-venue/LifecycleEnvironmentPromotion.tsx",
+   "component": "src/routes/access-venue/LifecycleEnvironmentPromotion.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1535,6 +1545,13 @@
     "purpose": "Promote configuration",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "listProfileDeployments",
+    "contract": "tenancy",
+    "purpose": "Follows deployConfigurationProfile (202) until what it started settles: Recent deployments, with a date, a target and an outcome",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -1591,7 +1608,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/platform-health-observability-bo-1069",
-   "component": "apps/venue-management-web/src/routes/access-venue/PlatformHealthObservability.tsx",
+   "component": "src/routes/access-venue/PlatformHealthObservability.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1690,6 +1707,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "12",
@@ -1699,7 +1717,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/setup-clone-inheritance-bo-1070",
-   "component": "apps/venue-management-web/src/routes/access-venue/SetupCloneInheritance.tsx",
+   "component": "src/routes/access-venue/SetupCloneInheritance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1823,6 +1841,12 @@
     {
      "name": "seatMapId",
      "from": "navigation"
+    },
+    {
+     "name": "profileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listConfigurationProfiles`."
     }
    ]
   },

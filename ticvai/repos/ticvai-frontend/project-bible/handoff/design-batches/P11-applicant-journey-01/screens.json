@@ -130,6 +130,7 @@
   "name": "Registration Form",
   "module": "Applicant Journey",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "requiresModule": "accreditation",
   "pattern": "multiStepForm",
   "density": "compact",
@@ -143,18 +144,18 @@
     "provenance": "readiness close-out, 29 September 2026"
    },
    {
-    "operationId": "submitAccreditationDocument",
-    "contract": "accreditation",
-    "purpose": "Each supporting document, against the requirement it satisfies",
-    "trigger": "onAction",
-    "provenance": "readiness close-out, 29 September 2026"
-   },
-   {
     "operationId": "updateAccreditationApplication",
     "contract": "accreditation",
     "purpose": "Save the draft as each step is completed (Save and finish later)",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "getAccreditationApplication",
+    "contract": "accreditation",
+    "purpose": "The draft being resumed from the acknowledgement link: where each step and requirement stands",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)"
    }
   ],
   "gaps": [
@@ -168,12 +169,13 @@
    "template": "wizard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "progress",
      "slot": "progress",
      "components": [
       {
        "kind": "progressIndicator",
        "label": "Step 1 of 4 — Organisation",
+       "operation": "getAccreditationApplication",
        "notes": "Organisation · Coverage · Documents · Check and submit.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-002"
       }
@@ -186,36 +188,42 @@
       {
        "kind": "textField",
        "label": "Organisation",
+       "operation": "createAccreditationApplication",
        "notes": "Who you work for. Free text — an outlet that is not on a list is still an outlet.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-002"
       },
       {
        "kind": "selectField",
        "label": "Role",
+       "operation": "createAccreditationApplication",
        "notes": "Photographer, writer, broadcast, technical. **Drives what coverage may be requested.**",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-002"
       },
       {
        "kind": "textField",
        "label": "Press card number",
+       "operation": "createAccreditationApplication",
        "notes": "Optional, and marked so. Its absence is a reviewer's signal, not a blocker.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-002"
       },
       {
        "kind": "textField",
        "label": "Commissioning editor",
+       "operation": "createAccreditationApplication",
        "notes": "Who commissioned the coverage, where there is one.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-002"
       },
       {
        "kind": "fileUpload",
        "label": "Supporting documents",
+       "operation": "createAccreditationApplication",
        "notes": "Commission letter and badge photo. Accepted formats stated before the picker opens.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-002"
       },
       {
        "kind": "consentBlock",
        "label": "Consent",
+       "operation": "createAccreditationApplication",
        "notes": "**Stated once, unticked, and collected before documents rather than after.** The 2 September session recorded consent language as a live question for face data; the same principle applies to a press photograph. An accepted-by-default consent is not consent.\n",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-002"
       }
@@ -231,7 +239,8 @@
       },
       {
        "kind": "secondaryButton",
-       "label": "Save and finish later"
+       "label": "Save and finish later",
+       "operation": "updateAccreditationApplication"
       }
      ]
     }
@@ -342,6 +351,7 @@
   "name": "Application Review & Submit",
   "module": "Applicant Journey",
   "wave": 3,
+  "permission": "ACCREDITATION_APPLY",
   "requiresModule": "accreditation",
   "pattern": "multiStepForm",
   "density": "compact",
@@ -353,20 +363,13 @@
     "purpose": "Submit the reviewed draft; blocking-submission requirements are checked here",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "updateAccreditationApplication",
-    "contract": "accreditation",
-    "purpose": "Apply a change made through a Change link",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "layout": {
    "template": "wizard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "progress",
      "slot": "progress",
      "components": [
       {
@@ -411,7 +414,8 @@
      "components": [
       {
        "kind": "primaryButton",
-       "label": "Submit application"
+       "label": "Submit application",
+       "operation": "submitAccreditationApplication"
       }
      ]
     }
@@ -529,6 +533,7 @@
   "name": "Application Status Tracking",
   "module": "Applicant Journey",
   "wave": 3,
+  "permission": "ACCREDITATION_APPLY",
   "requiresModule": "accreditation",
   "pattern": "statusTracker",
   "density": "compact",
@@ -545,27 +550,6 @@
     "operationId": "withdrawAccreditationApplication",
     "contract": "accreditation",
     "purpose": "Withdraw this application",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "submitAccreditationDocument",
-    "contract": "accreditation",
-    "purpose": "Add a document the reviewer asked for",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "updateAccreditationApplication",
-    "contract": "accreditation",
-    "purpose": "Amend answers after a return for information",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "resubmitAccreditationApplication",
-    "contract": "accreditation",
-    "purpose": "Send it back after a return for information or a rejection",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    }
@@ -586,7 +570,7 @@
    "template": "detail",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "state",
      "slot": "state",
      "components": [
       {
@@ -600,6 +584,7 @@
        "kind": "timeline",
        "label": "Where it has been",
        "bindsTo": "ApprovalRequest.decisions",
+       "operation": "listMyAccreditationApplications",
        "notes": "Received, documents checked, decision — each with its date.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-004"
       }
@@ -613,6 +598,7 @@
        "kind": "detailPanel",
        "label": "Application",
        "bindsTo": "ApprovalRequest.summary",
+       "operation": "listMyAccreditationApplications",
        "notes": "The reference, the performances, and what was requested.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-004"
       }
@@ -628,7 +614,8 @@
       },
       {
        "kind": "destructiveButton",
-       "label": "Withdraw this application"
+       "label": "Withdraw this application",
+       "operation": "withdrawAccreditationApplication"
       }
      ]
     }
@@ -728,6 +715,7 @@
   "name": "Accreditation Badge",
   "module": "Applicant Journey",
   "wave": 3,
+  "permission": "ACCREDITATION_APPLY",
   "requiresModule": "accreditation",
   "pattern": "credentialView",
   "density": "touchLarge",
@@ -767,7 +755,7 @@
    "template": "fullscreen",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "credential",
      "slot": "credential",
      "components": [
       {
@@ -780,7 +768,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "identity",
      "slot": "identity",
      "components": [
       {

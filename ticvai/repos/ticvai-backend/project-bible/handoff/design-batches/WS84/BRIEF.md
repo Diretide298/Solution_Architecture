@@ -1,6 +1,6 @@
 # WS84 — Game and Ride board 7
 
-**10 screens · 6 operations · 6 schemas · 3 permissions**
+**10 screens · 6 operations · 6 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_OPERATE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -100,7 +100,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-454` | Card Lifecycle Command Center | D | 2 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-455` | Card / Credential Profile | D | 0 | 18 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-456` | Card Expiry Rule Configuration | D | 4 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-457` | Last Recharge & Last Activity Tracking | D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-457` | Last Recharge & Last Activity Tracking | D | 0 | 15 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-458` | Expiry Monitoring & Upcoming Expiration | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-459` | Card Expiry Runtime Validation | D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-460` | Card Block, Suspend & Reactivation Control | D | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |

@@ -176,6 +176,7 @@
     "type": "integer"
    },
    "pendingApprovers": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -448,6 +449,7 @@
   }
  },
  "Deposit": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "ledger.deposit",
   "description": "**Money taken before the sale is complete.** Not deferred revenue — that is a sold entitlement not yet consumed, and the sale happened.\n",
@@ -632,6 +634,7 @@
     "type": "string"
    },
    "performanceId": {
+    "x-ticvai-references": "catalogue.performance",
     "type": "string",
     "format": "uuid"
    },
@@ -738,10 +741,12 @@
     "format": "uuid"
    },
    "holdTypeId": {
+    "x-ticvai-references": "seating.hold_type",
     "type": "string",
     "format": "uuid"
    },
    "performanceId": {
+    "x-ticvai-references": "catalogue.performance",
     "type": "string",
     "format": "uuid"
    },

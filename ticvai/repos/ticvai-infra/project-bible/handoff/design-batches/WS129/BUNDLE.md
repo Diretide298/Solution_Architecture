@@ -218,6 +218,8 @@ registration:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -349,6 +351,8 @@ form:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -421,7 +425,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every accreditation participant category** (data table)
+**Every accreditation participant category** (data table, from `listAccessProfiles`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -474,6 +478,8 @@ categories:
 - `listAccessProfiles` → `ACCREDITATION_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ACCREDITATION_VIEW`
 
 #### Requirements it meets
 
@@ -609,6 +615,8 @@ policy:
 - `getEvent` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -755,6 +763,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AccessProfile": {"type":"object","x-ticvai-persistence":"accreditation.access_profile","description":"Board 5.2. **How an estate stays governable.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"zoneIds":{"type":"array","items":{"type":"string","format":"uuid"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"operationalAreas":{"type":"array","items":{"type":"string"}},"schedule":{"type":"array","x-ticvai-persistence-column":"jsonb","description":"**Zone, date and time are three dimensions and all three are needed.**","items":{"type":"object","properties":{"zoneId":{"type":"string","format":"uuid","nullable":true},"daysOfWeek":{"type":"array","items":{"type":"string"}},"dateFrom":{"type":"string","format":"date","nullable":true},"dateTo":{"type":"string","format":"date","nullable":true},"from":{"type":"string","nullable":true},"to":{"type":"string","nullable":true},"eventPhase":{"type":"string","nullable":true,"enum":["build","rehearsal","doorsOpen","liveShow","breakdown"]}}}},"escortRequired":{"type":"boolean","default":false},"holderCount":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
 "Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"description":"For grouped events."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"},"lifecycleState":{"type":"string","readOnly":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."},"lifecycleStateChangedAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true}}},
-"EventRegistration": {"type":"object","x-ticvai-persistence":"catalogue.event_registration","description":"Event boards 5.2 and 5.3. **Registration is not ticketing.**","properties":{"eventId":{"type":"string","format":"uuid"},"required":{"type":"boolean","default":false},"formId":{"type":"string","format":"uuid","nullable":true},"capturePerAttendee":{"type":"boolean","default":true},"participantCategories":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"accessProfileId":{"type":"string","format":"uuid","nullable":true,"description":"**Where this meets `accreditation`** — a delegate, a speaker and a sponsor hold different passes to the same event.\n"},"quota":{"type":"integer","nullable":true},"requiresApproval":{"type":"boolean","default":false}}}},"admissionPolicy":{"type":"object","properties":{"reEntryAllowed":{"type":"boolean","default":true},"latecomerPolicy":{"type":"string","nullable":true},"idCheckRequired":{"type":"boolean","default":false},"minimumAge":{"type":"integer","nullable":true}}},"scopePath":{"type":"string"}}}
+"EventRegistration": {"type":"object","x-ticvai-persistence":"catalogue.event_registration","description":"Event boards 5.2 and 5.3. **Registration is not ticketing.**","properties":{"eventId":{"type":"string","format":"uuid"},"required":{"type":"boolean","default":false},"formId":{"type":"string","format":"uuid","nullable":true},"capturePerAttendee":{"type":"boolean","default":true},"participantCategories":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"accessProfileId":{"type":"string","format":"uuid","nullable":true,"description":"**Where this meets `accreditation`** — a delegate, a speaker and a sponsor hold different passes to the same event.\n"},"quota":{"type":"integer","nullable":true},"requiresApproval":{"type":"boolean","default":false}}}},"admissionPolicy":{"type":"object","properties":{"reEntryAllowed":{"type":"boolean","default":true},"latecomerPolicy":{"type":"string","nullable":true},"idCheckRequired":{"type":"boolean","default":false},"minimumAge":{"type":"integer","nullable":true}}},"scopePath":{"type":"string"}}}
 }
 ```

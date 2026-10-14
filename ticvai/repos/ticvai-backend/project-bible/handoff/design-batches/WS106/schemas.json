@@ -69,6 +69,7 @@
     "format": "uuid"
    },
    "tenantId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid"
    },
@@ -253,6 +254,8 @@
     "format": "uuid"
    },
    "thresholds": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

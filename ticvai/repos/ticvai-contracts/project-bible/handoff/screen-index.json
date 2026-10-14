@@ -12,37 +12,29 @@
    "listProducts",
    "listMyEntitlements",
    "getCookieConsentRuntime",
-   "recordDeviceConsent",
-   "decideRecommendations",
-   "recordRecommendationEvents",
-   "recordStorefrontSessionEvents"
+   "recordStorefrontSessionEvents",
+   "searchCatalogue"
   ],
   "services": [
    "AccessService",
-   "AiService",
    "CatalogueService",
    "MarketingService",
    "WhiteLabelService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
    "access.entitlement",
-   "ai.rec_decision",
-   "ai.rec_decline",
-   "ai.release",
    "cache:idempotency",
-   "cache:rec-candidates",
-   "cache:rec-features",
    "catalogue.entitlement_template",
+   "catalogue.event",
    "catalogue.product",
    "catalogue.product_category",
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
+   "catalogue.variant",
    "identity.delegated_access",
    "marketing.cookie_banner_design",
    "marketing.device_consent",
@@ -60,14 +52,7 @@
    "whitelabel.tenant_config"
   ],
   "writes": [
-   "ai.decision_record",
-   "ai.rec_decision",
-   "ai.rec_decline",
-   "ai.rec_event",
    "cache:idempotency",
-   "marketing.device_consent",
-   "marketing.device_consent_category",
-   "pii.consent_identifier",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -1370,6 +1355,7 @@
    "marketing.consent_record",
    "orders.cart",
    "orders.cart_line",
+   "orders.deposit",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
@@ -1531,6 +1517,7 @@
    "cache:idempotency",
    "cache:resolution",
    "marketing.booking_consent_record",
+   "marketing.guest_preference",
    "marketing.guest_profile",
    "pii.subject",
    "seating.seat_reservation"
@@ -1669,6 +1656,7 @@
    "ledger.journal_line",
    "marketing.consent_record",
    "orders.cart",
+   "orders.deposit",
    "orders.order_event",
    "orders.order_line",
    "orders.order_line_discount",
@@ -2169,10 +2157,7 @@
     "trigger": "They set a profile",
     "provenance": "flow F56 step 3\u21924",
     "crossesDevice": true,
-    "back": false,
-    "carries": [
-     "subjectId"
-    ]
+    "back": false
    }
   ],
   "machine": null,
@@ -2433,7 +2418,8 @@
    "listEntitlements",
    "transferOrderTickets",
    "issueWalletPass",
-   "shareEntitlement"
+   "shareEntitlement",
+   "listTicketTransfers"
   ],
   "services": [
    "AccessService",
@@ -2715,8 +2701,6 @@
    "listConsentPurposes",
    "verifyGuestEmail",
    "updateGuestPreferences",
-   "getMyIdentityVerification",
-   "submitGuestIdentityDocument",
    "getMyProfile",
    "getGuestConsents"
   ],
@@ -2729,11 +2713,8 @@
    "redis"
   ],
   "reads": [
-   "assets.media_asset",
    "cache:idempotency",
    "cache:resolution",
-   "identity.guest_identity_verification",
-   "identity.guest_verification_policy",
    "identity.otp_challenge",
    "marketing.consent_purpose",
    "marketing.consent_purpose_channel",
@@ -2745,15 +2726,13 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "identity.guest_identity_verification",
    "identity.otp_challenge",
    "marketing.consent_propagation",
    "marketing.consent_record",
    "marketing.guest_preference",
    "marketing.guest_profile",
    "marketing.message_dispatch",
-   "pii.subject",
-   "pii.subject_document"
+   "pii.subject"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -2878,11 +2857,7 @@
    "getGameCard",
    "listPaymentTokens",
    "storePaymentToken",
-   "transferWalletBalance",
-   "getWalletAutoReloadSetting",
-   "setWalletAutoReloadSetting",
-   "getWalletExitBalance",
-   "settleWalletAtExit"
+   "transferWalletBalance"
   ],
   "services": [
    "OrderService",
@@ -2899,29 +2874,18 @@
    "games.credit_ledger",
    "marketing.consent_record",
    "payments.provider",
-   "payments.stored_forward",
    "payments.token",
    "pii.subject",
-   "wallet.auto_reload_setting",
-   "wallet.balance",
    "wallet.credit_lot",
-   "wallet.exit_settlement",
-   "wallet.funding_rule",
    "wallet.gift_card",
-   "wallet.refund_policy",
    "wallet.wallet",
    "wallet.wallet_transaction"
   ],
   "writes": [
    "cache:idempotency",
-   "cache:resolution",
    "marketing.consent_record",
-   "orders.payment",
-   "orders.refund",
    "payments.token",
    "platform.outbox",
-   "wallet.auto_reload_setting",
-   "wallet.exit_settlement",
    "wallet.wallet",
    "wallet.wallet_transaction"
   ],
@@ -3088,9 +3052,7 @@
    "getBillingStatement",
    "listMyPaymentIssues",
    "retryMyDunningPayment",
-   "getMyMemberships",
-   "listInstalmentPlans",
-   "createInstalmentPlan"
+   "getMyMemberships"
   ],
   "services": [
    "CatalogueService",
@@ -3109,19 +3071,12 @@
    "orders.payment",
    "orders.sales_order",
    "payments.dunning_case",
-   "payments.dunning_policy",
-   "payments.instalment",
-   "payments.instalment_plan",
-   "payments.instalment_policy",
-   "payments.token"
+   "payments.dunning_policy"
   ],
   "writes": [
    "cache:idempotency",
    "orders.payment",
-   "payments.dunning_case",
-   "payments.instalment",
-   "payments.instalment_plan",
-   "platform.outbox"
+   "payments.dunning_case"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -3207,13 +3162,6 @@
    "listDelegations",
    "revokeFacePass",
    "listMfaMethods",
-   "enrolMfaMethod",
-   "verifyMfaEnrolment",
-   "removeMfaMethod",
-   "getCookieConsentRuntime",
-   "listPublishedTrackingTechnologies",
-   "getDeviceConsentHistory",
-   "recordDeviceConsent",
    "listConsentPurposes",
    "listMyEntitlements"
   ],
@@ -3240,21 +3188,15 @@
    "catalogue.variant",
    "identity.delegated_access",
    "identity.mfa_method",
-   "identity.mfa_recovery_code",
-   "identity.principal",
    "identity.subject_holding",
    "marketing.consent_purpose",
    "marketing.consent_purpose_channel",
    "marketing.consent_record",
-   "marketing.cookie_banner_design",
-   "marketing.device_consent",
-   "marketing.device_consent_category",
    "marketing.form_definition",
    "marketing.form_submission",
    "marketing.guest_device",
    "marketing.guest_document",
    "marketing.guest_profile",
-   "marketing.tracking_technology",
    "marketing.wishlist_item",
    "pii.subject",
    "pii.subject_biometric"
@@ -3264,15 +3206,11 @@
    "approvals.request",
    "cache:idempotency",
    "cache:resolution",
-   "identity.mfa_method",
-   "identity.mfa_recovery_code",
+   "identity.guest_session",
    "marketing.consent_propagation",
    "marketing.consent_record",
-   "marketing.device_consent",
-   "marketing.device_consent_category",
    "marketing.guest_device",
    "marketing.guest_profile",
-   "pii.consent_identifier",
    "pii.subject",
    "pii.subject_biometric",
    "platform.outbox"
@@ -3633,23 +3571,17 @@
   "app": "guest-web",
   "route": "/engagement-and-support/contact-and-venue-information",
   "operations": [
-   "getPublishedTenantConfig"
+   "getTenantAppStatus"
   ],
   "services": [
    "WhiteLabelService"
   ],
   "stores": [
-   "postgres",
-   "redis"
+   "postgres"
   ],
   "reads": [
-   "whitelabel.footer_config",
-   "whitelabel.footer_config_column",
-   "whitelabel.footer_config_social_link",
-   "whitelabel.homepage_layout",
-   "whitelabel.homepage_section",
-   "whitelabel.navigation_config",
-   "whitelabel.navigation_item"
+   "whitelabel.config_version",
+   "whitelabel.tenant_config"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -4108,6 +4040,7 @@
    "marketing.consent_record",
    "orders.cart",
    "orders.cart_line",
+   "orders.deposit",
    "orders.order_event",
    "orders.order_line",
    "orders.order_line_discount",
@@ -4660,7 +4593,8 @@
    "joinQueue",
    "getWaitingGuest",
    "leaveQueue",
-   "getWaitTimes"
+   "getWaitTimes",
+   "listQueues"
   ],
   "services": [
    "VenueOpsService"
@@ -4675,6 +4609,7 @@
    "promotions.promotion",
    "queue.entry",
    "queue.queue",
+   "queue.queue_operating_window",
    "queue.reading"
   ],
   "writes": [
@@ -4941,31 +4876,21 @@
    "listPromotions",
    "createReferral",
    "redeemLoyaltyPoints",
-   "decideRecommendations",
-   "recordRecommendationEvents",
    "listRewards",
    "listCustomerBadges",
    "listLeaderboard",
    "setLeaderboardNickname"
   ],
   "services": [
-   "AiService",
    "CatalogueService",
    "MarketingService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.rec_decision",
-   "ai.rec_decline",
-   "ai.release",
    "cache:idempotency",
-   "cache:rec-candidates",
-   "cache:rec-features",
    "marketing.customer_badge",
    "marketing.guest_profile",
    "marketing.loyalty_position",
@@ -4977,10 +4902,6 @@
    "promotions.promotion"
   ],
   "writes": [
-   "ai.decision_record",
-   "ai.rec_decision",
-   "ai.rec_decline",
-   "ai.rec_event",
    "cache:idempotency",
    "marketing.loyalty_position",
    "marketing.referral",
@@ -5488,7 +5409,6 @@
    "getTransportFareTable",
    "searchTransportDepartures",
    "getNextTransportDeparture",
-   "getTransportRoute",
    "getTransportRouteMap",
    "quoteTransportFare",
    "listTransportPassOffers",
@@ -5734,34 +5654,23 @@
    "searchCatalogue",
    "getPublishedTenantConfig",
    "getCookieConsentRuntime",
-   "recordDeviceConsent",
-   "decideRecommendations",
-   "recordRecommendationEvents",
    "recordStorefrontSessionEvents",
    "listProducts",
    "listProductCategories"
   ],
   "services": [
    "AccessService",
-   "AiService",
    "CatalogueService",
    "MarketingService",
    "WhiteLabelService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
    "access.entitlement",
-   "ai.rec_decision",
-   "ai.rec_decline",
-   "ai.release",
    "cache:idempotency",
-   "cache:rec-candidates",
-   "cache:rec-features",
    "catalogue.entitlement_template",
    "catalogue.event",
    "catalogue.product",
@@ -5788,14 +5697,7 @@
    "whitelabel.tenant_config"
   ],
   "writes": [
-   "ai.decision_record",
-   "ai.rec_decision",
-   "ai.rec_decline",
-   "ai.rec_event",
    "cache:idempotency",
-   "marketing.device_consent",
-   "marketing.device_consent_category",
-   "pii.consent_identifier",
    "platform.outbox"
   ],
   "storedProcedures": [],
@@ -6078,10 +5980,7 @@
    {
     "to": "GST-039",
     "trigger": "Profile",
-    "carries": [
-     "subjectId"
-    ],
-    "provenance": "derived \u2014 GST-039 declares entryState.params subjectId and GST-001 holds subjectId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-039 declares entryState.params  and GST-001 holds none of them. The edge carries nothing: GST-039 needs nothing to open"
    },
    {
     "to": "GST-040",
@@ -6365,10 +6264,11 @@
     "to": "GST-004",
     "trigger": "Attraction Details",
     "carries": [
+     "bundleId",
      "eventId",
      "productId"
     ],
-    "provenance": "derived \u2014 GST-004 declares entryState.params bundleId, eventId, productId and GST-002 holds eventId, productId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-004 declares entryState.params bundleId, eventId, productId and GST-002 holds bundleId, eventId, productId, so an edge into it carries them"
    },
    {
     "to": "GST-063",
@@ -6454,10 +6354,11 @@
     "to": "GST-004",
     "trigger": "Attraction Details",
     "carries": [
+     "bundleId",
      "eventId",
      "productId"
     ],
-    "provenance": "derived \u2014 GST-004 declares entryState.params bundleId, eventId, productId and GST-003 holds eventId, productId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-004 declares entryState.params bundleId, eventId, productId and GST-003 holds bundleId, eventId, productId, so an edge into it carries them"
    },
    {
     "to": "GST-007",
@@ -7206,6 +7107,7 @@
    "ledger.journal_line",
    "marketing.consent_record",
    "orders.cart",
+   "orders.deposit",
    "orders.order_event",
    "orders.order_line",
    "orders.order_line_discount",
@@ -7422,8 +7324,6 @@
    "listWalletTransactions",
    "getWalletAutoReloadSetting",
    "setWalletAutoReloadSetting",
-   "getWalletExitBalance",
-   "settleWalletAtExit",
    "getGameCard",
    "listPaymentTokens"
   ],
@@ -7440,27 +7340,17 @@
    "cache:idempotency",
    "games.card",
    "games.credit_ledger",
-   "payments.stored_forward",
    "payments.token",
    "wallet.auto_reload_setting",
-   "wallet.balance",
    "wallet.credit_lot",
-   "wallet.exit_settlement",
    "wallet.funding_rule",
-   "wallet.refund_policy",
    "wallet.wallet",
    "wallet.wallet_transaction"
   ],
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "orders.payment",
-   "orders.refund",
-   "platform.outbox",
-   "wallet.auto_reload_setting",
-   "wallet.exit_settlement",
-   "wallet.wallet",
-   "wallet.wallet_transaction"
+   "wallet.auto_reload_setting"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -7520,7 +7410,8 @@
    "transferOrderTickets",
    "getEntitlementCredential",
    "getEntitlementHistory",
-   "listEntitlements"
+   "listEntitlements",
+   "listTicketTransfers"
   ],
   "services": [
    "AccessService",
@@ -7618,7 +7509,8 @@
    "getEntitlementCredential",
    "getEntitlementHistory",
    "transferOrderTickets",
-   "bindCredentialDevice"
+   "bindCredentialDevice",
+   "listTicketTransfers"
   ],
   "services": [
    "AccessService",
@@ -7829,9 +7721,7 @@
    "getMyMemberships",
    "listDelegations",
    "grantDelegation",
-   "listProducts",
-   "listInstalmentPlans",
-   "createInstalmentPlan"
+   "listProducts"
   ],
   "services": [
    "CatalogueService",
@@ -7851,16 +7741,11 @@
    "catalogue.product_media",
    "identity.delegated_access",
    "ledger.tax_invoice_line",
-   "marketing.guest_profile",
    "marketing.loyalty_position",
    "orders.payment",
    "orders.sales_order",
    "payments.dunning_case",
    "payments.dunning_policy",
-   "payments.instalment",
-   "payments.instalment_plan",
-   "payments.instalment_policy",
-   "payments.token",
    "pii.subject",
    "whitelabel.guided_choice_answer"
   ],
@@ -7868,10 +7753,7 @@
    "cache:idempotency",
    "identity.delegated_access",
    "orders.payment",
-   "payments.dunning_case",
-   "payments.instalment",
-   "payments.instalment_plan",
-   "platform.outbox"
+   "payments.dunning_case"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -9433,8 +9315,7 @@
    "sendAiMessage",
    "sendGuestConversationMessage",
    "getGuestConversation",
-   "handoverToAgent",
-   "recordAnswerFeedback"
+   "handoverToAgent"
   ],
   "services": [
    "AiService",
@@ -9450,7 +9331,6 @@
    "redis"
   ],
   "reads": [
-   "ai.answer_feedback",
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
@@ -9494,7 +9374,6 @@
   ],
   "writes": [
    "ai.activity",
-   "ai.answer_feedback",
    "ai.decision_record",
    "ai.knowledge_gap",
    "ai.message",
@@ -9509,6 +9388,7 @@
    "marketing.conversation_message",
    "orders.cart",
    "orders.cart_line",
+   "orders.deposit",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
@@ -9954,8 +9834,6 @@
    "getLoyaltyPosition",
    "listLoyaltyProgrammes",
    "listPromotions",
-   "decideRecommendations",
-   "recordRecommendationEvents",
    "listRewards",
    "listCustomerBadges",
    "listLeaderboard",
@@ -9964,23 +9842,15 @@
    "createReferral"
   ],
   "services": [
-   "AiService",
    "CatalogueService",
    "MarketingService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.rec_decision",
-   "ai.rec_decline",
-   "ai.release",
    "cache:idempotency",
-   "cache:rec-candidates",
-   "cache:rec-features",
    "marketing.customer_badge",
    "marketing.guest_profile",
    "marketing.loyalty_position",
@@ -9992,10 +9862,6 @@
    "promotions.promotion"
   ],
   "writes": [
-   "ai.decision_record",
-   "ai.rec_decision",
-   "ai.rec_decline",
-   "ai.rec_event",
    "cache:idempotency",
    "marketing.loyalty_position",
    "marketing.referral",
@@ -10278,6 +10144,7 @@
    "cache:resolution",
    "marketing.consent_propagation",
    "marketing.consent_record",
+   "marketing.guest_preference",
    "marketing.guest_profile",
    "pii.subject"
   ],
@@ -10496,7 +10363,8 @@
    "updateCartLine",
    "getPerformance",
    "getResourceHold",
-   "getPublishedBookingFlow"
+   "getPublishedBookingFlow",
+   "createCart"
   ],
   "services": [
    "CatalogueService",
@@ -10527,6 +10395,7 @@
    "orders.payment",
    "orders.sales_order",
    "pii.subject",
+   "platform.scope",
    "promotions.coupon_campaign",
    "promotions.coupon_code",
    "promotions.promotion",
@@ -10541,6 +10410,7 @@
    "marketing.consent_record",
    "orders.cart",
    "orders.cart_line",
+   "orders.deposit",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
@@ -11490,7 +11360,6 @@
   "app": "guest-app",
   "route": "/general/plan-your-adventure-start",
   "operations": [
-   "getWaitTimes",
    "listProducts",
    "generateVisitPlan",
    "getTenantAppStatus"
@@ -11512,8 +11381,6 @@
    "catalogue.product_eligibility_rule",
    "catalogue.product_media",
    "catalogue.variant",
-   "queue.entry",
-   "queue.queue",
    "queue.reading",
    "venuemap.map",
    "venuemap.path",
@@ -11680,8 +11547,6 @@
   "app": "guest-app",
   "route": "/general/your-plan",
   "operations": [
-   "getCart",
-   "listProducts",
    "getWaitTimes",
    "getVisitPlan",
    "updateVisitPlan",
@@ -11689,8 +11554,6 @@
    "bookVisitPlan"
   ],
   "services": [
-   "CatalogueService",
-   "OrderService",
    "VenueOpsService"
   ],
   "stores": [
@@ -11700,27 +11563,20 @@
   "reads": [
    "cache:idempotency",
    "catalogue.channel_capacity",
-   "catalogue.inventory_reservation",
    "catalogue.performance",
    "catalogue.product",
-   "catalogue.product_category",
    "catalogue.product_eligibility_rule",
-   "catalogue.product_media",
    "catalogue.variant",
-   "marketing.consent_question",
-   "marketing.consent_question_version",
    "orders.cart",
    "orders.cart_line",
    "promotions.bundle",
-   "promotions.promotion",
    "queue.entry",
    "queue.queue",
    "queue.reading",
    "venuemap.path",
    "venuemap.point",
    "venuemap.visit_plan",
-   "venuemap.visit_plan_item",
-   "whitelabel.guided_choice_answer"
+   "venuemap.visit_plan_item"
   ],
   "writes": [
    "cache:idempotency",
@@ -12699,10 +12555,6 @@
    "exportSubjectData",
    "deleteGuestAccount",
    "getGuestConsents",
-   "getCookieConsentRuntime",
-   "listPublishedTrackingTechnologies",
-   "getDeviceConsentHistory",
-   "recordDeviceConsent",
    "recordConsent",
    "listConsentPurposes"
   ],
@@ -12721,13 +12573,9 @@
    "marketing.consent_purpose",
    "marketing.consent_purpose_channel",
    "marketing.consent_record",
-   "marketing.cookie_banner_design",
-   "marketing.device_consent",
-   "marketing.device_consent_category",
    "marketing.form_submission",
    "marketing.guest_document",
    "marketing.guest_profile",
-   "marketing.tracking_technology",
    "pii.subject"
   ],
   "writes": [
@@ -12736,12 +12584,8 @@
    "cache:resolution",
    "marketing.consent_propagation",
    "marketing.consent_record",
-   "marketing.device_consent",
-   "marketing.device_consent_category",
    "marketing.guest_profile",
-   "pii.consent_identifier",
-   "pii.subject",
-   "platform.outbox"
+   "pii.subject"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -12758,10 +12602,7 @@
    {
     "to": "GST-039",
     "trigger": "Profile",
-    "carries": [
-     "subjectId"
-    ],
-    "provenance": "derived \u2014 GST-039 declares entryState.params subjectId and GST-066 holds subjectId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-039 declares entryState.params  and GST-066 holds none of them. The edge carries nothing: GST-066 is opened from GST-039, so this edge is the way back and GST-039 keeps its own state"
    }
   ],
   "machine": null,
@@ -12836,10 +12677,7 @@
    {
     "to": "GST-039",
     "trigger": "Profile",
-    "carries": [
-     "subjectId"
-    ],
-    "provenance": "derived \u2014 GST-039 declares entryState.params subjectId and GST-067 holds subjectId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-039 declares entryState.params  and GST-067 holds none of them. The edge carries nothing: GST-039 needs nothing to open"
    }
   ],
   "machine": null,
@@ -12942,10 +12780,7 @@
    {
     "to": "GST-039",
     "trigger": "Profile",
-    "carries": [
-     "subjectId"
-    ],
-    "provenance": "derived \u2014 GST-039 declares entryState.params subjectId and GST-068 holds subjectId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-039 declares entryState.params  and GST-068 holds none of them. The edge carries nothing: GST-039 needs nothing to open"
    }
   ],
   "machine": null,
@@ -13018,7 +12853,6 @@
    "catalogue.product",
    "identity.delegated_access",
    "marketing.consent_record",
-   "marketing.guest_profile",
    "pii.subject",
    "pii.subject_biometric"
   ],
@@ -13045,10 +12879,7 @@
    {
     "to": "GST-039",
     "trigger": "Profile",
-    "carries": [
-     "subjectId"
-    ],
-    "provenance": "derived \u2014 GST-039 declares entryState.params subjectId and GST-069 holds subjectId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-039 declares entryState.params  and GST-069 holds none of them. The edge carries nothing: GST-069 is opened from GST-039, so this edge is the way back and GST-039 keeps its own state"
    }
   ],
   "machine": null,
@@ -13160,10 +12991,7 @@
    {
     "to": "GST-039",
     "trigger": "Profile",
-    "carries": [
-     "subjectId"
-    ],
-    "provenance": "derived \u2014 GST-039 declares entryState.params subjectId and GST-070 holds subjectId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-039 declares entryState.params  and GST-070 holds none of them. The edge carries nothing: GST-039 needs nothing to open"
    },
    {
     "to": "GST-041",
@@ -13354,10 +13182,7 @@
    {
     "to": "GST-039",
     "trigger": "Profile",
-    "carries": [
-     "subjectId"
-    ],
-    "provenance": "derived \u2014 GST-039 declares entryState.params subjectId and GST-071 holds subjectId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-039 declares entryState.params  and GST-071 holds none of them. The edge carries nothing: GST-071 is opened from GST-039, so this edge is the way back and GST-039 keeps its own state"
    }
   ],
   "machine": null,
@@ -13488,10 +13313,7 @@
    {
     "to": "GST-039",
     "trigger": "Profile",
-    "carries": [
-     "subjectId"
-    ],
-    "provenance": "derived \u2014 GST-039 declares entryState.params subjectId and GST-072 holds subjectId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-039 declares entryState.params  and GST-072 holds none of them. The edge carries nothing: GST-039 needs nothing to open"
    }
   ],
   "machine": null,
@@ -13585,10 +13407,7 @@
    "verifyGuestEmail",
    "listMfaMethods",
    "enrolMfaMethod",
-   "verifyMfaEnrolment",
-   "removeMfaMethod",
-   "createMfaChallenge",
-   "verifyMfaChallenge"
+   "verifyMfaEnrolment"
   ],
   "services": [
    "IdentityService",
@@ -13601,28 +13420,22 @@
   "reads": [
    "cache:idempotency",
    "identity.guest_session",
-   "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
    "identity.otp_challenge",
-   "identity.password_policy",
    "identity.principal",
-   "identity.session",
    "marketing.guest_device",
    "pii.subject"
   ],
   "writes": [
    "cache:idempotency",
    "identity.guest_session",
-   "identity.mfa_challenge",
    "identity.mfa_method",
    "identity.mfa_recovery_code",
    "identity.otp_challenge",
-   "identity.session",
    "marketing.guest_device",
    "marketing.message_dispatch",
-   "pii.subject",
-   "platform.outbox"
+   "pii.subject"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -13639,10 +13452,7 @@
    {
     "to": "GST-039",
     "trigger": "Profile",
-    "carries": [
-     "subjectId"
-    ],
-    "provenance": "derived \u2014 GST-039 declares entryState.params subjectId and GST-073 holds subjectId, so an edge into it carries them"
+    "provenance": "derived \u2014 GST-039 declares entryState.params  and GST-073 holds none of them. The edge carries nothing: GST-073 is opened from GST-039, so this edge is the way back and GST-039 keeps its own state"
    }
   ],
   "machine": null,
@@ -14009,7 +13819,6 @@
   "app": "guest-app",
   "route": "/transport/route-and-passengers",
   "operations": [
-   "getTransportRoute",
    "getTransportRouteMap",
    "getTransportFareTable",
    "quoteTransportFare",
@@ -14401,7 +14210,6 @@
    "orders.pos_shift_incident",
    "platform.denomination",
    "platform.device",
-   "platform.device_heartbeat",
    "platform.region_settings",
    "platform.venue_settings",
    "platform.workstation"
@@ -16302,16 +16110,13 @@
     "trigger": "Recall this held sale",
     "control": "dataTable#heldList",
     "guard": "sale.resume",
+    "operation": "resumeOrder",
     "carries": [
-     "cart",
-     "cartHoldExpiresAt",
-     "guest",
-     "discount",
-     "table",
-     "orderType"
+     "orderId",
+     "subjectId"
     ],
     "returnsTo": "POS-006",
-    "provenance": "board TICVAI POS Terminal \u00b7 recall (4000). **The hold clock travels with the cart** \u2014 a destination that re-fetches the lines has lost the lease, and the guest's seats go back on sale while they are standing at the till."
+    "provenance": "board TICVAI POS Terminal \u00b7 recall (4000). **The hold clock travels with the cart** \u2014 a destination that re-fetches the lines has lost the lease, and the guest's seats go back on sale while they are standing at the till. **The parked cart is the held order** (CHG-SPO-015), so the recall resumes it (`resumeOrder`) and carries its `orderId` and the guest's `subjectId`; its lines, discounts, hold clock (`heldUntil`), table and order type are the order's own fields, which POS-002 reads with the order (Block A audit, CHG-SCP-004)."
    },
    {
     "to": "POS-003",
@@ -17220,7 +17025,8 @@
    "lookupRetailSale",
    "createRetailReturn",
    "listSerialisedItems",
-   "issueCreditMemo"
+   "issueCreditMemo",
+   "listOrderRefunds"
   ],
   "services": [
    "InventoryService",
@@ -17266,6 +17072,7 @@
    "ledger.tax_invoice_line",
    "ledger.tax_invoice_template",
    "orders.order_event",
+   "orders.order_line",
    "orders.refund",
    "orders.sales_order",
    "platform.audit_record",
@@ -19177,7 +18984,6 @@
    "orders.pos_shift_approval",
    "orders.pos_shift_incident",
    "platform.device",
-   "platform.device_heartbeat",
    "platform.sale_board",
    "platform.sale_board_page",
    "platform.sale_board_tile",
@@ -20648,6 +20454,7 @@
   "writes": [
    "marketing.consent_record",
    "orders.cart",
+   "orders.deposit",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
@@ -21254,7 +21061,6 @@
    "listProducts",
    "getAvailability",
    "handoverToAgent",
-   "recordAnswerFeedback",
    "createAiConversation",
    "addCartLine"
   ],
@@ -21271,7 +21077,6 @@
    "redis"
   ],
   "reads": [
-   "ai.answer_feedback",
    "ai.assistant_profile",
    "ai.capability",
    "ai.chunk_embedding",
@@ -21304,7 +21109,6 @@
   ],
   "writes": [
    "ai.activity",
-   "ai.answer_feedback",
    "ai.conversation",
    "ai.decision_record",
    "ai.knowledge_gap",
@@ -21816,7 +21620,8 @@
    "getShift",
    "recordAuthorityNotification",
    "reportIncident",
-   "updateIncident"
+   "updateIncident",
+   "uploadIncidentMedia"
   ],
   "services": [
    "OrderService",
@@ -21832,6 +21637,7 @@
    "maintenance.incident_authority_notification",
    "maintenance.incident_investigation_note",
    "maintenance.incident_involved_party",
+   "maintenance.incident_media",
    "orders.pos_shift",
    "orders.pos_shift_approval",
    "orders.pos_shift_incident"
@@ -21839,7 +21645,10 @@
   "writes": [
    "cache:idempotency",
    "maintenance.incident",
-   "maintenance.incident_history"
+   "maintenance.incident_authority_notification",
+   "maintenance.incident_history",
+   "maintenance.incident_involved_party",
+   "maintenance.incident_media"
   ],
   "storedProcedures": [],
   "wave": 1,
@@ -22427,6 +22236,9 @@
     "id": "confirmSuspendShift",
     "component": "confirmDialog",
     "trigger": "Suspend shift",
+    "confirm": {
+     "operation": "suspendShift"
+    },
     "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A end shift this affects should be identified in the dialog, not just counted. **Collects what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.",
     "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
    },
@@ -22479,12 +22291,10 @@
    "lookupTicket",
    "overrideAccess",
    "validateAccess",
-   "validateGroupAccess",
-   "verifyAccreditationCredential"
+   "validateGroupAccess"
   ],
   "services": [
-   "AccessService",
-   "TenancyService"
+   "AccessService"
   ],
   "stores": [
    "postgres",
@@ -22500,11 +22310,6 @@
    "access.entitlement",
    "access.policy_scope_assignment",
    "access.scan_event",
-   "accreditation.access_profile",
-   "accreditation.credential",
-   "accreditation.holder",
-   "accreditation.holder_access",
-   "accreditation.programme",
    "cache:idempotency",
    "catalogue.entitlement_template",
    "identity.principal",
@@ -25393,7 +25198,8 @@
   "operations": [
    "listIncidents",
    "getIncident",
-   "updateIncident"
+   "updateIncident",
+   "uploadIncidentMedia"
   ],
   "services": [
    "VenueOpsService"
@@ -25407,12 +25213,14 @@
    "maintenance.incident",
    "maintenance.incident_authority_notification",
    "maintenance.incident_investigation_note",
-   "maintenance.incident_involved_party"
+   "maintenance.incident_involved_party",
+   "maintenance.incident_media"
   ],
   "writes": [
    "cache:idempotency",
    "maintenance.incident",
-   "maintenance.incident_history"
+   "maintenance.incident_history",
+   "maintenance.incident_media"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -26146,7 +25954,8 @@
    "getIncident",
    "updateIncident",
    "listIncidents",
-   "recordAuthorityNotification"
+   "recordAuthorityNotification",
+   "uploadIncidentMedia"
   ],
   "services": [
    "VenueOpsService"
@@ -26160,12 +25969,15 @@
    "maintenance.incident",
    "maintenance.incident_authority_notification",
    "maintenance.incident_investigation_note",
-   "maintenance.incident_involved_party"
+   "maintenance.incident_involved_party",
+   "maintenance.incident_media"
   ],
   "writes": [
    "cache:idempotency",
    "maintenance.incident",
-   "maintenance.incident_history"
+   "maintenance.incident_authority_notification",
+   "maintenance.incident_history",
+   "maintenance.incident_media"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -26493,7 +26305,9 @@
   "writes": [
    "cache:idempotency",
    "maintenance.incident",
+   "maintenance.incident_authority_notification",
    "maintenance.incident_history",
+   "maintenance.incident_involved_party",
    "marketing.case",
    "marketing.case_escalation",
    "marketing.case_message"
@@ -28634,44 +28448,22 @@
   "route": "/operations/retail-inventory-command-center",
   "operations": [
    "getStockPositions",
-   "listStockMovements",
-   "getKpiValues",
-   "getDashboard",
-   "listAlerts",
-   "acknowledgeAlert"
+   "listStockMovements"
   ],
   "services": [
-   "InventoryService",
-   "ReportingService"
+   "InventoryService"
   ],
   "stores": [
    "derived",
-   "postgres",
-   "postgres-analytical",
-   "redis"
+   "postgres"
   ],
   "reads": [
-   "accreditation.application",
-   "accreditation.credential",
-   "accreditation.holder",
-   "accreditation.validity",
-   "cache:idempotency",
-   "identity.principal",
    "inventory.inventory_item",
    "inventory.location",
    "inventory.movement",
-   "inventory.stock_earmark",
-   "reporting.alert",
-   "reporting.alert_rule",
-   "reporting.dashboard",
-   "reporting.dashboard_tile",
-   "reporting.kpi_definition",
-   "reporting.kpi_target"
+   "inventory.stock_earmark"
   ],
-  "writes": [
-   "cache:idempotency",
-   "reporting.alert"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 2,
   "offline": true,
@@ -28777,6 +28569,7 @@
   "reads": [
    "cache:idempotency",
    "inventory.inventory_item",
+   "inventory.location",
    "inventory.requisition",
    "inventory.requisition_line"
   ],
@@ -32729,6 +32522,7 @@
   "writes": [
    "access.access_incident",
    "access.access_point",
+   "access.configuration_change",
    "access.gate_mode_change",
    "cache:idempotency"
   ],
@@ -34148,6 +33942,7 @@
   "reads": [
    "access.entitlement",
    "assets.media_asset",
+   "assets.media_collection_member",
    "cache:idempotency",
    "catalogue.product",
    "catalogue.product_media",
@@ -37033,7 +36828,10 @@
     "component": "confirmDialog",
     "trigger": "Void order",
     "body": "**Names what `voidOrder` changes and what it leaves alone**, in the consequence rather than the verb. A refunds exchanges this affects should be identified in the dialog, not just counted. **Collects what `voidOrder` sends before it is called.** Required: `id`, `reason`, `recordedAt`. `reason` is the void reason list (`VoidReason`: guestChangedMind, enteredInError, itemUnavailable, qualityIssue, duplicate, other); **choosing Other makes `note` required** (decided 28 September, audit R125 (4), R222).",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/voids"
+    "provenance": "contract orders.yaml POST /orders/{orderId}/voids",
+    "confirm": {
+     "operation": "voidOrder"
+    }
    },
    {
     "id": "formCreateRefund",
@@ -38642,7 +38440,6 @@
    "cache:idempotency",
    "orders.pos_shift",
    "platform.device",
-   "platform.device_heartbeat",
    "platform.workstation",
    "reporting.alert",
    "reporting.alert_rule",
@@ -43685,7 +43482,9 @@
   "writes": [
    "cache:idempotency",
    "maintenance.incident",
-   "maintenance.incident_history"
+   "maintenance.incident_authority_notification",
+   "maintenance.incident_history",
+   "maintenance.incident_involved_party"
   ],
   "storedProcedures": [],
   "wave": 2,
@@ -46577,6 +46376,7 @@
   "reads": [
    "access.access_point",
    "assets.media_asset",
+   "assets.media_collection_member",
    "assets.media_upload",
    "cache:idempotency",
    "cache:resolution",
@@ -48949,7 +48749,7 @@
    {
     "to": "BO-118",
     "trigger": "Campaign & Audience Management",
-    "provenance": "derived \u2014 BO-118 declares entryState.params reportId and BO-102 holds none of them. The edge carries nothing: reportId only pre-selects (deep link or optional), and BO-118 opens on its own"
+    "provenance": "derived \u2014 BO-118 declares entryState.params executionId, reportId and BO-102 holds none of them. The edge carries nothing: reportId, executionId only pre-select (deep link or optional), and BO-118 opens on its own"
    },
    {
     "to": "BO-119",
@@ -49142,7 +48942,7 @@
    {
     "to": "BO-003",
     "trigger": "Queue Integration Setup",
-    "provenance": "derived \u2014 BO-003 declares entryState.params feedId, orderId and BO-103 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-003 finds feedId (configureQueueFeed) itself, and BO-003 opens on its own"
+    "provenance": "derived \u2014 BO-003 declares entryState.params feedId, orderId and BO-103 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-003 finds feedId (listQueueFeeds) itself, and BO-003 opens on its own"
    },
    {
     "to": "BO-004",
@@ -51020,7 +50820,8 @@
    "listCampaigns",
    "createCampaign",
    "listSegments",
-   "runReport"
+   "runReport",
+   "getReportExecution"
   ],
   "services": [
    "MarketingService",
@@ -51896,7 +51697,6 @@
   ],
   "reads": [
    "platform.device",
-   "platform.device_heartbeat",
    "platform.workstation"
   ],
   "writes": [],
@@ -51984,7 +51784,6 @@
    "cache:idempotency",
    "platform.configuration_profile",
    "platform.device",
-   "platform.device_heartbeat",
    "platform.profile_deployment",
    "platform.workstation",
    "tenancy.device_firmware",
@@ -52432,7 +52231,10 @@
     "trigger": "The connection returns",
     "provenance": "flow F33 step 4\u21925",
     "crossesDevice": true,
-    "back": false
+    "back": false,
+    "carries": [
+     "orderId"
+    ]
    }
   ],
   "machine": null,
@@ -57826,7 +57628,8 @@
   ],
   "writes": [
    "access.hardware_deployment",
-   "platform.device"
+   "platform.device",
+   "tenancy.device_audit"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -59797,6 +59600,7 @@
   "writes": [
    "access.access_incident",
    "access.access_point",
+   "access.configuration_change",
    "access.gate_mode_change",
    "cache:idempotency"
   ],
@@ -59834,7 +59638,10 @@
     "component": "confirmDialog",
     "trigger": "Cancel gate mode change",
     "body": "**Names what `cancelGateModeChange` changes and what it leaves alone**, in the consequence rather than the verb. A access gate mode change this affects should be identified in the dialog, not just counted. **Collects what `cancelGateModeChange` sends before it is called.** Nothing in the body is required. Optional: `reason`.",
-    "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel"
+    "provenance": "contract access.yaml POST /gate-mode-changes/{changeId}/cancel",
+    "confirm": {
+     "operation": "cancelGateModeChange"
+    }
    },
    {
     "id": "formSetAccessPointDirection",
@@ -60731,7 +60538,10 @@
     "component": "confirmDialog",
     "trigger": "ROLLBACK TO V3.4",
     "body": "**ROLLBACK TO V3.4 on a policy approval audit is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Access Control Module_Reference.pdf, page 146 \u00a7Allow"
+    "provenance": "pack Access Control Module_Reference.pdf, page 146 \u00a7Allow",
+    "confirm": {
+     "operation": "rollbackAccessPolicy"
+    }
    }
   ]
  },
@@ -65094,6 +64904,7 @@
   ],
   "reads": [
    "catalogue.inventory_reservation",
+   "orders.membership_renewal",
    "orders.order_line",
    "orders.payment",
    "orders.payment_link",
@@ -65436,7 +65247,8 @@
   "writes": [
    "cache:idempotency",
    "orders.reservation",
-   "orders.sales_order"
+   "orders.sales_order",
+   "platform.outbox"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -66468,7 +66280,6 @@
   "reads": [
    "ledger.settlement_exception",
    "orders.payment",
-   "orders.payment_tip",
    "orders.refund",
    "orders.sales_order",
    "orders.stored_value_authorisation"
@@ -66723,7 +66534,10 @@
     "component": "confirmDialog",
     "trigger": "Merge orders",
     "body": "**Names what `mergeOrders` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted. **Collects what `mergeOrders` sends before it is called.** Required: `sourceOrderIds`. Optional: `reason`.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/merge"
+    "provenance": "contract orders.yaml POST /orders/{orderId}/merge",
+    "confirm": {
+     "operation": "mergeOrders"
+    }
    }
   ]
  },
@@ -67870,7 +67684,10 @@
     "component": "confirmDialog",
     "trigger": "Archive media template",
     "body": "**Names what `archiveMediaTemplate` changes and what it leaves alone**, in the consequence rather than the verb. A access media template this affects should be identified in the dialog, not just counted. **Collects what `archiveMediaTemplate` sends before it is called.** Nothing in the body is required. Optional: `reason`.",
-    "provenance": "contract access.yaml POST /media-templates/{templateId}/archive"
+    "provenance": "contract access.yaml POST /media-templates/{templateId}/archive",
+    "confirm": {
+     "operation": "archiveMediaTemplate"
+    }
    },
    {
     "id": "formCreateTicketTemplate",
@@ -77435,6 +77252,7 @@
   "reads": [
    "cache:idempotency",
    "maintenance.asset_category",
+   "rental.location_rule",
    "rental.product"
   ],
   "writes": [
@@ -79108,6 +78926,7 @@
   "reads": [
    "rental.availability_rules",
    "rental.blackout",
+   "rental.location_rule",
    "rental.product"
   ],
   "writes": [
@@ -80250,7 +80069,8 @@
    "postgres"
   ],
   "reads": [
-   "rental.agreement_signature"
+   "rental.agreement_signature",
+   "rental.booking"
   ],
   "writes": [
    "rental.agreement_signature"
@@ -84235,7 +84055,8 @@
   "app": "venue-management-web",
   "route": "/setup-go-live/configuration-health-ai-review-bo-603",
   "operations": [
-   "runGoLiveValidation"
+   "runGoLiveValidation",
+   "getGoLiveReadiness"
   ],
   "services": [
    "PlatformService"
@@ -84460,7 +84281,8 @@
   "app": "venue-management-web",
   "route": "/setup-go-live/automated-validation-plan-bo-606",
   "operations": [
-   "runGoLiveValidation"
+   "runGoLiveValidation",
+   "getGoLiveReadiness"
   ],
   "services": [
    "PlatformService"
@@ -84513,7 +84335,8 @@
   "app": "venue-management-web",
   "route": "/setup-go-live/ticketing-product-validation-bo-607",
   "operations": [
-   "runGoLiveValidation"
+   "runGoLiveValidation",
+   "getGoLiveReadiness"
   ],
   "services": [
    "PlatformService"
@@ -84566,7 +84389,8 @@
   "app": "venue-management-web",
   "route": "/setup-go-live/end-to-end-sales-channel-testing-bo-608",
   "operations": [
-   "runGoLiveValidation"
+   "runGoLiveValidation",
+   "getGoLiveReadiness"
   ],
   "services": [
    "PlatformService"
@@ -84619,7 +84443,8 @@
   "app": "venue-management-web",
   "route": "/setup-go-live/payment-financial-validation-bo-609",
   "operations": [
-   "runGoLiveValidation"
+   "runGoLiveValidation",
+   "getGoLiveReadiness"
   ],
   "services": [
    "PlatformService"
@@ -84672,7 +84497,8 @@
   "app": "venue-management-web",
   "route": "/setup-go-live/ticket-qr-access-validation-bo-610",
   "operations": [
-   "runGoLiveValidation"
+   "runGoLiveValidation",
+   "getGoLiveReadiness"
   ],
   "services": [
    "PlatformService"
@@ -84725,7 +84551,8 @@
   "app": "venue-management-web",
   "route": "/setup-go-live/user-security-integration-validation-bo-611",
   "operations": [
-   "runGoLiveValidation"
+   "runGoLiveValidation",
+   "getGoLiveReadiness"
   ],
   "services": [
    "PlatformService"
@@ -84778,7 +84605,8 @@
   "app": "venue-management-web",
   "route": "/setup-go-live/communication-customer-journey-validation-bo-612",
   "operations": [
-   "runGoLiveValidation"
+   "runGoLiveValidation",
+   "getGoLiveReadiness"
   ],
   "services": [
    "PlatformService"
@@ -93129,6 +92957,7 @@
    "marketing.privacy_exception",
    "marketing.privacy_request",
    "marketing.retention_policy",
+   "marketing.segment",
    "marketing.tracking_technology"
   ],
   "writes": [],
@@ -94359,7 +94188,8 @@
    "createSegment",
    "previewSegment",
    "decideProposedAction",
-   "proposeLookalikeSegment"
+   "proposeLookalikeSegment",
+   "listProposedActions"
   ],
   "services": [
    "AiService",
@@ -95106,7 +94936,6 @@
    "marketing.campaign",
    "marketing.campaign_target",
    "marketing.campaign_variant",
-   "marketing.message_delivery",
    "marketing.message_dispatch",
    "marketing.message_template",
    "marketing.segment",
@@ -95185,7 +95014,6 @@
    "marketing.attribution_touch",
    "marketing.campaign",
    "marketing.campaign_variant",
-   "marketing.message_delivery",
    "marketing.message_dispatch"
   ],
   "writes": [],
@@ -96530,7 +96358,8 @@
   "operations": [
    "proposeMarketingContent",
    "decideProposedAction",
-   "proposeTranslations"
+   "proposeTranslations",
+   "listProposedActions"
   ],
   "services": [
    "AiService"
@@ -97267,6 +97096,7 @@
    "redis"
   ],
   "reads": [
+   "marketing.case",
    "marketing.case_message",
    "marketing.conversation",
    "marketing.conversation_message",
@@ -97491,7 +97321,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.case"
+   "marketing.case",
+   "marketing.case_message"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -102399,6 +102230,7 @@
    "workforce.sync_run"
   ],
   "writes": [
+   "workforce.employee",
    "workforce.field_ownership",
    "workforce.integration_source",
    "workforce.sync_conflict",
@@ -106110,6 +105942,7 @@
   "writes": [
    "cache:idempotency",
    "maintenance.incident",
+   "maintenance.incident_involved_party",
    "resources.booking",
    "resources.resource_request",
    "workforce.attendance"
@@ -108212,6 +108045,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "seating.import_job",
    "seating.seat_map"
   ],
   "writes": [
@@ -108271,6 +108105,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "seating.import_job",
    "seating.seat_map"
   ],
   "writes": [
@@ -108330,6 +108165,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "seating.import_job",
    "seating.seat",
    "seating.seat_map",
    "seating.zone"
@@ -108468,6 +108304,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "seating.import_job",
    "seating.seat_map"
   ],
   "writes": [
@@ -109247,7 +109084,8 @@
    "seating.seat_category",
    "seating.seat_reservation",
    "seating.seat_reservation_item",
-   "seating.seat_rules"
+   "seating.seat_rules",
+   "seating.section_row"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -109361,7 +109199,8 @@
    "seating.seat_category",
    "seating.seat_reservation",
    "seating.seat_reservation_item",
-   "seating.seat_rules"
+   "seating.seat_rules",
+   "seating.section_row"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -109577,7 +109416,8 @@
    "seating.seat_category",
    "seating.seat_reservation",
    "seating.seat_reservation_item",
-   "seating.seat_rules"
+   "seating.seat_rules",
+   "seating.section_row"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -109635,7 +109475,8 @@
    "seating.seat_category",
    "seating.seat_reservation",
    "seating.seat_reservation_item",
-   "seating.seat_rules"
+   "seating.seat_rules",
+   "seating.section_row"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -110143,7 +109984,8 @@
    "seating.seat_category",
    "seating.seat_reservation",
    "seating.seat_reservation_item",
-   "seating.seat_rules"
+   "seating.seat_rules",
+   "seating.section_row"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -113857,7 +113699,8 @@
   "route": "/access-venue/heat-maps-drill-down-bo-1059",
   "operations": [
    "getSeatInventory",
-   "runReport"
+   "runReport",
+   "getReportExecution"
   ],
   "services": [
    "CatalogueService",
@@ -113879,7 +113722,8 @@
    "seating.seat_category",
    "seating.seat_reservation",
    "seating.seat_reservation_item",
-   "seating.seat_rules"
+   "seating.seat_rules",
+   "seating.section_row"
   ],
   "writes": [
    "cache:idempotency",
@@ -113923,7 +113767,8 @@
   "route": "/access-venue/report-builder-export-audit-bo-1060",
   "operations": [
    "createReport",
-   "exportReportResult"
+   "exportReportResult",
+   "getReportExport"
   ],
   "services": [
    "ReportingService"
@@ -114569,7 +114414,8 @@
   "app": "venue-management-web",
   "route": "/access-venue/lifecycle-environment-promotion-bo-1068",
   "operations": [
-   "deployConfigurationProfile"
+   "deployConfigurationProfile",
+   "listProfileDeployments"
   ],
   "services": [
    "TenancyService"
@@ -120420,6 +120266,7 @@
    "wallet.integration_mapping",
    "wallet.reconciliation_source",
    "wallet.refund_policy",
+   "wallet.risk_rule",
    "wallet.risk_rule_set",
    "wallet.transfer_rule",
    "wallet.wallet_type"
@@ -120458,7 +120305,10 @@
     "component": "confirmDialog",
     "trigger": "Rollback",
     "body": "**Rollback on a security governance audit is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 \u00a7Support"
+    "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 \u00a7Support",
+    "confirm": {
+     "operation": "restoreWalletConfigurationVersion"
+    }
    }
   ]
  },
@@ -121572,7 +121422,10 @@
     "component": "confirmDialog",
     "trigger": "Suspend integration",
     "body": "**Suspend integration on a integration monitoring exception is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 \u00a7Actions"
+    "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 \u00a7Actions",
+    "confirm": {
+     "operation": "setApiClientStatus"
+    }
    }
   ]
  },
@@ -122756,6 +122609,7 @@
   ],
   "writes": [
    "cache:idempotency",
+   "catalogue.audit_entry",
    "catalogue.entitlement_template"
   ],
   "storedProcedures": [],
@@ -125636,7 +125490,10 @@
     "component": "confirmDialog",
     "trigger": "Cancel pricing rollback",
     "body": "**Names what `cancelPricingRollback` changes and what it leaves alone**, in the consequence rather than the verb. A catalogue rollback action this affects should be identified in the dialog, not just counted. **Collects what `cancelPricingRollback` sends before it is called.** Required: `reason`.",
-    "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel"
+    "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel",
+    "confirm": {
+     "operation": "cancelPricingRollback"
+    }
    }
   ]
  },
@@ -129220,6 +129077,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "catalogue.change_request",
    "catalogue.product",
    "catalogue.product_link",
    "catalogue.variant"
@@ -138601,6 +138459,7 @@
   ],
   "reads": [
    "catalogue.audit_entry",
+   "catalogue.channel_incident",
    "orders.sales_order"
   ],
   "writes": [],
@@ -144321,7 +144180,6 @@
   "reads": [
    "ledger.settlement_exception",
    "orders.payment",
-   "orders.payment_tip",
    "orders.refund",
    "orders.sales_order",
    "orders.stored_value_authorisation"
@@ -144997,7 +144855,6 @@
   "reads": [
    "ledger.settlement_exception",
    "orders.payment",
-   "orders.payment_tip",
    "orders.refund",
    "orders.sales_order",
    "orders.stored_value_authorisation"
@@ -145083,7 +144940,8 @@
   "operations": [
    "setReconciliationSource",
    "ingestSettlementFile",
-   "listReconciliationSources"
+   "listReconciliationSources",
+   "getSettlement"
   ],
   "services": [
    "LedgerService",
@@ -155336,6 +155194,9 @@
     "component": "confirmDialog",
     "trigger": "Cancel decommission",
     "body": "**Names what `cancelDecommission` changes and what it leaves alone**, in the consequence rather than the verb. A cross-tenant health this affects should be identified in the dialog, not just counted. **Collects what `cancelDecommission` sends before it is called.** Required: `reason`.",
+    "confirm": {
+     "operation": "cancelDecommission"
+    },
     "provenance": "contract subscription.yaml POST /cells/{cellId}/cancel-decommission"
    },
    {
@@ -155384,7 +155245,6 @@
   "route": "/general/platform-audit-log",
   "operations": [
    "listAiInteractions",
-   "getAiDecisionTrace",
    "listAuditRecords",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -155399,15 +155259,10 @@
   "stores": [
    "postgres",
    "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.action_plan",
-   "ai.action_step",
    "ai.activity",
-   "ai.decision_record",
-   "ai.intervention",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant",
@@ -156045,6 +155900,9 @@
     "component": "confirmDialog",
     "trigger": "Remove licence add on",
     "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A module feature entitlement this affects should be identified in the dialog, not just counted. **Collects what `removeLicenceAddOn` sends before it is called.** Required: `moduleKey`, `reason`.",
+    "confirm": {
+     "operation": "removeLicenceAddOn"
+    },
     "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
    },
    {
@@ -156315,15 +156173,13 @@
    "getSubscription",
    "getTenant",
    "getTenantLicences",
-   "listTenants",
-   "listCreditNotes"
+   "listTenants"
   ],
   "services": [
    "PlatformService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
    "redis"
   ],
   "reads": [
@@ -156332,7 +156188,6 @@
    "control.cell",
    "control.cell_tenant",
    "control.credit_note",
-   "control.credit_note_line",
    "control.invoice",
    "control.invoice_line",
    "control.licence_add_on",
@@ -156594,6 +156449,9 @@
     "component": "confirmDialog",
     "trigger": "Remove licence add on",
     "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A licence seat this affects should be identified in the dialog, not just counted. **Collects what `removeLicenceAddOn` sends before it is called.** Required: `moduleKey`, `reason`.",
+    "confirm": {
+     "operation": "removeLicenceAddOn"
+    },
     "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
    },
    {
@@ -157160,6 +157018,7 @@
   ],
   "reads": [
    "assets.media_asset",
+   "assets.media_collection_member",
    "assets.media_upload",
    "cache:idempotency",
    "cache:resolution",
@@ -160104,8 +159963,6 @@
   "route": "/commercial/tax-fee-calculation-command-center-adm-068",
   "operations": [
    "listTaxFeeCalculation",
-   "listTaxInvoices",
-   "getVatReturn",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -160113,7 +159970,6 @@
   "services": [
    "CatalogueService",
    "IdentityService",
-   "LedgerService",
    "PlatformService"
   ],
   "stores": [
@@ -160130,13 +159986,7 @@
    "catalogue.tax_profile",
    "catalogue.tax_rule",
    "control.tenant",
-   "identity.platform_staff_grant",
-   "ledger.journal_entry",
-   "ledger.legal_entity",
-   "ledger.posting",
-   "ledger.tax_code",
-   "ledger.tax_invoice",
-   "ledger.tax_invoice_line"
+   "identity.platform_staff_grant"
   ],
   "writes": [
    "identity.platform_staff_grant"
@@ -160356,19 +160206,17 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/commercial-command-center-adm-369",
   "operations": [
-   "listTenants",
-   "getSubscription"
+   "getCommercialMetrics"
   ],
   "services": [
    "PlatformService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "postgres-analytical",
+   "redis"
   ],
-  "reads": [
-   "control.tenant",
-   "subscription.contract"
-  ],
+  "reads": [],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -160510,8 +160358,7 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/customer-commercial-360-adm-371",
   "operations": [
-   "getSubscription",
-   "getEntitlementUsage"
+   "getSubscription"
   ],
   "services": [
    "PlatformService"
@@ -160520,9 +160367,6 @@
    "postgres"
   ],
   "reads": [
-   "access.entitlement",
-   "control.licence_add_on",
-   "control.usage_record",
    "subscription.contract"
   ],
   "writes": [],
@@ -160563,6 +160407,7 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/operational-profile-vsi-commercial-model-intelligence-adm-372",
   "operations": [
+   "getCommercialMetrics",
    "scoreVsiAssessment"
   ],
   "services": [
@@ -160614,7 +160459,8 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/revenue-commercial-model-analytics-adm-373",
   "operations": [
-   "getBillingReconciliation"
+   "getBillingReconciliation",
+   "getCommercialMetrics"
   ],
   "services": [
    "PlatformService"
@@ -160669,17 +160515,17 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/trial-conversion-monitor-adm-374",
   "operations": [
-   "listTenants"
+   "getCommercialMetrics"
   ],
   "services": [
    "PlatformService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "postgres-analytical",
+   "redis"
   ],
-  "reads": [
-   "control.tenant"
-  ],
+  "reads": [],
   "writes": [],
   "storedProcedures": [],
   "wave": 3,
@@ -160717,9 +160563,17 @@
   "operator": "ticvai",
   "app": "ticvai-web",
   "route": "/tenants-licensing/renewal-retention-center-adm-375",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "getCommercialMetrics"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
   "writes": [],
   "storedProcedures": [],
@@ -160758,9 +160612,17 @@
   "operator": "ticvai",
   "app": "ticvai-web",
   "route": "/tenants-licensing/commercial-optimization-expansion-opportunities-adm-376",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "getCommercialMetrics"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
   "writes": [],
   "storedProcedures": [],
@@ -160866,7 +160728,7 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/executive-ai-commercial-intelligence-adm-378",
   "operations": [
-   "getLicenceEnforcement",
+   "getCommercialMetrics",
    "getPlanRecommendations"
   ],
   "services": [
@@ -161497,6 +161359,7 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/commercial-rules-engine-overview-adm-389",
   "operations": [
+   "getCommercialMetrics",
    "listLicensingModels"
   ],
   "services": [
@@ -162853,7 +162716,6 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/billing-legal-entity-information-adm-411",
   "operations": [
-   "createLegalEntity",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant",
@@ -162862,7 +162724,6 @@
   ],
   "services": [
    "IdentityService",
-   "LedgerService",
    "PlatformService"
   ],
   "stores": [
@@ -162871,17 +162732,13 @@
    "redis"
   ],
   "reads": [
-   "cache:idempotency",
    "control.billing_entity",
    "control.tenant",
-   "identity.platform_staff_grant",
-   "ledger.legal_entity"
+   "identity.platform_staff_grant"
   ],
   "writes": [
-   "cache:idempotency",
    "control.billing_entity",
-   "identity.platform_staff_grant",
-   "ledger.legal_entity"
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -163701,7 +163558,6 @@
   "route": "/tenants-licensing/administrator-security-initialization-adm-422",
   "operations": [
    "getTenantLicences",
-   "addLicenceAddOn",
    "openPlatformStaffGrant",
    "createPrincipal",
    "setPasswordPolicy",
@@ -163734,8 +163590,6 @@
   "writes": [
    "cache:idempotency",
    "cache:resolution",
-   "control.licence_add_on",
-   "control.licence_add_on_limit",
    "identity.delegated_access",
    "identity.password_policy",
    "identity.platform_staff_grant",
@@ -164431,7 +164285,6 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/operational-usage-threshold-monitor-adm-452",
   "operations": [
-   "getLicenceEnforcement",
    "getPlanRecommendations"
   ],
   "services": [
@@ -164814,13 +164667,16 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/billing-commercial-command-center-adm-459",
   "operations": [
-   "listSubscriptionInvoices"
+   "listSubscriptionInvoices",
+   "getCommercialMetrics"
   ],
   "services": [
    "PlatformService"
   ],
   "stores": [
-   "postgres"
+   "postgres",
+   "postgres-analytical",
+   "redis"
   ],
   "reads": [
    "control.invoice",
@@ -165057,8 +164913,7 @@
   "operations": [
    "recordInvoicePayment",
    "listSubscriptionInvoices",
-   "issueCreditNote",
-   "listCreditNotes"
+   "issueCreditNote"
   ],
   "services": [
    "PlatformService"
@@ -165120,8 +164975,7 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/subscription-commercial-change-management-adm-463",
   "operations": [
-   "previewSubscriptionChange",
-   "setSubscription"
+   "previewSubscriptionChange"
   ],
   "services": [
    "PlatformService"
@@ -165137,8 +164991,7 @@
    "subscription.plan"
   ],
   "writes": [
-   "cache:idempotency",
-   "subscription.contract"
+   "cache:idempotency"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -165176,9 +165029,17 @@
   "operator": "ticvai",
   "app": "ticvai-web",
   "route": "/tenants-licensing/renewal-management-center-adm-464",
-  "operations": [],
-  "services": [],
-  "stores": [],
+  "operations": [
+   "getCommercialMetrics"
+  ],
+  "services": [
+   "PlatformService"
+  ],
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
   "reads": [],
   "writes": [],
   "storedProcedures": [],
@@ -165346,10 +165207,10 @@
   "app": "ticvai-web",
   "route": "/tenants-licensing/discount-credit-commercial-override-management-adm-467",
   "operations": [
-   "cancelInvoice",
-   "disputeInvoice",
    "issueCreditNote",
-   "listCreditNotes"
+   "listCreditNotes",
+   "cancelInvoice",
+   "disputeInvoice"
   ],
   "services": [
    "PlatformService"
@@ -165467,10 +165328,10 @@
   "operations": [
    "startConfigurationSession",
    "listConfigurationSessions",
-   "attachConfigurationSource",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "attachConfigurationSource"
   ],
   "services": [
    "AiService",
@@ -165644,12 +165505,11 @@
   "route": "/platform/setup-type-business-intent-discovery-adm-470",
   "operations": [
    "startConfigurationSession",
-   "answerConfigurationQuestion",
-   "attachConfigurationSource",
-   "listConfigurationSources",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "attachConfigurationSource",
+   "listConfigurationSources"
   ],
   "services": [
    "AiService",
@@ -165663,8 +165523,6 @@
    "redis"
   ],
   "reads": [
-   "ai.blueprint",
-   "ai.blueprint_decision",
    "ai.capability",
    "ai.config_session",
    "ai.config_source",
@@ -165678,7 +165536,6 @@
   ],
   "writes": [
    "ai.activity",
-   "ai.blueprint",
    "ai.blueprint_decision",
    "ai.config_session",
    "ai.config_source",
@@ -165748,7 +165605,6 @@
   "route": "/platform/venue-business-model-discovery-adm-471",
   "operations": [
    "answerConfigurationQuestion",
-   "getConfigurationBlueprint",
    "setAiVenueSettings",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -165769,7 +165625,6 @@
    "ai.blueprint",
    "ai.blueprint_decision",
    "ai.config_session",
-   "ai.config_source",
    "ai.policy",
    "ai.provider",
    "ai.venue_settings",
@@ -166254,7 +166109,6 @@
   "app": "ticvai-web",
   "route": "/platform/required-recommended-optional-decisions-adm-476",
   "operations": [
-   "getConfigurationBlueprint",
    "decideBlueprintRecommendation",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -166274,8 +166128,6 @@
   "reads": [
    "ai.blueprint",
    "ai.blueprint_decision",
-   "ai.config_session",
-   "ai.config_source",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -166348,14 +166200,12 @@
   "app": "ticvai-web",
   "route": "/platform/missing-information-clarification-center-adm-477",
   "operations": [
-   "answerConfigurationQuestion",
    "getConfigurationBlueprint",
-   "decideBlueprintRecommendation",
-   "attachConfigurationSource",
-   "listConfigurationSources",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "attachConfigurationSource",
+   "listConfigurationSources"
   ],
   "services": [
    "AiService",
@@ -166383,9 +166233,7 @@
   ],
   "writes": [
    "ai.activity",
-   "ai.blueprint",
    "ai.blueprint_decision",
-   "ai.config_session",
    "ai.config_source",
    "cache:idempotency",
    "identity.platform_staff_grant"
@@ -166556,7 +166404,6 @@
   "operations": [
    "getActionPlan",
    "getConfigurationBlueprint",
-   "buildConfigurationPlan",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -166577,22 +166424,12 @@
    "ai.action_step",
    "ai.blueprint",
    "ai.blueprint_decision",
-   "ai.capability",
    "ai.config_session",
    "ai.config_source",
-   "ai.governance_policy_version",
-   "ai.tool",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.action_plan",
-   "ai.action_step",
-   "ai.config_session",
-   "ai.decision_record",
-   "ai.proposed_action",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -166743,7 +166580,6 @@
   "route": "/platform/venue-organization-configuration-adm-480",
   "operations": [
    "getActionPlan",
-   "getConfigurationBlueprint",
    "decideBlueprintRecommendation",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -166765,8 +166601,6 @@
    "ai.action_step",
    "ai.blueprint",
    "ai.blueprint_decision",
-   "ai.config_session",
-   "ai.config_source",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -166840,7 +166674,6 @@
   "route": "/platform/product-configuration-assistant-adm-481",
   "operations": [
    "getActionPlan",
-   "getConfigurationBlueprint",
    "decideBlueprintRecommendation",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -166862,8 +166695,6 @@
    "ai.action_step",
    "ai.blueprint",
    "ai.blueprint_decision",
-   "ai.config_session",
-   "ai.config_source",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -166937,7 +166768,6 @@
   "route": "/platform/schedule-capacity-availability-configuration-adm-482",
   "operations": [
    "getActionPlan",
-   "getConfigurationBlueprint",
    "decideBlueprintRecommendation",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -166959,8 +166789,6 @@
    "ai.action_step",
    "ai.blueprint",
    "ai.blueprint_decision",
-   "ai.config_session",
-   "ai.config_source",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -167034,7 +166862,6 @@
   "route": "/platform/pricing-commercial-configuration-adm-483",
   "operations": [
    "getActionPlan",
-   "getConfigurationBlueprint",
    "decideBlueprintRecommendation",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -167056,8 +166883,6 @@
    "ai.action_step",
    "ai.blueprint",
    "ai.blueprint_decision",
-   "ai.config_session",
-   "ai.config_source",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -167131,7 +166956,6 @@
   "route": "/platform/promotion-bundle-upsell-configuration-adm-484",
   "operations": [
    "getActionPlan",
-   "getConfigurationBlueprint",
    "decideBlueprintRecommendation",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -167153,8 +166977,6 @@
    "ai.action_step",
    "ai.blueprint",
    "ai.blueprint_decision",
-   "ai.config_session",
-   "ai.config_source",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -167228,7 +167050,6 @@
   "route": "/platform/seating-access-operational-configuration-adm-485",
   "operations": [
    "getActionPlan",
-   "getConfigurationBlueprint",
    "decideBlueprintRecommendation",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -167250,8 +167071,6 @@
    "ai.action_step",
    "ai.blueprint",
    "ai.blueprint_decision",
-   "ai.config_session",
-   "ai.config_source",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -167325,7 +167144,6 @@
   "route": "/platform/channel-media-fulfillment-configuration-adm-486",
   "operations": [
    "getActionPlan",
-   "getConfigurationBlueprint",
    "decideBlueprintRecommendation",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -167347,8 +167165,6 @@
    "ai.action_step",
    "ai.blueprint",
    "ai.blueprint_decision",
-   "ai.config_session",
-   "ai.config_source",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -167422,7 +167238,6 @@
   "route": "/platform/cross-module-conflict-dependency-validation-adm-487",
   "operations": [
    "getActionPlan",
-   "simulateActionPlan",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -167441,15 +167256,10 @@
   "reads": [
    "ai.action_plan",
    "ai.action_step",
-   "ai.tool",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.action_plan",
-   "ai.action_step",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -167514,7 +167324,6 @@
   "app": "ticvai-web",
   "route": "/platform/configuration-preview-impact-analysis-adm-488",
   "operations": [
-   "getActionPlan",
    "simulateActionPlan",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -167607,7 +167416,6 @@
   "app": "ticvai-web",
   "route": "/platform/ai-configuration-readiness-center-adm-489",
   "operations": [
-   "getEffectiveAiPolicy",
    "getActionPlan",
    "getAiVenueSettings",
    "setAiVenueSettings",
@@ -167629,11 +167437,6 @@
   "reads": [
    "ai.action_plan",
    "ai.action_step",
-   "ai.capability",
-   "ai.governance_policy",
-   "ai.governance_policy_version",
-   "ai.policy",
-   "ai.policy_exception",
    "ai.venue_settings",
    "cache:idempotency",
    "control.tenant",
@@ -167906,7 +167709,6 @@
   "route": "/platform/ai-recommendations-best-practice-review-adm-491",
   "operations": [
    "getConfigurationBlueprint",
-   "decideBlueprintRecommendation",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -167927,14 +167729,10 @@
    "ai.blueprint_decision",
    "ai.config_session",
    "ai.config_source",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.blueprint",
-   "ai.blueprint_decision",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -168000,38 +167798,23 @@
   "app": "ticvai-web",
   "route": "/platform/configuration-approval-workflow-adm-492",
   "operations": [
-   "getActionPlan",
-   "listProposedActions",
-   "decideProposedAction",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
   ],
   "services": [
-   "AiService",
    "IdentityService",
    "PlatformService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.action_plan",
-   "ai.action_step",
-   "ai.proposed_action",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.action_plan",
-   "ai.activity",
-   "ai.decision_record",
-   "ai.proposed_action",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -168192,12 +167975,10 @@
   "route": "/platform/execution-progress-dependency-monitor-adm-494",
   "operations": [
    "getActionPlan",
-   "pauseActionPlan",
-   "resumeActionPlan",
-   "retryActionStep",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "retryActionStep"
   ],
   "services": [
    "AiService",
@@ -168218,7 +167999,6 @@
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.action_plan",
    "ai.action_step",
    "ai.decision_record",
    "ai.intervention",
@@ -168288,7 +168068,6 @@
   "route": "/platform/configuration-results-object-mapping-adm-495",
   "operations": [
    "getActionPlan",
-   "rollbackActionPlan",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -168307,17 +168086,10 @@
   "reads": [
    "ai.action_plan",
    "ai.action_step",
-   "ai.tool",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.action_plan",
-   "ai.action_step",
-   "ai.decision_record",
-   "ai.proposed_action",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -168382,49 +168154,23 @@
   "app": "ticvai-web",
   "route": "/platform/configuration-change-modification-assistant-adm-496",
   "operations": [
-   "startConfigurationSession",
-   "answerConfigurationQuestion",
-   "buildConfigurationPlan",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
   ],
   "services": [
-   "AiService",
    "IdentityService",
    "PlatformService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.action_plan",
-   "ai.action_step",
-   "ai.blueprint",
-   "ai.blueprint_decision",
-   "ai.capability",
-   "ai.config_session",
-   "ai.governance_policy_version",
-   "ai.policy",
-   "ai.provider",
-   "ai.tool",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.action_plan",
-   "ai.action_step",
-   "ai.activity",
-   "ai.blueprint",
-   "ai.blueprint_decision",
-   "ai.config_session",
-   "ai.decision_record",
-   "ai.proposed_action",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -168950,10 +168696,10 @@
   "operations": [
    "setForecastDefinition",
    "listForecastSignals",
-   "configureForecastSignalSource",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "configureForecastSignalSource"
   ],
   "services": [
    "AiService",
@@ -169043,7 +168789,6 @@
   "operations": [
    "getForecast",
    "configureAnomalyDetector",
-   "listAiInsights",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -169064,7 +168809,6 @@
    "ai.forecast_definition",
    "ai.forecast_point",
    "ai.forecast_version",
-   "ai.insight",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -169516,8 +169260,6 @@
   "route": "/analytics/forecast-scenario-what-if-simulator-adm-507",
   "operations": [
    "getForecast",
-   "createForecastScenario",
-   "compareForecastScenarios",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -169536,16 +169278,11 @@
   "reads": [
    "ai.forecast_definition",
    "ai.forecast_point",
-   "ai.forecast_scenario",
    "ai.forecast_version",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.forecast_point",
-   "ai.forecast_scenario",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -169755,7 +169492,6 @@
   "route": "/analytics/operational-forecasting-command-center-adm-509",
   "operations": [
    "getForecast",
-   "listOperationalRequirements",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -169775,7 +169511,6 @@
    "ai.forecast_definition",
    "ai.forecast_point",
    "ai.forecast_version",
-   "ai.operational_requirement",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
@@ -169925,7 +169660,6 @@
    "getForecast",
    "listOperationalRequirements",
    "configureAnomalyDetector",
-   "listAiInsights",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -169946,7 +169680,6 @@
    "ai.forecast_definition",
    "ai.forecast_point",
    "ai.forecast_version",
-   "ai.insight",
    "ai.operational_requirement",
    "cache:idempotency",
    "control.tenant",
@@ -170020,7 +169753,6 @@
   "route": "/analytics/attraction-utilization-queue-forecast-adm-511",
   "operations": [
    "getForecast",
-   "listOperationalRequirements",
    "requestSuggestion",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -170135,7 +169867,6 @@
   "route": "/analytics/entry-access-guest-flow-forecast-adm-512",
   "operations": [
    "getForecast",
-   "listOperationalRequirements",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -170155,7 +169886,6 @@
    "ai.forecast_definition",
    "ai.forecast_point",
    "ai.forecast_version",
-   "ai.operational_requirement",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
@@ -170224,30 +169954,21 @@
   "app": "ticvai-web",
   "route": "/analytics/workforce-demand-staffing-forecast-adm-513",
   "operations": [
-   "getForecast",
-   "listOperationalRequirements",
    "getStaffingCoverage",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
   ],
   "services": [
-   "AiService",
    "IdentityService",
    "PlatformService",
    "TenancyService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.forecast_definition",
-   "ai.forecast_point",
-   "ai.forecast_version",
-   "ai.operational_requirement",
    "control.tenant",
    "identity.platform_staff_grant",
    "workforce.forecast_requirement",
@@ -170323,28 +170044,19 @@
   "app": "ticvai-web",
   "route": "/analytics/pos-kiosk-frontline-service-forecast-adm-514",
   "operations": [
-   "getForecast",
-   "listOperationalRequirements",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
   ],
   "services": [
-   "AiService",
    "IdentityService",
    "PlatformService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.forecast_definition",
-   "ai.forecast_point",
-   "ai.forecast_version",
-   "ai.operational_requirement",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
@@ -170414,7 +170126,6 @@
   "route": "/analytics/f-b-retail-inventory-demand-forecast-adm-515",
   "operations": [
    "getForecast",
-   "listOperationalRequirements",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -170434,7 +170145,6 @@
    "ai.forecast_definition",
    "ai.forecast_point",
    "ai.forecast_version",
-   "ai.operational_requirement",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
@@ -170504,7 +170214,6 @@
   "route": "/analytics/resource-equipment-facility-requirement-forecast-adm-516",
   "operations": [
    "getForecast",
-   "listOperationalRequirements",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -170524,7 +170233,6 @@
    "ai.forecast_definition",
    "ai.forecast_point",
    "ai.forecast_version",
-   "ai.operational_requirement",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
@@ -170593,9 +170301,7 @@
   "app": "ticvai-web",
   "route": "/analytics/operational-scenario-readiness-simulator-adm-517",
   "operations": [
-   "createForecastScenario",
    "compareForecastScenarios",
-   "listOperationalRequirements",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -170614,15 +170320,11 @@
   "reads": [
    "ai.forecast_point",
    "ai.forecast_scenario",
-   "ai.forecast_version",
-   "ai.operational_requirement",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.forecast_point",
-   "ai.forecast_scenario",
    "cache:idempotency",
    "identity.platform_staff_grant"
   ],
@@ -170688,34 +170390,23 @@
   "app": "ticvai-web",
   "route": "/analytics/operational-forecast-review-recommendations-handover-adm-518",
   "operations": [
-   "listOperationalRequirements",
-   "decideOperationalRequirement",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
   ],
   "services": [
-   "AiService",
    "IdentityService",
    "PlatformService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.forecast_version",
-   "ai.operational_requirement",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.decision_record",
-   "ai.operational_requirement",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -170781,9 +170472,6 @@
   "route": "/platform/ai-governance-command-center-adm-519",
   "operations": [
    "listAiCapabilities",
-   "pauseAiCapability",
-   "promoteAiRelease",
-   "listAiGovernanceAlerts",
    "listAiCapabilityMaturity",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -170803,23 +170491,10 @@
   "reads": [
    "ai.capability",
    "ai.capability_maturity",
-   "ai.eval_run",
-   "ai.governance_alert",
-   "ai.release",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.action_plan",
-   "ai.capability",
-   "ai.decision_record",
-   "ai.forecast_definition",
-   "ai.governance_alert",
-   "ai.intervention",
-   "ai.policy",
-   "ai.release",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -171171,7 +170846,6 @@
   "app": "ticvai-web",
   "route": "/platform/ai-autonomy-level-configuration-adm-522",
   "operations": [
-   "listAiCapabilities",
    "configureAiCapability",
    "getEffectiveAiPolicy",
    "listTenants",
@@ -171387,8 +171061,6 @@
   "operations": [
    "createAiGovernancePolicyDraft",
    "listAiGovernancePolicyVersions",
-   "listDataRetentionSettings",
-   "setDataRetentionSetting",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -171396,8 +171068,7 @@
   "services": [
    "AiService",
    "IdentityService",
-   "PlatformService",
-   "TenancyService"
+   "PlatformService"
   ],
   "stores": [
    "postgres",
@@ -171410,15 +171081,13 @@
    "ai.governance_policy_version",
    "cache:idempotency",
    "control.tenant",
-   "identity.platform_staff_grant",
-   "tenancy.data_retention_setting"
+   "identity.platform_staff_grant"
   ],
   "writes": [
    "ai.governance_policy",
    "ai.governance_policy_version",
    "cache:idempotency",
-   "identity.platform_staff_grant",
-   "tenancy.data_retention_setting"
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -171483,7 +171152,6 @@
   "route": "/platform/environment-tenant-scope-governance-adm-525",
   "operations": [
    "getEffectiveAiPolicy",
-   "createAiGovernancePolicyDraft",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -171505,14 +171173,10 @@
    "ai.governance_policy_version",
    "ai.policy",
    "ai.policy_exception",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.governance_policy",
-   "ai.governance_policy_version",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -171578,7 +171242,6 @@
   "route": "/platform/ai-policy-conflict-exception-override-management-adm-526",
   "operations": [
    "getEffectiveAiPolicy",
-   "listAiGovernancePolicyVersions",
    "createAiPolicyException",
    "revokeAiPolicyException",
    "listTenants",
@@ -171924,7 +171587,6 @@
   "app": "ticvai-web",
   "route": "/platform/ai-human-oversight-command-center-adm-529",
   "operations": [
-   "getActionPlan",
    "listProposedActions",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -171937,13 +171599,9 @@
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.action_plan",
-   "ai.action_step",
    "ai.proposed_action",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -172091,9 +171749,6 @@
   "app": "ticvai-web",
   "route": "/platform/ai-approval-requirement-routing-configuration-adm-530",
   "operations": [
-   "createAiGovernancePolicyDraft",
-   "listAiGovernancePolicyVersions",
-   "listAiTools",
    "listApprovalMatrices",
    "setApprovalMatrix",
    "evaluateApprovalRequirement",
@@ -172102,21 +171757,15 @@
    "openPlatformStaffGrant"
   ],
   "services": [
-   "AiService",
    "IdentityService",
    "PlatformService",
    "TenancyService"
   ],
   "stores": [
    "postgres",
-   "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.governance_policy",
-   "ai.governance_policy_version",
-   "ai.tool",
    "approvals.delegation",
    "approvals.external_provider",
    "approvals.matrix",
@@ -172128,8 +171777,6 @@
    "platform.scope"
   ],
   "writes": [
-   "ai.governance_policy",
-   "ai.governance_policy_version",
    "approvals.matrix",
    "approvals.rule",
    "cache:idempotency",
@@ -172216,9 +171863,7 @@
   "app": "ticvai-web",
   "route": "/platform/ai-approval-review-workspace-adm-531",
   "operations": [
-   "getActionPlan",
    "simulateActionPlan",
-   "decideProposedAction",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -172237,7 +171882,6 @@
   "reads": [
    "ai.action_plan",
    "ai.action_step",
-   "ai.proposed_action",
    "ai.tool",
    "cache:idempotency",
    "control.tenant",
@@ -172246,9 +171890,6 @@
   "writes": [
    "ai.action_plan",
    "ai.action_step",
-   "ai.activity",
-   "ai.decision_record",
-   "ai.proposed_action",
    "cache:idempotency",
    "identity.platform_staff_grant"
   ],
@@ -172417,9 +172058,7 @@
   "app": "ticvai-web",
   "route": "/platform/human-review-challenge-ai-clarification-workspace-adm-533",
   "operations": [
-   "overrideAiDecision",
    "getAiDecisionTrace",
-   "sendAiMessage",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -172439,34 +172078,13 @@
    "ai.action_plan",
    "ai.action_step",
    "ai.activity",
-   "ai.assistant_profile",
-   "ai.capability",
-   "ai.chunk_embedding",
-   "ai.conversation",
    "ai.decision_record",
    "ai.intervention",
-   "ai.knowledge_document",
-   "ai.message",
-   "ai.policy",
-   "ai.proposed_action",
-   "ai.provider",
-   "cache:answer",
-   "cache:idempotency",
    "control.tenant",
-   "identity.platform_staff_grant",
-   "qdrant:knowledge"
+   "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.activity",
-   "ai.decision_record",
-   "ai.intervention",
-   "ai.knowledge_gap",
-   "ai.message",
-   "ai.proposed_action",
-   "cache:answer",
-   "cache:idempotency",
-   "identity.platform_staff_grant",
-   "qdrant:knowledge"
+   "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -173017,7 +172635,6 @@
   "route": "/platform/human-oversight-workflow-simulator-readiness-center-adm-538",
   "operations": [
    "simulateAiGovernancePolicy",
-   "simulateActionPlan",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -173034,18 +172651,13 @@
    "redis"
   ],
   "reads": [
-   "ai.action_plan",
-   "ai.action_step",
    "ai.decision_record",
    "ai.governance_policy_version",
-   "ai.tool",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.action_plan",
-   "ai.action_step",
    "ai.governance_policy_version",
    "cache:idempotency",
    "identity.platform_staff_grant"
@@ -173548,7 +173160,6 @@
   "app": "ticvai-web",
   "route": "/platform/candidate-rule-decision-path-trace-adm-543",
   "operations": [
-   "explainRecommendationDecision",
    "getAiDecisionTrace",
    "listTenants",
    "listOwnPlatformStaffGrants",
@@ -173571,7 +173182,6 @@
    "ai.activity",
    "ai.decision_record",
    "ai.intervention",
-   "ai.rec_decision",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
@@ -173823,7 +173433,6 @@
   "route": "/platform/execution-business-outcome-trace-adm-546",
   "operations": [
    "getActionPlan",
-   "getAiDecisionTrace",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -173842,9 +173451,6 @@
   "reads": [
    "ai.action_plan",
    "ai.action_step",
-   "ai.activity",
-   "ai.decision_record",
-   "ai.intervention",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
@@ -173913,11 +173519,11 @@
   "app": "ticvai-web",
   "route": "/platform/ai-audit-record-evidence-package-adm-547",
   "operations": [
-   "searchAiDecisions",
-   "exportAiEvidencePackage",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "exportAiEvidencePackage",
+   "searchAiDecisions"
   ],
   "services": [
    "AiService",
@@ -174006,10 +173612,10 @@
   "route": "/platform/ai-trace-investigation-replay-simulator-adm-548",
   "operations": [
    "getAiDecisionTrace",
-   "replayAiDecision",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "replayAiDecision"
   ],
   "services": [
    "AiService",
@@ -174274,11 +173880,11 @@
   "app": "ticvai-web",
   "route": "/platform/ai-risk-register-risk-exposure-management-adm-550",
   "operations": [
-   "listAiRiskRegister",
-   "setAiRiskRegisterEntry",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "listAiRiskRegister",
+   "setAiRiskRegisterEntry"
   ],
   "services": [
    "AiService",
@@ -174461,7 +174067,6 @@
   "route": "/platform/ai-policy-compliance-violation-monitoring-adm-552",
   "operations": [
    "listAiGovernanceAlerts",
-   "decideAiGovernanceAlert",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -174479,14 +174084,10 @@
   ],
   "reads": [
    "ai.governance_alert",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.governance_alert",
-   "ai.incident",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -174552,7 +174153,6 @@
   "route": "/platform/ai-data-privacy-usage-compliance-monitoring-adm-553",
   "operations": [
    "listAiGovernanceAlerts",
-   "decideAiGovernanceAlert",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -174570,14 +174170,10 @@
   ],
   "reads": [
    "ai.governance_alert",
-   "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
   ],
   "writes": [
-   "ai.governance_alert",
-   "ai.incident",
-   "cache:idempotency",
    "identity.platform_staff_grant"
   ],
   "storedProcedures": [],
@@ -174805,7 +174401,6 @@
   "operations": [
    "listAiGovernanceAlerts",
    "decideAiGovernanceAlert",
-   "openAiIncident",
    "listTenants",
    "listOwnPlatformStaffGrants",
    "openPlatformStaffGrant"
@@ -174823,7 +174418,6 @@
   ],
   "reads": [
    "ai.governance_alert",
-   "ai.incident",
    "cache:idempotency",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -175100,12 +174694,11 @@
   "app": "ticvai-web",
   "route": "/platform/ai-compliance-assurance-governance-reporting-adm-557",
   "operations": [
-   "exportAiEvidencePackage",
-   "listAiRiskRegister",
-   "listAiControls",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "exportAiEvidencePackage",
+   "listAiRiskRegister"
   ],
   "services": [
    "AiService",
@@ -175120,8 +174713,6 @@
   ],
   "reads": [
    "ai.activity",
-   "ai.control",
-   "ai.control_test",
    "ai.decision_record",
    "ai.evidence_package",
    "ai.risk_register",
@@ -175196,11 +174787,10 @@
   "app": "ticvai-web",
   "route": "/platform/ai-governance-review-action-plan-continuous-improvement-adm-558",
   "operations": [
-   "listAiGovernanceAlerts",
-   "listAiRiskRegister",
    "listTenants",
    "listOwnPlatformStaffGrants",
-   "openPlatformStaffGrant"
+   "openPlatformStaffGrant",
+   "listAiRiskRegister"
   ],
   "services": [
    "AiService",
@@ -175214,7 +174804,6 @@
    "redis"
   ],
   "reads": [
-   "ai.governance_alert",
    "ai.risk_register",
    "control.tenant",
    "identity.platform_staff_grant"
@@ -175339,7 +174928,10 @@
    {
     "to": "ADM-620",
     "trigger": "Reconciliation Source & Import Manager\\t141",
-    "provenance": "structural \u2014 pack board 7 wiring, 19 September 2026"
+    "provenance": "structural \u2014 pack board 7 wiring, 19 September 2026",
+    "carries": [
+     "settlementId"
+    ]
    },
    {
     "to": "ADM-621",
@@ -176740,6 +176332,7 @@
    "marketing.consent_record",
    "orders.cart",
    "orders.cart_line",
+   "orders.deposit",
    "orders.order_line",
    "orders.order_line_discount",
    "orders.order_line_eligibility",
@@ -179177,8 +178770,7 @@
   "app": "partner-web",
   "route": "/partners/partner-operations-command-center-ptr-042",
   "operations": [
-   "listPartner2",
-   "listPartner"
+   "listPartner2"
   ],
   "services": [
    "PlatformService"
@@ -179189,22 +178781,14 @@
    "redis"
   ],
   "reads": [
-   "control.api_client",
-   "control.channel_listing",
    "control.partner",
    "control.partner_agreement",
    "control.partner_allocation",
-   "control.partner_application",
    "control.partner_case",
    "control.partner_commission_line",
    "control.partner_credit_profile",
-   "control.partner_distribution_right",
-   "control.partner_document",
    "control.partner_reconciliation_exception",
-   "control.partner_scope_assignment",
    "control.partner_settlement_batch",
-   "control.partner_user",
-   "control.webhook_delivery",
    "ledger.fx_rate",
    "orders.order_line",
    "orders.payment",
@@ -179833,8 +179417,8 @@
   "route": "/applicant-journey/registration-form",
   "operations": [
    "createAccreditationApplication",
-   "submitAccreditationDocument",
-   "updateAccreditationApplication"
+   "updateAccreditationApplication",
+   "getAccreditationApplication"
   ],
   "services": [
    "TenancyService"
@@ -179844,7 +179428,6 @@
   ],
   "reads": [
    "accreditation.application",
-   "accreditation.document",
    "accreditation.holder",
    "accreditation.identity_conflict",
    "accreditation.requirements",
@@ -179852,7 +179435,6 @@
   ],
   "writes": [
    "accreditation.application",
-   "accreditation.document",
    "accreditation.identity_conflict",
    "cache:idempotency"
   ],
@@ -179914,8 +179496,7 @@
   "app": "accreditation-web",
   "route": "/applicant-journey/application-review-and-submit",
   "operations": [
-   "submitAccreditationApplication",
-   "updateAccreditationApplication"
+   "submitAccreditationApplication"
   ],
   "services": [
    "TenancyService"
@@ -179993,10 +179574,7 @@
   "route": "/applicant-journey/application-status-tracking",
   "operations": [
    "listMyAccreditationApplications",
-   "withdrawAccreditationApplication",
-   "submitAccreditationDocument",
-   "updateAccreditationApplication",
-   "resubmitAccreditationApplication"
+   "withdrawAccreditationApplication"
   ],
   "services": [
    "TenancyService"
@@ -180006,15 +179584,11 @@
   ],
   "reads": [
    "accreditation.application",
-   "accreditation.document",
    "accreditation.holder",
-   "accreditation.programme",
-   "accreditation.requirements",
    "cache:idempotency"
   ],
   "writes": [
    "accreditation.application",
-   "accreditation.document",
    "cache:idempotency"
   ],
   "storedProcedures": [],
@@ -180193,7 +179767,7 @@
    {
     "to": "ACC-008",
     "trigger": "Credential Register",
-    "provenance": "derived \u2014 ACC-008 declares entryState.params  and ACC-006 holds none of them. The edge carries nothing: ACC-008 needs nothing to open"
+    "provenance": "derived \u2014 ACC-008 declares entryState.params exportId and ACC-006 holds none of them. The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens on its own"
    }
   ],
   "machine": null,
@@ -180230,9 +179804,7 @@
   "route": "/reviewer-internal/reviewer-application-detail",
   "operations": [
    "decideAccreditationApplication",
-   "getAccreditationApplication",
-   "listAccreditationDocuments",
-   "verifyAccreditationDocument"
+   "getAccreditationApplication"
   ],
   "services": [
    "TenancyService"
@@ -180250,7 +179822,6 @@
   "writes": [
    "accreditation.application",
    "accreditation.audit",
-   "accreditation.document",
    "accreditation.holder",
    "cache:idempotency",
    "platform.outbox"
@@ -180281,7 +179852,7 @@
    {
     "to": "ACC-008",
     "trigger": "Credential Register",
-    "provenance": "derived \u2014 ACC-008 declares entryState.params  and ACC-007 holds none of them. The edge carries nothing: ACC-008 needs nothing to open"
+    "provenance": "derived \u2014 ACC-008 declares entryState.params exportId and ACC-007 holds none of them. The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens on its own"
    },
    {
     "to": "ACC-005",
@@ -180314,6 +179885,9 @@
     "component": "drawer",
     "trigger": "Approve",
     "body": "Coverage granted may be narrower than coverage requested \u2014 *stalls, not pit*. **The badge renders what is granted**, so the two screens must agree.\n",
+    "confirm": {
+     "operation": "decideAccreditationApplication"
+    },
     "provenance": "frame claude-design/Accreditation Board.dc.html#acc-005"
    }
   ]
@@ -180327,7 +179901,9 @@
   "route": "/reviewer-internal/credential-register",
   "operations": [
    "listAccreditationCredentials",
-   "listAccreditationAccessActivity"
+   "listAccreditationAccessActivity",
+   "exportAccreditationData",
+   "getAccreditationExport"
   ],
   "services": [
    "TenancyService"
@@ -180337,10 +179913,19 @@
   ],
   "reads": [
    "accreditation.access_profile",
+   "accreditation.application",
    "accreditation.credential",
-   "accreditation.holder"
+   "accreditation.data_export",
+   "accreditation.document",
+   "accreditation.holder",
+   "accreditation.holder_access",
+   "cache:idempotency"
   ],
-  "writes": [],
+  "writes": [
+   "accreditation.audit",
+   "accreditation.data_export",
+   "cache:idempotency"
+  ],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -181747,6 +181332,7 @@
    "redis"
   ],
   "reads": [
+   "marketing.case",
    "marketing.case_message",
    "marketing.conversation",
    "marketing.conversation_message",
@@ -181813,7 +181399,8 @@
   ],
   "writes": [
    "cache:idempotency",
-   "marketing.case"
+   "marketing.case",
+   "marketing.case_message"
   ],
   "storedProcedures": [],
   "wave": 3,
@@ -182206,7 +181793,6 @@
   "route": "/support/ai-customer-service-copilot-knowledge-workspace-sup-018",
   "operations": [
    "setCustomerServiceCopilot",
-   "configureAssistantProfile",
    "listAssistantProfiles"
   ],
   "services": [
@@ -182221,13 +181807,9 @@
   ],
   "reads": [
    "ai.assistant_profile",
-   "ai.policy",
-   "cache:idempotency",
    "marketing.service_copilot_config"
   ],
   "writes": [
-   "ai.assistant_profile",
-   "cache:idempotency",
    "marketing.service_copilot_config"
   ],
   "storedProcedures": [],
@@ -183371,6 +182953,7 @@
   ],
   "reads": [
    "assets.media_asset",
+   "assets.media_collection_member",
    "assets.media_upload",
    "cache:idempotency",
    "whitelabel.tenant_config"
@@ -183693,7 +183276,8 @@
    "publishContentBlock",
    "listLandingPageTemplates",
    "listContentBlocks",
-   "updateContentBlock"
+   "updateContentBlock",
+   "listProposedActions"
   ],
   "services": [
    "AiService",
@@ -183926,7 +183510,8 @@
    "listBanners",
    "deleteBanner",
    "proposeMarketingContent",
-   "decideProposedAction"
+   "decideProposedAction",
+   "listProposedActions"
   ],
   "services": [
    "AiService",
@@ -185752,7 +185337,8 @@
   "app": "venue-management-web",
   "route": "/policy/consent-purpose-consent-type-builder-cms-023",
   "operations": [
-   "setConsentPurposes"
+   "setConsentPurposes",
+   "listConsentPurposes"
   ],
   "services": [
    "MarketingService"
@@ -185763,6 +185349,7 @@
   ],
   "reads": [
    "cache:idempotency",
+   "cache:resolution",
    "marketing.consent_purpose",
    "marketing.consent_purpose_channel"
   ],
@@ -186932,6 +186519,7 @@
    "marketing.privacy_exception",
    "marketing.privacy_request",
    "marketing.retention_policy",
+   "marketing.segment",
    "marketing.tracking_technology"
   ],
   "writes": [],
@@ -187278,7 +186866,8 @@
   "app": "venue-management-web",
   "route": "/policy/signatory-signature-guardian-rule-configuration-cms-045",
   "operations": [
-   "setSignatorySignatureGuardian"
+   "setSignatorySignatureGuardian",
+   "getSignatorySignatureGuardian"
   ],
   "services": [
    "MarketingService"
@@ -187993,7 +187582,8 @@
    "redis"
   ],
   "reads": [
-   "marketing.waiver_exception"
+   "marketing.waiver_exception",
+   "marketing.waiver_requirement"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -188211,6 +187801,7 @@
   "reads": [
    "assets.audit",
    "assets.media_asset",
+   "assets.media_collection_member",
    "assets.media_usage",
    "assets.share",
    "assets.tag"
@@ -188317,7 +187908,6 @@
   "route": "/media-library/central-digital-asset-library-cms-062",
   "operations": [
    "searchMedia",
-   "listCollections",
    "semanticSearch"
   ],
   "services": [
@@ -188335,7 +187925,6 @@
    "ai.knowledge_collection",
    "ai.knowledge_document",
    "assets.media_asset",
-   "assets.media_collection",
    "assets.media_collection_member",
    "cache:answer",
    "cache:idempotency",
@@ -188586,6 +188175,7 @@
    "assets.taxonomy"
   ],
   "writes": [
+   "assets.media_asset",
    "assets.tag"
   ],
   "storedProcedures": [],
@@ -188634,7 +188224,8 @@
    "postgres"
   ],
   "reads": [
-   "assets.media_asset"
+   "assets.media_asset",
+   "assets.media_collection_member"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -188950,8 +188541,8 @@
   "app": "venue-management-web",
   "route": "/media-library/ai-auto-tagging-content-understanding-cms-072",
   "operations": [
-   "analyseMediaAsset",
-   "setMediaAssetTags"
+   "setMediaAssetTags",
+   "analyseMediaAsset"
   ],
   "services": [
    "VenueOpsService"
@@ -188966,6 +188557,7 @@
    "cache:idempotency"
   ],
   "writes": [
+   "assets.media_asset",
    "assets.media_fingerprint",
    "assets.tag",
    "cache:idempotency"
@@ -189024,7 +188616,8 @@
    "postgres"
   ],
   "reads": [
-   "assets.media_asset"
+   "assets.media_asset",
+   "assets.media_collection_member"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -189484,22 +189077,17 @@
   "app": "venue-management-web",
   "route": "/media-library/dam-governance-rights-command-center-cms-081",
   "operations": [
-   "getExpiringRights",
-   "getMediaUsageAnalytics"
+   "getExpiringRights"
   ],
   "services": [
    "VenueOpsService"
   ],
   "stores": [
-   "postgres",
-   "redis"
+   "postgres"
   ],
   "reads": [
-   "assets.audit",
    "assets.media_asset",
-   "assets.media_usage",
-   "assets.share",
-   "assets.tag"
+   "assets.media_usage"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -189608,27 +189196,19 @@
   "app": "venue-management-web",
   "route": "/media-library/asset-ownership-responsibility-management-cms-082",
   "operations": [
-   "updateMediaAsset",
    "getMediaAsset"
   ],
   "services": [
    "VenueOpsService"
   ],
   "stores": [
-   "postgres",
-   "redis"
+   "postgres"
   ],
   "reads": [
    "assets.media_asset",
-   "assets.media_collection",
-   "assets.media_usage",
-   "cache:idempotency"
+   "assets.media_usage"
   ],
-  "writes": [
-   "assets.media_asset",
-   "assets.media_collection_member",
-   "cache:idempotency"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -189964,25 +189544,19 @@
   "app": "venue-management-web",
   "route": "/media-library/rights-expiry-renewal-usage-impact-cms-088",
   "operations": [
-   "getExpiringRights",
-   "setMediaAssetRights"
+   "getExpiringRights"
   ],
   "services": [
    "VenueOpsService"
   ],
   "stores": [
-   "postgres",
-   "redis"
+   "postgres"
   ],
   "reads": [
    "assets.media_asset",
-   "assets.media_usage",
-   "cache:idempotency"
+   "assets.media_usage"
   ],
-  "writes": [
-   "assets.media_asset",
-   "cache:idempotency"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -190335,7 +189909,6 @@
   "app": "venue-management-web",
   "route": "/media-library/secure-delivery-url-cdn-rendition-delivery-cms-094",
   "operations": [
-   "setMediaDistributionChannels",
    "listMediaRenditions"
   ],
   "services": [
@@ -190346,12 +189919,9 @@
    "redis"
   ],
   "reads": [
-   "assets.distribution_channel",
    "assets.rendition"
   ],
-  "writes": [
-   "assets.distribution_channel"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -190389,7 +189959,6 @@
   "app": "venue-management-web",
   "route": "/media-library/asset-replacement-propagation-management-cms-095",
   "operations": [
-   "replaceMediaAsset",
    "getMediaDistribution"
   ],
   "services": [
@@ -190403,15 +189972,9 @@
    "assets.distribution_channel",
    "assets.media_asset",
    "assets.media_usage",
-   "assets.rendition",
-   "cache:idempotency"
+   "assets.rendition"
   ],
-  "writes": [
-   "assets.asset_version",
-   "assets.media_asset",
-   "assets.media_fingerprint",
-   "cache:idempotency"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -191951,8 +191514,7 @@
    "listWebhookSubscriptions",
    "createWebhookSubscription",
    "listWebhookDeliveries",
-   "replayEvents",
-   "listWebhookEventTypes"
+   "replayEvents"
   ],
   "services": [
    "PlatformService"
@@ -193245,7 +192807,8 @@
   "operations": [
    "setKitchenSla",
    "getKitchenSla",
-   "getCourseRules"
+   "getCourseRules",
+   "listKitchenTickets"
   ],
   "services": [
    "FnbService"
@@ -193259,7 +192822,9 @@
   "reads": [
    "cache:idempotency",
    "fnb.course_rule",
-   "fnb.kitchen_sla"
+   "fnb.kitchen_sla",
+   "fnb.kitchen_ticket",
+   "fnb.kitchen_ticket_line"
   ],
   "writes": [
    "cache:idempotency",
@@ -194818,8 +194383,7 @@
   "app": "venue-management-web",
   "route": "/analytics/live-operations-dashboard-anl-012",
   "operations": [
-   "getKpiValues",
-   "listAlerts"
+   "getKpiValues"
   ],
   "services": [
    "ReportingService"
@@ -194835,8 +194399,6 @@
    "accreditation.credential",
    "accreditation.holder",
    "accreditation.validity",
-   "reporting.alert",
-   "reporting.alert_rule",
    "reporting.kpi_definition",
    "reporting.kpi_target"
   ],
@@ -195495,7 +195057,6 @@
   "operations": [
    "listDashboards",
    "getDashboard",
-   "createDashboard",
    "recordDashboardView"
   ],
   "services": [
@@ -195514,8 +195075,6 @@
   ],
   "writes": [
    "cache:idempotency",
-   "reporting.dashboard",
-   "reporting.dashboard_tile",
    "reporting.dashboard_view"
   ],
   "storedProcedures": [],
@@ -196096,7 +195655,8 @@
   "app": "venue-management-web",
   "route": "/analytics/dashboard-access-publishing-versioning-anl-029",
   "operations": [
-   "updateDashboard"
+   "updateDashboard",
+   "getDashboard"
   ],
   "services": [
    "ReportingService"
@@ -196156,7 +195716,6 @@
   "route": "/analytics/dashboard-preview-validation-health-anl-030",
   "operations": [
    "getDashboard",
-   "listAnalyticsPipelines",
    "recordDashboardView"
   ],
   "services": [
@@ -196171,8 +195730,7 @@
   "reads": [
    "cache:idempotency",
    "reporting.dashboard",
-   "reporting.dashboard_tile",
-   "reporting.pipeline"
+   "reporting.dashboard_tile"
   ],
   "writes": [
    "cache:idempotency",
@@ -196733,7 +196291,6 @@
   "app": "venue-management-web",
   "route": "/analytics/report-preview-test-validation-anl-039",
   "operations": [
-   "runReport",
    "getReportExecution",
    "cancelReportExecution"
   ],
@@ -196746,9 +196303,7 @@
   ],
   "reads": [
    "cache:idempotency",
-   "reporting.execution",
-   "reporting.report_definition",
-   "reporting.report_parameter"
+   "reporting.execution"
   ],
   "writes": [
    "cache:idempotency",
@@ -196791,26 +196346,18 @@
   "app": "venue-management-web",
   "route": "/analytics/save-run-report-results-viewer-anl-040",
   "operations": [
-   "runReport",
    "getReportResult"
   ],
   "services": [
    "ReportingService"
   ],
   "stores": [
-   "postgres",
-   "redis"
+   "postgres"
   ],
   "reads": [
-   "cache:idempotency",
-   "reporting.execution",
-   "reporting.report_definition",
-   "reporting.report_parameter"
-  ],
-  "writes": [
-   "cache:idempotency",
    "reporting.execution"
   ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -196848,7 +196395,6 @@
   "app": "venue-management-web",
   "route": "/analytics/reporting-governance-command-center-anl-041",
   "operations": [
-   "listReportSchedules",
    "listReportDeliveries"
   ],
   "services": [
@@ -196861,9 +196407,7 @@
    "redis"
   ],
   "reads": [
-   "reporting.delivery",
-   "reporting.schedule",
-   "reporting.schedule_recipient"
+   "reporting.delivery"
   ],
   "writes": [],
   "storedProcedures": [],
@@ -197124,24 +196668,18 @@
   "app": "venue-management-web",
   "route": "/analytics/export-download-center-anl-045",
   "operations": [
-   "exportReportResult",
    "getReportExport"
   ],
   "services": [
    "ReportingService"
   ],
   "stores": [
-   "postgres",
-   "redis"
+   "postgres"
   ],
   "reads": [
-   "cache:idempotency",
    "reporting.export"
   ],
-  "writes": [
-   "cache:idempotency",
-   "reporting.export"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -197806,8 +197344,6 @@
   "app": "venue-management-web",
   "route": "/analytics/anomaly-detection-center-anl-055",
   "operations": [
-   "listAiInsights",
-   "configureAnomalyDetector",
    "listAnomalyDetectors"
   ],
   "services": [
@@ -197820,15 +197356,9 @@
    "redis"
   ],
   "reads": [
-   "ai.anomaly_detector",
-   "ai.forecast_definition",
-   "ai.insight",
-   "cache:idempotency"
+   "ai.anomaly_detector"
   ],
-  "writes": [
-   "ai.anomaly_detector",
-   "cache:idempotency"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -197939,39 +197469,26 @@
   "app": "venue-management-web",
   "route": "/analytics/forecasting-predictive-analytics-studio-anl-057",
   "operations": [
-   "getKpiValues",
-   "listForecastDefinitions",
    "getForecast",
-   "createForecastScenario",
-   "exportForecastVersion"
+   "createForecastScenario"
   ],
   "services": [
-   "AiService",
-   "ReportingService"
+   "AiService"
   ],
   "stores": [
-   "derived",
    "postgres",
    "postgres-analytical",
    "qdrant",
    "redis"
   ],
   "reads": [
-   "accreditation.application",
-   "accreditation.credential",
-   "accreditation.holder",
-   "accreditation.validity",
    "ai.forecast_definition",
-   "ai.forecast_export",
    "ai.forecast_point",
    "ai.forecast_scenario",
    "ai.forecast_version",
-   "cache:idempotency",
-   "reporting.kpi_definition",
-   "reporting.kpi_target"
+   "cache:idempotency"
   ],
   "writes": [
-   "ai.forecast_export",
    "ai.forecast_point",
    "ai.forecast_scenario",
    "cache:idempotency"
@@ -198012,22 +197529,18 @@
   "app": "venue-management-web",
   "route": "/analytics/ai-recommendation-next-best-action-center-anl-058",
   "operations": [
-   "listAnalyticsAnomalies",
-   "listAiInsights"
+   "listAnalyticsAnomalies"
   ],
   "services": [
-   "AiService",
    "ReportingService"
   ],
   "stores": [
    "derived",
    "postgres",
    "postgres-analytical",
-   "qdrant",
    "redis"
   ],
   "reads": [
-   "ai.insight",
    "reporting.anomaly"
   ],
   "writes": [],
@@ -198068,18 +197581,13 @@
   "app": "venue-management-web",
   "route": "/analytics/ai-insight-history-evidence-explainability-anl-059",
   "operations": [
-   "listAnalyticsAnomalies",
-   "listAiInsights",
-   "decideAiInsight",
    "searchAiDecisions",
    "listAiInteractions"
   ],
   "services": [
-   "AiService",
-   "ReportingService"
+   "AiService"
   ],
   "stores": [
-   "derived",
    "postgres",
    "postgres-analytical",
    "qdrant",
@@ -198087,16 +197595,9 @@
   ],
   "reads": [
    "ai.activity",
-   "ai.decision_record",
-   "ai.insight",
-   "cache:idempotency",
-   "reporting.anomaly"
+   "ai.decision_record"
   ],
-  "writes": [
-   "ai.anomaly_detector",
-   "ai.insight",
-   "cache:idempotency"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,
@@ -198133,13 +197634,7 @@
   "app": "venue-management-web",
   "route": "/analytics/ai-analytics-governance-model-control-anl-060",
   "operations": [
-   "listAiCapabilities",
-   "configureAiCapability",
-   "getEffectiveAiPolicy",
-   "listAiModels",
-   "listPromptTemplates",
-   "runAiEvaluation",
-   "listAiEvaluations"
+   "listAiModels"
   ],
   "services": [
    "AiService"
@@ -198151,25 +197646,9 @@
    "redis"
   ],
   "reads": [
-   "ai.capability",
-   "ai.eval_run",
-   "ai.eval_suite",
-   "ai.governance_policy",
-   "ai.governance_policy_version",
-   "ai.model",
-   "ai.policy",
-   "ai.policy_exception",
-   "ai.prompt_template",
-   "ai.release",
-   "cache:idempotency"
+   "ai.model"
   ],
-  "writes": [
-   "ai.capability",
-   "ai.decision_record",
-   "ai.eval_run",
-   "ai.release",
-   "cache:idempotency"
-  ],
+  "writes": [],
   "storedProcedures": [],
   "wave": 3,
   "offline": false,

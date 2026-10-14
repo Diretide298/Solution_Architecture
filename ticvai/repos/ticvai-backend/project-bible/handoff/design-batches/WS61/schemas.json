@@ -409,6 +409,7 @@
   ],
   "properties": {
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string"
    },
    "automaticRetry": {
@@ -948,6 +949,7 @@
     "description": "A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
+    "x-ticvai-references": "catalogue.entitlement_template",
     "type": "string",
     "format": "uuid",
     "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
@@ -1266,7 +1268,7 @@
  "MediaBindingActivationAssignmentOperationsInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.credential_binding` (with `access.credential_event`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Media Binding, Activation & Assignment Operations submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "credentialIdUid": {

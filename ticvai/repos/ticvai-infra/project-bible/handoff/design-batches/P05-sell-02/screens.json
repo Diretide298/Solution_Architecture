@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/collect-a-booking",
-   "component": "apps/guest-app/src/routes/sell/CollectABookingDetail.tsx",
+   "component": "src/routes/sell/CollectABookingDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -144,7 +144,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/booking-found",
-   "component": "apps/guest-app/src/routes/sell/BookingFoundDetail.tsx",
+   "component": "src/routes/sell/BookingFoundDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -268,7 +268,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/call-staff",
-   "component": "apps/guest-app/src/routes/sell/CallStaffDetail.tsx",
+   "component": "src/routes/sell/CallStaffDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -442,7 +442,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/out-of-service",
-   "component": "apps/guest-app/src/routes/sell/OutOfServiceDetail.tsx",
+   "component": "src/routes/sell/OutOfServiceDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -565,7 +565,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/order-food",
-   "component": "apps/guest-app/src/routes/sell/OrderFoodList.tsx",
+   "component": "src/routes/sell/OrderFoodList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -756,7 +756,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/shop",
-   "component": "apps/guest-app/src/routes/sell/ShopList.tsx",
+   "component": "src/routes/sell/ShopList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -912,7 +912,7 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add something",
+    "purpose": "Add the chosen item to the kiosk basket",
     "trigger": "onAction",
     "invalidates": [
      "listMerchandise"

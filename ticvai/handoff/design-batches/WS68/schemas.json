@@ -650,37 +650,6 @@
    }
   }
  },
- "RunReportRequest": {
-  "x-ticvai-persistence": "none — request only",
-  "type": "object",
-  "properties": {
-   "parameters": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "**Open on purpose; its shape is the report's.** Keyed by `ReportParameter.key` of the definition being run, each value of that parameter's `type`. An `isRequired` parameter with no value here and no `defaultValue` is the `400` `runReport` lists.\n"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Narrows to one venue. Omitting it returns everything the caller's scope permits — it cannot be used to reach beyond that.\n"
-   },
-   "dateFrom": {
-    "type": "string",
-    "format": "date",
-    "description": "Defaults to today in the venue's time zone when not sent (decided 28 September, audit R158). A business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."
-   },
-   "dateTo": {
-    "type": "string",
-    "format": "date",
-    "description": "Defaults to today in the venue's time zone when not sent (audit R158)."
-   },
-   "forceAsync": {
-    "type": "boolean",
-    "default": false,
-    "description": "Queue regardless of size, for a result to be collected later."
-   }
-  }
- },
  "SeededReport": {
   "type": "object",
   "description": "BL-053. **`ReportDefinition.isSystem` existed and nothing populated it.** Twenty-eight requirements asked for dashboards and analyses over data that was already there, and the answer to every one of them was *\"the builder can do that\"* — which is true and is not a deliverable.\n**A venue opening on Monday does not want a report builder. It wants the eight reports every venue runs**, and the ability to change them.\nSeeded at provisioning, `isSystem` true, and **clone-only (decided 28 September, audit R096)**: `updateReport` and `deleteReport` refuse a system report with 409, and a venue that wants one different clones it with `createReport`. The eight codes are listed on `listSeededReports` (proposed, audit R282).\n",
@@ -720,6 +689,7 @@
   }
  },
  "SemanticModel": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "reporting.semantic_model",
   "description": "BI boards 3.3 and 10.6. **A vocabulary, not a schema.** Exposing joins to report authors produces reports that are wrong invisibly.\n",
@@ -730,6 +700,8 @@
     "description": "Assigned by the server on each publish."
    },
    "domains": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -800,6 +772,8 @@
     }
    },
    "relationships": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

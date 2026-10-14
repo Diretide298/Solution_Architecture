@@ -63,7 +63,7 @@
  },
  "setHardwareModel": {
   "method": "PUT",
-  "path": "/hardware-models",
+  "path": "/hardware-models/{modelId}",
   "contract": "access",
   "summary": "Create or replace a hardware model in the library",
   "permission": "DEVICE_CONFIGURE",
@@ -71,6 +71,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "modelId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -101,7 +106,7 @@
  },
  "setReaderProfile": {
   "method": "PUT",
-  "path": "/reader-profiles",
+  "path": "/reader-profiles/{readerProfileId}",
   "contract": "games",
   "summary": "How a reader behaves and what it shows",
   "permission": "PRODUCT_CONFIGURE",
@@ -109,6 +114,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "readerProfileId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

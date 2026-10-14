@@ -5,6 +5,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "9",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-integration-command-center-bo-474",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderIntegrationCommandCenter.tsx",
+   "component": "src/routes/games-rides/ReaderIntegrationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -96,7 +97,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -220,6 +221,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "9",
@@ -229,7 +231,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-manufacturer-model-profile-bo-475",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderManufacturerModelProfile.tsx",
+   "component": "src/routes/games-rides/ReaderManufacturerModelProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -252,6 +254,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure supported capabilities) and no display directory — it is settings, not a population",
   "purpose": "Allow TICVAI to support multiple reader manufacturers/models without building business rules specifically for one Chinese reader.",
+  "division": "Shares `listDeviceTypeHardware`, `setHardwareModel` with BO-195; this screen is Reader Manufacturer & Model Profile (pack Game_and_Ride_Module.pdf, board 9.2, page 87): allow TICVAI to support multiple reader manufacturers/models without building business rules specifically for one Chinese reader.",
   "layout": {
    "template": "form",
    "regions": [
@@ -371,7 +374,16 @@
     "provenance": "contract access.yaml PUT /hardware-models; wiring fix, 2 October 2026"
    }
   ],
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "modelId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setHardwareModel` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "gaps": [
    {
     "operation": "setReaderProfile",
@@ -409,6 +421,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "9",
@@ -418,7 +431,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/communication-protocol-configuration-bo-476",
-   "component": "apps/venue-management-web/src/routes/games-rides/CommunicationProtocolConfiguration.tsx",
+   "component": "src/routes/games-rides/CommunicationProtocolConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -525,6 +538,16 @@
    "workshopBoard": "wireframes/WS66 Game and Ride Board 9.dc.html#bo-476"
   },
   "apisNote": "Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 88. 0 of 0 labels bound to a contract property; 10 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "readerProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setReaderProfile` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -563,7 +586,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-command-event-mapping-bo-477",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderCommandEventMapping.tsx",
+   "component": "src/routes/games-rides/ReaderCommandEventMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -658,6 +681,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "9",
@@ -667,7 +691,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-configuration-deployment-synchronization-bo-478",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderConfigurationDeploymentSynchronization.tsx",
+   "component": "src/routes/games-rides/ReaderConfigurationDeploymentSynchronization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -717,7 +741,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "deployReaderConfiguration",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "deployReaderConfiguration"
       },
       {
        "kind": "secondaryButton",
@@ -801,6 +826,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "9",
@@ -810,7 +836,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/game-trigger-i-o-control-mapping-bo-479",
-   "component": "apps/venue-management-web/src/routes/games-rides/GameTriggerIOControlMapping.tsx",
+   "component": "src/routes/games-rides/GameTriggerIOControlMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -959,6 +985,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "9",
@@ -968,7 +995,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-screen-led-sound-output-mapping-bo-480",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderScreenLedSoundOutputMapping.tsx",
+   "component": "src/routes/games-rides/ReaderScreenLedSoundOutputMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1091,6 +1118,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "9",
@@ -1100,7 +1128,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/edge-cache-offline-rule-package-bo-481",
-   "component": "apps/venue-management-web/src/routes/games-rides/EdgeCacheOfflineRulePackage.tsx",
+   "component": "src/routes/games-rides/EdgeCacheOfflineRulePackage.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1146,7 +1174,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "deployReaderConfiguration",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "deployReaderConfiguration"
       },
       {
        "kind": "secondaryButton",
@@ -1230,6 +1259,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "9",
@@ -1239,7 +1269,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/device-diagnostics-integration-logs-bo-482",
-   "component": "apps/venue-management-web/src/routes/games-rides/DeviceDiagnosticsIntegrationLogs.tsx",
+   "component": "src/routes/games-rides/DeviceDiagnosticsIntegrationLogs.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1285,7 +1315,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "testReader",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "testReader"
       },
       {
        "kind": "secondaryButton",
@@ -1368,7 +1399,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/integration-certification-test-console-bo-483",
-   "component": "apps/venue-management-web/src/routes/games-rides/IntegrationCertificationTestConsole.tsx",
+   "component": "src/routes/games-rides/IntegrationCertificationTestConsole.tsx",
    "status": "notStarted"
   },
   "navigation": {

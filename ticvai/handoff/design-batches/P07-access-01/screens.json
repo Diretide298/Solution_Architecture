@@ -226,6 +226,7 @@
   "module": "Access",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-scanner",
@@ -489,6 +490,7 @@
   "module": "Access",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "TICKET_LOOKUP",
   "capability": "C00",
   "implementation": {
    "app": "venue-scanner",
@@ -760,6 +762,10 @@
     {
      "name": "rightId",
      "from": "deepLink"
+    },
+    {
+     "name": "workstationId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mediaCode`, `rightId`.",
@@ -830,6 +836,7 @@
   "module": "Access",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ACCESS_VALIDATE",
   "capability": "C00",
   "implementation": {
    "app": "venue-scanner",
@@ -993,6 +1000,12 @@
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    }
+   ],
    "preloaded": [
     "ScanEvent.id",
     "ScanEvent.accessPointId",
@@ -1060,6 +1073,7 @@
   "module": "Access",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ACCESS_VALIDATE",
   "capability": "C00",
   "implementation": {
    "app": "venue-scanner",
@@ -1227,6 +1241,12 @@
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    }
+   ],
    "preloaded": [
     "ScanEvent.id",
     "ScanEvent.accessPointId",
@@ -1294,6 +1314,7 @@
   "module": "Access",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ACCESS_VALIDATE",
   "capability": "C00",
   "implementation": {
    "app": "venue-scanner",
@@ -1490,6 +1511,12 @@
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    }
+   ],
    "preloaded": [
     "ScanEvent.id",
     "ScanEvent.accessPointId",
@@ -1557,6 +1584,7 @@
   "module": "Access",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TICKET_LOOKUP",
   "capability": "C00",
   "implementation": {
    "app": "venue-scanner",
@@ -1664,6 +1692,10 @@
     {
      "name": "rightId",
      "from": "deepLink"
+    },
+    {
+     "name": "workstationId",
+     "from": "session"
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `rightId`."
@@ -1722,6 +1754,7 @@
   "module": "Access",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ACCESS_VALIDATE",
   "capability": "C00",
   "implementation": {
    "app": "venue-scanner",
@@ -1971,6 +2004,12 @@
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    }
+   ],
    "preloaded": [
     "ScanEvent.id",
     "ScanEvent.accessPointId",
@@ -2020,6 +2059,7 @@
   "module": "Access",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-scanner",
@@ -2360,6 +2400,12 @@
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    }
+   ],
    "preloaded": [
     "SyncRejection.id",
     "SyncRejection.workstationId",
@@ -2409,6 +2455,7 @@
   "module": "Access",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ACCESS_VALIDATE",
   "capability": "C00",
   "implementation": {
    "app": "venue-scanner",
@@ -2536,6 +2583,12 @@
    }
   ],
   "entryState": {
+   "params": [
+    {
+     "name": "workstationId",
+     "from": "session"
+    }
+   ],
    "preloaded": [
     "ScanEvent.id",
     "ScanEvent.accessPointId",

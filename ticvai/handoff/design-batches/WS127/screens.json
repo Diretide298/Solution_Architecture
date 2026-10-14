@@ -5,6 +5,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "EVENT_CONFIGURE",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/venue-space-command-center-bo-700",
-   "component": "apps/venue-management-web/src/routes/sell/VenueSpaceCommandCenter.tsx",
+   "component": "src/routes/sell/VenueSpaceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -72,7 +73,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSpaces",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSpaces"
       }
      ]
     }
@@ -129,6 +131,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "EVENT_CONFIGURE",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -138,7 +141,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/venue-master-configuration-bo-701",
-   "component": "apps/venue-management-web/src/routes/sell/VenueMasterConfiguration.tsx",
+   "component": "src/routes/sell/VenueMasterConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -162,6 +165,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define a space an event can occupy: its name, capacity and layout.",
   "purposeNote": "Administrators can create an event-level financial plan and compare budget, commitments, actuals and forecasts using data referenced from the shared Finance services. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-701)",
+  "division": "Shares `listSpaces`, `setSpace` with BO-702; this screen is Venue Master Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 3.02, page 82): define a space an event can occupy: its name, capacity and layout.",
   "gaps": [
    {
     "operation": null,
@@ -237,7 +241,16 @@
    "workshopBoard": "wireframes/WS50 Event Management Configuration Backend Structure v1.0 Board 3.dc.html#bo-701"
   },
   "apisNote": "Regenerated 9 September 2026 from Event_Management_Configuration_Backend_Structure_v1.0.pdf page 82. 0 of 0 labels bound to a contract property; 0 of 41 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "spaceId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listSpaces`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -267,6 +280,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "EVENT_CONFIGURE",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -276,7 +290,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/space-access-rules-configuration-bo-702",
-   "component": "apps/venue-management-web/src/routes/sell/SpaceAccessRulesConfiguration.tsx",
+   "component": "src/routes/sell/SpaceAccessRulesConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -300,6 +314,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Set the access rules of a space: who may enter it and when.",
   "purposeNote": "AI can accelerate event setup while every proposed configuration remains reviewable, editable, permission-controlled and subject to normal approval workflows. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-702)",
+  "division": "Shares `listSpaces`, `setSpace` with BO-701; this screen is Space Access Rules Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 3.06, page 85): set the access rules of a space: who may enter it and when.",
   "gaps": [
    {
     "operation": null,
@@ -383,6 +398,14 @@
    "preloaded": [
     "AI Proposal",
     "Existing / Approved Configuration"
+   ],
+   "params": [
+    {
+     "name": "spaceId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listSpaces`."
+    }
    ]
   },
   "wireframe": {

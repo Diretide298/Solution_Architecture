@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-057` | On-Site Waiver & Exception Handling | D | 7 | 0 | 5 | 0 | 0 | 4 | — | notStarted (generated) |
 | `CMS-058` | Compliance Evidence, Audit & Waiver Repository | D | 2 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `CMS-059` | Waiver Analytics, Compliance & Operational Insights | D | 2 | 26 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-060` | AI Waiver Compliance & Risk Intelligence Center | D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-060` | AI Waiver Compliance & Risk Intelligence Center | D | 0 | 20 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

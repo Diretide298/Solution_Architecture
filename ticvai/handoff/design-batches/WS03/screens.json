@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/digital-credential-security-command-center-bo-164",
-   "component": "apps/venue-management-web/src/routes/access-venue/DigitalCredentialSecurityCommandCenter.tsx",
+   "component": "src/routes/access-venue/DigitalCredentialSecurityCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -106,7 +107,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -279,6 +280,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "3",
@@ -288,7 +290,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/dynamic-qr-security-profile-builder-bo-165",
-   "component": "apps/venue-management-web/src/routes/access-venue/DynamicQrSecurityProfileBuilder.tsx",
+   "component": "src/routes/access-venue/DynamicQrSecurityProfileBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -459,6 +461,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "3",
@@ -468,7 +471,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-activation-display-rules-bo-166",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialActivationDisplayRules.tsx",
+   "component": "src/routes/access-venue/CredentialActivationDisplayRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -555,6 +558,14 @@
   "entryState": {
    "preloaded": [
     "CredentialActivationDisplayRulesView.beforeActivationDisplay"
+   ],
+   "params": [
+    {
+     "name": "credentialPolicyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listCredentialActivationDisplay`."
+    }
    ]
   },
   "wireframe": {
@@ -618,6 +629,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "3",
@@ -627,7 +639,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/device-binding-session-security-bo-167",
-   "component": "apps/venue-management-web/src/routes/access-venue/DeviceBindingSessionSecurity.tsx",
+   "component": "src/routes/access-venue/DeviceBindingSessionSecurity.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -856,6 +868,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "3",
@@ -865,7 +878,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/ble-beacon-geofence-configuration-bo-168",
-   "component": "apps/venue-management-web/src/routes/access-venue/BleBeaconGeofenceConfiguration.tsx",
+   "component": "src/routes/access-venue/BleBeaconGeofenceConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1091,6 +1104,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "3",
@@ -1100,7 +1114,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-transfer-rebinding-bo-169",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialTransferRebinding.tsx",
+   "component": "src/routes/access-venue/CredentialTransferRebinding.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1251,6 +1265,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "3",
@@ -1260,7 +1275,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-revocation-lifecycle-events-bo-170",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialRevocationLifecycleEvents.tsx",
+   "component": "src/routes/access-venue/CredentialRevocationLifecycleEvents.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1427,6 +1442,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "3",
@@ -1436,7 +1452,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/offline-cryptographic-validation-profile-bo-171",
-   "component": "apps/venue-management-web/src/routes/access-venue/OfflineCryptographicValidationProfile.tsx",
+   "component": "src/routes/access-venue/OfflineCryptographicValidationProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1576,6 +1592,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "3",
@@ -1585,7 +1602,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/embedded-entitlement-payload-designer-bo-172",
-   "component": "apps/venue-management-web/src/routes/access-venue/EmbeddedEntitlementPayloadDesigner.tsx",
+   "component": "src/routes/access-venue/EmbeddedEntitlementPayloadDesigner.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1707,6 +1724,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "AUDIT_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "3",
@@ -1716,7 +1734,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-security-simulation-audit-publication-bo-173",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialSecuritySimulationAuditPublication.tsx",
+   "component": "src/routes/access-venue/CredentialSecuritySimulationAuditPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {

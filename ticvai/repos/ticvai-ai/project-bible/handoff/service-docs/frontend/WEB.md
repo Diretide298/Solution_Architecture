@@ -8,6 +8,7 @@
 | Runtime | reactWeb |
 | App | guest-web |
 | Repository | P01 ticvai-guest-web |
+| Repository layout | P01 ticvai-guest-web: assumed: reactWeb (the package's runtime); package manager the one its lock file belongs to; screens in `src/routes/<area>/<Component>.tsx` (assumed); scripts: as its package.json says (not read: the clone of 2026-10-14 was refused; assumed; owner confirms) |
 | Offline | no |
 | Themes | light |
 | Directions | ltr, rtl |
@@ -25,7 +26,7 @@
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
-| [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 9 |
+| [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 7 |
 | [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 6 |
 | [WEB-003](#web-003-search-results) | Search Results | Discovery & Browse | 1 | 2 |
 | [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
@@ -42,13 +43,13 @@
 | [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 |
 | [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 14 |
 | [WEB-017](#web-017-my-account-dashboard) | My Account Dashboard | Account & Self-Service | 1 | 8 |
-| [WEB-018](#web-018-my-tickets) | My Tickets | Account & Self-Service | 1 | 8 |
+| [WEB-018](#web-018-my-tickets) | My Tickets | Account & Self-Service | 1 | 9 |
 | [WEB-019](#web-019-order-history) | Order History | Account & Self-Service | 1 | 8 |
-| [WEB-020](#web-020-profile-preferences) | Profile & Preferences | Account & Self-Service | 1 | 9 |
-| [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 1 | 11 |
+| [WEB-020](#web-020-profile-preferences) | Profile & Preferences | Account & Self-Service | 1 | 7 |
+| [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 1 | 7 |
 | [WEB-022](#web-022-membership-plans) | Membership Plans | Membership, Loyalty & Value | 1 | 3 |
-| [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 1 | 7 |
-| [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 1 | 21 |
+| [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 1 | 5 |
+| [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 1 | 14 |
 | [WEB-025](#web-025-help-centre-faq) | Help Centre / FAQ | Engagement & Support | 1 | 5 |
 | [WEB-026](#web-026-survey-feedback) | Survey & Feedback | Engagement & Support | 1 | 5 |
 | [WEB-027](#web-027-newsletter-subscription) | Newsletter Subscription | Engagement & Support | 1 | 5 |
@@ -64,16 +65,16 @@
 | [WEB-037](#web-037-menu-item-detail) | Menu Item Detail | In-venue Services | 1 | 1 |
 | [WEB-038](#web-038-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 1 | 2 |
 | [WEB-039](#web-039-venue-map-wait-times) | Venue Map & Wait Times | In-venue Services | 1 | 5 |
-| [WEB-040](#web-040-virtual-queue) | Virtual Queue | In-venue Services | 1 | 4 |
+| [WEB-040](#web-040-virtual-queue) | Virtual Queue | In-venue Services | 1 | 5 |
 | [WEB-041](#web-041-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 1 | 4 |
 | [WEB-042](#web-042-retail-shop-and-drop) | Retail & Shop and Drop | Retail | 1 | 3 |
-| [WEB-043](#web-043-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 1 | 11 |
+| [WEB-043](#web-043-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 1 | 9 |
 | [WEB-044](#web-044-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 1 | 9 |
 | [WEB-045](#web-045-help-centre-accessibility) | Help Centre & Accessibility | Support | 1 | 4 |
 | [WEB-046](#web-046-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 1 | 2 |
 | [WEB-047](#web-047-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 1 | 8 |
 | [WEB-048](#web-048-book-a-space-by-the-hour) | Book a Space by the Hour | Booking & Selection | 1 | 4 |
-| [WEB-049](#web-049-transport-route-schedule) | Transport — Route & Schedule | Transport | 1 | 13 |
+| [WEB-049](#web-049-transport-route-schedule) | Transport — Route & Schedule | Transport | 1 | 12 |
 | [WEB-050](#web-050-plan-your-visit) | Plan Your Visit | Discovery & Browse | 1 | 7 |
 
 ## WEB-001 Home / Landing
@@ -88,7 +89,7 @@
 | Route | `/discovery-and-browse/home-landing` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `HomeLandingDashboard` |
-| Suggested location | `src/routes/discovery-and-browse/HomeLandingDashboard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/discovery-and-browse/HomeLandingDashboard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -99,11 +100,9 @@
 | `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | onLoad | The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display settings and languages, read before anyone signs in (GFIX-1)  Also the analytics providers to start once their consent category is granted, from the published config (listAnalyticsProviders needs TENANT_CONFIGURE and left the guest screens: decided by Chinmay, 3 October 2026 (CHG-SPF-007)). | `None` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's upcoming tickets, so a visit day can suggest the ticket's venue (decided 28 September, audit R267); only when signed in | `ORDER_VIEW` |
-| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Cookie banner on first visit and what the tag loader may load | `None` |
-| `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Accept all, reject non-essential or save preferences from the banner | `None` |
-| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
-| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
-| `recordStorefrontSessionEvents` | [WhiteLabelService](../backend/WhiteLabelService.md#recordstorefrontsessionevents) | onLoad | Runtime-shell beacon of hashed browsing behaviour for fraud prevention (every page of the session; bound on the home screen as the shell's entry) | `None` |
+| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | background | Read by the app shell, not a control: which tracking categories this device has granted, so SDKs and the tag loader start only for those (none until granted) | `None` |
+| `recordStorefrontSessionEvents` | [WhiteLabelService](../backend/WhiteLabelService.md#recordstorefrontsessionevents) | background | Runtime-shell beacon of hashed browsing behaviour for fraud prevention (every page of the session; bound on the home screen as the shell's entry) | `None` |
+| `searchCatalogue` | [CatalogueService](../backend/CatalogueService.md#searchcatalogue) | onAction | Find something by name: the header search opens the results (WEB-003) with what was typed, as GST-001's search does | `None` |
 
 **States**
 
@@ -168,7 +167,7 @@
 | Route | `/discovery-and-browse/event-and-attraction-listing` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `EventAndAttractionListingList` |
-| Suggested location | `src/routes/discovery-and-browse/EventAndAttractionListingList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/discovery-and-browse/EventAndAttractionListingList.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -219,7 +218,7 @@
 | Route | `/discovery-and-browse/search-results` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `SearchResultsList` |
-| Suggested location | `src/routes/discovery-and-browse/SearchResultsList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/discovery-and-browse/SearchResultsList.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -259,7 +258,7 @@
 | Route | `/discovery-and-browse/event-attraction-detail` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `EventAttractionDetail` |
-| Suggested location | `src/routes/discovery-and-browse/EventAttractionDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/discovery-and-browse/EventAttractionDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -315,7 +314,7 @@
 | Route | `/booking-and-selection/ticket-type-selection` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `TicketTypeSelectionForm` |
-| Suggested location | `src/routes/booking-and-selection/TicketTypeSelectionForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/booking-and-selection/TicketTypeSelectionForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -372,7 +371,7 @@
 | Route | `/booking-and-selection/date-and-session-selection` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `DateAndSessionSelectionForm` |
-| Suggested location | `src/routes/booking-and-selection/DateAndSessionSelectionForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/booking-and-selection/DateAndSessionSelectionForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -394,7 +393,7 @@
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Acquire an inventory lease | `None` |
 | `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onAction | The performance being booked | `PRODUCT_VIEW` |
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The times of the event for the picked date or range, filtered by `language` | `PRODUCT_VIEW` |
-| `getCart` | [OrderService](../backend/OrderService.md#getcart) | onAction | The cart's `consentQuestions` after the time is added | `None` |
+| `getCart` | [OrderService](../backend/OrderService.md#getcart) | background | Read by the screen right after addCartLine, not a control: the cart's consentQuestions, which open the consent questions pop-up; with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `None` |
 | `recordConsentAnswers` | [MarketingService](../backend/MarketingService.md#recordconsentanswers) | onAction | Record the answers to the booking's consent questions | `ORDER_CREATE` |
 | `joinWaitlist` | [CatalogueService](../backend/CatalogueService.md#joinwaitlist) | onAction | Join the waitlist of a sold-out time (CHG-R6-037) | `None` |
 | `leaveWaitlist` | [CatalogueService](../backend/CatalogueService.md#leavewaitlist) | onAction | Leave it (CHG-R6-037) | `None` |
@@ -433,7 +432,7 @@
 | Route | `/booking-and-selection/seat-map-selection` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `SeatMapSelectionCanvas` |
-| Suggested location | `src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -453,7 +452,7 @@
 | `getSeatAvailability` | [CatalogueService](../backend/CatalogueService.md#getseatavailability) | onLoad | Seat status for a performance | `PRODUCT_VIEW` |
 | `recommendSeats` | [CatalogueService](../backend/CatalogueService.md#recommendseats) | onAction | Recommend seats for a party | `PRODUCT_VIEW` |
 | `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The event's other times, for the time bar and the date and time pop-up | `PRODUCT_VIEW` |
-| `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold | `ORDER_CREATE` |
+| `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | background | Sent by the time bar when the guest switches time, not a control: releases the seats held for the old performance (decided 29 September), with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `ORDER_CREATE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
@@ -478,7 +477,7 @@
 
 ## WEB-008 Add-ons & Upsell
 
-**See add-ons & upsell for this venue.**
+**Suggested add-ons and the offered bundle for this booking, each added to the cart, before checkout.**
 
 |  |  |
 |---|---|
@@ -488,7 +487,7 @@
 | Route | `/booking-and-selection/add-ons-and-upsell` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `AddOnsAndUpsellDetail` |
-| Suggested location | `src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -503,10 +502,10 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add a suggested add-on or the offered bundle to the cart | `None` |
 | `getBundle` | [CatalogueService](../backend/CatalogueService.md#getbundle) | onAction | A bundle offered as an upsell | `PRODUCT_VIEW` |
 | `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill the cart slot, maxItems 3 (DI-959) | `AI_USE` |
-| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report what happened to recommended items | `AI_USE` |
+| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | background | Sent by the Suggested for you list, not a control: impressions, clicks, add-to-cart and declines of the recommended items, batched | `AI_USE` |
 | `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
 
 **States**
@@ -540,7 +539,7 @@
 | Route | `/booking-and-selection/wishlist` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `WishlistDetail` |
-| Suggested location | `src/routes/booking-and-selection/WishlistDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/booking-and-selection/WishlistDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -587,7 +586,7 @@
 | Route | `/cart-and-checkout/shopping-cart` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `ShoppingCartDetail` |
-| Suggested location | `src/routes/cart-and-checkout/ShoppingCartDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/cart-and-checkout/ShoppingCartDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -607,7 +606,7 @@
 |---|---|---|---|---|
 | `applyCartPromoCode` | [OrderService](../backend/OrderService.md#applycartpromocode) | onAction | Apply a promo code to the cart; refused 422 promoCodeInvalid or promoCodeNotApplicable, shown as different messages (decided 28 September, audit R073 (e)) | `None` |
 | `getCart` | [OrderService](../backend/OrderService.md#getcart) | onLoad | The cart, priced and checked, right now With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add a suggested item from Add to your visit to the cart | `None` |
 | `updateCartLine` | [OrderService](../backend/OrderService.md#updatecartline) | onAction | Change a quantity | `None` |
 | `removeCartLine` | [OrderService](../backend/OrderService.md#removecartline) | onAction | Take something out | `None` |
 | `extendCart` | [OrderService](../backend/OrderService.md#extendcart) | onAction | Give the guest more time | `None` |
@@ -653,7 +652,7 @@
 | Route | `/cart-and-checkout/guest-details-and-attendee-forms` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `GuestDetailsAndAttendeeFormsForm` |
-| Suggested location | `src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -709,7 +708,7 @@
 | Route | `/cart-and-checkout/checkout-payment` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `CheckoutPaymentForm` |
-| Suggested location | `src/routes/cart-and-checkout/CheckoutPaymentForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/cart-and-checkout/CheckoutPaymentForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -763,7 +762,7 @@
 | Route | `/cart-and-checkout/order-confirmation` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `OrderConfirmationDetail` |
-| Suggested location | `src/routes/cart-and-checkout/OrderConfirmationDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/cart-and-checkout/OrderConfirmationDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -814,7 +813,7 @@
 | Route | `/pay/:token` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `PayByLinkForm` |
-| Suggested location | `src/routes/cart-and-checkout/PayByLinkForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/cart-and-checkout/PayByLinkForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -858,7 +857,7 @@
 | Route | `/high-demand-access/virtual-waiting-room` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `VirtualWaitingRoomDetail` |
-| Suggested location | `src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -903,7 +902,7 @@
 | Route | `/account-and-self-service/login-register` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `LoginRegisterList` |
-| Suggested location | `src/routes/account-and-self-service/LoginRegisterList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/account-and-self-service/LoginRegisterList.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | form |
 
 **Entry parameters**
@@ -929,9 +928,9 @@
 | `requestGuestOtp` | [IdentityService](../backend/IdentityService.md#requestguestotp) | onAction | Request a one-time code | `None` |
 | `verifyGuestOtp` | [IdentityService](../backend/IdentityService.md#verifyguestotp) | onAction | Verify a one-time code and issue a session | `None` |
 | `claimCart` | [OrderService](../backend/OrderService.md#claimcart) | onAction | Attach an anonymous cart to a guest | `None` |
-| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at a venue with guest two-step verification on | `None` |
+| `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | background | Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step verification on (action signIn), not a control: the code is then typed in Verification code | `None` |
 | `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Check the second-factor code and release the session | `None` |
-| `claimDeviceConsent` | [MarketingService](../backend/MarketingService.md#claimdeviceconsent) | onAction | Attach this browser's cookie decision to the guest after sign-in or registration | `None` |
+| `claimDeviceConsent` | [MarketingService](../backend/MarketingService.md#claimdeviceconsent) | background | Sent by the screen after sign-in or registration, not a control: attaches this device's tracking decision to the guest | `None` |
 
 **States**
 
@@ -954,7 +953,7 @@
 | WEB-010 | Signed in and verified — back to the cart | cartId | arrived from the cart |
 | WEB-011 | Guest Details & Attendee Forms |  |  |
 | WEB-012 | Checkout — Payment |  |  |
-| GST-039 | They set a profile | subjectId |  |
+| GST-039 | They set a profile |  |  |
 
 ## WEB-017 My Account Dashboard
 
@@ -968,7 +967,7 @@
 | Route | `/account-and-self-service/my-account-dashboard` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MyAccountDashboard` |
-| Suggested location | `src/routes/account-and-self-service/MyAccountDashboard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/account-and-self-service/MyAccountDashboard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1012,7 +1011,7 @@
 
 ## WEB-018 My Tickets
 
-**Find my tickets for this venue.**
+**The guest's tickets and passes, current and past: each with its code and history, sent to another guest, shared, or added to a phone wallet.**
 
 |  |  |
 |---|---|
@@ -1022,7 +1021,7 @@
 | Route | `/account-and-self-service/my-tickets` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MyTicketsDetail` |
-| Suggested location | `src/routes/account-and-self-service/MyTicketsDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/account-and-self-service/MyTicketsDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1045,6 +1044,7 @@
 | `transferOrderTickets` | [OrderService](../backend/OrderService.md#transferordertickets) | onAction | Transfer tickets to another guest | `None` |
 | `issueWalletPass` | [OrderService](../backend/OrderService.md#issuewalletpass) | onAction | Add the ticket to a phone wallet from the desktop | `ORDER_VIEW` |
 | `shareEntitlement` | [OrderService](../backend/OrderService.md#shareentitlement) | onAction | Send a ticket to somebody | `ORDER_MODIFY` |
+| `listTicketTransfers` | [OrderService](../backend/OrderService.md#listtickettransfers) | background | Re-read by the screen after transferOrderTickets answers 202, not a control: the guest's transfers, so the ticket shows as offered, then claimed or returned when the offer lapses | `None` |
 
 **States**
 
@@ -1067,7 +1067,7 @@
 
 ## WEB-019 Order History
 
-**Find order history for this venue.**
+**The guest's orders: open one, ask for a refund, and get or download its tax invoice and credit notes.**
 
 |  |  |
 |---|---|
@@ -1077,7 +1077,7 @@
 | Route | `/account-and-self-service/order-history` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `OrderHistoryList` |
-| Suggested location | `src/routes/account-and-self-service/OrderHistoryList.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/account-and-self-service/OrderHistoryList.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1133,7 +1133,7 @@
 | Route | `/account-and-self-service/profile-and-preferences` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `ProfileAndPreferencesDetail` |
-| Suggested location | `src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1151,8 +1151,6 @@
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
 | `verifyGuestEmail` | [IdentityService](../backend/IdentityService.md#verifyguestemail) | onAction | Send a verification link, or consume one | `GUEST_VIEW` |
 | `updateGuestPreferences` | [MarketingService](../backend/MarketingService.md#updateguestpreferences) | onAction | Change contact and consent preferences | `GUEST_MANAGE` |
-| `getMyIdentityVerification` | [IdentityService](../backend/IdentityService.md#getmyidentityverification) | onLoad | Show the guest's ID verification status | `None` |
-| `submitGuestIdentityDocument` | [IdentityService](../backend/IdentityService.md#submitguestidentitydocument) | onAction | Upload an ID document for verification | `None` |
 | `getMyProfile` | [MarketingService](../backend/MarketingService.md#getmyprofile) | onLoad | The guest's own details, read by session | `GUEST_VIEW` |
 | `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | The current consent position the toggles change | `GUEST_VIEW` |
 
@@ -1177,7 +1175,7 @@
 
 ## WEB-021 Wallet & Gift Cards
 
-**See wallet & gift cards for this venue.**
+**The guest's wallet and its activity, saved cards, and the balance on a gift card or game card.**
 
 |  |  |
 |---|---|
@@ -1187,7 +1185,7 @@
 | Route | `/membership-loyalty-and-value/wallet-and-gift-cards` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `WalletAndGiftCardsDetail` |
-| Suggested location | `src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1205,14 +1203,10 @@
 | `getWallet` | [WalletService](../backend/WalletService.md#getwallet) | onLoad | Read a guest wallet | `WALLET_VIEW` |
 | `listWalletTransactions` | [WalletService](../backend/WalletService.md#listwallettransactions) | onLoad | Wallet transaction history | `WALLET_VIEW` |
 | `getGiftCard` | [WalletService](../backend/WalletService.md#getgiftcard) | onAction | Check a gift card balance | `WALLET_VIEW` |
-| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Balance on a game card | `None` |
+| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Balance on a game card | `WALLET_VIEW` |
 | `listPaymentTokens` | [OrderService](../backend/OrderService.md#listpaymenttokens) | onLoad | Saved cards on this account | `ORDER_VIEW` |
 | `storePaymentToken` | [OrderService](../backend/OrderService.md#storepaymenttoken) | onAction | Save a card for next time | `ORDER_CREATE` |
 | `transferWalletBalance` | [WalletService](../backend/WalletService.md#transferwalletbalance) | onAction | Move value between wallets | `WALLET_OPERATE` |
-| `getWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#getwalletautoreloadsetting) | onLoad | Show auto top-up | `WALLET_VIEW` |
-| `setWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#setwalletautoreloadsetting) | onAction | Set auto top-up | `WALLET_OPERATE` |
-| `getWalletExitBalance` | [WalletService](../backend/WalletService.md#getwalletexitbalance) | onLoad | Balance due / refundable at exit | `WALLET_VIEW` |
-| `settleWalletAtExit` | [WalletService](../backend/WalletService.md#settlewalletatexit) | onAction | Settle the wallet at exit | `WALLET_OPERATE` |
 
 **States**
 
@@ -1245,7 +1239,7 @@
 | Route | `/membership-loyalty-and-value/membership-plans` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MembershipPlansDetail` |
-| Suggested location | `src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1283,7 +1277,7 @@
 
 ## WEB-023 Membership Management
 
-**Work with membership management for this venue.**
+**The guest's membership: billing statements, payments that need them, and the membership itself.**
 
 |  |  |
 |---|---|
@@ -1293,7 +1287,7 @@
 | Route | `/membership-loyalty-and-value/membership-management` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MembershipManagementForm` |
-| Suggested location | `src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1314,8 +1308,6 @@
 | `listMyPaymentIssues` | [OrderService](../backend/OrderService.md#listmypaymentissues) | onLoad | Declined renewals waiting on the guest | `None` |
 | `retryMyDunningPayment` | [OrderService](../backend/OrderService.md#retrymydunningpayment) | onAction | Retry a declined payment, on another card if needed | `None` |
 | `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history | `PRODUCT_VIEW` |
-| `listInstalmentPlans` | [OrderService](../backend/OrderService.md#listinstalmentplans) | onLoad | Instalment plans and schedule | `PAYMENT_VIEW` |
-| `createInstalmentPlan` | [OrderService](../backend/OrderService.md#createinstalmentplan) | onAction | Pay in instalments | `ORDER_CREATE` |
 
 **States**
 
@@ -1348,7 +1340,7 @@
 | Route | `/membership-loyalty-and-value/devices-wishlist-consent` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `DevicesWishlistConsentDetail` |
-| Suggested location | `src/routes/membership-loyalty-and-value/DevicesWishlistConsentDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/membership-loyalty-and-value/DevicesWishlistConsentDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1377,13 +1369,6 @@
 | `listDelegations` | [IdentityService](../backend/IdentityService.md#listdelegations) | onLoad | Who may act for this guest | `GUEST_VIEW` |
 | `revokeFacePass` | [AccessService](../backend/AccessService.md#revokefacepass) | onAction | Revoke it after losing the phone that made it | `GUEST_MANAGE` |
 | `listMfaMethods` | [IdentityService](../backend/IdentityService.md#listmfamethods) | onLoad | The guest's enrolled second-factor methods | `None` |
-| `enrolMfaMethod` | [IdentityService](../backend/IdentityService.md#enrolmfamethod) | onAction | Enrol an authenticator (email code as fallback) | `None` |
-| `verifyMfaEnrolment` | [IdentityService](../backend/IdentityService.md#verifymfaenrolment) | onAction | Confirm the enrolment with a first code | `None` |
-| `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove a method | `None` |
-| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Preference centre: categories and the current decision | `None` |
-| `listPublishedTrackingTechnologies` | [MarketingService](../backend/MarketingService.md#listpublishedtrackingtechnologies) | onLoad | Each cookie's name, provider, purpose, expiry and party | `None` |
-| `getDeviceConsentHistory` | [MarketingService](../backend/MarketingService.md#getdeviceconsenthistory) | onLoad | My cookie decisions so far | `None` |
-| `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Change or withdraw cookie preferences | `None` |
 | `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's passes, each with its facePassEnrolmentId for getFacePassEnrolment and revokeFacePass | `ORDER_VIEW` |
 
@@ -1419,7 +1404,7 @@
 | Route | `/engagement-and-support/help-centre-faq` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `HelpCentreFaqDetail` |
-| Suggested location | `src/routes/engagement-and-support/HelpCentreFaqDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/engagement-and-support/HelpCentreFaqDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1433,7 +1418,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | App status and recent changes | `None` |
-| `listMyCases` | [MarketingService](../backend/MarketingService.md#listmycases) | onLoad | The cases this guest raised | `None` |
+| `listMyCases` | [MarketingService](../backend/MarketingService.md#listmycases) | onLoad | The cases this guest raised. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4) | `None` |
 | `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Raise a case as the guest | `None` |
 | `replyToMyCase` | [MarketingService](../backend/MarketingService.md#replytomycase) | onAction | Reply on a case the guest raised | `None` |
 | `listPublishedFaqs` | [WhiteLabelService](../backend/WhiteLabelService.md#listpublishedfaqs) | onLoad | The published FAQs (GAP-D3: one implementation with WEB-045) | `None` |
@@ -1467,7 +1452,7 @@
 | Route | `/engagement-and-support/survey-and-feedback` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `SurveyAndFeedbackDetail` |
-| Suggested location | `src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1481,10 +1466,10 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `submitReview` | [MarketingService](../backend/MarketingService.md#submitreview) | onAction | from page inventory | `None` |
-| `getForm` | [MarketingService](../backend/MarketingService.md#getform) | onLoad | A triggered survey opened from its link | `GUEST_VIEW` |
+| `getForm` | [MarketingService](../backend/MarketingService.md#getform) | onLoad | A triggered survey opened from its link. Read once the guest is signed in (getForm needs the guest session): a signed-out guest opening the link is offered sign-in and brought back (GFIX-4) | `GUEST_VIEW` |
 | `submitForm` | [MarketingService](../backend/MarketingService.md#submitform) | onAction | Answer the survey | `GUEST_VIEW` |
 | `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report a problem as a case | `None` |
-| `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The recent visits a review can be about | `None` |
+| `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The recent visits a review can be about. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4) | `None` |
 
 **States**
 
@@ -1515,7 +1500,7 @@
 | Route | `/engagement-and-support/newsletter-subscription` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `NewsletterSubscriptionDetail` |
-| Suggested location | `src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1555,7 +1540,7 @@
 
 ## WEB-028 Contact & Venue Information
 
-**Find contact & venue information for this venue.**
+**How to reach the venue: phone, email, address and opening hours, readable without signing in.**
 
 |  |  |
 |---|---|
@@ -1565,14 +1550,14 @@
 | Route | `/engagement-and-support/contact-and-venue-information` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `ContactAndVenueInformationForm` |
-| Suggested location | `src/routes/engagement-and-support/ContactAndVenueInformationForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/engagement-and-support/ContactAndVenueInformationForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Operations**
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | onLoad | The published contact details, readable without signing in | `None` |
+| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | How to reach the venue: phone, email, WhatsApp, address, opening hours, without signing in (decided 28 September, audit R073 (f)) | `None` |
 
 **States**
 
@@ -1604,7 +1589,7 @@
 | Route | `/system-states/error-sold-out-maintenance` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `ErrorSoldOutMaintenanceDetail` |
-| Suggested location | `src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Operations**
@@ -1639,7 +1624,7 @@
 | Route | `/ticket-transfer` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `TicketTransfer` |
-| Suggested location | `src/routes/TicketTransfer.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/TicketTransfer.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1688,7 +1673,7 @@
 | Route | `/my-reservations` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MyReservations` |
-| Suggested location | `src/routes/MyReservations.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/MyReservations.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1745,7 +1730,7 @@
 | Route | `/offers-promotions` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `OffersPromotions` |
-| Suggested location | `src/routes/OffersPromotions.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/OffersPromotions.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1784,7 +1769,7 @@
 | Route | `/shop` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `Shop` |
-| Suggested location | `src/routes/Shop.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/Shop.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1802,7 +1787,7 @@
 | `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Price and stock check by barcode, at the outlet named by `outletId` (audit R215 (1)) | `PRODUCT_VIEW` |
 | `checkoutCart` | [OrderService](../backend/OrderService.md#checkoutcart) | onAction | Turn the cart into an order; merchandise for collection is paid online (audit R236) | `None` |
 | `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Pay for it; payment creates the shop-and-drop for collection (decided 28 September, audit R236) | `ORDER_CREATE` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add the chosen item to the cart, for collection on the way out | `None` |
 
 **States**
 
@@ -1833,7 +1818,7 @@
 | Route | `/lost-found` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `LostFound` |
-| Suggested location | `src/routes/LostFound.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/LostFound.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1881,7 +1866,7 @@
 | Route | `/multi-currency-pricing` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MulticurrencyPricing` |
-| Suggested location | `src/routes/MulticurrencyPricing.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/MulticurrencyPricing.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -1921,7 +1906,7 @@
 | Route | `/fandb--browse-and-order` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `FBBrowseOrder` |
-| Suggested location | `src/routes/FBBrowseOrder.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/FBBrowseOrder.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1950,9 +1935,9 @@
 | `createTableReservation` | [FnbService](../backend/FnbService.md#createtablereservation) | onAction | Reserve a table | `None` |
 | `joinRestaurantWaitlist` | [FnbService](../backend/FnbService.md#joinrestaurantwaitlist) | onAction | Join the waitlist when nothing is free | `ORDER_MODIFY` |
 | `leaveRestaurantWaitlist` | [FnbService](../backend/FnbService.md#leaverestaurantwaitlist) | onAction | Leave the restaurant waitlist; the entry returns cancelled (decided 28 September, audit R073 (d)) | `ORDER_MODIFY` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add a table deposit to the cart when the venue requires one | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | background | Sent by the screen when a table booking needs a deposit, not a control: adds the deposit to the cart, with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045) | `None` |
 | `updateTableReservation` | [FnbService](../backend/FnbService.md#updatetablereservation) | onAction | Change or cancel the guest's own table booking (web and app parity with GST-070) | `None` |
-| `listMyTableReservations` | [FnbService](../backend/FnbService.md#listmytablereservations) | onLoad | Show the guest's own reservations, the one being changed among them | `None` |
+| `listMyTableReservations` | [FnbService](../backend/FnbService.md#listmytablereservations) | onLoad | Show the guest's own reservations, the one being changed among them. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4) | `None` |
 
 **States**
 
@@ -1983,7 +1968,7 @@
 | Route | `/menu-item-detail` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MenuItemDetail` |
-| Suggested location | `src/routes/MenuItemDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/MenuItemDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2021,7 +2006,7 @@
 | Route | `/fandb--order-tracking` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `FBOrderTracking` |
-| Suggested location | `src/routes/FBOrderTracking.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/FBOrderTracking.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2062,7 +2047,7 @@
 | Route | `/venue-map-and-wait-times` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `VenueMapWaitTimes` |
-| Suggested location | `src/routes/VenueMapWaitTimes.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/VenueMapWaitTimes.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2105,7 +2090,7 @@
 | Route | `/virtual-queue` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `VirtualQueue` |
-| Suggested location | `src/routes/VirtualQueue.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/VirtualQueue.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2123,6 +2108,7 @@
 | `getWaitingGuest` | [VenueOpsService](../backend/VenueOpsService.md#getwaitingguest) | onInterval | The guest's place and the call to come forward, read on entry and polled while the screen is open; the queue call shows here, and in the in-venue notifications feed too, which is back in the first release (decided 29 September, rev 3 GAP-C1, reversing the deferral of audit R242) | `None` |
 | `leaveQueue` | [VenueOpsService](../backend/VenueOpsService.md#leavequeue) | onAction | Leave a queue | `None` |
 | `getWaitTimes` | [VenueOpsService](../backend/VenueOpsService.md#getwaittimes) | onLoad | Wait times across a venue | `None` |
+| `listQueues` | [VenueOpsService](../backend/VenueOpsService.md#listqueues) | onLoad | Which virtual queues are running | `QUEUE_VIEW` |
 
 **States**
 
@@ -2147,7 +2133,7 @@
 | Route | `/parking--reserve-and-pay` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `ParkingReservePay` |
-| Suggested location | `src/routes/ParkingReservePay.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/ParkingReservePay.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2165,7 +2151,7 @@
 | `listParkingFacilities` | [AccessService](../backend/AccessService.md#listparkingfacilities) | onLoad | Car parks at a venue, and how each integrates | `PARKING_CONFIGURE` |
 | `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put the car park's parking product in the cart; refused `soldOutForDay` when the car park is at capacity (decided 28 September, audit R166) | `None` |
 | `updateParkingEntitlement` | [AccessService](../backend/AccessService.md#updateparkingentitlement) | onAction | Change the plate, or revoke | `None` |
-| `getParkingEntitlement` | [AccessService](../backend/AccessService.md#getparkingentitlement) | onLoad | Load the parking entitlement being changed | `None` |
+| `getParkingEntitlement` | [AccessService](../backend/AccessService.md#getparkingentitlement) | onLoad | Load the parking entitlement being changed. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4) | `None` |
 
 **States**
 
@@ -2191,7 +2177,7 @@
 | Route | `/retail-and-shop-and-drop` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `RetailShopAndDrop` |
-| Suggested location | `src/routes/RetailShopAndDrop.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/RetailShopAndDrop.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2238,7 +2224,7 @@
 | Route | `/loyalty-and-rewards` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `LoyaltyRewards` |
-| Suggested location | `src/routes/LoyaltyRewards.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/LoyaltyRewards.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2257,8 +2243,6 @@
 | `listPromotions` | [CatalogueService](../backend/CatalogueService.md#listpromotions) | onLoad | List promotions | `PRICE_VIEW` |
 | `createReferral` | [MarketingService](../backend/MarketingService.md#createreferral) | onAction | Refer a friend | `MARKETING_MANAGE` |
 | `redeemLoyaltyPoints` | [MarketingService](../backend/MarketingService.md#redeemloyaltypoints) | onAction | Spend points | `LOYALTY_REDEEM` |
-| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
-| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
 | `listRewards` | [MarketingService](../backend/MarketingService.md#listrewards) | onLoad | What points can be turned into | `MARKETING_VIEW` |
 | `listCustomerBadges` | [MarketingService](../backend/MarketingService.md#listcustomerbadges) | onLoad | Badges the guest holds | `MARKETING_VIEW` |
 | `listLeaderboard` | [MarketingService](../backend/MarketingService.md#listleaderboard) | onLoad | Standings, by nickname | `None` |
@@ -2287,7 +2271,7 @@
 | Route | `/ai-concierge` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `AiConcierge` |
-| Suggested location | `src/routes/AiConcierge.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/AiConcierge.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -2302,14 +2286,14 @@
 
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
-| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first message; the scope comes from the session, never a module the guest picks | `AI_USE` |
+| `createAiConversation` | [AiService](../backend/AiService.md#createaiconversation) | background | Opened silently on the first message; the scope comes from the session, never a module the guest picks. Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject) | `AI_USE` |
 | `sendAiMessage` | [AiService](../backend/AiService.md#sendaimessage) | onAction | Ask | `AI_USE` |
 | `handoverToAgent` | [MarketingService](../backend/MarketingService.md#handovertoagent) | onAction | One tap; reason guestRequested and Sahli's summary are set for the guest | `None` |
-| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'. | `AI_USE` |
+| `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows 'Later'. Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject) | `AI_USE` |
 | `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onAction | Optional "Order food" shortcut to the menu in force | `None` |
 | `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | Earlier conversations Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `AI_USE` |
 | `sendGuestConversationMessage` | [MarketingService](../backend/MarketingService.md#sendguestconversationmessage) | onAction | After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013)) | `None` |
-| `getGuestConversation` | [MarketingService](../backend/MarketingService.md#getguestconversation) | onInterval | The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003) | `None` |
+| `getGuestConversation` | [MarketingService](../backend/MarketingService.md#getguestconversation) | onInterval | The agent's replies, the queue position and the wait after a handover, polled every 5 s while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the guest's own (x-ticvai-self-scoped subject) | `None` |
 | `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
 
 **States**
@@ -2335,7 +2319,7 @@
 | Route | `/help-centre-and-accessibility` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `HelpCentreAccessibility` |
-| Suggested location | `src/routes/HelpCentreAccessibility.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/HelpCentreAccessibility.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Operations**
@@ -2370,7 +2354,7 @@
 | Route | `/in-venue-notifications` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `InVenueNotifications` |
-| Suggested location | `src/routes/InVenueNotifications.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/InVenueNotifications.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -2409,7 +2393,7 @@
 | Route | `/booking-and-selection/map-booking` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `MapBookingCanvas` |
-| Suggested location | `src/routes/booking-and-selection/MapBookingCanvas.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/booking-and-selection/MapBookingCanvas.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2466,7 +2450,7 @@
 | Route | `/booking-and-selection/space-by-the-hour` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `SpaceByTheHourWizard` |
-| Suggested location | `src/routes/booking-and-selection/SpaceByTheHourWizard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/booking-and-selection/SpaceByTheHourWizard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | multiStepForm |
 
 **Entry parameters**
@@ -2515,7 +2499,7 @@
 | Route | `/transport/route-and-schedule` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `RouteAndScheduleSplit` |
-| Suggested location | `src/routes/transport/RouteAndScheduleSplit.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/transport/RouteAndScheduleSplit.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2535,7 +2519,6 @@
 | `getTransportFareTable` | [VenueOpsService](../backend/VenueOpsService.md#gettransportfaretable) | onLoad | Passenger types and fares of the route | `None` |
 | `searchTransportDepartures` | [VenueOpsService](../backend/VenueOpsService.md#searchtransportdepartures) | onLoad | Departures for the stations, date, period and party, with counts per period | `None` |
 | `getNextTransportDeparture` | [VenueOpsService](../backend/VenueOpsService.md#getnexttransportdeparture) | onAction | The next departure with room for the party | `None` |
-| `getTransportRoute` | [VenueOpsService](../backend/VenueOpsService.md#gettransportroute) | onLoad | The route and its stops | `None` |
 | `getTransportRouteMap` | [VenueOpsService](../backend/VenueOpsService.md#gettransportroutemap) | onLoad | Stop list, line and bounds for the map | `None` |
 | `quoteTransportFare` | [VenueOpsService](../backend/VenueOpsService.md#quotetransportfare) | onAction | The price for the stations and passengers | `None` |
 | `listTransportPassOffers` | [VenueOpsService](../backend/VenueOpsService.md#listtransportpassoffers) | onLoad | Multi-trip and unlimited passes for the station pair | `None` |
@@ -2576,7 +2559,7 @@
 | Route | `/plan-your-visit` |
 | Repository | ticvai-guest-web (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-guest-web.git) |
 | Component | `PlanYourVisit` |
-| Suggested location | `src/routes/PlanYourVisit.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/PlanYourVisit.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | multiStepForm |
 
 **Entry parameters**

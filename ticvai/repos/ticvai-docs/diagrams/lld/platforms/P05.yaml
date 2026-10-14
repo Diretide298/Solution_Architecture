@@ -40,10 +40,10 @@ servicesCalled:
   operationCalls: 7
 - service: MarketingService
   operationCalls: 3
-- service: AiService
-  operationCalls: 3
 - service: RetailService
   operationCalls: 3
+- service: AiService
+  operationCalls: 2
 - service: FnbService
   operationCalls: 2
 coverage:
@@ -463,7 +463,6 @@ screens:
   - getAvailability
   - handoverToAgent
   - listProducts
-  - recordAnswerFeedback
   - sendAiMessage
   states:
   - emptyFirstRun
@@ -475,6 +474,7 @@ screens:
   - conversationId<-deepLink
   - messageId<-navigation
   - cartId<-navigation
+  - sessionId<-session
   goesTo:
   - KSK-001
   boardFrames:

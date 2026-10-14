@@ -138,10 +138,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-069` | Tax Profile & Jurisdiction Configuration | A | 64 | 16 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-070` | Tax Rule & Treatment Builder | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-071` | Fee & Surcharge Library | B | 30 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-071` | Fee & Surcharge Library | A | 30 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-072` | Fee Applicability & Charging Rule Builder | B | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-073` | Fee Waiver, Tax Exemption & Exception Rules | B | 11 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
-| `ADM-074` | Price Calculation Sequence & Formula Engine | B | 25 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-074` | Price Calculation Sequence & Formula Engine | B | 24 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-075` | Currency Precision, Rounding & Monetary Rules | B | 11 | 2 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | B | 13 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-077` | Calculation Validation, Reconciliation & Service Interface | A | 10 | 24 | 6 | 1 | 0 | 6 | — | notStarted (generated) |

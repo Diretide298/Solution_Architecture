@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/kiosk/assistant",
-   "component": "apps/guest-app/src/routes/Assistant.tsx",
+   "component": "src/routes/Assistant.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -50,6 +50,12 @@
     "operation": "getAvailability",
     "why": "**`getAvailability` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
     "source": "contract catalogue.yaml GET /availability"
+   },
+   {
+    "operation": "recordAnswerFeedback",
+    "removed": true,
+    "why": "The client-approved screen has no Helpful / Not helpful control.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "layout": {
@@ -146,13 +152,6 @@
     ]
    },
    {
-    "operationId": "recordAnswerFeedback",
-    "contract": "ai",
-    "purpose": "Say whether an answer helped",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "createAiConversation",
     "contract": "ai",
     "purpose": "Opened silently on the first tap; the kiosk session is the scope",
@@ -185,6 +184,11 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional: only `addCartLine` takes it, from the record the user acts on."
+    },
+    {
+     "name": "sessionId",
+     "from": "session",
+     "notes": "The kiosk's guest session, opened when a guest starts at the kiosk; nobody signs in at a kiosk. createAiConversation takes its scope from it, as KSK-013 does."
     }
    ],
    "coldEntry": "None: a kiosk has no notification cold entry. The assistant opens from KSK-004 at the point of confusion and closes when the guest returns or the session times out.",

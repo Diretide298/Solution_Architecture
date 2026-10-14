@@ -5,6 +5,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/executive-command-center",
@@ -296,6 +297,7 @@
       },
       {
        "kind": "chart",
+       "operation": "listAiInsights",
        "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
        "provenance": "carried from the previous definition"
       }
@@ -395,7 +397,7 @@
    {
     "operationId": "requestSuggestion",
     "contract": "ai",
-    "purpose": "requestSuggestion",
+    "purpose": "Ask the assistant for an answer about the figures on the command centre",
     "trigger": "onAction",
     "invalidates": [
      "listAlerts"
@@ -543,6 +545,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/sales-revenue-channel",
@@ -734,6 +737,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/operational-performance",
@@ -1061,6 +1065,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/product-performance",
@@ -1338,6 +1343,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/cost-margin-profitability",
@@ -1559,6 +1565,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/inventory-waste-intelligence",
@@ -1639,6 +1646,7 @@
       {
        "kind": "multiSelect",
        "label": "Domain",
+       "operation": "requestSuggestion",
        "notes": "**The selector that collapses 26 board screens into nine.** A domain is a filter on an analytics screen, not a copy of it — building three sets means maintaining one screen three times and watching them drift.",
        "provenance": "carried from the previous definition"
       },
@@ -1851,6 +1859,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/guest-conversion-intelligence",
@@ -2172,6 +2181,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/demand-forecasting",
@@ -2233,6 +2243,7 @@
       },
       {
        "kind": "chart",
+       "operation": "getForecast",
        "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
        "provenance": "carried from the previous definition"
       }
@@ -2363,6 +2374,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/ai-assistant-action-center",
@@ -2508,6 +2520,7 @@
       },
       {
        "kind": "chart",
+       "operation": "getActionPlan",
        "notes": "**Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.",
        "provenance": "carried from the previous definition"
       }
@@ -2688,6 +2701,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "alertRuleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setAlertRule` takes it, from the record the user acts on."
     }
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not. A proposed action opened from the queue or an alert.",
@@ -2845,6 +2864,7 @@
   "module": "Analytics",
   "requiresModule": "ai",
   "wave": 3,
+  "permission": "AI_USE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/suggestions",

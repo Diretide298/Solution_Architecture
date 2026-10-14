@@ -117,7 +117,7 @@ operations:
   writes: []
 - operation: getRelease
   verb: GET
-  path: /releases/{reinventoryHoldId}
+  path: /releases/{releaseId}
   scope: tenant
   permission: PLATFORM_RELEASE_VIEW
   audience:
@@ -128,7 +128,7 @@ operations:
   writes: []
 - operation: getReleaseReadiness
   verb: GET
-  path: /releases/{reinventoryHoldId}/readiness
+  path: /releases/{releaseId}/readiness
   scope: tenant
   permission: PLATFORM_RELEASE_VIEW
   audience:
@@ -329,7 +329,7 @@ operations:
   - control.migration_plan_cell
 - operation: promoteRelease
   verb: POST
-  path: /releases/{reinventoryHoldId}/promote
+  path: /releases/{releaseId}/promote
   scope: tenant
   permission: PLATFORM_RELEASE_PROMOTE
   audience:
@@ -371,7 +371,7 @@ operations:
   - control.environment
 - operation: rejectRelease
   verb: POST
-  path: /releases/{reinventoryHoldId}/reject
+  path: /releases/{releaseId}/reject
   scope: tenant
   permission: PLATFORM_RELEASE_PROMOTE
   audience:
@@ -474,7 +474,7 @@ operations:
   - control.scaling_policy
 - operation: setWafPolicy
   verb: PUT
-  path: /waf-policies
+  path: /waf-policies/{wafRuleId}
   scope: region
   permission: PLATFORM_CELL_MANAGE
   audience:
@@ -495,9 +495,11 @@ operations:
   reads:
   - cache:idempotency
   - control.rollout
+  - control.rollout_cell
   writes:
   - cache:idempotency
   - control.rollout
+  - control.rollout_cell
 - operation: startRollout
   verb: POST
   path: /rollouts/{rolloutId}/start
@@ -514,7 +516,7 @@ operations:
   - control.rollout
 - operation: withdrawRelease
   verb: POST
-  path: /releases/{reinventoryHoldId}/withdraw
+  path: /releases/{releaseId}/withdraw
   scope: tenant
   permission: PLATFORM_RELEASE_MANAGE
   audience:

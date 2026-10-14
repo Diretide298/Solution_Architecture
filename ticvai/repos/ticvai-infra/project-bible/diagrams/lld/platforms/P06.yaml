@@ -45,13 +45,13 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: VenueOpsService
-  operationCalls: 103
+  operationCalls: 106
 - service: OrderService
   operationCalls: 44
 - service: FnbService
   operationCalls: 44
 - service: TenancyService
-  operationCalls: 30
+  operationCalls: 29
 - service: InventoryService
   operationCalls: 28
 - service: AccessService
@@ -64,10 +64,10 @@ servicesCalled:
   operationCalls: 11
 - service: AiService
   operationCalls: 10
-- service: ReportingService
-  operationCalls: 9
 - service: RetailService
   operationCalls: 6
+- service: ReportingService
+  operationCalls: 5
 coverage:
   screens: 96
   inAFlow: 41
@@ -156,6 +156,7 @@ screens:
   - recordAuthorityNotification
   - reportIncident
   - updateIncident
+  - uploadIncidentMedia
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -300,7 +301,6 @@ screens:
   - overrideAccess
   - validateAccess
   - validateGroupAccess
-  - verifyAccreditationCredential
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -966,6 +966,7 @@ screens:
   - getIncident
   - listIncidents
   - updateIncident
+  - uploadIncidentMedia
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1169,6 +1170,7 @@ screens:
   - listIncidents
   - recordAuthorityNotification
   - updateIncident
+  - uploadIncidentMedia
   states:
   - denied
   - emptyFirstRun
@@ -1811,11 +1813,7 @@ screens:
   wave: 2
   density: comfortable
   operations:
-  - acknowledgeAlert
-  - getDashboard
-  - getKpiValues
   - getStockPositions
-  - listAlerts
   - listStockMovements
   states:
   - emptyFirstRun

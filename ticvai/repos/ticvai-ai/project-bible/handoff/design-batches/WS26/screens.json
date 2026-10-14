@@ -5,6 +5,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "2",
@@ -106,7 +107,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -138,6 +139,7 @@
       {
        "kind": "metricTile",
        "label": "Open Cases",
+       "operation": "listContact",
        "provenance": "pack Customer Service_Reference.pdf, page 24 §Display"
       },
       {
@@ -277,6 +279,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "2",
@@ -550,6 +553,16 @@
     "provenance": "contract marketing-crm.yaml PUT /service-queues"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "queueId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listServiceQueues`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -579,6 +592,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "2",
@@ -747,6 +761,16 @@
    "workshopBoard": "wireframes/WS43 Customer Service Board 2.dc.html#sup-021"
   },
   "apisNote": "Regenerated 9 September 2026 from Customer Service_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 39 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "routingRuleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setIntelligentRoutingSkill` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P12",
    "audience": "staff",
@@ -776,6 +800,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "2",
@@ -902,6 +927,14 @@
     "SlaPolicyServiceLevelManagementView.withinSla",
     "SlaPolicyServiceLevelManagementView.atRisk",
     "SlaPolicyServiceLevelManagementView.breached"
+   ],
+   "params": [
+    {
+     "name": "slaPolicyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listSlaPolicyService`."
+    }
    ]
   },
   "wireframe": {
@@ -956,6 +989,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "2",
@@ -1155,6 +1189,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "2",
@@ -1303,6 +1338,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "2",
@@ -1436,6 +1472,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "2",
@@ -1619,6 +1656,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "2",
@@ -1811,6 +1849,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "2",

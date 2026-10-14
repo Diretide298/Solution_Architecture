@@ -140,10 +140,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setDunningPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-606 Partial Payment, Failure & Recovery Manager"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Set the retry schedule and what happens when it runs out
       description: '2.14.19-2.14.23, BL-100. **Dunning retry and gateway retry are different axes
@@ -796,11 +796,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPaymentRoutingRules
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-573 Payment Routing Rule Builder"
         - "P08 ADM-574 Routing Strategy, Priority & Load Distribution"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Route by method, currency, venue, amount, cost or share
       description: 'Boards 2.5 and 2.6. **Priority and load distribution are both needed and they are
@@ -896,10 +896,10 @@ paths:
   /payment-failover-policy:
     put:
       operationId: setPaymentFailoverPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-575 Failover, Retry & Resilience Manager"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: What happens when a provider fails, and when to stop trying
       description: 'Board 2.7. **A declined card and a broken gateway need opposite responses, and this
@@ -986,13 +986,13 @@ paths:
   /payment-providers/economics:
     get:
       operationId: getPaymentProviderEconomics
+      x-ticvai-consumed-by:
+        - "P08 ADM-577 Provider Cost, Commercial & Routing Economics"
+        - "P08 ADM-624 Fees, Commission, FX & Settlement Economics"
       x-ticvai-read-via:
       - query: finance#settlementRecords
         route: in-process
         for: 'its read of ledger.settlement, Ledger''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 ADM-577 Provider Cost, Commercial & Routing Economics"
-        - "P08 ADM-624 Fees, Commission, FX & Settlement Economics"
       summary: What each provider actually costs
       description: 'Board 2.9. **Cost per transaction is a routing input, not a finance report.** Scheme
         fees, interchange, acquirer margin, FX spread and chargeback costs differ per provider, per
@@ -1170,11 +1170,11 @@ paths:
   /hosted-checkout-config:
     put:
       operationId: setHostedCheckoutConfiguration
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-594 Hosted Checkout, Redirect & Return Flow Configuration"
         - "P08 ADM-597 Digital Payment Exception, Recovery & Expiry Center"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Redirect, return and the journey back
       description: 'Board 4.6. **The return leg is where hosted checkout goes wrong.** A guest who pays
@@ -1216,10 +1216,10 @@ paths:
   /payment-authentication-policy:
     put:
       operationId: setPaymentAuthenticationPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-596 Authentication, Tokenization & Recurring Payment Controls"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: 3-D Secure, tokenisation and recurring mandates
       description: 'Board 4.8. **Strong authentication is a commercial trade as much as a security
@@ -1287,14 +1287,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMixedTenderRules
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-600 Mixed Tender Rule & Combination Builder"
         - "P08 ADM-601 Split Payment & Tender Allocation Manager"
         - "P08 ADM-604 Stored Value, Gift Card & Voucher Tender Controls"
         - "P08 ADM-605 Advanced Payment Eligibility, Sequence & Restriction Rules"
         - "P08 ADM-606 Partial Payment, Failure & Recovery Manager"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Split payment, tender sequence and restrictions
       description: 'Boards 5.2, 5.3 and 5.7. **Sequence is not cosmetic.** Stored value before card
@@ -1563,10 +1563,10 @@ paths:
   /reconciliation-rules:
     put:
       operationId: setReconciliationMatchingRules
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-621 Transaction Matching & Reconciliation Engine"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: How a platform transaction is matched to a settled one
       description: 'Board 7.3. **Exact matching is not enough and never was.** An acquirer settles net
@@ -1678,12 +1678,12 @@ paths:
   /payment-risk-rules:
     put:
       operationId: setPaymentRiskRules
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-630 Payment Risk Rule & Decision Engine"
         - "P08 ADM-631 Velocity, Behavioral & Transaction Risk Controls"
         - "P08 ADM-632 Risk Lists, Signals & Payment Control Center"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Velocity, behaviour, lists and what a hit does
       description: 'Boards 8.2, 8.3 and 8.4. **Distinct from `wallet` risk, which watches stored value.**
@@ -1887,7 +1887,6 @@ paths:
   /payments/rules:
     get:
       operationId: getPaymentRules
-      x-ticvai-names-for-context: [whitelabel.policy]
       x-ticvai-consumed-by:
         - "P08 ADM-564 Currency & Payment Currency Configuration"
         - "P08 ADM-565 Payment Eligibility & Availability Rule Builder"
@@ -1895,6 +1894,7 @@ paths:
         - "P08 ADM-567 Payment Policy, Governance & Approval Manager"
         - "P08 ADM-568 Payment Configuration Simulator & Validation Center"
         - "P08 ADM-598 Digital Payment Simulator, Conversion & AI Advisor"
+      x-ticvai-names-for-context: [whitelabel.policy]
       summary: Currency, eligibility and fee rules as one set
       description: >
         **Three tables, one decision.** Whether a guest may pay with this method, in this currency,
@@ -1923,10 +1923,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPaymentRules
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-567 Payment Policy, Governance & Approval Manager"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Replace the payment rule set
       description: >
@@ -1965,11 +1965,11 @@ paths:
   /deposits/{depositId}/activity:
     get:
       operationId: listDepositActivity
-      x-ticvai-names-for-context: [ledger.deposit, orders.deposit]
       x-ticvai-consumed-by:
         - "P06 EMP-099 Deposit Release, Capture & Customer Confirmation"
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
         - "P08 BO-572 Deposit Release, Capture & Customer Confirmation"
+      x-ticvai-names-for-context: [ledger.deposit, orders.deposit]
       summary: Movements on a deposit
       description: >
         **Authorise, capture, release, forfeit — the history a disputed deposit is settled from.**
@@ -2190,14 +2190,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setInstalmentPolicy
+      x-ticvai-consumed-by:
+        - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: in-process
         for: 'the product''s term (422 too-many-instalments) (CHG-MOD-003)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 ADM-603 B2B Invoice, On-Account & Payment Terms Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 4.2.17, 2.14.19); shape follows setDunningPolicy'
@@ -2251,8 +2251,6 @@ paths:
     get:
       operationId: listInstalmentPlans
       x-ticvai-consumed-by:
-        - "P01 WEB-023 Membership Management"
-        - "P02 GST-015 Memberships"
         - "P08 BO-324 Payment & Order Financial Command Center"
       x-ticvai-audience:
       - staff
@@ -2311,14 +2309,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createInstalmentPlan
+      x-ticvai-consumed-by:
+        - "P08 BO-324 Payment & Order Financial Command Center"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: in-process
         for: 'whether the product qualifies under the instalment policy (422 not-eligible-for-instalments) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-023 Membership Management"
-        - "P02 GST-015 Memberships"
-        - "P08 BO-324 Payment & Order Financial Command Center"
       x-ticvai-audience:
       - staff
       - guest

@@ -1,0 +1,1603 @@
+{
+ "S": [
+  "setAccreditationNotificationRules",
+  "setAccreditationRequirements",
+  "setAccreditationValidity",
+  "configureRiskStrategy",
+  "setAiPolicy",
+  "setSuggestionProvider",
+  "setMediaTaxonomy",
+  "setFnbDeliveryPolicy",
+  "setFnbReservationPolicy",
+  "setFnbServiceChargePolicy",
+  "setKitchenStations",
+  "setSubstitutionRules",
+  "setGameCardExpiryRules",
+  "setGameKioskConfiguration",
+  "setGamePricing",
+  "setGameplayValidationRules",
+  "setRedemptionRules",
+  "setDailyCount",
+  "setWorkOrderPriorityPolicy",
+  "approvePrivacyTesting",
+  "approveWaiverTesting",
+  "setAgentAvailability",
+  "setCaseInvestigationResolution",
+  "setCommunicationPreferenceMarketing",
+  "setConsentCapturePoint",
+  "setConsentPurposes",
+  "setCustomerServiceCopilot",
+  "setDataDiscoveryAccess",
+  "setDigitalWaiverForm",
+  "setGuestAttributeModel",
+  "setGuestExtraFields",
+  "setGuestMatchPolicy",
+  "setIdentityResolutionRules",
+  "setLeaderboardNickname",
+  "setLocalizationBrandingCustomer",
+  "setMarketingSubscription",
+  "setMinorGuardianAge",
+  "setSeoMetadata",
+  "setSignatorySignatureGuardian",
+  "updateMyProfile",
+  "setDunningPolicy",
+  "setHostedCheckoutConfiguration",
+  "setInstalmentPolicy",
+  "setMixedTenderRules",
+  "setPaymentAuthenticationPolicy",
+  "setPaymentFailoverPolicy",
+  "setPaymentRiskRules",
+  "setPaymentRoutingRules",
+  "setPaymentRules",
+  "setReconciliationMatchingRules",
+  "setScalingPolicy",
+  "approveCampaignWorkflow",
+  "setCampaignBudgetFinancial",
+  "setCodeDistributionManager",
+  "setProductRelationships",
+  "setPromotionStackingRule",
+  "setRecommendationSuppression",
+  "setRuleTestRecommendation",
+  "simulateBundlePreviewRecommendation",
+  "setRentalDepositPolicy",
+  "setRentalFeePolicy",
+  "setSemanticModel",
+  "setSiteNormalisationBasis",
+  "setResourceAllocationPolicy",
+  "setResourceSelectionPolicy",
+  "setAccessibleSeating",
+  "setSeatRecommendationRules",
+  "setSeatRules",
+  "approveBookingLimitCommercial",
+  "approveMembershipProductValidation",
+  "approvePartnerStatuLifecycle",
+  "setAgreementContractTerm",
+  "setFamilyHouseholdDependent",
+  "setLicenceEnforcementPolicy",
+  "setMemberMembershipAccount",
+  "setMembershipCommercialConfig",
+  "setMembershipEligibilityQualification",
+  "setMembershipEntitlementAdmission",
+  "setMembershipProductTier",
+  "setMembershipUsagePolicy",
+  "setPartnerBrandVenue",
+  "setPartnerProfileOrganization",
+  "setPartnerRateNet",
+  "setPaymentTermBilling",
+  "setRenewalAutoMembership",
+  "setValidityActivationExpiry",
+  "setVsiModel",
+  "setCreditConsumptionPolicy",
+  "setWalletAccountingMapping",
+  "setWalletAuthenticationPolicy",
+  "setWalletChannelRules",
+  "setWalletFundingRules",
+  "setWalletIntegrationMapping",
+  "setWalletReconciliationSources",
+  "setWalletRefundPolicy",
+  "setWalletRiskRules",
+  "setWalletTransferRules",
+  "setAppIcons",
+  "setBookingFlowConfig",
+  "setBrandIdentity",
+  "setFaqs",
+  "setFeatureToggles",
+  "setFonts",
+  "setFooter",
+  "setHeader",
+  "setHomepageLayout",
+  "setLanguages",
+  "setMaintenanceMode",
+  "setModuleEnablement",
+  "setNavigation",
+  "setSiteSetupProgress",
+  "setStoreAccounts",
+  "setTheme",
+  "setStaffingRules",
+  "approveManualOverrideSupervisor",
+  "approveMultiMediaPreview",
+  "publishMediaCompatibilityTesting",
+  "publishRuleConflictCheck",
+  "publishTopologyValidation",
+  "setAccessAreaZone",
+  "setAccessGraphicalMap",
+  "setAppleWalletPass",
+  "setAttractionAccess",
+  "setBiometricVerificationProfile",
+  "setBleBeaconGeofence",
+  "setBrandingLocalizationTemplate",
+  "setContextTimeEvent",
+  "setCredentialEventPropagationRule",
+  "setCredentialIssuanceRetryPolicy",
+  "setDeviceBindingPolicy",
+  "setDeviceSoftwareContent",
+  "setDigitalBarcodeTicket",
+  "setDigitalCardMembership",
+  "setDynamicFieldData",
+  "setDynamicSecurityProfile",
+  "setEdgeNodeLocal",
+  "setEmbeddedEntitlementPayload",
+  "setFacePassEnrollment",
+  "setGateLane",
+  "setGateOfflinePolicy",
+  "setGoogleWalletPass",
+  "setGroupAdmissionProfile",
+  "setHandheldMobileAccess",
+  "setMediaBindingActivation",
+  "setOperationalIncidentException",
+  "setPdfPrintablePos",
+  "setPolicyEvaluationSetting",
+  "setReaderScannerPeripheral",
+  "setRealTimeSecurity",
+  "setRelationshipFraudRule",
+  "setRfidNfc",
+  "setRfidNfcCard",
+  "setRiskScoringConfig",
+  "setSecurityInvestigationEvidence",
+  "setTicketStatusTransition",
+  "setTurnstileLaneBehavior",
+  "setValidationOutcomeGuest",
+  "setVerificationMethodPolicy",
+  "setVirtualTicketCredential",
+  "setVirtualTicketIdentity",
+  "setVisualAccessRule",
+  "setVisualDynamicPolicy",
+  "simulateOfflineResilienceTesting",
+  "simulatePolicyConflictImpact",
+  "approveMatrixMultiLevel",
+  "approveRoleAuthorityDelegation",
+  "approveUnifiedDecision",
+  "approveVersioningGovernance",
+  "setStepUpPolicy",
+  "setTriggerActionCross",
+  "setVisualBusinessRule",
+  "setVisualWorkflow",
+  "simulateWorkflowTestingImpact",
+  "approvePricingWorkflowAuthority",
+  "approveReviewDecision",
+  "approveWorkflow",
+  "publishChannelAvailability",
+  "publishChannelReadinessValidation",
+  "publishPricingEffectiveDate",
+  "setBookingVelocityTime",
+  "setCatalogueReview",
+  "setChannelFeePayment",
+  "setChannelPricingCommercial",
+  "setChannelSyncSetting",
+  "setDemandOccupancyAvailability",
+  "setDynamicPricingGuardrailPolicy",
+  "setDynamicPricingStrategy",
+  "setFeeApplicabilityCharging",
+  "setLifecycleStatuWorkflow",
+  "setPackagePricingDefinition",
+  "setPriceHierarchyInheritance",
+  "setPricing",
+  "setPricingExperiment",
+  "setProductCatalogue",
+  "setProductCategories",
+  "setProductContextOwnership",
+  "setProductServicePrice",
+  "setRulePriorityConflict",
+  "setTaxProfileJurisdiction",
+  "setTaxRuleTreatment",
+  "simulatePriceBreakdownCalculation",
+  "setWalletAllocationPolicy",
+  "setAccountMappings",
+  "setFxProvider",
+  "deleteGuestAccount",
+  "guestLogout",
+  "setGuestVerificationPolicy",
+  "setPasswordPolicy",
+  "setSegregationRules",
+  "setSsoConfig",
+  "approveListingModeration",
+  "setAfterSaleFinancial",
+  "setAmendmentEligibilityPolicy",
+  "setCancellationPartialPolicy",
+  "setCustomerGuestAccount",
+  "setDepositPolicy",
+  "setFraudRules",
+  "setGroupBookingHandover",
+  "setGroupOperationalPlanning",
+  "setGroupPackageExperience",
+  "setGroupQuotationProposal",
+  "setMultiPaymentSplit",
+  "setOrderAmendment",
+  "setOrderDetailTransaction",
+  "setOrderReservationStatus",
+  "setProRataResidual",
+  "setRefundCalculationPolicy",
+  "setResaleEligibilityRule",
+  "setResaleFeePolicy",
+  "setResaleMarketplaceConfig",
+  "setResaleMarketplaceRecommendation",
+  "setReservationHoldPolicy",
+  "setUpgradeConversionPath",
+  "setDenominations",
+  "setConnectivityThresholds",
+  "setOfflinePolicy",
+  "setVenueSettingsDefaults"
+ ],
+ "K": [
+  {
+   "op": "setAccessProfile",
+   "from": "/accreditation-access-profiles",
+   "to": "/accreditation-access-profiles/{accessProfileId}",
+   "params": [
+    "accessProfileId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "accreditation"
+  },
+  {
+   "op": "setBadgeTemplate",
+   "from": "/badge-templates",
+   "to": "/badge-templates/{badgeTemplateId}",
+   "params": [
+    "badgeTemplateId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "accreditation"
+  },
+  {
+   "op": "setAiProvider",
+   "from": "/providers",
+   "to": "/providers/{providerId}",
+   "params": [
+    "providerId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "ai"
+  },
+  {
+   "op": "setIndexSource",
+   "from": "/index-sources",
+   "to": "/index-sources/{sourceId}",
+   "params": [
+    "sourceId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "ai"
+  },
+  {
+   "op": "setMediaDistributionChannels",
+   "from": "/media-distribution/channels",
+   "to": "/media-distribution/channels/{code}",
+   "params": [
+    "code"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "assets"
+  },
+  {
+   "op": "setOutletTemplate",
+   "from": "/outlet-templates",
+   "to": "/outlet-templates/{code}",
+   "params": [
+    "code"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "fnb"
+  },
+  {
+   "op": "setRecipe",
+   "from": "/recipes",
+   "to": "/recipes/{recipeId}",
+   "params": [
+    "recipeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "fnb"
+  },
+  {
+   "op": "setTemperatureCheckpoint",
+   "from": "/food-safety/checkpoints",
+   "to": "/food-safety/checkpoints/{checkpointId}",
+   "params": [
+    "checkpointId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "fnb"
+  },
+  {
+   "op": "setAttractionType",
+   "from": "/attraction-types",
+   "to": "/attraction-types/{attractionTypeId}",
+   "params": [
+    "attractionTypeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "games"
+  },
+  {
+   "op": "setReaderProfile",
+   "from": "/reader-profiles",
+   "to": "/reader-profiles/{readerProfileId}",
+   "params": [
+    "readerProfileId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "games"
+  },
+  {
+   "op": "setAgentServiceProfile",
+   "from": "/agent-workload-availability",
+   "to": "/agent-workload-availability/{agentServiceProfileId}",
+   "params": [
+    "agentServiceProfileId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setBadge",
+   "from": "/badges",
+   "to": "/badges/{badgeId}",
+   "params": [
+    "badgeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setBusinessEventMapping",
+   "from": "/business-event-notification",
+   "to": "/business-event-notification/{eventId}",
+   "params": [
+    "eventId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setCaseCategoryDefinition",
+   "from": "/case-categories",
+   "to": "/case-categories/{caseCategoryId}",
+   "params": [
+    "caseCategoryId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setCaseInternalRequest",
+   "from": "/escalation-collaboration-internal",
+   "to": "/escalation-collaboration-internal/{internalRequestId}",
+   "params": [
+    "internalRequestId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setCaseResolution",
+   "from": "/case-resolution-closure",
+   "to": "/case-resolution-closure/{caseResolutionId}",
+   "params": [
+    "caseResolutionId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setChannelProvider",
+   "from": "/channel-provider",
+   "to": "/channel-provider/{communicationProviderId}",
+   "params": [
+    "communicationProviderId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setCommunicationRoutingRule",
+   "from": "/routing-priority-throttling",
+   "to": "/routing-priority-throttling/{routingRuleId}",
+   "params": [
+    "routingRuleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setContactAutomation",
+   "from": "/contact-automation",
+   "to": "/contact-automation/{automationId}",
+   "params": [
+    "automationId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setCookieBannerDesign",
+   "from": "/cookie-banner-preference",
+   "to": "/cookie-banner-preference/{bannerDesignId}",
+   "params": [
+    "bannerDesignId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setCookieScanPolicy",
+   "from": "/cookie-scan-policy",
+   "to": "/cookie-scan-policy/{scanPolicyId}",
+   "params": [
+    "scanPolicyId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setDataProcessingPurpose",
+   "from": "/data-processing-purpose",
+   "to": "/data-processing-purpose/{purposeId}",
+   "params": [
+    "purposeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setDataRetentionPolicy",
+   "from": "/retention-policies",
+   "to": "/retention-policies/{retentionPolicyId}",
+   "params": [
+    "retentionPolicyId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setDynamicFieldQuestion",
+   "from": "/dynamic-field-question",
+   "to": "/dynamic-field-question/{formId}/{key}",
+   "params": [
+    "formId",
+    "key"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setIntelligentRoutingSkill",
+   "from": "/intelligent-routing-skill",
+   "to": "/intelligent-routing-skill/{routingRuleId}",
+   "params": [
+    "routingRuleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setLegalHold",
+   "from": "/data-retention-expiry",
+   "to": "/data-retention-expiry/{holdId}",
+   "params": [
+    "holdId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setLoyaltyCampaign",
+   "from": "/loyalty/campaigns",
+   "to": "/loyalty/campaigns/{loyaltyCampaignId}",
+   "params": [
+    "loyaltyCampaignId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setOrderBookingTicket",
+   "from": "/order-booking-ticket",
+   "to": "/order-booking-ticket/{serviceActionId}",
+   "params": [
+    "serviceActionId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setPrivacyAction",
+   "from": "/deletion-anonymization-restriction",
+   "to": "/deletion-anonymization-restriction/{actionId}",
+   "params": [
+    "actionId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setPrivacyComplianceException",
+   "from": "/privacy-compliance-exception",
+   "to": "/privacy-compliance-exception/{exceptionId}",
+   "params": [
+    "exceptionId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setPrivacyNoticePolicyGovernance",
+   "from": "/privacy-notice-policy",
+   "to": "/privacy-notice-policy/{governanceId}",
+   "params": [
+    "governanceId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setPrivacyRequest",
+   "from": "/data-subject-customer",
+   "to": "/data-subject-customer/{requestId}",
+   "params": [
+    "requestId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setPrivacyRequestTypes",
+   "from": "/privacy",
+   "to": "/privacy/{requestTypeId}",
+   "params": [
+    "requestTypeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setQualityEvaluation",
+   "from": "/quality-agent-evaluation",
+   "to": "/quality-agent-evaluation/{evaluationId}",
+   "params": [
+    "evaluationId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setRefundCompensationService",
+   "from": "/refund-compensation-service",
+   "to": "/refund-compensation-service/{compensationRequestId}",
+   "params": [
+    "compensationRequestId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setReward",
+   "from": "/loyalty/rewards",
+   "to": "/loyalty/rewards/{rewardId}",
+   "params": [
+    "rewardId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setSenderIdentityDomain",
+   "from": "/sender-identity-domain",
+   "to": "/sender-identity-domain/{senderIdentityId}",
+   "params": [
+    "senderIdentityId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setServiceQueueDefinition",
+   "from": "/service-queues",
+   "to": "/service-queues/{queueId}",
+   "params": [
+    "queueId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setSlaPolicy",
+   "from": "/sla-policies",
+   "to": "/sla-policies/{slaPolicyId}",
+   "params": [
+    "slaPolicyId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setTrackingTechnology",
+   "from": "/cookie-tracking-digital",
+   "to": "/cookie-tracking-digital/{technologyId}",
+   "params": [
+    "technologyId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setWaiverAssociation",
+   "from": "/product-event-experience",
+   "to": "/product-event-experience/{associationId}",
+   "params": [
+    "associationId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setWaiverException",
+   "from": "/site-waiver-exception",
+   "to": "/site-waiver-exception/{waiverExceptionId}",
+   "params": [
+    "waiverExceptionId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setWaiverTemplateMaster",
+   "from": "/waiver-template-master",
+   "to": "/waiver-template-master/{waiverId}",
+   "params": [
+    "waiverId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setWaiverTriggerRule",
+   "from": "/waiver-trigger-eligibility",
+   "to": "/waiver-trigger-eligibility/{triggerRuleId}",
+   "params": [
+    "triggerRuleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setWaiverVerificationValidation",
+   "from": "/waiver-verification-validation",
+   "to": "/waiver-verification-validation/{verificationId}",
+   "params": [
+    "verificationId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "marketing-crm"
+  },
+  {
+   "op": "setMerchantAccount",
+   "from": "/merchant-accounts",
+   "to": "/merchant-accounts/{merchantAccountId}",
+   "params": [
+    "merchantAccountId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "payments"
+  },
+  {
+   "op": "setPaymentTerminalConfiguration",
+   "from": "/payment-terminals",
+   "to": "/payment-terminals/{deviceId}",
+   "params": [
+    "deviceId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "payments"
+  },
+  {
+   "op": "setReconciliationSource",
+   "from": "/reconciliation-sources",
+   "to": "/reconciliation-sources/{sourceId}",
+   "params": [
+    "sourceId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "payments"
+  },
+  {
+   "op": "setWafPolicy",
+   "from": "/waf-policies",
+   "to": "/waf-policies/{wafRuleId}",
+   "params": [
+    "wafRuleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "platform-ops"
+  },
+  {
+   "op": "setApiAnomalyRule",
+   "from": "/api-anomaly-rules",
+   "to": "/api-anomaly-rules/{anomalyRuleId}",
+   "params": [
+    "anomalyRuleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "public-api"
+  },
+  {
+   "op": "setApiLicensing",
+   "from": "/api-licensing",
+   "to": "/api-licensing/{licenceId}",
+   "params": [
+    "licenceId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "public-api"
+  },
+  {
+   "op": "setApiQuota",
+   "from": "/api-quotas",
+   "to": "/api-quotas/{quotaId}",
+   "params": [
+    "quotaId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "public-api"
+  },
+  {
+   "op": "configureQueueFeed",
+   "from": "/queue-feeds",
+   "to": "/queue-feeds/{feedId}",
+   "params": [
+    "feedId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "queue"
+  },
+  {
+   "op": "setAlertRule",
+   "from": "/alert-rules",
+   "to": "/alert-rules/{alertRuleId}",
+   "params": [
+    "alertRuleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "reporting"
+  },
+  {
+   "op": "setStoreRules",
+   "from": "/store-rules",
+   "to": "/store-rules/{storeRuleId}",
+   "params": [
+    "storeRuleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "retail"
+  },
+  {
+   "op": "setSeatHoldType",
+   "from": "/seat-hold-types",
+   "to": "/seat-hold-types/{holdTypeId}",
+   "params": [
+    "holdTypeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "seating"
+  },
+  {
+   "op": "setChannelListing",
+   "from": "/channel-listings",
+   "to": "/channel-listings/{listingId}",
+   "params": [
+    "listingId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "subscription"
+  },
+  {
+   "op": "setLicensingModel",
+   "from": "/licensing-models",
+   "to": "/licensing-models/{licensingModelId}",
+   "params": [
+    "licensingModelId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "subscription"
+  },
+  {
+   "op": "setModuleListing",
+   "from": "/module-catalogue",
+   "to": "/module-catalogue/{moduleCode}",
+   "params": [
+    "moduleCode"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "subscription"
+  },
+  {
+   "op": "setPartnerContact",
+   "from": "/partner-contacts",
+   "to": "/partner-contacts/{contactId}",
+   "params": [
+    "contactId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "subscription"
+  },
+  {
+   "op": "setTrialConfiguration",
+   "from": "/trial-configurations",
+   "to": "/trial-configurations/{trialConfigurationId}",
+   "params": [
+    "trialConfigurationId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "subscription"
+  },
+  {
+   "op": "setGiftCardProduct",
+   "from": "/gift-card-products",
+   "to": "/gift-card-products/{giftCardProductId}",
+   "params": [
+    "giftCardProductId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "wallet"
+  },
+  {
+   "op": "setAnalyticsProvider",
+   "from": "/tenant-config/analytics-providers",
+   "to": "/tenant-config/analytics-providers/{analyticsProviderId}",
+   "params": [
+    "analyticsProviderId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "white-label"
+  },
+  {
+   "op": "setIntegrationSource",
+   "from": "/integration-sources",
+   "to": "/integration-sources/{sourceId}",
+   "params": [
+    "sourceId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "workforce"
+  },
+  {
+   "op": "setJobTitle",
+   "from": "/job-titles",
+   "to": "/job-titles/{jobTitleId}",
+   "params": [
+    "jobTitleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "workforce"
+  },
+  {
+   "op": "setLabourBudget",
+   "from": "/labour-budgets",
+   "to": "/labour-budgets/{labourBudgetId}",
+   "params": [
+    "labourBudgetId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "workforce"
+  },
+  {
+   "op": "setLeaveType",
+   "from": "/leave-types",
+   "to": "/leave-types/{leaveTypeId}",
+   "params": [
+    "leaveTypeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "workforce"
+  },
+  {
+   "op": "setShiftPattern",
+   "from": "/shift-patterns",
+   "to": "/shift-patterns/{shiftPatternId}",
+   "params": [
+    "shiftPatternId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "workforce"
+  },
+  {
+   "op": "setShiftTemplate",
+   "from": "/shift-templates",
+   "to": "/shift-templates/{shiftTemplateId}",
+   "params": [
+    "shiftTemplateId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "workforce"
+  },
+  {
+   "op": "setWorkAssignment",
+   "from": "/work-assignments",
+   "to": "/work-assignments/{workAssignmentId}",
+   "params": [
+    "workAssignmentId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "workforce"
+  },
+  {
+   "op": "setAccessAttributeCatalog",
+   "from": "/access-attribute-catalog",
+   "to": "/access-attribute-catalog/{attributeKey}",
+   "params": [
+    "attributeKey"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setAccessPointGroup",
+   "from": "/access-point-groups",
+   "to": "/access-point-groups/{groupId}",
+   "params": [
+    "groupId"
+   ],
+   "into_existing": true,
+   "source_item_removed": true,
+   "contract": "access"
+  },
+  {
+   "op": "setBiometricLifecycleRetention",
+   "from": "/biometric-lifecycle-retention",
+   "to": "/biometric-lifecycle-retention/{retentionSettingId}",
+   "params": [
+    "retentionSettingId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setCredentialActivationDisplay",
+   "from": "/credential-activation-display",
+   "to": "/credential-activation-display/{credentialPolicyId}",
+   "params": [
+    "credentialPolicyId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setEntitlementConsumption",
+   "from": "/entitlement-consumption",
+   "to": "/entitlement-consumption/{ruleId}",
+   "params": [
+    "ruleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setFaceMatchingVerification",
+   "from": "/face-matching-verification",
+   "to": "/face-matching-verification/{profileId}",
+   "params": [
+    "profileId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setFaceTagTemporaryEnrollment",
+   "from": "/face-tag-temporary",
+   "to": "/face-tag-temporary/{profileId}",
+   "params": [
+    "profileId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setFastPassProfile",
+   "from": "/fast-pass-profiles",
+   "to": "/fast-pass-profiles/{fastPassProfileId}",
+   "params": [
+    "fastPassProfileId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "access"
+  },
+  {
+   "op": "setFraudDetectionRule",
+   "from": "/fraud-detection-rule",
+   "to": "/fraud-detection-rule/{ruleId}",
+   "params": [
+    "ruleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setGateModePolicy",
+   "from": "/gate-mode-policies",
+   "to": "/gate-mode-policies/{gateModePolicyId}",
+   "params": [
+    "gateModePolicyId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "access"
+  },
+  {
+   "op": "setGuestCompanionEligibility",
+   "from": "/guest-companion-eligibility",
+   "to": "/guest-companion-eligibility/{ruleId}",
+   "params": [
+    "ruleId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setHardwareModel",
+   "from": "/hardware-models",
+   "to": "/hardware-models/{modelId}",
+   "params": [
+    "modelId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "access"
+  },
+  {
+   "op": "setHotelWalletExternal",
+   "from": "/hotel-wallet-external",
+   "to": "/hotel-wallet-external/{integrationId}",
+   "params": [
+    "integrationId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setJourneyProfile",
+   "from": "/journey-profiles",
+   "to": "/journey-profiles/{journeyProfileId}",
+   "params": [
+    "journeyProfileId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "access"
+  },
+  {
+   "op": "setJourneySequenceRule",
+   "from": "/journey-sequence-rules",
+   "to": "/journey-sequence-rules/{ruleId}",
+   "params": [
+    "ruleId"
+   ],
+   "into_existing": true,
+   "source_item_removed": true,
+   "contract": "access"
+  },
+  {
+   "op": "setMediaBindingRule",
+   "from": "/media-binding-rules",
+   "to": "/media-binding-rules/{ruleId}",
+   "params": [
+    "ruleId"
+   ],
+   "into_existing": true,
+   "source_item_removed": true,
+   "contract": "access"
+  },
+  {
+   "op": "setMediaIssuanceEncoding",
+   "from": "/media-issuance-encoding",
+   "to": "/media-issuance-encoding/{encodingProfileId}",
+   "params": [
+    "encodingProfileId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setMediaReplacementRevocation",
+   "from": "/media-replacement-revocation",
+   "to": "/media-replacement-revocation/{replacementReason}",
+   "params": [
+    "replacementReason"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setMediaTypeTechnology",
+   "from": "/media-type-technology",
+   "to": "/media-type-technology/{mediaTypeId}",
+   "params": [
+    "mediaTypeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setOperatingCalendarEntry",
+   "from": "/operating-calendar-entries",
+   "to": "/operating-calendar-entries/{entryId}",
+   "params": [
+    "entryId"
+   ],
+   "into_existing": true,
+   "source_item_removed": true,
+   "contract": "access"
+  },
+  {
+   "op": "setParkingFacility",
+   "from": "/parking-facilities",
+   "to": "/parking-facilities/{parkingFacilityId}",
+   "params": [
+    "parkingFacilityId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setPodium",
+   "from": "/podiums",
+   "to": "/podiums/{podiumId}",
+   "params": [
+    "podiumId"
+   ],
+   "into_existing": true,
+   "source_item_removed": true,
+   "contract": "access"
+  },
+  {
+   "op": "setPolicyScopeHierarchy",
+   "from": "/policy-scope-hierarchy",
+   "to": "/policy-scope-hierarchy/{policyId}",
+   "params": [
+    "policyId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "access"
+  },
+  {
+   "op": "setReasonCode",
+   "from": "/reason-codes",
+   "to": "/reason-codes/{reasonCodeId}",
+   "params": [
+    "reasonCodeId"
+   ],
+   "into_existing": true,
+   "source_item_removed": true,
+   "contract": "access"
+  },
+  {
+   "op": "setApprovalControlPolicy",
+   "from": "/approval-control-policies",
+   "to": "/approval-control-policies/{controlPolicyId}",
+   "params": [
+    "controlPolicyId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "approvals"
+  },
+  {
+   "op": "setApprovalExternalProvider",
+   "from": "/approval-external-providers",
+   "to": "/approval-external-providers/{externalProviderId}",
+   "params": [
+    "externalProviderId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "approvals"
+  },
+  {
+   "op": "setApprovalMatrix",
+   "from": "/approval-matrices",
+   "to": "/approval-matrices/{matrixId}",
+   "params": [
+    "matrixId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "approvals"
+  },
+  {
+   "op": "setApprovalRetentionPolicy",
+   "from": "/approval-retention",
+   "to": "/approval-retention/{retentionPolicyId}",
+   "params": [
+    "retentionPolicyId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "approvals"
+  },
+  {
+   "op": "setApprovalSlaPolicy",
+   "from": "/approval-sla-policies",
+   "to": "/approval-sla-policies/{slaPolicyId}",
+   "params": [
+    "slaPolicyId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "approvals"
+  },
+  {
+   "op": "setApproverAvailability",
+   "from": "/approval-delegations/availability",
+   "to": "/approval-delegations/availability/{availabilityId}",
+   "params": [
+    "availabilityId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "approvals"
+  },
+  {
+   "op": "publishActivationScheduler",
+   "from": "/activation-scheduler",
+   "to": "/activation-scheduler/{lifecycleActionId}",
+   "params": [
+    "lifecycleActionId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setChannelConnectionConfiguration",
+   "from": "/channel-connections",
+   "to": "/channel-connections/{connectionId}",
+   "params": [
+    "connectionId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setConfigurationTemplate",
+   "from": "/configuration-templates",
+   "to": "/configuration-templates/{configurationTemplateId}",
+   "params": [
+    "configurationTemplateId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setCurrencyRoundingRule",
+   "from": "/rounding-profiles",
+   "to": "/rounding-profiles/{roundingProfileId}",
+   "params": [
+    "roundingProfileId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setEventType",
+   "from": "/event-types",
+   "to": "/event-types/{eventTypeId}",
+   "params": [
+    "eventTypeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setFeeDefinition",
+   "from": "/fees",
+   "to": "/fees/{feeId}",
+   "params": [
+    "feeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setMarketPricingConfiguration",
+   "from": "/pricing-markets",
+   "to": "/pricing-markets/{marketId}",
+   "params": [
+    "marketId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setMembershipBenefit",
+   "from": "/membership-benefits",
+   "to": "/membership-benefits/{benefitId}",
+   "params": [
+    "benefitId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setMembershipProgramme",
+   "from": "/membership-programmes",
+   "to": "/membership-programmes/{programId}",
+   "params": [
+    "programId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setPerformanceTemplate",
+   "from": "/performance-templates",
+   "to": "/performance-templates/{performanceTemplateId}",
+   "params": [
+    "performanceTemplateId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setPrepaidMinutePackage",
+   "from": "/prepaid-minute-packages",
+   "to": "/prepaid-minute-packages/{prepaidMinutesId}",
+   "params": [
+    "prepaidMinutesId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setPriceCalculationPolicy",
+   "from": "/calculation-profiles",
+   "to": "/calculation-profiles/{calculationProfileId}",
+   "params": [
+    "calculationProfileId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setPriceCategoryRateType",
+   "from": "/price-categories",
+   "to": "/price-categories/{priceCategoryId}",
+   "params": [
+    "priceCategoryId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setPricingChangeRequest",
+   "from": "/pricing-change-request",
+   "to": "/pricing-change-request/{changeId}",
+   "params": [
+    "changeId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setSignalRegistryPolicy",
+   "from": "/signal-registry",
+   "to": "/signal-registry/{signalId}",
+   "params": [
+    "signalId"
+   ],
+   "into_existing": false,
+   "source_item_removed": true,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setSpace",
+   "from": "/spaces",
+   "to": "/spaces/{spaceId}",
+   "params": [
+    "spaceId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "catalogue"
+  },
+  {
+   "op": "setEInvoicingProvider",
+   "from": "/e-invoicing/providers",
+   "to": "/e-invoicing/providers/{providerId}",
+   "params": [
+    "providerId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "finance"
+  },
+  {
+   "op": "setFxRate",
+   "from": "/fx-rates",
+   "to": "/fx-rates/{rateId}",
+   "params": [
+    "rateId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "finance"
+  },
+  {
+   "op": "setTaxInvoiceTemplate",
+   "from": "/tax-invoice-templates",
+   "to": "/tax-invoice-templates/{invoiceTemplateId}",
+   "params": [
+    "invoiceTemplateId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "finance"
+  },
+  {
+   "op": "setCapabilityTemplate",
+   "from": "/capability-templates",
+   "to": "/capability-templates/{capabilityTemplateId}",
+   "params": [
+    "capabilityTemplateId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "identity"
+  },
+  {
+   "op": "setGroupCustomerOrganization",
+   "from": "/group-customer-organization",
+   "to": "/group-customer-organization/{organisationId}",
+   "params": [
+    "organisationId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "orders"
+  },
+  {
+   "op": "setPaymentProvider",
+   "from": "/payment-providers",
+   "to": "/payment-providers/{providerId}",
+   "params": [
+    "providerId"
+   ],
+   "into_existing": false,
+   "source_item_removed": false,
+   "contract": "orders"
+  },
+  {
+   "op": "setConfigurationProfile",
+   "from": "/configuration-profiles",
+   "to": "/configuration-profiles/{profileId}",
+   "params": [
+    "profileId"
+   ],
+   "into_existing": true,
+   "source_item_removed": false,
+   "contract": "tenancy"
+  }
+ ],
+ "skipped": [],
+ "kept": [
+  "approveDecision",
+  "approveExceptionServiceRecovery",
+  "approveGroupDiscountException"
+ ]
+}

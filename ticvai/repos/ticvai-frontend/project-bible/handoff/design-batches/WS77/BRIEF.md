@@ -1,6 +1,6 @@
 # WS77 — Digital Asset Management DAM board 4
 
-**10 screens · 5 operations · 6 schemas · 2 permissions**
+**10 screens · 4 operations · 4 schemas · 2 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -99,12 +99,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-091` | Asset Distribution & Delivery Command Center | B | 0 | 48 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-092` | Asset Usage & Distribution Map | B | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-093` | Channel & Distribution Configuration | B | 13 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | B | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `CMS-095` | Asset Replacement & Propagation Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `CMS-095` | Asset Replacement & Propagation Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-096` | Fallback, Expiry & Distribution Continuity | B | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `CMS-097` | DAM API & Integration Hub | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `CMS-098` | Delivery Monitoring & Integration Health | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-099` | Asset Usage & Performance Analytics | B | 0 | 6 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `CMS-098` | Delivery Monitoring & Integration Health | B | 0 | 45 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-099` | Asset Usage & Performance Analytics | B | 0 | 51 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `CMS-100` | Distribution Intelligence, AI Insights & Optimization | B | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

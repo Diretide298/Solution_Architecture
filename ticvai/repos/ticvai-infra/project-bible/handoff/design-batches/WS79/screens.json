@@ -5,6 +5,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-management-dashboard-bo-404",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderManagementDashboard.tsx",
+   "component": "src/routes/games-rides/ReaderManagementDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -99,7 +100,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -222,6 +223,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "2",
@@ -231,7 +233,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-directory-bo-405",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderDirectory.tsx",
+   "component": "src/routes/games-rides/ReaderDirectory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -286,7 +288,7 @@
         "Last Communication"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listReaders",
        "provenance": "pack Game_and_Ride_Module.pdf, page 14 §Directory Columns"
       },
       {
@@ -480,6 +482,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "2",
@@ -489,7 +492,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-profile-device-setup-bo-406",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderProfileDeviceSetup.tsx",
+   "component": "src/routes/games-rides/ReaderProfileDeviceSetup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -677,6 +680,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "2",
@@ -686,7 +690,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-credit-payment-configuration-bo-407",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderCreditPaymentConfiguration.tsx",
+   "component": "src/routes/games-rides/ReaderCreditPaymentConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -855,6 +859,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "2",
@@ -864,7 +869,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-attraction-assignment-bo-408",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderAttractionAssignment.tsx",
+   "component": "src/routes/games-rides/ReaderAttractionAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -988,6 +993,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "2",
@@ -997,7 +1003,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/retap-delay-transaction-protection-bo-409",
-   "component": "apps/venue-management-web/src/routes/games-rides/RetapDelayTransactionProtection.tsx",
+   "component": "src/routes/games-rides/RetapDelayTransactionProtection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1038,7 +1044,8 @@
        "derived": true,
        "impliedBy": "setReaderConfiguration",
        "label": "Save reader configuration",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setReaderConfiguration"
       },
       {
        "kind": "secondaryButton",
@@ -1115,6 +1122,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "2",
@@ -1124,7 +1132,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/free-game-glow-reader-display-rules-bo-410",
-   "component": "apps/venue-management-web/src/routes/games-rides/FreeGameGlowReaderDisplayRules.tsx",
+   "component": "src/routes/games-rides/FreeGameGlowReaderDisplayRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1253,6 +1261,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "2",
@@ -1262,7 +1271,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-theme-experience-configuration-bo-411",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderThemeExperienceConfiguration.tsx",
+   "component": "src/routes/games-rides/ReaderThemeExperienceConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1416,6 +1425,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "2",
@@ -1425,7 +1435,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/real-time-tap-validation-reader-response-bo-412",
-   "component": "apps/venue-management-web/src/routes/games-rides/RealTimeTapValidationReaderResponse.tsx",
+   "component": "src/routes/games-rides/RealTimeTapValidationReaderResponse.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1529,6 +1539,14 @@
   "entryState": {
    "preloaded": [
     "↓"
+   ],
+   "params": [
+    {
+     "name": "readerProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setReaderProfile` takes it, from the record the user acts on."
+    }
    ]
   },
   "wireframe": {
@@ -1582,6 +1600,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "2",
@@ -1591,7 +1610,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/balance-check-reader-device-test-console-bo-413",
-   "component": "apps/venue-management-web/src/routes/games-rides/BalanceCheckReaderDeviceTestConsole.tsx",
+   "component": "src/routes/games-rides/BalanceCheckReaderDeviceTestConsole.tsx",
    "status": "notStarted"
   },
   "navigation": {

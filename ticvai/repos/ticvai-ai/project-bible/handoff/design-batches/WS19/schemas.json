@@ -90,7 +90,8 @@
    },
    "developerId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.developer_account"
    },
    "name": {
     "type": "string"
@@ -175,6 +176,13 @@
     "nullable": true,
     "readOnly": true,
     "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   },
+   "statusReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the client was suspended (`setApiClientStatus`)."
    }
   }
  },
@@ -291,10 +299,12 @@
     "format": "uuid"
    },
    "requestId": {
+    "x-ticvai-references": "approvals.request",
     "type": "string",
     "format": "uuid"
    },
    "providerId": {
+    "x-ticvai-references": "approvals.external_provider",
     "type": "string",
     "format": "uuid"
    },
@@ -355,6 +365,7 @@
   }
  },
  "ApprovalExternalProvider": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "approvals.external_provider",
   "description": "11.1.65 (29 September, build pass). **A third-party workflow system registered to decide approval levels**: where TICVAI sends a request, how its fields are mapped, how the answer comes back and what happens when it does not.\n",
@@ -394,6 +405,7 @@
     "default": "oauthClientCredentials"
    },
    "outboundCredential": {
+    "x-ticvai-secret": "vault-reference",
     "type": "string",
     "format": "password",
     "writeOnly": true,
@@ -401,6 +413,7 @@
     "description": "The credential TICVAI presents to the provider. Write-only, never returned, kept on a replace that omits it. **Held in Key Vault**; the row's `outbound_credential` column keeps the secret's reference, never the value (CHG-R1S-020)."
    },
    "signingSecret": {
+    "x-ticvai-secret": "vault-reference",
     "type": "string",
     "format": "password",
     "writeOnly": true,
@@ -521,6 +534,7 @@
     "description": "Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -614,6 +628,12 @@
      "format": "uuid"
     },
     "description": "3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"
+   },
+   "statusReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the policy's state last changed (`setAuthorisationPolicyState`)."
    }
   }
  },

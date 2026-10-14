@@ -547,12 +547,14 @@
     }
    },
    "conflicts": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "$ref": "#/components/schemas/CartConflict"
     }
    },
    "consentQuestions": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
@@ -980,6 +982,7 @@
   ]
  },
  "CaseMessage": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.case_message",
   "type": "object",
   "required": [
@@ -987,9 +990,16 @@
    "body",
    "isInternal",
    "authorKind",
-   "recordedAt"
+   "recordedAt",
+   "scopePath",
+   "caseId"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "resolution": {
     "type": "string",
     "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
@@ -1036,6 +1046,13 @@
     "format": "date-time",
     "readOnly": true,
     "description": "Server time the message arrived."
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "marketing.case",
+    "description": "The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`)."
    }
   }
  },
@@ -1260,6 +1277,9 @@
   ]
  },
  "ConversationMessage": {
+  "x-ticvai-retired-columns": [
+   "ai_interaction_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "marketing.conversation_message + marketing.conversation_message_attachment",
   "required": [
@@ -1315,6 +1335,8 @@
     }
    },
    "aiInteractionId": {
+    "x-ticvai-references": "ai.activity",
+    "x-ticvai-column": "ai_activity_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1670,6 +1692,7 @@
   }
  },
  "FormSubmission": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.form_submission",
   "description": "**The acceptance record, and it is evidence.** Bound to the exact version accepted, with who accepted it and when.\n",
@@ -2238,6 +2261,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -2280,10 +2304,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -2510,7 +2536,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -2921,13 +2948,15 @@
     "type": "string",
     "format": "uuid",
     "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164).",
     "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
    },
    "approvedByPrincipalId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164)."
    },
    "responsibleDepartmentId": {
     "type": "string",
@@ -3033,6 +3062,8 @@
     "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 6,
     "items": {
@@ -3261,6 +3292,9 @@
   }
  },
  "ProposedAction": {
+  "x-ticvai-retired-columns": [
+   "interaction_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "ai.proposed_action",
   "required": [
@@ -3277,6 +3311,8 @@
     "format": "uuid"
    },
    "interactionId": {
+    "x-ticvai-references": "ai.activity",
+    "x-ticvai-column": "activity_id",
     "type": "string",
     "format": "uuid"
    },
@@ -3957,7 +3993,8 @@
    },
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "platform.scope"
    },
    "scopePath": {
     "type": "string",
@@ -3969,7 +4006,7 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
-    "x-ticvai-references": "marketing.guest_profile",
+    "x-ticvai-references": "pii.subject",
     "description": "The signed-in guest. From the session, never from the body."
    },
    "sessionRef": {
@@ -4030,6 +4067,8 @@
     "description": "The cart `bookVisitPlan` filled."
    },
    "excluded": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "readOnly": true,
     "description": "**What was left out and why**, e.g. a coaster excluded because one of the party is under its 120 cm minimum. Shown on GST-053, so the planner never looks as if it forgot.\n",
@@ -4108,6 +4147,7 @@
     }
    },
    "days": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "One per date, in order. The items of the version read.",

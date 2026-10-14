@@ -218,7 +218,7 @@
  },
  "setGiftCardProduct": {
   "method": "PUT",
-  "path": "/gift-card-products",
+  "path": "/gift-card-products/{giftCardProductId}",
   "contract": "wallet",
   "summary": "Denominations, validity, activation and distribution",
   "permission": "WALLET_CONFIGURE",
@@ -226,6 +226,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "giftCardProductId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

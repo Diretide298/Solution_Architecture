@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/ticket-transfer",
-   "component": "apps/guest-app/src/routes/general/TicketTransferDetail.tsx",
+   "component": "src/screens/general/TicketTransferDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -33,7 +33,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Work with ticket transfer for this venue.",
+  "purpose": "Send tickets from one of the guest's orders to another guest, and claim tickets someone sent.",
   "layout": {
    "template": "split",
    "regions": [
@@ -220,7 +220,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/my-reservations",
-   "component": "apps/guest-app/src/routes/general/MyReservationsDetail.tsx",
+   "component": "src/screens/general/MyReservationsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -255,7 +255,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listReservations` reads the population and `getReservation` reads one of them — list, select, act",
-  "purpose": "Find my reservations for this venue.",
+  "purpose": "The guest's reservations, each opened to see it or cancel it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -429,7 +429,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/reservation-details",
-   "component": "apps/guest-app/src/routes/general/ReservationDetailsDetail.tsx",
+   "component": "src/screens/general/ReservationDetailsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -454,7 +454,7 @@
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getReservation` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "See reservation details for this venue.",
+  "purpose": "One reservation, read and cancellable.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -588,7 +588,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/multi-currency-and-pricing",
-   "component": "apps/guest-app/src/routes/general/MultiCurrencyAndPricingDetail.tsx",
+   "component": "src/screens/general/MultiCurrencyAndPricingDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

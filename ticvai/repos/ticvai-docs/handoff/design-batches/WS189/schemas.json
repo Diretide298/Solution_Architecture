@@ -368,6 +368,7 @@
     "format": "uuid"
    },
    "walletId": {
+    "x-ticvai-references": "wallet.wallet",
     "type": "string",
     "format": "uuid"
    },
@@ -418,6 +419,7 @@
   ],
   "properties": {
    "subjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -495,10 +497,12 @@
   ],
   "properties": {
    "walletBalanceId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid"
    },
    "walletId": {
+    "x-ticvai-references": "wallet.wallet",
     "type": "string",
     "format": "uuid"
    },

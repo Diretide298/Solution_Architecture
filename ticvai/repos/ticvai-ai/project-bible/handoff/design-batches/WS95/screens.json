@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-return-command-center-bo-564",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalReturnCommandCenter.tsx",
+   "component": "src/routes/rentals/RentalReturnCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -122,7 +123,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -143,8 +144,9 @@
         "Deposit Status",
         "Group/Individual"
        ],
-       "notes": "The pack filters this screen by venue, return location, product, expected return, rental status, damage status and 2 more — which are present is a decision the pack already made.",
-       "provenance": "pack Rental_Management.pdf, page 92 §Filters"
+       "notes": "The pack filters this screen by venue, return location, product, expected return, rental status, damage status and 2 more — which are present is a decision the pack already made. Sends `?status=` to `listRentalBookings` for Rental Status; Return Location sends `?locationId=` and Expected Return `?from=` and `?to=`; Venue, Product, Damage Status, Deposit Status and Group/Individual have no parameter on it yet (Block A audit, 14 October 2026, CHG-SCR-020).",
+       "provenance": "pack Rental_Management.pdf, page 92 §Filters",
+       "operation": "listRentalBookings"
       }
      ]
     },
@@ -267,6 +269,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "8",
@@ -276,7 +279,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/return-scan-rental-retrieval-bo-565",
-   "component": "apps/venue-management-web/src/routes/rentals/ReturnScanRentalRetrieval.tsx",
+   "component": "src/routes/rentals/ReturnScanRentalRetrieval.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -321,7 +324,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getRentalBooking",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getRentalBooking"
       }
      ]
     }
@@ -388,6 +392,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "8",
@@ -397,7 +402,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/return-summary-actual-return-time-bo-566",
-   "component": "apps/venue-management-web/src/routes/rentals/ReturnSummaryActualReturnTime.tsx",
+   "component": "src/routes/rentals/ReturnSummaryActualReturnTime.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -522,6 +527,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "8",
@@ -531,7 +537,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/post-rental-condition-inspection-bo-567",
-   "component": "apps/venue-management-web/src/routes/rentals/PostRentalConditionInspection.tsx",
+   "component": "src/routes/rentals/PostRentalConditionInspection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -653,6 +659,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "8",
@@ -662,7 +669,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/before-vs-after-condition-comparison-bo-568",
-   "component": "apps/venue-management-web/src/routes/rentals/BeforeVsAfterConditionComparison.tsx",
+   "component": "src/routes/rentals/BeforeVsAfterConditionComparison.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -789,6 +796,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "8",
@@ -798,7 +806,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/damage-assessment-charge-workflow-bo-569",
-   "component": "apps/venue-management-web/src/routes/rentals/DamageAssessmentChargeWorkflow.tsx",
+   "component": "src/routes/rentals/DamageAssessmentChargeWorkflow.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -920,6 +928,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "8",
@@ -929,7 +938,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/partial-return-missing-equipment-bo-570",
-   "component": "apps/venue-management-web/src/routes/rentals/PartialReturnMissingEquipment.tsx",
+   "component": "src/routes/rentals/PartialReturnMissingEquipment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1054,6 +1063,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "8",
@@ -1063,7 +1073,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/late-fees-damage-fees-final-settlement-bo-571",
-   "component": "apps/venue-management-web/src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx",
+   "component": "src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1188,6 +1198,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "8",
@@ -1197,7 +1208,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/deposit-release-capture-customer-confirmation-bo-572",
-   "component": "apps/venue-management-web/src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx",
+   "component": "src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1340,6 +1351,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "8",
@@ -1349,7 +1361,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/return-completion-equipment-disposition-bo-573",
-   "component": "apps/venue-management-web/src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx",
+   "component": "src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -2,7 +2,7 @@
  "BookingVelocityTimeToEventRuleBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `pricing.dynamic_price_action` (with `catalogue.audit_entry`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Booking Velocity & Time-to-Event Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "ruleId": {
@@ -476,7 +476,7 @@
  "DemandOccupancyAvailabilityRuleBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `pricing.dynamic_price_action` (with `catalogue.audit_entry`, `pricing.dynamic_price_condition`, `pricing.dynamic_price_rule`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Demand, Occupancy & Availability Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "ruleId": {
@@ -1743,7 +1743,7 @@
  "DynamicPricingStrategyBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.dynamic_pricing_strategy` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Dynamic Pricing Strategy Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "strategyName": {
@@ -2253,6 +2253,7 @@
     "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
    },
    "dynamicPricingStrategyId": {
+    "x-ticvai-references": "catalogue.dynamic_pricing_strategy",
     "type": "string",
     "format": "uuid"
    },

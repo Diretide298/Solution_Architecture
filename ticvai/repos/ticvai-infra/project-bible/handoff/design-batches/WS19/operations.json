@@ -354,7 +354,7 @@
  },
  "setApprovalExternalProvider": {
   "method": "PUT",
-  "path": "/approval-external-providers",
+  "path": "/approval-external-providers/{externalProviderId}",
   "contract": "approvals",
   "summary": "Register a third-party workflow system as an approver",
   "permission": "APPROVAL_CONFIGURE",
@@ -362,6 +362,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "externalProviderId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

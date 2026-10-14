@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-booking-command-center-bo-534",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalBookingCommandCenter.tsx",
+   "component": "src/routes/rentals/RentalBookingCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -113,7 +114,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -260,6 +261,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_BOOK",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "5",
@@ -269,7 +271,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/new-rental-booking-wizard-bo-535",
-   "component": "apps/venue-management-web/src/routes/rentals/NewRentalBookingWizard.tsx",
+   "component": "src/routes/rentals/NewRentalBookingWizard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -407,6 +409,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "5",
@@ -416,7 +419,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/availability-selection-alternative-options-bo-536",
-   "component": "apps/venue-management-web/src/routes/rentals/AvailabilitySelectionAlternativeOptions.tsx",
+   "component": "src/routes/rentals/AvailabilitySelectionAlternativeOptions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -588,6 +591,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_BOOK",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "5",
@@ -597,7 +601,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/customer-participant-information-bo-537",
-   "component": "apps/venue-management-web/src/routes/rentals/CustomerParticipantInformation.tsx",
+   "component": "src/routes/rentals/CustomerParticipantInformation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -721,6 +725,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_BOOK",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "5",
@@ -730,7 +735,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/group-rental-participant-management-bo-538",
-   "component": "apps/venue-management-web/src/routes/rentals/GroupRentalParticipantManagement.tsx",
+   "component": "src/routes/rentals/GroupRentalParticipantManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -877,6 +882,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_BOOK",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "5",
@@ -886,7 +892,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-agreement-waiver-completion-bo-539",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalAgreementWaiverCompletion.tsx",
+   "component": "src/routes/rentals/RentalAgreementWaiverCompletion.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1037,6 +1043,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "5",
@@ -1046,7 +1053,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/booking-commercial-summary-payment-bo-540",
-   "component": "apps/venue-management-web/src/routes/rentals/BookingCommercialSummaryPayment.tsx",
+   "component": "src/routes/rentals/BookingCommercialSummaryPayment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1155,6 +1162,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "5",
@@ -1164,7 +1172,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/reservation-confirmation-qr-voucher-bo-541",
-   "component": "apps/venue-management-web/src/routes/rentals/ReservationConfirmationQrVoucher.tsx",
+   "component": "src/routes/rentals/ReservationConfirmationQrVoucher.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1209,7 +1217,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getRentalBooking",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getRentalBooking"
       }
      ]
     }
@@ -1276,6 +1285,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_BOOK",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "5",
@@ -1285,7 +1295,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/reservation-modification-cancellation-no-show-bo-542",
-   "component": "apps/venue-management-web/src/routes/rentals/ReservationModificationCancellationNoShow.tsx",
+   "component": "src/routes/rentals/ReservationModificationCancellationNoShow.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1454,6 +1464,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "5",
@@ -1463,7 +1474,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/reservation-detail-timeline-readiness-bo-543",
-   "component": "apps/venue-management-web/src/routes/rentals/ReservationDetailTimelineReadiness.tsx",
+   "component": "src/routes/rentals/ReservationDetailTimelineReadiness.tsx",
    "status": "notStarted"
   },
   "navigation": {

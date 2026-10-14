@@ -1,6 +1,6 @@
 # P06-stock-on-the-floor-01 — P06 · Stock on the Floor
 
-**10 screens · 36 operations · 40 schemas · 11 permissions**
+**10 screens · 34 operations · 36 schemas · 11 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 11 permissions apply here:
   `INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_CREATE, ORDER_MODIFY, PROCUREMENT_RECEIVE, PROCUREMENT_REQUEST, PROCUREMENT_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **14 of these operations work offline**: createGoodsReceipt, createRequisition, enterCountLine, getHaccpStatus, getStockPositions, getStockTransfer, listRequisitions, listSerialisedItems
+- **17 of these operations work offline**: acknowledgeAlert, createGoodsReceipt, createRequisition, createStockTransfer, enterCountLine, getHaccpStatus, getStockPositions, getStockTransfer
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.

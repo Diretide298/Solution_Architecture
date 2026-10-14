@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 28 |
-| Operations | 67 |
+| Operations | 66 |
 | Contracts | 8 |
 | Modules | 5 |
 | Undrawn | 0 |
@@ -100,7 +100,7 @@
 | `SUP-015` | Refund, Compensation & Service Exception Workspace | Support | 3 | 1 | yes |
 | `SUP-016` | Escalation, Collaboration & Internal Resolution | Support | 3 | 1 | yes |
 | `SUP-017` | Case Resolution, Closure & Customer Feedback | Support | 3 | 2 | yes |
-| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | Support | 3 | 3 | yes |
+| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | Support | 3 | 2 | yes |
 | `SUP-019` | Contact Center Operations Command Center | Support | 3 | 1 | yes |
 | `SUP-020` | Queue Configuration & Management | Support | 3 | 2 | yes |
 | `SUP-021` | Intelligent Routing, Skills & Assignment Engine | Support | 3 | 3 | yes |

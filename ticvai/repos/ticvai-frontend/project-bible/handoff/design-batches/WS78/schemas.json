@@ -1,5 +1,6 @@
 {
  "AttractionType": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "games.attraction_type",
   "description": "Board 1.4. **The type decides which settings apply.**",
@@ -130,10 +131,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "maxLength": 64
    },
@@ -175,6 +178,7 @@
     "nullable": true
    },
    "status": {
+    "readOnly": true,
     "$ref": "#/components/schemas/GameStatus"
    },
    "playsToday": {
@@ -290,6 +294,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -423,6 +428,8 @@
     "nullable": true
    },
    "operatingHours": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "nullable": true,
     "description": "Weekly opening windows, in venue local time, in the same window shape as `GamePricing.peakPricing`. Null means the game follows the venue's hours.\n",
@@ -526,6 +533,8 @@
     "nullable": true
    },
    "trace": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -669,6 +678,7 @@
   ],
   "properties": {
    "deviceId": {
+    "x-ticvai-references": "platform.device",
     "type": "string",
     "format": "uuid",
     "description": "`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"

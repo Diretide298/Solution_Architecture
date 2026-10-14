@@ -15,6 +15,7 @@
     "type": "string"
    },
    "programmeId": {
+    "x-ticvai-references": "accreditation.programme",
     "type": "string",
     "format": "uuid"
    },
@@ -41,6 +42,7 @@
     "description": "Name, date of birth, nationality, contact — shaped by the requirements matrix."
    },
    "requirementStatus": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "items": {
@@ -227,6 +229,7 @@
     "type": "string"
    },
    "assetId": {
+    "x-ticvai-references": "assets.media_asset",
     "type": "string",
     "format": "uuid"
    },
@@ -490,6 +493,7 @@
     "type": "integer"
    },
    "pendingApprovers": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -896,7 +900,7 @@
  "ApprovalWorkflowDesignerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.approval_policy` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Approval Workflow Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "workflowName": {
@@ -1383,10 +1387,12 @@
     "readOnly": true
    },
    "workflowDefinitionId": {
+    "x-ticvai-references": "approvals.workflow_definition",
     "type": "string",
     "format": "uuid"
    },
    "workflowVersionId": {
+    "x-ticvai-references": "approvals.workflow_version",
     "type": "string",
     "format": "uuid",
     "description": "The version the instance started on; never changes"
@@ -1426,6 +1432,7 @@
     "nullable": true
    },
    "currentNodeId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "nullable": true,
     "description": "The node of the version's graph the instance is at"

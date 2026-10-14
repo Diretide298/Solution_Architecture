@@ -4,6 +4,7 @@
   "name": "Reviewer Queue",
   "module": "Reviewer (Internal)",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "requiresModule": "accreditation",
   "pattern": "approvalInbox",
   "density": "compact",
@@ -36,7 +37,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -60,6 +61,7 @@
        "kind": "dataTable",
        "label": "Queue",
        "bindsTo": "ApprovalRequest[]",
+       "operation": "listAccreditationApplications",
        "columns": [
         "ApprovalRequest.summary",
         "ApprovalRequest.requestedAt",
@@ -79,6 +81,7 @@
        "kind": "detailPanel",
        "label": "Selected application",
        "bindsTo": "ApprovalRequest",
+       "operation": "listAccreditationApplications",
        "notes": "Enough to approve without opening `ACC-007`.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-006"
       }
@@ -147,7 +150,7 @@
     {
      "to": "ACC-008",
      "trigger": "Credential Register",
-     "provenance": "derived — ACC-008 declares entryState.params  and ACC-006 holds none of them. The edge carries nothing: ACC-008 needs nothing to open"
+     "provenance": "derived — ACC-008 declares entryState.params exportId and ACC-006 holds none of them. The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens on its own"
     }
    ]
   },
@@ -211,6 +214,7 @@
   "name": "Reviewer Application Detail",
   "module": "Reviewer (Internal)",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "requiresModule": "accreditation",
   "pattern": "approvalInbox",
   "density": "compact",
@@ -228,20 +232,6 @@
     "contract": "accreditation",
     "purpose": "The application under review",
     "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAccreditationDocuments",
-    "contract": "accreditation",
-    "purpose": "The application's documents (applicationId), each with its state",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "verifyAccreditationDocument",
-    "contract": "accreditation",
-    "purpose": "Verify or refuse each document",
-    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    }
   ],
@@ -263,6 +253,7 @@
        "kind": "detailPanel",
        "label": "The application",
        "bindsTo": "ApprovalRequest",
+       "operation": "getAccreditationApplication",
        "notes": "Role, outlet, press card, commission — **including the ones that are absent**, stated as *Not stated* and *None attached* rather than left blank. A blank field and a declared absence look identical and only one is information.\n",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-007"
       },
@@ -276,6 +267,7 @@
        "kind": "banner",
        "label": "Decision due",
        "bindsTo": "ApprovalRequest.slaDueAt",
+       "operation": "getAccreditationApplication",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-007"
       }
      ]
@@ -287,6 +279,7 @@
       {
        "kind": "primaryButton",
        "label": "Approve",
+       "operation": "decideAccreditationApplication",
        "permission": "APPROVAL_DECIDE"
       },
       {
@@ -312,6 +305,9 @@
     "component": "drawer",
     "trigger": "Approve",
     "body": "Coverage granted may be narrower than coverage requested — *stalls, not pit*. **The badge renders what is granted**, so the two screens must agree.\n",
+    "confirm": {
+     "operation": "decideAccreditationApplication"
+    },
     "provenance": "frame claude-design/Accreditation Board.dc.html#acc-005"
    }
   ],
@@ -362,7 +358,7 @@
     {
      "to": "ACC-008",
      "trigger": "Credential Register",
-     "provenance": "derived — ACC-008 declares entryState.params  and ACC-007 holds none of them. The edge carries nothing: ACC-008 needs nothing to open"
+     "provenance": "derived — ACC-008 declares entryState.params exportId and ACC-007 holds none of them. The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens on its own"
     },
     {
      "to": "ACC-005",
@@ -418,6 +414,7 @@
   "name": "Credential Register",
   "module": "Reviewer (Internal)",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "requiresModule": "accreditation",
   "pattern": "listDetail",
   "density": "compact",
@@ -437,6 +434,20 @@
     "purpose": "Where and when a credential was last used",
     "trigger": "onAction",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "exportAccreditationData",
+    "contract": "accreditation",
+    "purpose": "Hand the register to a security team before a performance; queues the export of the season's credentials",
+    "trigger": "onAction",
+    "provenance": "audit fix S-EXPORT, 14 October 2026 (CHG-SCO-005)"
+   },
+   {
+    "operationId": "getAccreditationExport",
+    "contract": "accreditation",
+    "purpose": "Follows the queued export until it is ready, then gives its signed, expiring download link",
+    "trigger": "onInterval",
+    "provenance": "audit fix S-EXPORT, 14 October 2026 (CHG-SCO-005); the 202's pollExport link"
    }
   ],
   "gaps": [
@@ -455,7 +466,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -485,6 +496,7 @@
        "kind": "dataTable",
        "label": "Credential register",
        "bindsTo": "AccreditationBadge[]",
+       "operation": "listAccreditationCredentials",
        "columns": [
         "AccreditationBadge.holderName",
         "AccreditationBadge.zones",
@@ -504,6 +516,7 @@
        "kind": "detailPanel",
        "label": "Credential",
        "bindsTo": "AccreditationBadge",
+       "operation": "listAccreditationCredentials",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-008"
       }
      ]
@@ -520,6 +533,7 @@
       {
        "kind": "secondaryButton",
        "label": "Export",
+       "operation": "exportAccreditationData",
        "notes": "The register is what a venue hands to a security team before a performance.",
        "provenance": "frame claude-design/Accreditation Board.dc.html#acc-008"
       }
@@ -549,6 +563,12 @@
     {
      "name": "programmeId",
      "from": "session"
+    },
+    {
+     "name": "exportId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (14 October 2026, CHG-SCO-005): the export this screen queues. exportAccreditationData answers 202 with its id and getAccreditationExport follows it to the signed download link; no edge brings one."
     }
    ],
    "preloaded": [],

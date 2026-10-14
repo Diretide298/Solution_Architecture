@@ -48,6 +48,7 @@
   }
  },
  "Wallet": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [
@@ -225,6 +226,7 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "presetAmounts": {
+    "x-ticvai-persistence-column": "numeric(18,4)[]",
     "type": "array",
     "items": {
      "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -251,6 +253,8 @@
     }
    },
    "bonusRules": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Board 2.3. *Top up 200, get 20.* **The bonus is a separate lot of a separate credit type**, which is how it can expire on different terms from the cash.\n",
     "items": {
@@ -506,6 +510,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

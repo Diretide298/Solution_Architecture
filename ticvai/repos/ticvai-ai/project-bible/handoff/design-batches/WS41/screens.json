@@ -5,6 +5,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -119,7 +120,7 @@
    "template": "form",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -302,6 +303,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -405,6 +407,14 @@
     "DataProcessingPurposeLawfulBasisRegistryView.description",
     "DataProcessingPurposeLawfulBasisRegistryView.businessOwner",
     "DataProcessingPurposeLawfulBasisRegistryView.dataControllerApplicableOrganization"
+   ],
+   "params": [
+    {
+     "name": "purposeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listDataProcessingPurpose`."
+    }
    ]
   },
   "wireframe": {
@@ -459,6 +469,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -504,86 +515,103 @@
       {
        "kind": "selectField",
        "label": "Consent ID",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Name",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Processing Purpose",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Description",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Consent Text",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Mandatory / Optional",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "textField",
        "label": "Explicit / Other configured consent method",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Default state",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Withdrawal permitted",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Renewal required",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Expiry",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Reconfirmation interval",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Age restrictions",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Guardian requirement",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Channel applicability",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Country applicability",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Brand applicability",
+       "operation": "listConsentPurposes",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure"
       }
      ]
@@ -613,6 +641,13 @@
     "contract": "marketing-crm",
     "purpose": "Configure consent purposes",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "The consent purposes as configured, which fill the builder before a change is saved",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)"
    }
   ],
   "wireframe": {
@@ -652,6 +687,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_MANAGE",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -851,6 +887,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -1073,6 +1110,18 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCookieScans` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "scanPolicyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listCookieScanPolicies`."
+    },
+    {
+     "name": "technologyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listCookieTrackingDigital`."
     }
    ]
   },
@@ -1157,6 +1206,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -1378,6 +1428,16 @@
    }
   ],
   "notes": "**Channel and brand, the upsert key, are fields on the form and choosing a row of the list loads that design (4 October 2026); the remaining selects are bound to the design's properties** (CHG-FXS-002)",
+  "entryState": {
+   "params": [
+    {
+     "name": "bannerDesignId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listCookieBannerPreference`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1407,6 +1467,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_MANAGE",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -1654,6 +1715,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -1761,6 +1823,14 @@
   "entryState": {
    "preloaded": [
     "PrivacyNoticePolicyTermsVersionManagementView.documentType"
+   ],
+   "params": [
+    {
+     "name": "governanceId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listPrivacyNoticePolicy`."
+    }
    ]
   },
   "wireframe": {
@@ -1827,6 +1897,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_MANAGE",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -1975,6 +2046,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_MANAGE",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -2019,151 +2091,181 @@
       {
        "kind": "selectField",
        "label": "Country",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Brand",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Channel",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Customer age",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Customer status",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Product",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Membership",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Existing consents",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Existing policy acceptance",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Language",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Requested processing",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Missing policy",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Missing consent mapping",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Missing language",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Conflicting consent rules",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Missing processing purpose",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Invalid effective dates",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Unmapped tracking technology",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Missing guardian rule",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Unpublished dependency",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "Circular configuration dependency",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration problems such as"
       },
       {
        "kind": "selectField",
        "label": "1 Center",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
       },
       {
        "kind": "selectField",
        "label": "2 Registry processed",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
       },
       {
        "kind": "textField",
        "label": "# Backend Screen Core Responsibility",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
       },
       {
        "kind": "selectField",
        "label": "3",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
       },
       {
        "kind": "textField",
        "label": "17.1. Communication Preference & Marketing Marketing/channel",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
       },
       {
        "kind": "textField",
        "label": "4 Permission Configuration permissions",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
       },
       {
        "kind": "selectField",
        "label": "17.1. Cookie/SDK/tracker",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
       },
       {
        "kind": "textField",
        "label": "Cookie, Tracking & Digital Technology Registry",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
       },
       {
        "kind": "selectField",
        "label": "5 inventory",
+       "operation": "approvePrivacyTesting",
        "provenance": "pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration"
       }
      ]
@@ -2269,6 +2371,16 @@
     "provenance": "contract marketing-crm.yaml PUT /privacy-notice-policy"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "governanceId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setPrivacyNoticePolicyGovernance` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",

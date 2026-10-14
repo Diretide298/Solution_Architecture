@@ -185,7 +185,7 @@
  },
  "setBadgeTemplate": {
   "method": "PUT",
-  "path": "/badge-templates",
+  "path": "/badge-templates/{badgeTemplateId}",
   "contract": "accreditation",
   "summary": "Design a badge",
   "permission": "ACCREDITATION_CONFIGURE",
@@ -193,6 +193,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "badgeTemplateId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

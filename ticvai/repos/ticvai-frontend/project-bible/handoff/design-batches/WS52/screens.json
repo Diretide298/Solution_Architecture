@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/stacking-conflict-command-center-adm-208",
-   "component": "apps/venue-management-web/src/routes/commercial/StackingConflictCommandCenter.tsx",
+   "component": "src/routes/commercial/StackingConflictCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -247,6 +248,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "8",
@@ -256,7 +258,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/promotion-priority-hierarchy-manager-adm-209",
-   "component": "apps/venue-management-web/src/routes/commercial/PromotionPriorityHierarchyManager.tsx",
+   "component": "src/routes/commercial/PromotionPriorityHierarchyManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -380,6 +382,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_CONFIGURE",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "8",
@@ -389,7 +392,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/promotion-stacking-rule-builder-adm-210",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
+   "component": "src/routes/venue-operations/PromotionsCouponsDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-010"
   },
@@ -518,6 +521,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "8",
@@ -527,7 +531,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/promotion-exclusion-compatibility-matrix-adm-211",
-   "component": "apps/venue-management-web/src/routes/commercial/PromotionExclusionCompatibilityMatrix.tsx",
+   "component": "src/routes/commercial/PromotionExclusionCompatibilityMatrix.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -665,6 +669,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "8",
@@ -674,7 +679,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/discount-calculation-application-sequence-adm-212",
-   "component": "apps/venue-management-web/src/routes/commercial/DiscountCalculationApplicationSequence.tsx",
+   "component": "src/routes/commercial/DiscountCalculationApplicationSequence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -791,6 +796,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "8",
@@ -800,7 +806,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/best-offer-customer-benefit-resolver-adm-213",
-   "component": "apps/venue-management-web/src/routes/commercial/BestOfferCustomerBenefitResolver.tsx",
+   "component": "src/routes/commercial/BestOfferCustomerBenefitResolver.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -908,6 +914,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "8",
@@ -917,7 +924,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/discount-cap-maximum-benefit-controller-adm-214",
-   "component": "apps/venue-management-web/src/routes/commercial/DiscountCapMaximumBenefitController.tsx",
+   "component": "src/routes/commercial/DiscountCapMaximumBenefitController.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1056,6 +1063,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "8",
@@ -1065,7 +1073,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/conflict-detection-resolution-center-adm-215",
-   "component": "apps/venue-management-web/src/routes/commercial/ConflictDetectionResolutionCenter.tsx",
+   "component": "src/routes/commercial/ConflictDetectionResolutionCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1216,6 +1224,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "8",
@@ -1225,7 +1234,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/promotion-decision-trace-transaction-explainer-adm-216",
-   "component": "apps/venue-management-web/src/routes/commercial/PromotionDecisionTraceTransactionExplainer.tsx",
+   "component": "src/routes/commercial/PromotionDecisionTraceTransactionExplainer.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1333,6 +1342,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "8",
@@ -1342,7 +1352,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/conflict-simulation-ai-optimization-adm-217",
-   "component": "apps/venue-management-web/src/routes/commercial/ConflictSimulationAiOptimization.tsx",
+   "component": "src/routes/commercial/ConflictSimulationAiOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1394,7 +1404,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listConflict",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listConflict"
       }
      ]
     }

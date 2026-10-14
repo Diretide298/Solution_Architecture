@@ -99,6 +99,29 @@ tags:
   - name: inspection
   - name: incident
 
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  inspectionTemplateRecords:
+    module: maintenance
+    table: maintenance.inspection_template
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The maintenance.inspection_template rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/InspectionTemplate'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its maintenance.inspection_template rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
 paths:
   # ---------------------------------------------------------------- assets
   /assets:
@@ -110,6 +133,7 @@ paths:
         - "P08 BO-504 Rental Inventory Command Center"
         - "P08 BO-505 Serialized Equipment Registry"
         - "P08 BO-903 Equipment & Asset Command Center"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List assets
@@ -357,6 +381,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AssetStatusResult' }
         '409':
+          x-ticvai-problem-types: [asset-inspection-required]
           description: >
             Return to service attempted without the inspection this asset category requires.
           content:
@@ -384,6 +409,8 @@ paths:
       description: >
         Every work order, inspection, incident and status change, in sequence. What an
         insurer or a regulator asks for after something goes wrong.
+
+        **Order.** Newest first, by `occurredAt` descending, then by `principalId`.
       tags: [asset]
       x-ticvai-permission: ASSET_VIEW
       x-ticvai-scope-level: venue
@@ -429,6 +456,8 @@ paths:
       summary: List work orders
       description: >
         A technician's queue. Defaults to their own assignments; a supervisor sees the venue.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags: [workOrder]
       x-ticvai-permission: WORK_ORDER_VIEW
       x-ticvai-scope-level: venue
@@ -675,6 +704,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
         '409':
+          x-ticvai-problem-types: [timer-action-not-allowed]
           description: Action inconsistent with the current timer state
           content:
             application/problem+json:
@@ -694,6 +724,10 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-579 Parts, Cost & Maintenance Expense Tracking"
+      x-ticvai-read-via:
+      - query: inventory#stockEarmarkRecords
+        route: in-process
+        for: 'its read of inventory.stock_earmark, Inventory''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Record parts consumed
       description: >
@@ -709,7 +743,7 @@ paths:
       tags: [workOrder]
       x-ticvai-permission: WORK_ORDER_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -741,6 +775,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrderDetail' }
         '409':
+          x-ticvai-problem-types: [insufficient-stock]
           description: Insufficient stock
           content:
             application/problem+json:
@@ -773,7 +808,7 @@ paths:
       tags: [work]
       x-ticvai-permission: WORK_ORDER_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -863,10 +898,18 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
         '400':
+          x-ticvai-problem-types: [completion-photos-required]
           description: Completion photographs required for this category and none supplied
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: 'The work order is not `inProgress`; only work that has been started can be completed. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-in-progress]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -895,7 +938,7 @@ paths:
       tags: [workOrder]
       x-ticvai-permission: WORK_ORDER_VERIFY
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -921,10 +964,18 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
         '403':
+          x-ticvai-problem-types: [verifier-is-technician]
           description: Verifier is the technician who completed the work
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '409':
+          description: 'The work order is not `completed`; only completed work is verified. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-completed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -966,6 +1017,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
         '409':
+          x-ticvai-problem-types: [work-order-not-assigned-to-caller, work-order-already-accepted]
           description: Not assigned to this principal, or already accepted
           content:
             application/problem+json:
@@ -1029,6 +1081,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: 'The work order is not `assigned`; only an assigned job can be declined. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-assigned]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1080,6 +1139,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: 'The work order is not `assigned`; only an assigned job can be started. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-assigned]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1144,6 +1210,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: 'The work order is not `inProgress`; only work under way can be paused. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-in-progress]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1178,6 +1251,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: 'The work order is not `paused` or `awaitingParts`; only a stopped job resumes. Nothing changes.'
+          x-ticvai-problem-types: [work-order-not-paused]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1206,7 +1286,7 @@ paths:
       tags: [maintenance]
       x-ticvai-permission: MAINTENANCE_APPROVE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -1233,6 +1313,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrder' }
+        '409':
+          description: 'The work order is already `closed` or `cancelled` (`work-order-already-closed`), or is `assigned` or `inProgress` with a technician on it (`work-order-in-progress`); pause, complete or reject it first. Nothing changes.'
+          x-ticvai-problem-types: [work-order-already-closed, work-order-in-progress]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1322,6 +1409,8 @@ paths:
       operationId: setWorkOrderPriorityPolicy
       x-ticvai-consumed-by:
         - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience: [staff]
       x-ticvai-config-scope: venue
       x-ticvai-agreed: '29 September: M17-01 (MoM 17 September): weighted priority scoring with a per-asset override'
@@ -1352,6 +1441,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/WorkOrderPriorityPolicy' }
         '400':
+          x-ticvai-problem-types: [weights-not-100, bands-not-descending]
           description: Weights that do not sum to 100, or bands that do not descend.
           content:
             application/problem+json:
@@ -1370,6 +1460,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-070 Work Orders"
         - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-read-via:
+      - query: workforce#shiftRecords
+        route: service
+        for: 'its read of workforce.shift, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): smart assignment by skill, confirmed by the maintenance head'
@@ -1412,6 +1506,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-070 Work Orders"
         - "P08 BO-577 Maintenance Work Order"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): external vendors engaged through vendor service requests'
@@ -1453,6 +1548,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-070 Work Orders"
         - "P08 BO-577 Maintenance Work Order"
+      x-ticvai-read-via:
+      - query: inventory#supplierRecords
+        route: in-process
+        for: 'its read of inventory.supplier, Inventory''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       x-ticvai-agreed: '29 September: M17-13 (MoM 17 September): external vendors engaged through vendor service requests'
       summary: Engage an outside vendor on a work order
@@ -1483,6 +1582,7 @@ paths:
               schema: { $ref: '#/components/schemas/VendorServiceRequest' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
+          x-ticvai-problem-types: [work-order-already-closed]
           description: The work order is closed or cancelled.
           content:
             application/problem+json:
@@ -1539,6 +1639,7 @@ paths:
               schema: { $ref: '#/components/schemas/VendorServiceRequest' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
+          x-ticvai-problem-types: [vendor-request-already-closed]
           description: The request is already `completed` or `cancelled`.
           content:
             application/problem+json:
@@ -1552,6 +1653,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-071 Planned Maintenance"
         - "P08 BO-575 Maintenance Rule & Service Plan Configuration"
+      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List planned maintenance schedules
@@ -1614,6 +1716,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/MaintenancePlan' }
         '400':
+          x-ticvai-problem-types: [maintenance-trigger-missing]
           description: Neither an interval nor a usage trigger supplied
           content:
             application/problem+json:
@@ -1778,6 +1881,8 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/InspectionTemplate' }
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -1793,6 +1898,8 @@ paths:
       description: >
         Retained for seven years alongside the financial audit trail. This is the record an
         inspector asks for.
+
+        **Order.** Newest first, by `recordedAt` descending, then by `id`.
       tags: [inspection]
       x-ticvai-permission: INSPECTION_VIEW
       x-ticvai-scope-level: venue
@@ -1868,6 +1975,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/InspectionResult' }
         '400':
+          x-ticvai-problem-types: [required-item-unanswered]
           description: A required item was not answered
           content:
             application/problem+json:
@@ -1887,6 +1995,7 @@ paths:
         - "P06 EMP-050 Post-incident restore"
         - "P08 BO-072 Incident Log"
         - "P08 BO-108 Venue Operations"
+      description: '**Order.** Newest first, by `occurredAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List incidents
@@ -2045,7 +2154,7 @@ paths:
       tags: [incident]
       x-ticvai-permission: INCIDENT_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -2073,6 +2182,7 @@ paths:
                   type: array
                   items: { type: string }
                 escalate:
+                  x-ticvai-stored-as: maintenance.incident.escalation
                   type: object
                   description: >
                     Escalate an incident under investigation (the optional Escalated step;
@@ -2082,6 +2192,7 @@ paths:
                     toPrincipalId: { type: string, format: uuid }
                     reason: { type: string, minLength: 3, maxLength: 1000 }
                 reason:
+                  x-ticvai-stored-as: maintenance.incident_history.note
                   type: string
                   minLength: 3
                   maxLength: 1000
@@ -2108,6 +2219,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '400':
+          x-ticvai-problem-types: [closure-findings-required, closure-corrective-action-required]
           description: Closure attempted without findings or a corrective action
           content:
             application/problem+json:
@@ -2132,7 +2244,10 @@ paths:
     post:
       operationId: uploadIncidentMedia
       x-ticvai-consumed-by:
+        - "P06 EMP-003 Home — on duty"
         - "P06 EMP-026 Incident report"
+        - "P06 EMP-027 Incident detail"
+        - "P06 EMP-050 Post-incident restore"
       x-ticvai-agreed: '3 October: Chinmay, Block A business rules, EMP-026 ("bind media upload for photos"); CHG-RUL-013; shape follows attachWorkOrderEvidence, with the signed upload of assets.createUpload'
       x-ticvai-audience: [staff]
       summary: Add a photo, video or document to an incident
@@ -2154,7 +2269,7 @@ paths:
       - assets.createUpload
       x-ticvai-permission: INCIDENT_REPORT
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -2288,7 +2403,7 @@ paths:
       tags: [incident]
       x-ticvai-permission: INCIDENT_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
       parameters:
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
@@ -2317,6 +2432,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Incident' }
         '409':
+          x-ticvai-problem-types: [incident-not-reportable]
           description: The incident is not reportable (`isReportable` false, audit R106 (6)).
           content:
             application/problem+json:
@@ -2483,7 +2599,7 @@ components:
       required: [id, assetId, ref]
       properties:
         id: { type: string, format: uuid }
-        assetId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid, x-ticvai-references: maintenance.asset }
         ref: { type: string, description: The document in the media store. }
         name: { type: string, maxLength: 200, nullable: true }
         kind:
@@ -2673,7 +2789,7 @@ components:
       required: [id, assetId, toStatus, reason, recordedAt]
       properties:
         id: { type: string, format: uuid }
-        assetId: { type: string, format: uuid }
+        assetId: { type: string, format: uuid, x-ticvai-references: maintenance.asset }
         fromStatus:
           allOf:
             - $ref: '#/components/schemas/AssetStatus'
@@ -2942,6 +3058,8 @@ components:
               type: array
               items: { type: string }
             timeEntries:
+              x-ticvai-persistence-column: jsonb
+              x-ticvai-persistence-kind: valueObject
               type: array
               items:
                 type: object
@@ -2951,6 +3069,8 @@ components:
                   pauseReason: { type: string, nullable: true }
                   recordedAt: { type: string, format: date-time }
             parts:
+              x-ticvai-persistence-column: jsonb
+              x-ticvai-persistence-kind: valueObject
               type: array
               items:
                 type: object
@@ -3036,6 +3156,8 @@ components:
             revenue: { type: integer, minimum: 0, maximum: 100 }
             criticality: { type: integer, minimum: 0, maximum: 100 }
         bands:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           maxItems: 5
@@ -3086,8 +3208,8 @@ components:
       properties:
         id: { type: string, format: uuid, readOnly: true }
         venueId: { type: string, format: uuid, readOnly: true }
-        workOrderId: { type: string, format: uuid }
-        supplierId: { type: string, format: uuid }
+        workOrderId: { type: string, format: uuid, x-ticvai-references: maintenance.work_order }
+        supplierId: { type: string, format: uuid, x-ticvai-references: inventory.supplier }
         scope: { type: string, maxLength: 2000, description: What the vendor is asked to do. }
         status:
           allOf:
@@ -3107,7 +3229,7 @@ components:
       type: object
       required: [id, name, assetId, taskTemplate]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         name: { type: string, maxLength: 200 }
         assetId: { type: string, format: uuid }
         assetCategoryId:
@@ -3179,8 +3301,8 @@ components:
           description: '**The procedure itself.** A technician asking how to isolate a chiller is asking a safety question, and the answer has to come from the template rather than from its title.
 
             '
-        id: { type: string, format: uuid }
-        code: { type: string, maxLength: 64 }
+        id: { type: string, format: uuid, readOnly: true }
+        code: { type: string, maxLength: 64, x-ticvai-unique: tenant }
         name: { type: string, maxLength: 200 }
         venueId: { type: string, format: uuid, nullable: true }
         appliesToAssetCategoryId: { type: string, format: uuid, nullable: true }
@@ -3228,7 +3350,7 @@ components:
       required: [id, templateId, venueId, responses, recordedAt]
       properties:
         id: { type: string, format: uuid }
-        templateId: { type: string, format: uuid }
+        templateId: { type: string, format: uuid, x-ticvai-references: maintenance.inspection_template }
         venueId: { type: string, format: uuid }
         assetId: { type: string, format: uuid }
         responses:
@@ -3427,12 +3549,12 @@ components:
       required: [id, incidentId, kind, recordedAt, principalId]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        incidentId: { type: string, format: uuid }
+        incidentId: { type: string, format: uuid, x-ticvai-references: maintenance.incident }
         kind: { type: string, enum: [note, statusChange, escalation] }
         fromStatus: { type: string, nullable: true }
         toStatus: { type: string, nullable: true }
         note: { type: string, nullable: true }
-        principalId: { type: string, format: uuid }
+        principalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
         recordedAt: { type: string, format: date-time }
     IncidentDetail:
       x-ticvai-persistence: "maintenance.incident"
@@ -3485,7 +3607,7 @@ components:
       required: [id, incidentId, kind]
       properties:
         id: { type: string, format: uuid }
-        incidentId: { type: string, format: uuid }
+        incidentId: { type: string, format: uuid, x-ticvai-references: maintenance.incident }
         kind: { type: string, enum: [subject, staff] }
         subjectId:
           type: string
@@ -3530,7 +3652,7 @@ components:
       required: [id, incidentId, kind, status]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        incidentId: { type: string, format: uuid }
+        incidentId: { type: string, format: uuid, x-ticvai-references: maintenance.incident }
         kind: { type: string, enum: [photo, video, document] }
         status:
           type: string
@@ -3617,7 +3739,7 @@ components:
       required: [id, incidentId, note, recordedAt]
       properties:
         id: { type: string, format: uuid }
-        incidentId: { type: string, format: uuid }
+        incidentId: { type: string, format: uuid, x-ticvai-references: maintenance.incident }
         note: { type: string, maxLength: 10000 }
         kind:
           type: string
@@ -3646,7 +3768,7 @@ components:
       required: [id, incidentId, authority, notifiedAt]
       properties:
         id: { type: string, format: uuid }
-        incidentId: { type: string, format: uuid }
+        incidentId: { type: string, format: uuid, x-ticvai-references: maintenance.incident }
         authority: { type: string, maxLength: 200 }
         reference: { type: string, maxLength: 128, nullable: true }
         notifiedAt: { type: string, format: date-time }

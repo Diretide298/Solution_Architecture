@@ -67,7 +67,7 @@
  },
  "setAccessProfile": {
   "method": "PUT",
-  "path": "/accreditation-access-profiles",
+  "path": "/accreditation-access-profiles/{accessProfileId}",
   "contract": "accreditation",
   "summary": "Define which zones, on which dates, at which times",
   "permission": "ACCREDITATION_CONFIGURE",
@@ -75,6 +75,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "accessProfileId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

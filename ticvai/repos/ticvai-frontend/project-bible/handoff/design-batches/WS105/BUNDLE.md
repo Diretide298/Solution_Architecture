@@ -253,6 +253,8 @@ readiness:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -338,6 +340,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `getGoLiveReadiness` (onInterval, Follows runGoLiveValidation (202) until what it started …)
+
 **Where the user goes next**
 
 - → `BO-605` Go-Live Readiness Command Center: *Back to Go-Live Readiness Command Center*
@@ -369,8 +373,11 @@ generatedFrom: ticketing, pos, b2c, access
 #### Permissions
 
 - `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
+- `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_MANAGE`
 
 #### Requirements it meets
 
@@ -447,6 +454,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `getGoLiveReadiness` (onInterval, Follows runGoLiveValidation (202) until what it started …)
+
 **Where the user goes next**
 
 - → `BO-605` Go-Live Readiness Command Center: *Back to Go-Live Readiness Command Center*
@@ -478,8 +487,11 @@ checks:
 #### Permissions
 
 - `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
+- `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_MANAGE`
 
 #### Requirements it meets
 
@@ -556,6 +568,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `getGoLiveReadiness` (onInterval, Follows runGoLiveValidation (202) until what it started …)
+
 **Where the user goes next**
 
 - → `BO-605` Go-Live Readiness Command Center: *Back to Go-Live Readiness Command Center*
@@ -585,8 +599,11 @@ duration: 2 min 40 s
 #### Permissions
 
 - `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
+- `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_MANAGE`
 
 #### Requirements it meets
 
@@ -663,6 +680,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `getGoLiveReadiness` (onInterval, Follows runGoLiveValidation (202) until what it started …)
+
 **Where the user goes next**
 
 - → `BO-605` Go-Live Readiness Command Center: *Back to Go-Live Readiness Command Center*
@@ -693,8 +712,11 @@ checks:
 #### Permissions
 
 - `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
+- `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_MANAGE`
 
 #### Requirements it meets
 
@@ -771,6 +793,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `getGoLiveReadiness` (onInterval, Follows runGoLiveValidation (202) until what it started …)
+
 **Where the user goes next**
 
 - → `BO-605` Go-Live Readiness Command Center: *Back to Go-Live Readiness Command Center*
@@ -800,8 +824,11 @@ reentry: refused (single entry)
 #### Permissions
 
 - `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
+- `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_MANAGE`
 
 #### Requirements it meets
 
@@ -886,6 +913,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **MFA check**: Every holder of a permission in the MFA list has an enrolled method; missing ones listed by name. *(source: R135)*
 
+**Data it reads**: `getGoLiveReadiness` (onInterval, Follows runGoLiveValidation (202) until what it started …)
+
 **Where the user goes next**
 
 - → `BO-605` Go-Live Readiness Command Center: *Back to Go-Live Readiness Command Center*
@@ -915,8 +944,11 @@ checks:
 #### Permissions
 
 - `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
+- `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_MANAGE`
 
 #### Requirements it meets
 
@@ -993,6 +1025,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |  (primary button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
+**Data it reads**: `getGoLiveReadiness` (onInterval, Follows runGoLiveValidation (202) until what it started …)
+
 **Where the user goes next**
 
 - → `BO-605` Go-Live Readiness Command Center: *Back to Go-Live Readiness Command Center*
@@ -1022,8 +1056,11 @@ linksWork: true
 #### Permissions
 
 - `runGoLiveValidation` → `PLATFORM_TENANT_MANAGE` (configure) · staff
+- `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_MANAGE`
 
 #### Requirements it meets
 
@@ -1141,6 +1178,8 @@ form example:
 - `getGoLiveReadiness` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_MANAGE`
 
 #### Requirements it meets
 
@@ -1307,6 +1346,8 @@ metric tiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1450,6 +1491,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"GoLiveReadiness": {"type":"object","x-ticvai-persistence":"subscription.go_live_readiness","description":"Board 8. **The screen that stops a launch going wrong in public.**","properties":{"tenantId":{"type":"string","format":"uuid"},"runAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["notStarted","running","blocked","readyWithWarnings","ready"]},"groups":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","enum":["ticketingAndProducts","salesChannels","payment","ticketQrAccess","usersAndSecurity","integrations","communications","financialSetup"]},"label":{"type":"string"},"checks":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"outcome":{"type":"string","enum":["pass","warn","fail","skipped"]},"detail":{"type":"string","nullable":true},"remediation":{"type":"string","nullable":true}}}}}}},"blockers":{"type":"integer"},"warnings":{"type":"integer"},"signedOffBy":{"type":"string","format":"uuid","nullable":true},"signedOffAt":{"type":"string","format":"date-time","nullable":true}}}
+"GoLiveReadiness": {"type":"object","x-ticvai-persistence":"subscription.go_live_readiness","description":"Board 8. **The screen that stops a launch going wrong in public.**","properties":{"tenantId":{"type":"string","format":"uuid"},"runAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["notStarted","running","blocked","readyWithWarnings","ready"]},"groups":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string","enum":["ticketingAndProducts","salesChannels","payment","ticketQrAccess","usersAndSecurity","integrations","communications","financialSetup"]},"label":{"type":"string"},"checks":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"outcome":{"type":"string","enum":["pass","warn","fail","skipped"]},"detail":{"type":"string","nullable":true},"remediation":{"type":"string","nullable":true}}}}}}},"blockers":{"type":"integer"},"warnings":{"type":"integer"},"signedOffBy":{"type":"string","format":"uuid","nullable":true},"signedOffAt":{"type":"string","format":"date-time","nullable":true}}}
 }
 ```

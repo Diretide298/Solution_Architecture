@@ -16,6 +16,7 @@
     "format": "uuid"
    },
    "ruleId": {
+    "x-ticvai-references": "reporting.alert_rule",
     "type": "string",
     "format": "uuid"
    },
@@ -119,6 +120,7 @@
   ]
  },
  "ColdChainEvent": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "fnb.cold_chain_event",
   "description": "Board 5G. **A delivery arriving warm is a rejection decision made at the door**, and the package had `createGoodsReceipt` with nowhere to record the temperature it arrived at.\n**The reading is taken before the receipt is posted**, not after — once stock is received it has entered the kitchen, and a claim against a supplier needs the reading that refused it.\n",
@@ -126,9 +128,15 @@
    "id",
    "recordedAt",
    "valueCelsius",
-   "decision"
+   "decision",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -645,88 +653,6 @@
    }
   }
  },
- "Dashboard": {
-  "x-ticvai-persistence": "reporting.dashboard + reporting.dashboard_tile",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/CreateDashboardRequest"
-   },
-   {
-    "type": "object",
-    "required": [
-     "id",
-     "ownerPrincipalId",
-     "aggregateCost",
-     "createdAt"
-    ],
-    "properties": {
-     "id": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "ownerPrincipalId": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "aggregateCost": {
-      "type": "string",
-      "enum": [
-       "low",
-       "medium",
-       "high"
-      ],
-      "description": "Combined refresh load of every tile."
-     },
-     "archivedAt": {
-      "type": "string",
-      "format": "date-time",
-      "nullable": true,
-      "readOnly": true,
-      "description": "**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"
-     },
-     "createdAt": {
-      "type": "string",
-      "format": "date-time"
-     }
-    }
-   }
-  ]
- },
- "DashboardData": {
-  "x-ticvai-persistence": "none — computed",
-  "allOf": [
-   {
-    "$ref": "#/components/schemas/Dashboard"
-   },
-   {
-    "type": "object",
-    "properties": {
-     "tileData": {
-      "type": "array",
-      "items": {
-       "type": "object",
-       "properties": {
-        "tileId": {
-         "type": "string",
-         "format": "uuid"
-        },
-        "result": {
-         "$ref": "#/components/schemas/ReportResult"
-        },
-        "isCached": {
-         "type": "boolean"
-        },
-        "error": {
-         "type": "string",
-         "nullable": true
-        }
-       }
-      }
-     }
-    }
-   }
-  ]
- },
  "GoodsReceipt": {
   "x-ticvai-persistence": "inventory.goods_receipt + inventory.goods_receipt_line",
   "type": "object",
@@ -832,87 +758,6 @@
    }
   }
  },
- "KpiValue": {
-  "type": "object",
-  "description": "BI board 10.3. **Value, target, variance, direction and freshness in one read.**",
-  "properties": {
-   "kpiId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "bucketStart": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "description": "The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."
-   },
-   "groupKey": {
-    "type": "string",
-    "nullable": true,
-    "description": "The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."
-   },
-   "name": {
-    "type": "string"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "period": {
-    "type": "string"
-   },
-   "value": {
-    "$ref": "#/components/schemas/MetricValue"
-   },
-   "target": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/MetricValue"
-     }
-    ],
-    "nullable": true
-   },
-   "comparison": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/MetricValue"
-     }
-    ],
-    "nullable": true
-   },
-   "variancePercent": {
-    "type": "number",
-    "nullable": true
-   },
-   "direction": {
-    "type": "string",
-    "enum": [
-     "up",
-     "down",
-     "flat"
-    ]
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "green",
-     "amber",
-     "red",
-     "noTarget"
-    ]
-   },
-   "asOf": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "stale": {
-    "type": "boolean",
-    "description": "**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"
-   }
-  }
- },
  "LocationKind": {
   "type": "string",
   "enum": [
@@ -995,7 +840,7 @@
  },
  "MetricSource": {
   "type": "string",
-  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
+  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.entry.estimated_call_at` against `called_at` | | `throughput` | `queue.entry` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
   "enum": [
    "occupancy",
    "capacityUtilisation",
@@ -1490,66 +1335,6 @@
    "cancelled"
   ]
  },
- "ReportResult": {
-  "x-ticvai-persistence": "none — result set, cached in object storage",
-  "type": "object",
-  "required": [
-   "executionId",
-   "columns",
-   "rows"
-  ],
-  "properties": {
-   "executionId": {
-    "type": "string"
-   },
-   "columns": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "key": {
-       "type": "string"
-      },
-      "label": {
-       "type": "string"
-      },
-      "type": {
-       "$ref": "#/components/schemas/FieldType"
-      }
-     }
-    }
-   },
-   "rows": {
-    "type": "array",
-    "description": "**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n",
-    "items": {
-     "type": "object",
-     "additionalProperties": true
-    }
-   },
-   "totals": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "Aggregated columns only, keyed and typed as a row is."
-   },
-   "rowCount": {
-    "type": "integer"
-   },
-   "nextCursor": {
-    "type": "string",
-    "nullable": true
-   },
-   "generatedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "dataAsOf": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"
-   }
-  }
- },
  "Requisition": {
   "x-ticvai-persistence": "inventory.requisition + inventory.requisition_line",
   "type": "object",
@@ -1889,6 +1674,7 @@
     "format": "uuid"
    },
    "locationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
@@ -1978,6 +1764,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -2125,10 +1912,12 @@
     "type": "string"
    },
    "fromLocationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
    "toLocationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
@@ -2219,6 +2008,7 @@
   }
  },
  "TemperatureLog": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "fnb.temperature_log",
   "description": "Board 5J of the client F&B pack, 20 August. **HACCP records are a UAE regulatory obligation, they are inspected, and nothing in 947 operations touched them** — a venue that cannot produce a temperature log has a compliance failure rather than a missing screen.\n**A reading out of range is not an error, it is a finding.** The log records it, opens a corrective action, and keeps the reading — **deleting a bad reading is the one thing an inspector looks for.**\n**Offline-capable and it must be.** A walk-in freezer is where the signal is worst and the readings matter most.\n",
@@ -2227,9 +2017,15 @@
    "checkPointId",
    "recordedAt",
    "valueCelsius",
-   "outcome"
+   "outcome",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"

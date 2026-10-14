@@ -82,6 +82,7 @@
   }
  },
  "AiCapabilityRegistration": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "ai.capability",
   "description": "**An entry in the capability registry** (design 3.1 Registry, AIC-144, AIC-145; ADM-520). Nothing becomes an operational AI capability without a row here: owner, function, risk class, autonomy, data categories and lifecycle per environment. `autonomyCeiling` is the platform ceiling for the tenant; a tenant or venue may lower `autonomyLevel`, never raise it (AIC-151).",
@@ -295,119 +296,6 @@
    }
   }
  },
- "AiGovernanceAlert": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.governance_alert",
-  "description": "**A governance alert** (design 4.4, AIC-210..223; ADM-549..555). Kept separate from operational incidents and linked where both apply (AIC-250). **`promotionReady`** (design 3.12, decided 29 September): a shadow model passed its promotion gate; the alert names the release and waits for a person to call `promoteAiRelease`. Monitoring never switches a model (AIC-252).",
-  "required": [
-   "kind",
-   "severity",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "policyViolation",
-     "crossScopeAttempt",
-     "maskingDefect",
-     "dataUsage",
-     "behaviourDrift",
-     "inputDrift",
-     "bias",
-     "overrideRateShift",
-     "controlFailed",
-     "spend",
-     "providerBreaker",
-     "evaluationRegression",
-     "forecastNotPublished",
-     "indexLag",
-     "promotionReady"
-    ]
-   },
-   "severity": {
-    "type": "string",
-    "enum": [
-     "info",
-     "low",
-     "medium",
-     "high",
-     "critical"
-    ]
-   },
-   "capabilityKey": {
-    "type": "string",
-    "nullable": true
-   },
-   "releaseId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "x-ticvai-references": "ai.release",
-    "description": "For `promotionReady` and `evaluationRegression`: the release concerned."
-   },
-   "subjectRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "evidence": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "open",
-     "acknowledged",
-     "dismissed",
-     "resolved",
-     "incidentOpened"
-    ],
-    "readOnly": true
-   },
-   "incidentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "ai.incident"
-   },
-   "raisedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "decidedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "note": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
  "AiGovernanceOutcome": {
   "type": "string",
   "enum": [
@@ -421,6 +309,7 @@
   "description": "What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). `block` is an answer, not an error, and is logged as outcome `refused`."
  },
  "AiGovernancePolicyVersion": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "ai.governance_policy_version",
   "description": "One version of a governance policy. **Published versions are never edited**: a change is a new version, and the previous one becomes `superseded` in the same transaction (AIC-165).",
@@ -689,6 +578,7 @@
   }
  },
  "AiPolicyException": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "ai.policy_exception",
   "description": "**A temporary, recorded exception to a governance policy** (AIC-162, ADM-526): an expiry, an approver and compensating controls. Governance is never bypassed silently.",
@@ -814,141 +704,6 @@
    }
   }
  },
- "AiRelease": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.release",
-  "description": "**The release pointer per capability and tenant** (design 3.5): draft, offline evaluation, shadow, canary, production, monitored. Rollback is a pointer switch. **A model goes live only when a person promotes it** (design 3.12, decided 29 September).",
-  "required": [
-   "capabilityKey",
-   "artefactKind",
-   "candidateRef",
-   "layer",
-   "stage"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "capabilityKey": {
-    "type": "string"
-   },
-   "artefactKind": {
-    "type": "string",
-    "enum": [
-     "model",
-     "prompt",
-     "routing",
-     "embedding",
-     "retrieval",
-     "rule"
-    ]
-   },
-   "candidateRef": {
-    "type": "string"
-   },
-   "currentRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "What production runs now: the rule, or the previously promoted artefact."
-   },
-   "previousRef": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true
-   },
-   "layer": {
-    "type": "string",
-    "enum": [
-     "platform",
-     "tenant"
-    ]
-   },
-   "module": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/common::ModuleKey"
-     }
-    ],
-    "nullable": true,
-    "description": "**Whose AI this release is, and so who promotes it** (Chinmay, 2 October, workbook Q7: \"AI release promotion goes to whoever holds it\"; CHG-FUP-004). For a tenant release, `promoteAiRelease` requires the permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this module; a tenant release with no module cannot be promoted (`409 module-required`). Set when the release is registered, from the capability's module. Null on a platform release, which `PLATFORM_AI_MANAGE` promotes."
-   },
-   "suggestionKind": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/SuggestionKind"
-     }
-    ],
-    "nullable": true,
-    "description": "Where the capability answers a `requestSuggestion` kind: promotion rewrites that kind's assignment in `AiPolicy.suggestionProviders`."
-   },
-   "stage": {
-    "type": "string",
-    "enum": [
-     "draft",
-     "offlineEval",
-     "shadow",
-     "canary",
-     "production",
-     "monitored",
-     "rolledBack",
-     "rejected"
-    ],
-    "readOnly": true
-   },
-   "shadowStartedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "gatePassedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true,
-    "description": "When the shadow run passed its gate and `promotionReady` was raised."
-   },
-   "canaryScope": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "Venues or share of traffic in canary."
-   },
-   "promotedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "promotedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "rolledBackByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "rolledBackAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
  "AiRiskClass": {
   "type": "string",
   "enum": [
@@ -960,6 +715,7 @@
   "description": "Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). The governance decision point scores against it."
  },
  "AiTool": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "ai.tool",
   "description": "**The tool registry** (design 3.1 Registry, 3.8; AIC-088, AIC-089). The executor calls owning modules only for tools registered here: each names its target operation at a contract version, whether it reads, writes or destroys, its risk, the permission it needs, its compensation and timeout. Platform rows, replicated read-only into each tenant database with the tenant root as `scopePath`; written only by `setAiTool` (`PLATFORM_AI_MANAGE`).",
@@ -1480,6 +1236,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -1566,6 +1323,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -1657,182 +1415,6 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
-   }
-  }
- },
- "TenantDataRetentionClass": {
-  "type": "string",
-  "description": "**The data classes a tenant sets a retention period for** (decided 29 September, Chinmay: all data retention is tenant configuration, one setting per class). Defaults are ADR-0047's and the AI system design's (section 8, decision 5); a legal limit is the only thing the platform enforces.\n| Class | Default | Counted from | Legal limit (refused) | |---|---|---|---| | `guestProfile` | 5 years | last activity | none | | `paymentRecord` | 10 years | created | at least 10 years (4.3.4) | | `financialRecord` | 7 years | created | at least 7 years (6.1.78) | | `auditRecord` | 2 years (authorisation and device audit) | created | none | | `approvalRecord` | 7 years (approvals board 6.7) | decided | none | | `complianceInspection` | 7 years | created | none | | `faceTagBiometric` | 7 days | ticket expiry | make-or-break | | `facePassBiometric` | follows `guestProfile` | last activity | make-or-break | | `aiPrompts` | 90 days (prompts and responses) | created | none | | `aiConversations` | 90 days | last activity | none | | `aiDecisionRecords` | follows `auditRecord` (decision records and the approvals of AI actions) | decided | none | | `aiMetadataIndex` | always follows `aiDecisionRecords` (summaries, entities, embeddings) | created | none |\n**ADR-0047's floors and ceilings that are not law are defaults now, not refusals** (the audit floor of one year, the proposed seven-year guest-profile ceiling, the Face Tag thirty-day ceiling). Platform-owned copies — the burst environment copy, a decommissioned cell — are not tenant data classes and are not here.\n",
-  "enum": [
-   "guestProfile",
-   "paymentRecord",
-   "financialRecord",
-   "auditRecord",
-   "approvalRecord",
-   "complianceInspection",
-   "faceTagBiometric",
-   "facePassBiometric",
-   "aiPrompts",
-   "aiConversations",
-   "aiDecisionRecords",
-   "aiMetadataIndex"
-  ]
- },
- "TenantDataRetentionSetting": {
-  "type": "object",
-  "x-ticvai-persistence": "tenancy.data_retention_setting",
-  "description": "**One tenant's retention period for one data class** (decided 29 September, Chinmay). One row per tenant and class, written by `setDataRetentionSetting`; a class with no row takes the platform default. The limit and default fields are the platform's catalogue, computed for the response and not stored on the row.\n",
-  "required": [
-   "dataClass"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "dataClass": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/TenantDataRetentionClass"
-     }
-    ],
-    "x-ticvai-unique": "tenant",
-    "description": "One row per class per tenant. On a write it comes from the path; a body value is ignored."
-   },
-   "retainAmount": {
-    "type": "integer",
-    "nullable": true,
-    "minimum": 0,
-    "description": "The tenant's period. Null with no `followsDataClass` means the platform default applies. Zero means the data is not kept past the transaction that produced it.\n"
-   },
-   "retainUnit": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "days",
-     "months",
-     "years"
-    ],
-    "description": "Required with `retainAmount`."
-   },
-   "followsDataClass": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/TenantDataRetentionClass"
-     }
-    ],
-    "nullable": true,
-    "description": "Keep this class for as long as another class is kept. Set by default for `aiDecisionRecords` (follows `auditRecord`), `facePassBiometric` (follows `guestProfile`) and `aiMetadataIndex` (follows `aiDecisionRecords`, and cannot be changed).\n"
-   },
-   "onExpiry": {
-    "type": "string",
-    "enum": [
-     "archive",
-     "anonymise",
-     "delete"
-    ],
-    "default": "archive",
-    "description": "ADR-0047's stages. `archive` moves the data to the archive instance, from where it is erased on the class's own schedule; derived stores (the AI index, search) purge at archive, not later.\n"
-   },
-   "anchor": {
-    "type": "string",
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "enum": [
-     "createdAt",
-     "lastActivity",
-     "decidedAt",
-     "ticketExpiry"
-    ],
-    "description": "What the period is counted from. Fixed per class by the platform."
-   },
-   "effectiveAmount": {
-    "type": "integer",
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "description": "The period actually applied, after follows and defaults are resolved."
-   },
-   "effectiveUnit": {
-    "type": "string",
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "enum": [
-     "days",
-     "months",
-     "years"
-    ]
-   },
-   "isDefault": {
-    "type": "boolean",
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "description": "True when the tenant has not set this class and the platform default applies."
-   },
-   "defaultAmount": {
-    "type": "integer",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-persisted": false
-   },
-   "defaultUnit": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "enum": [
-     "days",
-     "months",
-     "years"
-    ]
-   },
-   "legalMinimumAmount": {
-    "type": "integer",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "description": "A floor the law sets. A shorter period is refused (`422`)."
-   },
-   "legalMaximumAmount": {
-    "type": "integer",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "description": "A maximum the law sets. A longer period is refused (`422`). Null for every class until the biometric make-or-break is answered."
-   },
-   "legalLimitUnit": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "enum": [
-     "days",
-     "months",
-     "years"
-    ]
-   },
-   "legalBasis": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-persisted": false,
-    "description": "The law or requirement the limit comes from, e.g. `4.3.4`."
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "updatedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "The tenant. Retention is set at tenant scope only."
    }
   }
  },

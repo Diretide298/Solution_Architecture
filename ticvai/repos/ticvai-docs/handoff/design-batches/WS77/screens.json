@@ -5,6 +5,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "4",
@@ -143,7 +144,7 @@
         "Critical Alerts"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getMediaDistribution",
        "provenance": "pack Digital Asset Management DAM.pdf, page 62 §Display"
       }
      ]
@@ -156,6 +157,7 @@
        "kind": "detailPanel",
        "label": "The selected asset distribution delivery",
        "bindsTo": null,
+       "operation": "getMediaDistribution",
        "columns": [
         "Assets in Active Use",
         "Active Asset References",
@@ -286,6 +288,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "4",
@@ -346,7 +349,7 @@
         "Digital Signage — 1"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getMediaDistribution",
        "provenance": "pack Digital Asset Management DAM.pdf, page 64 §Show"
       }
      ]
@@ -359,6 +362,7 @@
        "kind": "detailPanel",
        "label": "The selected asset usage distribution",
        "bindsTo": null,
+       "operation": "getMediaDistribution",
        "columns": [
         "TICVAI DAM Asset",
         "↓",
@@ -437,6 +441,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_MANAGE",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "4",
@@ -479,66 +484,79 @@
       {
        "kind": "selectField",
        "label": "Channel name",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "channel type",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "tenant",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "venue scope",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "allowed asset types",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "allowed categories",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "required approval",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "required rights",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "preferred rendition",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "fallback rendition",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "delivery method",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "caching policy",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       },
       {
        "kind": "selectField",
        "label": "authentication requirement",
+       "operation": "setMediaDistributionChannels",
        "provenance": "pack Digital Asset Management DAM.pdf, page 65 §Configure"
       }
      ]
@@ -570,6 +588,16 @@
    "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-093"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 65. 0 of 0 labels bound to a contract property; 13 of 19 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "code",
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional: only `setMediaDistributionChannels` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -599,6 +627,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "4",
@@ -698,16 +727,6 @@
   },
   "apis": [
    {
-    "operationId": "setMediaDistributionChannels",
-    "contract": "assets",
-    "purpose": "Signed URLs and rendition delivery",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getMediaDistribution"
-    ]
-   },
-   {
     "operationId": "listMediaRenditions",
     "contract": "assets",
     "purpose": "What can be delivered",
@@ -758,6 +777,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "4",
@@ -856,17 +876,6 @@
   },
   "apis": [
    {
-    "operationId": "replaceMediaAsset",
-    "contract": "assets",
-    "purpose": "Replace and propagate",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listMediaAssetVersions",
-     "getMediaDistribution"
-    ]
-   },
-   {
     "operationId": "getMediaDistribution",
     "contract": "assets",
     "purpose": "Everywhere it would propagate to",
@@ -919,6 +928,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_MANAGE",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "4",
@@ -970,7 +980,8 @@
        "label": "Default fallback asset",
        "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
        "notes": "Picked from the library (e.g. DAM-IMG-009211, \"Default Dubai Park Hero\").",
-       "bindsTo": "MediaAsset.id"
+       "bindsTo": "MediaAsset.id",
+       "operation": "setMediaDistributionChannels"
       }
      ]
     },
@@ -1047,6 +1058,16 @@
    "workshopBoard": "wireframes/WS47 Digital Asset Management DAM Board 4.dc.html#cms-096"
   },
   "apisNote": "Regenerated 9 September 2026 from Digital Asset Management DAM.pdf page 68. 0 of 0 labels bound to a contract property; 14 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "code",
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional: only `setMediaDistributionChannels` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1076,6 +1097,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "4",
@@ -1201,6 +1223,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "4",
@@ -1250,26 +1273,31 @@
       {
        "kind": "metricTile",
        "label": "Delivery Availability",
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 70 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Average Response Time",
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 70 §Display"
       },
       {
        "kind": "metricTile",
        "label": "CDN Cache Hit %",
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 70 §Display"
       },
       {
        "kind": "metricTile",
        "label": "API Success %",
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 70 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Failed Requests",
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 70 §Display"
       }
      ]
@@ -1373,6 +1401,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "4",
@@ -1416,32 +1445,37 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "impressions",
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics"
       },
       {
        "kind": "metricTile",
        "label": "requests",
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics"
       },
       {
        "kind": "metricTile",
        "label": "downloads",
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics"
       },
       {
        "kind": "metricTile",
        "label": "delivery volume",
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics"
       },
       {
        "kind": "metricTile",
        "label": "reuse count",
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics"
       }
      ]
@@ -1545,6 +1579,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "4",

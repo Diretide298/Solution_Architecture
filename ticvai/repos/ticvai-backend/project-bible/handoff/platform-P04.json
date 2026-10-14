@@ -15,7 +15,7 @@
   "contracts": 18,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 150
+  "operationsWithNoScreen": 149
  },
  "waves": {
   "wave1": 32
@@ -80,11 +80,11 @@
    "operations": 7
   },
   {
-   "contract": "marketing-crm",
+   "contract": "finance",
    "operations": 5
   },
   {
-   "contract": "finance",
+   "contract": "reporting",
    "operations": 5
   },
   {
@@ -92,7 +92,7 @@
    "operations": 5
   },
   {
-   "contract": "reporting",
+   "contract": "marketing-crm",
    "operations": 5
   },
   {
@@ -230,7 +230,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/returns-refunds-exchanges",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -1237,12 +1237,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Devices that report having been interfered with"
-   },
-   {
-    "operation": "listProfileDeployments",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Recent deployments, with a date, a target and an outcome"
    },
    {
     "operation": "recordDeviceTamperEvent",

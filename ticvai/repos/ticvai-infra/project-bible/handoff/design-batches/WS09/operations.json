@@ -443,7 +443,7 @@
  },
  "setPodium": {
   "method": "PUT",
-  "path": "/podiums",
+  "path": "/podiums/{podiumId}",
   "contract": "access",
   "summary": "Create or replace a podium",
   "permission": "DEVICE_CONFIGURE",
@@ -462,7 +462,7 @@
  },
  "setReasonCode": {
   "method": "PUT",
-  "path": "/reason-codes",
+  "path": "/reason-codes/{reasonCodeId}",
   "contract": "access",
   "summary": "Create or replace a validation reason code",
   "permission": "ACCESS_POINT_CONFIGURE",

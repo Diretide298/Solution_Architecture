@@ -133,13 +133,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-374` | Approval Decision Workspace | B | 5 | 20 | 6 | 13 | 2 | 3 | — | notStarted (—) |
 | `BO-375` | Business Context & Evidence Viewer | B | 6 | 20 | 6 | 14 | 1 | 0 | — | notStarted (—) |
 | `BO-376` | Approval Timeline & Decision Chain | B | 0 | 6 | 6 | 0 | 2 | 3 | — | notStarted (—) |
-| `BO-377` | Approve & Sensitive Action Confirmation | B | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
+| `BO-377` | Approve & Sensitive Action Confirmation | B | 0 | 7 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 | `BO-378` | Reject / Return / Request Information | B | 5 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 | `BO-379` | Requester Modification & Resubmission | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-380` | Withdrawal, Cancellation, Expiration & Reopening | B | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `BO-381` | Segregation of Duties & Four-Eyes Control | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-382` | Approved Action Execution & Status | B | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-383` | Decision Record & Immutable Audit View | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-380` | Withdrawal, Cancellation, Expiration & Reopening | B | 1 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-381` | Segregation of Duties & Four-Eyes Control | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-382` | Approved Action Execution & Status | B | 3 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-383` | Decision Record & Immutable Audit View | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -285,10 +285,12 @@ request:
 
 #### Permissions
 
-- `listApprovalRequests` → `APPROVAL_VIEW` (read) · staff, public
-- `decideApprovalRequest` → `APPROVAL_DECIDE` (operate) · staff, public
+- `listApprovalRequests` → `APPROVAL_VIEW` (read) · staff
+- `decideApprovalRequest` → `APPROVAL_DECIDE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_VIEW`
 
 #### Requirements it meets
 
@@ -483,10 +485,12 @@ listApprovalRequests (ApprovalRequest):
 
 #### Permissions
 
-- `listApprovalRequests` → `APPROVAL_VIEW` (read) · staff, public
+- `listApprovalRequests` → `APPROVAL_VIEW` (read) · staff
 - `createApprovalEvidencePackage` → `APPROVAL_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_VIEW`
 
 #### Requirements it meets
 
@@ -643,6 +647,8 @@ Every approval timeline decision:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -719,7 +725,17 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listStepUpPolicies`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Operation | text | The action governed. Names an operation, never a screen. |
+| Required | chip: None, PIN, MFA | The strength in force at this scope. |
+| Contract floor | chip: None, PIN, MFA | What `x-ticvai-step-up` sets on the operation. Read only, and the value `required` may not go below. |
+| Scope level | chip: Tenant, Region, Venue | Where this rule was set, not where it applies. |
+| Reason | text | Why it was raised. An unexplained control is one somebody removes the first time it is inconvenient. |
+| Set by | the name it points at, never the id | — |
+| Set at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -748,7 +764,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the approve sensitive action are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The request is no longer open for a decision. `refusedReason` says which: `alreadyDecided` (approved or rejected), `withdrawn`, `expired` or `cancelled`, and … (ApprovalStateProblem); 422 The level's rule does not accept this signature method (`ApprovalRule.signatureMethods`; `signature-method-not-accepted`; CHG-CSP-045). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The request has no decision to sign: it is not yet decided (`draft`, `pending`, `escalated`, `returned` or `informationRequested`) or ended without one …; 409 The request is no longer open for a decision. `refusedReason` says which: `alreadyDecided` (approved or rejected), `withdrawn`, `expired` or `cancelled`, and … (ApprovalStateProblem); 422 The level's rule does not accept this signature … |
 
 #### Edge cases to draw
 
@@ -778,11 +794,13 @@ listStepUpPolicies (StepUpPolicy):
 
 #### Permissions
 
-- `decideApprovalRequest` → `APPROVAL_DECIDE` (operate) · staff, public
+- `decideApprovalRequest` → `APPROVAL_DECIDE` (operate) · staff
 - `signApprovalDecision` → `APPROVAL_DECIDE` (operate) · staff
 - `listStepUpPolicies` → `APPROVAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_CONFIGURE`
 
 #### Requirements it meets
 
@@ -820,7 +838,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-377?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-374`.
@@ -920,9 +938,11 @@ requester: Mariam Saeed
 
 #### Permissions
 
-- `decideApprovalRequest` → `APPROVAL_DECIDE` (operate) · staff, public
+- `decideApprovalRequest` → `APPROVAL_DECIDE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_DECIDE`
 
 #### Requirements it meets
 
@@ -1023,6 +1043,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the requester modification resubmission are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The request is not `rejected`; only a rejected request is resubmitted (a `returned` or `informationRequested` one goes back through `submitApprovalRequest`). |
 
 #### Edge cases to draw
 
@@ -1043,6 +1064,8 @@ amount: AED 2,720.00
 - `resubmitApprovalRequest` → `APPROVAL_REQUEST` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_REQUEST`
 
 #### Requirements it meets
 
@@ -1067,7 +1090,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-379?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
@@ -1107,7 +1130,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by **** (`withdrawApprovalRequest`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Reason `reason` | text area | optional | — | max length 300 | — | — | `withdrawApprovalRequest` body |
 
 #### Outputs: what the screen shows and produces
 
@@ -1115,7 +1142,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `withdrawApprovalRequest` POST `/approval-requests/{requestId}/withdraw` | inline | ApprovalRequest | 409 Already decided. `refusedReason` is `alreadyDecided` and `currentStatus` says whether it was approved or rejected. (ApprovalStateProblem) | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
@@ -1156,6 +1183,8 @@ by: Rahul Menon
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_REQUEST`
+
 #### Requirements it meets
 
 4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1186,7 +1215,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-380?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
@@ -1228,7 +1257,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listApprovalControlPolicies`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Applies to request kinds | list or chips (count when long) | — |
+| Applies above value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Control | chip: Four eyes, Dual control, Separation from requester, Separation from executor | `fourEyes` is two different people; `dualControl` is two people from different groups. |
+| Required approver groups | list or chips (count when long) | — |
+| Minimum approvers | 1,234 | — |
+| Requires step up | yes / no (icon or chip) | — |
+| Requires signature | yes / no (icon or chip) | — |
+| Break glass allowed | yes / no (icon or chip) | Whether the control may be overridden in an emergency, and if so it raises an alert rather than passing quietly. |
+| Is active | yes / no (icon or chip) | — |
 
 **Data it reads**: `listApprovalControlPolicies` (onLoad, Four-eyes and dual control in force)
 
@@ -1277,6 +1321,8 @@ listApprovalControlPolicies (ApprovalControlPolicy):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1301,7 +1347,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-381?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-374`.
@@ -1362,7 +1408,30 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listWorkflowInstanceProcess`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Workflow instance | text | Workflow Instance |
+| Workflow name | text | Workflow Name |
+| Source module | text | Source Module |
+| Business object | text | Business Object |
+| Initiated by | text | Initiated By |
+| Start time | 1 Oct 2026, 14:30 | Start Time |
+| Current status | chip: Running, Waiting approval, Waiting task, Waiting system, Escalated, Failed… | Current Status |
+| Current step | text | Current Step |
+| Sla | text | SLA |
+| Step | text | Step |
+| Type | text | Type |
+| Started | 1 Oct 2026, 14:30 | Started |
+| Completed | 1 Oct 2026, 14:30 | Completed |
+| Assigned to | text | Assigned To |
+| Input | text | Input |
+| Output | text | Output |
+| Decision | text | Decision |
+| Duration | 1,234 | Seconds |
+| Status | text | Status |
 
 **Actions and what each produces**
 
@@ -1421,6 +1490,8 @@ executions:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1445,7 +1516,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-382?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Retry, Investigate, Escalate.
 - [ ] Every transition is wired: `BO-374`.
@@ -1486,7 +1557,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getApprovalRecord`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Request | the name it points at, never the id | — |
+| Sequence | 1,234 | — |
+| Recorded at | 1 Oct 2026, 14:30 | — |
+| Decision | text | — |
+| Decided by | the name it points at, never the id | — |
+| Comment | text | — |
+| Policy versions | list or chips (count when long) | What the rules were at the time, because they have changed since. |
+| Policy | the name it points at, never the id | — |
+| Payload hash | text | — |
+| Previous record hash | text | — |
+| Record hash | text | — |
+| Signatures | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Request | the name it points at, never the id | — |
+| Signed by | the name it points at, never the id | — |
+| Signed at | 1 Oct 2026, 14:30 | — |
+| Method | chip: Platform key, Uae pass, External certificate, Drawn signature | — |
+| Payload hash | text | — |
+| Signature | text | — |
+| Certificate subject | text | — |
 
 **Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -1531,6 +1625,8 @@ getApprovalRecord (ApprovalRecord):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1555,7 +1651,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-383?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-374`.
@@ -1683,19 +1779,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"ApprovalControlPolicy": {"type":"object","x-ticvai-persistence":"approvals.control_policy","description":"Approvals boards 6.2 and 6.3. **Which decisions one person may not take alone** — distinct from which roles one person may not hold, which is `identity.setSegregationRules`.\n","required":["code","control"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"appliesToRequestKinds":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalKind"}},"appliesAboveValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"control":{"type":"string","enum":["fourEyes","dualControl","separationFromRequester","separationFromExecutor"],"description":"**`fourEyes` is two different people; `dualControl` is two people from different groups.** The second is stronger and is what a finance auditor means, and collapsing them makes the stronger control unexpressible.\n"},"requiredApproverGroupIds":{"type":"array","items":{"type":"string","format":"uuid"}},"minimumApprovers":{"type":"integer","default":2},"requiresStepUp":{"type":"boolean","default":false},"requiresSignature":{"type":"boolean","default":false},"breakGlassAllowed":{"type":"boolean","default":false,"description":"**Whether the control may be overridden in an emergency**, and if so it raises an alert rather than passing quietly. A control with no break-glass will be worked around by hand at three in the morning, which is worse.\n"},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"ApprovalControlPolicy": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"approvals.control_policy","description":"Approvals boards 6.2 and 6.3. **Which decisions one person may not take alone** — distinct from which roles one person may not hold, which is `identity.setSegregationRules`.\n","required":["code","control"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"appliesToRequestKinds":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalKind"}},"appliesAboveValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"control":{"type":"string","enum":["fourEyes","dualControl","separationFromRequester","separationFromExecutor"],"description":"**`fourEyes` is two different people; `dualControl` is two people from different groups.** The second is stronger and is what a finance auditor means, and collapsing them makes the stronger control unexpressible.\n"},"requiredApproverGroupIds":{"type":"array","items":{"type":"string","format":"uuid"}},"minimumApprovers":{"type":"integer","default":2},"requiresStepUp":{"type":"boolean","default":false},"requiresSignature":{"type":"boolean","default":false},"breakGlassAllowed":{"type":"boolean","default":false,"description":"**Whether the control may be overridden in an emergency**, and if so it raises an alert rather than passing quietly. A control with no break-glass will be worked around by hand at three in the morning, which is worse.\n"},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "ApprovalDecision": {"type":"object","x-ticvai-persistence":"approvals.decision","required":["level","principalId","decision","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"level":{"type":"integer"},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"},"delegatedFrom":{"type":"string","format":"uuid","nullable":true},"decision":{"type":"string","enum":["approve","reject"]},"comment":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"usedMfa":{"type":"boolean"},"signatureRef":{"type":"string","nullable":true},"decidedAt":{"type":"string","format":"date-time"}}},
 "ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n\n**A rota shift swap** (4 October 2026, CHG-FXC-008; Sprint 1-2 judging: `workforce.requestShiftSwap` raised a request\nwith no kind that fits). `configurationChange`, subject `shiftSwap`, `subjectContract` `workforce`, `subjectId` the\nShiftSwap id: an existing kind narrowed by `subjectTypes`, as the optional review steps above, so no kind is added.","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMode": {"type":"string","description":"11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n","enum":["sequential","parallel","consensus","majority"]},
-"ApprovalRecord": {"type":"object","x-ticvai-persistence":"approvals.decision_record","description":"Approvals boards 4.10 and 6.6. **Tamper evidence, not tamper prevention** — each record chains to the one before it, so a changed entry breaks every hash after it.\n","properties":{"requestId":{"type":"string","format":"uuid"},"sequence":{"type":"integer"},"recordedAt":{"type":"string","format":"date-time"},"decision":{"type":"string"},"decidedBy":{"type":"string","format":"uuid"},"comment":{"type":"string","nullable":true},"policyVersions":{"type":"array","description":"**What the rules were at the time**, because they have changed since.","items":{"type":"object","properties":{"policyId":{"type":"string","format":"uuid"},"version":{"type":"integer"}}}},"payloadHash":{"type":"string"},"previousRecordHash":{"type":"string","nullable":true},"recordHash":{"type":"string"},"signatures":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalSignature"}},"integrity":{"type":"string","readOnly":true,"enum":["intact","broken","unverifiable"],"description":"**Verified on read.** A tamper check nobody runs reports the breach years late."},"scopePath":{"type":"string"}}},
-"ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request + approvals.escalation","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n\n**Stored as `approvals.escalation` rows, one per escalation, in order** (14 October 2026, CHG-CRD-006, ADAM CR-078: the table held only `id` and `request_id`, so `escalateApprovalRequest` wrote nothing the escalation reports could read). Written by `escalateApprovalRequest` (manual, `wasAutomatic` false) and by the SLA job on a breach (`wasAutomatic` true); read by `getApprovalAnalytics` and the SLA and escalation monitors. Append-only: an escalation is never edited.\n","items":{"type":"object","required":["at","toLevel","wasAutomatic"],"properties":{"at":{"type":"string","format":"date-time","x-ticvai-column":"escalated_at"},"reason":{"type":"string","maxLength":300,"description":"The requester's or approver's reason; for an automatic escalation, the SLA rule that fired."},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"},"escalatedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who escalated it by hand (`escalateApprovalRequest`'s caller); null for an automatic one."},"addedApproverPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The approver the escalation added at `toLevel`; the original approver stays in the chain."}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."},"assignedToDepartmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."},"assignedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
+"ApprovalRecord": {"type":"object","x-ticvai-persistence":"approvals.decision_record","description":"Approvals boards 4.10 and 6.6. **Tamper evidence, not tamper prevention** — each record chains to the one before it, so a changed entry breaks every hash after it.\n","properties":{"requestId":{"type":"string","format":"uuid"},"sequence":{"type":"integer"},"recordedAt":{"type":"string","format":"date-time"},"decision":{"type":"string"},"decidedBy":{"type":"string","format":"uuid"},"comment":{"type":"string","nullable":true},"policyVersions":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"**What the rules were at the time**, because they have changed since.","items":{"type":"object","properties":{"policyId":{"type":"string","format":"uuid"},"version":{"type":"integer"}}}},"payloadHash":{"type":"string"},"previousRecordHash":{"type":"string","nullable":true},"recordHash":{"type":"string"},"signatures":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalSignature"}},"integrity":{"type":"string","readOnly":true,"enum":["intact","broken","unverifiable"],"description":"**Verified on read.** A tamper check nobody runs reports the breach years late."},"scopePath":{"type":"string"}}},
+"ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request + approvals.escalation","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"x-ticvai-persisted":false,"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n\n**Stored as `approvals.escalation` rows, one per escalation, in order** (14 October 2026, CHG-CRD-006, ADAM CR-078: the table held only `id` and `request_id`, so `escalateApprovalRequest` wrote nothing the escalation reports could read). Written by `escalateApprovalRequest` (manual, `wasAutomatic` false) and by the SLA job on a breach (`wasAutomatic` true); read by `getApprovalAnalytics` and the SLA and escalation monitors. Append-only: an escalation is never edited.\n","items":{"type":"object","required":["at","toLevel","wasAutomatic"],"properties":{"at":{"type":"string","format":"date-time","x-ticvai-column":"escalated_at"},"reason":{"type":"string","maxLength":300,"description":"The requester's or approver's reason; for an automatic escalation, the SLA rule that fired."},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"},"escalatedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who escalated it by hand (`escalateApprovalRequest`'s caller); null for an automatic one."},"addedApproverPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The approver the escalation added at `toLevel`; the original approver stays in the chain."}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."},"assignedToDepartmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."},"assignedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
 "ApprovalSignature": {"type":"object","x-ticvai-persistence":"approvals.signature","description":"Approvals board 6.5. **What is signed is the request as it stood at the moment of decision**, so a later edit breaks its own signature.\n","properties":{"id":{"type":"string","format":"uuid"},"requestId":{"type":"string","format":"uuid"},"signedBy":{"type":"string","format":"uuid"},"signedAt":{"type":"string","format":"date-time"},"method":{"type":"string","enum":["platformKey","uaePass","externalCertificate","drawnSignature"]},"payloadHash":{"type":"string"},"signature":{"type":"string"},"certificateSubject":{"type":"string","nullable":true},"stepUpVerified":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "ApprovalStatus": {"type":"string","enum":["draft","pending","escalated","returned","informationRequested","approved","rejected","withdrawn","expired","cancelled"]},
 "ApprovedActionExecutionActionInput": {"type":"object","x-ticvai-persistence":"none — request only (decided 29 September, VM close-out)","description":"One action on an approved action whose execution failed (decided 29 September, VM close-out).","required":["action"],"properties":{"action":{"type":"string","enum":["retry","investigate","escalate"]},"assigneeId":{"type":"string","format":"uuid","description":"Required for investigate and escalate"},"note":{"type":"string","maxLength":500}}},
-"ApprovedActionExecutionView": {"type":"object","x-ticvai-persistence":"approvals.approved_action_execution","description":"**One approved action and whether it ran** (decided 29 September, VM close-out). Written when a request is approved and updated by the requesting contract as it executes; the approval request itself stays immutable (11.1.56).","required":["id","approvalRequestId","sourceModule","actionType","status"],"properties":{"id":{"type":"string","format":"uuid"},"approvalRequestId":{"type":"string","format":"uuid"},"sourceModule":{"type":"string","description":"The contract that owns and executes the action"},"actionType":{"type":"string","description":"What was approved, e.g. refund, price change"},"subjectRef":{"type":"string","description":"The record the action applies to"},"status":{"type":"string","enum":["queued","executing","succeeded","failed","investigating","escalated"]},"attempts":{"type":"integer","minimum":0},"lastAttemptAt":{"type":"string","format":"date-time","nullable":true},"failureReason":{"type":"string","nullable":true},"assigneeId":{"type":"string","nullable":true},"lastAction":{"type":"string","enum":["retry","investigate","escalate"],"nullable":true},"note":{"type":"string","nullable":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","description":"The partition key (ADR-0005). Written at venue scope"}}},
+"ApprovedActionExecutionView": {"type":"object","x-ticvai-persistence":"approvals.approved_action_execution","description":"**One approved action and whether it ran** (decided 29 September, VM close-out). Written when a request is approved and updated by the requesting contract as it executes; the approval request itself stays immutable (11.1.56).","required":["id","approvalRequestId","sourceModule","actionType","status"],"properties":{"id":{"type":"string","format":"uuid"},"approvalRequestId":{"x-ticvai-references":"approvals.request","type":"string","format":"uuid"},"sourceModule":{"type":"string","description":"The contract that owns and executes the action"},"actionType":{"type":"string","description":"What was approved, e.g. refund, price change"},"subjectRef":{"type":"string","description":"The record the action applies to"},"status":{"type":"string","enum":["queued","executing","succeeded","failed","investigating","escalated"]},"attempts":{"type":"integer","minimum":0},"lastAttemptAt":{"type":"string","format":"date-time","nullable":true},"failureReason":{"type":"string","nullable":true},"assigneeId":{"type":"string","nullable":true},"lastAction":{"type":"string","enum":["retry","investigate","escalate"],"nullable":true},"note":{"type":"string","nullable":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","description":"The partition key (ADR-0005). Written at venue scope"}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"StepUpPolicy": {"x-ticvai-persistence":"approvals.step_up_policy","type":"object","required":["operationId","required"],"properties":{"operationId":{"type":"string","description":"The action governed. Names an operation, never a screen."},"required":{"allOf":[{"$ref":"#/components/schemas/StepUpStrength"}],"description":"The strength in force at this scope."},"contractFloor":{"allOf":[{"$ref":"#/components/schemas/StepUpStrength"}],"description":"What `x-ticvai-step-up` sets on the operation. Read only, and the value `required` may not go below.\n"},"scopeLevel":{"type":"string","enum":["tenant","region","venue"],"description":"Where this rule was set, not where it applies."},"reason":{"type":"string","maxLength":512,"description":"Why it was raised. **An unexplained control is one somebody removes** the first time it is inconvenient.\n"},"setBy":{"type":"string","format":"uuid"},"setAt":{"type":"string","format":"date-time"}}},
+"StepUpPolicy": {"x-ticvai-rls":"grant-holder-read","x-ticvai-persistence":"approvals.step_up_policy","type":"object","required":["operationId","required"],"properties":{"operationId":{"type":"string","description":"The action governed. Names an operation, never a screen."},"required":{"allOf":[{"$ref":"#/components/schemas/StepUpStrength"}],"description":"The strength in force at this scope."},"contractFloor":{"allOf":[{"$ref":"#/components/schemas/StepUpStrength"}],"description":"What `x-ticvai-step-up` sets on the operation. Read only, and the value `required` may not go below.\n"},"scopeLevel":{"type":"string","enum":["tenant","region","venue"],"description":"Where this rule was set, not where it applies."},"reason":{"type":"string","maxLength":512,"description":"Why it was raised. **An unexplained control is one somebody removes** the first time it is inconvenient.\n"},"setBy":{"type":"string","format":"uuid"},"setAt":{"type":"string","format":"date-time"}}},
 "StepUpStrength": {"type":"string","description":"**Ordered, weakest first, and that ordering is what makes *raise only* checkable.** `pin` is a supervisor PIN captured in place — `roles.yaml` already resolves escalation that way and it is right for an action taken several times a shift. `mfa` is a challenge against an enrolled method and is right for an action taken a few times a month.\n","enum":["none","pin","mfa"]},
 "WorkflowInstanceMonitorProcessTimelineView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over approvals.workflow_instance and approvals.workflow_step_execution (data model for the agreed operations, 29 September)","description":"**What Workflow Instance Monitor & Process Timeline displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"workflowInstance":{"type":"string","description":"Workflow Instance"},"workflowName":{"type":"string","description":"Workflow Name"},"version":{"type":"string","description":"Version"},"sourceModule":{"type":"string","description":"Source Module"},"businessObject":{"type":"string","description":"Business Object"},"initiatedBy":{"type":"string","description":"Initiated By"},"startTime":{"type":"string","format":"date-time","description":"Start Time"},"currentStatus":{"type":"string","enum":["running","waitingApproval","waitingTask","waitingSystem","escalated","failed","completed","cancelled"],"description":"Current Status"},"currentStep":{"type":"string","description":"Current Step"},"sla":{"type":"string","description":"SLA"},"step":{"type":"string","description":"Step"},"type":{"type":"string","description":"Type"},"started":{"type":"string","format":"date-time","description":"Started"},"completed":{"type":"string","format":"date-time","description":"Completed"},"assignedTo":{"type":"string","description":"Assigned To"},"input":{"type":"string","description":"Input"},"output":{"type":"string","description":"Output"},"decision":{"type":"string","description":"Decision"},"duration":{"type":"integer","description":"Seconds"},"status":{"type":"string","description":"Status"},"ruleEvaluations":{"type":"integer","description":"Rule evaluations"},"assignments":{"type":"integer","description":"Assignments"},"approvals":{"type":"integer","description":"Approvals"},"rejections":{"type":"integer","description":"Rejections"},"escalations":{"type":"integer","description":"Escalations"},"notifications":{"type":"integer","description":"Notifications"},"apiCalls":{"type":"integer","description":"API calls"},"systemActions":{"type":"integer","description":"System actions"},"errors":{"type":"integer","description":"Errors"}},"required":["workflowInstance"]}
 }

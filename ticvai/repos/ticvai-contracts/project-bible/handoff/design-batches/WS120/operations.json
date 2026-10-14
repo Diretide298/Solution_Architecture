@@ -37,44 +37,6 @@
   "requestBody": "AiAnomalyDetector",
   "responds": "AiAnomalyDetector"
  },
- "createForecastScenario": {
-  "method": "POST",
-  "path": "/forecast-scenarios",
-  "contract": "ai",
-  "summary": "Run a what-if",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AiForecastScenario",
-  "responds": null
- },
- "decideOperationalRequirement": {
-  "method": "POST",
-  "path": "/operational-requirements/{requirementId}/decide",
-  "contract": "ai",
-  "summary": "Accept, modify or reject a requirement",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiOperationalRequirement"
- },
  "getForecast": {
   "method": "GET",
   "path": "/forecasts",
@@ -162,50 +124,6 @@
   ],
   "requestBody": null,
   "responds": "StaffingCoverage"
- },
- "listAiInsights": {
-  "method": "GET",
-  "path": "/insights",
-  "contract": "ai",
-  "summary": "Insights and anomalies",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "kind",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "priority",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "from",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
  },
  "listOperationalRequirements": {
   "method": "GET",

@@ -226,9 +226,9 @@ paths:
   /service-charge-policy:
     get:
       operationId: getFnbServiceChargePolicy
-      x-ticvai-names-for-context: [rental.fee_policy]
       x-ticvai-consumed-by:
         - "P08 BO-733 Service Channel Configuration"
+      x-ticvai-names-for-context: [rental.fee_policy]
       summary: The service charge a venue applies, and on what
       description: '**`fnb.sub_bill.service_charge` was stored and nothing said what the rate was.**
         `F29` recomputes tax and service charge per bill on a split rather than apportioning them, so
@@ -260,10 +260,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFnbServiceChargePolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-733 Service Channel Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Set the service charge
       description: '**A service charge is revenue, not a tip** — `orders` already separates the two
         deliberately, *"it is revenue in most jurisdictions, and pooling it with tips is how a payroll
@@ -345,10 +345,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSubstitutionRules
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: What may replace what
       description: 'Board 2L. **A kitchen substitutes constantly and the package could not say which swaps
         are allowed.**
@@ -416,13 +416,13 @@ paths:
         format: uuid
     post:
       operationId: verifyAllergens
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
+        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
       x-ticvai-read-via:
       - query: inventory#inventoryItemRecords
         route: in-process
         for: 'its read of inventory.inventory_item, Inventory''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-045 Menu Management"
-        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
       summary: Does this dish still match its claim?
       description: 'Board 2L, and **the operation the whole frame exists for.** BL-127 built allergens
         on 18 August and built substitution nowhere — so **a substituted ingredient changed the dish and
@@ -555,12 +555,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: buildProductionPlan
+      x-ticvai-consumed-by:
+        - "P08 BO-112 Production Planning & Production Sheets"
       x-ticvai-read-via:
       - query: ai#suggestionRecords
         route: service
         for: 'its read of ai.suggestion, AI''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-112 Production Planning & Production Sheets"
       summary: Turn a forecast into a prep list
       description: 'Board 2M. **Demand forecast through recipes to quantities per item and per station.**
 
@@ -669,13 +669,13 @@ paths:
         format: uuid
     get:
       operationId: getProductionRun
+      x-ticvai-consumed-by:
+        - "P08 BO-112 Production Planning & Production Sheets"
+        - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
       x-ticvai-read-via:
       - query: inventory#movementRecords
         route: in-process
         for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-112 Production Planning & Production Sheets"
-        - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
       summary: One run — its plan, its output, and the gap
       description: 'Board 5D and 2M. **The prep sheet, the batch detail and the yield are three views
         of one run**, and the boards drew them as three panels.
@@ -712,12 +712,12 @@ paths:
         format: uuid
     post:
       operationId: sendBookingConfirmation
+      x-ticvai-consumed-by:
+        - "P06 EMP-055 Create / Edit Reservation"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-055 Create / Edit Reservation"
       summary: Confirm a booking, and ask them to confirm back
       description: 'Board 4E, 24 August. **A reservation nobody confirms is a no-show waiting to happen**,
         and the package created bookings and never told anybody about them.
@@ -1115,12 +1115,12 @@ paths:
         format: uuid
     post:
       operationId: applyMenuActions
+      x-ticvai-consumed-by:
+        - "P08 BO-045 Menu Management"
       x-ticvai-read-via:
       - query: catalogue#priceRecords
         route: service
         for: 'its read of catalogue.price, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-045 Menu Management"
       summary: Do the same thing to many items at once
       description: 'Board 2K. **Reprice a category by five per cent, retire a season, move ten items to
         a different section.** One at a time is forty edits and a mistake.
@@ -1342,12 +1342,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createCombo
+      x-ticvai-consumed-by:
+        - "P08 BO-011 Packages & Bundles"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-011 Packages & Bundles"
       summary: A meal deal, priced as one thing
       description: 'Board 2G. **`listCatalogueBundles` bundles ticketing products, both fixed.** A burger
         with a choice of side and a choice of drink is a different shape, and the package could not express
@@ -2180,12 +2180,12 @@ paths:
         format: uuid
     post:
       operationId: notifyServer
+      x-ticvai-consumed-by:
+        - "P15 KIT-002 Kitchen Display System (KDS)"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P15 KIT-002 Kitchen Display System (KDS)"
       summary: The kitchen calls the server to the pass
       description: 'Board 3 and Board 4. **Food ready and nobody collecting it is the commonest reason
         a plate goes out cold**, and the pass had no way to say so.
@@ -2247,13 +2247,13 @@ paths:
         format: uuid
     post:
       operationId: transferOrderItems
+      x-ticvai-consumed-by:
+        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: service
         for: 'the target visit''s outlet (409 target-visit-not-open) (CHG-MOD-003)'
       x-ticvai-names-for-context: [orders.order_line]
-      x-ticvai-consumed-by:
-        - "P06 EMP-059 Table Order, Bill & Payment Management"
       summary: Move items to another table's bill
       description: 'Board 4. **A guest moves from the bar to a table and their drinks should follow.**
         `transferTableVisit` hands a whole visit to another server; this moves lines between bills.
@@ -2400,12 +2400,12 @@ paths:
         format: uuid
     post:
       operationId: notifyWaitlistParty
+      x-ticvai-consumed-by:
+        - "P06 EMP-056 Walk-In & Waitlist Management"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-056 Walk-In & Waitlist Management"
       summary: Their table is ready
       description: 'Board 4. **The message a waitlist exists to send**, and nothing sent it.
 
@@ -2474,6 +2474,9 @@ paths:
         format: uuid
     post:
       operationId: enterCountLine
+      x-ticvai-consumed-by:
+        - "P06 EMP-066 Stock Count & Cycle Count Management"
+        - "P08 BO-079 Stock Count"
       x-ticvai-read-via:
       - query: inventory#inventoryItemRecords
         route: in-process
@@ -2481,9 +2484,6 @@ paths:
       - query: inventory#movementRecords
         route: in-process
         for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-066 Stock Count & Cycle Count Management"
-        - "P08 BO-079 Stock Count"
       summary: What was actually on the shelf
       description: 'Board 5. **`startStockCount` and `postStockCount` existed and entering a line did
         not** — a count could be opened and posted and **nothing recorded what was counted.**
@@ -3346,12 +3346,12 @@ paths:
         format: uuid
     put:
       operationId: reassignServer
+      x-ticvai-consumed-by:
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-058 Live Table & Service Management"
       summary: Hand a table to another server
       description: 'Board 4. **A shift change mid-service is the ordinary case**, and the package had
         no way to say who a table belongs to now.
@@ -3412,12 +3412,12 @@ paths:
         format: uuid
     post:
       operationId: compItem
+      x-ticvai-consumed-by:
+        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-read-via:
       - query: orders#orderLineRecords
         route: service
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-write-via:
       - table: orders.order_line
         operation: applyManualDiscount
@@ -3660,12 +3660,12 @@ paths:
   /food-safety/cold-chain:
     post:
       operationId: logColdChain
+      x-ticvai-consumed-by:
+        - "P06 EMP-065 Receiving"
       x-ticvai-read-via:
       - query: inventory#goodsReceiptRecords
         route: in-process
         for: 'its read of inventory.goods_receipt, Inventory''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-065 Receiving"
       summary: The temperature a delivery arrived at, and what was decided
       description: 'Board 5G. **A delivery arriving warm is a rejection decision made at the door**, and
         `createGoodsReceipt` had nowhere to record the temperature.
@@ -3766,13 +3766,13 @@ paths:
         format: uuid
     post:
       operationId: signCorrectiveAction
+      x-ticvai-consumed-by:
+        - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
+        - "P08 BO-044 F&B Outlets"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
-        - "P08 BO-044 F&B Outlets"
       summary: Say what was done, and put a name to it
       description: 'Board 5J. **The signature is the record.** *Discarded and reset* with nobody against
         it is not a corrective action, and an inspector reading an unsigned entry treats it as an entry
@@ -3842,13 +3842,13 @@ paths:
   /production-runs:
     get:
       operationId: listProductionRuns
+      x-ticvai-consumed-by:
+        - "P08 BO-112 Production Planning & Production Sheets"
+        - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
       x-ticvai-read-via:
       - query: inventory#movementRecords
         route: in-process
         for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-112 Production Planning & Production Sheets"
-        - "P08 BO-137 Recipe Consumption & Theoretical Inventory"
       summary: What is being made, and what was
       description: 'Board 5D, 24 August. **`planProductionRun` and `completeProductionRun` existed and
         nothing read one** — found by mapping the board panels rather than the operations, which is the
@@ -3916,6 +3916,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: planProductionRun
+      x-ticvai-consumed-by:
+        - "P08 BO-112 Production Planning & Production Sheets"
       x-ticvai-read-via:
       - query: inventory#movementRecords
         route: in-process
@@ -3923,8 +3925,6 @@ paths:
       - query: tenancy#outletRecords
         route: service
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-112 Production Planning & Production Sheets"
       summary: Plan a batch, for one outlet or several
       description: 'BL-129. **Orders consumed stock and nothing produced any**, so a central kitchen making
         400 portions at 6am for four outlets had no representation.
@@ -4052,13 +4052,13 @@ paths:
         format: uuid
     post:
       operationId: transferTableVisit
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
-        - "P06 EMP-058 Live Table & Service Management"
       summary: Move a check to another server
       description: 'BL-125. **A shift change mid-service leaves a check with a server who has gone home.**
 
@@ -4136,14 +4136,14 @@ paths:
   /waitlist:
     post:
       operationId: joinRestaurantWaitlist
-      x-ticvai-read-via:
-      - query: tenancy#outletRecords
-        route: service
-        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table"
         - "P06 EMP-056 Walk-In & Waitlist Management"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -4312,14 +4312,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createTableReservation
+      x-ticvai-consumed-by:
+        - "P01 WEB-036 F&B – Browse & Order"
+        - "P02 GST-070 Reserve a Table"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: service
         for: 'the outlet at the asked time (409 outlet-full-at-time) (CHG-MOD-003)'
       x-ticvai-names-for-context: [orders.deposit]
-      x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B – Browse & Order"
-        - "P02 GST-070 Reserve a Table"
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -4555,14 +4555,14 @@ paths:
         format: uuid
     get:
       operationId: listDiningOutlets
-      x-ticvai-read-via:
-      - query: tenancy#outletRecords
-        route: service
-        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-024 F&B – Browse & Order"
         - "P02 GST-029 Venue Info & Services"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - guest
       summary: Where a guest can eat, right now
@@ -4914,13 +4914,13 @@ paths:
   /location-sessions:
     post:
       operationId: claimLocationSession
+      x-ticvai-consumed-by:
+        - "P01 WEB-036 F&B – Browse & Order"
+        - "P02 GST-024 F&B – Browse & Order"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: service
         for: 'which outlets are open to deliver to the location (409 location-not-served) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B – Browse & Order"
-        - "P02 GST-024 F&B – Browse & Order"
       x-ticvai-audience:
       - guest
       summary: Tell the platform where the guest is
@@ -5263,10 +5263,10 @@ paths:
       x-ticvai-guest-callable: true
     put:
       operationId: setFnbDeliveryPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per outlet, the one the body''s `outletId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-044 F&B Outlets"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per outlet, the one the body''s `outletId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Set takeaway and delivery rules
       description: '**Design gap, 23 September.** The dining design offers takeaway with a collection time
         and delivery to an address with a delivery window, a minimum order, a fee, free delivery above a
@@ -5317,13 +5317,13 @@ paths:
   /outlets/{outletId}/fulfilment-slots:
     get:
       operationId: listFulfilmentSlots
+      x-ticvai-consumed-by:
+        - "P01 WEB-036 F&B – Browse & Order"
+        - "P02 GST-024 F&B – Browse & Order"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: service
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B – Browse & Order"
-        - "P02 GST-024 F&B – Browse & Order"
       summary: Collection times or delivery windows still open
       description: 'Computed from the outlet''s `FnbDeliveryPolicy` and its current load: ASAP plus fixed
         slots. A slot closes when the kitchen cannot make it, so the guest never picks a time that will
@@ -5388,6 +5388,11 @@ paths:
   /guest-orders:
     post:
       operationId: createGuestFnbOrder
+      x-ticvai-consumed-by:
+        - "P01 WEB-036 F&B – Browse & Order"
+        - "P02 GST-024 F&B – Browse & Order"
+        - "P02 GST-032 AI Concierge – Chat"
+        - "P05 KSK-016 Order Food"
       x-ticvai-read-via:
       - query: inventory#movementRecords
         route: in-process
@@ -5398,11 +5403,6 @@ paths:
       - query: orders#paymentRecords
         route: service
         for: 'the order''s payment (402 payment-required, payment-declined) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-036 F&B – Browse & Order"
-        - "P02 GST-024 F&B – Browse & Order"
-        - "P02 GST-032 AI Concierge – Chat"
-        - "P05 KSK-016 Order Food"
       x-ticvai-emits:
       - fnb.kitchenTicketCreated
       x-ticvai-audience:
@@ -5587,13 +5587,13 @@ paths:
         format: uuid
     get:
       operationId: getGuestBill
+      x-ticvai-consumed-by:
+        - "P01 WEB-038 F&B – Order Tracking"
+        - "P02 GST-025 F&B – Order Tracking"
       x-ticvai-read-via:
       - query: orders#paymentRecords
         route: service
         for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-038 F&B – Order Tracking"
-        - "P02 GST-025 F&B – Order Tracking"
       x-ticvai-audience:
       - guest
       summary: The bill for the guest's table
@@ -6019,9 +6019,9 @@ paths:
   /modifier-groups:
     get:
       operationId: listModifierGroups
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -6118,13 +6118,13 @@ paths:
   /fnb-orders:
     get:
       operationId: listFnbOrders
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P04 POS-029 Order Queue"
         - "P06 EMP-051 Restaurant Service Command Center"
         - "P08 BO-020 F&B Order Management"
         - "P08 BO-021 Order Search"
         - "P15 KIT-001 Kitchen Operations Command Center"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6170,14 +6170,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createFnbOrder
-      x-ticvai-read-via:
-      - query: tenancy#outletRecords
-        route: service
-        for: 'the outlet an entitlement may be redeemed at (409 entitlement-not-redeemable) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-022 Send to Kitchen"
         - "P06 EMP-058 Live Table & Service Management"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'the outlet an entitlement may be redeemed at (409 entitlement-not-redeemable) (CHG-MOD-003)'
       x-ticvai-calls:
       - access.validateAccess
       x-ticvai-note: >-
@@ -6271,13 +6271,13 @@ paths:
         format: uuid
     post:
       operationId: acceptFnbOrder
+      x-ticvai-consumed-by:
+        - "P04 POS-029 Order Queue"
+        - "P08 BO-020 F&B Order Management"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: service
         for: 'whether the outlet is taking orders (409 outlet-not-accepting-orders) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P04 POS-029 Order Queue"
-        - "P08 BO-020 F&B Order Management"
       x-ticvai-audience:
       - staff
       summary: The outlet takes the order
@@ -6890,13 +6890,13 @@ paths:
         format: uuid
     get:
       operationId: getBill
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-read-via:
       - query: orders#paymentRecords
         route: service
         for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
-        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -7024,13 +7024,13 @@ paths:
         format: uuid
     post:
       operationId: closeTableVisit
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
+        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-read-via:
       - query: orders#paymentRecords
         route: service
         for: 'the payments taken against the bill (409 payments-short-of-bill) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P04 POS-028 Table Service"
-        - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-audience:
       - staff
       summary: Settle and close a visit
@@ -7195,6 +7195,7 @@ paths:
         - "P15 KIT-006 Expeditor & Order Assembly"
         - "P15 KIT-007 Guest Collection, Buzzer & Digital Notification"
         - "P15 KIT-008 Exceptions, Re-Fire & Unavailable Items"
+        - "P15 KIT-009 SLA, Priority & Service Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -7417,11 +7418,11 @@ paths:
   /kitchen/stations:
     get:
       operationId: listKitchenStations
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-134 Kitchen & Preparation Stations"
         - "P15 KIT-001 Kitchen Operations Command Center"
         - "P15 KIT-005 Kitchen Station Workload & Dynamic Routing"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -7459,14 +7460,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setKitchenStations
+      x-ticvai-consumed-by:
+        - "P08 BO-134 Kitchen & Preparation Stations"
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
         route: service
         for: 'the display workstations it assigns (400 workstation-on-two-stations) (CHG-MOD-003)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-134 Kitchen & Preparation Stations"
       x-ticvai-audience:
       - staff
       summary: Configure stations and item routing
@@ -7585,12 +7586,12 @@ paths:
   /recipes/{recipeId}:
     put:
       operationId: setRecipe
+      x-ticvai-consumed-by:
+        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
       x-ticvai-read-via:
       - query: inventory#inventoryItemRecords
         route: in-process
         for: 'its read of inventory.inventory_item, Inventory''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-111 Ingredient Substitution, Allergen & Nutrition"
       x-ticvai-audience:
       - staff
       summary: Define a recipe for a menu item
@@ -7643,13 +7644,13 @@ paths:
         format: uuid
     post:
       operationId: recordWaste
+      x-ticvai-consumed-by:
+        - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
+        - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: service
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-067 Damage, Loss, Shrinkage & Stock Adjustment"
-        - "P08 BO-139 Wastage, Spoilage, Returns & Write-Off"
       x-ticvai-audience:
       - staff
       summary: Record waste
@@ -7775,12 +7776,12 @@ paths:
         format: uuid
     post:
       operationId: recordCorrectiveAction
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-044 F&B Outlets"
       summary: Record what was done about a finding
       description: 'What somebody did about it — discard, re-chill, recalibrate. **Distinct from signing
         it**: recording the action and attesting to it are two acts and often two people, which is the
@@ -7847,12 +7848,12 @@ paths:
         format: uuid
     post:
       operationId: escalateCorrectiveAction
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-044 F&B Outlets"
       summary: Escalate a finding
       description: 'Raised above the person who found it — a critical reading, or one nobody actioned
         in time. **Escalation is not a failure state**: it is how a finding reaches somebody with the
@@ -7905,12 +7906,12 @@ paths:
         format: uuid
     post:
       operationId: closeCorrectiveAction
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-044 F&B Outlets"
       summary: Close a signed finding
       description: '**The transition that had no operation.** A signed finding stayed signed forever because
         nothing could close it — which for a food-safety corrective action means an inspector reads an
@@ -8408,12 +8409,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setKitchenRoutingRules
+      x-ticvai-consumed-by:
+        - "P08 BO-135 Order Routing & KDS/Printer Rules"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: service
         for: 'the outlet the stations serve (422 unknown-station) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P08 BO-135 Order Routing & KDS/Printer Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '2 October: Chinmay, workbook Q189 and Q190 (BO-135, DI-323); shape follows setCourseRules'
@@ -8693,13 +8694,13 @@ paths:
         format: uuid
     put:
       operationId: setDeliveryLocationOutletMapping
+      x-ticvai-consumed-by:
+        - "P08 BO-044 F&B Outlets"
+        - "P08 BO-065 Venue Configuration"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: service
         for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-044 F&B Outlets"
-        - "P08 BO-065 Venue Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass (fnb.delivery_location_outlet had no writer; listDeliveryLocations only reads it); shape follows setFnbDeliveryPolicy'
@@ -8775,6 +8776,8 @@ paths:
   /delivery-locations:
     post:
       operationId: createDeliveryLocation
+      x-ticvai-consumed-by:
+        - "P08 BO-065 Venue Configuration"
       x-ticvai-read-via:
       - query: tenancy#outletRecords
         route: service
@@ -8782,8 +8785,6 @@ paths:
       - query: seating#seatRecords
         route: service
         for: 'the seat a `seat` location names (422 seat-id-required) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P08 BO-065 Venue Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass (fnb.delivery_location had no writer); shape follows createOutlet'

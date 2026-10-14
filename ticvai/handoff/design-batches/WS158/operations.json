@@ -303,7 +303,7 @@
  },
  "setAlertRule": {
   "method": "PUT",
-  "path": "/alert-rules",
+  "path": "/alert-rules/{alertRuleId}",
   "contract": "reporting",
   "summary": "Watch a metric and tell somebody",
   "permission": "REPORT_MANAGE",
@@ -311,6 +311,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "alertRuleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -322,7 +327,7 @@
  },
  "setLabourBudget": {
   "method": "PUT",
-  "path": "/labour-budgets",
+  "path": "/labour-budgets/{labourBudgetId}",
   "contract": "workforce",
   "summary": "Set the labour budget for a venue, department and period",
   "permission": "WORKFORCE_MANAGE",
@@ -330,6 +335,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "labourBudgetId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "7",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/reconciliation-source-import-manager-t141-adm-620",
-   "component": "apps/venue-management-web/src/routes/commercial/ReconciliationSourceImportManagerT141.tsx",
+   "component": "src/routes/commercial/ReconciliationSourceImportManagerT141.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -134,6 +135,13 @@
     "purpose": "The files and feeds reconciliation is run against",
     "trigger": "onLoad",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-025)"
+   },
+   {
+    "operationId": "getSettlement",
+    "contract": "finance",
+    "purpose": "Follows ingestSettlementFile (202) until what it started settles: Settlement detail with match results",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -142,7 +150,22 @@
    "workshopBoard": "wireframes/WS93 Payment Payment Orchestration Board 7.dc.html#adm-620"
   },
   "apisNote": "Regenerated 9 September 2026 from Payment_Payment_Orchestration.pdf page 140. 0 of 0 labels bound to a contract property; 1 of 34 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "settlementId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, `ingestSettlementFile` answers 202 with it and `getSettlement` follows it."
+    },
+    {
+     "name": "sourceId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listReconciliationSources`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -172,6 +195,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_CONFIGURE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "7",
@@ -181,7 +205,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/transaction-matching-reconciliation-engine-t142-adm-621",
-   "component": "apps/venue-management-web/src/routes/commercial/TransactionMatchingReconciliationEngineT142.tsx",
+   "component": "src/routes/commercial/TransactionMatchingReconciliationEngineT142.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -297,6 +321,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "SETTLEMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "7",
@@ -306,7 +331,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/reconciliation-exception-investigation-center-t143-adm-622",
-   "component": "apps/venue-management-web/src/routes/commercial/ReconciliationExceptionInvestigationCenterT143.tsx",
+   "component": "src/routes/commercial/ReconciliationExceptionInvestigationCenterT143.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -369,7 +394,7 @@
         "Match result"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listSettlementExceptions",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 142 §Show"
       }
      ]
@@ -476,6 +501,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "SETTLEMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "7",
@@ -485,7 +511,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/settlement-payout-manager-t144-adm-623",
-   "component": "apps/venue-management-web/src/routes/commercial/SettlementPayoutManagerT144.tsx",
+   "component": "src/routes/commercial/SettlementPayoutManagerT144.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -557,7 +583,7 @@
         "Settlement Date"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listSettlements",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 143 §Display"
       }
      ]
@@ -657,6 +683,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "7",
@@ -666,7 +693,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/fees-commission-fx-settlement-economics-t145-adm-624",
-   "component": "apps/venue-management-web/src/routes/commercial/FeesCommissionFxSettlementEconomicsT145.tsx",
+   "component": "src/routes/commercial/FeesCommissionFxSettlementEconomicsT145.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -749,7 +776,8 @@
         "FX"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Provider Fee”, “Where currencies differ, show”, “Important Boundary”.",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 144 §Compare"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 144 §Compare",
+       "operation": "getPaymentProviderEconomics"
       }
      ]
     },
@@ -861,6 +889,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "7",
@@ -870,7 +899,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/merchant-account-settlement-calendar-manager-t146-adm-625",
-   "component": "apps/venue-management-web/src/routes/commercial/MerchantAccountSettlementCalendarManagerT146.tsx",
+   "component": "src/routes/commercial/MerchantAccountSettlementCalendarManagerT146.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1008,6 +1037,14 @@
     "Expected settlement date",
     "Actual settlement date",
     "Status"
+   ],
+   "params": [
+    {
+     "name": "merchantAccountId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listMerchantAccounts`."
+    }
    ]
   },
   "wireframe": {
@@ -1045,6 +1082,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "LEDGER_POST",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "7",
@@ -1054,7 +1092,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/settlement-posting-finance-handoff-close-manager-t148-adm-626",
-   "component": "apps/venue-management-web/src/routes/commercial/SettlementPostingFinanceHandoffCloseManagerT148.tsx",
+   "component": "src/routes/commercial/SettlementPostingFinanceHandoffCloseManagerT148.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1187,6 +1225,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "LEDGER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "7",
@@ -1196,7 +1235,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/reconciliation-audit-trace-evidence-center-t149-adm-627",
-   "component": "apps/venue-management-web/src/routes/commercial/ReconciliationAuditTraceEvidenceCenterT149.tsx",
+   "component": "src/routes/commercial/ReconciliationAuditTraceEvidenceCenterT149.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1325,6 +1364,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "LEDGER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "7",
@@ -1334,7 +1374,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/reconciliation-simulator-forecast-ai-operations-advisor--adm-628",
-   "component": "apps/venue-management-web/src/routes/commercial/ReconciliationSimulatorForecastAiOperationsAdvis.tsx",
+   "component": "src/routes/commercial/ReconciliationSimulatorForecastAiOperationsAdvis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1416,7 +1456,8 @@
         "Merchant account payout"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Chargebacks”, “Expected Settlement Date”, “Date”, “Sep 04AED 980K”, “Sep 06AED 760K”, “Refund”.",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 149 §Forecast"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 149 §Forecast",
+       "operation": "getUnifiedReconciliation"
       }
      ]
     }

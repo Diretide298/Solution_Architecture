@@ -419,7 +419,7 @@ operationsByContract:
     writes: 1
   - operation: setGiftCardProduct
     verb: PUT
-    path: /gift-card-products
+    path: /gift-card-products/{giftCardProductId}
     scope: tenant
     permission: WALLET_CONFIGURE
     offline: false
@@ -512,7 +512,7 @@ operationsByContract:
     permission: WALLET_CONFIGURE
     offline: false
     reads: 2
-    writes: 1
+    writes: 2
   - operation: setWalletRiskRules
     verb: PUT
     path: /wallet-risk-rules
@@ -674,7 +674,7 @@ tables:
       affects: 'every scope in the tenant: the bump is one counter per resolver, so the scope written,
         its ancestors and every descendant that inherits from it re-resolve on their next read'
 - table: wallet.accounting_mapping
-  columns: 3
+  columns: 4
   store: postgres
   parent: null
   writtenBy:
@@ -688,7 +688,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.authentication_policy
-  columns: 2
+  columns: 3
   store: postgres
   parent: null
   writtenBy:
@@ -716,7 +716,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.configuration_version
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -737,7 +737,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.credential
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -786,7 +786,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.funding_rule
-  columns: 11
+  columns: 13
   store: postgres
   parent: wallet.wallet_type
   writtenBy:
@@ -800,7 +800,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.gift_card_product
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -814,7 +814,7 @@ tables:
   - wallet
   foreignWriters: null
 - table: wallet.reconciliation_source
-  columns: 2
+  columns: 3
   store: postgres
   parent: null
   writtenBy:

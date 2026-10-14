@@ -176,7 +176,8 @@
    },
    "assetId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.asset"
    },
    "ref": {
     "type": "string",
@@ -886,7 +887,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "authority": {
     "type": "string",
@@ -1002,7 +1004,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "note": {
     "type": "string",
@@ -1061,7 +1064,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "kind": {
     "type": "string",
@@ -1147,7 +1151,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "name": {
     "type": "string",
@@ -1574,6 +1579,8 @@
     }
    },
    "boundary": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "nullable": true,
     "description": "The shape drawn, as a polygon in drawing coordinates. Null for a pin.",
@@ -1665,13 +1672,15 @@
     "type": "string",
     "format": "uuid",
     "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164).",
     "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
    },
    "approvedByPrincipalId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164)."
    },
    "responsibleDepartmentId": {
     "type": "string",
@@ -1777,6 +1786,8 @@
     "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 6,
     "items": {
@@ -2005,6 +2016,9 @@
   }
  },
  "ProposedAction": {
+  "x-ticvai-retired-columns": [
+   "interaction_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "ai.proposed_action",
   "required": [
@@ -2021,6 +2035,8 @@
     "format": "uuid"
    },
    "interactionId": {
+    "x-ticvai-references": "ai.activity",
+    "x-ticvai-column": "activity_id",
     "type": "string",
     "format": "uuid"
    },
@@ -2255,10 +2271,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -2339,6 +2357,44 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003). `kind` is the fixed family a type belongs to; this is the tenant's own type within it, and the `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it."
+   },
+   "lifecycleState": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ResourceLifecycleState"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The lifecycle state `setResourceLifecycleState` set."
+   },
+   "lifecycleEffectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the lifecycle state takes effect (`setResourceLifecycleState`)."
+   },
+   "lifecycleReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the lifecycle state changed (`setResourceLifecycleState`)."
+   },
+   "replacementResourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "resources.resource",
+    "description": "The resource that replaces this one, where it was retired for a replacement."
+   },
+   "disposal": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "How a disposed resource left (`setResourceLifecycleState`), as given."
    }
   }
  },
@@ -2409,7 +2465,25 @@
    "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
   }
  },
+ "ResourceLifecycleState": {
+  "type": "string",
+  "description": "Board 1.10. **States of one machine**, whose allowed transitions are configuration.",
+  "enum": [
+   "draft",
+   "pendingApproval",
+   "approved",
+   "active",
+   "temporarilyUnavailable",
+   "underMaintenance",
+   "suspended",
+   "retired",
+   "archived"
+  ]
+ },
  "ScanEvent": {
+  "x-ticvai-retired-columns": [
+   "ticket_id"
+  ],
   "x-ticvai-append-only": "recordedAt",
   "x-ticvai-persistence": "access.scan_event",
   "type": "object",
@@ -2439,6 +2513,8 @@
     "type": "string"
    },
    "ticketId": {
+    "x-ticvai-references": "access.entitlement",
+    "x-ticvai-column": "entitlement_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -3176,15 +3252,22 @@
   }
  },
  "VenueMapImportJob": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "venuemap.import_job",
   "description": "**Two-phase, following `seating.ImportJob`**, and carrying its lesson: a job that finds nothing is not a successful job.\n",
   "required": [
    "id",
    "status",
-   "outcome"
+   "outcome",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -3248,6 +3331,8 @@
     "description": "**The number to check against your own count.** A manifest of 396 seats that joins 220 is the digit problem in §4, or a section code that differs by a space — and both look like success without this figure.\n"
    },
    "findings": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "**Named against the spec**, so a finding maps to a section of `handoff/venue-map-input-spec.md` rather than to a stack trace.\n",
     "items": {
@@ -3893,6 +3978,26 @@
     "nullable": true,
     "readOnly": true,
     "description": "Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"
+   },
+   "isClosed": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "Closed by `setPathClosure`; routing does not use a closed path."
+   },
+   "expectedReopenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a closed path is expected to reopen (`setPathClosure`)."
+   },
+   "closedNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The free text with an `other` closure reason (`setPathClosure`; audit R222)."
    }
   }
  },
@@ -4033,6 +4138,8 @@
     "description": "**What the guest reads on Item Detail** (29 September, MOB-4). Keyed by locale, like `nameLocalised`. One screen now serves rides, shows, restaurants and shops (GST-004 and GST-006 merged), and it opens from the map pin, so the point carries the words rather than each kind borrowing them from a different module. Set on BO-094.\n"
    },
    "media": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 12,
     "description": "**The gallery on Item Detail** (29 September, MOB-4): images and short clips from the asset library, first `isPrimary` shown on the map card. Assets are referenced, never copied, so a replaced photo changes everywhere.\n",

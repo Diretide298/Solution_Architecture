@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/virtual-ticket-command-center-bo-334",
-   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketCommandCenter.tsx",
+   "component": "src/routes/access-venue/VirtualTicketCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -106,7 +107,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -138,7 +139,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -355,6 +356,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -364,7 +366,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/virtual-ticket-identity-master-record-configuration-bo-335",
-   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketIdentityMasterRecordConfiguration.tsx",
+   "component": "src/routes/access-venue/VirtualTicketIdentityMasterRecordConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -554,6 +556,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -563,7 +566,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/virtual-ticket-status-lifecycle-model-bo-336",
-   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketStatusLifecycleModel.tsx",
+   "component": "src/routes/access-venue/VirtualTicketStatusLifecycleModel.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -723,6 +726,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -732,7 +736,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/media-type-credential-technology-registry-bo-337",
-   "component": "apps/venue-management-web/src/routes/access-venue/MediaTypeCredentialTechnologyRegistry.tsx",
+   "component": "src/routes/access-venue/MediaTypeCredentialTechnologyRegistry.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -915,6 +919,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -924,7 +929,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/multi-media-binding-association-rules-bo-338",
-   "component": "apps/venue-management-web/src/routes/access-venue/MultiMediaBindingAssociationRules.tsx",
+   "component": "src/routes/access-venue/MultiMediaBindingAssociationRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1164,6 +1169,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -1173,7 +1179,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-identity-token-reference-mapping-bo-339",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialIdentityTokenReferenceMapping.tsx",
+   "component": "src/routes/access-venue/CredentialIdentityTokenReferenceMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1292,6 +1298,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -1301,7 +1308,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/entitlement-cross-media-synchronization-rules-bo-340",
-   "component": "apps/venue-management-web/src/routes/access-venue/EntitlementCrossMediaSynchronizationRules.tsx",
+   "component": "src/routes/access-venue/EntitlementCrossMediaSynchronizationRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1468,6 +1475,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -1477,7 +1485,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/media-activation-priority-fallback-rules-bo-341",
-   "component": "apps/venue-management-web/src/routes/access-venue/MediaActivationPriorityFallbackRules.tsx",
+   "component": "src/routes/access-venue/MediaActivationPriorityFallbackRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1620,6 +1628,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -1629,7 +1638,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/media-replacement-revocation-rebinding-rules-bo-342",
-   "component": "apps/venue-management-web/src/routes/access-venue/MediaReplacementRevocationRebindingRules.tsx",
+   "component": "src/routes/access-venue/MediaReplacementRevocationRebindingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1796,6 +1805,16 @@
    "workshopBoard": "wireframes/WS165 Ticket Media   Credential Management Board 1.dc.html#bo-342"
   },
   "apisNote": "Regenerated 9 September 2026 from Ticket_Media___Credential_Management_Reference.pdf page 16. 0 of 0 labels bound to a contract property; 15 of 38 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setMediaReplacementRevocation`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "replacementReason",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listMediaReplacementRevocation`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1825,6 +1844,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "AUDIT_VIEW",
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -1834,7 +1854,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/virtual-ticket-architecture-testing-governance-audit-bo-343",
-   "component": "apps/venue-management-web/src/routes/access-venue/VirtualTicketArchitectureTestingGovernanceAudit.tsx",
+   "component": "src/routes/access-venue/VirtualTicketArchitectureTestingGovernanceAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {

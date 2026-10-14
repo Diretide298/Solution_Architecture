@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-review-queue-bo-635",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationReviewQueue.tsx",
+   "component": "src/routes/access-venue/AccreditationReviewQueue.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -102,7 +103,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -151,7 +152,7 @@
         "Risk / exception indicator"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAccreditationApplications",
        "provenance": "pack ACCREDITATION.pdf, page 20 §Each record shall show"
       }
      ]
@@ -329,6 +330,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "3",
@@ -338,7 +340,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/application-review-workspace-bo-636",
-   "component": "apps/venue-management-web/src/routes/access-venue/ApplicationReviewWorkspace.tsx",
+   "component": "src/routes/access-venue/ApplicationReviewWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -536,6 +538,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "3",
@@ -545,7 +548,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/approval-workflow-builder-bo-637",
-   "component": "apps/venue-management-web/src/routes/access-venue/ApprovalWorkflowBuilder.tsx",
+   "component": "src/routes/access-venue/ApprovalWorkflowBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -697,6 +700,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "3",
@@ -706,7 +710,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/approval-rules-conditions-bo-638",
-   "component": "apps/venue-management-web/src/routes/access-venue/ApprovalRulesConditions.tsx",
+   "component": "src/routes/access-venue/ApprovalRulesConditions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -816,6 +820,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "3",
@@ -825,7 +830,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/reviewer-assignment-delegation-bo-639",
-   "component": "apps/venue-management-web/src/routes/access-venue/ReviewerAssignmentDelegation.tsx",
+   "component": "src/routes/access-venue/ReviewerAssignmentDelegation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -906,6 +911,16 @@
    "workshopBoard": "wireframes/WS03 ACCREDITATION Board 3.dc.html#bo-639"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalMatrix` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -935,6 +950,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "3",
@@ -944,7 +960,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/rejection-resubmission-management-bo-640",
-   "component": "apps/venue-management-web/src/routes/access-venue/RejectionResubmissionManagement.tsx",
+   "component": "src/routes/access-venue/RejectionResubmissionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1103,6 +1119,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "APPROVAL_REQUEST",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "3",
@@ -1112,7 +1129,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/escalation-exception-management-bo-641",
-   "component": "apps/venue-management-web/src/routes/access-venue/EscalationExceptionManagement.tsx",
+   "component": "src/routes/access-venue/EscalationExceptionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1231,6 +1248,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "3",
@@ -1240,7 +1258,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/approval-decision-history-bo-642",
-   "component": "apps/venue-management-web/src/routes/access-venue/ApprovalDecisionHistory.tsx",
+   "component": "src/routes/access-venue/ApprovalDecisionHistory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1350,6 +1368,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "3",
@@ -1359,7 +1378,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/approval-policy-validation-publication-bo-643",
-   "component": "apps/venue-management-web/src/routes/access-venue/ApprovalPolicyValidationPublication.tsx",
+   "component": "src/routes/access-venue/ApprovalPolicyValidationPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {

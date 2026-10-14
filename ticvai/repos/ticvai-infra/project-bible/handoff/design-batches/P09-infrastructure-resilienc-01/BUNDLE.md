@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-014` | Auto-Scaling Configuration | B–D | 0 | 43 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-030` | Infrastructure Sizing & Scaling Policy | B–D | 8 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-030` | Infrastructure Sizing & Scaling Policy | B–D | 7 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-033` | Backup & DR Status | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-034` | Archival Job Monitor | B–D | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
@@ -280,6 +280,8 @@ Every cell job:
 
 **A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_CELL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -352,7 +354,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `setScalingPolicy` body |
 | Cell `cellId` | picker: choose a cell | optional | — | — | shows names, sends the id | — | `setScalingPolicy` body |
 | Service `service` | text field | optional | — | — | — | — | `setScalingPolicy` body |
 | Replica floor `replicaFloor` | number field | optional | — | — | — | — | `setScalingPolicy` body |
@@ -454,6 +455,8 @@ Every cell job:
 
 **A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `setScalingPolicy`.
 
+Screen guard: `PLATFORM_CELL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -475,7 +478,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-030?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save scaling policy.
@@ -616,6 +619,8 @@ Every cell job:
 
 **A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_CELL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -745,6 +750,8 @@ Every cell job:
 - `listArchivalJobs` → `PLATFORM_CELL_VIEW` (read) · staff
 
 **A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_CELL_VIEW`
 
 #### Requirements it meets
 
@@ -880,6 +887,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CellJob": {"x-ticvai-persistence":"control.cell_job","type":"object","required":["id","cellId","kind","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"cellId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["provision","tierMigration","schemaMigration","backup","restore","decommission"]},"status":{"type":"string","enum":["queued","running","completed","failed","rolledBack"]},"progressPercent":{"type":"integer","minimum":0,"maximum":100},"message":{"type":"string","nullable":true},"error":{"type":"string","nullable":true},"scheduledFor":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true}}},
 "CellKind": {"type":"string","description":"Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law requires it.\n\n**On-premise is two configurations, not one (ADR-0046).** `onPremiseIsolated` keeps no channel to TICVAI — updates are pull-initiated or physically delivered, licensing is a signed file, support is blind. `onPremiseConnected` keeps an outbound control channel and is reachable, updatable and licensable in the ordinary way. The channel carries control traffic only and no natural person (ADR-0043); **AI inference is data, not control**, so connectivity alone does not grant the assistant.\n\nThere is no `hybrid`. The RFP's third model is answered by `onPremiseConnected`; a genuine split workload has never been asked for and would be a new decision.\n\n\n**`burst` added 31 August.** An environment stood up for one on-sale and torn down after (CF-162 scenario c). **It is not a jurisdiction and it is not permanent** — it holds a catalogue snapshot, three services of sixteen, and 17 tables of 380.\n\n**The other four are places data lives. This one is a place data passes through**, which is why it has its own lifecycle and a reconciliation obligation the others do not.","enum":["shared","dedicated","onPremiseIsolated","onPremiseConnected","controlPlane","burst"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"ScalingPolicy": {"type":"object","x-ticvai-persistence":"control.scaling_policy","description":"**Drafted 4 September.** What a cell scales on. **A floor and a ceiling are not symmetric** - the floor is the size the environment is stood up at before traffic arrives, and the ceiling is a cap on absorbing a peak nobody predicted (ADR-0035).","required":["id"],"properties":{"id":{"type":"string","format":"uuid"},"cellId":{"type":"string","format":"uuid"},"service":{"type":"string"},"replicaFloor":{"type":"integer"},"replicaCeiling":{"type":"integer","description":"Null means no maximum, which is the correct setting for a burst cell."},"targetUtilisationPct":{"type":"integer"},"scaleStepPct":{"type":"integer"},"updatedAt":{"type":"string","format":"date-time"}}}
+"ScalingPolicy": {"type":"object","x-ticvai-persistence":"control.scaling_policy","description":"**Drafted 4 September.** What a cell scales on. **A floor and a ceiling are not symmetric** - the floor is the size the environment is stood up at before traffic arrives, and the ceiling is a cap on absorbing a peak nobody predicted (ADR-0035).","required":["id"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"cellId":{"type":"string","format":"uuid"},"service":{"type":"string"},"replicaFloor":{"type":"integer"},"replicaCeiling":{"type":"integer","description":"Null means no maximum, which is the correct setting for a burst cell."},"targetUtilisationPct":{"type":"integer"},"scaleStepPct":{"type":"integer"},"updatedAt":{"type":"string","format":"date-time"}}}
 }
 ```

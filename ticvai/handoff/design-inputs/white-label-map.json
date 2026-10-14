@@ -8132,7 +8132,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8144,6 +8144,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8173,7 +8174,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8185,6 +8186,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8214,7 +8216,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8226,6 +8228,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8255,7 +8258,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8267,6 +8270,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8296,7 +8300,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8308,6 +8312,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8337,7 +8342,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8349,6 +8354,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8420,7 +8426,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8432,6 +8438,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8461,7 +8468,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8473,6 +8480,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8502,7 +8510,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8514,6 +8522,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8543,7 +8552,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8555,6 +8564,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8584,7 +8594,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8596,6 +8606,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8625,7 +8636,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8637,6 +8648,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -8666,7 +8678,7 @@
     }
    ],
    "reach": "status",
-   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (13)",
+   "reachesText": "GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014 … (14)",
    "specific": [
     "GST-001",
     "GST-029",
@@ -8678,6 +8690,7 @@
     "KSK-014",
     "WEB-001",
     "WEB-025",
+    "WEB-028",
     "WEB-029",
     "WEB-045",
     "WEB-050"
@@ -9154,12 +9167,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9186,12 +9197,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9218,12 +9227,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9250,12 +9257,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9282,12 +9287,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9314,12 +9317,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9346,12 +9347,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9378,12 +9377,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9410,12 +9407,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9442,14 +9437,11 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-042, GST-066, WEB-001, WEB-016, WEB-024",
+   "reachesText": "GST-001, WEB-001, WEB-016",
    "specific": [
     "GST-001",
-    "GST-042",
-    "GST-066",
     "WEB-001",
-    "WEB-016",
-    "WEB-024"
+    "WEB-016"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9476,12 +9468,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9508,12 +9498,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9540,12 +9528,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9572,12 +9558,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9604,12 +9588,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9636,12 +9618,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9668,12 +9648,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9700,12 +9678,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9732,12 +9708,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9764,12 +9738,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9796,12 +9768,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -9828,12 +9798,10 @@
     }
    ],
    "reach": "cookie",
-   "reachesText": "GST-001, GST-066, WEB-001, WEB-024",
+   "reachesText": "GST-001, WEB-001",
    "specific": [
     "GST-001",
-    "GST-066",
-    "WEB-001",
-    "WEB-024"
+    "WEB-001"
    ],
    "channel": "",
    "change": "on publish (CMS-014): web at once, the app on its next launch",
@@ -12281,30 +12249,7 @@
    "specific": []
   },
   "WEB-024": {
-   "specific": [
-    "cookieBanner.brandId",
-    "cookieBanner.inheritsFromId",
-    "cookieBanner.channel",
-    "cookieBanner.logoAssetId",
-    "cookieBanner.title",
-    "cookieBanner.body",
-    "cookieBanner.position",
-    "cookieBanner.themeId",
-    "cookieBanner.buttons",
-    "cookieBanner.buttons[].action",
-    "cookieBanner.buttons[].label",
-    "cookieBanner.rejectIsOneClick",
-    "cookieBanner.links",
-    "cookieBanner.links[].label",
-    "cookieBanner.links[].policyKind",
-    "cookieBanner.categories",
-    "cookieBanner.categories[].category",
-    "cookieBanner.categories[].description",
-    "cookieBanner.categories[].defaultOn",
-    "cookieBanner.languages",
-    "cookieBanner.regulatoryRegimes",
-    "cookieBanner.recordIpAddress"
-   ]
+   "specific": []
   },
   "WEB-025": {
    "specific": [
@@ -12332,7 +12277,20 @@
   },
   "WEB-028": {
    "specific": [
-    "maintenance.contact"
+    "maintenance.isInMaintenance",
+    "maintenance.message",
+    "maintenance.expectedBackAt",
+    "maintenance.minimumAppVersion",
+    "maintenance.minimumAppVersion.ios",
+    "maintenance.minimumAppVersion.android",
+    "maintenance.contact",
+    "maintenance.contact.phone",
+    "maintenance.contact.email",
+    "maintenance.contact.whatsapp",
+    "maintenance.contact.address",
+    "maintenance.contact.openingHours",
+    "maintenance.availability",
+    "maintenance.availabilityMessage"
    ]
   },
   "WEB-029": {
@@ -13044,8 +13002,7 @@
   "GST-042": {
    "specific": [
     "bookingFlow.guestContactFields",
-    "bookingFlow.venueOverrides[].settings.guestContactFields",
-    "cookieBanner.buttons[].action"
+    "bookingFlow.venueOverrides[].settings.guestContactFields"
    ]
   },
   "GST-043": {
@@ -13154,30 +13111,7 @@
    "specific": []
   },
   "GST-066": {
-   "specific": [
-    "cookieBanner.brandId",
-    "cookieBanner.inheritsFromId",
-    "cookieBanner.channel",
-    "cookieBanner.logoAssetId",
-    "cookieBanner.title",
-    "cookieBanner.body",
-    "cookieBanner.position",
-    "cookieBanner.themeId",
-    "cookieBanner.buttons",
-    "cookieBanner.buttons[].action",
-    "cookieBanner.buttons[].label",
-    "cookieBanner.rejectIsOneClick",
-    "cookieBanner.links",
-    "cookieBanner.links[].label",
-    "cookieBanner.links[].policyKind",
-    "cookieBanner.categories",
-    "cookieBanner.categories[].category",
-    "cookieBanner.categories[].description",
-    "cookieBanner.categories[].defaultOn",
-    "cookieBanner.languages",
-    "cookieBanner.regulatoryRegimes",
-    "cookieBanner.recordIpAddress"
-   ]
+   "specific": []
   },
   "GST-067": {
    "specific": []

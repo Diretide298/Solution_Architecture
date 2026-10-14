@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-710` | Event Resource Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-710` | Event Resource Command Center | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-711` | Event Resource Requirement Configuration | B | 0 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-712` | Staff & Role Assignment Configuration | B | 0 | 40 | 6 | 9 | 0 | 5 | — | notStarted (—) |
 | `BO-713` | Contractor & External Workforce Configuration | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -178,7 +178,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getEventResourcePlan`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Event | the name it points at, never the id | — |
+| Requirements | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Space, Equipment, Staff, Contractor, Vehicle, Service | — |
+| Resource type | the name it points at, never the id | — |
+| Role code | text | — |
+| Quantity | 1,234 | — |
+| From | 1 Oct 2026, 14:30 | — |
+| To | 1 Oct 2026, 14:30 | — |
+| Location scope path | text | — |
+| Secured count | 1,234 | — |
+| Status | chip: Required, Partially secured, Secured, At risk | — |
+| Bookings | list or chips (count when long) | — |
+| Contractors | list or chips (count when long) | — |
+| Organisation | the name it points at, never the id | — |
+| Role | text | — |
+| Headcount | 1,234 | — |
+| Accreditation programme | the name it points at, never the id | — |
+| Insurance verified | yes / no (icon or chip) | — |
+| Readiness | chip: Not planned, Planning, At risk, Ready | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -221,6 +244,8 @@ events:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `EVENT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -251,7 +276,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-710?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-711`, `BO-712`, `BO-713`, `BO-714`, `BO-715`.
@@ -365,6 +390,8 @@ requirements:
 - `getEventResourcePlan` → `EVENT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `EVENT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -546,6 +573,8 @@ assignment:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `EVENT_CONFIGURE`
+
 #### Requirements it meets
 
 9 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -703,6 +732,8 @@ contractors:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `EVENT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -750,7 +781,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `shiftTemplateId` (navigation) |
 | Route | `/sell/event-shift-roster-configuration-bo-714` |
 
 **Known gaps.** **This screen's operations return no schema with described properties**, so not one of its columns can be bound. The columns are the pack's own labels and are carried as text until the response shape …
@@ -848,7 +879,7 @@ Errors to draw in the form: 409 Overlaps an existing assignment, or the person l
 | Next cursor | text | — |
 | Has more | yes / no (icon or chip) | — |
 
-**The selected event shift roster** (detail panel): The pack groups this record's detail under its own headings: “Administrators can”, “Critical Governance Principle”.
+**The selected event shift roster** (detail panel, from `getStaffingCoverage`): The pack groups this record's detail under its own headings: “Administrators can”, “Critical Governance Principle”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -930,6 +961,8 @@ shifts:
 - `createRotaAssignment` → `WORKFORCE_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WORKFORCE_VIEW`
 
 #### Requirements it meets
 
@@ -1092,6 +1125,8 @@ deployment:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `EVENT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1230,7 +1265,7 @@ Method, path, parameters, request and response for every operation these screens
 "getStaffingCoverage": {"method":"GET","path":"/staffing-coverage","contract":"workforce","summary":"Where the rota is short, and by how much","permission":"WORKFORCE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true},{"name":"venueId","in":"query","required":null},{"name":"basis","in":"query","required":null}],"requestBody":null,"responds":"StaffingCoverage"},
 "listRotaAssignments": {"method":"GET","path":"/rota-assignments","contract":"workforce","summary":"The rota","permission":"WORKFORCE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"departmentId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setEventResourcePlan": {"method":"PUT","path":"/events/{eventId}/resource-plan","contract":"catalogue","summary":"State what the event needs, by role and by kind","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EventResourcePlan","responds":"EventResourcePlan"},
-"setShiftTemplate": {"method":"PUT","path":"/shift-templates","contract":"workforce","summary":"Define a shift pattern, its breaks and its qualifications","permission":"WORKFORCE_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ShiftTemplate","responds":"ShiftTemplate"}
+"setShiftTemplate": {"method":"PUT","path":"/shift-templates/{shiftTemplateId}","contract":"workforce","summary":"Define a shift pattern, its breaks and its qualifications","permission":"WORKFORCE_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"shiftTemplateId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"ShiftTemplate","responds":"ShiftTemplate"}
 }
 ```
 
@@ -1240,11 +1275,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"EventResourcePlan": {"type":"object","x-ticvai-persistence":"catalogue.event_resource_plan","description":"Event board 6. **Secured against required is the only number an event manager wants.**\n","properties":{"eventId":{"type":"string","format":"uuid"},"requirements":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["space","equipment","staff","contractor","vehicle","service"]},"resourceTypeId":{"type":"string","format":"uuid","nullable":true},"roleCode":{"type":"string","nullable":true},"quantity":{"type":"integer"},"from":{"type":"string","format":"date-time","nullable":true},"to":{"type":"string","format":"date-time","nullable":true},"locationScopePath":{"type":"string","nullable":true},"securedCount":{"type":"integer","readOnly":true},"status":{"type":"string","enum":["required","partiallySecured","secured","atRisk"]},"bookingIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"contractors":{"type":"array","items":{"type":"object","properties":{"organisationId":{"type":"string","format":"uuid"},"role":{"type":"string"},"headcount":{"type":"integer"},"accreditationProgrammeId":{"type":"string","format":"uuid","nullable":true},"insuranceVerified":{"type":"boolean","default":false}}}},"readiness":{"type":"string","readOnly":true,"enum":["notPlanned","planning","atRisk","ready"]},"scopePath":{"type":"string"}}},
+"EventResourcePlan": {"type":"object","x-ticvai-persistence":"catalogue.event_resource_plan","description":"Event board 6. **Secured against required is the only number an event manager wants.**\n","properties":{"eventId":{"type":"string","format":"uuid"},"requirements":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["space","equipment","staff","contractor","vehicle","service"]},"resourceTypeId":{"type":"string","format":"uuid","nullable":true},"roleCode":{"type":"string","nullable":true},"quantity":{"type":"integer"},"from":{"type":"string","format":"date-time","nullable":true},"to":{"type":"string","format":"date-time","nullable":true},"locationScopePath":{"type":"string","nullable":true},"securedCount":{"type":"integer","readOnly":true},"status":{"type":"string","enum":["required","partiallySecured","secured","atRisk"]},"bookingIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"contractors":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"organisationId":{"type":"string","format":"uuid"},"role":{"type":"string"},"headcount":{"type":"integer"},"accreditationProgrammeId":{"type":"string","format":"uuid","nullable":true},"insuranceVerified":{"type":"boolean","default":false}}}},"readiness":{"type":"string","readOnly":true,"enum":["notPlanned","planning","atRisk","ready"]},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "RotaAssignment": {"type":"object","x-ticvai-persistence":"workforce.rota_assignment","required":["principalId","venueId","startsAt","endsAt","position"],"properties":{"overtimeMinutes":{"type":"integer","nullable":true,"readOnly":true,"description":"BL-044, 1.2.83. **UAE labour law limits working hours and mandates rest periods**, and nothing in the package counted either. Derived from attendance against the shift.\n"},"restPeriodBefore":{"type":"integer","nullable":true,"description":"Minutes since the previous shift ended. **The check that stops a closing shift followed by an opening one**, which is legal in most places and unsafe in all of them.\n"},"breachesWorkingHourLimit":{"type":"boolean","default":false,"readOnly":true,"description":"**Flagged at assignment, not discovered at payroll.** A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a month later means it was worked.\n"},"labourCost":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"**Cost at the point of scheduling.** A manager building a rota without seeing its cost is a manager who finds out from finance.\n"},"id":{"type":"string","format":"uuid","readOnly":true},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string","readOnly":true},"venueId":{"type":"string","format":"uuid"},"departmentId":{"type":"string","format":"uuid","nullable":true},"position":{"type":"string","description":"What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n**A position code, not a label.** It is the same value as `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an assignment spelled differently from the rule it fills is counted against nothing and the gap stays open. Tenant-defined, which is why it is not an enum here.\n"},"requiredRoleId":{"type":"string","format":"uuid","nullable":true,"description":"Checked on assignment. A rota naming someone unqualified is a rota that gets overridden."},"workstationId":{"type":"string","format":"uuid","nullable":true,"description":"Where the position needs a till. **The link between a rota and a cash session**, without merging the two.\n"},"startsAt":{"type":"string","format":"date-time"},"endsAt":{"type":"string","format":"date-time"},"status":{"$ref":"#/components/schemas/RotaStatus"},"breakMinutes":{"type":"integer","nullable":true},"note":{"type":"string","nullable":true}}},
 "RotaStatus": {"type":"string","enum":["planned","published","confirmed","swapPending","cancelled","completed","noShow"]},
-"ShiftTemplate": {"type":"object","x-ticvai-persistence":"workforce.shift_template","description":"Resource board 3.7. **The unit a manager actually thinks in.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["early","late","middle","split","double","night","onCall","overtime"]},"startsAt":{"type":"string"},"endsAt":{"type":"string"},"breaks":{"type":"array","items":{"type":"object","properties":{"afterMinutes":{"type":"integer"},"minutes":{"type":"integer"},"paid":{"type":"boolean","default":false}}}},"requiredQualifications":{"type":"array","items":{"type":"string"}},"roleCode":{"type":"string","nullable":true},"costCentre":{"type":"string","nullable":true},"hourlyRate":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"scopePath":{"type":"string"}}},
+"ShiftTemplate": {"type":"object","x-ticvai-persistence":"workforce.shift_template","description":"Resource board 3.7. **The unit a manager actually thinks in.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["early","late","middle","split","double","night","onCall","overtime"]},"startsAt":{"type":"string"},"endsAt":{"type":"string"},"breaks":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"afterMinutes":{"type":"integer"},"minutes":{"type":"integer"},"paid":{"type":"boolean","default":false}}}},"requiredQualifications":{"type":"array","items":{"type":"string"}},"roleCode":{"type":"string","nullable":true},"costCentre":{"type":"string","nullable":true},"hourlyRate":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"scopePath":{"type":"string"}}},
 "StaffingCoverage": {"type":"object","description":"Resource board 4.4. **The gap is the product.**","properties":{"date":{"type":"string","format":"date"},"venueId":{"type":"string","format":"uuid"},"positionCode":{"type":"string"},"label":{"type":"string"},"from":{"type":"string"},"to":{"type":"string"},"required":{"type":"integer"},"rostered":{"type":"integer"},"qualified":{"type":"integer","description":"**A position filled by somebody not qualified for it is still a gap.**"},"gap":{"type":"integer"},"severity":{"type":"string","enum":["covered","tight","short","blocking"]},"openShiftIds":{"type":"array","items":{"type":"string","format":"uuid"}},"basisApplied":{"type":"string","enum":["minimum","forecastRequirement"],"description":"Which figure `required` is for this row. With `higherOfBoth`, the larger; with `forecastRequirement` and no handed-over requirement for the period, `minimum`."},"minimumRequired":{"type":"integer","nullable":true,"description":"The configured minimum for the position and window."},"forecastRequired":{"type":"number","nullable":true,"description":"The forecast staff requirement (p50) for the position and window, from `workforce.forecast_requirement`. Null where none was handed over."},"forecastRequiredP90":{"type":"number","nullable":true,"description":"The busy-case requirement, for planning to the busy case."},"forecastVersionId":{"type":"string","format":"uuid","nullable":true,"description":"The AI forecast version the requirement is bound to (AIP-067), so a manager can open the forecast behind it."}}}
 }
 ```

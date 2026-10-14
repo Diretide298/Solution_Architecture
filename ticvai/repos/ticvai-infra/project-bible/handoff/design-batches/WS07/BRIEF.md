@@ -123,7 +123,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-204` | Offline & Edge Operations Command Center | C | 0 | 182 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-205` | Edge Node & Local Processing Configuration | C | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-206` | Offline Validation Policy Builder | C | 13 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-206` | Offline Validation Policy Builder | C | 11 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-207` | Edge Package & Data Distribution | C | 16 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-208` | Offline Credential & Revocation Cache | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-209` | Offline Entitlement & Usage Ledger | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

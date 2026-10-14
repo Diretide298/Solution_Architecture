@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 235
+  x-ticvai-screen-count: 232
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -79,6 +79,302 @@ tags:
 - name: case
 - name: loyalty
 - name: feedback
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  attributionTouchRecords:
+    module: marketing-crm
+    table: marketing.attribution_touch
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.attribution_touch rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AttributionTouch'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.attribution_touch rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  audienceListRecords:
+    module: marketing-crm
+    table: marketing.audience_list
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.audience_list rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AudienceList'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.audience_list rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  campaignRecords:
+    module: marketing-crm
+    table: marketing.campaign
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.campaign rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Campaign'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.campaign rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  caseRecords:
+    module: marketing-crm
+    table: marketing.case
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.case rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Case'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.case rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  consentQuestionRecords:
+    module: marketing-crm
+    table: marketing.consent_question
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.consent_question rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ConsentQuestion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.consent_question rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  consentQuestionVersionRecords:
+    module: marketing-crm
+    table: marketing.consent_question_version
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.consent_question_version rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ConsentQuestionVersion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.consent_question_version rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  consentRecords:
+    module: marketing-crm
+    table: marketing.consent_record
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.consent_record rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ConsentRecord'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.consent_record rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Marketing implements, and asked from another
+      deployable through Marketing's service route (serviceAuth).
+    served: [in-process, service]
+  guestProfileRecords:
+    module: marketing-crm
+    table: marketing.guest_profile
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.guest_profile rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/GuestProfile'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.guest_profile rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  loyaltyPositionRecords:
+    module: marketing-crm
+    table: marketing.loyalty_position
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.loyalty_position rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/LoyaltyPosition'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.loyalty_position rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked in process within operations, through the C# query interface Marketing implements, and
+      asked from another deployable through Marketing's service route (serviceAuth).
+    served: [in-process, service]
+  loyaltyProgrammeRecords:
+    module: marketing-crm
+    table: marketing.loyalty_programme
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.loyalty_programme rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/LoyaltyProgramme'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.loyalty_programme rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  messageDispatchRecords:
+    module: marketing-crm
+    table: marketing.message_dispatch
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.message_dispatch rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MessageDispatch'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.message_dispatch rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  messageTemplateRecords:
+    module: marketing-crm
+    table: marketing.message_template
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.message_template rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MessageTemplate'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.message_template rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  messageTemplateVersionRecords:
+    module: marketing-crm
+    table: marketing.message_template_version
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.message_template_version rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MessageTemplateVersion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.message_template_version rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  programmeTierRecords:
+    module: marketing-crm
+    table: marketing.programme_tier
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.programme_tier rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MarketingProgrammeTier'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.programme_tier rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
+  segmentRecords:
+    module: marketing-crm
+    table: marketing.segment
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.segment rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Segment'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.segment rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Marketing implements, and asked from another
+      deployable through Marketing's service route (serviceAuth).
+    served: [in-process, service]
+  segmentCriterionRecords:
+    module: marketing-crm
+    table: marketing.segment_criterion
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The marketing.segment_criterion rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Marketing stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SegmentCriterion'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Marketing answers with its marketing.segment_criterion rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through Marketing's service route (serviceAuth).
+    served: [service]
 paths:
   /my/cases:
     get:
@@ -89,6 +385,10 @@ paths:
         - "P02 GST-034 Lost & Found"
         - "P02 GST-040 Help & Support"
         - "P02 GST-068 Help & My Cases"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -102,7 +402,11 @@ paths:
         **Scoped to the caller, not filtered by it.** A guest-facing list that takes a subject parameter
         is a list somebody will call with another subject.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - marketing
       parameters:
@@ -495,6 +799,8 @@ paths:
       operationId: setGuestMatchPolicy
       x-ticvai-consumed-by:
         - "P08 BO-745 Identity Resolution Rules"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Set how returning guests are recognised
       description: '**Design gap, 23 September.** The booking design matches a guest checking out without
         an account to an existing profile, by email, mobile or either, and asks them whether it is them.
@@ -547,6 +853,10 @@ paths:
   /guest-checkout/profile-match:
     post:
       operationId: checkGuestCheckoutMatch
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: service
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       summary: Does this contact already have a profile here
       deprecated: true
       description: '**Retired from checkout, 28 September (decided 28 September, audit R120 (b)).** A verified
@@ -585,6 +895,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuestCheckoutMatch'
         '403':
+          x-ticvai-problem-types: [contact-not-verified]
           description: The contact has not been proven with a one-time code.
           content:
             application/problem+json:
@@ -603,6 +914,10 @@ paths:
   /guest-checkout/profile-match/decision:
     post:
       operationId: decideGuestCheckoutMatch
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: service
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: orders.cart
         operation: claimCart
@@ -640,6 +955,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuestMatchDecision'
         '409':
+          x-ticvai-problem-types: [profile-match-expired, already-decided]
           description: The match has expired or was already decided.
           content:
             application/problem+json:
@@ -661,6 +977,10 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-055 Create / Edit Reservation"
         - "P06 EMP-057 Guest Profile & Dining History"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       summary: Is this the same person we already have?
       description: 'Board 4E, 24 August. **A restaurant creates a duplicate guest every time somebody
         books by phone with a different number**, and a CRM that cannot recognise them reports two visits
@@ -727,6 +1047,10 @@ paths:
       x-ticvai-consumed-by:
         - "P06 EMP-057 Guest Profile & Dining History"
         - "P08 BO-746 Duplicate Review & Merge"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: pii.subject
         event: guest.merged
@@ -948,6 +1272,13 @@ paths:
   /invitation-campaigns:
     post:
       operationId: createInvitationCampaign
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: A quota-bounded, addressed invitation
       description: 'BL-150 and CF-74''s issuance half. **A campaign broadcasts; an invitation is addressed
         and expects a response.**
@@ -997,6 +1328,11 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-017 My Account Dashboard"
         - "P02 GST-072 Share & Group Booking"
+      x-ticvai-read-via:
+      - query: orders#invitationRecords
+        route: service
+        for: 'its read of orders.invitation, Orders''s data (CHG-MOD-001)'
+      x-ticvai-names-for-context: [access.entitlement]
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1049,7 +1385,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Invitation'
+                $ref: '#/components/schemas/CampaignInvitation'
         '409':
           description: Already answered, expired or revoked — the token is single-use — or an acceptance
             when the campaign's `quota` of places is taken.
@@ -1064,6 +1400,10 @@ paths:
       operationId: recordPrivacyIncident
       x-ticvai-consumed-by:
         - "P08 BO-752 Privacy & AI Governance"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       summary: Log a personal-data breach and start the clock
       description: 'BL-176. **UAE PDPL gives 72 hours from discovery**, and nothing recorded one.
 
@@ -1112,7 +1452,11 @@ paths:
       description: 'The builder''s list. **The latest version of each form**; older versions stay readable
         through `getForm` with `version`.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`retired`, `superseded`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - marketing
       x-ticvai-permission: MARKETING_VIEW
@@ -1160,6 +1504,10 @@ paths:
         - "P08 BO-815 Survey Builder"
         - "P13 CMS-042 Waiver Template Library & Master Setup"
         - "P13 CMS-043 Digital Waiver & Form Builder"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: Define a waiver, survey or capture form
       description: 'CF-129. **One mechanism, three uses.** A waiver is this with a signature, a survey
         is this with a scale, a capture is this at the point of sale.
@@ -1255,6 +1603,10 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-026 Survey & Feedback"
         - "P02 GST-035 Feedback & Ratings"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1277,7 +1629,7 @@ paths:
       - staff
       - guest
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: true
+      x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -1312,6 +1664,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P08 BO-852 Documents, Search & Retention"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1364,6 +1723,10 @@ paths:
   /guest-documents:
     post:
       operationId: uploadGuestDocument
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
       security:
       - guestAuth: []
@@ -1414,6 +1777,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-825 Challenge Builder"
         - "P08 BO-829 Family, Team & Event Challenges"
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       summary: Define a challenge, mission or streak
       description: '22.6.1. **Gamification is not loyalty** — loyalty pays for spend, and a challenge
         pays for behaviour the venue wants that spend does not produce: a second visit, a quiet Tuesday,
@@ -1641,6 +2008,10 @@ paths:
       operationId: getSeoMetadata
       x-ticvai-consumed-by:
         - "P13 CMS-013 SEO & Metadata"
+      x-ticvai-read-via:
+      - query: platform-ops#seoMetadataRecords
+        route: in-process
+        for: 'its read of control.seo_metadata, Platform''s data (CHG-MOD-001)'
       summary: The metadata in force for one page
       description: '**The read `setSeoMetadata` had none of**, so the editor could not show what was there
         before replacing it.
@@ -1697,6 +2068,15 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: platform-ops#seoMetadataRecords
+        route: in-process
+        for: 'its read of control.seo_metadata, Platform''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per entity and locale, the one the body''s `entityId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Titles, descriptions, canonicals and hreflang
       description: '22.11.1 and 22.11.11. **SEO is not a marketing nicety for a venue selling online**
         — an attraction that does not appear in search sells through OTAs at OTA commission.
@@ -1739,6 +2119,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-842 SEO Management"
         - "P13 CMS-013 SEO & Metadata"
+      x-ticvai-read-via:
+      - query: platform-ops#urlRedirectRecords
+        route: in-process
+        for: 'its read of control.url_redirect, Platform''s data (CHG-MOD-001)'
       summary: 301, 302 and custom redirects
       description: '22.11.7. **A redirect chain is the failure mode.** A to B to C loses ranking at every
         hop, so a new redirect whose target is itself a redirect is **collapsed rather than appended.**
@@ -1777,6 +2161,10 @@ paths:
       operationId: listLostItems
       x-ticvai-consumed-by:
         - "P08 BO-073 Lost & Found Register"
+      x-ticvai-read-via:
+      - query: venue-map#pointRecords
+        route: in-process
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1787,7 +2175,9 @@ paths:
         The suggested matches for an item come from `getLostItemMatches`; an item already tied to its
         other half carries it in `matchedItemId`.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - marketing
       parameters:
@@ -1824,6 +2214,13 @@ paths:
         - "P01 WEB-034 Lost & Found"
         - "P02 GST-034 Lost & Found"
         - "P08 BO-073 Lost & Found Register"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: venue-map#pointRecords
+        route: in-process
+        for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1842,7 +2239,7 @@ paths:
       - staff
       - guest
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: true
+      x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -1911,6 +2308,10 @@ paths:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
         - "P08 BO-830 Referral & Streak Management"
+      x-ticvai-read-via:
+      - query: promotions#promotionRecords
+        route: service
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1947,6 +2348,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Referral'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/disposition:
@@ -1992,6 +2395,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CallDisposition'
+        '409':
+          description: 'The conversation has not ended (`withAssistant`, `queued`, `withAgent` or `waitingOnGuest`); a disposition records why it ended. Nothing is recorded.'
+          x-ticvai-problem-types: [conversation-not-ended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /lost-items/{itemId}/match:
@@ -2116,6 +2526,9 @@ paths:
         - "P08 BO-780 Guest Engagement Journeys"
         - "P08 BO-782 AI Journey Optimization"
         - "P08 BO-783 Journey Analytics & Audit"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`); a screen that shows only live rows filters on `status` itself.'
       summary: Automated journeys
       tags:
       - marketing
@@ -2187,6 +2600,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Journey'
         '422':
+          x-ticvai-problem-types: [journey-graph-not-terminating, journey-step-target-missing]
           description: '**The graph does not terminate, or a step points at nothing.** Refused at creation
             rather than discovered by a guest stuck in a loop.
 
@@ -2250,6 +2664,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Journey'
+        '409':
+          description: 'The journey is `archived` (`journey-archived`), or the move is not one its state model allows, such as pausing a `draft` journey or activating one already `active` (`journey-transition-not-allowed`). Nothing changes.'
+          x-ticvai-problem-types: [journey-archived, journey-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /journeys/{journeyId}/performance:
@@ -2294,6 +2715,7 @@ paths:
       operationId: listMessageTriggers
       x-ticvai-consumed-by:
         - "P08 BO-776 Trigger Event Catalog"
+      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       summary: What fires a message, and when
       tags:
       - marketing
@@ -2370,6 +2792,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageTrigger'
         '400':
+          x-ticvai-problem-types: [optimised-send-not-allowed, unknown-event]
           description: '`sendTimeMode` `optimised` on a trigger whose `priority` is `operational` or `transactional`
             (29 September, build pass, group G2), or an `event` not in the event catalogue.'
           content:
@@ -2500,6 +2923,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MessageDispatch'
+        '409':
+          description: 'The dispatch has not failed (`queued`, `sent`, `delivered`, `opened` or `clicked`; `message-dispatch-not-failed`), or was `suppressed` (`message-dispatch-suppressed`); only a `failed` or `bounced` dispatch is retried. Nothing is sent.'
+          x-ticvai-problem-types: [message-dispatch-not-failed, message-dispatch-suppressed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guests/identify:
@@ -2508,6 +2938,16 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-027 Guest Lookup"
+      x-ticvai-read-via:
+      - query: access#blacklistRecords
+        route: service
+        for: 'its read of access.blacklist, Access''s data (CHG-MOD-001)'
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       summary: Resolve any identifier to a guest
       description: '**A resolver over identifiers, not new data.** `searchGuests` finds by name and contact
         and `lookupTicket` resolves a ticket, so a cashier handed a wristband had to know which operation
@@ -2624,6 +3064,8 @@ paths:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-039 Profile"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own profile: one per signed-in guest, so there is no key in the path.'
       x-ticvai-write-via:
       - table: pii.subject
         operation: updateGuestSubjectDetails
@@ -2689,6 +3131,7 @@ paths:
                   - push
                   - none
                 dietary:
+                  x-ticvai-stored-as: marketing.guest_preference.dietary
                   type: array
                   description: '**Health-adjacent personal data, kept structured rather than as a tag**
                     (BL-134). `GuestProfile.tags` carries VIP-style markers adequately and is the wrong
@@ -2699,6 +3142,7 @@ paths:
                   items:
                     type: string
                 accessibility:
+                  x-ticvai-stored-as: marketing.guest_preference.accessibility
                   type: array
                   description: Same treatment, same reason. Stored as `GuestPreferences.accessibility`.
                   items:
@@ -2718,6 +3162,10 @@ paths:
   /loyalty/accruals:
     post:
       operationId: accrueLoyaltyPoints
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Award points for a completed order
       description: '**`games` awards points on play and ticketing did not**, so a guest earned for an
         arcade game and not for the ticket that got them in.
@@ -2875,6 +3323,10 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: The omnichannel inbox
@@ -2887,7 +3339,9 @@ paths:
 
         A conversation may *create* a case (22.8.12). It is not one.
 
-        '
+        
+
+        **Order.** Newest first, by `sentAt` descending, then by `id`.'
       tags:
       - marketing
       x-ticvai-permission: CASE_VIEW
@@ -2940,6 +3394,10 @@ paths:
         - "P08 BO-796 Guest Conversation 360"
         - "P08 BO-799 Agent Workspace"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: One conversation and everything before it
@@ -3186,6 +3644,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Conversation'
         '409':
+          x-ticvai-problem-types: [already-claimed]
           description: Already claimed by another agent
           content:
             application/problem+json:
@@ -3206,6 +3665,10 @@ paths:
       x-ticvai-consumed-by:
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Pass it to another agent or queue
@@ -3247,6 +3710,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+        '409':
+          description: 'The conversation is not `withAgent` (still with the assistant, queued, waiting on the guest, or ended); only an agent''s conversation is transferred. Nothing changes.'
+          x-ticvai-problem-types: [conversation-not-with-agent]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /conversations/{conversationId}/close:
@@ -3307,6 +3777,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Conversation'
+        '409':
+          description: 'The conversation is already `resolved`, `abandoned` or `timedOut` (`conversation-already-closed`), or is `queued` or `waitingOnGuest` (`conversation-transition-not-allowed`); only a conversation `withAssistant` or `withAgent` is closed. Nothing changes.'
+          x-ticvai-problem-types: [conversation-already-closed, conversation-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /agent-availability:
@@ -3315,6 +3792,12 @@ paths:
       x-ticvai-consumed-by:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-003 Availability & Routing Settings"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own availability: one per signed-in staff member, so there is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: An agent goes available, away or offline
@@ -3376,6 +3859,13 @@ paths:
       operationId: startKioskAssist
       x-ticvai-consumed-by:
         - "P08 BO-799 Agent Workspace"
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: service
+        for: 'its read of orders.cart, Orders''s data (CHG-MOD-001)'
+      - query: tenancy#deviceRecords
+        route: service
+        for: 'its read of platform.device, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: A staff member helps a guest at a kiosk, remotely
@@ -3473,6 +3963,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/KioskAssistSession'
+        '409':
+          description: 'The assist session has already ended (`endedAt` is set). Nothing changes.'
+          x-ticvai-problem-types: [kiosk-assist-already-ended]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/position:
@@ -3580,7 +4077,9 @@ paths:
         **never filled in from their real name**, which is the disclosure this exists to prevent
         and would arrive silently on the day they first placed.
 
-        '
+        
+
+        **Order.** Sorted by `rank` ascending.'
       tags:
       - loyalty
       x-ticvai-permission: null
@@ -3632,6 +4131,9 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own leaderboard nickname: one per signed-in guest, so there is no key in the path.'
+      x-ticvai-names-for-context: [pii.subject]
       x-ticvai-audience:
       - guest
       summary: Choose the name shown on the board
@@ -3669,6 +4171,7 @@ paths:
               - nickname
               properties:
                 nickname:
+                  x-ticvai-stored-as: marketing.loyalty_position.leaderboard_nickname
                   type: string
                   minLength: 2
                   maxLength: 24
@@ -3702,7 +4205,9 @@ paths:
         principals holding `GUEST_VIEW_PII`; everyone else sees the opaque subject reference and behavioural
         attributes.
 
-        '
+        
+
+        **Order.** Sorted by `displayName` ascending, then by `id`.'
       tags:
       - guest
       x-ticvai-permission: GUEST_VIEW
@@ -3746,6 +4251,7 @@ paths:
                       items:
                         $ref: '#/components/schemas/GuestProfile'
         '403':
+          x-ticvai-problem-types: [forbidden, pii-search-not-permitted]
           description: Not permitted at the requested scope, or `search` passed without `GUEST_VIEW_PII`.
           content:
             application/problem+json:
@@ -3771,6 +4277,13 @@ paths:
         - "P08 BO-738 Activity Timeline"
         - "P08 BO-740 Family & Guardians"
         - "P08 BO-799 Agent Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectContactRecords
+        route: service
+        for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -3939,6 +4452,10 @@ paths:
         - "P02 GST-066 Privacy & My Data"
         - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-749 Guest Preference Center"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -4044,6 +4561,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConsentState'
         '400':
+          x-ticvai-problem-types: [unknown-notice-version, purpose-not-configured]
           description: Notice version unknown, or the purpose is not configured
           content:
             application/problem+json:
@@ -4312,6 +4830,7 @@ paths:
         - "P02 GST-071 Payment Methods"
         - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
+        - "P13 CMS-023 Consent Purpose & Consent Type Builder"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -4329,6 +4848,8 @@ paths:
         purposes a guest is asked for, and nothing in draft, unpublished or withdrawn; asked for by id, such a
         record answers as not found. `GUEST_VIEW` is what a staff caller must hold, and staff also see drafts
         (ADR-0025).
+
+        **Order.** Sorted by `displayName` ascending.
       tags:
       - consent
       parameters:
@@ -4361,6 +4882,8 @@ paths:
         - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
         - "P13 CMS-023 Consent Purpose & Consent Type Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Configure consent purposes
@@ -4419,7 +4942,9 @@ paths:
       description: 'Hard bounces, complaints, explicit global opt-outs and unsubscribes. Checked at send
         time regardless of segment or consent — a complaint outranks a consent record.
 
-        '
+        
+
+        **Order.** Sorted by `channel` ascending, then by `id`.'
       tags:
       - consent
       x-ticvai-permission: GUEST_VIEW
@@ -4736,6 +5261,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
+      x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - guest
       summary: A guest's registered devices
@@ -4751,7 +5277,8 @@ paths:
         **Every status is listed**, `active`, `failed` and `revoked`, each with its `status` and, for a revoked
         one, `revokedAt`: GST-073 and WEB-024 show a revoked device as revoked rather than dropping it, so a
         guest can see that the old phone that still held tickets was cut off, and a failed one as needing the
-        app opened again. There is no status filter; a screen that wants active devices only filters what it
+        app opened again. **A revoked device is also signed out** (CHG-MOD-009): `revokeGuestDevice` ended its
+        guest sessions and refresh tokens in Identity, so a revoked device is neither sent to nor signed in. There is no status filter; a screen that wants active devices only filters what it
         is given.
 
         **Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here
@@ -4920,6 +5447,11 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
+      x-ticvai-write-via:
+      - table: identity.guest_session
+        operation: endGuestDeviceSessions
+      x-ticvai-calls:
+      - identity.endGuestDeviceSessions
       x-ticvai-audience:
       - guest
       summary: Revoke a device registration
@@ -4931,6 +5463,17 @@ paths:
         `status` `revoked`, `revokedAt` now, and `tokenRef`, `tokenFingerprint` and `installationId` cleared, so
         nothing can be sent to it and no later registration matches it. The row stays, with its platform, model
         and dates, as the guest''s record of the device. Revoking a revoked device is `204` again.
+
+
+        **A revoke also signs that device out** (decided 14 October 2026, Chinmay, the audit of ticket 27741;
+        CHG-MOD-009). After the row is revoked, and only where it had an `installationId`, this calls Identity''s
+        `endGuestDeviceSessions` (serviceAuth, cell-internal: Identity is in `commerce`, this in `operations`,
+        ADR-0055 rule 4) with the guest''s `subjectId` and that `installationId`, which the app sent as `deviceId`
+        when it signed in. Identity ends every guest session of this guest on that device and revokes each one''s
+        refresh token, so the old phone can neither refresh nor call again; the guest''s other devices stay
+        signed in. Revoking the device the guest is using signs it out too, so the app returns to sign-in. If
+        Identity does not answer, the device stays revoked and this answers `502`
+        `device-sessions-not-ended`; the client calls again, which is a `204` revoke that asks Identity again.
 
         '
       tags:
@@ -4956,9 +5499,18 @@ paths:
           headers:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
-          description: Revoked
+          description: Revoked, and the device signed out
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '502':
+          description: The device is revoked but Identity did not end its sessions (`device-sessions-not-ended`);
+            call again to retry (CHG-MOD-009).
+          x-ticvai-problem-types:
+          - device-sessions-not-ended
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /segments:
@@ -4973,6 +5525,7 @@ paths:
         - "P08 BO-757 Behavioral Segmentation"
         - "P08 BO-766 Campaign Builder"
         - "P16 ANL-007 Guest & Conversion Intelligence"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5051,6 +5604,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Segment'
         '400':
+          x-ticvai-problem-types: [segment-criteria-contradictory, unknown-segment-attribute]
           description: Criteria are contradictory or reference unknown attributes
           content:
             application/problem+json:
@@ -5159,6 +5713,8 @@ paths:
       x-ticvai-read-routing: replica
       summary: List guests currently matching a segment
       description: Evaluated live. Useful for spot-checking a definition before use.
+
+        **Order.** Sorted by `displayName` ascending, then by `id`.
       tags:
       - segment
       x-ticvai-permission: MARKETING_VIEW
@@ -5192,6 +5748,7 @@ paths:
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-764 Campaign Command Center"
         - "P08 BO-766 Campaign Builder"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5775,6 +6332,7 @@ paths:
         - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-785 Template Library"
         - "P12 SUP-007 Canned Response Management"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5849,11 +6407,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageTemplate'
         '400':
+          x-ticvai-problem-types: [unknown-merge-field, required-language-missing]
           description: Unknown merge field, or a required language is missing
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /messages:
@@ -5928,6 +6489,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MessageDispatch'
         '409':
+          x-ticvai-problem-types: [address-suppressed, no-address-for-channel]
           description: Address suppressed, or the guest has no address for that channel
           content:
             application/problem+json:
@@ -5982,6 +6544,7 @@ paths:
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-005 Live Chat Workspace"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -6159,7 +6722,7 @@ paths:
       - case
       x-ticvai-permission: CASE_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -6195,6 +6758,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Case'
         '400':
+          x-ticvai-problem-types: [case-resolution-note-required]
           description: Resolving without a resolution note
           content:
             application/problem+json:
@@ -6311,7 +6875,7 @@ paths:
       - case
       x-ticvai-permission: CASE_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -6370,7 +6934,7 @@ paths:
       - case
       x-ticvai-permission: CASE_MANAGE
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
@@ -6402,6 +6966,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Case'
+        '409':
+          description: 'The case is already `escalated` (`case-already-escalated`), or is not `inProgress` (`open`, `awaitingGuest`, `resolved` or `closed`; `case-not-in-progress`). Nothing changes.'
+          x-ticvai-problem-types: [case-already-escalated, case-not-in-progress]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /loyalty/programmes:
@@ -6430,6 +7001,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published loyalty
         programmes, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `rank` ascending, then by `id`.
       tags:
       - loyalty
       parameters:
@@ -6615,6 +7188,9 @@ paths:
       operationId: listReviews
       x-ticvai-consumed-by:
         - "P08 BO-819 Review Collection & Rating Rules"
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`rejected`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6749,6 +7325,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Review'
+        '409':
+          description: 'The review was `rejected` in moderation and is shown to nobody; it takes no response. Nothing changes.'
+          x-ticvai-problem-types: [review-rejected]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /marketing-subscriptions:
@@ -6798,6 +7381,8 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-065 Newsletter & Preferences"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per guest, channel and list, the one the body''s `subjectId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -6903,7 +7488,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /channel-provider:
+  /channel-provider/{communicationProviderId}:
     put:
       operationId: setChannelProvider
       x-ticvai-consumed-by:
@@ -6937,6 +7522,11 @@ paths:
             schema:
               $ref: '#/components/schemas/ChannelProviderConfigurationInput'
       parameters:
+        - name: communicationProviderId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -6953,6 +7543,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [provider-credentials-failed, provider-connection-failed, webhook-verification-failed, secret-reference-unresolved]
           description: >
             The provider cannot be activated: credentials, connection or webhook verification failed, or
             the secret reference does not resolve.
@@ -6962,7 +7553,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /sender-identity-domain:
+  /sender-identity-domain/{senderIdentityId}:
     put:
       operationId: setSenderIdentityDomain
       x-ticvai-consumed-by:
@@ -6996,6 +7587,11 @@ paths:
             schema:
               $ref: '#/components/schemas/SenderIdentityDomainBrandConfigurationInput'
       parameters:
+        - name: senderIdentityId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -7012,6 +7608,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [sender-identity-not-verified, channel-fields-missing, provider-not-on-channel]
           description: >
             The identity cannot take this status (not yet verified), the channel-specific fields are
             missing, or the provider does not serve this channel.
@@ -7200,6 +7797,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /business-event-notification/{eventId}:
     put:
       operationId: setBusinessEventMapping
       x-ticvai-audience:
@@ -7222,6 +7820,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `eventId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -7244,6 +7847,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [event-type-not-registered, template-channel-mismatch, template-not-platform-owned]
           description: >
             The eventType is not registered, a template's channel does not match its entry, or a template
             is not a platform template.
@@ -7327,6 +7931,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /routing-priority-throttling/{routingRuleId}:
     put:
       operationId: setCommunicationRoutingRule
       x-ticvai-audience:
@@ -7348,6 +7953,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: routingRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -7370,6 +7980,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [unknown-provider, provider-not-on-channel, provider-listed-twice, fallback-includes-own-channel]
           description: >
             A provider is unknown, on another channel or listed twice, or the fallback includes the
             rule's own channel.
@@ -7993,6 +8604,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /data-processing-purpose/{purposeId}:
     put:
       operationId: setDataProcessingPurpose
       x-ticvai-consumed-by:
@@ -8015,6 +8627,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: purposeId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `purposeId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -8044,6 +8661,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-749 Guest Preference Center"
         - "P13 CMS-024 Communication Preference & Marketing Permission Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per communication preference category, the one the body''s `categoryCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.8-9 (17.1.4); MoM 20 Aug §4.3 (no opt-in, no promotional communication); MoM 31 Aug §4.6'
@@ -8088,6 +8707,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [marketing-category-defaults-on, consent-purpose-missing]
           description: A marketing category that defaults to on, or names no consent purpose.
           content:
             application/problem+json:
@@ -8197,6 +8817,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-tracking-digital/{technologyId}:
     put:
       operationId: setTrackingTechnology
       x-ticvai-consumed-by:
@@ -8218,6 +8839,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: technologyId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `technologyId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -8238,6 +8864,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [category-required, non-essential-without-consent]
           description: Approved with no category, or a non-essential technology marked as needing no consent.
           content:
             application/problem+json:
@@ -8320,6 +8947,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-banner-preference/{bannerDesignId}:
     put:
       operationId: setCookieBannerDesign
       x-ticvai-consumed-by:
@@ -8344,6 +8972,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: bannerDesignId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -8364,6 +8997,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [reject-harder-than-accept, non-essential-pre-ticked, do-not-sell-button-missing]
           description: A design that makes rejecting harder than accepting, pre-ticks a non-essential category, or names `ccpaCpra` without a `doNotSellOrShare` button.
           content:
             application/problem+json:
@@ -8376,6 +9010,8 @@ paths:
       operationId: setConsentCapturePoint
       x-ticvai-consumed-by:
         - "P13 CMS-027 Consent Capture Point & Customer Journey Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per capture point and channel, the one the body''s `capturePoint` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.12-13 (17.1.7); guardian threshold from setMinorGuardianAge (per country, no shipped default)'
@@ -8421,6 +9057,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [consent-purpose-missing, policy-kind-missing]
           description: A consent step naming no consent purpose, or a notice step naming no policy kind.
           content:
             application/problem+json:
@@ -8508,11 +9145,16 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /privacy-notice-policy/{governanceId}:
     put:
       operationId: setPrivacyNoticePolicyGovernance
       x-ticvai-consumed-by:
         - "P13 CMS-028 Privacy Notice, Policy & Terms Version Management"
         - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
+      x-ticvai-read-via:
+      - query: white-label#policyRecords
+        route: in-process
+        for: 'its read of whitelabel.policy, WhiteLabel''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: writers pass; marketing.privacy_notice_governance had no writer, listPrivacyNoticePolicy only reads it (DM6); pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.14-15 (17.1.8: lifecycle Draft, Review, Approved, Scheduled, Published, Superseded, Archived; change marked by an authorised user, never by AI); approval through the approvals engine as approvePrivacyTesting does'
@@ -8549,6 +9191,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: governanceId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -8573,6 +9220,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [privacy-notice-transition-not-allowed, approval-fields-read-only, classification-locked-after-approval]
           description: A status move the lifecycle does not allow, approval fields sent by the caller, or a
             change to the classification after approval.
           content:
@@ -8580,6 +9228,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [change-classification-required]
           description: '`review` without a `changeClassification`.'
           content:
             application/problem+json:
@@ -8592,6 +9241,8 @@ paths:
       operationId: setMinorGuardianAge
       x-ticvai-consumed-by:
         - "P13 CMS-029 Minor, Guardian & Age-Based Privacy Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.15-16 (17.1.9: configure by jurisdiction, do not hard-code 13, 16 or 18); the ages are the tenant''s configuration per country with no shipped default, so no age is guessed'
@@ -8636,6 +9287,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [guardian-age-above-minor-age, verification-method-required]
           description: '`guardianRequiredBelowAge` above `minorBelowAge`, or no verification method.'
           content:
             application/problem+json:
@@ -8648,6 +9300,8 @@ paths:
       operationId: approvePrivacyTesting
       x-ticvai-consumed-by:
         - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per privacy change set, the one the body''s `changeSetId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.16-18 (17.1.10); approval runs through the approvals engine (configurable workflow, no hard-coded job titles)'
@@ -8792,6 +9446,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /privacy/{requestTypeId}:
     put:
       operationId: setPrivacyRequestTypes
       x-ticvai-audience:
@@ -8814,6 +9469,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: requestTypeId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -8834,6 +9494,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
+          x-ticvai-problem-types: [request-type-has-open-requests]
           description: Retiring a type that still has open requests.
           content:
             application/problem+json:
@@ -8846,6 +9507,10 @@ paths:
       operationId: listCustomerPrivacyConsent
       x-ticvai-consumed-by:
         - "P13 CMS-032 Customer Privacy, Consent & Preference 360°"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.22-24 (17.2.2); MoM 20 Aug §4.3; composed from existing consent, profile and request reads'
@@ -9110,6 +9775,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /data-subject-customer/{requestId}:
     put:
       operationId: setPrivacyRequest
       x-ticvai-consumed-by:
@@ -9135,6 +9801,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: requestId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `requestId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -9157,12 +9828,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [dsar-fan-out-incomplete, privacy-request-already-completed]
           description: Completion while the cross-cell DSAR fan-out is not `completed`, or a change to a completed request.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [identity-not-verified, outcome-required, unknown-request-type]
           description: Progressed past verification without a verified identity, completed without an outcome, or an unknown request type.
           content:
             application/problem+json:
@@ -9176,6 +9849,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-750 Data Subject Requests"
         - "P13 CMS-035 Data Discovery, Access, Export & Correction Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per privacy request, the one the body''s `requestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.28-29 (17.2.5); exportSubjectData already assembles an export from the lineage; MoM 20 Aug §4.3 (access, correction, deletion)'
@@ -9220,6 +9895,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [request-kind-not-supported, request-not-in-progress, identity-not-verified, approver-is-generator]
           description: The request is not an access, export or correction request, is not `inProgress`,
             its identity is not verified, or the approver is the principal who generated the package.
           content:
@@ -9317,6 +9993,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /deletion-anonymization-restriction/{actionId}:
     put:
       operationId: setPrivacyAction
       x-ticvai-audience:
@@ -9340,6 +10017,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: actionId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `actionId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -9362,12 +10044,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [privacy-action-not-decidable]
           description: A decision on an action already executing, completed or cancelled.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [approval-out-of-order, same-approver-both-steps, legal-hold-blocks-action]
           description: Approval out of order, the same principal approving both steps, or an action blocked by a legal hold.
           content:
             application/problem+json:
@@ -9435,6 +10119,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /data-retention-expiry/{holdId}:
     put:
       operationId: setLegalHold
       x-ticvai-consumed-by:
@@ -9458,6 +10143,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: holdId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `holdId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -9480,6 +10170,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [hold-approved-by-placer, release-reason-required, hold-already-released]
           description: Approved by the principal who placed it, released without a reason, or a change to a released hold.
           content:
             application/problem+json:
@@ -9596,6 +10287,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /privacy-compliance-exception/{exceptionId}:
     put:
       operationId: setPrivacyComplianceException
       x-ticvai-consumed-by:
@@ -9626,6 +10318,11 @@ paths:
             schema:
               $ref: '#/components/schemas/PrivacyComplianceExceptionInvestigationWorkspaceInput'
       parameters:
+        - name: exceptionId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -9642,6 +10339,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [root-cause-required, corrective-action-required, exception-closed]
           description: Closed without root cause and corrective action, or a change to a closed exception.
           content:
             application/problem+json:
@@ -9724,6 +10422,7 @@ paths:
             type: string
             format: uuid
         - name: requestId
+          x-ticvai-column: marketing.privacy_audit_event.related_request_id
           in: query
           required: false
           schema:
@@ -9904,6 +10603,7 @@ paths:
       parameters:
         - $ref: ../shared/common.yaml#/components/parameters/PageSize
         - name: agentPrincipalId
+          x-ticvai-column: marketing.case.assigned_to_principal_id
           in: query
           required: false
           description: Whose workload; defaults to the caller. Another agent's needs a team-level CASE_VIEW grant.
@@ -9934,6 +10634,25 @@ paths:
         - "P08 BO-737 Customer 360 Profile"
         - "P12 SUP-009 Customer Service Command Center"
         - "P12 SUP-010 Customer 360° Service Profile"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: identity#subjectContactRecords
+        route: service
+        for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
+      - query: orders#reservationRecords
+        route: service
+        for: 'its read of orders.reservation, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1; pack ''Customer Service_Reference.pdf'' pp.5-7 (10.1.2); CRM stays the source of truth (pack p.7), ADR-0023 for the personal data'
@@ -10046,6 +10765,7 @@ paths:
               - internalNote
               - automatedNotification
         - name: agentPrincipalId
+          x-ticvai-column: marketing.conversation.assigned_principal_id
           in: query
           required: false
           schema:
@@ -10058,12 +10778,14 @@ paths:
             type: string
             format: uuid
         - name: orderId
+          x-ticvai-column: marketing.case.related_order_id
           in: query
           required: false
           schema:
             type: string
             format: uuid
         - name: ticketId
+          x-ticvai-column: marketing.case.id
           in: query
           required: false
           schema:
@@ -10144,6 +10866,8 @@ paths:
       operationId: setCaseInvestigationResolution
       x-ticvai-consumed-by:
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per case and linked record, the one the body''s `caseId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (agents act from the case; AI summariser compiles actions on a case); pack ''Customer Service_Reference.pdf'' pp.11-13 (10.1.5 Related Records, Case Actions)'
@@ -10187,6 +10911,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [linked-record-not-found, linked-record-out-of-scope]
           description: The referenced record does not exist or is outside the caller's scope.
           content:
             application/problem+json:
@@ -10232,12 +10957,16 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /order-booking-ticket:
+  /order-booking-ticket/{serviceActionId}:
     put:
       operationId: setOrderBookingTicket
       x-ticvai-consumed-by:
         - "P08 BO-801 Sales & Service Actions"
         - "P12 SUP-014 Order, Booking & Ticket Service Workspace"
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'the order and its policies (422 not-permitted-by-policy) (CHG-MOD-003)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (agents act on bookings from the case: date change, reschedule, resend); pack ''Customer Service_Reference.pdf'' pp.13-14 (10.1.6, Guardrail: agents cannot bypass Ticketing or Pricing rules)'
@@ -10269,6 +10998,11 @@ paths:
             schema:
               $ref: '#/components/schemas/OrderBookingTicketServiceWorkspaceInput'
       parameters:
+        - name: serviceActionId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -10289,6 +11023,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [not-permitted-by-policy]
           description: The action is not permitted for this order under its policies; the problem names
             the policy.
           content:
@@ -10297,7 +11032,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /refund-compensation-service:
+  /refund-compensation-service/{compensationRequestId}:
     put:
       operationId: setRefundCompensationService
       x-ticvai-consumed-by:
@@ -10331,6 +11066,11 @@ paths:
             schema:
               $ref: '#/components/schemas/RefundCompensationServiceExceptionWorkspaceInput'
       parameters:
+        - name: compensationRequestId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -10349,6 +11089,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [refund-request-not-draft, exceeds-refundable]
           description: The request is no longer a draft, or the amount exceeds what remains refundable
             (`exceedsRefundable`).
           content:
@@ -10459,6 +11200,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /escalation-collaboration-internal/{internalRequestId}:
     put:
       operationId: setCaseInternalRequest
       x-ticvai-audience:
@@ -10480,6 +11222,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: internalRequestId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -10613,6 +11360,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /case-resolution-closure/{caseResolutionId}:
     put:
       operationId: setCaseResolution
       x-ticvai-audience:
@@ -10633,6 +11381,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: caseResolutionId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -10691,6 +11444,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-798 Intent & Knowledge Management"
         - "P12 SUP-018 AI Customer Service Copilot & Knowledge Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (AI summariser on a case); pack ''Customer Service_Reference.pdf'' pp.19-21 (10.1.10); inherits getAiPolicy (ADR-0018: a venue narrows, never widens)'
@@ -10738,6 +11493,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [venue-widens-tenant-configuration, venue-widens-ai-policy]
           description: A venue row would widen the tenant's configuration or the AI policy.
           content:
             application/problem+json:
@@ -10858,6 +11614,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /intelligent-routing-skill/{routingRuleId}:
     put:
       operationId: setIntelligentRoutingSkill
       x-ticvai-consumed-by:
@@ -10891,6 +11648,11 @@ paths:
             schema:
               $ref: '#/components/schemas/IntelligentRoutingSkillsAssignmentEngineInput'
       parameters:
+        - name: routingRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -11099,6 +11861,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /agent-workload-availability/{agentServiceProfileId}:
     put:
       operationId: setAgentServiceProfile
       x-ticvai-audience:
@@ -11120,6 +11883,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: agentServiceProfileId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -11149,6 +11917,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-810 Escalation Rules"
         - "P12 SUP-024 Escalation & Critical Case Monitor"
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.2 (escalation and case monitoring, unresolved cases escalated further); pack ''Customer Service_Reference.pdf'' pp.32-34 (10.2.6)'
@@ -11164,6 +11936,8 @@ paths:
         customer's name is returned only to callers holding `GUEST_VIEW_PII`, as `Case.guestName` is.
         Ordered by `escalatedAt` descending then `caseId`; keyset cursor. (decided 29 September,
         readiness close-out)
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
       tags:
         - case
       x-ticvai-permission: CASE_VIEW
@@ -11397,6 +12171,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /quality-agent-evaluation/{evaluationId}:
     put:
       operationId: setQualityEvaluation
       x-ticvai-audience:
@@ -11419,6 +12194,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: evaluationId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -11533,6 +12313,7 @@ paths:
             type: string
             format: uuid
         - name: agentPrincipalId
+          x-ticvai-column: marketing.case.assigned_to_principal_id
           in: query
           required: false
           schema:
@@ -11578,6 +12359,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-823 VOC Analytics & Audit"
         - "P12 SUP-027 Service Analytics & Root-Cause Intelligence"
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.2 (week-over-week case volume trends); pack ''Customer Service_Reference.pdf'' pp.37-39 (10.2.9)'
@@ -11719,6 +12504,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /contact-automation/{automationId}:
     put:
       operationId: setContactAutomation
       x-ticvai-audience:
@@ -11743,6 +12529,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: automationId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -11826,12 +12617,14 @@ paths:
             type: string
             format: uuid
         - name: productId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
             type: string
             format: uuid
         - name: eventId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
@@ -11992,6 +12785,8 @@ paths:
         check (products and venues that reference the waiver). `q` matches name and description, which
         is how the create dialog offers similar existing templates before a duplicate is made. Ordered by
         `waiverName` then `waiverId`; keyset cursor. (decided 29 September, readiness close-out)
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`, `expired`); a screen that shows only live rows filters on `status` itself.
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -12028,6 +12823,7 @@ paths:
           schema:
             type: boolean
         - name: q
+          description: 'Matched case-insensitively as a substring of `waiverName`, `internalDescription` or `customTypeLabel`; no wildcards.'
           in: query
           required: false
           schema:
@@ -12053,6 +12849,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waiver-template-master/{waiverId}:
     put:
       operationId: setWaiverTemplateMaster
       x-ticvai-audience:
@@ -12075,6 +12872,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: waiverId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `waiverId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -12099,6 +12901,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [form-kind-not-waiver, source-waiver-required]
           description: The form is not of kind `waiver` or `consentForm` (CHG-CSA-026), or `sourceWaiverId` is
             missing for a duplicate.
           content:
@@ -12113,6 +12916,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-845 Waiver Template Builder"
         - "P13 CMS-043 Digital Waiver & Form Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (drag-and-drop fields, builder fully configurable, conditional questions, mobile view); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.9-11 (11.1.3)'
@@ -12166,12 +12971,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [form-version-not-draft]
           description: The version is no longer a draft.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [block-field-unknown, block-content-missing]
           description: A block names a field the version does not have, or a block kind needs content it lacks.
           content:
             application/problem+json:
@@ -12291,6 +13098,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /dynamic-field-question/{formId}/{key}:
     put:
       operationId: setDynamicFieldQuestion
       x-ticvai-audience:
@@ -12312,6 +13120,16 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: formId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `formId`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
+        - name: key
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces. The body''s `key`, when sent, must equal it.'
+          schema: { type: string }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -12334,12 +13152,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [form-version-not-draft, field-used-by-layout-block]
           description: The version is not a draft, or a layout block still uses the field.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [field-condition-invalid, field-validation-invalid]
           description: A condition or validation rule that cannot hold.
           content:
             application/problem+json:
@@ -12354,6 +13174,8 @@ paths:
         - "P08 BO-848 Signature Experience Setup"
         - "P08 BO-849 Guardian & Group Signing"
         - "P13 CMS-045 Signatory, Signature & Guardian Rule Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (signatory = participant or parent/guardian; minor/guardian handling); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.13-14 (11.1.5), which also settles the legal question: signature method and evidence are configured per waiver and approved by the organisation''s legal/compliance reviewer, TICVAI assumes none is sufficient everywhere'
@@ -12401,12 +13223,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [form-version-not-draft]
           description: The version is no longer a draft.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [signatory-mode-unsupported, group-mode-unsupported]
           description: A signatory or group mode the version's fields cannot collect (e.g. a guardian mode
             with no guardian signature field).
           content:
@@ -12419,6 +13243,7 @@ paths:
       operationId: getSignatorySignatureGuardian
       x-ticvai-consumed-by:
         - "P08 BO-848 Signature Experience Setup"
+        - "P13 CMS-045 Signatory, Signature & Guardian Rule Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.13-14 (11.1.5); the configuration screen needs to load what it saved'
@@ -12482,6 +13307,8 @@ paths:
         `includeImpact` fills `impact`, the pack's dependency check shown before an association is
         removed. Written by `setWaiverAssociation`. Ordered by `targetType`, `targetId`, `sequence`, then
         `id`; keyset cursor. (decided 29 September, readiness close-out)
+
+        **Statuses.** Every `status` is returned, ended ones included (`removed`); a screen that shows only live rows filters on `status` itself.
       tags:
         - consent
       x-ticvai-permission: GUEST_VIEW
@@ -12565,6 +13392,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /product-event-experience/{associationId}:
     put:
       operationId: setWaiverAssociation
       x-ticvai-audience:
@@ -12585,6 +13413,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: associationId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -12607,12 +13440,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [waiver-retired]
           description: The waiver is retired.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [condition-rule-required, target-type-mismatch]
           description: A conditional association without a rule, or a target that does not match its type.
           content:
             application/problem+json:
@@ -12701,6 +13536,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waiver-trigger-eligibility/{triggerRuleId}:
     put:
       operationId: setWaiverTriggerRule
       x-ticvai-audience:
@@ -12722,6 +13558,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: triggerRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -12744,6 +13585,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [deadline-offset-required, deadline-after-trigger-point]
           description: A deadline without its offset, or one that cannot be met before the point it enforces.
           content:
             application/problem+json:
@@ -12830,6 +13672,8 @@ paths:
       operationId: setLocalizationBrandingCustomer
       x-ticvai-consumed-by:
         - "P13 CMS-049 Localization, Branding & Customer Experience Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (mobile view; waiver reachable by QR code; delivery by email/WhatsApp/SMS); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.19-20 (11.1.9)'
@@ -12877,12 +13721,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [published-version-languages-locked]
           description: A language of a published version was changed.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [human-reviewer-required, approver-is-translator]
           description: An approval without a human reviewer, or approved by the translator.
           content:
             application/problem+json:
@@ -12939,6 +13785,8 @@ paths:
       operationId: approveWaiverTesting
       x-ticvai-consumed-by:
         - "P13 CMS-050 Waiver Approval, Testing & Publication Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per waiver form, the one the body''s `formId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (approval/testing/publication; templates published vs draft; versioning); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.19 (Emergency Suspension, Re-Sign Rules), 21-23 (11.1.10); states/form-definition.yaml'
@@ -12988,12 +13836,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [waiver-version-transition-not-allowed]
           description: The action does not apply to the version's current stage.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [critical-checklist-failure, waiver-approver-is-submitter]
           description: A critical checklist failure, or the approver is the submitter.
           content:
             application/problem+json:
@@ -13049,12 +13899,14 @@ paths:
             type: string
             pattern: ^[A-Z]{2}$
         - name: productId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
             type: string
             format: uuid
         - name: eventId
+          x-ticvai-column: marketing.waiver_association.target_id
           in: query
           required: false
           schema:
@@ -13109,6 +13961,16 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-844 Waiver Command Center"
         - "P13 CMS-051 Waiver Operations Command Center"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (tracking per participant, incomplete waiver can block download, activation, check-in or access); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.26-27 (11.2.1); filters are the pack''s Filters'
@@ -13241,6 +14103,19 @@ paths:
         - "P08 BO-850 Pre-Arrival Completion"
         - "P08 BO-851 Verification & Access Control"
         - "P13 CMS-052 Participant Waiver Status & Tracking"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (tracking per participant with delivery channel; purchaser, participant and signatory kept apart); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.28-29 (11.2.2)'
@@ -13355,6 +14230,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: actOnWaiverRequirements
+      x-ticvai-read-via:
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (delivery by email, WhatsApp or SMS; waiver reachable by QR code); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.29-37 (operational, bulk and corrective actions); the tracking screens need their write'
@@ -13622,6 +14501,19 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-850 Pre-Arrival Completion"
         - "P13 CMS-054 Minor, Guardian & Group Consent Management"
+      x-ticvai-read-via:
+      - query: identity#subjectContactRecords
+        route: service
+        for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (signatory = participant or parent/guardian; minor/guardian handling); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.31-33 (11.2.4), whose Important Rule settles who may sign for a group'
@@ -13744,6 +14636,10 @@ paths:
       operationId: listWaiverVerificationQueue
       x-ticvai-consumed-by:
         - "P13 CMS-055 Waiver Verification & Validation Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (verification workspace flags missing/expired/invalid); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.33-34 (11.2.5 Verification Queue); the workspace needs its read'
@@ -13824,6 +14720,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /waiver-verification-validation/{verificationId}:
     put:
       operationId: setWaiverVerificationValidation
       x-ticvai-consumed-by:
@@ -13859,6 +14756,11 @@ paths:
             schema:
               $ref: '#/components/schemas/WaiverVerificationValidationWorkspaceInput'
       parameters:
+        - name: verificationId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -13877,6 +14779,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [checks-failing, reason-required]
           description: '`verified` while an automatic check fails or no signature is present
             (`checksFailing`), or a required `note` or `escalatedTo` is missing (`reasonRequired`).'
           content:
@@ -13890,6 +14793,19 @@ paths:
       operationId: listMissingExpiredInvalid
       x-ticvai-consumed-by:
         - "P13 CMS-056 Missing, Expired & Invalid Waiver Management"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#groupBookingRecords
+        route: service
+        for: 'its read of orders.group_booking, Orders''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (verification workspace flags missing/expired/invalid; incomplete waiver can block access); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.34-36 (11.2.6)'
@@ -14074,6 +14990,7 @@ paths:
             type: string
             format: uuid
         - name: customerSubjectId
+          x-ticvai-column: marketing.waiver_requirement.signatory_subject_id
           in: query
           required: false
           schema:
@@ -14092,6 +15009,7 @@ paths:
             type: string
             format: uuid
         - name: membershipId
+          x-ticvai-column: marketing.waiver_requirement.ticket_id
           in: query
           required: false
           schema:
@@ -14119,8 +15037,13 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /site-waiver-exception/{waiverExceptionId}:
     put:
       operationId: setWaiverException
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'the performance the exception''s scope names (422 scope-incomplete) (CHG-MOD-003)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' p.37 (11.2.7 Exception Workflow, Override Scope, Critical Rule); the exception workflow needs its write'
@@ -14142,6 +15065,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: waiverExceptionId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -14166,6 +15094,7 @@ paths:
         '409':
           $ref: ../shared/common.yaml#/components/responses/Conflict
         '422':
+          x-ticvai-problem-types: [exception-not-allowed, scope-incomplete]
           description: The waiver form does not allow exceptions (`exceptionNotAllowed`), or the scope
             is missing its ticket, performance or `validUntil` (`scopeIncomplete`).
           content:
@@ -14181,6 +15110,10 @@ paths:
         - "P08 BO-852 Documents, Search & Retention"
         - "P08 BO-853 Legal Evidence & Audit"
         - "P13 CMS-058 Compliance Evidence, Audit & Waiver Repository"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (versioning; signatory = participant or parent/guardian); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.38-39 (11.2.8); legal posture: record more evidence rather than less, retention per ADR-0047'
@@ -14522,6 +15455,8 @@ paths:
       operationId: setGuestAttributeModel
       x-ticvai-consumed-by:
         - "P08 BO-736 Guest Master Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Change the model, as a version
       description: '**Versioned and audited, because a guest record answers questions years later.** A
         field whose meaning changed in March makes every value before it ambiguous unless the change is
@@ -14573,6 +15508,13 @@ paths:
         - "P08 BO-739 Contact & Preferences"
         - "P08 BO-742 Commerce & Documents"
         - "P08 BO-796 Guest Conversation 360"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Everything this guest did, in order, across the platform
       description: 'Board 1.5. Purchases, scans, reservations, visits, membership changes, loyalty,
         wallet, campaigns, messages, cases, surveys and waivers — **twelve contexts, one chronology.**
@@ -14722,6 +15664,10 @@ paths:
         - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-743 AI Guest Intelligence"
         - "P08 BO-832 AI Engagement Optimization"
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Value, engagement, churn and propensity, with their reasons
       description: 'Board 1.10 — *"turn the unified record into **explainable** customer insight."*
 
@@ -14779,6 +15725,8 @@ paths:
       operationId: setIdentityResolutionRules
       x-ticvai-consumed-by:
         - "P08 BO-745 Identity Resolution Rules"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Matching weights, thresholds and survivorship
       description: 'Board 2.2. **`mergeGuests` existed and nothing said which records were duplicates or
         which value survives.**
@@ -14835,7 +15783,11 @@ paths:
         **Merging is not reversible in practice**, whatever the system claims, so the preview is the
         control.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
+
+        **Statuses.** Every `status` is returned, ended ones included (`rejected`); a screen that shows only live rows filters on `status` itself.'
       tags:
       - guests
       x-ticvai-permission: GUEST_MANAGE
@@ -14943,9 +15895,13 @@ paths:
                 $ref: '#/components/schemas/DuplicateCandidate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /retention-policies:
+  /retention-policies/{retentionPolicyId}:
     put:
       operationId: setDataRetentionPolicy
+      x-ticvai-read-via:
+      - query: tenancy#dataRetentionSettingRecords
+        route: service
+        for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
       summary: How long guest data is kept, and what happens at expiry
       description: 'Board 2.8. **`listDataRetentionExpiry` could read them and nothing set them.**
 
@@ -14975,6 +15931,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: tenant
       parameters:
+      - name: retentionPolicyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -14993,6 +15954,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DataRetentionPolicy'
         '422':
+          x-ticvai-problem-types: [retention-exceeds-tenant-period]
           description: '`retainMonths` longer than the tenant''s effective `guestProfile` retention
             period (tenancy `setDataRetentionSetting`); a rule here may only shorten it'
           content:
@@ -15059,6 +16021,7 @@ paths:
       operationId: listAudienceLists
       x-ticvai-consumed-by:
         - "P08 BO-756 Static Lists & Imports"
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       summary: Static and imported audiences
       tags:
       - guests
@@ -15135,6 +16098,9 @@ paths:
       operationId: listAudienceActivations
       x-ticvai-consumed-by:
         - "P08 BO-763 Activation & Governance"
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`expired`, `failed`); a screen that shows only live rows filters on `status` itself.'
       summary: Where audiences are being used, and whether they are still in sync
       tags:
       - guests
@@ -15206,6 +16172,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AudienceActivation'
         '409':
+          x-ticvai-problem-types: [audience-consent-blocked, audience-volume-exceeded, audience-approval-required]
           description: Blocked by consent, volume or approval
           content:
             application/problem+json:
@@ -15262,6 +16229,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-827 Points & Activity Rules"
         - "P08 BO-828 Milestones & Reward Rules"
+      x-ticvai-names-for-context: [marketing.loyalty_programme]
       summary: Every rule a loyalty programme runs on
       description: 'Decision 8 of the schema merge. **`marketing.loyalty_programme` holds no rules** —
         it is a header with a code, a name and an expiry. The rules were taken from the backend
@@ -15296,6 +16264,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoyaltyRuleSet'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such programme
           content:
             application/problem+json:
@@ -15308,6 +16277,10 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-827 Points & Activity Rules"
         - "P08 BO-828 Milestones & Reward Rules"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'whether a rule''s product exists (409 unknown-reward-or-product) (CHG-MOD-003)'
       summary: Replace a programme's rules as one set
       description: '**Applied whole or not at all.** Setting rules one at a time leaves a live
         programme inconsistent in the middle, which means guests earning under one rule and
@@ -15348,6 +16321,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LoyaltyRuleSet'
         '409':
+          x-ticvai-problem-types: [unknown-reward-or-product]
           description: A rule references a reward or product that does not exist
           content:
             application/problem+json:
@@ -15365,7 +16339,9 @@ paths:
         the programme''s earning rule plus a window, and without this table it is a rule somebody has
         to remember to switch off.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -15377,6 +16353,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
       - name: programmeId
+        x-ticvai-column: marketing.loyalty_campaign.program_id
         in: query
         schema:
           type: string
@@ -15404,6 +16381,7 @@ paths:
                         $ref: '#/components/schemas/MarketingLoyaltyCampaign'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /loyalty/campaigns/{loyaltyCampaignId}:
     put:
       operationId: setLoyaltyCampaign
       x-ticvai-consumed-by:
@@ -15419,6 +16397,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: venue
       parameters:
+      - name: loyaltyCampaignId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -15441,6 +16424,7 @@ paths:
   /loyalty/points:
     get:
       operationId: listLoyaltyPointEntries
+      x-ticvai-names-for-context: [marketing.loyalty_position]
       summary: The ledger behind a points balance
       description: '**This is the point of decision 8.** The merge response says it plainly:
         *"`marketing.loyalty_position` is a balance with no ledger behind it. It cannot be audited or
@@ -15450,7 +16434,9 @@ paths:
         Every row carries `balance_after`, so a disputed balance can be walked rather than argued
         about.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: LOYALTY_ACCRUE
@@ -15467,6 +16453,7 @@ paths:
           type: string
           format: uuid
       - name: programmeId
+        x-ticvai-column: marketing.loyalty_points.program_id
         in: query
         schema:
           type: string
@@ -15522,6 +16509,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published rewards, and
         nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
         `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `name` ascending, then by `id`.
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -15535,6 +16524,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
       - name: programmeId
+        x-ticvai-column: marketing.reward.loyalty_program_id
         in: query
         schema:
           type: string
@@ -15557,6 +16547,7 @@ paths:
                         $ref: '#/components/schemas/MarketingReward'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /loyalty/rewards/{rewardId}:
     put:
       operationId: setReward
       x-ticvai-consumed-by:
@@ -15572,6 +16563,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: venue
       parameters:
+      - name: rewardId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -15598,7 +16594,9 @@ paths:
       description: '**A reward is a definition and an assignment is an instance**, which is why the
         code, the expiry and the order it was redeemed against live here rather than on the reward.
 
-        '
+        
+
+        **Order.** Newest first, by `issuedAt` descending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -15670,6 +16668,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MarketingRewardAssignment'
         '409':
+          x-ticvai-problem-types: [insufficient-points, reward-not-available-at-venue]
           description: Not enough points, or the reward is not available at this venue
           content:
             application/problem+json:
@@ -15682,6 +16681,7 @@ paths:
       operationId: listBadges
       x-ticvai-consumed-by:
         - "P08 BO-826 Achievement & Badge Engine"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -15718,6 +16718,7 @@ paths:
                         $ref: '#/components/schemas/MarketingBadge'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /badges/{badgeId}:
     put:
       operationId: setBadge
       x-ticvai-consumed-by:
@@ -15733,6 +16734,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: venue
       parameters:
+      - name: badgeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -15772,7 +16778,9 @@ paths:
         not exist, never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest
         (ADR-0025).
 
-        '
+        
+
+        **Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
@@ -15853,6 +16861,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MarketingCustomerBadge'
         '409':
+          x-ticvai-problem-types: [badge-already-held]
           description: Already held and not expired
           content:
             application/problem+json:
@@ -15870,6 +16879,8 @@ paths:
         and the alternative is a `notes` column nobody can report on.
 
         The options come back with the field because a select with no options is not a field.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - marketing
       x-ticvai-permission: GUEST_VIEW
@@ -15902,6 +16913,8 @@ paths:
       operationId: setGuestExtraFields
       x-ticvai-consumed-by:
         - "P08 BO-736 Guest Master Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: Define the extra guest fields
       description: >
         **Set whole, because removing an option is only safe when the values are in view.** An
@@ -16022,12 +17035,15 @@ paths:
   /sla-policies:
     get:
       operationId: listSlaPolicies
+      x-ticvai-names-for-context: [approvals.sla_policy]
       summary: Response and resolution targets for cases
       description: >
         **Not `approvals.sla_policy`, which times an approval request.** This times a guest case:
         first response, resolution, escalation, and whether the clock runs outside business hours.
         Two tables with one name, and the `audit-duplicate-tables` pairing was a false positive for
         exactly that reason.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - marketing
       x-ticvai-permission: CASE_VIEW
@@ -16056,6 +17072,7 @@ paths:
                         $ref: '#/components/schemas/MarketingSlaPolicy'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /sla-policies/{slaPolicyId}:
     put:
       operationId: setSlaPolicy
       x-ticvai-consumed-by:
@@ -16076,6 +17093,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-config-scope: venue
       parameters:
+      - name: slaPolicyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -16103,6 +17125,8 @@ paths:
         **`getWaiverStatus` answered whether a guest had signed and nothing could produce the
         signature.** A waiver whose evidence cannot be retrieved is not a waiver, which is the
         entire reason venues collect them.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
       tags:
       - marketing
       x-ticvai-permission: GUEST_VIEW_PII
@@ -16314,6 +17338,7 @@ paths:
           type: string
           format: uuid
       - name: subjectId
+        x-ticvai-column: marketing.booking_consent_record.person_subject_id
         in: query
         schema:
           type: string
@@ -16353,6 +17378,10 @@ paths:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P02 GST-007 Select Date & Time"
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: service
+        for: 'the questions the cart asks (409, 422 question-not-asked) (CHG-MOD-003)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -16410,6 +17439,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/BookingConsentRecord'
         '409':
+          x-ticvai-problem-types: [question-version-superseded]
           description: The question has changed since the cart was read (`questionVersionSuperseded`); the
             client re-reads the cart and asks the current version.
           content:
@@ -16417,6 +17447,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConsentAnswerProblem'
         '422':
+          x-ticvai-problem-types: [person-required, question-not-asked, question-retired]
           description: 'A `perPerson` question answered without a person (`personRequired`), a question
             this cart does not ask (`questionNotAsked`), or a retired one (`questionRetired`).'
           content:
@@ -16445,7 +17476,9 @@ paths:
         **Scoped to the caller, not filtered by it**, like `/me/cases`: there is no subject parameter.
         `unreadOnly` returns only what the guest has not opened. Agreed 29 September, our build plan.
 
-        '
+        
+
+        **Order.** Sorted by `title` ascending, then by `id`.'
       tags:
       - message
       parameters:
@@ -16618,6 +17651,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /case-categories/{caseCategoryId}:
     put:
       operationId: setCaseCategoryDefinition
       x-ticvai-consumed-by:
@@ -16646,6 +17680,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: caseCategoryId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -16668,12 +17707,14 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
+          x-ticvai-problem-types: [category-has-active-subcategories]
           description: Retiring a category that still has active subcategories.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [parent-not-top-level-category, category-is-own-parent]
           description: The parent is not a top-level category of this venue, or the row names itself as
             its parent.
           content:
@@ -16735,6 +17776,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /service-queues/{queueId}:
     put:
       operationId: setServiceQueueDefinition
       x-ticvai-consumed-by:
@@ -16762,6 +17804,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+        - name: queueId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -16784,6 +17831,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
+          x-ticvai-problem-types: [queue-named-by-routing-rule, queue-has-waiting-cases]
           description: Retiring a queue that an active routing rule names, or that an unresolved case still
             waits in.
           content:
@@ -16795,11 +17843,6 @@ paths:
   /consent/device:
     post:
       operationId: recordDeviceConsent
-      x-ticvai-consumed-by:
-        - "P01 WEB-001 Home / Landing"
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-001 Home"
-        - "P02 GST-066 Privacy & My Data"
       x-ticvai-write-via:
       - table: pii.consent_identifier
         operation: recordConsentIdentifier
@@ -16871,6 +17914,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DeviceConsent'
         '400':
+          x-ticvai-problem-types: [banner-design-not-published, category-not-offered]
           description: No published banner design with this id for the channel, or a category the design does not offer
           content:
             application/problem+json:
@@ -16885,6 +17929,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [strictly-necessary-declined, preference-categories-missing]
           description: '`strictlyNecessary` declined, or `savePreferences` with no categories'
           content:
             application/problem+json:
@@ -16897,6 +17942,7 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-033 Consent Evidence, History & Withdrawal Management"
         - "P13 CMS-039 Privacy Audit, Evidence & Compliance Reporting"
+      x-ticvai-names-for-context: [pii.consent_identifier]
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
       - staff
@@ -16991,9 +18037,6 @@ paths:
   /consent/device/history:
     get:
       operationId: getDeviceConsentHistory
-      x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-066 Privacy & My Data"
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
       - anonymous
@@ -17137,9 +18180,7 @@ paths:
       operationId: getCookieConsentRuntime
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
-        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-001 Home"
-        - "P02 GST-066 Privacy & My Data"
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
       - anonymous
@@ -17218,9 +18259,6 @@ paths:
   /storefront/cookie-consent/technologies:
     get:
       operationId: listPublishedTrackingTechnologies
-      x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-066 Privacy & My Data"
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
       - anonymous
@@ -17622,6 +18660,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /cookie-scan-policy/{scanPolicyId}:
     put:
       operationId: setCookieScanPolicy
       x-ticvai-consumed-by:
@@ -17646,6 +18685,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: scanPolicyId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -17666,6 +18710,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '422':
+          x-ticvai-problem-types: [day-of-week-required, day-of-month-required]
           description: A weekly schedule with no `dayOfWeek`, or a monthly one with no `dayOfMonth`
           content:
             application/problem+json:
@@ -18042,6 +19087,7 @@ components:
           format: uuid
           readOnly: true
         deviceConsentId:
+          x-ticvai-references: marketing.device_consent
           type: string
           format: uuid
           description: The `DeviceConsent` row it was captured with.
@@ -18447,6 +19493,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
     TrackingTechnologyCatalogueEntry:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listTrackingTechnologyCatalogue
       type: object
       x-ticvai-persistence: marketing.tracking_technology_catalogue
       description: '**The platform''s catalogue of known cookies and trackers** (Chinmay, 2 October, contract
@@ -18543,7 +19590,7 @@ components:
           - daily
           - weekly
           - monthly
-          - off
+          - 'off'
         dayOfWeek:
           type: integer
           minimum: 1
@@ -19197,6 +20244,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         name:
@@ -19219,6 +20267,7 @@ components:
           format: date-time
           nullable: true
     MarketingGuestExtraOption:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listGuestExtraFields, setGuestExtraFields
       type: object
       x-ticvai-persistence: marketing.guest_extra_option
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores dropdown choices only when an extra field uses SELECT type, for example Language = English, Hindi, Marathi.'
@@ -19227,7 +20276,12 @@ components:
       - name
       - displayOrder
       - isActive
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -19242,6 +20296,7 @@ components:
         isActive:
           type: boolean
     MarketingGuestExtraValue:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestExtraValues, setGuestExtraValues
       type: object
       x-ticvai-persistence: marketing.guest_extra_value
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Stores the value entered by a customer for each Admin-created extra field.'
@@ -19249,7 +20304,12 @@ components:
       - customerId
       - fieldId
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -19271,6 +20331,7 @@ components:
           format: date-time
           nullable: true
     MarketingBadge:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listBadges, setBadge
       type: object
       x-ticvai-persistence: marketing.badge
       description: '**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.'
@@ -19280,7 +20341,12 @@ components:
       - type
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -19304,6 +20370,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
         updatedAt:
@@ -19326,6 +20393,7 @@ components:
           type: string
           format: uuid
         campaignId:
+          x-ticvai-references: marketing.campaign
           type: string
           format: uuid
         domain:
@@ -19359,6 +20427,7 @@ components:
           type: string
           format: uuid
         badgeId:
+          x-ticvai-references: marketing.badge
           type: string
           format: uuid
         challengeId:
@@ -19381,6 +20450,7 @@ components:
           format: date-time
           nullable: true
         status:
+          readOnly: true
           type: string
           maxLength: 20
     MarketingJourneyStep:
@@ -19448,6 +20518,7 @@ components:
           type: string
           format: date-time
     MarketingLoyaltyCampaign:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listLoyaltyCampaigns, setLoyaltyCampaign
       type: object
       x-ticvai-persistence: marketing.loyalty_campaign
       description: '**Taken from the backend workbook, 20 September.** Links a marketing campaign to temporary loyalty bonuses, rewards, or earning changes.'
@@ -19459,7 +20530,12 @@ components:
       - endAt
       - isActive
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -19485,9 +20561,11 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
     MarketingLoyaltyPoints:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by adjustLoyaltyPoints, getGuestTimeline, listLoyaltyPointEntries
       type: object
       x-ticvai-persistence: marketing.loyalty_points
       description: '**Taken from the backend workbook, 20 September.** Stores every loyalty point earn, redeem, expire, adjustment, or reversal transaction for a customer.'
@@ -19498,7 +20576,12 @@ components:
       - points
       - balanceAfter
       - createdAt
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -19566,6 +20649,7 @@ components:
           type: string
           format: uuid
         campaignId:
+          x-ticvai-references: marketing.campaign
           type: string
           format: uuid
         type:
@@ -19591,6 +20675,7 @@ components:
         isActive:
           type: boolean
     MarketingPointsRedemptionRule:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getLoyaltyRules, setLoyaltyRules
       type: object
       x-ticvai-persistence: marketing.points_redemption_rule
       description: '**Taken from the backend workbook, 20 September.** Defines how loyalty points can be exchanged for discounts, products, or other benefits.'
@@ -19600,7 +20685,12 @@ components:
       - name
       - redemptionType
       - isActive
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -19656,6 +20746,7 @@ components:
           type: string
           format: uuid
         reviewId:
+          x-ticvai-references: marketing.review
           type: string
           format: uuid
         text:
@@ -19676,6 +20767,7 @@ components:
           format: date-time
           nullable: true
     MarketingReward:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listRewards, setReward
       type: object
       x-ticvai-persistence: marketing.reward
       description: '**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.'
@@ -19685,7 +20777,12 @@ components:
       - name
       - type
       - isActive
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -19734,6 +20831,7 @@ components:
           type: string
           format: uuid
         rewardId:
+          x-ticvai-references: marketing.reward
           type: string
           format: uuid
         code:
@@ -19748,6 +20846,7 @@ components:
           format: uuid
           nullable: true
         status:
+          readOnly: true
           type: string
           maxLength: 30
         issuedAt:
@@ -19806,6 +20905,7 @@ components:
         isActive:
           type: boolean
         createdAt:
+          readOnly: true
           type: string
           format: date-time
         updatedAt:
@@ -19813,6 +20913,7 @@ components:
           format: date-time
           nullable: true
     MarketingWaiverSignature:
+      x-ticvai-retired-columns: [template_id]
       type: object
       x-ticvai-persistence: marketing.waiver_signature
       description: '**Taken from the backend workbook, 20 September.** Stores the auditable signature of a customer/guardian against an exact immutable waiver-template version.'
@@ -19829,6 +20930,8 @@ components:
           type: string
           format: uuid
         templateId:
+          x-ticvai-column: form_definition_id
+          x-ticvai-references: marketing.form_definition
           type: string
           format: uuid
         customerId:
@@ -19885,6 +20988,8 @@ components:
         version:
           type: integer
         fieldGroups:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -19896,6 +21001,8 @@ components:
               displayOrder:
                 type: integer
         attributes:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -19946,6 +21053,8 @@ components:
                 type: boolean
                 default: false
         identifiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20178,6 +21287,8 @@ components:
       description: 'Board 2.2. **Three thresholds, and the middle band is the point.**'
       properties:
         matchers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20211,6 +21322,8 @@ components:
         possibleMatchThreshold:
           type: number
         survivorship:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20271,6 +21384,8 @@ components:
           items:
             type: string
         conflicts:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -20316,6 +21431,7 @@ components:
         scopePath:
           type: string
     DataRetentionPolicy:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listPrivacy, listPrivacyCompliance
       type: object
       x-ticvai-persistence: marketing.retention_policy
       description: 'Board 2.8. **The only routine operation that destroys data irrecoverably at scale.**'
@@ -20419,6 +21535,7 @@ components:
           format: date-time
           nullable: true
     AudienceList:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeLookalikeSegment
       type: object
       x-ticvai-persistence: marketing.audience_list
       description: 'Board 3.3. **Consent basis is required on the import, not optional metadata.**'
@@ -20496,6 +21613,7 @@ components:
           type: string
           format: uuid
         segmentId:
+          x-ticvai-references: marketing.segment
           type: string
           format: uuid
         destination:
@@ -20650,6 +21768,7 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           readOnly: true
@@ -20668,6 +21787,7 @@ components:
           type: string
           description: Where the opt-in happened, because a regulator asks.
         unsubscribeToken:
+          x-ticvai-secret: blind-index
           writeOnly: true
           type: string
           description: '**Unsubscribe must work without a login.** The link in a message carries the token
@@ -20678,6 +21798,7 @@ components:
           type: string
           format: date-time
     MessageChannel:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getConsentHistory, listConsentEvidenceWithdrawal, listCustomerPrivacyConsent
       type: string
       enum:
       - email
@@ -20763,7 +21884,8 @@ components:
 
 
             **Operations write it at `venue` scope.**'
-    Invitation:
+    CampaignInvitation:
+      x-ticvai-retired-columns: [product_id, performance_id, offered_by_principal_id, issued_by_principal_id, cost_center_id]
       type: object
       x-ticvai-persistence: marketing.invitation
       description: '**Addressed and tokenised.** A guest accepting an invitation is claiming a specific
@@ -20830,6 +21952,7 @@ components:
 
             **Operations write it at `venue` scope.**'
     PrivacyIncident:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listPrivacy
       type: object
       x-ticvai-persistence: marketing.privacy_incident
       description: 'BL-176. **A personal-data breach has a regulator clock**, and UAE PDPL gives 72 hours
@@ -20904,6 +22027,7 @@ components:
           type: string
           nullable: true
         status:
+          readOnly: true
           type: string
           enum:
           - open
@@ -21130,6 +22254,7 @@ components:
             equals:
               type: string
     FormSubmission:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestTimeline, getWaiverStatus, listComplianceEvidenceWaiver, listContact and others
       type: object
       x-ticvai-persistence: marketing.form_submission
       description: '**The acceptance record, and it is evidence.** Bound to the exact version accepted,
@@ -21212,6 +22337,7 @@ components:
           type: string
           nullable: true
     GuestDocument:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listComplianceEvidenceWaiver, uploadGuestDocument
       type: object
       x-ticvai-persistence: marketing.guest_document
       description: 'BL-133. **No store for guest photos, avatars, IDs or signed documents anywhere.**
@@ -21581,6 +22707,7 @@ components:
         toPath:
           type: string
         statusCode:
+          x-ticvai-persistence-column: integer
           type: integer
           enum:
           - 301
@@ -21843,6 +22970,7 @@ components:
           type: string
           format: uuid
         referrerSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         refereeSubjectId:
@@ -21851,6 +22979,7 @@ components:
           format: uuid
           nullable: true
         code:
+          x-ticvai-unique: tenant
           readOnly: true
           type: string
         status:
@@ -21934,6 +23063,7 @@ components:
           type: string
           nullable: true
     TouchPoint:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestIntelligence, getGuestTimeline
       type: object
       x-ticvai-persistence: marketing.touch_point
       description: '22.14.17, 22.14.18, BL-177. **`CampaignPerformance.attributedOrders` models single-touch
@@ -21954,6 +23084,7 @@ components:
       - occurredAt
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         subjectId:
@@ -22247,6 +23378,7 @@ components:
 
             '
         templateId:
+          x-ticvai-references: marketing.message_template
           type: string
           format: uuid
         offsetMinutes:
@@ -22473,6 +23605,7 @@ components:
           type: string
           format: date-time
     ConversationMessage:
+      x-ticvai-retired-columns: [ai_interaction_id]
       type: object
       x-ticvai-persistence: marketing.conversation_message + marketing.conversation_message_attachment
       required:
@@ -22519,6 +23652,8 @@ components:
                 - qr
                 - paymentLink
         aiInteractionId:
+          x-ticvai-references: ai.activity
+          x-ticvai-column: ai_activity_id
           type: string
           format: uuid
           nullable: true
@@ -22722,6 +23857,7 @@ components:
           type: string
           format: uuid
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           format: uuid
         venueId:
@@ -22755,6 +23891,8 @@ components:
           - guest
           - timeout
         actionsTaken:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: '**Every action recorded as the staff member''s**, not the kiosk''s. A cashier
             completing a guest''s checkout remotely is a staff action on a guest cart.
@@ -23178,6 +24316,7 @@ components:
           readOnly: true
           description: The guest who saved it. The wishlist is keyed by subject; there is no parent wishlist row.
         variantId:
+          x-ticvai-references: catalogue.variant
           type: string
           format: uuid
         productName:
@@ -23337,6 +24476,7 @@ components:
           format: date-time
           nullable: true
     ConsentPurposeConfig:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGuestConsents, listCustomerPrivacyConsent, listPrivacyConsent
       x-ticvai-persistence: marketing.consent_purpose + marketing.consent_purpose_channel
       type: object
       required:
@@ -23397,6 +24537,7 @@ components:
           type: string
           format: date-time
     ConsentRecord:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by enrolFacePass, getConsentHistory, getGuestConsents, getGuestIntelligence and others
       x-ticvai-persistence: marketing.consent_record + marketing.consent_record_channel
       allOf:
       - $ref: '#/components/schemas/RecordConsentRequest'
@@ -23470,6 +24611,7 @@ components:
                 format: date-time
                 nullable: true
     Suppression:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listConsentPreferenceCommunication, listCustomerServiceProfile, previewSegmentDraft, retryMessageDispatch
       x-ticvai-persistence: marketing.suppression
       type: object
       required:
@@ -23974,6 +25116,7 @@ components:
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         kind:
@@ -24006,6 +25149,7 @@ components:
           format: date-time
           readOnly: true
     GuestPreferences:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listCustomerPrivacyConsent, listCustomerServiceProfile
       type: object
       x-ticvai-persistence: marketing.guest_preference
       description: '**What the guest likes, kept apart from what they permit** (consent) and from who they
@@ -24090,6 +25234,7 @@ components:
           nullable: true
           description: '`goalReached` over `entrants`. Null while there are no entrants.'
     AgentAvailability:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createCaseClassificationIntelligent, listAgentWorkloadAvailability, listContact
       type: object
       x-ticvai-persistence: marketing.agent_availability
       required:
@@ -24482,6 +25627,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005), the campaign''s.'
     MessageTemplate:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createJourney, listBusinessEventNotification, listCommunicationService, listDeliveryQueueFailure and others
       x-ticvai-persistence: marketing.message_template
       type: object
       required:
@@ -24496,6 +25642,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
@@ -24546,6 +25693,7 @@ components:
             version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed
             operations)'
     MessageDispatch:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getCampaignPerformance, getGuestTimeline, getJourneyPerformance, getMessageStatus and others
       x-ticvai-append-only: queuedAt
       x-ticvai-persistence: marketing.message_dispatch
       type: object
@@ -24716,6 +25864,7 @@ components:
         relatedOrderId:
           type: string
         attachmentRefs:
+          x-ticvai-stored-as: marketing.case_message.attachment_refs
           type: array
           description: Stored on the opening `CaseMessage`, not on the case.
           items:
@@ -24870,6 +26019,7 @@ components:
             items:
               $ref: '#/components/schemas/CaseMessage'
     CaseMessage:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by addCaseMessage, getCase, listCustomerService, listUnifiedInteractionCommunication
       x-ticvai-persistence: marketing.case_message
       type: object
       required:
@@ -24878,7 +26028,13 @@ components:
       - isInternal
       - authorKind
       - recordedAt
+      - scopePath
+      - caseId
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         resolution:
           type: string
           description: '**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.
@@ -24916,6 +26072,12 @@ components:
           format: date-time
           readOnly: true
           description: Server time the message arrived.
+        caseId:
+          type: string
+          format: uuid
+          readOnly: true
+          x-ticvai-references: marketing.case
+          description: The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`).
     LoyaltyProgramme:
       x-ticvai-persistence: marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier
       type: object
@@ -25187,13 +26349,16 @@ components:
           type: string
           format: uuid
         journeyId:
+          x-ticvai-references: marketing.journey
           type: string
           format: uuid
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           description: The guest. `pii.subject`, never duplicated here.
         stepId:
+          x-ticvai-references: marketing.journey_step
           type: string
           format: uuid
           description: Where they are now.
@@ -25575,6 +26740,7 @@ components:
           pattern: '^[A-Z]{2}$'
           description: ISO 3166-1 alpha-2 (required for sms and whatsapp).
         providerId:
+          x-ticvai-references: marketing.communication_provider
           type: string
           format: uuid
           description: The marketing.communication_provider row this identity is registered with.
@@ -25918,6 +27084,8 @@ components:
             - partner
             - employee
         providers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Tried in order; a provider below minimum health is skipped.
           items:
@@ -25997,6 +27165,7 @@ components:
           type: string
           description: marketing.message_dispatch id.
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         messageClass:
@@ -27078,6 +28247,8 @@ components:
           nullable: true
           description: The white-label theme it takes colours and fonts from.
         buttons:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -27099,6 +28270,8 @@ components:
           default: true
           description: Must be true.
         links:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -27115,6 +28288,8 @@ components:
                 - cookie
                 - termsAndConditions
         categories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           items:
@@ -27269,6 +28444,8 @@ components:
           - school
           nullable: true
         steps:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           maxItems: 20
@@ -27537,6 +28714,8 @@ components:
           - rolledBack
           - rejected
         items:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -27549,6 +28728,7 @@ components:
               version:
                 type: integer
         validationIssues:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -27575,6 +28755,7 @@ components:
               message:
                 type: string
         simulation:
+          x-ticvai-persisted: false
           type: array
           description: What the scenario's guest would be shown, step by step (from `simulate`; not stored).
           items:
@@ -27611,6 +28792,7 @@ components:
           format: date-time
           nullable: true
         audit:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -27950,6 +29132,8 @@ components:
           - other
           description: What fulfilment does; `deletion` and `dataExport` fan out through the cross-region DSAR.
         stages:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           description: Ordered workflow steps inside `inProgress`. Suggested default received, verifyIdentity,
@@ -28454,6 +29638,7 @@ components:
           format: uuid
           readOnly: true
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
           description: The person the request is about.
@@ -28615,6 +29800,7 @@ components:
       - results
       properties:
         requestId:
+          x-ticvai-references: marketing.privacy_request
           type: string
           format: uuid
         discoveredAt:
@@ -28622,6 +29808,8 @@ components:
           format: date-time
           readOnly: true
         results:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Record counts per source; the records themselves go only into the export package.
           items:
@@ -28688,6 +29876,8 @@ components:
               nullable: true
               description: The cross-region fan-out that assembled it.
         corrections:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           items:
@@ -28737,6 +29927,8 @@ components:
           format: uuid
           description: The privacy request (`setPrivacyRequest`); the natural key.
         identifiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Extra identifiers to search by; the request's subject is always included.
           items:
@@ -28833,6 +30025,8 @@ components:
               - deliver
               description: Moves the package through generated -> privacyReview -> approved -> delivered.
         corrections:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Correction requests to route to the system of record.
           items:
@@ -28875,6 +30069,7 @@ components:
           nullable: true
           readOnly: true
         subjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         actionType:
@@ -28897,6 +30092,7 @@ components:
           type: boolean
           readOnly: true
         impact:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           description: Affected areas and what will happen to each, shown before execution.
@@ -28934,6 +30130,7 @@ components:
                 nullable: true
                 description: Required for `retain` and `hold`, e.g. the retention policy code.
         checks:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -28958,6 +30155,7 @@ components:
                 type: string
                 maxLength: 300
         approvals:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -29021,6 +30219,8 @@ components:
           - manualActionRequired
           - cancelled
         systemResults:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           description: The execution monitor, per system.
@@ -29338,6 +30538,7 @@ components:
             readOnly: true
             description: From the SLA policy for the severity (`setSlaPolicy`).
           timeline:
+            x-ticvai-persisted: false
             type: array
             readOnly: true
             items:
@@ -29480,6 +30681,7 @@ components:
           nullable: true
           description: The `recordPrivacyIncident` record, when the exception is also a breach.
     PrivacyAuditEvidenceComplianceReportingView:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listCustomerPrivacyConsent, listPrivacyEvidenceCompliance
       type: object
       x-ticvai-persistence: marketing.privacy_audit_event
       description: One privacy audit event (pack 17.2.9 Audit Fields). Append-only; written by the operation
@@ -30511,6 +31713,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         kind:
@@ -30686,6 +31889,7 @@ components:
         - orderId
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: Client-generated UUIDv7; equals the `Idempotency-Key` header.
@@ -30703,6 +31907,7 @@ components:
           format: uuid
           description: Required with `execute`; the action is recorded on this case.
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
         lineIds:
@@ -30842,6 +32047,7 @@ components:
         - reason
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: Client-generated UUIDv7; equals the `Idempotency-Key` header.
@@ -30850,6 +32056,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         orderId:
@@ -30943,6 +32150,7 @@ components:
         - escalationType
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
           description: Client-generated UUIDv7; equals the `Idempotency-Key` header on the write.
@@ -30951,6 +32159,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         department:
@@ -31071,6 +32280,7 @@ components:
           readOnly: true
           description: '**The partition key** (ADR-0005).'
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         caseNumber:
@@ -31954,6 +33164,7 @@ components:
           format: uuid
           readOnly: true
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           description: The agent. The natural key.
@@ -32116,9 +33327,11 @@ components:
       - criteria
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         agentPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         evaluatorPrincipalId:
@@ -32156,6 +33369,8 @@ components:
           - scored
           - acknowledged
         criteria:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           maxItems: 30
           items:
@@ -32200,6 +33415,8 @@ components:
           readOnly: true
           description: Criteria score as a percentage; 0 when any critical failure is recorded.
         aiFindings:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           readOnly: true
           items:
@@ -32229,6 +33446,8 @@ components:
           maxLength: 2000
           nullable: true
         coachingActions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -33273,6 +34492,8 @@ components:
           type: integer
           minimum: 1
         sections:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           items:
@@ -33661,6 +34882,8 @@ components:
           description: A participant under this age needs a guardian. Written to `FormDefinition.minimumAge`.
             No default.
         guardianThresholdByCountry:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -33883,6 +35106,8 @@ components:
           - beforeMembershipActivation
           - beforeActivityStart
         eligibility:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: All must hold (AND). Empty means every participant the association reaches.
           items:
@@ -33956,6 +35181,8 @@ components:
           default: false
           description: An authorised operator may admit the participant anyway; the override is recorded.
         reminders:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -34146,6 +35373,8 @@ components:
           maxLength: 10
           description: The language the legal text is written and reviewed in.
         languages:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           minItems: 1
           description: Every language the version is offered in, the source language included. Arabic
@@ -34277,6 +35506,7 @@ components:
           - expired
           - archived
         checklist:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -34350,6 +35580,7 @@ components:
                 - access
               description: What a missing signature would block, when `missingSignature` was set.
         aiFindings:
+          x-ticvai-persisted: false
           type: array
           items:
             type: object
@@ -34456,6 +35687,8 @@ components:
               format: date-time
               nullable: true
         history:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: Every action with its comment, oldest first.
           items:
@@ -35417,6 +36650,7 @@ components:
           format: uuid
           readOnly: true
         submissionId:
+          x-ticvai-references: marketing.form_submission
           type: string
           format: uuid
           description: The `FormSubmission` reviewed; the natural key.
@@ -35743,6 +36977,7 @@ components:
           format: uuid
           description: Absent on a new request; set by the server.
         requirementId:
+          x-ticvai-references: marketing.waiver_requirement
           type: string
           format: uuid
         reasonCode:
@@ -36455,6 +37690,7 @@ components:
           format: uuid
           readOnly: true
         messageTriggerId:
+          x-ticvai-references: marketing.message_trigger
           type: string
           format: uuid
         dimension:
@@ -36508,6 +37744,7 @@ components:
           format: uuid
           readOnly: true
         messageTemplateId:
+          x-ticvai-references: marketing.message_template
           type: string
           format: uuid
         language:
@@ -36600,12 +37837,14 @@ components:
           format: uuid
           readOnly: true
         messageDispatchId:
+          x-ticvai-references: marketing.message_dispatch
           type: string
           description: The `MessageDispatch.id`.
         attemptNumber:
           type: integer
           minimum: 1
         communicationProviderId:
+          x-ticvai-references: marketing.communication_provider
           type: string
           format: uuid
         channel:
@@ -36685,6 +37924,7 @@ components:
           format: uuid
           readOnly: true
         consentRecordId:
+          x-ticvai-references: marketing.consent_record
           type: string
           description: The withdrawal's `ConsentRecord.id`.
         target:
@@ -36931,6 +38171,7 @@ components:
           format: uuid
           readOnly: true
         caseId:
+          x-ticvai-references: marketing.case
           type: string
           format: uuid
         reason:
@@ -37075,9 +38316,11 @@ components:
           format: uuid
           readOnly: true
         participantSubjectId:
+          x-ticvai-references: pii.subject
           type: string
           format: uuid
         orderId:
+          x-ticvai-references: orders.sales_order
           type: string
           format: uuid
           description: The booking.
@@ -37107,6 +38350,7 @@ components:
           format: uuid
           nullable: true
         formDefinitionId:
+          x-ticvai-references: marketing.form_definition
           type: string
           format: uuid
         formVersion:
@@ -37244,6 +38488,7 @@ components:
           format: uuid
           readOnly: true
         waiverRequirementId:
+          x-ticvai-references: marketing.waiver_requirement
           type: string
           format: uuid
         event:

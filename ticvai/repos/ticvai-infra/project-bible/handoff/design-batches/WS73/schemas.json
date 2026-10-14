@@ -1397,6 +1397,7 @@
     "description": "Absent on a new request; set by the server."
    },
    "requirementId": {
+    "x-ticvai-references": "marketing.waiver_requirement",
     "type": "string",
     "format": "uuid"
    },
@@ -1992,6 +1993,7 @@
     "readOnly": true
    },
    "submissionId": {
+    "x-ticvai-references": "marketing.form_submission",
     "type": "string",
     "format": "uuid",
     "description": "The `FormSubmission` reviewed; the natural key."

@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 ### `GST-037` Offers & Promotions
 
-**Find offers & promotions for this venue.**
+**The offers running at this venue, one opened in detail, and a code the guest typed checked.**
 
 | | |
 |---|---|

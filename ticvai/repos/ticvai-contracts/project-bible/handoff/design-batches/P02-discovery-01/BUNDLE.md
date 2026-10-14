@@ -240,7 +240,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### References
 
-- Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-063` · status **notStarted** · provenance client-verified
+- Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-063` · status **notStarted** · provenance client-verified · Drawn frame: wireframes/incoming/P02-mobile-v4/gst-063.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).
 - Prototype (mobile v4 (30 September build), verified 2026-10-01, match exact): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view *Explore tab → search ("coaster")*
 
 #### Acceptance for the design

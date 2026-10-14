@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `CMS-061` | Digital Asset Management Command Center | B | 0 | 72 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `CMS-062` | Central Digital Asset Library | B | 3 | 18 | 6 | 9 | 1 | 0 | — | notStarted (—) |
-| `CMS-063` | Upload & Asset Ingestion Workspace | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `CMS-063` | Upload & Asset Ingestion Workspace | B | 17 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `CMS-064` | Folder, Collection & Workspace Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-065` | Metadata & Taxonomy Management | B | 18 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-066` | Tags, Keywords & Classification | B | 4 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |

@@ -5,6 +5,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-booking-operations-command-center-bo-274",
-   "component": "apps/venue-management-web/src/routes/sell/GroupBookingOperationsCommandCenter.tsx",
+   "component": "src/routes/sell/GroupBookingOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -236,6 +237,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "2",
@@ -245,7 +247,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-operational-planning-task-workspace-bo-275",
-   "component": "apps/venue-management-web/src/routes/sell/GroupOperationalPlanningTaskWorkspace.tsx",
+   "component": "src/routes/sell/GroupOperationalPlanningTaskWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -440,6 +442,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "2",
@@ -449,7 +452,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/participants-guest-lists-group-structure-bo-276",
-   "component": "apps/venue-management-web/src/routes/sell/ParticipantsGuestListsGroupStructure.tsx",
+   "component": "src/routes/sell/ParticipantsGuestListsGroupStructure.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -618,6 +621,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "2",
@@ -627,7 +631,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-payment-deposit-balance-management-bo-277",
-   "component": "apps/venue-management-web/src/routes/sell/GroupPaymentDepositBalanceManagement.tsx",
+   "component": "src/routes/sell/GroupPaymentDepositBalanceManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -809,6 +813,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "2",
@@ -818,7 +823,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-ticket-seat-entitlement-allocation-bo-278",
-   "component": "apps/venue-management-web/src/routes/sell/GroupTicketSeatEntitlementAllocation.tsx",
+   "component": "src/routes/sell/GroupTicketSeatEntitlementAllocation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1015,6 +1020,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "2",
@@ -1024,7 +1030,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-ticket-fulfillment-distribution-bo-279",
-   "component": "apps/venue-management-web/src/routes/sell/GroupTicketFulfillmentDistribution.tsx",
+   "component": "src/routes/sell/GroupTicketFulfillmentDistribution.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1203,6 +1209,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "2",
@@ -1212,7 +1219,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-arrival-check-in-admission-operations-bo-280",
-   "component": "apps/venue-management-web/src/routes/sell/GroupArrivalCheckInAdmissionOperations.tsx",
+   "component": "src/routes/sell/GroupArrivalCheckInAdmissionOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1409,6 +1416,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "2",
@@ -1418,7 +1426,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-amendments-cancellation-refund-operations-bo-281",
-   "component": "apps/venue-management-web/src/routes/sell/GroupAmendmentsCancellationRefundOperations.tsx",
+   "component": "src/routes/sell/GroupAmendmentsCancellationRefundOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1610,6 +1618,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "2",
@@ -1619,7 +1628,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-booking-reconciliation-closure-performance-bo-282",
-   "component": "apps/venue-management-web/src/routes/sell/GroupBookingReconciliationClosurePerformance.tsx",
+   "component": "src/routes/sell/GroupBookingReconciliationClosurePerformance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1752,6 +1761,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Group_Sales___Corporate_Booking_Management_Reference.pdf",
    "board": "2",
@@ -1761,7 +1771,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/group-sales-analytics-ai-intelligence-center-bo-283",
-   "component": "apps/venue-management-web/src/routes/sell/GroupSalesAnalyticsAiIntelligenceCenter.tsx",
+   "component": "src/routes/sell/GroupSalesAnalyticsAiIntelligenceCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1776,6 +1786,7 @@
   },
   "density": "compact",
   "purposeNote": "Management can analyze group-sales performance and use explainable AI recommendations to improve conversion, utilization, revenue and operational planning. Board 2 — Final Screen Register",
+  "division": "Shares `listGroupSale`, `listGroupSale2` with BO-264; this screen is Group Sales Analytics & AI Intelligence Center (pack Group_Sales___Corporate_Booking_Management_Reference.pdf, board 2.9.2.10, page 33): provide management with intelligence across the complete group-sales lifecycle. This should combine data from Board 1 + Board 2.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Analyze) and no metric row",
   "purpose": "Provide management with intelligence across the complete group-sales lifecycle. This should combine data from Board 1 + Board 2.",
@@ -1783,7 +1794,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {

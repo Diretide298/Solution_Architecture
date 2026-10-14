@@ -138,7 +138,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1159` | Automated Security Action Orchestration | C | 12 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-1160` | Fraud Alert & Investigation Case Management | D | 0 | 90 | 6 | 15 | 1 | 0 | — | notStarted (—) |
 | `BO-1161` | Security Rules Testing, Simulation & AI Sandbox | B | 0 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1162` | Security Governance, Audit & Rule Publication | A | 4 | 33 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1162` | Security Governance, Audit & Rule Publication | A | 6 | 33 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -270,6 +270,8 @@ today:
 - `setWalletRiskRules` → `WALLET_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_CONFIGURE`
 
 #### Requirements it meets
 
@@ -405,6 +407,8 @@ rule:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_CONFIGURE`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -523,6 +527,8 @@ score:
 - `setWalletRiskRules` → `WALLET_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_CONFIGURE`
 
 #### Requirements it meets
 
@@ -653,6 +659,8 @@ rule: More than AED 1,000.00 transferred in 1 hour
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_CONFIGURE`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -730,7 +738,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every device credential account** (data table)
+**Every device credential account** (data table, from `listWalletDisputes`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -842,6 +850,8 @@ signal:
 - `listWalletDisputes` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -967,6 +977,8 @@ model:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_CONFIGURE`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1089,6 +1101,8 @@ ladder:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_CONFIGURE`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1206,7 +1220,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Credentials | text | not in the schema: `Credentials` |
 | … 15 more | | `schemas.json` |
 
-**The selected fraud alert investigation** (detail panel)
+**The selected fraud alert investigation** (detail panel, from `getRiskCase`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1296,6 +1310,8 @@ alert:
 - `closeRiskCase` → `RISK_INVESTIGATE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -1508,11 +1524,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-**Sent by *Rollback*** (`restoreWalletConfigurationVersion`; no form is declared, so these are filled from the screen or collected inline)
+**Form: Rollback** (confirmDialog, opened by *Rollback*; ** calls `restoreWalletConfigurationVersion`, *Cancel* sends nothing)
+
+**Rollback on a security governance audit is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | min length 1; max length 500 | — | — | `restoreWalletConfigurationVersion` body |
+
+Errors to draw in the form: 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The working draft has unpublished changes that the restore would overwrite; publish or discard them first.
+
+**Sent by *What publishing changes*** (`publishWalletConfiguration`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Mode `mode` | segmented control | optional | Validate only | Validate only · Publish | — | — | `publishWalletConfiguration` body |
+| Note `note` | text area | optional | — | — | — | — | `publishWalletConfiguration` body |
 
 **Sent by *Emergency disable*** (`setWalletRiskRuleStatus`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -1578,9 +1605,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| What publishing changes (publish gate) | navigation or local | — | — | — | — |
+| What publishing changes (publish gate) | `publishWalletConfiguration` POST `/wallet-configuration/publish` | inline | WalletConfigurationVersion | — | — |
 | Version comparison (primary button) | `diffWalletConfigurationVersion` GET `/wallet-configuration/versions/{version}/diff` | — | WalletConfigurationDiff | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
-| Rollback (destructive button) | `restoreWalletConfigurationVersion` POST `/wallet-configuration/versions/{version}/restore` | inline | WalletConfigurationVersion | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
+| Rollback (destructive button) | `restoreWalletConfigurationVersion` POST `/wallet-configuration/versions/{version}/restore` | inline | WalletConfigurationVersion | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The working draft has unpublished changes that the restore would overwrite; publish or discard them first. | opens confirmDialog first |
 | Emergency disable (secondary button) | `setWalletRiskRuleStatus` POST `/wallet-risk-rules/{ruleCode}/status` | inline | WalletRiskRules | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 No `reason` for `suspended` or `emergencyDisabled`, or `until` given with a status other than `suspended`, or … | — |
 | Rule suspension (secondary button) | `setWalletRiskRuleStatus` POST `/wallet-risk-rules/{ruleCode}/status` | inline | WalletRiskRules | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 No `reason` for `suspended` or `emergencyDisabled`, or `until` given with a status other than `suspended`, or … | — |
 | Security Audit (secondary button) | navigation or local | — | — | — | — |
@@ -1601,10 +1628,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - → `BO-1153` Wallet Security & Risk Command Center: *Back to Wallet Security & Risk Command Center*
 
-**What opens over it**
-
-- confirmDialog *Rollback*: **Rollback on a security governance audit is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.
-
 #### States
 
 | State | What it shows |
@@ -1615,7 +1638,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the security governance audit are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WALLET_VIEW`, which `listWalletConfigurationVersions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AUDIT_VIEW` for `listAuditRecords`; `WALLET_CONFIGURE` for `publishWalletConfiguration`, `restoreWalletConfigurationVersion` … |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 No `reason` for `suspended` or `emergencyDisabled`, or `until` given with a status other than `suspended`, or `until` in the past. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The working draft has unpublished changes that the restore would overwrite; publish or discard them first.; 422 No `reason` for `suspended` or `emergencyDisabled`, or `until` given with a status other than `suspended`, or `until` in the past. |
 
 #### Sample data for the mock-up
 
@@ -1648,6 +1671,8 @@ rule:
 
 **A refused user sees:** Shown when the caller lacks `WALLET_VIEW`, which `listWalletConfigurationVersions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AUDIT_VIEW` for `listAuditRecords`; `WALLET_CONFIGURE` for `publishWalletConfiguration`, `restoreWalletConfigurationVersion` …
 
+Screen guard: `WALLET_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1671,7 +1696,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (4), with its required mark, default, format and its error state (403, 404, 422).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (403, 404, 409, 422).
 - [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1162?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: What publishing changes, Version comparison, Rollback, Emergency disable, Rule suspension, Security Audit.
@@ -1808,17 +1833,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "AiRiskAlert": {"type":"object","x-ticvai-persistence":"ai.risk_alert","description":"**A risk alert** (AIP-109): raised by scoring or re-scoring. **Alert, case and confirmed fraud are kept distinct** (AIP-163): an alert is a signal to look, not a finding.","required":["kind","entityType","entityRef","band","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["transaction","velocity","entity","network","staffLeakage","scanAbuse","accountTakeover","chargeback"]},"entityType":{"type":"string","enum":["customer","account","device","paymentToken","credential","cluster","staff","wallet","ipAddress"]},"entityRef":{"type":"string"},"score":{"type":"integer","minimum":0,"maximum":100},"band":{"type":"string","enum":["low","medium","high","critical"],"description":"Design 5.6: a risk score and band, never a probability."},"reasonCodes":{"type":"array","items":{"type":"string"}},"correlationKey":{"type":"string","nullable":true},"assessmentId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["open","monitoring","dismissed","falsePositive","escalated"],"readOnly":true},"caseId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.risk_case"},"raisedAt":{"type":"string","format":"date-time","readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"decisionNote":{"type":"string","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
-"AiRiskCase": {"type":"object","x-ticvai-persistence":"ai.risk_case","description":"**An investigation** (AIP-150..160). Its evidence and actions are `ai.case_evidence` and `ai.case_action`. The summary is written by a model from structured evidence only (AIP-153); the outcome is a person's.","required":["reference","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"reference":{"type":"string","readOnly":true},"title":{"type":"string"},"status":{"type":"string","enum":["open","investigating","pendingAction","closed"],"readOnly":true},"priority":{"type":"string","enum":["low","medium","high","critical"]},"entities":{"type":"array","items":{"type":"object","properties":{"entityType":{"type":"string","enum":["customer","account","device","paymentToken","credential","cluster","staff"]},"entityRef":{"type":"string"}}}},"alertIds":{"type":"array","items":{"type":"string","format":"uuid"}},"assigneePrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal"},"summary":{"type":"string","nullable":true,"readOnly":true},"outcome":{"type":"string","enum":["confirmedFraud","notFraud","inconclusive"],"nullable":true,"readOnly":true},"closureNote":{"type":"string","nullable":true,"readOnly":true},"openedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"openedAt":{"type":"string","format":"date-time","readOnly":true},"closedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"closedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiRiskCase": {"type":"object","x-ticvai-persistence":"ai.risk_case","description":"**An investigation** (AIP-150..160). Its evidence and actions are `ai.case_evidence` and `ai.case_action`. The summary is written by a model from structured evidence only (AIP-153); the outcome is a person's.","required":["reference","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"reference":{"type":"string","readOnly":true},"title":{"type":"string"},"status":{"type":"string","enum":["open","investigating","pendingAction","closed"],"readOnly":true},"priority":{"type":"string","enum":["low","medium","high","critical"]},"entities":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"entityType":{"type":"string","enum":["customer","account","device","paymentToken","credential","cluster","staff"]},"entityRef":{"type":"string"}}}},"alertIds":{"type":"array","items":{"type":"string","format":"uuid"}},"assigneePrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal"},"summary":{"type":"string","nullable":true,"readOnly":true},"outcome":{"type":"string","enum":["confirmedFraud","notFraud","inconclusive"],"nullable":true,"readOnly":true},"closureNote":{"type":"string","nullable":true,"readOnly":true},"openedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"openedAt":{"type":"string","format":"date-time","readOnly":true},"closedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"closedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiRiskCaseAction": {"type":"object","x-ticvai-persistence":"ai.case_action","description":"**A restrictive action proposed from a case** (AIP-136). It goes to the owning module through the action pipeline, never straight from review; at the first-release ceiling (L1 advisory, design 3.8) it is a recommendation the owning module's operator applies. **Scoped through its case.**","required":["caseId","action","targetContract"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"caseId":{"type":"string","format":"uuid","x-ticvai-references":"ai.risk_case"},"action":{"type":"string","enum":["blockPaymentToken","suspendAccount","restrictWallet","revokeEntitlement","flagCustomer","requireStepUp","holdRefunds","lockIdentity"]},"targetContract":{"type":"string"},"targetOperation":{"type":"string"},"targetRef":{"type":"string"},"rationale":{"type":"string"},"status":{"type":"string","enum":["recommended","planned","awaitingApproval","applied","rejected","failed"],"readOnly":true},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan"},"proposedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"proposedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "AiRiskCaseDetail": {"type":"object","x-ticvai-persistence":"none — ai.risk_case with its evidence, actions and alerts","description":"A case with everything attached to it.","required":["case"],"properties":{"case":{"$ref":"#/components/schemas/AiRiskCase"},"evidence":{"type":"array","items":{"$ref":"#/components/schemas/AiRiskCaseEvidence"}},"actions":{"type":"array","items":{"$ref":"#/components/schemas/AiRiskCaseAction"}},"alerts":{"type":"array","items":{"$ref":"#/components/schemas/AiRiskAlert"}}}},
 "AiRiskCaseEvidence": {"type":"object","x-ticvai-persistence":"ai.case_evidence","description":"**Case evidence** (AIP-155): `jsonb` plus an immutable Blob copy. **Scoped through its case** (`platform.apply_parent_rls`). Never edited; a correction is new evidence.","required":["caseId","kind","label"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"caseId":{"type":"string","format":"uuid","x-ticvai-references":"ai.risk_case"},"kind":{"type":"string","enum":["assessment","alert","transaction","networkSnapshot","note","document"]},"ref":{"type":"string","nullable":true},"content":{"type":"object","additionalProperties":true,"nullable":true},"blobRef":{"type":"string","nullable":true,"readOnly":true,"description":"The immutable (WORM) copy."},"label":{"type":"string","enum":["source","derived","modelInferred"]},"contentHash":{"type":"string","readOnly":true},"addedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"addedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "AuditRecord": {"x-ticvai-append-only":"occurredAt","type":"object","x-ticvai-persistence":"platform.audit_record","description":"26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n","required":["id","action","occurredAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"principalId":{"type":"string","format":"uuid","description":"Who acted."},"orgUnitId":{"type":"string","format":"uuid","nullable":true,"description":"The scope node the action happened in."},"workstationId":{"type":"string","format":"uuid","nullable":true,"description":"The workstation it was done from, where there was one."},"action":{"type":"string","description":"What was done, as the writing operation names it."},"subjectRef":{"type":"string","nullable":true,"description":"**The thing acted on** — a profile, a shift, an order. The same value the `subjectRef` filter matches.\n"},"occurredAt":{"type":"string","format":"date-time","description":"When. The list is ordered by this, most recent first."},"platformStaffGrantId":{"type":"string","format":"uuid","nullable":true,"description":"**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "WalletConfigurationDiff": {"x-ticvai-persistence":"none — computed from wallet.configuration_version_snapshot (a published version) against the area tables (the working draft)","type":"object","description":"Board 8, p.98. Field-level comparison of two wallet configuration versions, shaped as white-label `ConfigDiff`.","required":["fromVersion","toVersion","changes"],"properties":{"fromVersion":{"type":"integer"},"toVersion":{"type":"integer","nullable":true,"description":"Null when compared against the working draft."},"changes":{"type":"array","items":{"type":"object","required":["area","path","changeKind"],"properties":{"area":{"type":"string","enum":["walletTypes","creditTypes","consumptionPolicy","fundingRules","channelRules","authenticationPolicy","transferRules","refundPolicy","riskRules","accountingMapping","reconciliationSources","integrationMappings"]},"path":{"type":"string"},"changeKind":{"type":"string","enum":["added","removed","modified"]},"before":{"type":"string","nullable":true},"after":{"type":"string","nullable":true}}}}}},
-"WalletConfigurationVersion": {"type":"object","x-ticvai-persistence":"wallet.configuration_version","description":"Boards 1.10 and 10.8. **Ten boards of configuration that interact.**","properties":{"version":{"type":"integer"},"publishedAt":{"type":"string","format":"date-time","nullable":true},"publishedBy":{"type":"string","format":"uuid","nullable":true},"note":{"type":"string","nullable":true},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning"]},"code":{"type":"string"},"message":{"type":"string"}}}},"scopePath":{"type":"string"}}},
-"WalletCredential": {"type":"object","x-ticvai-persistence":"wallet.credential","description":"Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n","required":["walletId","kind","identifier"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["card","wristband","nfc","rfid","qr","mobileApp","digitalKey"]},"identifier":{"type":"string"},"linkedAt":{"type":"string","format":"date-time"},"unlinkedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","lost","replaced","blocked","expired"]},"replacedByCredentialId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
-"WalletDispute": {"type":"object","x-ticvai-persistence":"wallet.dispute","description":"Board 7.9. **Internal, and the venue decides it** — unlike a card chargeback.","required":["walletId","description"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"transactionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"amount":{"x-ticvai-column":"disputed_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"description":{"type":"string"},"raisedBy":{"type":"string","format":"uuid"},"raisedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["open","investigating","escalated","upheld","rejected","withdrawn"],"description":"`escalated` added with `resolveWalletDispute` (VM close-out, 29 September). `upheld`, `rejected` and `withdrawn` are closed."},"resolution":{"type":"string","nullable":true},"escalatedToRoleId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"reprocessedTransactionIds":{"type":"array","readOnly":true,"description":"Transactions created by a `reprocess` action.","items":{"type":"string","format":"uuid"}},"resolvedBy":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"adjustmentId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
-"WalletRestriction": {"type":"object","x-ticvai-persistence":"wallet.restriction","description":"Board 7.8. **Freeze, block and restrict are three different things.**","required":["walletId","kind","reason"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["freeze","block","restrict","none"],"description":"**`freeze` stops spending and allows funding** — what you do while investigating. **`block` stops both** — a confirmed fraud. **`restrict` limits channels or categories** — what a parent asked for.\n"},"blockedChannels":{"type":"array","items":{"type":"string"}},"blockedCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"reason":{"type":"string"},"appliedBy":{"type":"string","format":"uuid"},"appliedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
+"WalletConfigurationVersion": {"type":"object","x-ticvai-persistence":"wallet.configuration_version","description":"Boards 1.10 and 10.8. **Ten boards of configuration that interact.**","properties":{"version":{"type":"integer"},"publishedAt":{"type":"string","format":"date-time","nullable":true},"publishedBy":{"type":"string","format":"uuid","nullable":true},"note":{"type":"string","nullable":true},"findings":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning"]},"code":{"type":"string"},"message":{"type":"string"}}}},"scopePath":{"type":"string"}}},
+"WalletCredential": {"type":"object","x-ticvai-persistence":"wallet.credential","description":"Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n","required":["walletId","kind","identifier"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"x-ticvai-references":"wallet.wallet","type":"string","format":"uuid"},"kind":{"type":"string","enum":["card","wristband","nfc","rfid","qr","mobileApp","digitalKey"]},"identifier":{"type":"string"},"linkedAt":{"type":"string","format":"date-time"},"unlinkedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","lost","replaced","blocked","expired"]},"replacedByCredentialId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"recordedAt":{"type":"string","format":"date-time","description":"**When the device made the write** (R113; CHG-OFL-003). `linkWalletCredential` is offline-capable, so the client sets this from its own clock and keeps it on replay; `created_at` is when the server heard of it. Omitted online, the server sets it to the time it received the call."}}},
+"WalletDispute": {"type":"object","x-ticvai-persistence":"wallet.dispute","description":"Board 7.9. **Internal, and the venue decides it** — unlike a card chargeback.","required":["walletId","description"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"x-ticvai-references":"wallet.wallet","type":"string","format":"uuid"},"transactionIds":{"type":"array","items":{"type":"string","format":"uuid"}},"amount":{"x-ticvai-column":"disputed_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"description":{"type":"string"},"raisedBy":{"type":"string","format":"uuid"},"raisedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["open","investigating","escalated","upheld","rejected","withdrawn"],"description":"`escalated` added with `resolveWalletDispute` (VM close-out, 29 September). `upheld`, `rejected` and `withdrawn` are closed."},"resolution":{"type":"string","nullable":true},"escalatedToRoleId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"reprocessedTransactionIds":{"type":"array","readOnly":true,"description":"Transactions created by a `reprocess` action.","items":{"type":"string","format":"uuid"}},"resolvedBy":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"adjustmentId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
+"WalletRestriction": {"type":"object","x-ticvai-persistence":"wallet.restriction","description":"Board 7.8. **Freeze, block and restrict are three different things.**","required":["walletId","kind","reason"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"x-ticvai-references":"wallet.wallet","type":"string","format":"uuid"},"kind":{"type":"string","enum":["freeze","block","restrict","none"],"description":"**`freeze` stops spending and allows funding** — what you do while investigating. **`block` stops both** — a confirmed fraud. **`restrict` limits channels or categories** — what a parent asked for.\n"},"blockedChannels":{"type":"array","items":{"type":"string"}},"blockedCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"reason":{"type":"string"},"appliedBy":{"type":"string","format":"uuid"},"appliedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
 "WalletRiskRules": {"type":"object","x-ticvai-persistence":"wallet.risk_rule_set + wallet.risk_rule","description":"Boards 8.2 to 8.7. **A risk rule with no action is a report.**","properties":{"rules":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"signal":{"type":"string","enum":["velocityCount","velocityAmount","newCredential","geographyJump","deviceChange","dormantThenLarge","repeatedFailure","refundPattern","accountSharing","duplicateTransaction","aiRiskScore"],"description":"4.3.32 (29 September, build pass). **`accountSharing`**: one wallet or credential used from more devices or places at once than one person can be (`threshold` concurrent devices within `windowMinutes`). **`duplicateTransaction`**: the same amount at the same acceptance point within `windowMinutes` (`threshold` repeats). **`aiRiskScore`**: the score the `ai` risk engine returns for the wallet operation (`scoreTransactionRisk`, rules first and statistical baselines as history builds, ai-system-design 3.10); `threshold` is the score at or above which the rule acts. The wallet keeps its own rules and actions; the AI finding and its case are the `ai` contract's (`listRiskAlerts`)."},"threshold":{"type":"number"},"windowMinutes":{"type":"integer"},"action":{"type":"string","enum":["scoreOnly","challenge","holdTransaction","freezeWallet","raiseCase"]},"minimumConfidence":{"type":"number","nullable":true,"description":"**Required before an automated freeze.** A rule that freezes on a false positive will eventually freeze a family in a queue.\n"},"alertOnAction":{"type":"boolean","x-ticvai-column":"does_alert_on_action","default":true},"status":{"type":"string","readOnly":true,"enum":["active","suspended","emergencyDisabled"],"default":"active","description":"Set by `setWalletRiskRuleStatus`, not by publishing the rule set. A rule not `active` is evaluated for nothing (VM close-out, 29 September)."},"statusReason":{"type":"string","nullable":true,"readOnly":true},"statusUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a `suspended` rule returns to `active` by itself."}}}},"scopePath":{"type":"string"}}}
 }
 ```

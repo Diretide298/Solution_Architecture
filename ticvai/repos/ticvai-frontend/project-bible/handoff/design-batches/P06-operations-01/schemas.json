@@ -1,139 +1,4 @@
 {
- "AccreditationCredentialVerification": {
-  "type": "object",
-  "description": "18.8.3. **What a steward needs to believe the person in front of them**: the face, the name, the category and the zones, and whether any of it is valid now. Returned by `verifyAccreditationCredential`; not stored.\n",
-  "required": [
-   "outcome"
-  ],
-  "properties": {
-   "outcome": {
-    "type": "string",
-    "enum": [
-     "valid",
-     "notYetValid",
-     "expired",
-     "suspended",
-     "revoked",
-     "credentialReplaced",
-     "credentialLost",
-     "credentialInactive"
-    ],
-    "description": "`valid` only when the holder is `active`, today is inside the holder's validity, and the credential is `issued` or `active`"
-   },
-   "reason": {
-    "type": "string",
-    "nullable": true
-   },
-   "credentialId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "credentialKind": {
-    "type": "string"
-   },
-   "credentialStatus": {
-    "type": "string"
-   },
-   "holderId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "accreditationNumber": {
-    "type": "string"
-   },
-   "fullName": {
-    "type": "string"
-   },
-   "photoAssetId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "photoUrl": {
-    "type": "string",
-    "nullable": true,
-    "description": "Signed and short-lived, so the scan screen can show the face without a second call"
-   },
-   "organisationName": {
-    "type": "string",
-    "nullable": true
-   },
-   "affiliationRole": {
-    "type": "string",
-    "nullable": true
-   },
-   "programmeId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "categoryCode": {
-    "type": "string",
-    "nullable": true
-   },
-   "categoryName": {
-    "type": "string",
-    "nullable": true
-   },
-   "holderStatus": {
-    "type": "string"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "effectiveZones": {
-    "type": "array",
-    "description": "The zones the holder may enter under their profiles and exceptions, today",
-    "items": {
-     "type": "object",
-     "properties": {
-      "zoneId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "zoneName": {
-       "type": "string"
-      },
-      "allowedNow": {
-       "type": "boolean",
-       "description": "Inside the profile schedule (date, day, time, event phase) at this moment"
-      }
-     }
-    }
-   },
-   "escortRequired": {
-    "type": "boolean"
-   },
-   "zoneCheck": {
-    "type": "object",
-    "nullable": true,
-    "description": "Present when `zoneId` was given",
-    "properties": {
-     "zoneId": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "allowed": {
-      "type": "boolean"
-     },
-     "reason": {
-      "type": "string",
-      "nullable": true
-     }
-    }
-   },
-   "checkedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "CashMovement": {
   "x-ticvai-persistence": "orders.cash_movement",
   "allOf": [
@@ -622,7 +487,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "authority": {
     "type": "string",
@@ -738,7 +604,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "note": {
     "type": "string",
@@ -797,7 +664,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "kind": {
     "type": "string",
@@ -851,6 +719,100 @@
    "environmental",
    "other"
   ]
+ },
+ "IncidentMedia": {
+  "x-ticvai-persistence": "maintenance.incident_media",
+  "type": "object",
+  "description": "**One photo, video or document on an incident** (`uploadIncidentMedia`; CHG-RUL-013). The file is in the media store; this row links it to the incident.\n",
+  "required": [
+   "id",
+   "incidentId",
+   "kind",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "incidentId": {
+    "type": "string",
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
+   },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "photo",
+     "video",
+     "document"
+    ]
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "awaitingUpload",
+     "stored"
+    ],
+    "readOnly": true,
+    "description": "`stored` once the media store confirmed the transfer and `assetRef` is set."
+   },
+   "assetRef": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "assets.media_asset"
+   },
+   "caption": {
+    "type": "string",
+    "nullable": true
+   },
+   "capturedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "uploadedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "upload": {
+    "type": "object",
+    "readOnly": true,
+    "x-ticvai-persisted": false,
+    "description": "The signed upload, as `assets.createUpload` returns it; only on the 201.",
+    "properties": {
+     "uploadUrl": {
+      "type": "string"
+     },
+     "method": {
+      "type": "string",
+      "enum": [
+       "PUT",
+       "POST"
+      ]
+     },
+     "headers": {
+      "type": "object",
+      "additionalProperties": {
+       "type": "string"
+      }
+     },
+     "expiresAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   }
+  }
  },
  "IncidentSeverity": {
   "type": "string",
@@ -1591,7 +1553,8 @@
       },
       "principalId": {
        "type": "string",
-       "format": "uuid"
+       "format": "uuid",
+       "x-ticvai-references": "identity.principal"
       },
       "at": {
        "type": "string",
@@ -1857,6 +1820,46 @@
    "expiresIn": {
     "type": "integer",
     "description": "Seconds"
+   }
+  }
+ },
+ "UploadIncidentMediaRequest": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "kind",
+   "filename",
+   "contentType",
+   "sizeBytes"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "photo",
+     "video",
+     "document"
+    ]
+   },
+   "filename": {
+    "type": "string",
+    "maxLength": 256
+   },
+   "contentType": {
+    "type": "string"
+   },
+   "sizeBytes": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "capturedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "Device time the photo or video was taken."
+   },
+   "caption": {
+    "type": "string",
+    "maxLength": 500
    }
   }
  },
@@ -2311,6 +2314,8 @@
       }
      },
      "timeEntries": {
+      "x-ticvai-persistence-column": "jsonb",
+      "x-ticvai-persistence-kind": "valueObject",
       "type": "array",
       "items": {
        "type": "object",
@@ -2334,6 +2339,8 @@
       }
      },
      "parts": {
+      "x-ticvai-persistence-column": "jsonb",
+      "x-ticvai-persistence-kind": "valueObject",
       "type": "array",
       "items": {
        "type": "object",

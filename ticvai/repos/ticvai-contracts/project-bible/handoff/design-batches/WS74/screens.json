@@ -5,6 +5,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "1",
@@ -260,6 +261,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "1",
@@ -308,7 +310,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -319,6 +321,7 @@
       {
        "kind": "multiSelect",
        "label": "Filter by",
+       "operation": "semanticSearch",
        "columns": [
         "Tenant",
         "Venue",
@@ -340,7 +343,8 @@
        "label": "Sort by",
        "notes": "Name, updated date or file size. \"Ticket Media\" is not a filter here: wristband and ticket media are not library assets.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
-       "bindsTo": "MediaAsset.sizeBytes"
+       "bindsTo": "MediaAsset.sizeBytes",
+       "operation": "semanticSearch"
       }
      ]
     },
@@ -363,7 +367,7 @@
         "updated date"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "searchMedia",
        "provenance": "pack Digital Asset Management DAM.pdf, page 5 §Each card should show"
       }
      ]
@@ -376,6 +380,7 @@
        "kind": "detailPanel",
        "label": "The selected central digital asset",
        "bindsTo": null,
+       "operation": "searchMedia",
        "columns": [
         "Thumbnail",
         "asset name",
@@ -441,13 +446,6 @@
     "provenance": "board reading, 19 September 2026"
    },
    {
-    "operationId": "listCollections",
-    "contract": "assets",
-    "purpose": "Collections to file into",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "semanticSearch",
     "contract": "ai",
     "purpose": "Natural-language search of the media library (kind media)",
@@ -500,6 +498,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_MANAGE",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "1",
@@ -564,6 +563,7 @@
       {
        "kind": "secondaryButton",
        "label": "Bulk Upload",
+       "operation": "completeUpload",
        "provenance": "pack Digital Asset Management DAM.pdf, page 6 §Support"
       },
       {
@@ -670,6 +670,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "1",
@@ -835,6 +836,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "1",
@@ -985,6 +987,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "1",
@@ -1029,28 +1032,32 @@
        "label": "Venue",
        "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
        "notes": "e.g. Dubai Park",
-       "bindsTo": "MediaAsset.venueId"
+       "bindsTo": "MediaAsset.venueId",
+       "operation": "setMediaAssetTags"
       },
       {
        "kind": "selectField",
        "label": "Category",
        "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
        "notes": "e.g. Marketing",
-       "bindsTo": "MediaAsset.categoryId"
+       "bindsTo": "MediaAsset.categoryId",
+       "operation": "setMediaAssetTags"
       },
       {
        "kind": "selectField",
        "label": "Campaign",
        "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
        "notes": "e.g. Summer 2026",
-       "bindsTo": "MediaAsset.tags"
+       "bindsTo": "MediaAsset.tags",
+       "operation": "setMediaAssetTags"
       },
       {
        "kind": "selectField",
        "label": "Tags",
        "provenance": "corrected 2 October 2026 (CHG-SGU-023, design-notes correction)",
        "notes": "e.g. Family, Outdoor",
-       "bindsTo": "MediaAsset.tags"
+       "bindsTo": "MediaAsset.tags",
+       "operation": "setMediaAssetTags"
       }
      ]
     }
@@ -1128,6 +1135,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "1",
@@ -1268,6 +1276,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "1",
@@ -1338,7 +1347,7 @@
         "Keywords"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listMediaAssetVersions",
        "provenance": "pack Digital Asset Management DAM.pdf, page 13 §Show"
       }
      ]
@@ -1351,6 +1360,7 @@
        "kind": "detailPanel",
        "label": "The selected digital asset 360°",
        "bindsTo": null,
+       "operation": "getMediaAsset",
        "columns": [
         "Asset ID",
         "title",
@@ -1467,6 +1477,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_MANAGE",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "1",
@@ -1601,6 +1612,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "1",
@@ -1665,7 +1677,7 @@
         "Monthly Growth"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 16 §Display"
       }
      ]
@@ -1678,6 +1690,7 @@
        "kind": "detailPanel",
        "label": "The selected asset activity recent",
        "bindsTo": null,
+       "operation": "getMediaUsageAnalytics",
        "columns": [
         "Assets Added",
         "Assets Updated",

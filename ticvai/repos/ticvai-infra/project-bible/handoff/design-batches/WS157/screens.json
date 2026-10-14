@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "USER_MANAGE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/staff-resource-directory-bo-873",
-   "component": "apps/venue-management-web/src/routes/rentals/StaffResourceDirectory.tsx",
+   "component": "src/routes/rentals/StaffResourceDirectory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -217,6 +218,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "USER_MANAGE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -226,7 +228,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/staff-resource-profile-bo-874",
-   "component": "apps/venue-management-web/src/routes/rentals/StaffResourceProfile.tsx",
+   "component": "src/routes/rentals/StaffResourceProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -432,6 +434,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -441,7 +444,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/skills-competency-management-bo-875",
-   "component": "apps/venue-management-web/src/routes/rentals/SkillsCompetencyManagement.tsx",
+   "component": "src/routes/rentals/SkillsCompetencyManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -465,6 +468,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define what each staff resource is capable of performing.",
   "purposeNote": "Administrators can maintain reusable staff competencies and proficiency levels that are available to the assignment and AI recommendation engines.",
+  "division": "Shares `getResourceQualifications`, `setResourceQualifications` with BO-098; this screen is Skills & Competency Management (pack Resource_Management_Configuration_Reference.pdf, board 3.03, page 36): define what each staff resource is capable of performing.",
   "gaps": [
    {
     "operation": null,
@@ -574,6 +578,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_MANAGE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -583,7 +588,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/certification-expiry-management-bo-876",
-   "component": "apps/venue-management-web/src/routes/rentals/CertificationExpiryManagement.tsx",
+   "component": "src/routes/rentals/CertificationExpiryManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -736,6 +741,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 1,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -745,7 +751,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/qualification-assignment-rule-engine-bo-877",
-   "component": "apps/venue-management-web/src/routes/rentals/QualificationAssignmentRuleEngine.tsx",
+   "component": "src/routes/rentals/QualificationAssignmentRuleEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -972,6 +978,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -981,7 +988,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/staff-availability-working-pattern-bo-878",
-   "component": "apps/venue-management-web/src/routes/rentals/StaffAvailabilityWorkingPattern.tsx",
+   "component": "src/routes/rentals/StaffAvailabilityWorkingPattern.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1219,6 +1226,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -1228,7 +1236,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/shift-template-assignment-configuration-bo-879",
-   "component": "apps/venue-management-web/src/routes/rentals/ShiftTemplateAssignmentConfiguration.tsx",
+   "component": "src/routes/rentals/ShiftTemplateAssignmentConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1343,6 +1351,22 @@
    "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-879"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 41. 0 of 0 labels bound to a contract property; 6 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "shiftPatternId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listShiftPatterns`."
+    },
+    {
+     "name": "shiftTemplateId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listShiftTemplates`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1372,6 +1396,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -1381,7 +1406,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/break-leave-absence-configuration-bo-880",
-   "component": "apps/venue-management-web/src/routes/rentals/BreakLeaveAbsenceConfiguration.tsx",
+   "component": "src/routes/rentals/BreakLeaveAbsenceConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1537,6 +1562,16 @@
    "workshopBoard": "wireframes/WS128 Resource Management Configuration Board 3.dc.html#bo-880"
   },
   "apisNote": "Regenerated 9 September 2026 from Resource_Management_Configuration_Reference.pdf page 42. 0 of 0 labels bound to a contract property; 10 of 37 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** Administrative block: `createResourceBlock`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "leaveTypeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listLeaveTypes`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1566,6 +1601,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_MANAGE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -1575,7 +1611,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/overtime-working-hour-rules-bo-881",
-   "component": "apps/venue-management-web/src/routes/rentals/OvertimeWorkingHourRules.tsx",
+   "component": "src/routes/rentals/OvertimeWorkingHourRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1718,6 +1754,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -1727,7 +1764,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/workforce-integration-synchronization-center-bo-882",
-   "component": "apps/venue-management-web/src/routes/rentals/WorkforceIntegrationSynchronizationCenter.tsx",
+   "component": "src/routes/rentals/WorkforceIntegrationSynchronizationCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1809,7 +1846,8 @@
         "Conflict Handling"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Integration Sources”, “External System Master”, “For example”, “Board 3 Shared Governance”, “Board 3 End-to-End Outcome”, “The platform understands”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Display"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 45 §Display",
+       "operation": "getFieldOwnership"
       }
      ]
     },

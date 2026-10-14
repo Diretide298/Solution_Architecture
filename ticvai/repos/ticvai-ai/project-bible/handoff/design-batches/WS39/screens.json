@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "6",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ai-pricing-intelligence-command-center-adm-098",
-   "component": "apps/venue-management-web/src/routes/commercial/AiPricingIntelligenceCommandCenter.tsx",
+   "component": "src/routes/commercial/AiPricingIntelligenceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -111,7 +112,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -291,6 +292,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "6",
@@ -300,7 +302,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/internal-demand-booking-signal-hub-adm-099",
-   "component": "apps/venue-management-web/src/routes/commercial/InternalDemandBookingSignalHub.tsx",
+   "component": "src/routes/commercial/InternalDemandBookingSignalHub.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -415,6 +417,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "6",
@@ -424,7 +427,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/weather-intelligence-demand-impact-configuration-adm-100",
-   "component": "apps/venue-management-web/src/routes/commercial/WeatherIntelligenceDemandImpactConfiguration.tsx",
+   "component": "src/routes/commercial/WeatherIntelligenceDemandImpactConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -606,6 +609,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "6",
@@ -615,7 +619,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/nearby-event-exhibition-local-demand-intelligence-adm-101",
-   "component": "apps/venue-management-web/src/routes/commercial/NearbyEventExhibitionLocalDemandIntelligence.tsx",
+   "component": "src/routes/commercial/NearbyEventExhibitionLocalDemandIntelligence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -880,6 +884,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "6",
@@ -889,7 +894,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/competitor-pricing-market-position-intelligence-adm-102",
-   "component": "apps/venue-management-web/src/routes/commercial/CompetitorPricingMarketPositionIntelligence.tsx",
+   "component": "src/routes/commercial/CompetitorPricingMarketPositionIntelligence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1095,6 +1100,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "6",
@@ -1104,7 +1110,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/market-tourism-holiday-contextual-signal-hub-adm-103",
-   "component": "apps/venue-management-web/src/routes/commercial/MarketTourismHolidayContextualSignalHub.tsx",
+   "component": "src/routes/commercial/MarketTourismHolidayContextualSignalHub.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1280,6 +1286,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "6",
@@ -1289,7 +1296,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ai-demand-forecasting-booking-curve-studio-adm-104",
-   "component": "apps/venue-management-web/src/routes/commercial/AiDemandForecastingBookingCurveStudio.tsx",
+   "component": "src/routes/commercial/AiDemandForecastingBookingCurveStudio.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1445,6 +1452,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "6",
@@ -1454,7 +1462,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/price-elasticity-revenue-response-intelligence-adm-105",
-   "component": "apps/venue-management-web/src/routes/commercial/PriceElasticityRevenueResponseIntelligence.tsx",
+   "component": "src/routes/commercial/PriceElasticityRevenueResponseIntelligence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1597,6 +1605,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "6",
@@ -1606,7 +1615,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ai-pricing-recommendation-explainability-center-adm-106",
-   "component": "apps/venue-management-web/src/routes/commercial/AiPricingRecommendationExplainabilityCenter.tsx",
+   "component": "src/routes/commercial/AiPricingRecommendationExplainabilityCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1767,6 +1776,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "6",
@@ -1776,7 +1786,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ai-signal-registry-data-quality-model-governance-adm-107",
-   "component": "apps/venue-management-web/src/routes/commercial/AiSignalRegistryDataQualityModelGovernance.tsx",
+   "component": "src/routes/commercial/AiSignalRegistryDataQualityModelGovernance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1930,6 +1940,14 @@
     "AiSignalRegistryDataQualityModelGovernanceView.source",
     "AiSignalRegistryDataQualityModelGovernanceView.internalExternal",
     "AiSignalRegistryDataQualityModelGovernanceView.market"
+   ],
+   "params": [
+    {
+     "name": "signalId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setSignalRegistryPolicy` takes it, from the record the user acts on."
+    }
    ]
   },
   "wireframe": {

@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/shop",
-   "component": "apps/guest-web/src/routes/Shop.tsx",
+   "component": "src/routes/Shop.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -154,7 +154,7 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add something",
+    "purpose": "Add the chosen item to the cart, for collection on the way out",
     "trigger": "onAction",
     "invalidates": [
      "listMerchandise"
@@ -237,7 +237,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/retail-and-shop-and-drop",
-   "component": "apps/guest-web/src/routes/RetailShopAndDrop.tsx",
+   "component": "src/routes/RetailShopAndDrop.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -1,6 +1,6 @@
 # WS66 — Unified BI Reporting and AI Analytics Platform board 1
 
-**9 screens · 10 operations · 23 schemas · 4 permissions**
+**9 screens · 9 operations · 19 schemas · 4 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -147,15 +147,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-012` | Live Operations Dashboard | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-012` | Live Operations Dashboard | D | 0 | 196 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-013` | Revenue Pulse | D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-014` | Attendance & Footfall Intelligence | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-015` | Capacity & Utilization Monitor | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-016` | Sales & Channel Performance | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-014` | Attendance & Footfall Intelligence | D | 0 | 210 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-015` | Capacity & Utilization Monitor | D | 0 | 112 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-016` | Sales & Channel Performance | D | 0 | 168 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ANL-017` | Customer, Membership & Loyalty Pulse | D | 2 | 30 | 6 | 0 | 2 | 2 | — | notStarted (—) |
 | `ANL-018` | Alerts & Exception Center | C | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-019` | AI Management Insights | D | 11 | 41 | 6 | 3 | 2 | 0 | — | notStarted (—) |
-| `ANL-020` | Multi-Site & Performance Comparison | D | 3 | 6 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-020` | Multi-Site & Performance Comparison | D | 3 | 90 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

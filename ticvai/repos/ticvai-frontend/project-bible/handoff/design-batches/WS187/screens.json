@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/funding-command-center-bo-1093",
-   "component": "apps/venue-management-web/src/routes/orders-money/FundingCommandCenter.tsx",
+   "component": "src/routes/orders-money/FundingCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -315,6 +316,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -324,7 +326,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/funding-method-configuration-bo-1094",
-   "component": "apps/venue-management-web/src/routes/orders-money/FundingMethodConfiguration.tsx",
+   "component": "src/routes/orders-money/FundingMethodConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -500,6 +502,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -509,7 +512,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/top-up-rule-configuration-bo-1095",
-   "component": "apps/venue-management-web/src/routes/orders-money/TopUpRuleConfiguration.tsx",
+   "component": "src/routes/orders-money/TopUpRuleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -533,6 +536,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control the business rules governing individual wallet top-up transactions.",
   "purposeNote": "Every wallet top-up is evaluated against the applicable funding rules before value is credited.",
+  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418; this screen is Top-Up Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.03, page 15): control the business rules governing individual wallet top-up transactions.",
   "layout": {
    "template": "form",
    "regions": [
@@ -728,6 +732,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -737,7 +742,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/channel-funding-source-mapping-bo-1096",
-   "component": "apps/venue-management-web/src/routes/orders-money/ChannelFundingSourceMapping.tsx",
+   "component": "src/routes/orders-money/ChannelFundingSourceMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -760,6 +765,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure funding availability across; Configure) and no display directory — it is settings, not a population",
   "purpose": "Determine where each funding method may be used.",
+  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1097, BO-1098, BO-1099, BO-1101, BO-417, BO-418; this screen is Channel & Funding Source Mapping (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.04, page 16): determine where each funding method may be used.",
   "layout": {
    "template": "form",
    "regions": [
@@ -940,6 +946,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -949,7 +956,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/auto-reload-configuration-bo-1097",
-   "component": "apps/venue-management-web/src/routes/orders-money/AutoReloadConfiguration.tsx",
+   "component": "src/routes/orders-money/AutoReloadConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -973,6 +980,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure automatic wallet replenishment when balances fall below predefined thresholds. The attached scope specifically requires automatic top-up when a wallet balance falls below a configurable threshold.",
   "purposeNote": "Auto-reload occurs only after the configured threshold is reached and all consent, payment, security and funding-limit validations have passed.",
+  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1098, BO-1099, BO-1101, BO-417, BO-418; this screen is Auto-Reload Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.05, page 17): configure automatic wallet replenishment when balances fall below predefined thresholds. The attached scope specifically requires automatic top-up when a wallet balance falls below a configurable threshold.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1143,6 +1151,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -1152,7 +1161,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/recurring-funding-schedule-bo-1098",
-   "component": "apps/venue-management-web/src/routes/orders-money/RecurringFundingSchedule.tsx",
+   "component": "src/routes/orders-money/RecurringFundingSchedule.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1176,6 +1185,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure scheduled wallet funding independent of the wallet's current balance. The source specifically requires scheduled or recurring top-ups based on date, frequency, amount, payment method and customer authorization.",
   "purposeNote": "and authorization requirements.",
+  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1099, BO-1101, BO-417, BO-418; this screen is Recurring Funding Schedule (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.06, page 17): configure scheduled wallet funding independent of the wallet's current balance. The source specifically requires scheduled or recurring top-ups based on date, frequency, amount, payment method and customer authorization.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1352,6 +1362,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -1361,7 +1372,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/funding-authorization-approval-rules-bo-1099",
-   "component": "apps/venue-management-web/src/routes/orders-money/FundingAuthorizationApprovalRules.tsx",
+   "component": "src/routes/orders-money/FundingAuthorizationApprovalRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1385,6 +1396,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure approval based on; Configure) and no display directory — it is settings, not a population",
   "purpose": "Apply governance and approval controls to wallet funding operations.",
   "purposeNote": "Funding transactions requiring approval cannot alter the wallet balance until all configured authorization requirements are satisfied.",
+  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1101, BO-417, BO-418; this screen is Funding Authorization & Approval Rules (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.07, page 18): apply governance and approval controls to wallet funding operations.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1570,6 +1582,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -1579,7 +1592,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/funding-reversal-correction-management-bo-1100",
-   "component": "apps/venue-management-web/src/routes/orders-money/FundingReversalCorrectionManagement.tsx",
+   "component": "src/routes/orders-money/FundingReversalCorrectionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1793,6 +1806,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -1802,7 +1816,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/funding-limits-velocity-controls-bo-1101",
-   "component": "apps/venue-management-web/src/routes/orders-money/FundingLimitsVelocityControls.tsx",
+   "component": "src/routes/orders-money/FundingLimitsVelocityControls.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1826,6 +1840,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Protect wallets against excessive or suspicious funding activity. The source specifically requires configurable maximum balance, daily top-up limit, single-transaction limit and user- specific limits.",
   "purposeNote": "Funding limits are evaluated in real time before wallet value is credited, with configurable actions for violations.",
+  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-417, BO-418; this screen is Funding Limits & Velocity Controls (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 2.09, page 20): protect wallets against excessive or suspicious funding activity. The source specifically requires configurable maximum balance, daily top-up limit, single-transaction limit and user- specific limits.",
   "layout": {
    "template": "form",
    "regions": [
@@ -2056,6 +2071,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "2",
@@ -2065,7 +2081,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/funding-transaction-audit-reconciliation-bo-1102",
-   "component": "apps/venue-management-web/src/routes/orders-money/FundingTransactionAuditReconciliation.tsx",
+   "component": "src/routes/orders-money/FundingTransactionAuditReconciliation.tsx",
    "status": "notStarted"
   },
   "navigation": {

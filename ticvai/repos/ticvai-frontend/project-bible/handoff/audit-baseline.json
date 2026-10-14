@@ -19166,5 +19166,15 @@
     "WEB-050"
    ]
   }
+ },
+ "check-ticket-links": {
+  "updated": "2026-10-14",
+  "commit": "e7211da9",
+  "rules": {}
+ },
+ "check-approved-ui": {
+  "updated": "2026-10-14",
+  "commit": "e7211da9",
+  "rules": {}
  }
 }

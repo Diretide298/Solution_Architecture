@@ -995,7 +995,7 @@ operations:
   writes: []
 - operation: listDynamicBundle2
   verb: GET
-  path: /dynamic-bundle
+  path: /dynamic-bundle-2
   scope: venue
   permission: PRICE_VIEW
   audience:

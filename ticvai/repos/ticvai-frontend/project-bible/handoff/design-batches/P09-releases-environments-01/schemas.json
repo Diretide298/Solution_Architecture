@@ -48,6 +48,8 @@
     "readOnly": true
    },
    "changes": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "**The developer changelog for this version** (17 September minutes, M17-14): every operation added, changed, deprecated or removed, and whether the change is breaking under ADR-0026. Generated at release from the contract diff; shown on DEV-001.\n",
     "items": {
@@ -267,6 +269,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -465,6 +468,7 @@
     "format": "uuid"
    },
    "planId": {
+    "x-ticvai-references": "control.migration_plan",
     "type": "string",
     "format": "uuid"
    },
@@ -546,6 +550,7 @@
   ],
   "properties": {
    "cellId": {
+    "x-ticvai-references": "control.cell",
     "type": "string",
     "format": "uuid"
    },
@@ -845,6 +850,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -1081,10 +1087,12 @@
   ],
   "properties": {
    "tenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },
    "cellId": {
+    "x-ticvai-references": "control.cell",
     "type": "string",
     "format": "uuid"
    },
@@ -1209,10 +1217,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "version": {
+    "readOnly": true,
     "type": "string"
    },
    "supportEndsAt": {
@@ -1273,6 +1283,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -1387,6 +1398,8 @@
   ],
   "properties": {
    "tenantId": {
+    "readOnly": true,
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },

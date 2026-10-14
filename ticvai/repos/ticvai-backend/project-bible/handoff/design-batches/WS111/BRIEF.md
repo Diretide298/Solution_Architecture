@@ -97,13 +97,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-644` | Credential Issuance Command Center | D | 0 | 41 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `BO-645` | Credential Generation Workspace | D | 14 | 0 | 6 | 4 | 1 | 0 | — | notStarted (—) |
+| `BO-644` | Credential Issuance Command Center | D | 0 | 43 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `BO-645` | Credential Generation Workspace | D | 14 | 13 | 6 | 4 | 1 | 0 | — | notStarted (—) |
 | `BO-646` | Credential Media Configuration | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-647` | Badge Template Designer | D | 0 | 11 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-648` | Badge Printing & Print Queue | D | 9 | 10 | 6 | 1 | 1 | 6 | — | notStarted (—) |
 | `BO-649` | Digital & Mobile Credential Management | D | 0 | 13 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-650` | NFC & RFID Credential Encoding | D | 2 | 31 | 6 | 10 | 0 | 0 | — | notStarted (—) |
+| `BO-650` | NFC & RFID Credential Encoding | D | 2 | 33 | 6 | 10 | 0 | 0 | — | notStarted (—) |
 | `BO-651` | Credential Activation & Delivery | D | 0 | 13 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-653` | Credential Registry & Credential History | D | 0 | 25 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 

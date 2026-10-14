@@ -621,7 +621,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "name": {
     "type": "string",
@@ -821,7 +822,8 @@
    },
    "templateId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.inspection_template"
    },
    "venueId": {
     "type": "string",
@@ -894,11 +896,13 @@
    },
    "workOrderId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.work_order"
    },
    "supplierId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "inventory.supplier"
    },
    "scope": {
     "type": "string",
@@ -1292,6 +1296,8 @@
       }
      },
      "timeEntries": {
+      "x-ticvai-persistence-column": "jsonb",
+      "x-ticvai-persistence-kind": "valueObject",
       "type": "array",
       "items": {
        "type": "object",
@@ -1315,6 +1321,8 @@
       }
      },
      "parts": {
+      "x-ticvai-persistence-column": "jsonb",
+      "x-ticvai-persistence-kind": "valueObject",
       "type": "array",
       "items": {
        "type": "object",
@@ -1541,6 +1549,8 @@
     }
    },
    "bands": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "minItems": 1,
     "maxItems": 5,

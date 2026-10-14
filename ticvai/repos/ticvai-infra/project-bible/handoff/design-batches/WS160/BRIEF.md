@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-908` | Rental Duration, Extension & Return Management | D | 0 | 32 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-909` | Deposit & Rental Financial Control | D | 0 | 16 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-910` | Maintenance & Resource Blocking | D | 19 | 0 | 6 | 10 | 1 | 2 | — | notStarted (—) |
-| `BO-911` | Inspection, Condition & Compliance Management | A | 31 | 25 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-911` | Inspection, Condition & Compliance Management | A | 30 | 25 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-912` | Asset Lifecycle, Depreciation & Retirement | D | 11 | 38 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

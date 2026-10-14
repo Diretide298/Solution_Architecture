@@ -13,6 +13,7 @@
     "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
    "variantId": {
+    "x-ticvai-references": "catalogue.variant",
     "type": "string",
     "format": "uuid"
    },
@@ -58,13 +59,20 @@
   ]
  },
  "AlternativeCode": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "catalogue.alternative_code",
   "type": "object",
   "required": [
    "code",
-   "partnerId"
+   "partnerId",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "code": {
     "type": "string",
     "maxLength": 128
@@ -214,15 +222,22 @@
   }
  },
  "BookingFlowStep": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "whitelabel.booking_flow_step",
   "type": "object",
   "description": "One step of a venue's flow, in the venue's order (decided 29 September, W12).",
   "required": [
    "stepKey",
    "enabled",
-   "sortOrder"
+   "sortOrder",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -456,6 +471,7 @@
        "readOnly": true
       },
       "variantId": {
+       "x-ticvai-references": "catalogue.variant",
        "type": "string",
        "format": "uuid"
       },
@@ -496,6 +512,7 @@
     "description": "**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"
    },
    "variantId": {
+    "x-ticvai-references": "catalogue.variant",
     "type": "string",
     "format": "uuid"
    },
@@ -808,6 +825,9 @@
   ]
  },
  "ChannelAllocation": {
+  "x-ticvai-retired-columns": [
+   "envelope_id"
+  ],
   "x-ticvai-persistence": "catalogue.channel_envelope",
   "type": "object",
   "required": [
@@ -846,6 +866,13 @@
     "format": "date-time",
     "nullable": true,
     "description": "Unsold units return to the general pool at this time. How distribution holds are freed close to a performance without someone remembering to do it.\n"
+   },
+   "channelCapacityId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "catalogue.channel_capacity",
+    "description": "The capacity envelope this allocation draws from (`catalogue.channel_capacity`), from the path of `setChannelAllocations`."
    },
    "salesChannelId": {
     "type": "string",
@@ -1041,6 +1068,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -1129,6 +1157,7 @@
   }
  },
  "Combo": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "fnb.combo",
   "description": "Board 2G, 24 August. **A meal deal is one product with slots, not a bundle of products.** `listCatalogueBundles` bundles ticketing products — a ticket and a parking pass, both fixed — and **a burger with a choice of side and a choice of drink is a different shape entirely.**\n**The price is on the combo, not the sum of its parts.** That is the whole commercial point: a meal deal is cheaper than its items, and a model that prices by summing cannot express it.\n**Upcharges live on the slot options.** A large drink in a meal deal costs two dirhams more than a regular, and it is not a separate combo.\n",
@@ -1136,10 +1165,17 @@
    "id",
    "name",
    "price",
-   "slots"
+   "slots",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -1183,15 +1219,22 @@
   }
  },
  "ComboSlot": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "fnb.combo_slot + fnb.combo_slot_option",
   "description": "One choice within a combo. **`minSelect` and `maxSelect` are what make it a slot rather than a line** — a main is exactly one, a side is one of four, and a sauce might be none or two.\n",
   "required": [
    "id",
    "name",
-   "options"
+   "options",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -1224,6 +1267,7 @@
      ],
      "properties": {
       "menuItemId": {
+       "x-ticvai-references": "fnb.menu_item",
        "type": "string",
        "format": "uuid"
       },
@@ -1256,10 +1300,12 @@
     "readOnly": true
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "maxLength": 64,
     "nullable": true
@@ -1618,6 +1664,7 @@
   ],
   "properties": {
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -1737,6 +1784,7 @@
   ],
   "properties": {
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -2607,6 +2655,7 @@
     "description": "Assigned by the server on create; `createEntitlementTemplate` does not take it."
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -2685,6 +2734,8 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "validTimeWindows": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "nullable": true,
     "description": "BL-036, 1.1.81 and 1.1.83. **A time-window entitlement needed a performance to express** — valid 09:00 to 13:00 on any day was a thing you built by creating performances.\n**A window is a property of the entitlement and a performance is an occurrence**, and conflating them means a morning pass generates 365 performances a year.\n",
@@ -3472,6 +3523,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "maxLength": 64
    },
@@ -3605,7 +3657,8 @@
    },
    "barcode": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "x-ticvai-unique": "venue"
    },
    "name": {
     "type": "string"
@@ -3711,6 +3764,7 @@
     "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
    },
    "productId": {
+    "x-ticvai-references": "catalogue.product",
     "type": "string",
     "format": "uuid"
    },
@@ -3974,6 +4028,8 @@
     "type": "integer"
    },
    "bands": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -4100,6 +4156,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -4282,6 +4339,7 @@
     "format": "uuid"
    },
    "dynamicPriceRuleId": {
+    "x-ticvai-references": "pricing.dynamic_price_rule",
     "type": "string",
     "format": "uuid"
    },
@@ -4320,6 +4378,7 @@
     "format": "uuid"
    },
    "dynamicPriceRuleId": {
+    "x-ticvai-references": "pricing.dynamic_price_rule",
     "type": "string",
     "format": "uuid"
    },
@@ -4520,13 +4579,15 @@
     "type": "string",
     "format": "uuid",
     "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164).",
     "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
    },
    "approvedByPrincipalId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164)."
    },
    "responsibleDepartmentId": {
     "type": "string",
@@ -4632,6 +4693,8 @@
     "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 6,
     "items": {
@@ -4977,6 +5040,7 @@
     "format": "date-time"
    },
    "publishedByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid"
    },
@@ -5342,14 +5406,21 @@
   }
  },
  "PromotionVariant": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "promotions.promotion_variant",
   "type": "object",
   "description": "One arm of a promotion A/B test (BL-114), written by `setPromotionVariants`. **Stored as rows** because the split has to be read back at evaluation time. The body used to be a free object with no table behind it, so the variants a caller set could not be persisted.\n",
   "required": [
    "label",
-   "trafficPercent"
+   "trafficPercent",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -5943,6 +6014,8 @@
     "maxLength": 200
    },
    "values": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "minItems": 1,
     "items": {

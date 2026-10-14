@@ -46,7 +46,7 @@
   "states": 42,
   "events": 48,
   "tables": 138,
-  "screens": 194,
+  "screens": 183,
   "flows": 11,
   "documents": 68,
   "openConflicts": 1
@@ -97,9 +97,9 @@
   "build": 0
  },
  "waves": {
-  "wave1": 48,
+  "wave1": 44,
   "wave2": 6,
-  "wave3": 140
+  "wave3": 133
  },
  "reachedOutsideTheContract": [
   {

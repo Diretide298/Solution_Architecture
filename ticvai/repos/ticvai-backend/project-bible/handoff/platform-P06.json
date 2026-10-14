@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
-  "operations": 223,
-  "contracts": 20,
+  "operations": 221,
+  "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 136
+  "operationsWithNoScreen": 135
  },
  "waves": {
   "wave1": 30,
@@ -111,26 +111,22 @@
   },
   {
    "contract": "reporting",
-   "operations": 6
+   "operations": 5
   },
   {
    "contract": "retail",
    "operations": 5
   },
   {
-   "contract": "venue-map",
-   "operations": 2
-  },
-  {
    "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "approvals",
-   "operations": 1
+   "contract": "venue-map",
+   "operations": 2
   },
   {
-   "contract": "accreditation",
+   "contract": "approvals",
    "operations": 1
   },
   {
@@ -163,7 +159,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/home-on-duty",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -226,7 +222,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/scan-ready",
-   "operations": 5,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -343,7 +339,7 @@
    "module": "Operations",
    "wave": 2,
    "route": "/operations/incident-detail",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -550,7 +546,7 @@
    "module": "Operations",
    "wave": 2,
    "route": "/operations/post-incident-restore",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -649,7 +645,7 @@
    "module": "Stock on the Floor",
    "wave": 2,
    "route": "/operations/retail-inventory-command-center",
-   "operations": 6,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1791,12 +1787,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Devices that report having been interfered with"
-   },
-   {
-    "operation": "listProfileDeployments",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Recent deployments, with a date, a target and an outcome"
    },
    {
     "operation": "recordDeviceTamperEvent",

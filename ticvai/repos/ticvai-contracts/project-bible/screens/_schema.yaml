@@ -173,6 +173,16 @@ properties:
           description: >
             Required to reach the screen at all. Null means any authenticated principal, or
             public. Component-level gating is declared on the component.
+            **Derived from the operations** where a person has not set it (Block A audit, 14 October
+            2026, CHG-SCR-002, `tools/derive-screen-wiring.py`).
+        division:
+          type: string
+          description: >
+            **What this screen is for, where another screen on its platform calls the same
+            operations** (Block A audit, 14 October 2026, CHG-SCR-009). The client's boards draw
+            facets of one record as separate screens; they are never merged to tidy the package.
+            Each says what it shares, with whom, and which part of the record it is for.
+            `check-screen-wiring` (S-DUP-SCREEN) fails a group whose members do not all state one.
         apis:
           type: array
           description: >

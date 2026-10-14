@@ -103,10 +103,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-019` | Contact Center Operations Command Center | D | 2 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `SUP-019` | Contact Center Operations Command Center | D | 2 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `SUP-020` | Queue Configuration & Management | D | 25 | 6 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 | `SUP-021` | Intelligent Routing, Skills & Assignment Engine | D | 4 | 13 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `SUP-022` | SLA Policy & Service-Level Management | D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `SUP-022` | SLA Policy & Service-Level Management | D | 17 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `SUP-023` | Agent Workload, Availability & Workforce Control | D | 5 | 26 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `SUP-024` | Escalation & Critical Case Monitor | D | 0 | 24 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `SUP-025` | Quality Management & Agent Evaluation | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |

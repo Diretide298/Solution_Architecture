@@ -114,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-083` | Pricing Approval Workflow & Authority Matrix | B | 4 | 20 | 5 | 1 | 1 | 3 | — | notStarted (generated) |
 | `ADM-084` | Pricing Publication & Effective-Date Scheduler | B | 1 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-085` | Pricing Distribution, Synchronization & Publication Monitor | B | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-086` | Pricing Rollback & Emergency Control Center | B | 22 | 0 | 6 | 1 | 1 | 2 | — | notStarted (generated) |
+| `ADM-086` | Pricing Rollback & Emergency Control Center | B | 21 | 0 | 6 | 1 | 1 | 2 | — | notStarted (generated) |
 | `ADM-087` | Pricing History, Audit & Compliance Explorer | B | 2 | 0 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch

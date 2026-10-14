@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-363` | Approval Trend & Comparative Analytics | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 | `ADM-364` | Approver & Team Performance Analytics | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-365` | Risk & Governance Analytics | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-366` | AI Approval Intelligence Center | B | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `ADM-366` | AI Approval Intelligence Center | B | 0 | 16 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `ADM-367` | AI Optimization & What-If Simulator | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-368` | AI Governance Executive Advisor | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
@@ -238,6 +238,8 @@ getApprovalAnalytics (ApprovalAnalytics):
 - `getApprovalAnalytics` → `APPROVAL_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_VIEW`
 
 #### Requirements it meets
 
@@ -361,6 +363,8 @@ getApprovalAnalytics (ApprovalAnalytics):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -470,6 +474,8 @@ getApprovalAnalytics (ApprovalAnalytics):
 - `getApprovalAnalytics` → `APPROVAL_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_VIEW`
 
 #### Requirements it meets
 
@@ -624,6 +630,8 @@ Every bottleneck analysis heatmap:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -733,6 +741,8 @@ getApprovalAnalytics (ApprovalAnalytics):
 - `getApprovalAnalytics` → `APPROVAL_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_VIEW`
 
 #### Requirements it meets
 
@@ -865,6 +875,8 @@ metric tiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -986,6 +998,8 @@ risk:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1059,7 +1073,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getApprovalRequestScore`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Approval request | the name it points at, never the id | — |
+| Trigger | chip: Submitted, Resubmitted, Sla tick, Escalated | — |
+| Risk score | 1,234 | — |
+| Risk band | chip: Low, Medium, High, Critical | Design 5.6: a risk score and band, never a probability. |
+| Priority score | 1,234 | For ordering work in an inbox; higher first. |
+| Escalation suggestion | grouped details | A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy. |
+| Action | chip: Escalate, Add backup approver, None | — |
+| Reason | text | — |
+| Signals | list or chips (count when long) | — |
+| Code | text | e.g. `amountAboveRequesterNorm`, `requesterEntityRisk`, `outOfHours`, `irreversibleAction`, `slaDueSoon`, `stepBreachRate` … |
+| Contribution | 1,234.5 | — |
+| Detail | text | — |
+| Basis | chip: Heuristic, Statistical, Model, Hybrid, Manual | How the answer was reached, and this is the field the whole design exists for. A venue must be able to see that today's price suggestion is … |
+| Decision record | the name it points at, never the id | — |
+| Scored at | 1 Oct 2026, 14:30 | — |
 
 **Data it reads**: `getApprovalAnalytics` (onLoad, What the models see); `getApprovalRequestScore` (onLoad, Risk band, priority and suggested escalation for the …)
 
@@ -1099,6 +1132,8 @@ getApprovalAnalytics (ApprovalAnalytics):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1127,7 +1162,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-366?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-359`.
@@ -1204,6 +1239,8 @@ effect: -31% approvals, +AED 4,200 refunded without manager
 - `simulateWorkflowTestingImpact` → `APPROVAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1312,6 +1349,8 @@ getApprovalAnalytics (ApprovalAnalytics):
 - `getApprovalAnalytics` → `APPROVAL_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_VIEW`
 
 #### Requirements it meets
 
@@ -1454,7 +1493,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AiApprovalRequestScore": {"type":"object","x-ticvai-persistence":"ai.approval_request_score","description":"**Context for an approval reviewer** (11.1.73..75): risk, priority and a suggested escalation for one pending request, the latest per request. **There is no approve or reject field, by design** (minutes of 8 September: AI in approvals never recommends or influences approve or reject).","required":["approvalRequestId","riskScore","riskBand","priorityScore","escalationSuggestion"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"approvalRequestId":{"type":"string","format":"uuid","x-ticvai-references":"approvals.request"},"trigger":{"type":"string","enum":["submitted","resubmitted","slaTick","escalated"]},"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"],"description":"Design 5.6: a risk score and band, never a probability."},"priorityScore":{"type":"integer","minimum":0,"maximum":100,"description":"For ordering work in an inbox; higher first."},"escalationSuggestion":{"type":"object","required":["action"],"properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}},"description":"A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy."},"signals":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string","description":"e.g. `amountAboveRequesterNorm`, `requesterEntityRisk`, `outOfHours`, `irreversibleAction`, `slaDueSoon`, `stepBreachRate`, `approverUnavailable`."},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"decisionRecordId":{"type":"string","format":"uuid","nullable":true},"scoredAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiApprovalRequestScore": {"type":"object","x-ticvai-persistence":"ai.approval_request_score","description":"**Context for an approval reviewer** (11.1.73..75): risk, priority and a suggested escalation for one pending request, the latest per request. **There is no approve or reject field, by design** (minutes of 8 September: AI in approvals never recommends or influences approve or reject).","required":["approvalRequestId","riskScore","riskBand","priorityScore","escalationSuggestion"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"approvalRequestId":{"type":"string","format":"uuid","x-ticvai-references":"approvals.request"},"trigger":{"type":"string","enum":["submitted","resubmitted","slaTick","escalated"]},"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"],"description":"Design 5.6: a risk score and band, never a probability."},"priorityScore":{"type":"integer","minimum":0,"maximum":100,"description":"For ordering work in an inbox; higher first."},"escalationSuggestion":{"type":"object","required":["action"],"properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}},"description":"A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy."},"signals":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string","description":"e.g. `amountAboveRequesterNorm`, `requesterEntityRisk`, `outOfHours`, `irreversibleAction`, `slaDueSoon`, `stepBreachRate`, `approverUnavailable`."},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"decisionRecordId":{"type":"string","format":"uuid","nullable":true},"scoredAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "ApprovalAnalytics": {"type":"object","x-ticvai-persistence":"none — aggregated from approvals.request","properties":{"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"groupBy":{"type":"string","description":"The grouping asked for, as the `groupBy` query parameter; each row's `key` is one value of it.","enum":["kind","approver","venue","day","week"]},"rows":{"type":"array","items":{"type":"object","properties":{"key":{"type":"string"},"raised":{"type":"integer"},"approved":{"type":"integer"},"rejected":{"type":"integer"},"withdrawn":{"type":"integer"},"expired":{"type":"integer","description":"**Requests nobody answered.** Usually a routing defect rather than a busy approver, and the number that says the matrix names the wrong person.\n"},"escalated":{"type":"integer"},"slaBreached":{"type":"integer"},"medianMinutes":{"type":"number"},"p95Minutes":{"type":"number"}}}}}},
 "GovernanceAuditAiRiskLaunchReadinessView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Governance Audit, AI Risk & Launch Readiness displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"promotionConfiguration":{"type":"string","description":"Promotion Configuration ✓"},"eligibility":{"type":"string","description":"Eligibility ✓"},"stackingRules":{"type":"string","description":"Stacking Rules ✓"},"budget":{"type":"string","description":"Budget ✓"},"redemptionLimits":{"type":"string","description":"Redemption Limits ✓"},"marginGuardrail":{"type":"number","description":"Margin Guardrail ✓"},"simulationCompleted":{"type":"string","description":"Simulation Completed ✓"},"requiredApproval":{"type":"string","description":"Required Approval ✓"},"channelPublication":{"type":"string","description":"Channel Publication ✓"},"auditRequirements":{"type":"string","description":"Audit Requirements ✓"},"budgetCreation":{"type":"string","description":"Budget creation"},"budgetChange":{"type":"string","description":"Budget change"},"limitChanges":{"type":"integer","description":"Limit changes"},"approvalSubmissions":{"type":"string","description":"Approval submissions"},"approvalDecisions":{"type":"string","description":"Approval decisions"},"overrides":{"type":"string","description":"Overrides"},"automaticSuspension":{"type":"string","description":"Automatic suspension"},"reactivation":{"type":"string","description":"Reactivation"},"simulationResults":{"type":"string","description":"Simulation results"},"experimentChanges":{"type":"string","description":"Experiment changes"},"campaignLaunch":{"type":"string","description":"Campaign launch"}}},
 "GovernanceRiskAiMonitoringControlCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Governance Risk, AI Monitoring & Control Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"risk":{"type":"string","enum":["productWithoutOwner","missingApproval","outdatedPricing","conflictingValidity","missingChannelConfiguration","orphanedDependency","unusedProduct","duplicateProduct","unusualConfigurationChange","highOverrideLevel","scheduledPublicationConflict","expiredCommercialConfiguration","activeAfterEventEnd","brokenDependency"],"description":"Risk detected (AI Monitoring, pack p.26)"},"product":{"type":"string","description":"Product name"},"venue":{"type":"string","description":"Venue name"},"businessImpact":{"type":"string","description":"Business impact, in plain language"},"recommendedAction":{"type":"string","description":"Recommended action; advisory"},"owner":{"type":"string","description":"Owner (display name)","nullable":true},"dueDate":{"type":"string","description":"Due date","format":"date","nullable":true},"status":{"type":"string","description":"Status: open, acknowledged, inRemediation, resolved or dismissed (decided 29 September, readiness close-out)"},"riskId":{"type":"string","description":"Risk id","format":"uuid"},"productId":{"type":"string","description":"Product id","format":"uuid","nullable":true},"severity":{"type":"string","enum":["critical","high","medium","low"],"description":"Severity (Risk Dashboard)"},"explanation":{"type":"string","description":"AI explanation, e.g. the two products share 96% of their configuration; advisory"},"detectedAt":{"type":"string","description":"Detected","format":"date-time"}}},

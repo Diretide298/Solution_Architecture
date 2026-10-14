@@ -1,6 +1,6 @@
 # WS67 — Unified BI Reporting and AI Analytics Platform board 2
 
-**10 screens · 13 operations · 15 schemas · 3 permissions**
+**10 screens · 12 operations · 14 schemas · 3 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-021` | Dashboard Library | D | 0 | 62 | 6 | 18 | 2 | 0 | — | notStarted (—) |
+| `ANL-021` | Dashboard Library | D | 0 | 62 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ANL-022` | Dashboard Creation Wizard | D | 18 | 0 | 5 | 18 | 1 | 0 | — | notStarted (—) |
 | `ANL-023` | Drag-and-Drop Dashboard Canvas | A | 37 | 33 | 6 | 18 | 3 | 0 | — | notStarted (—) |
 | `ANL-024` | Widget & Visualization Library | D | 0 | 12 | 6 | 0 | 2 | 0 | — | notStarted (—) |

@@ -27,7 +27,7 @@
  },
  "setPerformanceTemplate": {
   "method": "PUT",
-  "path": "/performance-templates",
+  "path": "/performance-templates/{performanceTemplateId}",
   "contract": "catalogue",
   "summary": "Define slot length, capacity, bands and walk-in policy",
   "permission": "PERFORMANCE_CONFIGURE",
@@ -35,6 +35,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "performanceTemplateId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -46,7 +51,7 @@
  },
  "setPrepaidMinutePackage": {
   "method": "PUT",
-  "path": "/prepaid-minute-packages",
+  "path": "/prepaid-minute-packages/{prepaidMinutesId}",
   "contract": "catalogue",
   "summary": "Time bought in advance and drawn down per visit",
   "permission": "PRICE_CONFIGURE",
@@ -54,6 +59,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "prepaidMinutesId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

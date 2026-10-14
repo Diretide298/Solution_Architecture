@@ -23,15 +23,15 @@ tables**, and the distribution is the honest shape of the package:
 
 | Terminal table | Tables that reach it |
 |---|---:|
-| `platform.scope` | 886 |
-| `identity.role` | 736 |
-| `control.partner` | 715 |
-| `ledger.legal_entity` | 334 |
-| `platform.configuration_profile` | 225 |
-| `access.admission_rules` | 218 |
-| `catalogue.variant` | 150 |
-| `access.hardware_model` | 84 |
-| `resources.resource_type` | 70 |
+| `platform.scope` | 884 |
+| `identity.role` | 742 |
+| `control.partner` | 721 |
+| `ledger.legal_entity` | 328 |
+| `access.admission_rules` | 219 |
+| `platform.configuration_profile` | 213 |
+| `catalogue.variant` | 147 |
+| `access.hardware_model` | 79 |
+| `resources.resource_type` | 74 |
 | `control.developer_account` | 31 |
 
 `platform.scope` is reached by 289 of 353 — **the tenancy spine, and almost
@@ -41,15 +41,15 @@ everything hangs off it.** `identity.role` at 207 is the authorisation spine.
 tables reaching nothing, including `identity.role` itself, because `principal` points
 at `role` rather than the reverse. **The direction was the bug, not the data.**
 
-## `marketing` — 132 tables
+## `marketing` — 131 tables
 
-**Root: `marketing.guest_profile`**  ·  own 1 · reach 2 · out 5
+**Root: `marketing.guest_profile`**  ·  own 1 · reach 1 · out 5
 
 > **Overridden.** The arithmetic picks `marketing.case`. **`campaign` scores higher and a campaign is something done *to* a guest.** The schema is a CRM: the profile is what persists and campaigns come and go.
 
 - **1 step from the root** — `guest_match_decision`
 
-- **Reaches the root through nothing** — `agent_availability`, `agent_service_profile`, `attribution_touch`, `audience_activation`, `audience_list`, `badge`, `booking_consent_record`, `business_event`, `campaign`, `campaign_target`, `campaign_variant`, `case`, `case_category`, `case_compensation_request`, `case_escalation`, `case_internal_request`, `case_linked_record`, `case_message`, `case_resolution`, `case_routing_rule`, `case_service_action`, `challenge`, `challenge_progress`, `communication_policy_decision`, `communication_preference_type`, `communication_provider`, `communication_routing_rule`, `consent_capture_point`, `consent_propagation`, `consent_purpose`, `consent_purpose_channel`, `consent_question`, `consent_question_version`, `consent_record`, `consent_record_channel`, `contact_automation`, `conversation`, `conversation_message`, `conversation_message_attachment`, `cookie_banner_design`, `cookie_scan_finding`, `cookie_scan_policy`, `cookie_scan_run`, `customer_badge`, `device_consent`, `device_consent_category`, `duplicate_candidate`, `feedback_classification`, `form_definition`, `form_definition_field`, `form_submission`, `guest_attribute_model`, `guest_device`, `guest_document`, `guest_extra_field`, `guest_extra_option`, `guest_extra_value`, `guest_match_policy`, `guest_note`, `guest_preference`, `guest_relationship`, `identity_rules`, `invitation`, `invitation_campaign`, `journey`, `journey_enrollment`, `journey_step`, `kiosk_assist_session`, `legal_hold`, `lost_item`, `loyalty_campaign`, `loyalty_points`, `loyalty_position`, `loyalty_programme`, `loyalty_rule`, `message_delivery`, `message_dispatch`, `message_dispatch_attempt`, `message_template`, `message_template_version`, `message_trigger`, `message_trigger_condition`, `minor_privacy_rule`, `points_earning_rule`, `points_redemption_rule`, `privacy_action`, `privacy_audit_event`, `privacy_change_set`, `privacy_exception`, `privacy_export_package`, `privacy_incident`, `privacy_notice_governance`, `privacy_request`, `privacy_request_deadline`, `privacy_request_type`, `processing_purpose`, `programme_tier`, `quality_evaluation`, `referral`, `retention_policy`, `retention_run`, `review`, `review_response`, `reward`, `reward_assignment`, `segment`, `segment_criterion`, `sender_identity`, `service_copilot_config`, `service_queue`, `sla_policy`, `subscription`, `suppression`, `touch_point`, `tracking_technology`, `tracking_technology_catalogue`, `waiver_association`, `waiver_exception`, `waiver_field_rule`, `waiver_form_layout`, `waiver_localisation`, `waiver_master`, `waiver_requirement`, `waiver_requirement_event`, `waiver_signatory_rule`, `waiver_signature`, `waiver_trigger_rule`, `waiver_verification`, `waiver_version_control`, `wishlist_item`
+- **Reaches the root through nothing** — `agent_availability`, `agent_service_profile`, `attribution_touch`, `audience_activation`, `audience_list`, `badge`, `booking_consent_record`, `business_event`, `campaign`, `campaign_target`, `campaign_variant`, `case`, `case_category`, `case_compensation_request`, `case_escalation`, `case_internal_request`, `case_linked_record`, `case_message`, `case_resolution`, `case_routing_rule`, `case_service_action`, `challenge`, `challenge_progress`, `communication_policy_decision`, `communication_preference_type`, `communication_provider`, `communication_routing_rule`, `consent_capture_point`, `consent_propagation`, `consent_purpose`, `consent_purpose_channel`, `consent_question`, `consent_question_version`, `consent_record`, `consent_record_channel`, `contact_automation`, `conversation`, `conversation_message`, `conversation_message_attachment`, `cookie_banner_design`, `cookie_scan_finding`, `cookie_scan_policy`, `cookie_scan_run`, `customer_badge`, `device_consent`, `device_consent_category`, `duplicate_candidate`, `feedback_classification`, `form_definition`, `form_definition_field`, `form_submission`, `guest_attribute_model`, `guest_device`, `guest_document`, `guest_extra_field`, `guest_extra_option`, `guest_extra_value`, `guest_match_policy`, `guest_note`, `guest_preference`, `guest_relationship`, `identity_rules`, `invitation`, `invitation_campaign`, `journey`, `journey_enrollment`, `journey_step`, `kiosk_assist_session`, `legal_hold`, `lost_item`, `loyalty_campaign`, `loyalty_points`, `loyalty_position`, `loyalty_programme`, `loyalty_rule`, `message_dispatch`, `message_dispatch_attempt`, `message_template`, `message_template_version`, `message_trigger`, `message_trigger_condition`, `minor_privacy_rule`, `points_earning_rule`, `points_redemption_rule`, `privacy_action`, `privacy_audit_event`, `privacy_change_set`, `privacy_exception`, `privacy_export_package`, `privacy_incident`, `privacy_notice_governance`, `privacy_request`, `privacy_request_deadline`, `privacy_request_type`, `processing_purpose`, `programme_tier`, `quality_evaluation`, `referral`, `retention_policy`, `retention_run`, `review`, `review_response`, `reward`, `reward_assignment`, `segment`, `segment_criterion`, `sender_identity`, `service_copilot_config`, `service_queue`, `sla_policy`, `subscription`, `suppression`, `touch_point`, `tracking_technology`, `tracking_technology_catalogue`, `waiver_association`, `waiver_exception`, `waiver_field_rule`, `waiver_form_layout`, `waiver_localisation`, `waiver_master`, `waiver_requirement`, `waiver_requirement_event`, `waiver_signatory_rule`, `waiver_signature`, `waiver_trigger_rule`, `waiver_verification`, `waiver_version_control`, `wishlist_item`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -66,21 +66,9 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `orders` — 83 tables
-
-**Root: `orders.sales_order`**  ·  own 21 · reach 62 · out 6
-
-- **1 step from the root** — `after_sale_request`, `credit_override`, `deposit`, `discount`, `external_reference_mapping`, `group_booking`, `membership_migration`, `membership_renewal`, `order_event`, `order_fee`, `order_line`, `order_relationship`, `payment`, `payment_link`, `refund`, `reservation`, `ticket_transfer`, `upgrade`, `visit_reminder`
-- **2 steps from the root** — `chargeback`, `group_participant_list`, `group_payment_schedule`, `group_quote`, `group_task`, `group_ticket_allocation`, `group_ticket_fulfillment`, `group_visit_plan`, `order_line_discount`, `order_line_eligibility`, `payment_tip`, `reservation_line`
-- **3 steps from the root** — `chargeback_evidence`, `chargeback_investigation_log`, `group_participant`, `group_payment_milestone`, `group_quote_line`, `group_ticket_allocation_line`
-
-- **Reaches the root through nothing** — `after_sale_policy`, `after_sale_policy_window`, `b2b_credit`, `cart`, `cart_line`, `cash_count_line`, `cash_movement`, `deposit_box`, `deposit_box_foreign_holding`, `deposit_box_opening_denomination`, `deposit_policy`, `fraud_rule`, `group_customer_organisation`, `group_customer_organisation_contact`, `group_enquiry`, `guest_credit_account`, `invitation`, `invitation_allowance`, `member_exception`, `membership_activation_action`, `no_sale_event`, `order_source_channel`, `payment_allocation_rule`, `pos_shift`, `pos_shift_approval`, `pos_shift_incident`, `refund_batch`, `refund_calculation_policy`, `refund_policy`, `refund_policy_time_band`, `resale_eligibility_rule`, `resale_fee_policy`, `resale_listing`, `resale_marketplace_config`, `resale_recommendation`, `resale_settlement`, `reservation_hold_policy`, `sales_order_unassigned`, `status_transition_rule`, `stored_value_authorisation`, `ticket_template`, `ticket_template_channel`, `till_shift_policy`, `upgrade_rule`, `wallet_pass`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
 ## `catalogue` — 82 tables
 
-**Root: `catalogue.product`**  ·  own 30 · reach 65 · out 10
+**Root: `catalogue.product`**  ·  own 30 · reach 53 · out 10
 
 - **1 step from the root** — `ai_catalogue_session`, `ai_finding`, `alternative_code`, `audit_entry`, `change_request`, `channel_incident`, `channel_sales_rule`, `configuration_template`, `demand_forecast`, `demand_signal`, `dynamic_pricing_strategy`, `group_package`, `lifecycle_action`, `package_pricing`, `price_assignment`, `price_execution`, `pricing_experiment`, `pricing_recommendation`, `pricing_simulation`, `product_channel_assignment`, `product_eligibility_rule`, `product_link`, `product_media`, `product_version`, `rollback_action`, `tax_rule`, `variant`, `variant_dimension`
 - **2 steps from the root** — `change_request_line`, `entitlement_template`, `import_job`, `price`, `price_ladder`, `price_list_version`, `pricing_publication`, `pricing_recommendation_decision`, `waitlist_entry`
@@ -90,16 +78,28 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
+## `orders` — 82 tables
+
+**Root: `orders.sales_order`**  ·  own 21 · reach 50 · out 6
+
+- **1 step from the root** — `after_sale_request`, `credit_override`, `deposit`, `discount`, `external_reference_mapping`, `group_booking`, `membership_migration`, `membership_renewal`, `order_event`, `order_fee`, `order_line`, `order_relationship`, `payment`, `payment_link`, `refund`, `reservation`, `ticket_transfer`, `upgrade`, `visit_reminder`
+- **2 steps from the root** — `chargeback`, `group_participant_list`, `group_payment_schedule`, `group_quote`, `group_task`, `group_ticket_allocation`, `group_ticket_fulfillment`, `group_visit_plan`, `order_line_discount`, `order_line_eligibility`, `reservation_line`
+- **3 steps from the root** — `chargeback_evidence`, `chargeback_investigation_log`, `group_participant`, `group_payment_milestone`, `group_quote_line`, `group_ticket_allocation_line`
+
+- **Reaches the root through nothing** — `after_sale_policy`, `after_sale_policy_window`, `b2b_credit`, `cart`, `cart_line`, `cash_count_line`, `cash_movement`, `deposit_box`, `deposit_box_foreign_holding`, `deposit_box_opening_denomination`, `deposit_policy`, `fraud_rule`, `group_customer_organisation`, `group_customer_organisation_contact`, `group_enquiry`, `guest_credit_account`, `invitation`, `invitation_allowance`, `member_exception`, `membership_activation_action`, `no_sale_event`, `order_source_channel`, `payment_allocation_rule`, `pos_shift`, `pos_shift_approval`, `pos_shift_incident`, `refund_batch`, `refund_calculation_policy`, `refund_policy`, `refund_policy_time_band`, `resale_eligibility_rule`, `resale_fee_policy`, `resale_listing`, `resale_marketplace_config`, `resale_recommendation`, `resale_settlement`, `reservation_hold_policy`, `sales_order_unassigned`, `status_transition_rule`, `stored_value_authorisation`, `ticket_template`, `ticket_template_channel`, `till_shift_policy`, `upgrade_rule`, `wallet_pass`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
 ## `access` — 78 tables
 
-**Root: `access.entitlement`**  ·  own 13 · reach 21 · out 7
+**Root: `access.entitlement`**  ·  own 15 · reach 23 · out 7
 
 > **Overridden.** The arithmetic picks `access.entitlement`. **`access_point` has more inbound edges and the schema is about entitlements.** A gate is equipment; the thing being admitted is the point. `entitlement` also did not exist as a table until 18 August, which is why the arithmetic still favours the gate.
 
-- **1 step from the root** — `biometric_audit_event`, `credential_binding`, `credential_delivery`, `credential_event`, `credential_exception`, `credential_issuance`, `credential_sharing_case`, `device_binding`, `face_reenrolment_attempt`, `scan_event`, `security_alert`, `security_investigation`
+- **1 step from the root** — `access_change`, `biometric_audit_event`, `credential_binding`, `credential_delivery`, `credential_event`, `credential_exception`, `credential_issuance`, `credential_sharing_case`, `device_binding`, `face_reenrolment_attempt`, `scan_event`, `security_alert`, `security_investigation`
 - **2 steps from the root** — `identity_lock`
 
-- **Reaches the root through nothing** — `access_area`, `access_attribute`, `access_change`, `access_incident`, `access_map`, `access_point`, `access_point_configuration`, `access_point_group`, `accreditation_credential`, `admission_rules`, `attraction_access`, `biometric_profile`, `blacklist`, `branding_profile`, `companion_rule`, `configuration_change`, `configuration_version`, `consumption_rule`, `credential_event_propagation_rule`, `credential_issuance_retry_policy`, `credential_policy`, `credential_security_profile`, `device_configuration`, `device_placement`, `dynamic_field`, `dynamic_policy`, `dynamic_policy_version`, `edge_node`, `edge_package`, `entry_rule_point`, `external_credential_integration`, `fast_pass_profile`, `fraud_rule`, `gate_lane`, `gate_mode_change`, `gate_mode_policy`, `gate_outcome_profile`, `group_admission_rule`, `hardware_certification`, `hardware_deployment`, `hardware_model`, `journey_profile`, `journey_sequence_rule`, `media_binding_rule`, `media_compatibility_test`, `media_encoding_profile`, `media_replacement_policy`, `media_template`, `media_template_version`, `media_type`, `offline_policy`, `operating_calendar_entry`, `parking_entitlement`, `parking_facility`, `podium`, `podium_shift`, `policy_evaluation_setting`, `policy_scope_assignment`, `reason_code`, `risk_scoring_config`, `scan_event_unassigned`, `security_playbook`, `ticket_status_transition`, `verification_method_policy`
+- **Reaches the root through nothing** — `access_area`, `access_attribute`, `access_incident`, `access_map`, `access_point`, `access_point_configuration`, `access_point_group`, `accreditation_credential`, `admission_rules`, `attraction_access`, `biometric_profile`, `blacklist`, `branding_profile`, `companion_rule`, `configuration_change`, `configuration_version`, `consumption_rule`, `credential_event_propagation_rule`, `credential_issuance_retry_policy`, `credential_policy`, `credential_security_profile`, `device_configuration`, `device_placement`, `dynamic_field`, `dynamic_policy`, `dynamic_policy_version`, `edge_node`, `edge_package`, `entry_rule_point`, `external_credential_integration`, `fast_pass_profile`, `fraud_rule`, `gate_lane`, `gate_mode_change`, `gate_mode_policy`, `gate_outcome_profile`, `group_admission_rule`, `hardware_certification`, `hardware_deployment`, `hardware_model`, `journey_profile`, `journey_sequence_rule`, `media_binding_rule`, `media_compatibility_test`, `media_encoding_profile`, `media_replacement_policy`, `media_template`, `media_template_version`, `media_type`, `offline_policy`, `operating_calendar_entry`, `parking_entitlement`, `parking_facility`, `podium`, `podium_shift`, `policy_evaluation_setting`, `policy_scope_assignment`, `reason_code`, `risk_scoring_config`, `scan_event_unassigned`, `security_playbook`, `ticket_status_transition`, `verification_method_policy`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -133,7 +133,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `identity` — 36 tables
 
-**Root: `identity.principal`**  ·  own 24 · reach 378 · out 3
+**Root: `identity.principal`**  ·  own 24 · reach 376 · out 3
 
 - **1 step from the root** — `access_decision`, `access_override`, `access_review_campaign`, `access_review_item`, `authz_audit`, `delegated_access`, `guest_identity_verification`, `membership_history`, `mfa_challenge`, `mfa_method`, `mfa_recovery_code`, `module_access`, `platform_staff_grant`, `principal_credential`, `refresh_token`, `role_permission`, `session`
 - **2 steps from the root** — `principal_credential_history`
@@ -198,7 +198,7 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `workforce` — 28 tables
 
-**Root: `workforce.employee`**  ·  own 5 · reach 5 · out 3
+**Root: `workforce.employee`**  ·  own 5 · reach 5 · out 2
 
 - **1 step from the root** — `employment`, `leave_balance`, `sync_conflict`, `work_assignment`
 
@@ -231,35 +231,35 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `rental` — 24 tables
 
-**Root: `rental.product`**  ·  own 6 · reach 6 · out 5
+**Root: `rental.product`**  ·  own 12 · reach 12 · out 5
 
-- **1 step from the root** — `blackout`, `booking`, `deposit_policy`, `fee_policy`, `pricing_profile`, `quote`
-- **2 steps from the root** — `incident`, `override`, `settlement`
+- **1 step from the root** — `agreement_rules`, `availability_rules`, `blackout`, `booking`, `deposit_policy`, `duration_rules`, `fee_policy`, `inventory_model`, `location_rule`, `operational_rules`, `pricing_profile`, `quote`
+- **2 steps from the root** — `damage_assessment`, `equipment_assignment`, `incident`, `inspection`, `override`, `settlement`
+- **3 steps from the root** — `inspection_item`
 
-- **Reaches the root through nothing** — `agreement`, `agreement_item`, `agreement_rules`, `agreement_signature`, `availability_rules`, `damage_assessment`, `duration_rules`, `equipment_assignment`, `inspection`, `inspection_item`, `inventory_model`, `location_rule`, `operational_rules`, `participant`
+- **Reaches the root through nothing** — `agreement`, `agreement_item`, `agreement_signature`, `participant`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `platform` — 24 tables
+## `inventory` — 23 tables
 
-**Root: `platform.scope`**  ·  own 13 · reach 210 · out 1
+**Root: `inventory.inventory_item`**  ·  own 13 · reach 20 · out 2
+
+- **1 step from the root** — `count_line`, `goods_receipt_line`, `kit_component`, `movement`, `purchase_order_line`, `quotation_line`, `requisition_line`, `serialised_item`, `stock_batch`, `stock_earmark`, `stock_level`, `transfer_line`
+
+- **Reaches the root through nothing** — `count`, `daily_count_list`, `goods_receipt`, `location`, `purchase_order`, `quotation`, `requisition`, `supplier`, `supplier_contract`, `transfer`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
+## `platform` — 23 tables
+
+**Root: `platform.scope`**  ·  own 11 · reach 209 · out 1
 
 - **1 step from the root** — `audit_record`, `outlet`, `region_settings`, `sale_board`, `tenant`, `venue_settings`, `workstation`
-- **2 steps from the root** — `device`, `outbox`, `outlet_opening_hour`, `sale_board_page`
-- **3 steps from the root** — `dead_letter`, `device_heartbeat`, `sale_board_tile`
+- **2 steps from the root** — `device`, `outlet_opening_hour`, `sale_board_page`
+- **3 steps from the root** — `sale_board_tile`
 
-- **Reaches the root through nothing** — `audit_read`, `cell_endpoint`, `configuration_profile`, `connectivity_policy`, `denomination`, `idempotency_record`, `offline_policy`, `profile_deployment`, `schema_version`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
-## `subscription` — 23 tables
-
-**Root: `subscription.membership_product`**  ·  own 6 · reach 6 · out 2
-
-- **1 step from the root** — `membership_eligibility_rule`, `membership_entitlement`, `membership_household_policy`, `membership_product_history`, `membership_renewal_policy`, `membership_usage_policy`
-- **2 steps from the root** — `membership_household_policy_role_limit`
-
-- **Reaches the root through nothing** — `capacity_pack`, `contract`, `enforcement_policy`, `go_live_readiness`, `licensing_model`, `module_listing`, `partner_quote`, `plan`, `plan_limit`, `plan_module`, `tier_allowance`, `tier_module`, `trial_config`, `vsi_assessment`, `vsi_model`
+- **Reaches the root through nothing** — `audit_read`, `cell_endpoint`, `configuration_profile`, `connectivity_policy`, `dead_letter`, `denomination`, `idempotency_record`, `offline_policy`, `outbox`, `profile_deployment`, `schema_version`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -274,13 +274,14 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `inventory` — 23 tables
+## `subscription` — 23 tables
 
-**Root: `inventory.inventory_item`**  ·  own 13 · reach 20 · out 2
+**Root: `subscription.membership_product`**  ·  own 6 · reach 6 · out 2
 
-- **1 step from the root** — `count_line`, `goods_receipt_line`, `kit_component`, `movement`, `purchase_order_line`, `quotation_line`, `requisition_line`, `serialised_item`, `stock_batch`, `stock_earmark`, `stock_level`, `transfer_line`
+- **1 step from the root** — `membership_eligibility_rule`, `membership_entitlement`, `membership_household_policy`, `membership_product_history`, `membership_renewal_policy`, `membership_usage_policy`
+- **2 steps from the root** — `membership_household_policy_role_limit`
 
-- **Reaches the root through nothing** — `count`, `daily_count_list`, `goods_receipt`, `location`, `purchase_order`, `quotation`, `requisition`, `supplier`, `supplier_contract`, `transfer`
+- **Reaches the root through nothing** — `capacity_pack`, `contract`, `enforcement_policy`, `go_live_readiness`, `licensing_model`, `module_listing`, `partner_quote`, `plan`, `plan_limit`, `plan_module`, `tier_allowance`, `tier_module`, `trial_config`, `vsi_assessment`, `vsi_model`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -297,17 +298,17 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `resources` — 20 tables
 
-**Root: `resources.resource`**  ·  own 11 · reach 16 · out 4
+**Root: `resources.resource`**  ·  own 13 · reach 18 · out 5
 
-- **1 step from the root** — `booking`, `qualification`, `resource_audit`, `resource_block`, `resource_cost`, `resource_dependency`, `resource_relation`, `resource_request`, `resource_requirement`, `resource_schedule`
+- **1 step from the root** — `booking`, `qualification`, `resource_audit`, `resource_block`, `resource_cost`, `resource_dependency`, `resource_relation`, `resource_request`, `resource_requirement`, `resource_schedule`, `venue_assignment`
 
-- **Reaches the root through nothing** — `allocation_policy`, `attribute_definition`, `performance_participant`, `resource_category`, `resource_package`, `resource_reservation`, `resource_type`, `selection_policy`, `venue_assignment`
+- **Reaches the root through nothing** — `allocation_policy`, `attribute_definition`, `performance_participant`, `resource_category`, `resource_package`, `resource_reservation`, `resource_type`, `selection_policy`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
 ## `maintenance` — 19 tables
 
-**Root: `maintenance.asset`**  ·  own 6 · reach 18 · out 6
+**Root: `maintenance.asset`**  ·  own 6 · reach 16 · out 6
 
 - **1 step from the root** — `asset_document`, `asset_status_change`, `incident`, `inspection`, `preventive_plan`, `work_order`
 - **2 steps from the root** — `incident_authority_notification`, `incident_history`, `incident_investigation_note`, `incident_involved_party`, `incident_media`, `inspection_item`, `vendor_service_request`, `work_order_attachment`
@@ -328,11 +329,11 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `assets` — 14 tables
 
-**Root: `assets.media_asset`**  ·  own 4 · reach 35 · out 2
+**Root: `assets.media_asset`**  ·  own 5 · reach 39 · out 2
 
-- **1 step from the root** — `media_collection`, `media_collection_member`, `media_upload`, `media_usage`
+- **1 step from the root** — `media_collection`, `media_collection_member`, `media_upload`, `media_usage`, `rendition`
 
-- **Reaches the root through nothing** — `approval`, `asset_version`, `audit`, `distribution_channel`, `media_fingerprint`, `rendition`, `share`, `tag`, `taxonomy`
+- **Reaches the root through nothing** — `approval`, `asset_version`, `audit`, `distribution_channel`, `media_fingerprint`, `share`, `tag`, `taxonomy`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -357,6 +358,16 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
+## `tenancy` — 8 tables
+
+**Root: `tenancy.device_firmware`**  ·  own 1 · reach 1 · out 1
+
+- **1 step from the root** — `device_rollout`
+
+- **Reaches the root through nothing** — `data_retention_setting`, `device_assignment`, `device_audit`, `device_credential`, `device_tamper_event`, `device_telemetry`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
 ## `venuemap` — 8 tables
 
 **Root: `venuemap.map`**  ·  own 5 · reach 7 · out 4
@@ -368,19 +379,9 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `tenancy` — 8 tables
-
-**Root: `tenancy.device_firmware`**  ·  own 1 · reach 1 · out 1
-
-- **1 step from the root** — `device_rollout`
-
-- **Reaches the root through nothing** — `data_retention_setting`, `device_assignment`, `device_audit`, `device_credential`, `device_tamper_event`, `device_telemetry`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
 ## `sync` — 7 tables
 
-**Root: `sync.guest_link`**  ·  own 4 · reach 5 · out 0
+**Root: `sync.guest_link`**  ·  own 4 · reach 5 · out 1
 
 - **1 step from the root** — `cross_cell_request`, `cross_region_entitlement`, `dsar_request`, `wallet_authorisation`
 
@@ -388,21 +389,21 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
+## `queue` — 5 tables
+
+**Root: `queue.queue`**  ·  own 5 · reach 5 · out 5
+
+- **1 step from the root** — `entry`, `feed`, `queue_operating_window`, `reading`
+
 ## `pii` — 5 tables
 
-**Root: `pii.subject`**  ·  own 4 · reach 102 · out 1
+**Root: `pii.subject`**  ·  own 4 · reach 105 · out 1
 
 - **1 step from the root** — `subject_biometric`, `subject_contact`, `subject_document`
 
 - **Reaches the root through nothing** — `consent_identifier`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
-## `queue` — 5 tables
-
-**Root: `queue.queue`**  ·  own 6 · reach 6 · out 6
-
-- **1 step from the root** — `entry`, `feed`, `queue_operating_window`, `reading`
 
 ## `pricing` — 3 tables
 
@@ -412,6 +413,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `kernel` — 1 tables
 
-**Root: `kernel.inbox`**  ·  own 0 · reach 0 · out 1
+**Root: `kernel.inbox`**  ·  own 0 · reach 0 · out 0
 
 

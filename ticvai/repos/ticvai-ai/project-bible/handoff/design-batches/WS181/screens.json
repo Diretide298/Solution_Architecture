@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upsell-upgrade-command-center-adm-649",
-   "component": "apps/venue-management-web/src/routes/commercial/UpsellUpgradeCommandCenter.tsx",
+   "component": "src/routes/commercial/UpsellUpgradeCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -122,7 +123,9 @@
       {
        "kind": "metricTile",
        "label": "Acceptance Rate",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 37 §KPI Cards"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 37 §KPI Cards",
+       "operation": "getRecommendationPerformance",
+       "bindsTo": "RecommendationPerformance.acceptanceRate"
       },
       {
        "kind": "metricTile",
@@ -137,7 +140,9 @@
       {
        "kind": "metricTile",
        "label": "Incremental Revenue",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 37 §KPI Cards"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 37 §KPI Cards",
+       "operation": "getRecommendationPerformance",
+       "bindsTo": "RecommendationPerformance.incrementalRevenue"
       },
       {
        "kind": "metricTile",
@@ -214,6 +219,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "2",
@@ -223,7 +229,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upgrade-path-product-ladder-builder-adm-650",
-   "component": "apps/venue-management-web/src/routes/commercial/UpgradePathProductLadderBuilder.tsx",
+   "component": "src/routes/commercial/UpgradePathProductLadderBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -247,6 +253,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define valid upgrade relationships between products. governed product relationships.",
+  "division": "Shares `listProductRelationships`, `setProductRelationships` with ADM-642, ADM-660, ADM-663, ADM-664; this screen is Upgrade Path & Product Ladder Builder (pack Upsell,CrossSellEngine.pdf, board 2.2, page 39): define valid upgrade relationships between products. governed product relationships.",
   "gaps": [
    {
     "operation": null,
@@ -355,6 +362,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "2",
@@ -364,7 +372,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upsell-eligibility-qualification-rules-adm-651",
-   "component": "apps/venue-management-web/src/routes/commercial/UpsellEligibilityQualificationRules.tsx",
+   "component": "src/routes/commercial/UpsellEligibilityQualificationRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -388,6 +396,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Determine whether an upsell opportunity is valid for the current customer and transaction. This screen provides upgrade-specific qualification, while the reusable customer targeting capabilities remain centralized in the recommendation/CRM eligibility architecture.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-647, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Upsell Eligibility & Qualification Rules (pack Upsell,CrossSellEngine.pdf, board 2.3, page 41): determine whether an upsell opportunity is valid for the current customer and transaction. This screen provides upgrade-specific qualification, while the reusable customer targeting capabilities remain centralized in the recommendation/CRM eligibility architecture.",
   "gaps": [
    {
     "operation": null,
@@ -539,6 +548,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "2",
@@ -548,7 +558,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upgrade-price-difference-value-proposition-manager-adm-652",
-   "component": "apps/venue-management-web/src/routes/commercial/UpgradePriceDifferenceValuePropositionManager.tsx",
+   "component": "src/routes/commercial/UpgradePriceDifferenceValuePropositionManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -572,6 +582,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure benefits such as) and no display directory — it is settings, not a population",
   "purpose": "Configure how TICVAI calculates and communicates the commercial difference between the current product and the recommended upgrade. The Recommendation Engine should not become the authoritative pricing engine. It should consume the authoritative price difference from Pricing/Promotion services.",
+  "division": "Shares `listProductRelationships`, `quoteUpgrade` with ADM-653, ADM-654; this screen is Upgrade Price Difference & Value Proposition Manager (pack Upsell,CrossSellEngine.pdf, board 2.4, page 42): configure how TICVAI calculates and communicates the commercial difference between the current product and the recommended upgrade. The Recommendation Engine should not become the authoritative pricing engine. It should consume the authoritative price difference from Pricing/Promotion services.",
   "gaps": [
    {
     "operation": null,
@@ -710,6 +721,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "2",
@@ -719,7 +731,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ticket-experience-bundle-upgrade-manager-adm-653",
-   "component": "apps/venue-management-web/src/routes/commercial/TicketExperienceBundleUpgradeManager.tsx",
+   "component": "src/routes/commercial/TicketExperienceBundleUpgradeManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -743,6 +755,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Track; Show) and no metric row",
   "purpose": "Configure detailed upsell relationships for ticketing and experience products.",
+  "division": "Shares `listProductRelationships`, `quoteUpgrade` with ADM-652, ADM-654; this screen is Ticket, Experience & Bundle Upgrade Manager (pack Upsell,CrossSellEngine.pdf, board 2.5, page 44): configure detailed upsell relationships for ticketing and experience products.",
   "gaps": [
    {
     "operation": null,
@@ -882,6 +895,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "2",
@@ -891,7 +905,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/membership-pass-upgrade-engine-adm-654",
-   "component": "apps/venue-management-web/src/routes/commercial/MembershipPassUpgradeEngine.tsx",
+   "component": "src/routes/commercial/MembershipPassUpgradeEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -915,6 +929,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Handle one of the most commercially valuable upgrade scenarios: Converting visitors into members/pass holders.",
+  "division": "Shares `listProductRelationships`, `quoteUpgrade` with ADM-652, ADM-653; this screen is Membership & Pass Upgrade Engine (pack Upsell,CrossSellEngine.pdf, board 2.6, page 45): handle one of the most commercially valuable upgrade scenarios: Converting visitors into members/pass holders.",
   "gaps": [
    {
     "operation": null,
@@ -1025,6 +1040,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "2",
@@ -1034,7 +1050,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pre-purchase-cart-checkout-upsell-manager-adm-655",
-   "component": "apps/venue-management-web/src/routes/commercial/PrePurchaseCartCheckoutUpsellManager.tsx",
+   "component": "src/routes/commercial/PrePurchaseCartCheckoutUpsellManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1058,6 +1074,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control upselling during the active purchase journey.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-647, ADM-651, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Pre-Purchase, Cart & Checkout Upsell Manager (pack Upsell,CrossSellEngine.pdf, board 2.7, page 47): control upselling during the active purchase journey.",
   "gaps": [
    {
     "operation": null,
@@ -1184,6 +1201,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "2",
@@ -1193,7 +1211,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/post-purchase-in-journey-upgrade-manager-adm-656",
-   "component": "apps/venue-management-web/src/routes/commercial/PostPurchaseInJourneyUpgradeManager.tsx",
+   "component": "src/routes/commercial/PostPurchaseInJourneyUpgradeManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1351,6 +1369,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "2",
@@ -1360,7 +1379,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upsell-ranking-propensity-ai-opportunity-engine-adm-657",
-   "component": "apps/venue-management-web/src/routes/commercial/UpsellRankingPropensityAiOpportunityEngine.tsx",
+   "component": "src/routes/commercial/UpsellRankingPropensityAiOpportunityEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1456,6 +1475,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "2",
@@ -1465,7 +1485,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upgrade-simulator-comparison-ai-advisor-adm-658",
-   "component": "apps/venue-management-web/src/routes/commercial/UpgradeSimulatorComparisonAiAdvisor.tsx",
+   "component": "src/routes/commercial/UpgradeSimulatorComparisonAiAdvisor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1489,6 +1509,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow business users to simulate an upsell strategy before activation.",
+  "division": "Shares `listRecommendationStrategies`, `simulateRecommendationStrategy` with ADM-648, ADM-668, ADM-688, ADM-698; this screen is Upgrade Simulator, Comparison & AI Advisor (pack Upsell,CrossSellEngine.pdf, board 2.10, page 51): allow business users to simulate an upsell strategy before activation.",
   "gaps": [
    {
     "operation": null,

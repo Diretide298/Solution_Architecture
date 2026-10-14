@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-pricing-command-center-bo-524",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalPricingCommandCenter.tsx",
+   "component": "src/routes/rentals/RentalPricingCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -104,7 +105,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -183,7 +184,8 @@
       {
        "kind": "primaryButton",
        "label": "+ Create Pricing Profile",
-       "provenance": "pack Rental_Management.pdf, page 38 §Actions"
+       "provenance": "pack Rental_Management.pdf, page 38 §Actions",
+       "operation": "createRentalPricingProfile"
       }
      ]
     }
@@ -260,6 +262,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_PRICE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "4",
@@ -269,7 +272,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/pricing-profile-builder-bo-525",
-   "component": "apps/venue-management-web/src/routes/rentals/PricingProfileBuilder.tsx",
+   "component": "src/routes/rentals/PricingProfileBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -424,6 +427,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_PRICE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "4",
@@ -433,7 +437,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/duration-tiered-pricing-configuration-bo-526",
-   "component": "apps/venue-management-web/src/routes/rentals/DurationTieredPricingConfiguration.tsx",
+   "component": "src/routes/rentals/DurationTieredPricingConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -566,6 +570,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_PRICE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "4",
@@ -575,7 +580,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/calendar-peak-seasonal-pricing-bo-527",
-   "component": "apps/venue-management-web/src/routes/rentals/CalendarPeakSeasonalPricing.tsx",
+   "component": "src/routes/rentals/CalendarPeakSeasonalPricing.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -707,7 +712,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/dynamic-pricing-ai-recommendation-bo-528",
-   "component": "apps/venue-management-web/src/routes/rentals/DynamicPricingAiRecommendation.tsx",
+   "component": "src/routes/rentals/DynamicPricingAiRecommendation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -797,6 +802,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_PRICE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "4",
@@ -806,7 +812,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/deposit-security-hold-policy-bo-529",
-   "component": "apps/venue-management-web/src/routes/rentals/DepositSecurityHoldPolicy.tsx",
+   "component": "src/routes/rentals/DepositSecurityHoldPolicy.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -925,6 +931,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_PRICE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "4",
@@ -934,7 +941,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/deposit-lifecycle-settlement-rules-bo-530",
-   "component": "apps/venue-management-web/src/routes/rentals/DepositLifecycleSettlementRules.tsx",
+   "component": "src/routes/rentals/DepositLifecycleSettlementRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1057,6 +1064,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_PRICE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "4",
@@ -1066,7 +1074,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/late-fee-grace-period-extension-pricing-bo-531",
-   "component": "apps/venue-management-web/src/routes/rentals/LateFeeGracePeriodExtensionPricing.tsx",
+   "component": "src/routes/rentals/LateFeeGracePeriodExtensionPricing.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1189,6 +1197,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OVERRIDE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "4",
@@ -1198,7 +1207,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/commercial-exceptions-waivers-overrides-bo-532",
-   "component": "apps/venue-management-web/src/routes/rentals/CommercialExceptionsWaiversOverrides.tsx",
+   "component": "src/routes/rentals/CommercialExceptionsWaiversOverrides.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1307,6 +1316,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_PRICE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "4",
@@ -1316,7 +1326,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/pricing-simulation-validation-ai-commercial-intelligence-bo-533",
-   "component": "apps/venue-management-web/src/routes/rentals/PricingSimulationValidationAiCommercialIntellige.tsx",
+   "component": "src/routes/rentals/PricingSimulationValidationAiCommercialIntellige.tsx",
    "status": "notStarted"
   },
   "navigation": {

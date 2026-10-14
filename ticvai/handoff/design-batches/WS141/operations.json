@@ -62,7 +62,7 @@
   "contract": "marketing-crm",
   "summary": "Escalate a case",
   "permission": "CASE_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -562,7 +562,7 @@
  },
  "setIntelligentRoutingSkill": {
   "method": "PUT",
-  "path": "/intelligent-routing-skill",
+  "path": "/intelligent-routing-skill/{routingRuleId}",
   "contract": "marketing-crm",
   "summary": "Create or change a case routing rule",
   "permission": "CASE_MANAGE",
@@ -570,6 +570,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "routingRuleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -581,7 +586,7 @@
  },
  "setOrderBookingTicket": {
   "method": "PUT",
-  "path": "/order-booking-ticket",
+  "path": "/order-booking-ticket/{serviceActionId}",
   "contract": "marketing-crm",
   "summary": "Evaluate or perform a service action on an order from a case",
   "permission": "CASE_MANAGE",
@@ -589,6 +594,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "serviceActionId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -600,7 +610,7 @@
  },
  "setServiceQueueDefinition": {
   "method": "PUT",
-  "path": "/service-queues",
+  "path": "/service-queues/{queueId}",
   "contract": "marketing-crm",
   "summary": "Create or change a customer-service queue",
   "permission": "CASE_MANAGE",
@@ -608,6 +618,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "queueId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

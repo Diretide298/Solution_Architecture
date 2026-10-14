@@ -153,25 +153,6 @@
   "requestBody": null,
   "responds": "SeededReport"
  },
- "runReport": {
-  "method": "POST",
-  "path": "/reports/{reportId}/run",
-  "contract": "reporting",
-  "summary": "Run a report",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RunReportRequest",
-  "responds": "ReportResult"
- },
  "updateReport": {
   "method": "PUT",
   "path": "/reports/{reportId}",

@@ -62,6 +62,7 @@
   }
  },
  "PaymentProviderConnection": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "payments.provider_connection",
   "description": "Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped.**",
@@ -75,6 +76,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -167,6 +169,7 @@
     "type": "string"
    },
    "credentialRef": {
+    "x-ticvai-secret": "vault-reference",
     "type": "string",
     "writeOnly": true,
     "description": "**Where the provider credential is kept** (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as `SetPaymentProviderRequest.credentialRef`. Sent on create, never returned; `credentialFingerprint` is what reads show."
@@ -242,6 +245,8 @@
     }
    },
    "targets": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

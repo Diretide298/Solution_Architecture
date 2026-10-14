@@ -21,6 +21,7 @@
     "description": "The attemptId the list shows"
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
@@ -29,6 +30,7 @@
     "description": "ltree of the owning scope node"
    },
    "subjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid",
     "description": "The guest (pii.subject)"
@@ -328,6 +330,7 @@
     "description": "ltree of the owning scope node"
    },
    "subjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid",
     "description": "The locked identity (the list's identityId, pii.subject)"
@@ -571,10 +574,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "scopePath": {
+    "readOnly": true,
     "type": "string",
     "description": "ltree of the owning scope node; one row per scope"
    },
@@ -794,6 +799,13 @@
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The latest note on the alert (`updateSecurityAlert`)."
    }
   }
  },
@@ -1364,7 +1376,7 @@
  "RealTimeSecurityResponsePlaybookBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.security_playbook` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Real-Time Security Response & Playbook Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "triggerCondition": {
@@ -1700,7 +1712,7 @@
  "SecurityInvestigationEvidenceWorkspaceInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.security_investigation`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Security Investigation & Evidence Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "investigationId": {

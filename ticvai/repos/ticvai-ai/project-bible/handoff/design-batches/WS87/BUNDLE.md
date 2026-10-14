@@ -676,7 +676,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | Block D · task VM-BO-486 |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Validate Card Status; Card recognized) and no metric row |
 | Offline | online only |
@@ -719,7 +719,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | ↓ | text | not in the schema: `↓` |
 | 4321 | text | not in the schema: `4321` |
 
-**The selected customer card wallet** (detail panel): The pack groups this record's detail under its own headings: “WELCOME”, “Identification Methods”, “Customer Tap”, “Invalid Results”.
+**The selected customer card wallet** (detail panel, from `getGameCard`): The pack groups this record's detail under its own headings: “WELCOME”, “Identification Methods”, “Customer Tap”, “Invalid Results”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -779,9 +779,11 @@ failures:
 
 #### Permissions
 
-- `getGameCard` → no permission · guest
+- `getGameCard` → `WALLET_VIEW` (read) · guest, staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -823,7 +825,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every state opens from `#BO-486?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-484`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -920,6 +922,8 @@ balance:
 - `settleWalletAtExit` → `WALLET_OPERATE` (operate) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -1078,6 +1082,8 @@ topUp:
 - `getWallet` → `WALLET_VIEW` (read) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -1288,6 +1294,8 @@ entitlement:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1455,6 +1463,8 @@ results:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1610,6 +1620,8 @@ locked:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1758,6 +1770,8 @@ history:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1897,6 +1911,8 @@ theme:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `TENANT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -2032,7 +2048,7 @@ Method, path, parameters, request and response for every operation these screens
 {
 "createKioskConfig": {"method":"POST","path":"/venues/{venueId}/kiosk-configs","contract":"white-label","summary":"Add a kiosk group to a venue, with its kiosk configuration","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"KioskConfig","responds":"KioskConfig"},
 "deleteKioskConfig": {"method":"DELETE","path":"/kiosk-configs/{kioskConfigId}","contract":"white-label","summary":"Remove a kiosk group's configuration","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
-"getGameCard": {"method":"GET","path":"/game-cards/{cardCode}","contract":"games","summary":"Read a card's balances","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GameCard"},
+"getGameCard": {"method":"GET","path":"/game-cards/{cardCode}","contract":"games","summary":"Read a card's balances","permission":"WALLET_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GameCard"},
 "getGameEligibility": {"method":"GET","path":"/game-eligibility","contract":"games","summary":"What this guest can play right now, and what it would cost","permission":"PRODUCT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"cardId","in":"query","required":null},{"name":"subjectId","in":"query","required":null},{"name":"venueId","in":"query","required":null}],"requestBody":null,"responds":"GameEligibility"},
 "getKioskConfig": {"method":"GET","path":"/kiosk-configs/{kioskConfigId}","contract":"white-label","summary":"Read one kiosk configuration from the working draft, every part included","permission":"TENANT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"KioskConfig"},
 "getWallet": {"method":"GET","path":"/wallets/{subjectId}","contract":"wallet","summary":"Read a guest wallet","permission":"WALLET_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Wallet"},
@@ -2080,9 +2096,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "LinkTarget": {"x-ticvai-persistence":"none — embedded","type":"object","required":["kind"],"properties":{"kind":{"type":"string","enum":["module","contentPage","product","event","externalUrl","appSection","none"],"description":"`appSection` points at a section of the guest mobile app (decided 29 September, MOB-1), so the bottom navigation can hold Home, Explore, Plan and Tickets."},"moduleKey":{"$ref":"#/components/schemas/white-label::ModuleKey"},"appSection":{"type":"string","enum":["home","explore","plan","tickets","map","account","buyTickets"],"description":"Required when `kind` is `appSection`. `plan` needs the `visitPlanner` module and `map` the `map` module enabled, or `setNavigation` refuses it."},"contentPageId":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid"},"eventId":{"type":"string","format":"uuid"},"url":{"type":"string"}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"Prize": {"x-ticvai-persistence":"games.prize","type":"object","required":["id","name","venueId","pointCost","onHand"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string","maxLength":200},"description":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid"},"merchandiseId":{"type":"string","format":"uuid","nullable":true,"description":"Links to retail. Redemption depletes stock through the inventory ledger — a prize wall running out is a stock problem and should look like one.\n"},"pointCost":{"type":"integer","minimum":1},"onHand":{"type":"integer"},"isAvailable":{"type":"boolean"},"tier":{"type":"string","nullable":true,"description":"Small, medium, large, jackpot. Drives prize-wall layout."},"imageAssetRef":{"type":"string","nullable":true},"barcode":{"type":"string","maxLength":64,"nullable":true,"description":"The prize's own barcode, read by `lookupPrize` before the linked retail item's barcode or SKU. Unique within the venue (VM close-out, 29 September)."},"isActive":{"type":"boolean"}}},
-"Wallet": {"x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money","x-ticvai-column":"balance_amount"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},
+"Prize": {"x-ticvai-persistence":"games.prize","type":"object","required":["id","name","venueId","pointCost","onHand"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"name":{"type":"string","maxLength":200},"description":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid"},"merchandiseId":{"type":"string","format":"uuid","nullable":true,"description":"Links to retail. Redemption depletes stock through the inventory ledger — a prize wall running out is a stock problem and should look like one.\n"},"pointCost":{"type":"integer","minimum":1},"onHand":{"type":"integer"},"isAvailable":{"type":"boolean"},"tier":{"type":"string","nullable":true,"description":"Small, medium, large, jackpot. Drives prize-wall layout."},"imageAssetRef":{"type":"string","nullable":true},"barcode":{"type":"string","maxLength":64,"nullable":true,"description":"The prize's own barcode, read by `lookupPrize` before the linked retail item's barcode or SKU. Unique within the venue (VM close-out, 29 September)."},"isActive":{"type":"boolean"}}},
+"Wallet": {"x-ticvai-rls":"grant-holder-read","x-ticvai-persistence":"wallet.wallet + wallet.credit_lot","type":"object","required":["subjectId","balance","currency","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money","x-ticvai-column":"balance_amount"},"credits":{"type":"array","description":"4.3.5 and 4.3.19. **One balance and one bonus balance with one expiry could not express what the requirement asks for** — cash, bonus and redemption credit, each with its own expiry.\n**The expiries are the reason this is a list.** Cash a guest paid for should outlive a promotional credit they were given, and a single `expiresAt` either expires the money they paid or never expires the promotion.\n**Consumed first-expiry-first-out across all three** (4.3.19), which is also the order that is fairest to the guest — spend what is about to die before what is not.\n**One entry per `active` lot in `wallet.credit_lot`** for this wallet: `amount` is the lot's `remaining_amount`, `expiresAt` its `expires_at`, `sourceRef` its `source_reference`. `kind` and `isRefundable` are not stored on the lot; they come from the lot's credit type (`listCreditLots` returns the lots themselves).\n","items":{"type":"object","required":["kind","amount"],"properties":{"kind":{"type":"string","enum":["cash","bonus","redemption","refund","goodwill"],"description":"**`cash` is money the guest paid and the others are not.** That distinction decides what is refundable, what expires, and what shows as a liability.\n","x-ticvai-persisted":false},"amount":{"x-ticvai-column":"remaining_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"sourceRef":{"type":"string","nullable":true,"x-ticvai-column":"source_reference"},"isRefundable":{"type":"boolean","default":false,"x-ticvai-persisted":false,"description":"**True only for `cash`.** A guest cannot cash out a promotional credit, and a wallet that lets them has given away the promotion twice.\n"}}}},"bonusBalance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Promotional value. Typically non-refundable and spent first."},"currency":{"type":"string","pattern":"^[A-Z]{3}$"},"status":{"type":"string","enum":["active","suspended","closed"]},"homeCellName":{"type":"string","nullable":true,"description":"Where the authoritative balance lives. Present when the guest is linked across cells.\n"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"lastActivityAt":{"type":"string","format":"date-time","nullable":true}}},
 "WalletExitBalance": {"type":"object","x-ticvai-persistence":"none — computed from wallet.wallet, wallet.credit_lot and held offline transactions","required":["walletId","balance","amountDue","refundable"],"properties":{"walletId":{"type":"string","format":"uuid"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"pendingOfflineAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amountDue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundable":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"nonRefundableCredit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"waiveAllowedUpTo":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"asAt":{"type":"string","format":"date-time"}}},
-"WalletExitSettlement": {"type":"object","x-ticvai-persistence":"wallet.exit_settlement","description":"4.3.4. One settlement of a wallet at exit.","required":["id","walletId","action","amount","settledAt"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"action":{"type":"string","enum":["collect","refund","waive"]},"method":{"type":"string","nullable":true,"enum":["card","cash","storedCard","originalPayment"]},"amount":{"x-ticvai-column":"settled_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"balanceBefore":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"paymentId":{"type":"string","format":"uuid","nullable":true},"refundId":{"type":"string","format":"uuid","nullable":true},"walletTransactionId":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"settledByPrincipalId":{"type":"string","format":"uuid","nullable":true},"settledAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true}}}
+"WalletExitSettlement": {"type":"object","x-ticvai-persistence":"wallet.exit_settlement","description":"4.3.4. One settlement of a wallet at exit.","required":["id","walletId","action","amount","settledAt"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"x-ticvai-references":"wallet.wallet","type":"string","format":"uuid"},"action":{"type":"string","enum":["collect","refund","waive"]},"method":{"type":"string","nullable":true,"enum":["card","cash","storedCard","originalPayment"]},"amount":{"x-ticvai-column":"settled_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"balanceBefore":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"paymentId":{"type":"string","format":"uuid","nullable":true},"refundId":{"type":"string","format":"uuid","nullable":true},"walletTransactionId":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"settledByPrincipalId":{"type":"string","format":"uuid","nullable":true},"settledAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true}}}
 }
 ```

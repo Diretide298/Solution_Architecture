@@ -462,6 +462,7 @@ screens:
   module: Overview
   requiresModule: partner
   wave: 2
+  permission: ORDER_VIEW
   capability: C34
   implementation:
     app: partner-web
@@ -911,6 +912,7 @@ screens:
   module: Access & Account
   requiresModule: partner
   wave: 2
+  permission: USER_MANAGE
   capability: C56
   implementation:
     app: partner-web
@@ -1096,6 +1098,7 @@ screens:
   module: Access & Account
   requiresModule: partner
   wave: 3
+  permission: GUEST_VIEW
   capability: C59
   implementation:
     app: partner-web
@@ -1217,6 +1220,7 @@ screens:
   module: Inventory & Pricing
   requiresModule: partner
   wave: 2
+  permission: PRODUCT_VIEW
   capability: C103
   implementation:
     app: partner-web
@@ -1259,8 +1263,8 @@ screens:
   pattern: listDetail
   patternReason: '`listChannelCapacities` reads the population and `getChannelAllocations` reads one of
     them — list, select, act'
-  purpose: 'A partner sees the capacity allocated to its channel for each performance and the orders sold
-    against it, and returns unsold allocation to the general pool.'
+  purpose: A partner sees the capacity allocated to its channel for each performance and the orders sold
+    against it, and returns unsold allocation to the general pool.
   layout:
     template: split
     regions:
@@ -1551,6 +1555,7 @@ screens:
   module: Inventory & Pricing
   requiresModule: partner
   wave: 2
+  permission: PRODUCT_VIEW
   capability: C85
   implementation:
     app: partner-web
@@ -1779,6 +1784,7 @@ screens:
   module: Inventory & Pricing
   requiresModule: partner
   wave: 2
+  permission: PRODUCT_VIEW
   capability: C81
   implementation:
     app: partner-web
@@ -1856,6 +1862,7 @@ screens:
   module: Booking & Quotes
   requiresModule: partner
   wave: 2
+  permission: ORDER_VIEW
   capability: C02
   implementation:
     app: partner-web
@@ -1908,6 +1915,9 @@ screens:
   patternReason: '`listOrders` reads the population and `getOrder` reads one of them — list, select, act'
   purpose: 'A partner books against its allocation: creates the order, then holds, resumes, modifies,
     exchanges, reschedules or reprints it.'
+  division: 'Shares `createOrder`, `exchangeOrderLines`, `getOrder`, `getOrderStatement` and more with
+    PTR-015; this screen is Booking Creation: a partner books against its allocation: creates the order,
+    then holds, resumes, modifies, exchanges, reschedules or reprints it.'
   layout:
     template: split
     regions:
@@ -2270,6 +2280,7 @@ screens:
   module: Booking & Quotes
   requiresModule: partner
   wave: 3
+  permission: PRODUCT_VIEW
   capability: C54
   implementation:
     app: partner-web
@@ -2300,8 +2311,8 @@ screens:
   pattern: listDetail
   patternReason: '`listSeatBlocks` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: 'A partner blocks seats for a group, issues them from the block, and releases what the group
-    does not take back to sale.'
+  purpose: A partner blocks seats for a group, issues them from the block, and releases what the group
+    does not take back to sale.
   layout:
     template: split
     regions:
@@ -2484,6 +2495,7 @@ screens:
   module: Booking & Quotes
   requiresModule: partner
   wave: 3
+  permission: PRICE_VIEW
   capability: C02
   implementation:
     app: partner-web
@@ -2515,8 +2527,8 @@ screens:
   pattern: listDetail
   patternReason: '`listPromotions` reads the population and `getPromotion` reads one of them — list, select,
     act'
-  purpose: 'A partner builds a cart, sees the promotions that apply and their usage, changes its lines, and
-    turns it into an order.'
+  purpose: A partner builds a cart, sees the promotions that apply and their usage, changes its lines,
+    and turns it into an order.
   layout:
     template: split
     regions:
@@ -2800,6 +2812,7 @@ screens:
   module: Booking & Quotes
   requiresModule: partner
   wave: 3
+  permission: PARTNER_MANAGE
   implementation:
     app: partner-web
     route: /general/quote-management
@@ -2984,6 +2997,7 @@ screens:
   module: Credit & Settlement
   requiresModule: partner
   wave: 2
+  permission: ORDER_CREATE
   capability: C04
   implementation:
     app: partner-web
@@ -3137,6 +3151,7 @@ screens:
   module: Credit & Settlement
   requiresModule: partner
   wave: 2
+  permission: ORDER_VIEW
   capability: C34
   implementation:
     app: partner-web
@@ -3175,8 +3190,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getB2bCredit` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: 'A partner sees its credit position: the limit, what it has used and what remains to book
-    against.'
+  purpose: 'A partner sees its credit position: the limit, what it has used and what remains to book against.'
   layout:
     template: detail
     regions:
@@ -3241,6 +3255,7 @@ screens:
   module: Reports & Settlement
   requiresModule: partner
   wave: 3
+  permission: SETTLEMENT_VIEW
   capability: C50
   implementation:
     app: partner-web
@@ -3435,6 +3450,7 @@ screens:
   module: Orders & Fulfilment
   requiresModule: partner
   wave: 2
+  permission: ORDER_VIEW
   capability: C34
   implementation:
     app: partner-web
@@ -3478,8 +3494,11 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrderStatement` reads one of them — list,
     select, act'
-  purpose: 'A partner reads its orders with their statements and refunds, and acts on one: modify,
-    exchange, reschedule, hold, resume or reprint.'
+  purpose: 'A partner reads its orders with their statements and refunds, and acts on one: modify, exchange,
+    reschedule, hold, resume or reprint.'
+  division: 'Shares `createOrder`, `exchangeOrderLines`, `getOrder`, `getOrderStatement` and more with
+    PTR-008; this screen is Order History: a partner reads its orders with their statements and refunds,
+    and acts on one: modify, exchange, reschedule, hold, resume or reprint.'
   layout:
     template: split
     regions:
@@ -3849,6 +3868,7 @@ screens:
   module: Orders & Fulfilment
   requiresModule: partner
   wave: 2
+  permission: ORDER_VIEW
   capability: C09
   implementation:
     app: partner-web
@@ -3883,8 +3903,8 @@ screens:
   pattern: listDetail
   patternReason: '`listOrderRefunds` reads the population and `getOrder` reads one of them — list, select,
     act'
-  purpose: 'A partner reprints or resends the vouchers and tickets of an order, beside the order, its
-    statement and its refunds.'
+  purpose: A partner reprints or resends the vouchers and tickets of an order, beside the order, its statement
+    and its refunds.
   layout:
     template: split
     regions:
@@ -4093,6 +4113,7 @@ screens:
   module: Reports & Settlement
   requiresModule: partner
   wave: 3
+  permission: PARTNER_MANAGE
   implementation:
     app: partner-web
     route: /general/commission-statement
@@ -4228,6 +4249,7 @@ screens:
   module: Reports & Settlement
   requiresModule: partner
   wave: 3
+  permission: REPORT_VIEW_VENUE
   capability: C21
   implementation:
     app: partner-web
@@ -4532,6 +4554,7 @@ screens:
   module: Access & Account
   requiresModule: developerApi
   wave: 3
+  permission: DEVELOPER_VIEW
   implementation:
     app: partner-web
     route: /general/api-credentials-and-integration
@@ -4781,6 +4804,7 @@ screens:
   module: Access & Account
   requiresModule: partner
   wave: 3
+  permission: PERMISSION_VIEW
   capability: C56
   implementation:
     app: partner-web
@@ -4956,6 +4980,7 @@ screens:
   module: Support
   requiresModule: partner
   wave: 3
+  permission: CASE_VIEW
   capability: C32
   implementation:
     app: partner-web
@@ -5194,6 +5219,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -5435,6 +5461,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -5563,6 +5590,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -5718,6 +5746,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -5941,11 +5970,16 @@ screens:
     params:
     - name: partnerId
       from: session
+    - name: contactId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPartnerContactUser`.'
 - id: PTR-027
   name: Partner Brand, Venue & Business Scope Assignment
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -6034,6 +6068,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -6172,6 +6207,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -6298,6 +6334,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -6388,6 +6425,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -6612,6 +6650,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -6770,6 +6809,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -6868,6 +6908,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -6983,6 +7024,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -7151,6 +7193,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -7253,6 +7296,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -7479,6 +7523,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -7631,6 +7676,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -7763,6 +7809,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -7884,6 +7931,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -8043,6 +8091,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -8227,6 +8276,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -8312,6 +8362,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'

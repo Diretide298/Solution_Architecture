@@ -1,6 +1,6 @@
 # WS23 — B2B, Reseller & OTA Partner Management board 3
 
-**8 screens · 12 operations · 18 schemas · 3 permissions**
+**8 screens · 11 operations · 16 schemas · 3 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -96,11 +96,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-042` | Partner Operations Command Center | B | 2 | 28 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-042` | Partner Operations Command Center | B | 2 | 268 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `PTR-043` | Partner Orders & Booking Management | B | 2 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `PTR-044` | Reservations, Holds & Release Management | B | 0 | 160 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `PTR-045` | Partner Cancellations, Refunds & Amendments | B | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-046` | Partner Statement & Account Activity | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-046` | Partner Statement & Account Activity | B | 0 | 94 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-049` | Partner Disputes, Cases & Service Management | B | 21 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-050` | Partner Performance Scorecard & Risk Monitoring | B | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-051` | Partner AI Intelligence & Relationship Optimization | B | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |

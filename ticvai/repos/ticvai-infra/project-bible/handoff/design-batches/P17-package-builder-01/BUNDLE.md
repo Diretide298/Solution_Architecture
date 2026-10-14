@@ -97,11 +97,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `SGN-011` | Recommended Package Overview | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `SGN-012` | Commercial Model & Tier Selection | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `SGN-012` | Commercial Model & Tier Selection | B | 0 | 20 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `SGN-013` | Module Marketplace | B | 0 | 18 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `SGN-014` | AI Module & Package Recommendations | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-015` | Module Detail & Commercial Treatment | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-016` | Module Dependency & Compatibility Manager | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-015` | Module Detail & Commercial Treatment | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-016` | Module Dependency & Compatibility Manager | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `SGN-017` | Add-Ons, Capacity & Commercial Options | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -196,6 +196,8 @@ why: 3 venues, F&B and access required
 
 **A refused user sees:** TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -274,7 +276,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listPlans`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Code | text | — |
+| Name | text | — |
+| Description | text | — |
+| Cell tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
+| Licensed modules | list or chips (count when long) | A closed set as of 24 August. `moduleKey` was a free string, so nothing could join a licence to a screen — a tenant without an F&B licence … |
+| Limits | list or chips (count when long) | — |
+| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
+| Limit | 1,234 | Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure … |
+| Overage allowed | yes / no (icon or chip) | — |
+| Overage unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Base price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Billing period | chip: Monthly, Quarterly, Annual | — |
+| Includes branded app | yes / no (icon or chip) | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
+| Included AI tokens | 1,234 | AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 … |
+| Request limits | grouped details | The limits section of a plan: every tenant has a request budget (ADR-0064, accepted 1 October; it decides the per-tenant limit ADR-0032 … |
+| Guest | grouped details | One audience's bucket (ADR-0064). `guest` covers `public` and `anonymous` callers too; shedding order stays ADR-0032's, `guest` first and … |
+| Sustained per second | 1,234 | Requests per second the bucket refills at. |
+| Burst multiplier | 1,234.5 | How far above the sustained rate a burst may go (2 is twice the rate). |
+| Burst seconds | 1,234 | How long a burst may last. |
+| Staff | grouped details | One audience's bucket (ADR-0064). `guest` covers `public` and `anonymous` callers too; shedding order stays ADR-0032's, `guest` first and … |
 
 **Actions and what each produces**
 
@@ -329,6 +354,8 @@ listPlans (Plan):
 
 **A refused user sees:** TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -355,7 +382,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SGN-012?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `SGN-011`.
@@ -403,7 +430,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every module marketplace** (data table)
+**Every module marketplace** (data table, from `listModuleCatalogue`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -417,7 +444,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Recommended / required | text | not in the schema: `Recommended / Required` |
 | Trial availability | text | not in the schema: `Trial Availability` |
 
-**The selected module marketplace** (detail panel): The pack groups this record's detail under its own headings: “Sales”, “Venue Operations”, “Customer”, “Commercial”, “Important”.
+**The selected module marketplace** (detail panel, from `listModuleCatalogue`): The pack groups this record's detail under its own headings: “Sales”, “Venue Operations”, “Customer”, “Commercial”, “Important”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -485,6 +512,8 @@ Every module marketplace:
 - `listModuleCatalogue` → `PLATFORM_PLAN_MANAGE` (configure) · staff, guest, prospect
 
 **A refused user sees:** TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.
+
+Screen guard: `PLATFORM_PLAN_MANAGE`
 
 #### Requirements it meets
 
@@ -558,7 +587,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every module package recommendations** (data table)
+**Every module package recommendations** (data table, from `listModuleCatalogue`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -570,7 +599,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Confidence | text | not in the schema: `Confidence` |
 | Reason | text | not in the schema: `Reason` |
 
-**The selected module package recommendations** (detail panel): The pack groups this record's detail under its own headings: “Add Virtual Queue”, “Seat Management”.
+**The selected module package recommendations** (detail panel, from `listModuleCatalogue`): The pack groups this record's detail under its own headings: “Add Virtual Queue”, “Seat Management”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -637,6 +666,8 @@ Every module package recommendations:
 - `listModuleCatalogue` → `PLATFORM_PLAN_MANAGE` (configure) · staff, guest, prospect
 
 **A refused user sees:** TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.
+
+Screen guard: `PLATFORM_PLAN_MANAGE`
 
 #### Requirements it meets
 
@@ -708,7 +739,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listModuleCatalogue`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Module code | text | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
+| Name | text | — |
+| Description | text | — |
+| Category | text | — |
+| Requires modules | list or chips (count when long) | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
+| Incompatible with modules | list or chips (count when long) | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
+| Included in tiers | list or chips (count when long) | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Pricing basis | chip: Included, Flat fee, Per venue, Per unit, Revenue share, Metered | — |
+| Metered metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise. |
+| Metered unit size | 1,234 | For `metered`, how many units `price` buys (e.g. 1000 tokens). |
+| Provisioning minutes | 1,234 | — |
+| Requires professional services | yes / no (icon or chip) | — |
+| Status | chip: Available, Beta, Deprecated, Withdrawn | — |
 
 **Data it reads**: `listModuleCatalogue` (onLoad, One module in detail)
 
@@ -747,6 +795,8 @@ listModuleCatalogue (ModuleListing):
 
 **A refused user sees:** TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -771,7 +821,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SGN-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `SGN-011`.
@@ -813,7 +863,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listModuleCatalogue`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Module code | text | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
+| Name | text | — |
+| Description | text | — |
+| Category | text | — |
+| Requires modules | list or chips (count when long) | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
+| Incompatible with modules | list or chips (count when long) | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
+| Included in tiers | list or chips (count when long) | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Pricing basis | chip: Included, Flat fee, Per venue, Per unit, Revenue share, Metered | — |
+| Metered metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise. |
+| Metered unit size | 1,234 | For `metered`, how many units `price` buys (e.g. 1000 tokens). |
+| Provisioning minutes | 1,234 | — |
+| Requires professional services | yes / no (icon or chip) | — |
+| Status | chip: Available, Beta, Deprecated, Withdrawn | — |
 
 **Data it reads**: `listModuleCatalogue` (onLoad, What depends on what)
 
@@ -852,6 +919,8 @@ listModuleCatalogue (ModuleListing):
 
 **A refused user sees:** TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -876,7 +945,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SGN-016?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `SGN-011`.
@@ -954,6 +1023,8 @@ price: AED 1,500.00 / month
 - `addCapacityPack` → `PLATFORM_BILLING_MANAGE` (configure) · staff, prospect
 
 **A refused user sees:** TODO — not decided. A prospect is signed out and holds no permission, so the operator wording on the P09 twin does not apply. The book offers *Continue Saved Setup* and *Sign In* on 2.1, which is where somebody without access to a saved setup would be sent; no minute has decided it.
+
+Screen guard: `PLATFORM_BILLING_MANAGE`
 
 #### Requirements it meets
 
@@ -1073,8 +1144,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"CapacityPack": {"type":"object","x-ticvai-persistence":"subscription.capacity_pack","description":"Board 3.8. **A good season should not require renegotiating a contract in August.**\n","required":["tenantId","unit","quantity"],"properties":{"id":{"type":"string","format":"uuid"},"tenantId":{"type":"string","format":"uuid"},"unit":{"type":"string"},"quantity":{"type":"integer"},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date","nullable":true},"temporary":{"type":"boolean","default":true},"approvedBy":{"type":"string","format":"uuid","nullable":true},"invoiceId":{"type":"string","format":"uuid","nullable":true}}},
-"CreatePlanRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","cellTier","licensedModules","limits","basePrice"],"properties":{"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"cellTier":{"$ref":"#/components/schemas/CellTier"},"licensedModules":{"type":"array","minItems":1,"description":"**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n","items":{"$ref":"#/components/schemas/subscription::ModuleKey"}},"limits":{"type":"array","items":{"$ref":"#/components/schemas/EntitlementLimit"}},"basePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"billingPeriod":{"type":"string","enum":["monthly","quarterly","annual"]},"includesBrandedApp":{"type":"boolean","description":"Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"},"includedAiTokens":{"type":"integer","nullable":true,"description":"AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."},"requestLimits":{"$ref":"#/components/schemas/PlanRequestLimits"},"packageKind":{"type":"string","enum":["standard","custom"],"default":"standard","description":"**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."},"offeredToTenantId":{"type":"string","format":"uuid","nullable":true,"description":"**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422 `plan-not-offered`). Null for a package any tenant may buy. Custom packages only."}}},
+"CapacityPack": {"type":"object","x-ticvai-persistence":"subscription.capacity_pack","description":"Board 3.8. **A good season should not require renegotiating a contract in August.**\n","required":["tenantId","unit","quantity"],"properties":{"id":{"type":"string","format":"uuid"},"tenantId":{"x-ticvai-references":"none","type":"string","format":"uuid"},"unit":{"type":"string"},"quantity":{"type":"integer"},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date","nullable":true},"temporary":{"type":"boolean","default":true},"approvedBy":{"type":"string","format":"uuid","nullable":true},"invoiceId":{"type":"string","format":"uuid","nullable":true}}},
+"CreatePlanRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["code","name","cellTier","licensedModules","limits","basePrice"],"properties":{"code":{"x-ticvai-unique":"tenant","type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"cellTier":{"$ref":"#/components/schemas/CellTier"},"licensedModules":{"type":"array","minItems":1,"description":"**A closed set as of 24 August.** `moduleKey` was a free string, so nothing could join a licence to a screen — **a tenant without an F&B licence was still served every F&B screen**, because no screen said which module it belonged to in a form the licence could match.\n**The key is the join.** `screen.requiresModule` names one of these, and navigation is built from the intersection of what a tenant licensed and what their role permits.\n","items":{"$ref":"#/components/schemas/subscription::ModuleKey"}},"limits":{"type":"array","items":{"$ref":"#/components/schemas/EntitlementLimit"}},"basePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"billingPeriod":{"type":"string","enum":["monthly","quarterly","annual"]},"includesBrandedApp":{"type":"boolean","description":"Branded native publishing carries per-tenant operational cost and is priced, not absorbed.\n"},"includedAiTokens":{"type":"integer","nullable":true,"description":"AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 September)."},"requestLimits":{"$ref":"#/components/schemas/PlanRequestLimits"},"packageKind":{"type":"string","enum":["standard","custom"],"default":"standard","description":"**Three standard packages, and custom ones allowed** (decided 29 September, Chinmay)."},"offeredToTenantId":{"type":"string","format":"uuid","nullable":true,"description":"**Private to one tenant** (decided 29 September, Chinmay): a custom package offered only to this tenant; `listPlans` shows it to no other tenant and `setSubscription` refuses it for any other (422 `plan-not-offered`). Null for a package any tenant may buy. Custom packages only."}}},
 "ModuleListing": {"type":"object","x-ticvai-persistence":"subscription.module_listing","description":"Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n","required":["moduleCode"],"properties":{"moduleCode":{"type":"string","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches."},"name":{"type":"string"},"description":{"type":"string","nullable":true},"category":{"type":"string","nullable":true},"requiresModules":{"type":"array","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.","items":{"type":"string"}},"incompatibleWithModules":{"type":"array","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.","items":{"type":"string"}},"includedInTiers":{"type":"array","items":{"type":"string"}},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"pricingBasis":{"type":"string","enum":["included","flatFee","perVenue","perUnit","revenueShare","metered"]},"meteredMetric":{"allOf":[{"$ref":"#/components/schemas/UsageMetric"}],"nullable":true,"description":"For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise."},"meteredUnitSize":{"type":"integer","minimum":1,"nullable":true,"description":"For `metered`, how many units `price` buys (e.g. 1000 tokens). Null otherwise."},"provisioningMinutes":{"type":"integer","nullable":true},"requiresProfessionalServices":{"type":"boolean","default":false},"status":{"type":"string","enum":["available","beta","deprecated","withdrawn"]}}},
 "PackageSimulation": {"type":"object","description":"Boards 3.9 and 4.8. **Refused at quote time rather than at go-live.**","properties":{"lines":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["baseTier","module","addOn","capacityPack","overage","professionalServices","discount"]},"label":{"type":"string"},"quantity":{"type":"number","nullable":true},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"recurringTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"oneOffTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"contractTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"minimumGuarantee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning","advisory"]},"code":{"type":"string"},"message":{"type":"string"}}}},"provisionable":{"type":"boolean"}}},
 "PackageSimulationRequest": {"type":"object","required":["tierCode"],"properties":{"tierCode":{"type":"string"},"licensingModelId":{"type":"string","format":"uuid","nullable":true},"moduleCodes":{"type":"array","items":{"type":"string"}},"venueCount":{"type":"integer","default":1},"projectedVolumes":{"type":"object","additionalProperties":{"type":"integer"}},"contractMonths":{"type":"integer","default":12},"billingCycle":{"type":"string","nullable":true},"currency":{"type":"string","nullable":true}}},

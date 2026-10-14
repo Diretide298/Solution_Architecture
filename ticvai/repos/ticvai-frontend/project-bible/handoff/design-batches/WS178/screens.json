@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "TICVAI Finance Backend Structure Reference v1.0.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/finance-dashboard-bo-1081",
-   "component": "apps/venue-management-web/src/routes/orders-money/FinanceDashboard.tsx",
+   "component": "src/routes/orders-money/FinanceDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {

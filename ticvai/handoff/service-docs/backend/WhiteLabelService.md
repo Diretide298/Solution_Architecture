@@ -91,7 +91,7 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 1 | ADM-018, BO-834, CMS-009, CMS-011 |
 | overview | [`listAnalyticsProviders`](#listanalyticsproviders) | GET | `/tenant-config/analytics-providers` | core | 1 | CMS-016 |
 | overview | [`recordStorefrontSessionEvents`](#recordstorefrontsessionevents) | POST | `/storefront/session-events` | core | 1 | GST-001, WEB-001 |
-| overview | [`setAnalyticsProvider`](#setanalyticsprovider) | PUT | `/tenant-config/analytics-providers` | core | 1 | CMS-016 |
+| overview | [`setAnalyticsProvider`](#setanalyticsprovider) | PUT | `/tenant-config/analytics-providers/{analyticsProviderId}` | core | 1 | CMS-016 |
 | overview | [`setMaintenanceMode`](#setmaintenancemode) | PUT | `/tenant-config/status` | core | 1 | CMS-001 |
 | publishing | [`createPreview`](#createpreview) | POST | `/tenant-config/preview` | core | 1 | ADM-016, CMS-006, CMS-012, CMS-014 |
 | publishing | [`diffConfigVersion`](#diffconfigversion) | GET | `/tenant-config/versions/{version}/diff` | core | 1 | ADM-016, CMS-014, CMS-015 |
@@ -239,6 +239,9 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 ### listAppBuilds
 
 **`GET /tenant-config/app-builds`**: The tenant's app builds, newest first
+
+**Order.** Newest first, by `requestedAt` descending, then by `id`.
+**Statuses.** Every `status` is returned, ended ones included (`failed`, `rejected`); a screen that shows only live rows filters on `status` itself.
 
 |  |  |
 |---|---|
@@ -489,6 +492,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
 | isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
 | steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| steps[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | steps[].id | string (uuid) |  | (read-only) |
 | steps[].bookingFlowId | string (uuid) |  | (read-only) |
 | steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
@@ -518,6 +522,7 @@ The Apple and Google accounts the client has recorded, and the checklist CMS-104
 | isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
 | isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
 | steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| steps[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | steps[].id | string (uuid) |  | (read-only) |
 | steps[].bookingFlowId | string (uuid) |  | (read-only) |
 | steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
@@ -614,6 +619,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 | isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
 | isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
 | steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| steps[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | steps[].id | string (uuid) |  | (read-only) |
 | steps[].bookingFlowId | string (uuid) |  | (read-only) |
 | steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
@@ -679,6 +685,7 @@ Removed from the working draft; guests keep the published copy until the next pu
 | isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
 | isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
 | steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| steps[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | steps[].id | string (uuid) |  | (read-only) |
 | steps[].bookingFlowId | string (uuid) |  | (read-only) |
 | steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
@@ -710,6 +717,9 @@ Removed from the working draft; guests keep the published copy until the next pu
 **`GET /booking-flow-types`**: The booking flow types a venue can pick from, with their steps
 
 **The system catalogue of booking flows (decided 29 September, W12).** Shipped with the service and the same for every tenant; a venue never edits it, it picks from it (`createBookingFlowDefinition`). Each type lists its steps, each `required`, `optional` or `conditional` (with the condition), the order constraints the venue's own order must respect (for example payment is last, and the seat map comes after date and time), and the settings each step owns. The full catalogue is `x-ticvai-system-catalogue` on `BookingFlowType`.
+
+
+**Order.** Sorted by `name` ascending.
 
 |  |  |
 |---|---|
@@ -770,6 +780,9 @@ Removed from the working draft; guests keep the published copy until the next pu
 
 The flows this venue has picked, each with its steps in the venue's order. Draft rows: guests read the published copy through `getPublishedBookingFlow` (decided 29 September, W12).
 
+
+**Order.** Newest first, by `updatedAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -804,6 +817,7 @@ The flows this venue has picked, each with its steps in the venue's order. Draft
 | items[].isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
 | items[].isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
 | items[].steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| items[].steps[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | items[].steps[].id | string (uuid) |  | (read-only) |
 | items[].steps[].bookingFlowId | string (uuid) |  | (read-only) |
 | items[].steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
@@ -866,6 +880,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | isDefaultForType | boolean |  |  |
 | isEnabled | boolean |  |  |
 | steps | array of BookingFlowStep |  | (min items 1; max items 30) |
+| steps[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | steps[].id | string (uuid) |  | (read-only) |
 | steps[].bookingFlowId | string (uuid) |  | (read-only) |
 | steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
@@ -892,6 +907,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
 | isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
 | steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| steps[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | steps[].id | string (uuid) |  | (read-only) |
 | steps[].bookingFlowId | string (uuid) |  | (read-only) |
 | steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
@@ -949,6 +965,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | steps | array of BookingFlowStep |  | (max items 30) |
+| steps[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | steps[].id | string (uuid) |  | (read-only) |
 | steps[].bookingFlowId | string (uuid) |  | (read-only) |
 | steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
@@ -1794,7 +1811,7 @@ Presentation only. A block may point at a promotion, but it does not create or p
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
-| Writes | `cache:idempotency`, `whitelabel.tenant_config` |
+| Writes | `cache:idempotency`, `whitelabel.banner`, `whitelabel.tenant_config` |
 | Called by | CMS-008 |
 
 **Parameters**
@@ -1827,7 +1844,7 @@ Refused where the page is referenced by navigation or the homepage. Deleting a l
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
-| Writes | `cache:idempotency`, `whitelabel.tenant_config` |
+| Writes | `cache:idempotency`, `whitelabel.content_page`, `whitelabel.tenant_config` |
 | Called by | CMS-007 |
 
 **Parameters**
@@ -1982,6 +1999,8 @@ A `published` choice is unpublished first, or 409.
 
 **`GET /tenant-config/banners`**: List banners
 
+**Order.** Soonest first, by `startsAt` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -2043,6 +2062,9 @@ A `published` choice is unpublished first, or 409.
 **A guest caller sees only what is live**: pages whose `status` is `published` and `isEnabled` is true. For a guest `status` is ignored and `TENANT_CONFIGURE` is not needed — reading a published page is not configuring it. A staff caller sees every page, and with no `status` gets all three states.
 **A guest screen reads `listPublishedContentPages`** (decided 2 October, GFIX-2), which needs no session: help and accessibility pages are public.
 
+
+**Order.** Sorted by `sortOrder` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -2098,6 +2120,9 @@ A `published` choice is unpublished first, or 409.
 **`GET /venues/{venueId}/guided-choices`**: List a venue's Help me choose set-ups
 
 Drafts, AI suggestions awaiting review and the published one (decided 29 September, rev 3 REV3-11). Filter by `status` or `source` to show the suggestions waiting for a person.
+
+
+**Order.** Newest first, by `updatedAt` descending, then by `id`.
 
 |  |  |
 |---|---|
@@ -3637,7 +3662,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | Offline note | 2 October: servable from a local cache. |
 | Reads | `whitelabel.footer_config`, `whitelabel.footer_config_column`, `whitelabel.footer_config_social_link`, `whitelabel.homepage_layout`, `whitelabel.homepage_section`, `whitelabel.navigation_config`, `whitelabel.navigation_item` |
 | Writes | - |
-| Called by | GST-001, GST-043, GST-047, GST-071, KSK-002, WEB-001, WEB-028, WEB-029 |
+| Called by | GST-001, GST-043, GST-047, GST-071, KSK-002, WEB-001, WEB-029 |
 
 **Parameters**
 
@@ -3858,7 +3883,7 @@ Also the endpoint the guest app calls to discover a maintenance window, which is
 | Read routing | replica |
 | Reads | `whitelabel.config_version`, `whitelabel.tenant_config` |
 | Writes | - |
-| Called by | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014, WEB-001, WEB-025, WEB-029, WEB-045, WEB-050 |
+| Called by | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038, GST-040, GST-047, GST-051, KSK-002, KSK-014, WEB-001, WEB-025, WEB-028, WEB-029, WEB-045, WEB-050 |
 
 **Response**: `TenantAppStatus`
 
@@ -4008,6 +4033,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | bookingFlows[].isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
 | bookingFlows[].isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
 | bookingFlows[].steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| bookingFlows[].steps[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | bookingFlows[].steps[].id | string (uuid) |  | (read-only) |
 | bookingFlows[].steps[].bookingFlowId | string (uuid) |  | (read-only) |
 | bookingFlows[].steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
@@ -4285,7 +4311,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 
 ### setAnalyticsProvider
 
-**`PUT /tenant-config/analytics-providers`**: Connect the storefront and app to an analytics platform
+**`PUT /tenant-config/analytics-providers/{analyticsProviderId}`**: Connect the storefront and app to an analytics platform
 
 **An upsert keyed on `venueId` + `provider`** (22.10.29). A null `venueId` is the tenant-wide default; a venue's own row replaces it for that venue (ADR-0018, nearest wins). `measurementId` is what the page tag or app SDK reports to (a GA4 `G-` id, a Tag Manager `GTM-` container, a pixel id); it is public by nature, and the reporting credential is not: `reportingCredentialRef` names a secret in the platform vault, is write-only and is never returned.
 **Every provider waits on a consent category** (`consentCategory`, `analytics` unless set): it is not loaded, and no hit is sent, until the visitor's decision grants that category. `strictlyNecessary` is not offered: no analytics platform is necessary for the site to work. Takes effect with `publishTenantConfig`, like the rest of the storefront configuration.
@@ -4307,6 +4333,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| analyticsProviderId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `StorefrontAnalyticsProvider`
@@ -4736,6 +4763,8 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 
 **`GET /tenant-config/versions`**: Version history
 
+**Order.** Newest first, by `publishedAt` descending, then by `approvalRequestId`.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -4952,6 +4981,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | bookingFlows[].isDefaultForType | boolean |  | At most one per venue and type; setting it takes it from the previous default. (default False) |
 | bookingFlows[].isEnabled | boolean |  | A disabled flow is kept and not published; products naming it fall back to the default. (default True) |
 | bookingFlows[].steps | array of BookingFlowStep |  | Every step of the type, in the venue's order. (max items 30) |
+| bookingFlows[].steps[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | bookingFlows[].steps[].id | string (uuid) |  | (read-only) |
 | bookingFlows[].steps[].bookingFlowId | string (uuid) |  | (read-only) |
 | bookingFlows[].steps[].stepKey | BookingFlowStepKey: enum (location, helpMeChoose, product, date, time, performance, level, language, …) | yes | Every step a guest booking flow can hold (decided 29 September, W12). |
@@ -5109,6 +5139,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 |---|---|---|
 | 200 |  | Restored into the working draft |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The working draft has unpublished changes that the restore would overwrite; publish or discard them first. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPublishReviewPolicy
@@ -5988,6 +6019,8 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 
 **Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, drafts and published alike.
 
+**Statuses.** Every `status` is returned, ended ones included (`archived`, `expired`); a screen that shows only live rows filters on `status` itself.
+
 |  |  |
 |---|---|
 | Permission | `TENANT_CONFIGURE` |
@@ -6092,6 +6125,7 @@ Approval is separate from authoring where the tenant requires it — **the appro
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Published or scheduled |
+| 409 |  | The block is already published (content-block-published; a change goes through a new draft) or is archived (content-block-archived). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setFooter
@@ -6273,7 +6307,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | failure_reason | text | no |  |
 | package_asset_ref | uuid | no | The signed .ipa or .aab in the assets library, for the client to download and upload. |
 | release_notes | jsonb | no |  |
-| submit_to_store | boolean | no |  |
+| submits_to_store | boolean | no |  |
 | requested_at | timestamptz | yes |  |
 | requested_by_principal_id | uuid | no |  |
 | finished_at | timestamptz | no |  |
@@ -6315,6 +6349,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | booking_flow_id | uuid | no |  |
 | step_key | text | yes |  |
@@ -6337,6 +6372,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_current | boolean | yes |  |
 | scheduled_for | timestamptz | no |  |
 | content_hash | text | no |  |
+| pending_build_time_changes | jsonb | no | Changes in this version that will not reach guests until the next store release. |
 | snapshot | jsonb | no | What this version contained. |
 | scope_path | text | no | The partition key (ADR-0005). |
 | id | uuid | yes | Synthesised key. |
@@ -6601,7 +6637,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | preset_key | text | no | The starting point. |
 | current_step | text | no |  |
 | steps | jsonb | no | One entry per SiteSetupStepKey. |
-| minimum_path_done | boolean | no | True once the minimum path is done: a logo, the four theme colours, at least one enabled valid booking flow and a published version. |
+| is_minimum_path_done | boolean | no | True once the minimum path is done: a logo, the four theme colours, at least one enabled valid booking flow and a published version. |
 | scope_path | text | no | The partition key (ADR-0005). |
 | updated_at | timestamptz | no |  |
 

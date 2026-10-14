@@ -168,7 +168,8 @@
    },
    "amendedByPrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "identity.principal"
    },
    "amendedAt": {
     "type": "string",
@@ -338,12 +339,14 @@
     }
    },
    "conflicts": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "$ref": "#/components/schemas/CartConflict"
     }
    },
    "consentQuestions": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
@@ -716,6 +719,7 @@
     "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
+    "x-ticvai-references": "catalogue.variant",
     "type": "string",
     "format": "uuid"
    },
@@ -883,6 +887,7 @@
      ],
      "properties": {
       "denominationId": {
+       "x-ticvai-references": "platform.denomination",
        "type": "string",
        "format": "uuid",
        "description": "References `platform.denomination`, as `CashCountLine.denominationId` does. Until 26 September this was `denomination: number` — a face value as a JSON float, which naming-and-style 5.1 forbids and which could disagree with the note it named (pull audit R122).\n"
@@ -980,6 +985,11 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the device made the write** (R113; CHG-OFL-003): for an allocation, the same moment as `allocatedAt`, kept in `recorded_at`, the column every offline-written table carries for the sync to order replays by. Omitted online, the server sets it to the time it received the call."
    }
   }
  },
@@ -1280,7 +1290,8 @@
    "productVariantId",
    "name",
    "price",
-   "isAvailable"
+   "isAvailable",
+   "menuSectionId"
   ],
   "properties": {
    "id": {
@@ -1333,9 +1344,9 @@
     "nullable": true
    },
    "menuSectionId": {
+    "x-ticvai-references": "fnb.menu_section",
     "type": "string",
     "format": "uuid",
-    "nullable": true,
     "readOnly": true,
     "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
    },
@@ -1365,6 +1376,13 @@
     "items": {
      "$ref": "#/components/schemas/AllergenCode"
     }
+   },
+   "unavailableNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The free text with an `other` unavailable reason (`setItemAvailability`); reviewed quarterly so the common ones become reasons (audit R222)."
    }
   }
  },
@@ -1382,10 +1400,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -1641,7 +1661,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -2135,7 +2156,8 @@
       },
       "principalId": {
        "type": "string",
-       "format": "uuid"
+       "format": "uuid",
+       "x-ticvai-references": "identity.principal"
       },
       "at": {
        "type": "string",
@@ -2226,16 +2248,24 @@
   }
  },
  "TableDefinition": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "fnb.dining_table",
   "type": "object",
   "description": "A restaurant (dining) table, reserved with `createTableReservation`. Not a map-bookable `resources` table, which is a non-dining spot sold like a cabana (decided 29 September, rev 3 GAP-C2).",
   "required": [
    "id",
    "label",
-   "capacity"
+   "capacity",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -2369,7 +2399,8 @@
    },
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "platform.scope"
    },
    "scopePath": {
     "type": "string",

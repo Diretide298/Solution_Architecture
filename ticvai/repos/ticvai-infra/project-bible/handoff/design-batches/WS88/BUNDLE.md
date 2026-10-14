@@ -99,16 +99,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-494` | Rental Product Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-494` | Rental Product Command Center | D | 24 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-495` | Create Rental Product Wizard | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-496` | Rental Product Profile | D | 0 | 28 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-497` | Rental Category & Classification Setup | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-497` | Rental Category & Classification Setup | D | 0 | 13 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-498` | Inventory Tracking Model | D | 8 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
 | `BO-499` | Rental Location Assignment | D | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-500` | Rental Duration & Turnaround Configuration | D | 10 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-501` | Rental Rules & Operational Policy | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-502` | Customer Requirements, Agreement & Waiver | D | 16 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-503` | Product Validation, Approval & Publication | D | 11 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `BO-503` | Product Validation, Approval & Publication | D | 15 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -160,6 +160,38 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Tracking model | segmented control | — | Pooled · Serialised · Hybrid | `listRentalProducts` ?trackingModel |
 | Status | text field | — | — | `listRentalProducts` ?status |
 
+**Sent by *What publishing changes*** (`publishRentalProduct`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| State `state` | select | required | — | Draft · Configuration review · Approved · Active · Suspended · Archived | — | — | `publishRentalProduct` body |
+| Comment `comment` | text area | optional | — | — | — | — | `publishRentalProduct` body |
+| Rejection reason `rejectionReason` | text field | optional | — | — | — | — | `publishRentalProduct` body |
+| Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `publishRentalProduct` body |
+
+**Sent by *+ Create Rental Product*** (`createRentalProduct`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `createRentalProduct` body |
+| Code `code` | text field | required | — | — | — | — | `createRentalProduct` body |
+| Name `name` | text field | required | — | — | — | — | `createRentalProduct` body |
+| Internal name `internalName` | text field | optional | — | — | — | — | `createRentalProduct` body |
+| Description `description` | text area | optional | — | — | — | — | `createRentalProduct` body |
+| Category `categoryId` | picker: choose a category | optional | — | — | shows names, sends the id | — | `createRentalProduct` body |
+| Image `imageAssetId` | upload, or pick from the media library | optional | — | — | PNG or SVG ≤ 2 MB for logos; images ≥ 1600 px; video MP4 | — | `createRentalProduct` body |
+| Tags `tags` | list of values (chips) | optional | — | — | — | — | `createRentalProduct` body |
+| Tenant `tenantId` | picker: choose a tenant | optional | — | — | shows names, sends the id | — | `createRentalProduct` body |
+| Venue `venueId` | picker: choose a venue | required | — | — | shows names, sends the id | — | `createRentalProduct` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `createRentalProduct` body |
+| Tracking model `trackingModel` | segmented control | optional | — | Pooled · Serialised · Hybrid | — | — | `createRentalProduct` body |
+| Catalogue product `catalogueProductId` | picker: choose a catalogue product | optional | — | — | shows names, sends the id | The thing the guest actually buys. `catalogue` sells it and this configures how it behaves once sold; the link is here so a rental is never sold twice through two different … | `createRentalProduct` body |
+| Resource type `resourceTypeId` | picker: choose a resource type | optional | — | — | shows names, sends the id | For serialised products, the `resources` type its assets belong to. The individual bikes are resources and maintenance assets — this contract does not keep a third register of … | `createRentalProduct` body |
+| Status `status` | select | optional | — | Draft · Configuration review · Approved · Active · Suspended · Archived | — | — | `createRentalProduct` body |
+| Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createRentalProduct` body |
+| Version `version` | number field | optional | 1 | — | — | — | `createRentalProduct` body |
+| Is active `isActive` | toggle | optional | on | — | — | — | `createRentalProduct` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -184,8 +216,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| What publishing changes (publish gate) | navigation or local | — | — | — | — |
-| + Create Rental Product (primary button) | navigation or local | — | — | — | — |
+| What publishing changes (publish gate) | `publishRentalProduct` POST `/rental-products/{productId}/publish` | inline | RentalProduct | 409 Blocking findings remain; they are listed | — |
+| + Create Rental Product (primary button) | `createRentalProduct` POST `/rental-products` | RentalProduct | RentalProduct | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | — |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -221,7 +253,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental product are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Blocking findings remain; they are listed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Blocking findings remain; they are listed |
 
 #### Sample data for the mock-up
 
@@ -254,6 +286,8 @@ products:
 - `createRentalProduct` → `RENTAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_VIEW`
 
 #### Requirements it meets
 
@@ -295,7 +329,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-494?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: What publishing changes, + Create Rental Product.
@@ -362,6 +396,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the create rental product are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -385,6 +420,8 @@ steps:
 - `validateRentalProduct` → `RENTAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_CONFIGURE`
 
 #### Requirements it meets
 
@@ -416,7 +453,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-495?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create rental product, Cancel.
@@ -479,7 +516,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Deposit requirement | text | not in the schema: `Deposit requirement` |
 | Current status | text | not in the schema: `Current status` |
 
-**The selected rental product profile** (detail panel): The pack groups this record's detail under its own headings: “Product Header”, “Display tabs”, “Missing”.
+**The selected rental product profile** (detail panel, from `getRentalProduct`): The pack groups this record's detail under its own headings: “Product Header”, “Display tabs”, “Missing”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -516,6 +553,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental product profile are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -531,6 +569,8 @@ product: City Bicycle · BIKE-CITY · Serialised · 40 units · Active since 1 N
 - `updateRentalProduct` → `RENTAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_VIEW`
 
 #### Requirements it meets
 
@@ -560,7 +600,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-496?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -600,7 +640,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listRentalCategories`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Description | text | — |
+| Parent category | the name it points at, never the id | — |
+| Icon | the image or video | — |
+| Default tracking model | text | — |
+| Default duration minutes | 1,234 | — |
+| Default turnaround minutes | 1,234 | — |
+| Default waiver required | yes / no (icon or chip) | — |
+| Default deposit policy | the name it points at, never the id | — |
+| Overridable fields | list or chips (count when long) | Which defaults a product may override. An empty list means the category is binding, which is the whole point of a category for a venue that … |
+| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -629,6 +685,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental category classification are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -647,6 +704,8 @@ categories:
 - `createRentalCategory` → `RENTAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_VIEW`
 
 #### Requirements it meets
 
@@ -678,8 +737,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-497?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create rental category, Cancel.
 - [ ] Every transition is wired: `BO-494`.
@@ -763,6 +822,8 @@ model: Serialised · assign unit at check-out · scan required · manual pick al
 - `setRentalInventoryModel` → `RENTAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_CONFIGURE`
 
 #### Requirements it meets
 
@@ -883,6 +944,8 @@ locations:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1002,6 +1065,8 @@ rules: Min 30 min · max 4 h · step 30 min · default 1 h · extension up to 2 
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1114,6 +1179,8 @@ rules: Age 12+ · guardian required under 16 · Emirates ID required (kept with 
 - `setRentalOperationalRules` → `RENTAL_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1250,6 +1317,8 @@ requirements: Name, mobile, Emirates ID required; email optional · waiver v2.1 
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1334,13 +1403,22 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Product: Double Kayak | select field | — | — | — | — | — | — |
 | Configuration Score: 87% | select field | — | — | — | — | — | — |
 
+**Sent by *What publishing changes*** (`publishRentalProduct`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| State `state` | select | required | — | Draft · Configuration review · Approved · Active · Suspended · Archived | — | — | `publishRentalProduct` body |
+| Comment `comment` | text area | optional | — | — | — | — | `publishRentalProduct` body |
+| Rejection reason `rejectionReason` | text field | optional | — | — | — | — | `publishRentalProduct` body |
+| Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `publishRentalProduct` body |
+
 #### Outputs: what the screen shows and produces
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| What publishing changes (publish gate) | navigation or local | — | — | — | — |
+| What publishing changes (publish gate) | `publishRentalProduct` POST `/rental-products/{productId}/publish` | inline | RentalProduct | 409 Blocking findings remain; they are listed | — |
 | Maker/checker workflow (primary button) | navigation or local | — | — | — | — |
 | Approval comments (secondary button) | navigation or local | — | — | — | — |
 | Rejection reason (secondary button) | navigation or local | — | — | — | — |
@@ -1386,6 +1464,8 @@ product: Double Kayak · 7 of 8 sections complete · Inventory not yet assigned
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AUDIT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1413,7 +1493,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (403, 409).
+- [ ] Every input above is drawn (15), with its required mark, default, format and its error state (403, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-503?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: What publishing changes, Maker/checker workflow, Approval comments, Rejection reason, Version history.
@@ -1543,15 +1623,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AuditRecord": {"x-ticvai-append-only":"occurredAt","type":"object","x-ticvai-persistence":"platform.audit_record","description":"26 September, pull audit R198. **One row of the platform audit trail, as `listAuditRecords` returns it.** It was a free-form object, so nothing said what an audit row carries. These are the fields the operation already filters on — who, where, on which workstation, what action, on what, and when — and nothing more. Written by the operations that audit themselves; never edited and never deleted.\n","required":["id","action","occurredAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"principalId":{"type":"string","format":"uuid","description":"Who acted."},"orgUnitId":{"type":"string","format":"uuid","nullable":true,"description":"The scope node the action happened in."},"workstationId":{"type":"string","format":"uuid","nullable":true,"description":"The workstation it was done from, where there was one."},"action":{"type":"string","description":"What was done, as the writing operation names it."},"subjectRef":{"type":"string","nullable":true,"description":"**The thing acted on** — a profile, a shift, an order. The same value the `subjectRef` filter matches.\n"},"occurredAt":{"type":"string","format":"date-time","description":"When. The list is ordered by this, most recent first."},"platformStaffGrantId":{"type":"string","format":"uuid","nullable":true,"description":"**Set when a TICVAI platform operator acted, naming the grant they acted under** (`identity.openPlatformStaffGrant`; decided 28 September, audit R098). Null for the tenant's own staff. Every platform action in a tenant carries one, so the tenant can see all of them.\n"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"RentalAgreementRules": {"type":"object","x-ticvai-persistence":"rental.agreement_rules","description":"Board 1.9. **The version is part of the rule**, because a signature against text nobody kept is not a defence.\n","properties":{"customerFields":{"type":"object","additionalProperties":{"$ref":"#/components/schemas/RuleRequirement"}},"agreementRequired":{"type":"boolean","default":false},"liabilityWaiverRequired":{"type":"boolean","default":false},"termsDocumentAssetId":{"type":"string","format":"uuid","nullable":true},"agreementVersion":{"type":"string","nullable":true},"eSignatureRequired":{"type":"boolean","default":false},"guardianSignatureForMinor":{"type":"boolean","default":true},"groupWaiverMode":{"type":"string","enum":["perParticipant","singleGroupWaiver"],"default":"perParticipant"},"scopePath":{"type":"string"}}},
-"RentalCategory": {"type":"object","x-ticvai-persistence":"maintenance.asset_category","description":"Board 1.4. **Defaults cascade and products override within a permitted set.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"parentCategoryId":{"type":"string","format":"uuid","nullable":true},"iconAssetId":{"type":"string","format":"uuid","nullable":true},"defaultTrackingModel":{"type":"string","nullable":true},"defaultDurationMinutes":{"type":"integer","nullable":true},"defaultTurnaroundMinutes":{"type":"integer","nullable":true},"defaultWaiverRequired":{"type":"boolean","default":false},"defaultDepositPolicyId":{"type":"string","format":"uuid","nullable":true},"overridableFields":{"type":"array","items":{"type":"string"},"description":"**Which defaults a product may override.** An empty list means the category is binding, which is the whole point of a category for a venue that wants consistency.\n"},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"RentalAgreementRules": {"type":"object","x-ticvai-persistence":"rental.agreement_rules","description":"Board 1.9. **The version is part of the rule**, because a signature against text nobody kept is not a defence.\n","properties":{"customerFields":{"type":"object","additionalProperties":{"$ref":"#/components/schemas/RuleRequirement"}},"agreementRequired":{"type":"boolean","default":false},"liabilityWaiverRequired":{"type":"boolean","default":false},"termsDocumentAssetId":{"type":"string","format":"uuid","nullable":true},"agreementVersion":{"type":"string","nullable":true},"eSignatureRequired":{"type":"boolean","default":false},"guardianSignatureForMinor":{"type":"boolean","default":true},"groupWaiverMode":{"type":"string","enum":["perParticipant","singleGroupWaiver"],"default":"perParticipant"},"scopePath":{"type":"string"},"productId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"rental.product","x-ticvai-unique":"tenant","description":"The rental product these rules are for (one set per product), from the path."}}},
+"RentalCategory": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"maintenance.asset_category","description":"Board 1.4. **Defaults cascade and products override within a permitted set.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"parentCategoryId":{"type":"string","format":"uuid","nullable":true},"iconAssetId":{"type":"string","format":"uuid","nullable":true},"defaultTrackingModel":{"type":"string","nullable":true},"defaultDurationMinutes":{"type":"integer","nullable":true},"defaultTurnaroundMinutes":{"type":"integer","nullable":true},"defaultWaiverRequired":{"type":"boolean","default":false},"defaultDepositPolicyId":{"type":"string","format":"uuid","nullable":true},"overridableFields":{"type":"array","items":{"type":"string"},"description":"**Which defaults a product may override.** An empty list means the category is binding, which is the whole point of a category for a venue that wants consistency.\n"},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "RentalConfigurationFinding": {"type":"object","description":"Boards 1.10 and 4.10. **Severity travels with the finding**, so the publish gate can distinguish a missing turnaround buffer from a missing price.\n","properties":{"code":{"type":"string"},"severity":{"type":"string","enum":["blocking","warning","advisory"]},"message":{"type":"string"},"field":{"type":"string","nullable":true},"source":{"type":"string","enum":["validation","ai"],"default":"validation","description":"**AI findings are advisory unless the client configures otherwise** (board 1.10), so the origin is on the record rather than assumed by the reader.\n"}}},
-"RentalDurationRules": {"type":"object","x-ticvai-persistence":"rental.duration_rules","description":"Board 1.7. **Turnaround feeds availability automatically.** *10:00–11:00 rental, 11:00–11:15 turnaround, next available 11:15.*\n","properties":{"minimumMinutes":{"type":"integer"},"maximumMinutes":{"type":"integer"},"incrementMinutes":{"type":"integer","default":15},"defaultMinutes":{"type":"integer"},"turnaroundMinutes":{"type":"integer","default":0},"extensionAllowed":{"type":"boolean","default":true},"maximumExtensionMinutes":{"type":"integer","nullable":true},"sameDayReturnRequired":{"type":"boolean","default":false},"overnightAllowed":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
+"RentalDurationRules": {"type":"object","x-ticvai-persistence":"rental.duration_rules","description":"Board 1.7. **Turnaround feeds availability automatically.** *10:00–11:00 rental, 11:00–11:15 turnaround, next available 11:15.*\n","properties":{"minimumMinutes":{"type":"integer"},"maximumMinutes":{"type":"integer"},"incrementMinutes":{"type":"integer","default":15},"defaultMinutes":{"type":"integer"},"turnaroundMinutes":{"type":"integer","default":0},"extensionAllowed":{"type":"boolean","default":true},"maximumExtensionMinutes":{"type":"integer","nullable":true},"sameDayReturnRequired":{"type":"boolean","default":false},"overnightAllowed":{"type":"boolean","default":false},"scopePath":{"type":"string"},"productId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"rental.product","x-ticvai-unique":"tenant","description":"The rental product these rules are for (one set per product), from the path."}}},
 "RentalImportResult": {"type":"object","description":"26 August onboarding load. **Validated whole, written whole.**","properties":{"rowsRead":{"type":"integer"},"productsCreated":{"type":"integer"},"assetsCreated":{"type":"integer"},"rowsRejected":{"type":"integer"},"findings":{"type":"array","items":{"$ref":"#/components/schemas/RentalConfigurationFinding"}},"committed":{"type":"boolean"}}},
-"RentalInventoryModel": {"type":"object","x-ticvai-persistence":"rental.inventory_model","description":"Board 1.5. **Pooled, serialised or hybrid**, and the switches the counter obeys.","required":["trackingModel"],"properties":{"trackingModel":{"type":"string","enum":["pooled","serialised","hybrid"]},"inventoryUnit":{"type":"string","nullable":true},"totalQuantity":{"type":"integer","nullable":true,"description":"Pooled only. *150 lockers.*"},"components":{"type":"array","description":"**Hybrid only** — *one serialised kayak, two pooled paddles, two pooled life jackets.* One booking, two mechanisms.\n","items":{"type":"object","properties":{"resourceTypeId":{"type":"string","format":"uuid","nullable":true},"label":{"type":"string"},"quantity":{"type":"integer"},"serialised":{"type":"boolean"}}}},"assignmentRequiredAtCheckout":{"type":"boolean","default":false},"scanRequired":{"type":"boolean","default":false},"allowManualAssignment":{"type":"boolean","default":true},"allowSubstitution":{"type":"boolean","default":true},"allowEquipmentSwap":{"type":"boolean","default":true},"scopePath":{"type":"string"}}},
-"RentalLocationRule": {"type":"object","x-ticvai-persistence":"rental.location_rule","description":"Board 1.6. **Pickup and return are separate flags**, because a station that hands out kayaks and cannot receive them is a real shape.\n","required":["locationId"],"properties":{"locationId":{"type":"string","format":"uuid"},"enabled":{"type":"boolean","default":true},"pickupAllowed":{"type":"boolean","default":true},"returnAllowed":{"type":"boolean","default":true},"crossLocationReturnAllowed":{"type":"boolean","default":false},"inventoryAllocation":{"type":"integer","nullable":true},"inventoryBuffer":{"type":"integer","default":0,"description":"**Held back from online sale**, so the counter always has something to give the guest standing in front of it.\n"},"operatingHours":{"type":"object","nullable":true,"additionalProperties":true},"scopePath":{"type":"string"}}},
-"RentalOperationalRules": {"type":"object","x-ticvai-persistence":"rental.operational_rules","description":"Board 1.8. **Three states per rule — required, optional, not applicable.** *Optional* and *not applicable* look identical at the counter and are entirely different in an audit.\n","properties":{"minimumAge":{"type":"integer","nullable":true},"maximumAge":{"type":"integer","nullable":true},"minimumHeightCm":{"type":"integer","nullable":true},"maximumWeightKg":{"type":"integer","nullable":true},"idRequired":{"$ref":"#/components/schemas/RuleRequirement"},"guardianRequired":{"$ref":"#/components/schemas/RuleRequirement"},"membershipRequired":{"$ref":"#/components/schemas/RuleRequirement"},"drivingLicenceRequired":{"$ref":"#/components/schemas/RuleRequirement"},"safetyBriefingRequired":{"$ref":"#/components/schemas/RuleRequirement"},"checkoutScanRequired":{"$ref":"#/components/schemas/RuleRequirement"},"returnScanRequired":{"$ref":"#/components/schemas/RuleRequirement"},"conditionInspectionRequired":{"$ref":"#/components/schemas/RuleRequirement"},"photoAtCheckoutRequired":{"$ref":"#/components/schemas/RuleRequirement"},"photoAtReturnRequired":{"$ref":"#/components/schemas/RuleRequirement"},"maximumQuantityPerCustomer":{"type":"integer","nullable":true},"returnLocationRestricted":{"type":"boolean","default":false},"partialReturnAllowed":{"type":"boolean","default":true},"staffApprovalRequired":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
-"RentalProduct": {"type":"object","x-ticvai-persistence":"rental.product","description":"Board 1.3. **The master reference every later board resolves against.**","required":["code","name","venueId"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"internalName":{"type":"string","nullable":true},"description":{"type":"string","nullable":true},"categoryId":{"type":"string","format":"uuid","nullable":true},"imageAssetId":{"type":"string","format":"uuid","nullable":true},"tags":{"type":"array","items":{"type":"string"}},"tenantId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"trackingModel":{"type":"string","enum":["pooled","serialised","hybrid"]},"catalogueProductId":{"type":"string","format":"uuid","nullable":true,"description":"**The thing the guest actually buys.** `catalogue` sells it and this configures how it behaves once sold; the link is here so a rental is never sold twice through two different product records.\n"},"resourceTypeId":{"type":"string","format":"uuid","nullable":true,"description":"**For serialised products, the `resources` type its assets belong to.** The individual bikes are resources and maintenance assets — this contract does not keep a third register of them.\n"},"status":{"type":"string","enum":["draft","configurationReview","approved","active","suspended","archived"]},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"version":{"type":"integer","default":1},"isActive":{"type":"boolean","default":true}}},
+"RentalInventoryModel": {"type":"object","x-ticvai-persistence":"rental.inventory_model","description":"Board 1.5. **Pooled, serialised or hybrid**, and the switches the counter obeys.","required":["trackingModel"],"properties":{"trackingModel":{"type":"string","enum":["pooled","serialised","hybrid"]},"inventoryUnit":{"type":"string","nullable":true},"totalQuantity":{"type":"integer","nullable":true,"description":"Pooled only. *150 lockers.*"},"components":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"**Hybrid only** — *one serialised kayak, two pooled paddles, two pooled life jackets.* One booking, two mechanisms.\n","items":{"type":"object","properties":{"resourceTypeId":{"type":"string","format":"uuid","nullable":true},"label":{"type":"string"},"quantity":{"type":"integer"},"serialised":{"type":"boolean"}}}},"assignmentRequiredAtCheckout":{"type":"boolean","default":false},"scanRequired":{"type":"boolean","default":false},"allowManualAssignment":{"type":"boolean","default":true},"allowSubstitution":{"type":"boolean","default":true},"allowEquipmentSwap":{"type":"boolean","default":true},"scopePath":{"type":"string"},"productId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"rental.product","x-ticvai-unique":"tenant","description":"The rental product this model is for (one per product), from the path."}}},
+"RentalLocationRule": {"type":"object","x-ticvai-persistence":"rental.location_rule","description":"Board 1.6. **Pickup and return are separate flags**, because a station that hands out kayaks and cannot receive them is a real shape.\n","required":["locationId"],"properties":{"locationId":{"x-ticvai-references":"inventory.location","type":"string","format":"uuid"},"enabled":{"type":"boolean","default":true},"pickupAllowed":{"type":"boolean","default":true},"returnAllowed":{"type":"boolean","default":true},"crossLocationReturnAllowed":{"type":"boolean","default":false},"inventoryAllocation":{"type":"integer","nullable":true},"inventoryBuffer":{"type":"integer","default":0,"description":"**Held back from online sale**, so the counter always has something to give the guest standing in front of it.\n"},"operatingHours":{"type":"object","nullable":true,"additionalProperties":true},"scopePath":{"type":"string"},"productId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"rental.product","description":"The rental product offered at this location, from the path of `setRentalProductLocations`."}}},
+"RentalOperationalRules": {"type":"object","x-ticvai-persistence":"rental.operational_rules","description":"Board 1.8. **Three states per rule — required, optional, not applicable.** *Optional* and *not applicable* look identical at the counter and are entirely different in an audit.\n","properties":{"minimumAge":{"type":"integer","nullable":true},"maximumAge":{"type":"integer","nullable":true},"minimumHeightCm":{"type":"integer","nullable":true},"maximumWeightKg":{"type":"integer","nullable":true},"idRequired":{"$ref":"#/components/schemas/RuleRequirement"},"guardianRequired":{"$ref":"#/components/schemas/RuleRequirement"},"membershipRequired":{"$ref":"#/components/schemas/RuleRequirement"},"drivingLicenceRequired":{"$ref":"#/components/schemas/RuleRequirement"},"safetyBriefingRequired":{"$ref":"#/components/schemas/RuleRequirement"},"checkoutScanRequired":{"$ref":"#/components/schemas/RuleRequirement"},"returnScanRequired":{"$ref":"#/components/schemas/RuleRequirement"},"conditionInspectionRequired":{"$ref":"#/components/schemas/RuleRequirement"},"photoAtCheckoutRequired":{"$ref":"#/components/schemas/RuleRequirement"},"photoAtReturnRequired":{"$ref":"#/components/schemas/RuleRequirement"},"maximumQuantityPerCustomer":{"type":"integer","nullable":true},"returnLocationRestricted":{"type":"boolean","default":false},"partialReturnAllowed":{"type":"boolean","default":true},"staffApprovalRequired":{"type":"boolean","default":false},"scopePath":{"type":"string"},"productId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"rental.product","x-ticvai-unique":"tenant","description":"The rental product these rules are for (one set per product), from the path."}}},
+"RentalProduct": {"type":"object","x-ticvai-persistence":"rental.product","description":"Board 1.3. **The master reference every later board resolves against.**","required":["code","name","venueId"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"internalName":{"type":"string","nullable":true},"description":{"type":"string","nullable":true},"categoryId":{"type":"string","format":"uuid","nullable":true},"imageAssetId":{"type":"string","format":"uuid","nullable":true},"tags":{"type":"array","items":{"type":"string"}},"tenantId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"trackingModel":{"type":"string","enum":["pooled","serialised","hybrid"]},"catalogueProductId":{"type":"string","format":"uuid","nullable":true,"description":"**The thing the guest actually buys.** `catalogue` sells it and this configures how it behaves once sold; the link is here so a rental is never sold twice through two different product records.\n"},"resourceTypeId":{"type":"string","format":"uuid","nullable":true,"description":"**For serialised products, the `resources` type its assets belong to.** The individual bikes are resources and maintenance assets — this contract does not keep a third register of them.\n"},"status":{"type":"string","enum":["draft","configurationReview","approved","active","suspended","archived"]},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"version":{"type":"integer","default":1},"isActive":{"type":"boolean","default":true}}},
 "RuleRequirement": {"type":"string","enum":["required","optional","notApplicable"],"default":"notApplicable"}
 }
 ```

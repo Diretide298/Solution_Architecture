@@ -106,8 +106,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-228` | Promotion Performance Command Center | C | 2 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
-| `ADM-229` | Campaign & Promotion Performance Explorer | C | 4 | 5 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-228` | Promotion Performance Command Center | B | 2 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-229` | Campaign & Promotion Performance Explorer | B | 4 | 5 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-230` | Redemption, Conversion & Funnel Analytics | C | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-231` | Discount, Margin & Profitability Analytics | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-232` | Bundle, BOGO & Advanced Offer Analytics | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-228 |
+| Block | Block B · task VM-ADM-228 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards; Show) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -260,6 +260,8 @@ kpis:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -316,7 +318,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-229 |
+| Block | Block B · task VM-ADM-229 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -423,6 +425,8 @@ row:
 - `listCommercialCampaigns` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -570,6 +574,8 @@ funnel:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -695,6 +701,8 @@ row:
 - `listDiscountMarginProfitability` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -832,6 +840,8 @@ row:
 - `listBundleBogoAdvanced` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -981,6 +991,8 @@ row:
 - `listUpsellCrossSell` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -1137,6 +1149,8 @@ row:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1262,6 +1276,8 @@ result:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1373,6 +1389,8 @@ action: 'End RESIDENT-15 on weekends: +AED 9,000.00 margin'
 - `listNextBestAction` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -1518,6 +1536,8 @@ report:
 - `listExecutivePromotionReporting` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -1673,7 +1693,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "BundleBogoAdvancedOfferAnalyticsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Bundle, BOGO & Advanced Offer Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"bundleSales":{"type":"integer","description":"Bundle Sales"},"bundleRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Bundle Revenue"},"bundleConversion":{"type":"number","description":"Bundle Conversion"},"bundleAov":{"type":"string","description":"Bundle AOV"},"componentAttachRate":{"type":"number","description":"Component Attach Rate"},"componentRedemption":{"type":"string","description":"Component Redemption"},"bundleMargin":{"type":"number","description":"Bundle Margin"},"bundleVsStandaloneRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Bundle vs Standalone Revenue"},"substitutionRate":{"type":"number","description":"Substitution Rate"},"availabilityFailureRate":{"type":"number","description":"Availability Failure Rate"},"bogoTransactions":{"type":"integer","description":"BOGO transactions"},"freeItemsIssued":{"type":"string","description":"Free items issued"},"averageRewardValue":{"type":"number","description":"Average reward value"},"incrementalUnits":{"type":"integer","description":"Incremental units"},"incrementalRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Incremental revenue"},"marginImpact":{"type":"number","description":"Margin impact"},"componentAttachRates":{"type":"array","items":{"type":"string"},"description":"Attach rate per bundle component"}}},
 "CampaignBudget": {"x-ticvai-persistence":"promotions.campaign_budget","type":"object","description":"One budget line of a commercial campaign (setCampaignBudgetFinancial): what kind of spend it caps, who funds it, what it covers, and what happens as it is consumed. **Consumed, committed and reserved are not stored**: consumed is the discount given on orders (`orders.discount`, `promotions.promotion.discount_given`), committed and reserved are priced carts not yet paid, all worked out on read so they cannot drift from the orders they summarise. (DM5, 29 September: data model for the agreed operations)","required":["budgetType","amount"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"budgetType":{"type":"string","enum":["total","discount","reward","freeProduct"],"description":"The spend this line caps (total campaign, discount, reward or free-product budget)."},"fundingSource":{"type":"string","nullable":true,"enum":["venue","department","marketing","partner"],"description":"Who pays for it; `partner` is a co-funded (e.g. bank or partner-funded) line."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"scope":{"type":"string","enum":["entireCampaign","promotion","product","channel","partner","customerSegment"],"default":"entireCampaign","description":"What the line covers."},"scopeRef":{"type":"string","nullable":true,"description":"The promotion, product, partner or segment id, or the SalesChannel value, that `scope` names. Null for `entireCampaign`."},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The budget owner."},"costCentre":{"type":"string","maxLength":64,"nullable":true},"department":{"type":"string","maxLength":100,"nullable":true},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"thresholdPolicy":{"$ref":"#/components/schemas/BudgetThresholdPolicy"}}},
 "CampaignPromotionPerformanceExplorerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Campaign & Promotion Performance Explorer displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue"},"transactions":{"type":"string","description":"Transactions"},"units":{"type":"string","description":"Units"},"redemptions":{"type":"string","description":"Redemptions"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discount"},"margin":{"type":"number","description":"Margin"},"conversion":{"type":"number","description":"Conversion"},"aov":{"type":"string","description":"AOV"},"roi":{"type":"string","description":"ROI"},"customerAcquisition":{"type":"string","description":"Customer acquisition"},"repeatPurchase":{"type":"string","description":"Repeat purchase"},"marginRisk":{"type":"number","description":"Margin Risk"},"classification":{"type":"string","enum":["excellent","healthy","monitor","underperforming","critical"],"description":"AI/system classification."},"campaignId":{"type":"string","description":"Campaign ID"},"campaignName":{"type":"string","description":"Campaign"}}},
-"CommercialCampaign": {"x-ticvai-persistence":"promotions.campaign + promotions.campaign_budget","type":"object","description":"A commercial campaign: the grouping of promotions, coupon campaigns and bundles that share an owner, a business entity, dates and a budget. **Not `marketing.campaign`**, which is the CRM send campaign in another service. The header is saved with its budget lines by setCampaignBudgetFinancial (the budget screen is where the pack captures campaign, owner, business entity and effective dates), and on its own by createCommercialCampaign and updateCommercialCampaign; listCommercialCampaigns lists it (decided 29 September, writers pass); promotions, coupon campaigns and bundles point at it by `campaignId`. No status of its own: a campaign is live while its promotions are, and a threshold action that stops it pauses them. (DM5, 29 September: data model for the agreed operations)","required":["id","venueId","name"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64,"nullable":true},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000,"nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The campaign (and budget) owner."},"legalEntityId":{"type":"string","format":"uuid","nullable":true,"description":"The business entity that funds and books the campaign."},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"budgets":{"type":"array","description":"The rows of `promotions.campaign_budget`, one per budget line.","items":{"$ref":"#/components/schemas/CampaignBudget"}}}},
+"CommercialCampaign": {"x-ticvai-persistence":"promotions.campaign + promotions.campaign_budget","type":"object","description":"A commercial campaign: the grouping of promotions, coupon campaigns and bundles that share an owner, a business entity, dates and a budget. **Not `marketing.campaign`**, which is the CRM send campaign in another service. The header is saved with its budget lines by setCampaignBudgetFinancial (the budget screen is where the pack captures campaign, owner, business entity and effective dates), and on its own by createCommercialCampaign and updateCommercialCampaign; listCommercialCampaigns lists it (decided 29 September, writers pass); promotions, coupon campaigns and bundles point at it by `campaignId`. No status of its own: a campaign is live while its promotions are, and a threshold action that stops it pauses them. (DM5, 29 September: data model for the agreed operations)","required":["id","venueId","name"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"x-ticvai-references":"platform.scope","type":"string","format":"uuid"},"code":{"x-ticvai-unique":"venue","type":"string","maxLength":64,"nullable":true},"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000,"nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"The campaign (and budget) owner."},"legalEntityId":{"type":"string","format":"uuid","nullable":true,"description":"The business entity that funds and books the campaign."},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"budgets":{"type":"array","description":"The rows of `promotions.campaign_budget`, one per budget line.","items":{"$ref":"#/components/schemas/CampaignBudget"}}}},
 "CustomerSegmentChannelPartnerAnalyticsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Customer, Segment, Channel & Partner Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"customersReached":{"type":"string","description":"Customers reached"},"newCustomers":{"type":"integer","description":"New customers"},"returningCustomers":{"type":"integer","description":"Returning customers"},"conversion":{"type":"number","description":"Conversion"},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discount"},"aov":{"type":"string","description":"AOV"},"margin":{"type":"number","description":"Margin"},"repeatPurchase":{"type":"string","description":"Repeat purchase"},"redemption":{"type":"string","description":"Redemption"},"partnerRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner revenue"},"partnerRedemptions":{"type":"integer","description":"Partner redemptions"},"discountCost":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discount cost"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission"},"netContribution":{"type":"string","description":"Net contribution"},"campaignRoi":{"type":"string","description":"Campaign ROI"},"channel":{"type":"string","enum":["b2c","mobileApp","pos","kiosk","b2b","callCenter","ota","reseller","api"],"description":"Channel compared."},"segment":{"type":"string","description":"Customer segment"}}},
 "DiscountMarginProfitabilityAnalyticsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Discount, Margin & Profitability Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"grossRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Gross Revenue"},"discountValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Discount Value"},"netRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Net Revenue"},"productCost":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Product Cost"},"promotionCost":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Promotion Cost"},"grossProfit":{"type":"string","description":"Gross Profit"},"grossMargin":{"type":"number","description":"Gross Margin %"},"marginChange":{"type":"number","description":"Margin Change"},"revenueUplift":{"type":"number","description":"Revenue Uplift"},"profitUplift":{"type":"number","description":"Profit Uplift"},"roi":{"type":"string","description":"ROI"},"quadrant":{"type":"string","enum":["highRevenueHighMargin","highRevenueLowMargin","lowRevenueHighMargin","lowRevenueLowMargin"],"description":"Revenue and margin quadrant."}}},
 "ExecutivePromotionIntelligenceReportingStudioView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Executive Promotion Intelligence & Reporting Studio displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"incrementalRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Incremental revenue"},"profit":{"type":"string","description":"Profit"},"roi":{"type":"string","description":"ROI"},"conversion":{"type":"number","description":"Conversion"},"aov":{"type":"string","description":"AOV"},"campaign":{"type":"string","description":"Campaign"},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue"},"attentionReason":{"type":"string","enum":["negativeMarginImpact","lowConversion","highDiscountCost","lowIncrementality"],"description":"Why the campaign needs attention, if it does"}}},

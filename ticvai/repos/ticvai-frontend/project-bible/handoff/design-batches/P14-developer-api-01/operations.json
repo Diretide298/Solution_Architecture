@@ -404,35 +404,6 @@
   "requestBody": null,
   "responds": "WebhookDelivery"
  },
- "listWebhookEventTypes": {
-  "method": "GET",
-  "path": "/webhook-event-types",
-  "contract": "public-api",
-  "summary": "The events a webhook may subscribe to",
-  "permission": "DEVELOPER_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "publisher",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listWebhookSubscriptions": {
   "method": "GET",
   "path": "/webhook-subscriptions",
@@ -568,7 +539,7 @@
  },
  "setApiAnomalyRule": {
   "method": "PUT",
-  "path": "/api-anomaly-rules",
+  "path": "/api-anomaly-rules/{anomalyRuleId}",
   "contract": "public-api",
   "summary": "When API traffic is flagged as abnormal",
   "permission": "DEVELOPER_ADMIN",
@@ -576,6 +547,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "anomalyRuleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -587,7 +563,7 @@
  },
  "setApiLicensing": {
   "method": "PUT",
-  "path": "/api-licensing",
+  "path": "/api-licensing/{licenceId}",
   "contract": "public-api",
   "summary": "Which API modules a tenant has licensed, and on what terms",
   "permission": "DEVELOPER_ADMIN",
@@ -595,6 +571,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "licenceId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -606,7 +587,7 @@
  },
  "setApiQuota": {
   "method": "PUT",
-  "path": "/api-quotas",
+  "path": "/api-quotas/{quotaId}",
   "contract": "public-api",
   "summary": "Rate limits and throttling per client",
   "permission": "DEVELOPER_ADMIN",
@@ -614,6 +595,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "quotaId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

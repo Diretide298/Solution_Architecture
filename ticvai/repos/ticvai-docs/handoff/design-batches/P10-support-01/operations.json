@@ -105,7 +105,7 @@
   "contract": "marketing-crm",
   "summary": "Reopen a resolved case",
   "permission": "CASE_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

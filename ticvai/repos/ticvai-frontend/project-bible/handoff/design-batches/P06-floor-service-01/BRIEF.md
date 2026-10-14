@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 8 permissions apply here:
   `GUEST_MANAGE, GUEST_VIEW, ORDER_CREATE, ORDER_MODIFY, ORDER_VIEW, PRODUCT_CONFIGURE, PRODUCT_VIEW, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
-- **23 of these operations work offline**: addGuestNote, compItem, createFnbOrder, createPayment, fireCourse, getBill, getFnbReservationPolicy, getTableMap
+- **24 of these operations work offline**: addGuestNote, closeTableVisit, compItem, createFnbOrder, createPayment, fireCourse, getBill, getFnbReservationPolicy
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -133,10 +133,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `EMP-051` | Restaurant Service Command Center | C | 3 | 16 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
 | `EMP-052` | Floor Plan & Table Map | C | 1 | 3 | 5 | 1 | 6 | 1 | — | notStarted (generated) |
-| `EMP-053` | Table & Seating Configuration | C | 22 | 0 | 5 | 1 | 1 | 6 | — | notStarted (generated) |
+| `EMP-053` | Table & Seating Configuration | C | 21 | 0 | 5 | 1 | 1 | 6 | — | notStarted (generated) |
 | `EMP-054` | Reservation Calendar & Timeline | C | 3 | 36 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `EMP-055` | Create / Edit Reservation | C | 33 | 11 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `EMP-056` | Walk-In & Waitlist Management | C | 23 | 0 | 5 | 7 | 1 | 0 | — | notStarted (generated) |
+| `EMP-056` | Walk-In & Waitlist Management | C | 22 | 0 | 5 | 7 | 1 | 0 | — | notStarted (generated) |
 | `EMP-057` | Guest Profile & Dining History | D | 13 | 14 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
 | `EMP-058` | Live Table & Service Management | A | 51 | 5 | 5 | 10 | 4 | 1 | — | notStarted (generated) |
 | `EMP-059` | Table Order, Bill & Payment Management | A | 51 | 5 | 5 | 16 | 2 | 1 | — | notStarted (generated) |

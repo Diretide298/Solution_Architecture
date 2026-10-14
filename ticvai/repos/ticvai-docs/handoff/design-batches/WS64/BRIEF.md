@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-299` | Resale Eligibility & Ticket Selection | C | 0 | 16 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-300` | Create Listing & Resale Price Selection | C | 0 | 0 | 6 | 0 | 2 | 5 | — | notStarted (generated) |
 | `ADM-301` | Fees, Seller Proceeds & Listing Confirmation | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-302` | My Resale Listings & Seller Dashboard | C | 0 | 22 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
+| `ADM-302` | My Resale Listings & Seller Dashboard | C | 0 | 40 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-303` | Official Resale Marketplace & Buyer Discovery | C | 0 | 0 | 6 | 0 | 2 | 5 | — | notStarted (generated) |
 | `ADM-304` | Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience | C | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `ADM-305` | Buyer Checkout, Inventory Hold & Secure Payment | C | 1 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |

@@ -5,10 +5,11 @@
   "module": "Food & Beverage",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/fnb/fnb-order-management",
-   "component": "apps/venue-management-web/src/routes/fnb/FnBOrderManagementList.tsx",
+   "component": "src/routes/fnb/FnBOrderManagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -419,10 +420,11 @@
   "module": "Food & Beverage",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/fnb/order-search",
-   "component": "apps/venue-management-web/src/routes/fnb/OrderSearchList.tsx",
+   "component": "src/routes/fnb/OrderSearchList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -592,10 +594,11 @@
   "module": "Food & Beverage",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/fnb/menu-management",
-   "component": "apps/venue-management-web/src/routes/fnb/MenuManagementList.tsx",
+   "component": "src/routes/fnb/MenuManagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1193,10 +1196,11 @@
   "module": "Food & Beverage",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/fnb/kitchen-display",
-   "component": "apps/venue-management-web/src/routes/fnb/KitchenDisplayList.tsx",
+   "component": "src/routes/fnb/KitchenDisplayList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1446,10 +1450,11 @@
   "module": "Food & Beverage",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/food-beverage",
-   "component": "apps/venue-management-web/src/routes/home/FoodBeverageList.tsx",
+   "component": "src/routes/home/FoodBeverageList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1657,10 +1662,11 @@
   "module": "Food & Beverage",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/food-beverage/kitchen-preparation-stations",
-   "component": "apps/venue-management-web/src/routes/ops/KitchenPreparationStationsList.tsx",
+   "component": "src/routes/ops/KitchenPreparationStationsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1687,7 +1693,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listKitchenStations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Kitchen & Preparation Stations — from the client design board, 20 August.",
+  "purpose": "Kitchen & Preparation Stations: shows list preparation stations and their routing (`listKitchenStations`); list outlets (`listOutlets`), and acts with configure stations and item routing (`setKitchenStations`); how long a ticket may sit before it is late (`setKitchenSla`); print a production plan's prep sheet (`printPrepSheet`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -1916,10 +1922,11 @@
   "module": "Food & Beverage",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/food-beverage/order-routing-kds-printer-rules",
-   "component": "apps/venue-management-web/src/routes/ops/OrderRoutingKdsPrinterRulesList.tsx",
+   "component": "src/routes/ops/OrderRoutingKdsPrinterRulesList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1946,7 +1953,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listWorkstations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Order Routing & KDS/Printer Rules — from the client design board, 20 August.",
+  "purpose": "Order Routing & KDS/Printer Rules: shows an outlet's kitchen routing rules (`getKitchenRoutingRules`), and acts with set an outlet's category rules, default station and fallback station (`setKitchenRoutingRules`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -2090,10 +2097,11 @@
   "module": "Food & Beverage",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "TENANT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/food-beverage/f-b-global-settings-controls",
-   "component": "apps/venue-management-web/src/routes/ops/FBGlobalSettingsControlsList.tsx",
+   "component": "src/routes/ops/FBGlobalSettingsControlsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2126,7 +2134,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listProductionRuns` reads the population and `getVenueSettings` reads one of them — list, select, act",
-  "purpose": "F&B Global Settings & Controls — from the client design board, 20 August.",
+  "purpose": "F&B Global Settings & Controls: shows operational settings for this venue (`getVenueSettings`); how this outlet courses by default (read) (`getCourseRules`), and acts with set support hours, quiet hours, segregated access and alerting (`setVenueSettings`); how this outlet courses by default (`setCourseRules`).",
   "layout": {
    "template": "split",
    "regions": [

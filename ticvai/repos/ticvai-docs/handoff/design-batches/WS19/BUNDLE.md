@@ -97,15 +97,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-349` | Approval Integration Command Center | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `ADM-350` | Module Integration Registry | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-351` | Approval API Management | B | 9 | 37 | 5 | 21 | 0 | 3 | — | notStarted (—) |
+| `ADM-350` | Module Integration Registry | B | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-351` | Approval API Management | B | 9 | 38 | 5 | 21 | 0 | 3 | — | notStarted (—) |
 | `ADM-352` | Workflow Event Framework | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-353` | Webhook Configuration & Subscription Manager | B–D | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-354` | External Workflow System Integration | A | 22 | 16 | 5 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-355` | Data & Workflow Mapping Studio | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-356` | Integration Security & Access Control | B | 2 | 34 | 6 | 18 | 0 | 0 | — | notStarted (—) |
-| `ADM-357` | Integration Monitoring, Error & Retry Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-358` | Integration Analytics & AI Health Advisor | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-356` | Integration Security & Access Control | B | 2 | 35 | 6 | 18 | 0 | 0 | — | notStarted (—) |
+| `ADM-357` | Integration Monitoring, Error & Retry Center | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-358` | Integration Analytics & AI Health Advisor | B | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -224,6 +224,8 @@ metric tiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -309,7 +311,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listCrossModuleOrchestration`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Service | text | Service |
+| Action | text | Action |
+| Status | chip: Not started, Running, Waiting, Successful, Failed, Compensated | Status |
+| Started | 1 Oct 2026, 14:30 | Started |
+| Completed | 1 Oct 2026, 14:30 | Completed |
+| Duration | 1,234 | Seconds |
+| Input output | text | Input/Output |
+| Failure handling | chip: Waits, Retries, Rolls back, Continues partially, Requires human intervention | What the workflow does after this node fails |
+| Retries | 1,234 | Retries |
+| Correlation | text | a common correlation/workflow ID |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Data it reads**: `listCrossModuleOrchestration` (onLoad, The integration registry)
 
@@ -352,6 +370,8 @@ listCrossModuleOrchestration (CrossModuleOrchestrationMonitorView):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -376,7 +396,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-350?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-349`.
@@ -472,6 +492,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Ip allow list | list or chips (count when long) | 13.1.38. Required on a production client (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the … |
 | Status | chip: Active, Suspended, Revoked | — |
 | Last used at | 1 Oct 2026, 14:30 | A credential unused for a year is a credential nobody will notice being stolen. |
+| Status reason | text | Why the client was suspended (`setApiClientStatus`). |
 
 **Usage** (detail panel, from `getApiUsage`)
 
@@ -530,6 +551,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `DEVELOPER_VIEW`
+
 #### Requirements it meets
 
 21 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -572,7 +595,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-351?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-349`.
@@ -666,6 +689,8 @@ listWebhookEventTypes (WebhookEventCatalogueEntry):
 - `listWebhookEventTypes` → `DEVELOPER_VIEW` (read) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `DEVELOPER_VIEW`
 
 #### Requirements it meets
 
@@ -829,7 +854,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `externalProviderId` (navigation) |
 | Route | `/platform/external-workflow-system-integration-adm-354` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, 2 October: the approvals workflow and matrix screens and the communication service screens move to Venue Management; CHG-CLN-003). It configures a record the tenant owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The console's tenant picker and grant (CHG-SBO-001) came off with the move. The id is kept, so its tickets keep their keys.
@@ -885,6 +910,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Max attempts `maxAttempts` | number field | optional | 5 | — | — | Delivery attempts, with backoff, before a dispatch is `failed` and the level falls back as on timeout. | `setApprovalExternalProvider` body |
 | Status `status` | segmented control | optional | Active | Active · Paused · Disabled | — | `paused` sends nothing and every level that names it falls back at once; the platform sets `disabled` after repeated failures, as it disables a failing webhook. | `setApprovalExternalProvider` body |
 
+Carried, not typed: `externalProviderId`
+
 Errors to draw in the form: 422 The endpoint is not `https`, the API client is not an active client of the tenant, or the decision mapping has no value for `approve` or for `reject`
 
 **Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
@@ -921,7 +948,7 @@ Errors to draw in the form: 422 The endpoint is not `https`, the API client is n
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save provider (primary button) | `setApprovalExternalProvider` PUT `/approval-external-providers` | ApprovalExternalProvider | ApprovalExternalProvider | 422 The endpoint is not `https`, the API client is not an active client of the tenant, or the decision mapping has no value for `approve` or for `reject` | opens modal first |
+| Save provider (primary button) | `setApprovalExternalProvider` PUT `/approval-external-providers/{externalProviderId}` | ApprovalExternalProvider | ApprovalExternalProvider | 422 The endpoint is not `https`, the API client is not an active client of the tenant, or the decision mapping has no value for `approve` or for `reject` | opens modal first |
 
 **Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -969,6 +996,8 @@ provider:
 - `listApprovalExternalDispatches` → `APPROVAL_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `APPROVAL_VIEW`
 
 #### Requirements it meets
 
@@ -1079,6 +1108,8 @@ transform: minor units to AED 2 decimals
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1187,6 +1218,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Ip allow list | list or chips (count when long) | 13.1.38. Required on a production client (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the … |
 | Status | chip: Active, Suspended, Revoked | — |
 | Last used at | 1 Oct 2026, 14:30 | A credential unused for a year is a credential nobody will notice being stolen. |
+| Status reason | text | Why the client was suspended (`setApiClientStatus`). |
 
 **Authorisation policies** (data table, from `listAuthorisationPolicies`)
 
@@ -1265,6 +1297,8 @@ listAuthorisationPolicies (AuthorisationPolicy):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PERMISSION_VIEW`
+
 #### Requirements it meets
 
 18 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1306,7 +1340,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-356?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Suspend or reactivate.
 - [ ] Every transition is wired: `ADM-349`.
@@ -1359,7 +1393,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listWorkflowExceptionFailure`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Error type | chip: Business rule failure, Missing data, Missing approver, Permission failure … | Kind of failure |
+| Exception | text | Exception ID |
+| Workflow | text | Workflow |
+| Instance | text | Instance |
+| Module | text | Module |
+| Failed step | text | Step that failed |
+| Time | 1 Oct 2026, 14:30 | Time |
+| Business impact | text | Business Impact |
+| Priority | text | Priority |
+| Owner | text | Owner |
+| Retry count | 1,234 | Retry count |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Data it reads**: `listWorkflowExceptionFailure` (onLoad, Errors and retries); `listApprovalExternalDispatches` (onLoad, External dispatch errors and retries)
 
@@ -1405,6 +1456,8 @@ listApprovalExternalDispatches (ApprovalExternalDispatch):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `APPROVAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1431,7 +1484,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-357?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-349`.
@@ -1490,7 +1543,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listWorkflowProcessPerformance`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Workflow volume | 1,234 | Workflow Volume |
+| Completion rate | 12.5% | Completion Rate |
+| Failure rate | 12.5% | Failure Rate |
+| Average completion time | 1,234 | Minutes |
+| Approval time | 1,234 | Minutes |
+| Automation rate | 12.5% | Automation Rate |
+| Escalation rate | 12.5% | Escalation Rate |
+| Rejection rate | 12.5% | Rejection Rate |
+| Rework rate | 12.5% | Rework Rate |
+| Sla compliance | 1,234.5 | Percent within SLA |
+| Average approval time | 1,234 | Minutes |
+| Approval rate | 12.5% | Approval Rate |
+| Request changes rate | 12.5% | Request Changes Rate |
+| Delegation rate | 12.5% | Delegation Rate |
+| Manual steps removed | 1,234 | Manual Steps Removed |
+| Processing time saved | 1,234 | Minutes |
+| Workload reduced | 1,234.5 | Staff hours |
+| Cost saving where measurable | AED 1,234.50 | Cost Saving where measurable |
 
 **Data it reads**: `listWorkflowProcessPerformance` (onLoad, Integration health)
 
@@ -1539,6 +1613,8 @@ listWorkflowProcessPerformance (WorkflowAnalyticsProcessPerformanceView):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1563,7 +1639,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-358?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-349`.
@@ -1676,7 +1752,7 @@ Method, path, parameters, request and response for every operation these screens
 "listWorkflowExceptionFailure": {"method":"GET","path":"/workflow-exception-failure","contract":"approvals","summary":"Workflow Exception, Failure & Recovery Center","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"errorType","in":"query","required":false},{"name":"module","in":"query","required":false},{"name":"priority","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listWorkflowProcessPerformance": {"method":"GET","path":"/workflow-process-performance","contract":"approvals","summary":"Workflow Analytics & Process Performance","permission":"REPORT_VIEW_VENUE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"workflow","in":"query","required":false},{"name":"module","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"brand","in":"query","required":false},{"name":"businessProcess","in":"query","required":false},{"name":"department","in":"query","required":false},{"name":"approver","in":"query","required":false},{"name":"user","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":"minTransactionValue","in":"query","required":false},{"name":"maxTransactionValue","in":"query","required":false}],"requestBody":null,"responds":"WorkflowAnalyticsProcessPerformanceView"},
 "setApiClientStatus": {"method":"POST","path":"/api-clients/{clientId}/status","contract":"public-api","summary":"Suspend or reactivate an integration, reversibly","permission":"DEVELOPER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ApiClient"},
-"setApprovalExternalProvider": {"method":"PUT","path":"/approval-external-providers","contract":"approvals","summary":"Register a third-party workflow system as an approver","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ApprovalExternalProvider","responds":"ApprovalExternalProvider"},
+"setApprovalExternalProvider": {"method":"PUT","path":"/approval-external-providers/{externalProviderId}","contract":"approvals","summary":"Register a third-party workflow system as an approver","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"externalProviderId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"ApprovalExternalProvider","responds":"ApprovalExternalProvider"},
 "setTriggerActionCross": {"method":"PUT","path":"/trigger-action-cross","contract":"approvals","summary":"Trigger, Action & Cross-Module Orchestration Configuration","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"TriggerActionCrossModuleOrchestrationConfigurationInput","responds":"TriggerActionCrossModuleOrchestrationConfigurationView"}
 }
 ```
@@ -1688,12 +1764,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "AccessCondition": {"type":"object","description":"**One attribute, one operator, one value** — and the attribute names are an enum rather than free text, because a policy that reads `venu.type` silently never matches.\nThe enum is the matrix, row by row: user (3.3.7), employee (3.3.8), membership (3.3.9), accreditation (3.3.10), customer segment (3.3.11), resource classification (3.3.12), venue (3.3.13), attraction (3.3.14), device (3.3.15), day of week (3.3.16), season (3.3.17), event (3.3.18), capacity (3.3.19), occupancy (3.3.20), risk score (3.3.21), location (3.3.2) and time (3.3.3).\n","required":["attribute","operator"],"properties":{"attribute":{"type":"string","enum":["user.attribute","employee.attribute","employee.onShift","membership.tier","membership.status","accreditation.type","accreditation.status","customer.segment","resource.classification","venue.attribute","venue.id","attraction.attribute","device.kind","device.id","device.trusted","time.ofDay","time.dayOfWeek","time.season","time.withinOperatingHours","event.id","event.status","capacity.utilisationPercent","occupancy.level","risk.score","ticket.status","location.scopePath"]},"key":{"type":"string","nullable":true,"description":"For the `*.attribute` forms — which attribute, by code."},"operator":{"type":"string","enum":["equals","notEquals","in","notIn","greaterThan","lessThan","between","contains","startsWith","exists"]},"value":{"nullable":true,"description":"The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. Null for `exists`; `in`, `notIn` and `between` use `values`.\n"},"values":{"type":"array","items":{"type":"string"}}}},
-"ApiClient": {"type":"object","x-ticvai-persistence":"control.api_client","description":"CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things with three lifecycles.\n","required":["id","developerId","name","environment","scopes","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"developerId":{"type":"string","format":"uuid"},"name":{"type":"string"},"clientId":{"type":"string","readOnly":true},"environment":{"type":"string","enum":["sandbox","production"],"description":"**Bound to one, stated on the object rather than by naming convention.** A key that works in both is a key somebody will use in the wrong one.\n"},"scopes":{"type":"array","description":"**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing. **Module scopes** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, one of `listApiScopes`.\n","items":{"type":"string","pattern":"^[a-zA-Z]+\\.(read|write)$"}},"issuedBy":{"type":"string","enum":["partner","ticvai"],"readOnly":true,"description":"Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved `requestProductionAccess`.\n"},"certificationListingId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"control.integration_listing","description":"For a production client, the certified integration it was issued against."},"credentialTtlDays":{"type":"integer","minimum":1,"maximum":730,"nullable":true,"description":"Key lifetime. Default 365 for production, 90 for sandbox (M17-06, configurable expiry)."},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the key stops working unless rotated. No token is issued after it."},"allowedTenantIds":{"type":"array","description":"13.1.46. **Which tenants this client may act for.** A developer integrating for one venue must not reach another, and a client with an empty list reaches none.\n","items":{"type":"string","format":"uuid"}},"ipAllowList":{"type":"array","description":"13.1.38. **Required on a production client** (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the internet); optional in the sandbox. CIDR ranges. Checked at token issue and on every call.\n","items":{"type":"string"}},"status":{"type":"string","enum":["active","suspended","revoked"],"readOnly":true},"lastUsedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**A credential unused for a year is a credential nobody will notice being stolen.**\n"}}},
+"ApiClient": {"type":"object","x-ticvai-persistence":"control.api_client","description":"CF-135a. **The one credential model.** 2.7.52, 7.1.25 and 7.1.30 each asserted their own, so a partner API key, a POS integration credential and a webstore credential were three unrelated things with three lifecycles.\n","required":["id","developerId","name","environment","scopes","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"developerId":{"type":"string","format":"uuid","x-ticvai-references":"control.developer_account"},"name":{"type":"string"},"clientId":{"type":"string","readOnly":true},"environment":{"type":"string","enum":["sandbox","production"],"description":"**Bound to one, stated on the object rather than by naming convention.** A key that works in both is a key somebody will use in the wrong one.\n"},"scopes":{"type":"array","description":"**Resolved against the tenant's licence at token issue** (13.3.24). A scope granted here and not licensed there produces no token — and the refusal is at issue rather than at call time, so an integrator finds out in testing. **Module scopes** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, one of `listApiScopes`.\n","items":{"type":"string","pattern":"^[a-zA-Z]+\\.(read|write)$"}},"issuedBy":{"type":"string","enum":["partner","ticvai"],"readOnly":true,"description":"Who generated the key (M17-06): a developer for a sandbox key, TICVAI for a production key issued on an approved `requestProductionAccess`.\n"},"certificationListingId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"control.integration_listing","description":"For a production client, the certified integration it was issued against."},"credentialTtlDays":{"type":"integer","minimum":1,"maximum":730,"nullable":true,"description":"Key lifetime. Default 365 for production, 90 for sandbox (M17-06, configurable expiry)."},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the key stops working unless rotated. No token is issued after it."},"allowedTenantIds":{"type":"array","description":"13.1.46. **Which tenants this client may act for.** A developer integrating for one venue must not reach another, and a client with an empty list reaches none.\n","items":{"type":"string","format":"uuid"}},"ipAllowList":{"type":"array","description":"13.1.38. **Required on a production client** (17 September minutes, M17-07: endpoints are protected by IP allow-listing, not left open to the internet); optional in the sandbox. CIDR ranges. Checked at token issue and on every call.\n","items":{"type":"string"}},"status":{"type":"string","enum":["active","suspended","revoked"],"readOnly":true},"lastUsedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**A credential unused for a year is a credential nobody will notice being stolen.**\n"},"statusReason":{"type":"string","maxLength":500,"nullable":true,"readOnly":true,"description":"Why the client was suspended (`setApiClientStatus`)."}}},
 "ApiScope": {"type":"object","x-ticvai-persistence":"none — generated at release from x-ticvai-api-scope on each partner-callable operation","description":"**One module scope** (17 September minutes, M17-05): `{module}.read` or `{module}.write`, and the operations it opens.\n**A write scope never opens a catalogue write** (M17-04): `ticketing.write` opens carts, orders and holds for a partner or developer client, and no product, price list, price, channel capacity, lifecycle or alternative-code write, since those operations are not partner-callable and carry no `x-ticvai-api-scope`. Only a platform-staff `ApiLicence.catalogueWriteException` opens one, for one named client.\n","required":["scope","module","access"],"properties":{"scope":{"type":"string","description":"e.g. `ticketing.read`."},"module":{"$ref":"#/components/schemas/common::ModuleKey"},"access":{"type":"string","enum":["read","write"]},"description":{"type":"string"},"operations":{"type":"array","items":{"type":"object","properties":{"contract":{"type":"string"},"operationId":{"type":"string"}}}},"licensed":{"type":"boolean","description":"Whether the caller's tenant licenses the module (`ApiLicence.licensedModules`)."}}},
 "ApiUsageSummary": {"type":"object","description":"13.1.16 to 13.1.20, 13.1.41 to 13.1.45. **One endpoint because they are one question asked five ways.**\n","properties":{"totalCalls":{"type":"integer"},"successRate":{"type":"number"},"clientErrorRate":{"type":"number","description":"**4xx — the integrator's problem.** Separated because a single error rate lets both sides blame the other.\n"},"serverErrorRate":{"type":"number","description":"5xx — TICVAI's problem."},"p50LatencyMs":{"type":"number"},"p95LatencyMs":{"type":"number"},"p99LatencyMs":{"type":"number"},"quotaBreaches":{"type":"integer"},"byOperation":{"type":"array","items":{"type":"object","properties":{"operationId":{"type":"string"},"calls":{"type":"integer"},"errorRate":{"type":"number"}}}}}},
-"ApprovalExternalDispatch": {"type":"object","x-ticvai-persistence":"approvals.external_dispatch","description":"11.1.65 (29 September, build pass). **One request level sent to an external workflow system**, and what became of it. Written by the platform when a level that names a provider is reached, and closed by `recordExternalApprovalDecision` or by the timeout.\n","required":["id","requestId","providerId","level","status"],"properties":{"id":{"type":"string","format":"uuid"},"requestId":{"type":"string","format":"uuid"},"providerId":{"type":"string","format":"uuid"},"level":{"type":"integer"},"status":{"type":"string","enum":["pending","sent","failed","decided","timedOut","cancelled"]},"attemptCount":{"type":"integer","default":0},"externalReference":{"type":"string","nullable":true,"description":"The provider's own id for the item, as it acknowledged or called back with."},"lastResponseCode":{"type":"integer","nullable":true},"lastError":{"type":"string","nullable":true},"sentAt":{"type":"string","format":"date-time","nullable":true},"answeredAt":{"type":"string","format":"date-time","nullable":true},"externalOutcome":{"type":"string","nullable":true,"description":"The provider's own outcome value, before mapping."},"externalApproverRef":{"type":"string","nullable":true,"description":"Who decided in the provider's system, as it named them."},"scopePath":{"type":"string"}}},
-"ApprovalExternalProvider": {"type":"object","x-ticvai-persistence":"approvals.external_provider","description":"11.1.65 (29 September, build pass). **A third-party workflow system registered to decide approval levels**: where TICVAI sends a request, how its fields are mapped, how the answer comes back and what happens when it does not.\n","required":["code","name","endpointUrl","apiClientId","decisionMapping"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","x-ticvai-unique":"tenant","description":"The provider's stable name, and the key `setApprovalExternalProvider` upserts on."},"name":{"type":"string"},"endpointUrl":{"type":"string","description":"`https` only. Where a request level is sent."},"outboundAuth":{"type":"string","enum":["bearerToken","basic","oauthClientCredentials","mutualTls"],"default":"oauthClientCredentials"},"outboundCredential":{"type":"string","format":"password","writeOnly":true,"nullable":true,"description":"The credential TICVAI presents to the provider. Write-only, never returned, kept on a replace that omits it. **Held in Key Vault**; the row's `outbound_credential` column keeps the secret's reference, never the value (CHG-R1S-020)."},"signingSecret":{"type":"string","format":"password","writeOnly":true,"nullable":true,"description":"Signs every request TICVAI sends, as webhook deliveries are signed, so the provider can tell it came from TICVAI. Write-only. **Held in Key Vault**; the `signing_secret` column keeps the secret's reference, never the value (CHG-R1S-020).\n"},"apiClientId":{"type":"string","format":"uuid","description":"The public-api client the provider calls back as. It must hold `APPROVAL_DECIDE`; `recordExternalApprovalDecision` from any other client is refused.\n"},"requestMapping":{"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"Stored whole on the provider row (`request_mapping`, jsonb; 3 October 2026, CHG-R1S-020: the r1 gate found no column held it). Which request fields go to the provider, under which names. **Only mapped fields leave TICVAI** — a provider receives the amount and the subject it needs, not the whole request.\n","items":{"type":"object","required":["from","to"],"properties":{"from":{"type":"string","description":"A field of `ApprovalRequest`, e.g. `amount`, `kind`, `subjectId`, `requestedByPrincipalId`."},"to":{"type":"string","description":"The provider's field name."}}}},"decisionMapping":{"type":"array","minItems":2,"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"The provider's outcome values and the decision each means. At least one maps to `approve` and one to `reject`. Stored whole on the provider row (`decision_mapping`, jsonb; CHG-R1S-020).","items":{"type":"object","required":["externalValue","decision"],"properties":{"externalValue":{"type":"string"},"decision":{"type":"string","enum":["approve","reject","return","requestInformation"]}}}},"timeoutMinutes":{"type":"integer","default":1440,"description":"How long a level waits for the provider before `onTimeout` applies."},"onTimeout":{"type":"string","enum":["fallBackToRoles","escalate","reject"],"default":"fallBackToRoles"},"maxAttempts":{"type":"integer","default":5,"description":"Delivery attempts, with backoff, before a dispatch is `failed` and the level falls back as on timeout."},"status":{"type":"string","enum":["active","paused","disabled"],"default":"active","description":"`paused` sends nothing and every level that names it falls back at once; the platform sets `disabled` after repeated failures, as it disables a failing webhook.\n"},"lastSuccessAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true}}},
-"AuthorisationPolicy": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy","description":"3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n","required":["code","name","effect"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"isTemplate":{"type":"boolean","default":false},"permissions":{"type":"array","items":{"type":"string"},"description":"**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"},"conditions":{"type":"array","x-ticvai-persistence-column":"jsonb","items":{"$ref":"#/components/schemas/AccessCondition"}},"combining":{"type":"string","enum":["allMustMatch","anyMayMatch"],"default":"allMustMatch"},"effect":{"type":"string","enum":["permit","deny"],"description":"**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"},"priority":{"type":"integer","default":0},"scopePath":{"type":"string","description":"3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"},"appliesToRoleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"status":{"type":"string","readOnly":true,"description":"**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n","enum":["draft","pendingApproval","active","suspended","retired"]},"version":{"type":"integer","default":1,"readOnly":true,"description":"Set by the server; every `updateAuthorisationPolicy` writes a new version."},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"delegatedAdminRoleIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"}}},
+"ApprovalExternalDispatch": {"type":"object","x-ticvai-persistence":"approvals.external_dispatch","description":"11.1.65 (29 September, build pass). **One request level sent to an external workflow system**, and what became of it. Written by the platform when a level that names a provider is reached, and closed by `recordExternalApprovalDecision` or by the timeout.\n","required":["id","requestId","providerId","level","status"],"properties":{"id":{"type":"string","format":"uuid"},"requestId":{"x-ticvai-references":"approvals.request","type":"string","format":"uuid"},"providerId":{"x-ticvai-references":"approvals.external_provider","type":"string","format":"uuid"},"level":{"type":"integer"},"status":{"type":"string","enum":["pending","sent","failed","decided","timedOut","cancelled"]},"attemptCount":{"type":"integer","default":0},"externalReference":{"type":"string","nullable":true,"description":"The provider's own id for the item, as it acknowledged or called back with."},"lastResponseCode":{"type":"integer","nullable":true},"lastError":{"type":"string","nullable":true},"sentAt":{"type":"string","format":"date-time","nullable":true},"answeredAt":{"type":"string","format":"date-time","nullable":true},"externalOutcome":{"type":"string","nullable":true,"description":"The provider's own outcome value, before mapping."},"externalApproverRef":{"type":"string","nullable":true,"description":"Who decided in the provider's system, as it named them."},"scopePath":{"type":"string"}}},
+"ApprovalExternalProvider": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"approvals.external_provider","description":"11.1.65 (29 September, build pass). **A third-party workflow system registered to decide approval levels**: where TICVAI sends a request, how its fields are mapped, how the answer comes back and what happens when it does not.\n","required":["code","name","endpointUrl","apiClientId","decisionMapping"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","x-ticvai-unique":"tenant","description":"The provider's stable name, and the key `setApprovalExternalProvider` upserts on."},"name":{"type":"string"},"endpointUrl":{"type":"string","description":"`https` only. Where a request level is sent."},"outboundAuth":{"type":"string","enum":["bearerToken","basic","oauthClientCredentials","mutualTls"],"default":"oauthClientCredentials"},"outboundCredential":{"x-ticvai-secret":"vault-reference","type":"string","format":"password","writeOnly":true,"nullable":true,"description":"The credential TICVAI presents to the provider. Write-only, never returned, kept on a replace that omits it. **Held in Key Vault**; the row's `outbound_credential` column keeps the secret's reference, never the value (CHG-R1S-020)."},"signingSecret":{"x-ticvai-secret":"vault-reference","type":"string","format":"password","writeOnly":true,"nullable":true,"description":"Signs every request TICVAI sends, as webhook deliveries are signed, so the provider can tell it came from TICVAI. Write-only. **Held in Key Vault**; the `signing_secret` column keeps the secret's reference, never the value (CHG-R1S-020).\n"},"apiClientId":{"type":"string","format":"uuid","description":"The public-api client the provider calls back as. It must hold `APPROVAL_DECIDE`; `recordExternalApprovalDecision` from any other client is refused.\n"},"requestMapping":{"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"Stored whole on the provider row (`request_mapping`, jsonb; 3 October 2026, CHG-R1S-020: the r1 gate found no column held it). Which request fields go to the provider, under which names. **Only mapped fields leave TICVAI** — a provider receives the amount and the subject it needs, not the whole request.\n","items":{"type":"object","required":["from","to"],"properties":{"from":{"type":"string","description":"A field of `ApprovalRequest`, e.g. `amount`, `kind`, `subjectId`, `requestedByPrincipalId`."},"to":{"type":"string","description":"The provider's field name."}}}},"decisionMapping":{"type":"array","minItems":2,"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"The provider's outcome values and the decision each means. At least one maps to `approve` and one to `reject`. Stored whole on the provider row (`decision_mapping`, jsonb; CHG-R1S-020).","items":{"type":"object","required":["externalValue","decision"],"properties":{"externalValue":{"type":"string"},"decision":{"type":"string","enum":["approve","reject","return","requestInformation"]}}}},"timeoutMinutes":{"type":"integer","default":1440,"description":"How long a level waits for the provider before `onTimeout` applies."},"onTimeout":{"type":"string","enum":["fallBackToRoles","escalate","reject"],"default":"fallBackToRoles"},"maxAttempts":{"type":"integer","default":5,"description":"Delivery attempts, with backoff, before a dispatch is `failed` and the level falls back as on timeout."},"status":{"type":"string","enum":["active","paused","disabled"],"default":"active","description":"`paused` sends nothing and every level that names it falls back at once; the platform sets `disabled` after repeated failures, as it disables a failing webhook.\n"},"lastSuccessAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true}}},
+"AuthorisationPolicy": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy","description":"3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n","required":["code","name","effect"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"isTemplate":{"type":"boolean","default":false},"permissions":{"type":"array","items":{"type":"string"},"description":"**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"},"conditions":{"type":"array","x-ticvai-persistence-column":"jsonb","items":{"$ref":"#/components/schemas/AccessCondition"}},"combining":{"type":"string","enum":["allMustMatch","anyMayMatch"],"default":"allMustMatch"},"effect":{"type":"string","enum":["permit","deny"],"description":"**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"},"priority":{"type":"integer","default":0},"scopePath":{"type":"string","description":"3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"},"appliesToRoleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"status":{"type":"string","readOnly":true,"description":"**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n","enum":["draft","pendingApproval","active","suspended","retired"]},"version":{"type":"integer","default":1,"readOnly":true,"description":"Set by the server; every `updateAuthorisationPolicy` writes a new version."},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"delegatedAdminRoleIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"},"statusReason":{"type":"string","nullable":true,"readOnly":true,"description":"Why the policy's state last changed (`setAuthorisationPolicyState`)."}}},
 "CrossModuleOrchestrationMonitorView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over approvals.workflow_step_execution joined to approvals.workflow_instance by correlation id (data model for the agreed operations, 29 September)","description":"**What Cross-Module Orchestration Monitor displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"service":{"type":"string","description":"Service"},"action":{"type":"string","description":"Action"},"status":{"type":"string","enum":["notStarted","running","waiting","successful","failed","compensated"],"description":"Status"},"started":{"type":"string","format":"date-time","description":"Started"},"completed":{"type":"string","format":"date-time","description":"Completed"},"duration":{"type":"integer","description":"Seconds"},"inputOutput":{"type":"string","description":"Input/Output"},"failureHandling":{"type":"string","enum":["waits","retries","rollsBack","continuesPartially","requiresHumanIntervention"],"description":"What the workflow does after this node fails"},"retries":{"type":"integer","description":"Retries"},"correlationId":{"type":"string","description":"a common correlation/workflow ID"}},"required":["correlationId","service"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "TriggerActionCrossModuleOrchestrationConfigurationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; writes approvals.workflow_trigger (schema WorkflowTrigger) (data model for the agreed operations, 29 September)","description":"**What Trigger, Action & Cross-Module Orchestration Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"triggerType":{"type":"string","enum":["event","dataCondition","schedule","manual"],"description":"What starts the workflow"},"workflowId":{"type":"string","description":"Workflow this trigger and action set belongs to"},"allowedActions":{"type":"array","items":{"type":"string","enum":["createApproval","createTask","updateStatus","applyHold","releaseHold","createNotification","generateDocument","executeRefund","updateAllocation","activateMembership","suspendPartner","callApprovedApi","callApprovedService","startSubWorkflow"]},"description":"Actions this workflow may call"},"onFailure":{"type":"string","enum":["retry","rollback","compensate","exceptionQueue","humanIntervention"],"description":"What happens when an action fails"},"triggerDefinition":{"type":"string","description":"Event name, data condition (e.g. Balance > Limit) or schedule"},"maxRetries":{"type":"integer","description":"Retries before the failure handling applies"}},"required":["workflowId","triggerType"]},

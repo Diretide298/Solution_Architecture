@@ -715,6 +715,7 @@
     "format": "uuid"
    },
    "ruleId": {
+    "x-ticvai-references": "reporting.alert_rule",
     "type": "string",
     "format": "uuid"
    },
@@ -814,6 +815,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -889,6 +891,7 @@
     "type": "boolean"
    },
    "scopePath": {
+    "readOnly": true,
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**\n\n**Required, and it is the write target.** `setAlertRule` has no id in its path and a caller may hold several venues, so the rule names the venue it watches here — inside the caller's scope, or the write is refused."
    }
@@ -1307,6 +1310,7 @@
   "description": "**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -1319,7 +1323,7 @@
  },
  "MetricSource": {
   "type": "string",
-  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
+  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.entry.estimated_call_at` against `called_at` | | `throughput` | `queue.entry` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
   "enum": [
    "occupancy",
    "capacityUtilisation",
@@ -1619,6 +1623,7 @@
     "format": "uuid"
    },
    "username": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "displayName": {
@@ -1741,13 +1746,15 @@
     "type": "string",
     "format": "uuid",
     "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164).",
     "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
    },
    "approvedByPrincipalId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164)."
    },
    "responsibleDepartmentId": {
     "type": "string",
@@ -1853,6 +1860,8 @@
     "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 6,
     "items": {
@@ -2081,6 +2090,9 @@
   }
  },
  "ProposedAction": {
+  "x-ticvai-retired-columns": [
+   "interaction_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "ai.proposed_action",
   "required": [
@@ -2097,6 +2109,8 @@
     "format": "uuid"
    },
    "interactionId": {
+    "x-ticvai-references": "ai.activity",
+    "x-ticvai-column": "activity_id",
     "type": "string",
     "format": "uuid"
    },
@@ -2208,15 +2222,22 @@
   }
  },
  "RegisteredDevice": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "platform.device",
   "type": "object",
   "description": "**The only device register** (ADR-0067, accepted 1 October; the register of record since 29 September). Identity (kind, hardware type, model, serial), every version (firmware, configuration, rule package, credential package), health, heartbeat and one lifecycle (`enrolmentState`: registered, enrolled, provisioned, active, deactivated, retired) for every device in the estate live on this row. The access-control device row, which repeated serial, versions, health and lifecycle, is now `access.device_placement` and holds only where an access-control device is placed. Tenancy owns and migrates this table; Access reads it only through this contract.\n",
   "required": [
    "id",
    "kind",
-   "driver"
+   "driver",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -2255,6 +2276,7 @@
     "description": "The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the library; this names a model in it.\n"
    },
    "serialNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "nullable": true,
     "maxLength": 100,
@@ -2307,6 +2329,7 @@
     "description": "Reported connectivity."
    },
    "pushToken": {
+    "x-ticvai-secret": "field-encrypted",
     "type": "string",
     "format": "password",
     "nullable": true,
@@ -2839,6 +2862,7 @@
   }
  },
  "StockBatch": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "inventory.stock_batch",
   "description": "BL-122. **`isPerishable` and `shelfLifeDays` are on the item, so a shelf life is declared and never instantiated.** Two deliveries of the same milk arriving a week apart are one stock level with one implied expiry, and the older one is invisible.\n**A batch is the instance that actually expires.** Without it, first-expiry-first-out is not computable and a venue discovers the problem by smell.\n",
@@ -3073,10 +3097,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "suggestionId": {
+    "x-ticvai-references": "ai.suggestion",
     "type": "string",
     "format": "uuid"
    },

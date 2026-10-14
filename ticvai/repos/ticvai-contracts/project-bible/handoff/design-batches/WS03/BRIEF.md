@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-167` | Device Binding & Session Security | A | 5 | 16 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-168` | BLE Beacon & Geofence Configuration | A | 21 | 21 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-169` | Credential Transfer & Rebinding | C | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-170` | Credential Revocation & Lifecycle Events | C | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-170` | Credential Revocation & Lifecycle Events | C | 5 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-171` | Offline Cryptographic Validation Profile | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-172` | Embedded Entitlement Payload Designer | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-173` | Credential Security Simulation, Audit & Publication | C | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

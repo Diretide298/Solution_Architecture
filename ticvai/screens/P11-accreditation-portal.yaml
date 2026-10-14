@@ -173,6 +173,7 @@ screens:
   name: Registration Form
   module: Applicant Journey
   wave: 3
+  permission: ACCREDITATION_VIEW
   requiresModule: accreditation
   pattern: multiStepForm
   density: compact
@@ -193,10 +194,9 @@ screens:
     provenance: build, 29 September 2026
   - operationId: getAccreditationApplication
     contract: accreditation
-    purpose: 'The draft being resumed from the acknowledgement link: where each step and requirement
-      stands'
+    purpose: 'The draft being resumed from the acknowledgement link: where each step and requirement stands'
     trigger: onLoad
-    provenance: 'audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)'
+    provenance: audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)
   gaps:
   - operation: saveAccreditationDraft
     why: 'The pattern requires a draft that autosaves. **A four-step form that loses everything to a dropped
@@ -336,6 +336,7 @@ screens:
   name: Application Review & Submit
   module: Applicant Journey
   wave: 3
+  permission: ACCREDITATION_APPLY
   requiresModule: accreditation
   pattern: multiStepForm
   density: compact
@@ -475,6 +476,7 @@ screens:
   name: Application Status Tracking
   module: Applicant Journey
   wave: 3
+  permission: ACCREDITATION_APPLY
   requiresModule: accreditation
   pattern: statusTracker
   density: compact
@@ -612,6 +614,7 @@ screens:
   name: Accreditation Badge
   module: Applicant Journey
   wave: 3
+  permission: ACCREDITATION_APPLY
   requiresModule: accreditation
   pattern: credentialView
   density: touchLarge
@@ -766,6 +769,7 @@ screens:
   name: Reviewer Queue
   module: Reviewer (Internal)
   wave: 3
+  permission: ACCREDITATION_VIEW
   requiresModule: accreditation
   pattern: approvalInbox
   density: compact
@@ -881,8 +885,9 @@ screens:
         applicationId, documentId, so an edge into it carries them
     - to: ACC-008
       trigger: Credential Register
-      provenance: 'derived — ACC-008 declares entryState.params  and ACC-006 holds none of them. The edge
-        carries nothing: ACC-008 needs nothing to open'
+      provenance: 'derived — ACC-008 declares entryState.params exportId and ACC-006 holds none of them.
+        The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens
+        on its own'
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-queue
@@ -922,6 +927,7 @@ screens:
   name: Reviewer Application Detail
   module: Reviewer (Internal)
   wave: 3
+  permission: ACCREDITATION_VIEW
   requiresModule: accreditation
   pattern: approvalInbox
   density: compact
@@ -1045,8 +1051,9 @@ screens:
         so an edge into it carries them
     - to: ACC-008
       trigger: Credential Register
-      provenance: 'derived — ACC-008 declares entryState.params  and ACC-007 holds none of them. The edge
-        carries nothing: ACC-008 needs nothing to open'
+      provenance: 'derived — ACC-008 declares entryState.params exportId and ACC-007 holds none of them.
+        The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens
+        on its own'
     - to: ACC-005
       trigger: The badge is issued
       provenance: flow F23 step 2→3
@@ -1079,6 +1086,7 @@ screens:
   name: Credential Register
   module: Reviewer (Internal)
   wave: 3
+  permission: ACCREDITATION_VIEW
   requiresModule: accreditation
   pattern: listDetail
   density: compact
@@ -1203,9 +1211,9 @@ screens:
     - name: exportId
       from: navigation
       optional: true
-      notes: 'Optional (14 October 2026, CHG-SCO-005): the export this screen queues.
-        exportAccreditationData answers 202 with its id and getAccreditationExport follows it to the signed
-        download link; no edge brings one.'
+      notes: 'Optional (14 October 2026, CHG-SCO-005): the export this screen queues. exportAccreditationData
+        answers 202 with its id and getAccreditationExport follows it to the signed download link; no
+        edge brings one.'
     preloaded: []
     coldEntry: Opens on the current season.
   navigation:

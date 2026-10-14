@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "12",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-monitoring-analytics-command-center-bo-254",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessMonitoringAnalyticsCommandCenter.tsx",
+   "component": "src/routes/access-venue/AccessMonitoringAnalyticsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -106,7 +107,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -298,6 +299,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "12",
@@ -307,7 +309,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/live-venue-occupancy-people-counting-bo-255",
-   "component": "apps/venue-management-web/src/routes/access-venue/LiveVenueOccupancyPeopleCounting.tsx",
+   "component": "src/routes/access-venue/LiveVenueOccupancyPeopleCounting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -420,6 +422,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "12",
@@ -429,7 +432,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/graphical-access-map-live-gate-performance-bo-256",
-   "component": "apps/venue-management-web/src/routes/access-venue/GraphicalAccessMapLiveGatePerformance.tsx",
+   "component": "src/routes/access-venue/GraphicalAccessMapLiveGatePerformance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -548,6 +551,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "12",
@@ -557,7 +561,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/attendance-admission-analytics-bo-257",
-   "component": "apps/venue-management-web/src/routes/access-venue/AttendanceAdmissionAnalytics.tsx",
+   "component": "src/routes/access-venue/AttendanceAdmissionAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -586,7 +590,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -721,6 +725,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "12",
@@ -730,7 +735,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/entry-exit-re-entry-crossover-analytics-bo-258",
-   "component": "apps/venue-management-web/src/routes/access-venue/EntryExitReEntryCrossoverAnalytics.tsx",
+   "component": "src/routes/access-venue/EntryExitReEntryCrossoverAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -862,6 +867,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "12",
@@ -871,7 +877,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/throughput-queue-validation-performance-analytics-bo-259",
-   "component": "apps/venue-management-web/src/routes/access-venue/ThroughputQueueValidationPerformanceAnalytics.tsx",
+   "component": "src/routes/access-venue/ThroughputQueueValidationPerformanceAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -943,7 +949,9 @@
       {
        "kind": "metricTile",
        "label": "Reject Rate",
-       "provenance": "pack Access Control Module_Reference.pdf, page 175 §Show"
+       "provenance": "pack Access Control Module_Reference.pdf, page 175 §Show",
+       "operation": "listThroughputQueueValidation",
+       "bindsTo": "ThroughputQueueValidationPerformanceAnalyticsView.rejectRate"
       },
       {
        "kind": "metricTile",
@@ -1016,6 +1024,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "12",
@@ -1025,7 +1034,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/validation-outcome-rejection-analytics-bo-260",
-   "component": "apps/venue-management-web/src/routes/access-venue/ValidationOutcomeRejectionAnalytics.tsx",
+   "component": "src/routes/access-venue/ValidationOutcomeRejectionAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1142,6 +1151,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "12",
@@ -1151,7 +1161,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/guest-dwell-time-length-of-stay-attraction-flow-bo-261",
-   "component": "apps/venue-management-web/src/routes/access-venue/GuestDwellTimeLengthOfStayAttractionFlow.tsx",
+   "component": "src/routes/access-venue/GuestDwellTimeLengthOfStayAttractionFlow.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1291,6 +1301,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "12",
@@ -1300,7 +1311,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-reports-scheduled-reporting-data-export-bo-262",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessReportsScheduledReportingDataExport.tsx",
+   "component": "src/routes/access-venue/AccessReportsScheduledReportingDataExport.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1475,6 +1486,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "12",
@@ -1484,7 +1496,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/ai-access-intelligence-forecasting-executive-insights-bo-263",
-   "component": "apps/venue-management-web/src/routes/access-venue/AiAccessIntelligenceForecastingExecutiveInsights.tsx",
+   "component": "src/routes/access-venue/AiAccessIntelligenceForecastingExecutiveInsights.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -133,13 +133,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-374` | Approval Decision Workspace | B | 5 | 20 | 6 | 13 | 2 | 3 | — | notStarted (—) |
 | `BO-375` | Business Context & Evidence Viewer | B | 6 | 20 | 6 | 14 | 1 | 0 | — | notStarted (—) |
 | `BO-376` | Approval Timeline & Decision Chain | B | 0 | 6 | 6 | 0 | 2 | 3 | — | notStarted (—) |
-| `BO-377` | Approve & Sensitive Action Confirmation | B | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
+| `BO-377` | Approve & Sensitive Action Confirmation | B | 0 | 7 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 | `BO-378` | Reject / Return / Request Information | B | 5 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 | `BO-379` | Requester Modification & Resubmission | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-380` | Withdrawal, Cancellation, Expiration & Reopening | B | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `BO-381` | Segregation of Duties & Four-Eyes Control | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-382` | Approved Action Execution & Status | B | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-383` | Decision Record & Immutable Audit View | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-380` | Withdrawal, Cancellation, Expiration & Reopening | B | 1 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-381` | Segregation of Duties & Four-Eyes Control | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-382` | Approved Action Execution & Status | B | 3 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-383` | Decision Record & Immutable Audit View | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-414` | Wallet & Credit Management Dashboard | C | 2 | 2 | 6 | 19 | 1 | 6 | — | notStarted (—) |
+| `BO-414` | Wallet & Credit Management Dashboard | C | 2 | 17 | 6 | 30 | 1 | 6 | — | notStarted (—) |
 | `BO-415` | Wallet & Credit Type Configuration | C | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-416` | Wallet Account & Balance View | C | 0 | 0 | 6 | 18 | 1 | 6 | — | notStarted (—) |
 | `BO-417` | Top-Up Configuration | C | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -140,7 +140,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-420` | Bonus Validity & Expiry Configuration | C | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-421` | Free Game & Ride Credit Management | D | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-422` | Refund, Adjustment & Manual Bonus Control | C | 0 | 15 | 6 | 28 | 1 | 6 | — | notStarted (—) |
-| `BO-423` | Wallet Credit Transaction Ledger & Audit | C | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-423` | Wallet Credit Transaction Ledger & Audit | C | 0 | 14 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -1,5 +1,6 @@
 {
  "AiAssistantProfile": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "ai.assistant_profile",
   "description": "**One assistant runtime, many profiles** (design 5.10, C5; AIC-069..080). The profile decides the audience, roles, knowledge sources, tools, model task and guest scope: guest concierge, support chatbot and staff assistants by role.",
@@ -769,6 +770,7 @@
     "description": "**The partition key** (ADR-0005)."
    },
    "caseId": {
+    "x-ticvai-references": "marketing.case",
     "type": "string",
     "format": "uuid"
    },
@@ -1010,6 +1012,7 @@
   ]
  },
  "CaseMessage": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.case_message",
   "type": "object",
   "required": [
@@ -1017,9 +1020,16 @@
    "body",
    "isInternal",
    "authorKind",
-   "recordedAt"
+   "recordedAt",
+   "scopePath",
+   "caseId"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "resolution": {
     "type": "string",
     "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
@@ -1066,6 +1076,13 @@
     "format": "date-time",
     "readOnly": true,
     "description": "Server time the message arrived."
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "marketing.case",
+    "description": "The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`)."
    }
   }
  },
@@ -1100,6 +1117,7 @@
     "description": "**The partition key** (ADR-0005)."
    },
    "caseId": {
+    "x-ticvai-references": "marketing.case",
     "type": "string",
     "format": "uuid"
    },
@@ -1372,6 +1390,7 @@
     "type": "string"
    },
    "attachmentRefs": {
+    "x-ticvai-stored-as": "marketing.case_message.attachment_refs",
     "type": "array",
     "description": "Stored on the opening `CaseMessage`, not on the case.",
     "items": {
@@ -1847,6 +1866,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid",
     "description": "Client-generated UUIDv7; equals the `Idempotency-Key` header on the write."
@@ -1857,6 +1877,7 @@
     "description": "**The partition key** (ADR-0005)."
    },
    "caseId": {
+    "x-ticvai-references": "marketing.case",
     "type": "string",
     "format": "uuid"
    },
@@ -2201,6 +2222,7 @@
   ]
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -2223,6 +2245,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid",
     "description": "Client-generated UUIDv7; equals the `Idempotency-Key` header."
@@ -2245,6 +2268,7 @@
     "description": "Required with `execute`; the action is recorded on this case."
    },
    "orderId": {
+    "x-ticvai-references": "orders.sales_order",
     "type": "string",
     "format": "uuid"
    },
@@ -2624,6 +2648,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid",
     "description": "Client-generated UUIDv7; equals the `Idempotency-Key` header."
@@ -2634,6 +2659,7 @@
     "description": "**The partition key** (ADR-0005)."
    },
    "caseId": {
+    "x-ticvai-references": "marketing.case",
     "type": "string",
     "format": "uuid"
    },

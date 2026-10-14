@@ -90,7 +90,8 @@
    },
    "developerId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.developer_account"
    },
    "name": {
     "type": "string"
@@ -175,6 +176,13 @@
     "nullable": true,
     "readOnly": true,
     "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   },
+   "statusReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the client was suspended (`setApiClientStatus`)."
    }
   }
  },
@@ -402,6 +410,7 @@
     "type": "integer"
    },
    "pendingApprovers": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -633,6 +642,7 @@
     "description": "Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -726,6 +736,12 @@
      "format": "uuid"
     },
     "description": "3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"
+   },
+   "statusReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the policy's state last changed (`setAuthorisationPolicyState`)."
    }
   }
  },
@@ -825,7 +841,8 @@
    "developerId": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-references": "control.developer_account"
    },
    "sandboxClientId": {
     "type": "string",
@@ -983,6 +1000,8 @@
     "nullable": true
    },
    "findings": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1022,6 +1041,7 @@
     "format": "uuid"
    },
    "walletId": {
+    "x-ticvai-references": "wallet.wallet",
     "type": "string",
     "format": "uuid"
    },
@@ -1396,7 +1416,8 @@
    },
    "subscriptionId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.webhook_subscription"
    },
    "eventId": {
     "type": "string",
@@ -1523,7 +1544,8 @@
    },
    "clientId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.api_client"
    },
    "endpointUrl": {
     "type": "string"
@@ -1542,6 +1564,7 @@
     "additionalProperties": true
    },
    "signingSecret": {
+    "x-ticvai-secret": "vault-reference",
     "type": "string",
     "format": "password",
     "writeOnly": true,

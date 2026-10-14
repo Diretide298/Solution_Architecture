@@ -462,6 +462,7 @@ screens:
   module: Overview
   requiresModule: partner
   wave: 2
+  permission: ORDER_VIEW
   capability: C34
   implementation:
     app: partner-web
@@ -911,6 +912,7 @@ screens:
   module: Access & Account
   requiresModule: partner
   wave: 2
+  permission: USER_MANAGE
   capability: C56
   implementation:
     app: partner-web
@@ -1096,6 +1098,7 @@ screens:
   module: Access & Account
   requiresModule: partner
   wave: 3
+  permission: GUEST_VIEW
   capability: C59
   implementation:
     app: partner-web
@@ -1217,6 +1220,7 @@ screens:
   module: Inventory & Pricing
   requiresModule: partner
   wave: 2
+  permission: PRODUCT_VIEW
   capability: C103
   implementation:
     app: partner-web
@@ -1259,7 +1263,8 @@ screens:
   pattern: listDetail
   patternReason: '`listChannelCapacities` reads the population and `getChannelAllocations` reads one of
     them — list, select, act'
-  purpose: See inventory & allocation view for this venue.
+  purpose: A partner sees the capacity allocated to its channel for each performance and the orders sold
+    against it, and returns unsold allocation to the general pool.
   layout:
     template: split
     regions:
@@ -1550,6 +1555,7 @@ screens:
   module: Inventory & Pricing
   requiresModule: partner
   wave: 2
+  permission: PRODUCT_VIEW
   capability: C85
   implementation:
     app: partner-web
@@ -1778,6 +1784,7 @@ screens:
   module: Inventory & Pricing
   requiresModule: partner
   wave: 2
+  permission: PRODUCT_VIEW
   capability: C81
   implementation:
     app: partner-web
@@ -1855,6 +1862,7 @@ screens:
   module: Booking & Quotes
   requiresModule: partner
   wave: 2
+  permission: ORDER_VIEW
   capability: C02
   implementation:
     app: partner-web
@@ -1905,7 +1913,11 @@ screens:
   density: compact
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrder` reads one of them — list, select, act'
-  purpose: Add booking creation for this venue.
+  purpose: 'A partner books against its allocation: creates the order, then holds, resumes, modifies,
+    exchanges, reschedules or reprints it.'
+  division: 'Shares `createOrder`, `exchangeOrderLines`, `getOrder`, `getOrderStatement` and more with
+    PTR-015; this screen is Booking Creation: a partner books against its allocation: creates the order,
+    then holds, resumes, modifies, exchanges, reschedules or reprints it.'
   layout:
     template: split
     regions:
@@ -2268,6 +2280,7 @@ screens:
   module: Booking & Quotes
   requiresModule: partner
   wave: 3
+  permission: PRODUCT_VIEW
   capability: C54
   implementation:
     app: partner-web
@@ -2298,7 +2311,8 @@ screens:
   pattern: listDetail
   patternReason: '`listSeatBlocks` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Work with group / bulk booking for this venue.
+  purpose: A partner blocks seats for a group, issues them from the block, and releases what the group
+    does not take back to sale.
   layout:
     template: split
     regions:
@@ -2481,6 +2495,7 @@ screens:
   module: Booking & Quotes
   requiresModule: partner
   wave: 3
+  permission: PRICE_VIEW
   capability: C02
   implementation:
     app: partner-web
@@ -2512,7 +2527,8 @@ screens:
   pattern: listDetail
   patternReason: '`listPromotions` reads the population and `getPromotion` reads one of them — list, select,
     act'
-  purpose: Work with cart & quote for this venue.
+  purpose: A partner builds a cart, sees the promotions that apply and their usage, changes its lines,
+    and turns it into an order.
   layout:
     template: split
     regions:
@@ -2733,7 +2749,7 @@ screens:
     trigger: onLoad
   - operationId: addCartLine
     contract: orders
-    purpose: Add something
+    purpose: Add a product, its quantity and date to the partner's cart, priced against its rates
     trigger: onAction
     invalidates:
     - listPromotions
@@ -2796,6 +2812,7 @@ screens:
   module: Booking & Quotes
   requiresModule: partner
   wave: 3
+  permission: PARTNER_MANAGE
   implementation:
     app: partner-web
     route: /general/quote-management
@@ -2980,6 +2997,7 @@ screens:
   module: Credit & Settlement
   requiresModule: partner
   wave: 2
+  permission: ORDER_CREATE
   capability: C04
   implementation:
     app: partner-web
@@ -3133,6 +3151,7 @@ screens:
   module: Credit & Settlement
   requiresModule: partner
   wave: 2
+  permission: ORDER_VIEW
   capability: C34
   implementation:
     app: partner-web
@@ -3171,7 +3190,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getB2bCredit` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: See credit limit & balance for this venue.
+  purpose: 'A partner sees its credit position: the limit, what it has used and what remains to book against.'
   layout:
     template: detail
     regions:
@@ -3236,6 +3255,7 @@ screens:
   module: Reports & Settlement
   requiresModule: partner
   wave: 3
+  permission: SETTLEMENT_VIEW
   capability: C50
   implementation:
     app: partner-web
@@ -3430,6 +3450,7 @@ screens:
   module: Orders & Fulfilment
   requiresModule: partner
   wave: 2
+  permission: ORDER_VIEW
   capability: C34
   implementation:
     app: partner-web
@@ -3473,7 +3494,11 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getOrderStatement` reads one of them — list,
     select, act'
-  purpose: Find order history for this venue.
+  purpose: 'A partner reads its orders with their statements and refunds, and acts on one: modify, exchange,
+    reschedule, hold, resume or reprint.'
+  division: 'Shares `createOrder`, `exchangeOrderLines`, `getOrder`, `getOrderStatement` and more with
+    PTR-008; this screen is Order History: a partner reads its orders with their statements and refunds,
+    and acts on one: modify, exchange, reschedule, hold, resume or reprint.'
   layout:
     template: split
     regions:
@@ -3843,6 +3868,7 @@ screens:
   module: Orders & Fulfilment
   requiresModule: partner
   wave: 2
+  permission: ORDER_VIEW
   capability: C09
   implementation:
     app: partner-web
@@ -3877,7 +3903,8 @@ screens:
   pattern: listDetail
   patternReason: '`listOrderRefunds` reads the population and `getOrder` reads one of them — list, select,
     act'
-  purpose: Work with voucher / ticket download for this venue.
+  purpose: A partner reprints or resends the vouchers and tickets of an order, beside the order, its statement
+    and its refunds.
   layout:
     template: split
     regions:
@@ -4086,6 +4113,7 @@ screens:
   module: Reports & Settlement
   requiresModule: partner
   wave: 3
+  permission: PARTNER_MANAGE
   implementation:
     app: partner-web
     route: /general/commission-statement
@@ -4221,6 +4249,7 @@ screens:
   module: Reports & Settlement
   requiresModule: partner
   wave: 3
+  permission: REPORT_VIEW_VENUE
   capability: C21
   implementation:
     app: partner-web
@@ -4525,6 +4554,7 @@ screens:
   module: Access & Account
   requiresModule: developerApi
   wave: 3
+  permission: DEVELOPER_VIEW
   implementation:
     app: partner-web
     route: /general/api-credentials-and-integration
@@ -4774,6 +4804,7 @@ screens:
   module: Access & Account
   requiresModule: partner
   wave: 3
+  permission: PERMISSION_VIEW
   capability: C56
   implementation:
     app: partner-web
@@ -4949,6 +4980,7 @@ screens:
   module: Support
   requiresModule: partner
   wave: 3
+  permission: CASE_VIEW
   capability: C32
   implementation:
     app: partner-web
@@ -5187,6 +5219,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -5248,7 +5281,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -5271,57 +5304,69 @@ screens:
         notes: The pack filters this screen by partner type, country, territory, brand, venue, account
           manager and 5 more — which are present is a decision the pack already made.
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
         label: Total Partners
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.totalPartners
+        operation: listPartner
       - kind: metricTile
         label: Active Partners
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.activePartners
+        operation: listPartner
       - kind: metricTile
         label: Pending Onboarding
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.pendingOnboarding
+        operation: listPartner
       - kind: metricTile
         label: Pending Approval
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.pendingApproval
+        operation: listPartner
       - kind: metricTile
         label: Suspended Partners
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.suspendedPartners
+        operation: listPartner
       - kind: metricTile
         label: Expiring Agreements
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.expiringAgreements
+        operation: listPartner
       - kind: metricTile
         label: Documentation Issues
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.documentationIssues
+        operation: listPartner
       - kind: metricTile
         label: Partners With Credit Holds
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.partnersWithCreditHolds
+        operation: listPartner
       - kind: metricTile
         label: Connected OTA/API Partners
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.connectedOtaApiPartners
+        operation: listPartner
       - kind: metricTile
         label: Partner Sales YTD
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.partnerSalesYtd
+        operation: listPartner
       - kind: metricTile
         label: Partner Revenue YTD
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.partnerRevenueYtd
+        operation: listPartner
       - kind: metricTile
         label: High-Risk Partners
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 5 §Display
         bindsTo: PartnerManagementCommandCenterSummary.highRiskPartners
+        operation: listPartner
     - name: contentBody
       slot: moduleTiles
       components:
@@ -5353,6 +5398,7 @@ screens:
       - kind: detailPanel
         label: The selected partner
         bindsTo: PartnerManagementCommandCenterView
+        operation: listPartner
         columns:
         - PartnerManagementCommandCenterView.partnerId
         - PartnerManagementCommandCenterView.tradingName
@@ -5415,6 +5461,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -5543,6 +5590,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -5698,6 +5746,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -5921,11 +5970,16 @@ screens:
     params:
     - name: partnerId
       from: session
+    - name: contactId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPartnerContactUser`.'
 - id: PTR-027
   name: Partner Brand, Venue & Business Scope Assignment
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -6014,6 +6068,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -6152,6 +6207,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -6212,6 +6268,7 @@ screens:
       components:
       - kind: primaryButton
         label: Approve
+        operation: approvePartnerStatuLifecycle
         provenance: contract operation approvePartnerStatuLifecycle
         permission: Approve
       - kind: banner
@@ -6277,6 +6334,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '1'
@@ -6327,6 +6385,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listPartnerProfileReadiness
         derived: true
         impliedBy: listPartnerProfileReadiness
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -6366,6 +6425,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -6421,7 +6481,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -6444,57 +6504,69 @@ screens:
         notes: The pack filters this screen by partner, partner type, brand, venue, country, agreement
           type and 5 more — which are present is a decision the pack already made.
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
         label: Active Agreements
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.activeAgreements
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Draft Agreements
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.draftAgreements
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Pending Approval
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.pendingApproval
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Agreements Expiring Soon
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.agreementsExpiringSoon
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Expired Agreements
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.expiredAgreements
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Partners on Credit Hold
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.partnersOnCreditHold
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Total Approved Credit
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.totalApprovedCredit
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Current Credit Exposure
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.currentCreditExposure
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Outstanding Receivables
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.outstandingReceivables
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Active Commercial Allocations
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.activeCommercialAllocations
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Agreements With Exceptions
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.agreementsWithExceptions
+        operation: listCommercialAgreement
       - kind: metricTile
         label: Commercial Risk Alerts
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 23 §Display
         bindsTo: CommercialAgreementCommandCenterSummary.commercialRiskAlerts
+        operation: listCommercialAgreement
     - name: contentBody
       slot: moduleTiles
       components:
@@ -6526,6 +6598,7 @@ screens:
       - kind: detailPanel
         label: The selected commercial agreement
         bindsTo: CommercialAgreementCommandCenterView
+        operation: listCommercialAgreement
         columns:
         - CommercialAgreementCommandCenterView.agreementId
         - CommercialAgreementCommandCenterView.partner
@@ -6577,6 +6650,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -6735,6 +6809,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -6833,6 +6908,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -6948,6 +7024,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -7116,6 +7193,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '2'
@@ -7179,6 +7257,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listCommercialAgreementHealth
         derived: true
         impliedBy: listCommercialAgreementHealth
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -7217,6 +7296,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -7282,7 +7362,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -7304,56 +7384,68 @@ screens:
         notes: The pack filters this screen by partner, partner type, venue, event, market, account manager
           and 4 more — which are present is a decision the pack already made.
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
         label: Partner Sales Today
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.partnerSalesToday
+        operation: listPartner2
       - kind: metricTile
         label: Partner Sales MTD
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.partnerSalesMtd
+        operation: listPartner2
       - kind: metricTile
         label: Active Partner Orders
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.activePartnerOrders
+        operation: listPartner2
       - kind: metricTile
         label: Active Reservations/Holds
+        operation: listPartner2
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
       - kind: metricTile
         label: Tickets Sold
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.ticketsSold
+        operation: listPartner2
       - kind: metricTile
         label: Cancellations
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.cancellations
+        operation: listPartner2
       - kind: metricTile
         label: Refunds
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.refunds
+        operation: listPartner2
       - kind: metricTile
         label: Outstanding Receivables
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.outstandingReceivables
+        operation: listPartner2
       - kind: metricTile
         label: Commission Payable
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.commissionPayable
+        operation: listPartner2
       - kind: metricTile
         label: Pending Settlements
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.pendingSettlements
+        operation: listPartner2
       - kind: metricTile
         label: Operational Exceptions
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.operationalExceptions
+        operation: listPartner2
       - kind: metricTile
         label: Partners Requiring Attention
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display
         bindsTo: PartnerOperationsCommandCenterSummary.partnersRequiringAttention
+        operation: listPartner2
     - name: contentBody
       slot: moduleTiles
       components:
@@ -7384,6 +7476,7 @@ screens:
       - kind: detailPanel
         label: The selected partner operations
         bindsTo: PartnerOperationsCommandCenterView
+        operation: listPartner2
         columns:
         - PartnerOperationsCommandCenterView.partner
         - PartnerOperationsCommandCenterView.partnerType
@@ -7416,10 +7509,6 @@ screens:
     contract: subscription
     purpose: Partner Operations Command Center
     trigger: onLoad
-  - operationId: listPartner
-    contract: subscription
-    purpose: Partner Management Command Center
-    trigger: onLoad
   wireframe:
     status: notStarted
     provenance: generated
@@ -7434,6 +7523,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -7466,7 +7556,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -7586,6 +7676,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -7619,7 +7710,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -7718,6 +7809,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -7839,6 +7931,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -7872,7 +7965,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -7921,15 +8014,19 @@ screens:
         bindsTo: PartnerStatementAccountActivitySummary.current
       - kind: metricTile
         label: 1–30 Days
+        operation: listPartnerStatementAccount
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
       - kind: metricTile
         label: 31–60 Days
+        operation: listPartnerStatementAccount
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
       - kind: metricTile
         label: 61–90 Days
+        operation: listPartnerStatementAccount
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
       - kind: metricTile
         label: 90+ Days
+        operation: listPartnerStatementAccount
         provenance: pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display
     - name: contentBody
       slot: moduleTiles
@@ -7994,6 +8091,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -8178,6 +8276,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'
@@ -8263,6 +8362,7 @@ screens:
   module: Partners
   requiresModule: partner
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: B2B, Reseller & OTA Partner Management_Reference.pdf
     board: '3'

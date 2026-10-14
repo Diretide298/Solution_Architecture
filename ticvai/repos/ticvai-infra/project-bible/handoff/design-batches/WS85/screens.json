@@ -5,6 +5,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/game-ride-operations-control-center-bo-464",
-   "component": "apps/venue-management-web/src/routes/games-rides/GameRideOperationsControlCenter.tsx",
+   "component": "src/routes/games-rides/GameRideOperationsControlCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -181,6 +182,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "8",
@@ -190,7 +192,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/live-gameplay-transaction-monitor-bo-465",
-   "component": "apps/venue-management-web/src/routes/games-rides/LiveGameplayTransactionMonitor.tsx",
+   "component": "src/routes/games-rides/LiveGameplayTransactionMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -246,7 +248,7 @@
         "Response time"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listGameplayTransactions",
        "provenance": "pack Game_and_Ride_Module.pdf, page 75 §Selecting a transaction should show"
       }
      ]
@@ -341,6 +343,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "8",
@@ -350,7 +353,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/reader-device-health-monitor-bo-466",
-   "component": "apps/venue-management-web/src/routes/games-rides/ReaderDeviceHealthMonitor.tsx",
+   "component": "src/routes/games-rides/ReaderDeviceHealthMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -396,13 +399,15 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listReaders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listReaders"
       },
       {
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getDeviceTelemetry",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getDeviceTelemetry"
       }
      ]
     }
@@ -474,6 +479,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "8",
@@ -483,7 +489,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/tap-validation-decision-trace-bo-467",
-   "component": "apps/venue-management-web/src/routes/games-rides/TapValidationDecisionTrace.tsx",
+   "component": "src/routes/games-rides/TapValidationDecisionTrace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -593,6 +599,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "8",
@@ -602,7 +609,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/rejected-transaction-reason-analysis-bo-468",
-   "component": "apps/venue-management-web/src/routes/games-rides/RejectedTransactionReasonAnalysis.tsx",
+   "component": "src/routes/games-rides/RejectedTransactionReasonAnalysis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -637,7 +644,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -694,7 +701,7 @@
         "Rejection trend"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listGameplayTransactions",
        "provenance": "pack Game_and_Ride_Module.pdf, page 78 §Time Attraction Card Reason Reader"
       }
      ]
@@ -784,6 +791,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "8",
@@ -793,7 +801,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/wallet-deduction-transaction-monitor-bo-469",
-   "component": "apps/venue-management-web/src/routes/games-rides/WalletDeductionTransactionMonitor.tsx",
+   "component": "src/routes/games-rides/WalletDeductionTransactionMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -839,7 +847,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listWalletTransactions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listWalletTransactions"
       }
      ]
     }
@@ -906,6 +915,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "8",
@@ -915,7 +925,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/entitlement-free-play-consumption-monitor-bo-470",
-   "component": "apps/venue-management-web/src/routes/games-rides/EntitlementFreePlayConsumptionMonitor.tsx",
+   "component": "src/routes/games-rides/EntitlementFreePlayConsumptionMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1041,6 +1051,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "8",
@@ -1050,7 +1061,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/offline-synchronization-recovery-monitor-bo-471",
-   "component": "apps/venue-management-web/src/routes/games-rides/OfflineSynchronizationRecoveryMonitor.tsx",
+   "component": "src/routes/games-rides/OfflineSynchronizationRecoveryMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1098,7 +1109,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1307,6 +1318,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "8",
@@ -1316,7 +1328,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/operational-analytics-reconciliation-dashboard-bo-473",
-   "component": "apps/venue-management-web/src/routes/games-rides/OperationalAnalyticsReconciliationDashboard.tsx",
+   "component": "src/routes/games-rides/OperationalAnalyticsReconciliationDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1356,7 +1368,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {

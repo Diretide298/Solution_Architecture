@@ -11,7 +11,7 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 28,
-  "operations": 67,
+  "operations": 66,
   "contracts": 8,
   "modules": 5,
   "undrawn": 0,
@@ -75,18 +75,18 @@
   },
   {
    "contract": "ai",
-   "operations": 4
+   "operations": 3
   },
   {
    "contract": "assets",
    "operations": 2
   },
   {
-   "contract": "white-label",
+   "contract": "orders",
    "operations": 1
   },
   {
-   "contract": "orders",
+   "contract": "white-label",
    "operations": 1
   },
   {
@@ -254,7 +254,7 @@
    "module": "Support",
    "wave": 3,
    "route": "/support/ai-customer-service-copilot-knowledge-workspace-sup-018",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {

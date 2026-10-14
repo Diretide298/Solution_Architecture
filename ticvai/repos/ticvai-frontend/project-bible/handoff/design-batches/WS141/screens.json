@@ -5,6 +5,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/omnichannel-command-center-bo-794",
-   "component": "apps/venue-management-web/src/routes/engagement-support/OmnichannelCommandCenter.tsx",
+   "component": "src/routes/engagement-support/OmnichannelCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -125,7 +126,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listConversations",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listConversations"
       }
      ]
     }
@@ -182,6 +184,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -191,7 +194,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/unified-inbox-bo-795",
-   "component": "apps/venue-management-web/src/routes/engagement-support/UnifiedInbox.tsx",
+   "component": "src/routes/engagement-support/UnifiedInbox.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -236,14 +239,16 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listConversations",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listConversations"
       },
       {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "claimConversation",
        "label": "Claim conversation",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "claimConversation"
       },
       {
        "kind": "secondaryButton",
@@ -322,6 +327,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -331,7 +337,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/guest-conversation-360-bo-796",
-   "component": "apps/venue-management-web/src/routes/engagement-support/GuestConversation360.tsx",
+   "component": "src/routes/engagement-support/GuestConversation360.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -376,7 +382,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getConversation",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getConversation"
       }
      ]
     }
@@ -463,7 +470,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/ai-chatbot-configuration-bo-797",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AiChatbotConfiguration.tsx",
+   "component": "src/routes/engagement-support/AiChatbotConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -561,6 +568,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -570,7 +578,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/intent-knowledge-management-bo-798",
-   "component": "apps/venue-management-web/src/routes/engagement-support/IntentKnowledgeManagement.tsx",
+   "component": "src/routes/engagement-support/IntentKnowledgeManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -862,6 +870,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -871,7 +880,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/agent-workspace-bo-799",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AgentWorkspace.tsx",
+   "component": "src/routes/engagement-support/AgentWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1141,6 +1150,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -1150,7 +1160,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/routing-queue-management-bo-800",
-   "component": "apps/venue-management-web/src/routes/engagement-support/RoutingQueueManagement.tsx",
+   "component": "src/routes/engagement-support/RoutingQueueManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1196,13 +1206,15 @@
        "derived": true,
        "impliedBy": "setIntelligentRoutingSkill",
        "label": "Save",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setIntelligentRoutingSkill"
       },
       {
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAgentWorkloadAvailability",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAgentWorkloadAvailability"
       },
       {
        "kind": "secondaryButton",
@@ -1363,6 +1375,22 @@
     "provenance": "contract marketing-crm.yaml PUT /service-queues"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "queueId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listAgentWorkloadAvailability`."
+    },
+    {
+     "name": "routingRuleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setIntelligentRoutingSkill` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1392,6 +1420,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -1401,7 +1430,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/sales-service-actions-bo-801",
-   "component": "apps/venue-management-web/src/routes/engagement-support/SalesServiceActions.tsx",
+   "component": "src/routes/engagement-support/SalesServiceActions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1482,6 +1511,16 @@
    "workshopBoard": "wireframes/WS76 Marketing CRM Configuration Reference v1.0 Board 7.dc.html#bo-801"
   },
   "apisNote": "Regenerated 9 September 2026 from Marketing_CRM_Configuration_Reference v1.0.pdf page 38. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "serviceActionId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setOrderBookingTicket` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1511,6 +1550,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -1520,7 +1560,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/sentiment-quality-escalation-bo-802",
-   "component": "apps/venue-management-web/src/routes/engagement-support/SentimentQualityEscalation.tsx",
+   "component": "src/routes/engagement-support/SentimentQualityEscalation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1565,7 +1605,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listQualityAgentEvaluation",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listQualityAgentEvaluation"
       },
       {
        "kind": "primaryButton",
@@ -1650,6 +1691,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -1659,7 +1701,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/chat-analytics-audit-bo-803",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ChatAnalyticsAudit.tsx",
+   "component": "src/routes/engagement-support/ChatAnalyticsAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1704,7 +1746,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listUnifiedInteractionCommunication",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listUnifiedInteractionCommunication"
       }
      ]
     }

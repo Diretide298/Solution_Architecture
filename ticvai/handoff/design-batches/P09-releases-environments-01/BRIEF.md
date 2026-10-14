@@ -98,11 +98,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-022` | Release & Version Management | B | 17 | 25 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
 | `ADM-023` | Staging Promotion & Approval | B | 7 | 23 | 6 | 1 | 2 | 5 | — | notStarted (generated) |
-| `ADM-024` | Release Notification Composer | B | 7 | 21 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
-| `ADM-025` | Tenant Upgrade Scheduler | B | 8 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-026` | End-of-Support Notice Management | B | 16 | 16 | 7 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-024` | Release Notification Composer | B | 5 | 21 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-025` | Tenant Upgrade Scheduler | B | 7 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-026` | End-of-Support Notice Management | B | 14 | 16 | 7 | 1 | 1 | 0 | — | notStarted (generated) |
 | `ADM-027` | Database Migration Console | B | 14 | 26 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-028` | Environment Registry | B | 8 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-028` | Environment Registry | B | 7 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-700` | Configuration Promotion | B | 11 | 13 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
 
 ## Thin screens in this batch

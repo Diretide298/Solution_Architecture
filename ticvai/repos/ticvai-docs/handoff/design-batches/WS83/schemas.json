@@ -12,10 +12,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "maxLength": 64
    },
@@ -57,6 +59,7 @@
     "nullable": true
    },
    "status": {
+    "readOnly": true,
     "$ref": "#/components/schemas/GameStatus"
    },
    "playsToday": {
@@ -86,6 +89,8 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "groupPricing": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -100,6 +105,8 @@
     }
    },
    "peakPricing": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -123,6 +130,8 @@
     }
    },
    "calendarExceptions": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -283,6 +292,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -449,6 +459,7 @@
   ],
   "properties": {
    "deviceId": {
+    "x-ticvai-references": "platform.device",
     "type": "string",
     "format": "uuid",
     "description": "`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"
@@ -538,6 +549,8 @@
     "nullable": true
    },
    "earnRules": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -644,6 +657,7 @@
   }
  },
  "Wallet": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [

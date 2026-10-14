@@ -30,7 +30,6 @@ packages:
 - offline-core
 contracts:
 - access
-- accreditation
 - ai
 - approvals
 - catalogue

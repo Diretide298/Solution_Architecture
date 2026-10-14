@@ -1,6 +1,6 @@
 # WS107 — Subscription Licensing AI Self Service board 10
 
-**10 screens · 14 operations · 19 schemas · 5 permissions**
+**10 screens · 14 operations · 20 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -96,14 +96,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-459` | Billing & Commercial Command Center | B | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-459` | Billing & Commercial Command Center | B | 0 | 108 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-460` | Billing Calculation & Charge Breakdown | B | 6 | 70 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `ADM-461` | Consumption Reconciliation & Billing Approval | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `ADM-462` | Invoice & Payment Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `ADM-463` | Subscription & Commercial Change Management | B | 0 | 12 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-464` | Renewal Management Center | B | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-462` | Invoice & Payment Management | B | 0 | 20 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `ADM-463` | Subscription & Commercial Change Management | B | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-464` | Renewal Management Center | B | 0 | 83 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-465` | AI Upgrade, Downgrade & Commercial Right-Sizing | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-466` | Commercial Scenario Simulator | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-466` | Commercial Scenario Simulator | B | 0 | 135 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-467` | Discount, Credit & Commercial Override Management | B | 10 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-468` | Renewal Approval, Activation & Commercial Handoff | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
@@ -150,6 +150,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Status | select | — | Draft · Issued · Paid · Overdue · Disputed · Cancelled | `listSubscriptionInvoices` ?status |
+| Codes | text field | — | — | `getCommercialMetrics` ?codes |
+| Period | text field | — | — | `getCommercialMetrics` ?period |
+| Compare to | segmented control | — | Previous period · Same period last year | `getCommercialMetrics` ?compareTo |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -157,27 +160,147 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Current Billing Period** (metric tile)
+**Current Billing Period** (metric tile, from `getCommercialMetrics`)
 
-**Current Charge** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**MRR / Monthly Equivalent** (metric tile)
+**Current Charge** (metric tile, from `getCommercialMetrics`)
 
-**ACV** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**YTD Revenue** (metric tile)
+**MRR / Monthly Equivalent** (metric tile, from `getCommercialMetrics`)
 
-**Outstanding Balance** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Next Invoice** (metric tile)
+**ACV** (metric tile, from `getCommercialMetrics`)
 
-**Minimum Guarantee** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Variable Consumption** (metric tile)
+**YTD Revenue** (metric tile, from `getCommercialMetrics`)
 
-**Payment Status** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Every billing commercial** (data table)
+**Outstanding Balance** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Next Invoice** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Minimum Guarantee** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Variable Consumption** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Payment Status** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Every billing commercial** (data table, from `listSubscriptionInvoices`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -191,7 +314,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Discounts/credits | text | not in the schema: `Discounts/Credits` |
 | Tax | text | not in the schema: `Tax` |
 
-**The selected billing commercial** (detail panel): The pack groups this record's detail under its own headings: “Dubai Discovery Museum”, “Billable Tickets”, “Rate”, “Commercial Health”.
+**The selected billing commercial** (detail panel, from `listSubscriptionInvoices`): The pack groups this record's detail under its own headings: “Dubai Discovery Museum”, “Billable Tickets”, “Rate”, “Commercial Health”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -209,7 +332,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Money columns (Platform Fee)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
 
-**Data it reads**: `listSubscriptionInvoices` (onLoad, Billing at a glance)
+**Data it reads**: `listSubscriptionInvoices` (onLoad, Billing at a glance); `getCommercialMetrics` (onLoad, The commercial figures the tiles show, one value per metric …)
 
 **Where the user goes next**
 
@@ -234,6 +357,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the billing commercial are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown metric code or a malformed period |
 
 #### Sample data for the mock-up
 
@@ -281,8 +405,11 @@ Every billing commercial:
 #### Permissions
 
 - `listSubscriptionInvoices` → `PLATFORM_BILLING_VIEW` (read) · staff
+- `getCommercialMetrics` → `PLATFORM_BILLING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -319,8 +446,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (108 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-459?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-002`, `ADM-460`, `ADM-461`, `ADM-462`, `ADM-463`, `ADM-464`, `ADM-465`, `ADM-466`, `ADM-467`, `ADM-468`.
@@ -526,6 +653,8 @@ total: AED 60,742.50 incl. VAT 5%
 
 **A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_BILLING_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for `generateInvoice`.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -649,6 +778,8 @@ aiUsage: AED 1,240.00 to settle
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_BILLING_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -714,7 +845,6 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Status | select | — | Draft · Issued · Paid · Overdue · Disputed · Cancelled | `listSubscriptionInvoices` ?status |
-| Invoice | text field | — | — | `listCreditNotes` ?invoiceId |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -722,7 +852,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listSubscriptionInvoices`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Invoice number | text | A tax invoice number, so gapless, per legal entity (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity … |
+| Period start | 1 Oct 2026 | — |
+| Period end | 1 Oct 2026 | — |
+| Status | chip: Draft, Issued, Paid, Overdue, Disputed, Cancelled | — |
+| Lines | list or chips (count when long) | — |
+| Description | text | — |
+| Kind | chip: Base plan, Module, Add on, Overage, Metered, One off… | `module`, one per licensed module at its platform price, and `metered`, usage such as AI tokens (decided 29 September). |
+| Module code | text | The module a `module` or `metered` line charges for. |
+| Audience | chip: Staff, Guest | For an AI `metered` line, whose usage it is. |
+| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Plan version used | text | Priced against the version the tenant is subscribed to, not the latest. |
+| Credited total | AED 1,234.50 | The sum of the credit notes issued against this invoice (`issueCreditNote`); the invoice itself is never edited. |
 
 **Actions and what each produces**
 
@@ -735,7 +888,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Issue credit note**: Linked to the invoice, reason required, amount cannot exceed what remains creditable. *(source: contracts/satellite/subscription.yaml#issueCreditNote)*
 
-**Data it reads**: `listSubscriptionInvoices` (onLoad, Invoices raised); `listCreditNotes` (onLoad, Credit notes issued)
+**Data it reads**: `listSubscriptionInvoices` (onLoad, Invoices raised)
 
 **Where the user goes next**
 
@@ -787,9 +940,10 @@ listSubscriptionInvoices (SubscriptionInvoice):
 - `recordInvoicePayment` → `PLATFORM_BILLING_MANAGE` (configure) · staff
 - `listSubscriptionInvoices` → `PLATFORM_BILLING_VIEW` (read) · staff
 - `issueCreditNote` → `PLATFORM_BILLING_MANAGE` (configure) · staff
-- `listCreditNotes` → `PLATFORM_BILLING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -821,7 +975,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-462?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `ADM-459`.
@@ -841,7 +995,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29370 (APP-CONSOLE-ADM-463) |
-| Who uses it | ticvai staff holding `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` (1 configure, 1 read); in the flows as platform admin |
+| Who uses it | ticvai staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
@@ -904,7 +1058,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the subscription commercial change are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Downgrade conflicts with current usage. The response names every module and limit that would be violated. (DowngradeConflictProblem); 422 `effectiveFrom` was sent and is not the date the change must take effect: today for an upgrade, the next renewal for a downgrade (`effective-date-not-allowed` … |
 
 #### Edge cases to draw
 
@@ -940,20 +1093,19 @@ Every subscription commercial change:
 #### Permissions
 
 - `previewSubscriptionChange` → `PLATFORM_TENANT_VIEW` (read) · staff, prospect
-- `setSubscription` → `PLATFORM_TENANT_MANAGE` (configure) · staff, prospect
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
-4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 20.2.5 | Subscription Upgrade - System shall support subscription upgrades. | Subscription & Licensing Management | CONTRACTED | `previewSubscriptionChange` |
 | 20.2.6 | Subscription Downgrade - System shall support subscription downgrades. | Subscription & Licensing Management | CONTRACTED | `previewSubscriptionChange` |
-| 20.2.2 | Monthly Billing - System shall support monthly subscriptions. | Subscription & Licensing Management | CONTRACTED | `setSubscription` |
-| 20.2.3 | Annual Billing - System shall support annual subscriptions. | Subscription & Licensing Management | CONTRACTED | `setSubscription` |
 
 #### Client meeting inputs
 
@@ -974,12 +1126,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-463?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-459`.
-- [ ] Every gated control is gated: `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW`.
+- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -995,7 +1147,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29228 (APP-CONSOLE-ADM-464) |
-| Who uses it | ticvai; in the flows as platform admin |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Renewal KPIs) and a per-row directory (§Analyze) — counts over a population, then the population |
 | Offline | online only |
@@ -1014,25 +1166,117 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Codes | text field | — | — | `getCommercialMetrics` ?codes |
+| Period | text field | — | — | `getCommercialMetrics` ?period |
+| Compare to | segmented control | — | Previous period · Same period last year | `getCommercialMetrics` ?compareTo |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Renewals Due** (metric tile)
+**Renewals Due** (metric tile, from `getCommercialMetrics`)
 
-**Renewal ARR / Contract Value** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Renewal Rate** (metric tile)
+**Renewal ARR / Contract Value** (metric tile, from `getCommercialMetrics`)
 
-**At-Risk Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Auto-Renew Value** (metric tile)
+**Renewal Rate** (metric tile, from `getCommercialMetrics`)
 
-**Expansion Opportunity** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Cost Optimization Opportunity** (metric tile)
+**At-Risk Revenue** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Auto-Renew Value** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Expansion Opportunity** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Cost Optimization Opportunity** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
 **Every renewal** (data table)
 
@@ -1064,6 +1308,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Contract exceptions | text | not in the schema: `Contract Exceptions` |
 | Customer growth/decline | text | not in the schema: `Customer Growth/Decline` |
 
+**Data it reads**: `getCommercialMetrics` (onLoad, The commercial figures the tiles show, one value per metric …)
+
 **Where the user goes next**
 
 - → `ADM-459` Billing & Commercial Command Center: *Back to Billing & Commercial Command Center*
@@ -1078,6 +1324,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the renewal are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown metric code or a malformed period |
 
 #### Edge cases to draw
 
@@ -1125,7 +1372,11 @@ Every renewal:
 
 #### Permissions
 
+- `getCommercialMetrics` → `PLATFORM_BILLING_VIEW` (read) · staff
+
 **A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -1152,12 +1403,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (83 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-464?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-459`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1245,6 +1496,8 @@ saving: AED 6,000.00 / month
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_BILLING_VIEW`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1313,23 +1566,185 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Customer Cost** (metric tile)
+**Customer Cost** (metric tile, from `simulateCommercialPackage`)
 
-**TICVAI Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Lines | list or chips (count when long) | — |
+| Kind | chip: Base tier, Module, Add on, Capacity pack, Overage, Professional services… | — |
+| Label | text | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Recurring total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| One off total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Contract total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Minimum guarantee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning, Advisory | — |
+| Code | text | — |
+| Message | text | — |
+| Provisionable | yes / no (icon or chip) | — |
 
-**Minimum Revenue Protection** (metric tile)
+**TICVAI Revenue** (metric tile, from `simulateCommercialPackage`)
 
-**Variable Revenue Exposure** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Lines | list or chips (count when long) | — |
+| Kind | chip: Base tier, Module, Add on, Capacity pack, Overage, Professional services… | — |
+| Label | text | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Recurring total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| One off total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Contract total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Minimum guarantee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning, Advisory | — |
+| Code | text | — |
+| Message | text | — |
+| Provisionable | yes / no (icon or chip) | — |
 
-**Margin** (metric tile)
+**Minimum Revenue Protection** (metric tile, from `simulateCommercialPackage`)
 
-**Expected Overage** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Lines | list or chips (count when long) | — |
+| Kind | chip: Base tier, Module, Add on, Capacity pack, Overage, Professional services… | — |
+| Label | text | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Recurring total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| One off total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Contract total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Minimum guarantee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning, Advisory | — |
+| Code | text | — |
+| Message | text | — |
+| Provisionable | yes / no (icon or chip) | — |
 
-**Customer Saving/Increase** (metric tile)
+**Variable Revenue Exposure** (metric tile, from `simulateCommercialPackage`)
 
-**Contract Predictability** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Lines | list or chips (count when long) | — |
+| Kind | chip: Base tier, Module, Add on, Capacity pack, Overage, Professional services… | — |
+| Label | text | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Recurring total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| One off total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Contract total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Minimum guarantee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning, Advisory | — |
+| Code | text | — |
+| Message | text | — |
+| Provisionable | yes / no (icon or chip) | — |
 
-**Revenue Growth/Contraction** (metric tile)
+**Margin** (metric tile, from `simulateCommercialPackage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Lines | list or chips (count when long) | — |
+| Kind | chip: Base tier, Module, Add on, Capacity pack, Overage, Professional services… | — |
+| Label | text | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Recurring total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| One off total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Contract total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Minimum guarantee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning, Advisory | — |
+| Code | text | — |
+| Message | text | — |
+| Provisionable | yes / no (icon or chip) | — |
+
+**Expected Overage** (metric tile, from `simulateCommercialPackage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Lines | list or chips (count when long) | — |
+| Kind | chip: Base tier, Module, Add on, Capacity pack, Overage, Professional services… | — |
+| Label | text | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Recurring total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| One off total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Contract total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Minimum guarantee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning, Advisory | — |
+| Code | text | — |
+| Message | text | — |
+| Provisionable | yes / no (icon or chip) | — |
+
+**Customer Saving/Increase** (metric tile, from `simulateCommercialPackage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Lines | list or chips (count when long) | — |
+| Kind | chip: Base tier, Module, Add on, Capacity pack, Overage, Professional services… | — |
+| Label | text | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Recurring total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| One off total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Contract total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Minimum guarantee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning, Advisory | — |
+| Code | text | — |
+| Message | text | — |
+| Provisionable | yes / no (icon or chip) | — |
+
+**Contract Predictability** (metric tile, from `simulateCommercialPackage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Lines | list or chips (count when long) | — |
+| Kind | chip: Base tier, Module, Add on, Capacity pack, Overage, Professional services… | — |
+| Label | text | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Recurring total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| One off total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Contract total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Minimum guarantee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning, Advisory | — |
+| Code | text | — |
+| Message | text | — |
+| Provisionable | yes / no (icon or chip) | — |
+
+**Revenue Growth/Contraction** (metric tile, from `simulateCommercialPackage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Lines | list or chips (count when long) | — |
+| Kind | chip: Base tier, Module, Add on, Capacity pack, Overage, Professional services… | — |
+| Label | text | — |
+| Quantity | 1,234.5 | — |
+| Unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Recurring total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| One off total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Contract total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Minimum guarantee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Findings | list or chips (count when long) | — |
+| Severity | chip: Blocking, Warning, Advisory | — |
+| Code | text | — |
+| Message | text | — |
+| Provisionable | yes / no (icon or chip) | — |
 
 **Where the user goes next**
 
@@ -1369,6 +1784,8 @@ metric tiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1393,7 +1810,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (135 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-466?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-459`.
@@ -1492,12 +1909,14 @@ form example:
 
 #### Permissions
 
-- `cancelInvoice` → `PLATFORM_BILLING_MANAGE` (configure) · staff
-- `disputeInvoice` → `PLATFORM_BILLING_MANAGE` (configure) · staff
 - `issueCreditNote` → `PLATFORM_BILLING_MANAGE` (configure) · staff
 - `listCreditNotes` → `PLATFORM_BILLING_VIEW` (read) · staff
+- `cancelInvoice` → `PLATFORM_BILLING_MANAGE` (configure) · staff
+- `disputeInvoice` → `PLATFORM_BILLING_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -1604,6 +2023,8 @@ activation: 01/01/2027
 - `getBillingReconciliation` → `PLATFORM_BILLING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -1718,6 +2139,7 @@ Method, path, parameters, request and response for every operation these screens
 "disputeInvoice": {"method":"POST","path":"/invoices/{invoiceId}/dispute","contract":"subscription","summary":"Raise a dispute","permission":"PLATFORM_BILLING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "generateInvoice": {"method":"POST","path":"/tenants/{tenantId}/invoices","contract":"subscription","summary":"Generate an invoice for a period","permission":"PLATFORM_BILLING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SubscriptionInvoice"},
 "getBillingReconciliation": {"method":"GET","path":"/billing-reconciliation","contract":"subscription","summary":"Metered consumption against what was invoiced","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"tenantId","in":"query","required":true},{"name":"period","in":"query","required":true}],"requestBody":null,"responds":"BillingReconciliation"},
+"getCommercialMetrics": {"method":"GET","path":"/commercial-metrics","contract":"subscription","summary":"The commercial figures across the customer portfolio, by code","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"codes","in":"query","required":null},{"name":"tenantId","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null}],"requestBody":null,"responds":"CommercialMetricSet"},
 "getPlanRecommendations": {"method":"GET","path":"/plan-recommendations","contract":"subscription","summary":"Which plan, module or pack would fit this tenant better, and what it would cost or save","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"tenantId","in":"query","required":true},{"name":"horizonMonths","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "issueCreditNote": {"method":"POST","path":"/invoices/{invoiceId}/credit-notes","contract":"subscription","summary":"Issue a credit note against a tenant invoice, in full or in part","permission":"PLATFORM_BILLING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"IssueCreditNoteRequest","responds":"SubscriptionCreditNote"},
 "listCreditNotes": {"method":"GET","path":"/tenants/{tenantId}/credit-notes","contract":"subscription","summary":"List a tenant's credit notes","permission":"PLATFORM_BILLING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"invoiceId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1725,7 +2147,6 @@ Method, path, parameters, request and response for every operation these screens
 "listTenants": {"method":"GET","path":"/tenants","contract":"subscription","summary":"List tenants","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"status","in":"query","required":null},{"name":"planId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "previewSubscriptionChange": {"method":"POST","path":"/tenants/{tenantId}/subscription/preview","contract":"subscription","summary":"Preview the effect of a plan change","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetSubscriptionRequest","responds":"SubscriptionPreview"},
 "recordInvoicePayment": {"method":"POST","path":"/invoices/{invoiceId}/payment","contract":"subscription","summary":"Record payment against an invoice","permission":"PLATFORM_BILLING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
-"setSubscription": {"method":"PUT","path":"/tenants/{tenantId}/subscription","contract":"subscription","summary":"Assign or change a subscription","permission":"PLATFORM_TENANT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetSubscriptionRequest","responds":"Subscription"},
 "settleAiUsage": {"method":"POST","path":"/ai-usage/settle","contract":"subscription","summary":"Turn metered AI interactions into a billable usage record","permission":"PLATFORM_BILLING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "simulateCommercialPackage": {"method":"POST","path":"/package-simulations","contract":"subscription","summary":"What this package would cost, and what it would provision","permission":"PLATFORM_PLAN_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PackageSimulationRequest","responds":"PackageSimulation"}
 }
@@ -1739,6 +2160,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "BillingReconciliation": {"type":"object","description":"Boards 10.2 and 10.3. **The first invoice sets the tone for the relationship.**","properties":{"tenantId":{"type":"string","format":"uuid"},"period":{"type":"string"},"lines":{"type":"array","items":{"type":"object","properties":{"unit":{"type":"string"},"meteredQuantity":{"type":"integer"},"billedQuantity":{"type":"integer"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variance":{"type":"integer"}}}},"meteredNotBilled":{"type":"integer"},"billedNotMetered":{"type":"integer"},"invoiceId":{"type":"string","format":"uuid","nullable":true},"approvedBy":{"type":"string","format":"uuid","nullable":true}}},
 "CellTier": {"type":"string","enum":["shared","dedicated","isolated","clientHosted"]},
+"CommercialMetric": {"type":"object","description":"One commercial figure. Money-valued codes carry a `Money`; counts, rates and days a number (naming-and-style 5.1: money is never a float).","required":["code","value"],"properties":{"code":{"type":"string"},"groupKey":{"type":"string","nullable":true,"description":"The band, profile or model this row is for, on a code split by one; null otherwise."},"unit":{"type":"string","enum":["count","currency","percent","days"]},"value":{"oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},"comparison":{"nullable":true,"oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},"direction":{"type":"string","enum":["up","down","flat"]}}},
+"CommercialMetricSet": {"type":"object","description":"The commercial command centres' figures, one row per metric code (getCommercialMetrics).","properties":{"tenantId":{"type":"string","format":"uuid","nullable":true,"description":"The customer the figures are for; null for the whole portfolio."},"period":{"type":"string"},"asOf":{"type":"string","format":"date-time"},"metrics":{"type":"array","items":{"$ref":"#/components/schemas/CommercialMetric"}}}},
 "DowngradeConflictProblem": {"x-ticvai-persistence":"none — error shape","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Problem"},{"type":"object","properties":{"modulesInUse":{"type":"array","description":"Enabled by the tenant but not licensed by the target plan.","items":{"type":"object","properties":{"moduleKey":{"type":"string"},"displayName":{"type":"string"},"isEnabled":{"type":"boolean"}}}},"limitsExceeded":{"type":"array","items":{"type":"object","properties":{"metric":{"$ref":"#/components/schemas/UsageMetric"},"currentUsage":{"type":"integer"},"targetLimit":{"type":"integer"}}}}}}]},
 "InvoiceStatus": {"type":"string","enum":["draft","issued","paid","overdue","disputed","cancelled"]},
 "IssueCreditNoteRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["reasonCode","settlement","lines"],"properties":{"reasonCode":{"type":"string","enum":["billingError","serviceCredit","disputeResolution","goodwill","other"]},"reason":{"type":"string","maxLength":500,"nullable":true},"settlement":{"type":"string","enum":["offsetNextInvoice","refund"]},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["invoiceLineIndex"],"properties":{"invoiceLineIndex":{"type":"integer","minimum":0,"description":"The line of the invoice being credited, by its position in `SubscriptionInvoice.lines`."},"quantity":{"type":"number","minimum":0,"nullable":true,"description":"Part of the line's quantity; null with `amount`, or for the whole line."},"amount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Part of the line's amount, net of tax; null with `quantity`, or for the whole line."}}}}}},
@@ -1747,13 +2170,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "PackageSimulationRequest": {"type":"object","required":["tierCode"],"properties":{"tierCode":{"type":"string"},"licensingModelId":{"type":"string","format":"uuid","nullable":true},"moduleCodes":{"type":"array","items":{"type":"string"}},"venueCount":{"type":"integer","default":1},"projectedVolumes":{"type":"object","additionalProperties":{"type":"integer"}},"contractMonths":{"type":"integer","default":12},"billingCycle":{"type":"string","nullable":true},"currency":{"type":"string","nullable":true}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "SetSubscriptionRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["planId"],"properties":{"planId":{"type":"string","format":"uuid"},"planVersion":{"type":"string","description":"Defaults to the current version."},"effectiveFrom":{"type":"string","format":"date","description":"Optional, and set by the server if omitted. Today for an upgrade, `renewsAt` for a downgrade; any other date is refused (audit R214 (1))."},"prorate":{"type":"boolean","default":true,"description":"An upgrade is always prorated and a downgrade, which starts at renewal, never is (audit R214 (1)). Kept so a preview can show the unprorated figure; `setSubscription` applies the rule whatever is sent."},"note":{"type":"string","maxLength":500}}},
-"Subscription": {"x-ticvai-persistence":"subscription.contract","type":"object","required":["tenantId","planId","planVersion","status","startsAt"],"properties":{"tenantId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid"},"planName":{"type":"string"},"planVersion":{"type":"string"},"status":{"type":"string","enum":["trial","active","pastDue","cancelled","expired"]},"startsAt":{"type":"string","format":"date"},"renewsAt":{"type":"string","format":"date","nullable":true},"cancelledAt":{"type":"string","format":"date","nullable":true},"scheduledChange":{"type":"object","nullable":true,"readOnly":true,"description":"A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). Null when none is scheduled.","properties":{"planId":{"type":"string","format":"uuid"},"planVersion":{"type":"string"},"effectiveFrom":{"type":"string","format":"date","description":"Always the `renewsAt` it was scheduled against."}}},"currentPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"billingPeriod":{"type":"string"}}},
-"SubscriptionCreditNote": {"type":"object","x-ticvai-persistence":"control.credit_note + control.credit_note_line","description":"**A credit note against one tenant invoice** (20.7.7, 29 September build): its own number, lines, tax and total. The invoice it credits is never edited.","required":["id","creditNoteNumber","invoiceId","tenantId","reasonCode","settlement","total","issuedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"creditNoteNumber":{"type":"string","readOnly":true,"description":"**Gapless, per issuing legal entity, in its own sequence** (the R152 rule for invoices, decided 28 September, applied to credit notes): assigned at issue, never reused."},"invoiceId":{"type":"string","description":"The invoice credited."},"tenantId":{"type":"string","format":"uuid"},"reasonCode":{"type":"string","enum":["billingError","serviceCredit","disputeResolution","goodwill","other"]},"reason":{"type":"string","maxLength":500,"nullable":true},"settlement":{"type":"string","enum":["offsetNextInvoice","refund"]},"settlementStatus":{"type":"string","enum":["pending","offset","refunded"],"readOnly":true,"description":"`offset` once a later invoice has taken it; `refunded` once the refund is recorded."},"lines":{"type":"array","items":{"type":"object","properties":{"invoiceLineIndex":{"type":"integer"},"description":{"type":"string"},"quantity":{"type":"number","nullable":true},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"subtotal":{"x-ticvai-column":"net_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"issuedAt":{"type":"string","format":"date-time","readOnly":true},"issuedByPrincipalId":{"type":"string","format":"uuid","readOnly":true}}},
-"SubscriptionInvoice": {"x-ticvai-persistence":"control.invoice + control.invoice_line","type":"object","required":["id","invoiceNumber","tenantId","periodStart","periodEnd","status","total"],"properties":{"id":{"type":"string","format":"uuid"},"invoiceNumber":{"type":"string","readOnly":true,"description":"A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the invoice is issued, never reused. A cancelled invoice keeps its number.\n"},"tenantId":{"type":"string","format":"uuid"},"periodStart":{"type":"string","format":"date"},"periodEnd":{"type":"string","format":"date"},"status":{"$ref":"#/components/schemas/InvoiceStatus"},"lines":{"type":"array","items":{"type":"object","properties":{"description":{"type":"string"},"kind":{"type":"string","enum":["basePlan","module","addOn","overage","metered","oneOff","credit"],"description":"`module`, one per licensed module at its platform price, and `metered`, usage such as AI tokens (decided 29 September)."},"moduleCode":{"type":"string","nullable":true,"description":"The module a `module` or `metered` line charges for."},"audience":{"type":"string","enum":["staff","guest"],"nullable":true,"description":"For an AI `metered` line, whose usage it is."},"metric":{"$ref":"#/components/schemas/UsageMetric"},"quantity":{"type":"number"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"subtotal":{"x-ticvai-column":"net_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"planVersionUsed":{"type":"string","description":"Priced against the version the tenant is subscribed to, not the latest."},"creditedTotal":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"The sum of the credit notes issued against this invoice (`issueCreditNote`); the invoice itself is never edited. Null with none."},"issuedAt":{"type":"string","format":"date-time","nullable":true},"dueAt":{"type":"string","format":"date","nullable":true},"paidAt":{"type":"string","format":"date-time","nullable":true}}},
+"SubscriptionCreditNote": {"type":"object","x-ticvai-persistence":"control.credit_note + control.credit_note_line","description":"**A credit note against one tenant invoice** (20.7.7, 29 September build): its own number, lines, tax and total. The invoice it credits is never edited.","required":["id","creditNoteNumber","invoiceId","tenantId","reasonCode","settlement","total","issuedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"creditNoteNumber":{"type":"string","readOnly":true,"description":"**Gapless, per issuing legal entity, in its own sequence** (the R152 rule for invoices, decided 28 September, applied to credit notes): assigned at issue, never reused."},"invoiceId":{"x-ticvai-references":"control.invoice","type":"string","description":"The invoice credited."},"tenantId":{"x-ticvai-references":"control.tenant","type":"string","format":"uuid"},"reasonCode":{"type":"string","enum":["billingError","serviceCredit","disputeResolution","goodwill","other"]},"reason":{"type":"string","maxLength":500,"nullable":true},"settlement":{"type":"string","enum":["offsetNextInvoice","refund"]},"settlementStatus":{"type":"string","enum":["pending","offset","refunded"],"readOnly":true,"description":"`offset` once a later invoice has taken it; `refunded` once the refund is recorded."},"lines":{"type":"array","items":{"type":"object","properties":{"invoiceLineIndex":{"type":"integer"},"description":{"type":"string"},"quantity":{"type":"number","nullable":true},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"subtotal":{"x-ticvai-column":"net_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"issuedAt":{"type":"string","format":"date-time","readOnly":true},"issuedByPrincipalId":{"type":"string","format":"uuid","readOnly":true}}},
+"SubscriptionInvoice": {"x-ticvai-persistence":"control.invoice + control.invoice_line","type":"object","required":["id","invoiceNumber","tenantId","periodStart","periodEnd","status","total"],"properties":{"id":{"type":"string","format":"uuid"},"invoiceNumber":{"type":"string","readOnly":true,"description":"A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the invoice is issued, never reused. A cancelled invoice keeps its number.\n"},"tenantId":{"x-ticvai-references":"control.tenant","type":"string","format":"uuid"},"periodStart":{"type":"string","format":"date"},"periodEnd":{"type":"string","format":"date"},"status":{"$ref":"#/components/schemas/InvoiceStatus"},"lines":{"type":"array","items":{"type":"object","properties":{"description":{"type":"string"},"kind":{"type":"string","enum":["basePlan","module","addOn","overage","metered","oneOff","credit"],"description":"`module`, one per licensed module at its platform price, and `metered`, usage such as AI tokens (decided 29 September)."},"moduleCode":{"type":"string","nullable":true,"description":"The module a `module` or `metered` line charges for."},"audience":{"type":"string","enum":["staff","guest"],"nullable":true,"description":"For an AI `metered` line, whose usage it is."},"metric":{"$ref":"#/components/schemas/UsageMetric"},"quantity":{"type":"number"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"subtotal":{"x-ticvai-column":"net_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"planVersionUsed":{"type":"string","description":"Priced against the version the tenant is subscribed to, not the latest."},"creditedTotal":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"The sum of the credit notes issued against this invoice (`issueCreditNote`); the invoice itself is never edited. Null with none."},"issuedAt":{"type":"string","format":"date-time","nullable":true},"dueAt":{"type":"string","format":"date","nullable":true},"paidAt":{"type":"string","format":"date-time","nullable":true}}},
 "SubscriptionPlanRecommendation": {"type":"object","x-ticvai-persistence":"none — computed from control.usage_record, the plan, tier and add-on limits and capacity packs, priced as simulateCommercialPackage prices","description":"One plan-fit move for a tenant, priced against staying as it is (20.8.4, 20.8.5; decided 29 September, build pass, group G2).","required":["kind","reason","projectedMonthlyCost"],"properties":{"kind":{"type":"string","enum":["upgrade","downgrade","addModule","removeModule","removeAddOn","capacityPack"]},"targetPlanId":{"type":"string","format":"uuid","nullable":true,"description":"The tier to move to, for `upgrade` and `downgrade`."},"moduleCode":{"type":"string","nullable":true,"description":"For `addModule` and `removeModule`."},"addOnCode":{"type":"string","nullable":true,"description":"For `removeAddOn`."},"billableUnit":{"type":"string","nullable":true,"description":"The unit that drives it (for `upgrade`, `downgrade` and `capacityPack`), as `getLicenceEnforcement` names it."},"capacityPackSize":{"type":"integer","nullable":true,"description":"For `capacityPack`, the pack size that covers the projected overage."},"projectedMonthlyCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"projectedSaving":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Against staying as it is over the horizon, monthly. Set where the move saves money."},"projectedAddedCost":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Where the move costs more than today but less than the alternative named in `comparedWith`."},"comparedWith":{"type":"string","enum":["currentPackage","projectedOverage","nextTier","capacityPack"],"description":"What the move is cheaper than. An `upgrade` is compared with paying the projected overage; a `capacityPack` with the next tier."},"reason":{"type":"string","maxLength":500,"description":"One sentence a person can repeat to the customer."},"basis":{"type":"object","description":"The numbers it rests on.","properties":{"usageWindowDays":{"type":"integer"},"usedAverage":{"type":"number","nullable":true},"usedPeak":{"type":"number","nullable":true},"projectedPeak":{"type":"number","nullable":true},"currentLimit":{"type":"number","nullable":true},"targetLimit":{"type":"number","nullable":true},"lastUsedAt":{"type":"string","format":"date-time","nullable":true,"description":"For `removeModule` and `removeAddOn`, the last metered use; null for never."}}},"applyWith":{"type":"string","enum":["setSubscription","addCapacityPack"],"description":"The operation a person uses to carry it out (after `previewSubscriptionChange` for `setSubscription`)."}}},
 "SubscriptionPreview": {"x-ticvai-persistence":"none — computed","type":"object","required":["canApply","priceChange"],"properties":{"canApply":{"type":"boolean"},"priceChange":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"proratedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"modulesGained":{"type":"array","items":{"type":"string"}},"modulesLost":{"type":"array","items":{"type":"string"}},"conflicts":{"$ref":"#/components/schemas/DowngradeConflictProblem"},"cellTierChange":{"type":"object","nullable":true,"properties":{"from":{"$ref":"#/components/schemas/CellTier"},"to":{"$ref":"#/components/schemas/CellTier"},"requiresMigration":{"type":"boolean"}}}}},
 "SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
-"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "TenantStatus": {"type":"string","enum":["onboarding","active","suspended","terminating","terminated"]},
 "UsageMetric": {"type":"string","enum":["venues","workstations","activeUsers","devices","brandedApps","aiTokens","apiCalls","storageGb","transactions","guestProfiles"]}
 }

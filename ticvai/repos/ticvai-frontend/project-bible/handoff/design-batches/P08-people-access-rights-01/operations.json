@@ -837,7 +837,7 @@
   "contract": "workforce",
   "summary": "Ask someone to take your shift",
   "permission": "WORKFORCE_VIEW",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -947,7 +947,7 @@
  },
  "setApprovalMatrix": {
   "method": "PUT",
-  "path": "/approval-matrices",
+  "path": "/approval-matrices/{matrixId}",
   "contract": "approvals",
   "summary": "Configure what requires approval",
   "permission": "APPROVAL_CONFIGURE",
@@ -955,6 +955,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "matrixId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -966,7 +971,7 @@
  },
  "setCapabilityTemplate": {
   "method": "PUT",
-  "path": "/capability-templates",
+  "path": "/capability-templates/{capabilityTemplateId}",
   "contract": "identity",
   "summary": "Save a tick-set under a name",
   "permission": "ROLE_MANAGE",
@@ -974,6 +979,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "capabilityTemplateId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -985,7 +995,7 @@
  },
  "setJobTitle": {
   "method": "PUT",
-  "path": "/job-titles",
+  "path": "/job-titles/{jobTitleId}",
   "contract": "workforce",
   "summary": "Define a job title",
   "permission": "WORKFORCE_MANAGE",
@@ -993,6 +1003,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "jobTitleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -1023,7 +1038,7 @@
  },
  "setWorkAssignment": {
   "method": "PUT",
-  "path": "/work-assignments",
+  "path": "/work-assignments/{workAssignmentId}",
   "contract": "workforce",
   "summary": "Post a person to a job title at a venue",
   "permission": "WORKFORCE_MANAGE",
@@ -1031,6 +1046,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "workAssignmentId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -1129,7 +1149,7 @@
     "required": null
    }
   ],
-  "requestBody": "RotaAssignment",
+  "requestBody": "UpdateRotaAssignmentRequest",
   "responds": "RotaAssignment"
  },
  "verifyMfaChallenge": {

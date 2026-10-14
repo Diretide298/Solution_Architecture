@@ -26,6 +26,23 @@ layout:
   note: 'The internal layout of the six repositories is unknown (13 October 2026). A ticket gives the route, the
     component name and a suggested location only; a developer who finds the repository laid out differently
     follows the repository.'
+  # **Each repository's profile** (CHG-RPO-001, CHG-RPO-002, 14 October 2026). What a repository was seen to hold is
+  # recorded on its entry as `observed:` (by, date, how, reachable; and, once read: workspace, stack,
+  # packageManager, appRoot, srcRoot, packages, scripts). tools/frontend_repos.py profile() lays that over `default`
+  # below, then over the entry's own `profile:` (a value nobody observed, kept apart and named as assumed).
+  # Every screen's implementation.component on a platform with a repository is written from its profile by
+  # tools/apply-repo-layout.py: `<screensDir>/<area>/<Component>.tsx`, relative to the repository's root. The
+  # tickets, the frontend spec pages and ADAM setup's frontend CLAUDE.md read the same profile. The owner of each
+  # repository confirms its profile afterwards (the lead's decision 3, 14 October 2026).
+  default:
+    stack: the platform's runtime (screens/P*.yaml platform.runtime)
+    workspace: unknown
+    packageManager: the one its lock file belongs to
+    appRoot: .
+    srcRoot: src
+    screensDir: src/routes
+    packages: unknown
+    scripts: {lint: unknown, typecheck: unknown, test: unknown, build: unknown}
 
 # One entry per platform in screens/P*.yaml. `repo: null` is a platform with no repository yet: its tickets say
 # so and name no folder. `assumed: true` is a mapping the lead stated as an assumption, not yet confirmed.
@@ -35,16 +52,53 @@ platforms:
     app: guest-web
     repo: ticvai-guest-web
     assumed: false
+    observed:
+      by: the Block A audit's frontend-repos batch (RPO), for Chinmay
+      date: '2026-10-14'
+      how: a shallow, read-only clone of the url above with the GitLab access the package team holds
+      reachable: false
+      result: 'GitLab answered that the project could not be found: nothing inside the repository was read, so
+        its profile is the default above (assumed). The repository''s owner confirms the real layout.'
+      confirmed: false
   P02:
     name: Guest App - Mobile
     app: guest-app
     repo: ticvai-guest-app
     assumed: false
+    observed:
+      by: 'the developer''s agent on #27741 (AM-IDENTITY-SECURITY-P02), in its own clone; relayed by the lead'
+      date: '2026-10-14'
+      how: '#27741 problem 3 (CHG-SWP-003). A shallow, read-only clone from the package team the same day was
+        refused, as for the other five repositories.'
+      reachable: true
+      workspace: none
+      stack: React Native CLI, one app at the repository root
+      packageManager: npm
+      state: Redux Toolkit
+      navigation: React Navigation
+      appRoot: .
+      srcRoot: src
+      packages: []
+      scripts: {lint: unknown, typecheck: none, test: unknown, build: unknown}
+      confirmed: false
+    profile:
+      screensDir: src/screens
+      assumed: 'screensDir only. React Navigation registers screens in a navigator, not by file route, so the
+        package''s routes/ folder (a web router''s) is not carried over; src/screens is assumed until the owner
+        confirms.'
   P04:
     name: Venue POS - Terminal and Tablet
     app: venue-pos
     repo: ticvai-pos
     assumed: false
+    observed:
+      by: the Block A audit's frontend-repos batch (RPO), for Chinmay
+      date: '2026-10-14'
+      how: a shallow, read-only clone of the url above with the GitLab access the package team holds
+      reachable: false
+      result: 'GitLab answered that the project could not be found: nothing inside the repository was read, so
+        its profile is the default above (assumed). The repository''s owner confirms the real layout.'
+      confirmed: false
   P05:
     name: Guest Kiosk - Self-Service
     app: guest-app
@@ -52,6 +106,14 @@ platforms:
     assumed: true
     note: 'The package serves P05 from guest-app, the same app as P02 (screens/P05-guest-kiosk.yaml). The lead
       maps it to its own repository, ticvai-kiosk, as an assumption of 13 October 2026, not yet confirmed.'
+    observed:
+      by: the Block A audit's frontend-repos batch (RPO), for Chinmay
+      date: '2026-10-14'
+      how: a shallow, read-only clone of the url above with the GitLab access the package team holds
+      reachable: false
+      result: 'GitLab answered that the project could not be found: nothing inside the repository was read, so
+        its profile is the default above (assumed). The repository''s owner confirms the real layout.'
+      confirmed: false
   P06:
     name: Venue Staff App - Operations
     app: venue-staff-app
@@ -59,6 +121,14 @@ platforms:
     assumed: true
     note: 'The lead maps the Venue Staff App (venue-staff-app) to ticvai-employee-app as an assumption of
       13 October 2026, not yet confirmed.'
+    observed:
+      by: the Block A audit's frontend-repos batch (RPO), for Chinmay
+      date: '2026-10-14'
+      how: a shallow, read-only clone of the url above with the GitLab access the package team holds
+      reachable: false
+      result: 'GitLab answered that the project could not be found: nothing inside the repository was read, so
+        its profile is the default above (assumed). The repository''s owner confirms the real layout.'
+      confirmed: false
   P07:
     name: Venue Scanner - Access Control
     app: venue-scanner
@@ -68,6 +138,14 @@ platforms:
     app: venue-management-web
     repo: ticvai-venue-management
     assumed: false
+    observed:
+      by: the Block A audit's frontend-repos batch (RPO), for Chinmay
+      date: '2026-10-14'
+      how: a shallow, read-only clone of the url above with the GitLab access the package team holds
+      reachable: false
+      result: 'GitLab answered that the project could not be found: nothing inside the repository was read, so
+        its profile is the default above (assumed). The repository''s owner confirms the real layout.'
+      confirmed: false
   P09:
     name: TICVAI Web - Platform Console
     app: ticvai-web

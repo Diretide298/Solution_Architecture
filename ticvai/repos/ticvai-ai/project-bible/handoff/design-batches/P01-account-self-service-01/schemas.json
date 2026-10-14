@@ -1,4 +1,77 @@
 {
+ "CampaignInvitation": {
+  "x-ticvai-retired-columns": [
+   "product_id",
+   "performance_id",
+   "offered_by_principal_id",
+   "issued_by_principal_id",
+   "cost_center_id"
+  ],
+  "type": "object",
+  "x-ticvai-persistence": "marketing.invitation",
+  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
+  "required": [
+   "id",
+   "campaignId",
+   "token",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "campaignId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "recipientEmail": {
+    "type": "string",
+    "format": "email",
+    "nullable": true
+   },
+   "token": {
+    "type": "string",
+    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
+   },
+   "plusOnes": {
+    "type": "integer",
+    "default": 0
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "issued",
+     "viewed",
+     "accepted",
+     "declined",
+     "expired",
+     "revoked"
+    ]
+   },
+   "entitlementIds": {
+    "type": "array",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "respondedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
  "Cart": {
   "type": "object",
   "x-ticvai-persistence": "orders.cart",
@@ -42,12 +115,14 @@
     }
    },
    "conflicts": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "$ref": "#/components/schemas/CartConflict"
     }
    },
    "consentQuestions": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
@@ -383,6 +458,7 @@
   ]
  },
  "ConsentPurposeConfig": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.consent_purpose + marketing.consent_purpose_channel",
   "type": "object",
   "required": [
@@ -509,6 +585,7 @@
     "description": "A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
+    "x-ticvai-references": "catalogue.entitlement_template",
     "type": "string",
     "format": "uuid",
     "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
@@ -814,6 +891,7 @@
     "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
    },
    "taxInvoiceId": {
+    "x-ticvai-references": "ledger.tax_invoice",
     "type": "string",
     "format": "uuid"
    },
@@ -850,6 +928,7 @@
     "nullable": true
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -1154,6 +1233,7 @@
     "$ref": "#/components/schemas/FinTaxInvoiceStatus"
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -1515,6 +1595,7 @@
   "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six places the wire carries survive the database.\n"
  },
  "GuestPreferences": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.guest_preference",
   "description": "**What the guest likes, kept apart from what they permit** (consent) and from who they are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as tags because BL-134 gives them their own consent purpose and retention.\n",
@@ -1739,171 +1820,6 @@
    }
   }
  },
- "IdentityGuestDocumentSubmission": {
-  "type": "object",
-  "x-ticvai-persistence": "none — request only; the document goes to pii.subject_document and the verification to identity.guest_identity_verification",
-  "required": [
-   "documentKind",
-   "documentNumber",
-   "documentAssetId"
-  ],
-  "properties": {
-   "documentKind": {
-    "type": "string",
-    "enum": [
-     "passport",
-     "emiratesId",
-     "nationalId",
-     "drivingLicence",
-     "residencePermit",
-     "other"
-    ],
-    "description": "The vocabulary of `pii.subject_document.kind`."
-   },
-   "documentNumber": {
-    "type": "string",
-    "format": "password",
-    "writeOnly": true,
-    "maxLength": 64,
-    "description": "**Write-only, never returned.** Hashed on arrival; only the last four are kept in clear."
-   },
-   "issuingCountry": {
-    "type": "string",
-    "pattern": "^[A-Z]{2}$",
-    "nullable": true
-   },
-   "expiresOn": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "documentAssetId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The uploaded scan or photo of the document."
-   },
-   "selfieAssetId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "A live photo for the reviewer to compare, where the policy asks for one. Deleted with the scan."
-   },
-   "reason": {
-    "type": "string",
-    "enum": [
-     "policyRequired",
-     "ageRestrictedPurchase",
-     "residentPricing",
-     "accountRecovery"
-    ],
-    "default": "policyRequired",
-    "description": "What the guest is verifying for; the review queue shows it."
-   }
-  }
- },
- "IdentityGuestVerification": {
-  "type": "object",
-  "x-ticvai-persistence": "identity.guest_identity_verification",
-  "description": "**One guest identity-document verification** (5.3.21; decided 29 September, build pass): the document it checks, its status, the method and who decided. The document itself is `pii.subject_document`; this row holds no document number.",
-  "required": [
-   "id",
-   "subjectId",
-   "status",
-   "submittedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectDocumentId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "The `pii.subject_document` row submitted."
-   },
-   "documentKind": {
-    "type": "string",
-    "enum": [
-     "passport",
-     "emiratesId",
-     "nationalId",
-     "drivingLicence",
-     "residencePermit",
-     "other"
-    ]
-   },
-   "documentNumberLast4": {
-    "type": "string",
-    "maxLength": 4,
-    "nullable": true,
-    "readOnly": true
-   },
-   "reason": {
-    "type": "string",
-    "enum": [
-     "policyRequired",
-     "ageRestrictedPurchase",
-     "residentPricing",
-     "accountRecovery"
-    ]
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "pending",
-     "verified",
-     "rejected",
-     "resubmissionRequested"
-    ],
-    "readOnly": true
-   },
-   "method": {
-    "type": "string",
-    "enum": [
-     "manualReview",
-     "documentScanner",
-     "provider"
-    ],
-    "nullable": true,
-    "readOnly": true
-   },
-   "decisionReason": {
-    "type": "string",
-    "maxLength": 300,
-    "nullable": true,
-    "readOnly": true
-   },
-   "decidedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true
-   },
-   "submittedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "documentImageDeletedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true,
-    "description": "When the scan (and any selfie) was deleted under the policy's retention."
-   }
-  }
- },
  "LoyaltyProgramme": {
   "x-ticvai-persistence": "marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier",
   "type": "object",
@@ -2057,6 +1973,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -2279,7 +2196,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -2765,6 +2683,83 @@
   ],
   "description": "**The credential a ticket is issued with** (MoM 2 Sep 2026 §4.7, MOM-0330: VIP invitations and B2B/reseller tickets \"may need to fall back to a standard QR code or RFID card\", with \"a per-product override to disable dynamic QR for specific ticket types\"; 12 October 2026, CHG-R6-031). `platformSignedQr` is the default: the platform's own signed QR as the event issues it, rotating where the event sells dynamic QR (`getEntitlementCredential` `rotation`). `staticQr` is the platform's signed QR issued once and never rotated, for a ticket that leaves the app (a reseller's batch, a printed invitation): dynamic QR is off for it even in a fully dynamic event. `rfidCard` issues no QR; the ticket is collected as an RFID card or wristband and bound then (`AccessCredentialBinding`). A partner's own barcode symbology is not issued by the platform: tickets a partner issues itself are imported and validated (BO-181), not this."
  },
+ "TicketTransfer": {
+  "x-ticvai-persistence": "orders.ticket_transfer",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "ticketIds",
+   "status",
+   "offeredAt",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "ticketIds": {
+    "type": "array",
+    "description": "The entitlements offered — `Entitlement.id` values, since a ticket is an entitlement. Each points at `access.entitlement`.",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "fromSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set only on claim. Ownership moves then, not at offer."
+   },
+   "recipientAddressMasked": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "offered",
+     "claimed",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "claimUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "claimToken": {
+    "x-ticvai-secret": "blind-index",
+    "type": "string",
+    "format": "password",
+    "writeOnly": true,
+    "description": "**What `claimTicketTransfer` checks the presented `claimToken` against.** Carried to the recipient inside `claimUrl` and never returned — the sender reading their transfer must not be able to claim it on the recipient's behalf.\n"
+   },
+   "offeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "claimedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "An unclaimed transfer expires and the tickets return. A transfer to a mistyped address must not strand a ticket somewhere nobody can reach.\n"
+   }
+  }
+ },
  "TokenPair": {
   "x-ticvai-persistence": "none — transient",
   "type": "object",
@@ -2788,6 +2783,7 @@
   }
  },
  "Wallet": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [
@@ -2924,6 +2920,7 @@
     "type": "string"
    },
    "authenticationToken": {
+    "x-ticvai-secret": "blind-index",
     "type": "string",
     "format": "password",
     "writeOnly": true,
@@ -3004,6 +3001,7 @@
     "description": "The guest who saved it. The wishlist is keyed by subject; there is no parent wishlist row."
    },
    "variantId": {
+    "x-ticvai-references": "catalogue.variant",
     "type": "string",
     "format": "uuid"
    },
@@ -3144,72 +3142,6 @@
     ],
     "readOnly": true,
     "description": "**The tenant's `PasswordPolicy.pinLength`, carried to the device** (14 October 2026, CHG-CRD-002, ADAM CR-078). A device door draws its PIN keypad, and its supervisor step-up prompt, at this many digits; the device keeps it with the workstation context of the last session on it, so the door needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the server decides. Read from `identity.password_policy`, not stored on the workstation."
-   }
-  }
- },
- "marketing-crm::Invitation": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.invitation",
-  "description": "**Addressed and tokenised.** A guest accepting an invitation is claiming a specific place, not buying one.\n",
-  "required": [
-   "id",
-   "campaignId",
-   "token",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "campaignId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "recipientEmail": {
-    "type": "string",
-    "format": "email",
-    "nullable": true
-   },
-   "token": {
-    "type": "string",
-    "description": "**Single-use and unguessable.** An invitation link forwarded to a group chat is the failure mode, and a token that survives its first use is one that ends up there.\n"
-   },
-   "plusOnes": {
-    "type": "integer",
-    "default": 0
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "issued",
-     "viewed",
-     "accepted",
-     "declined",
-     "expired",
-     "revoked"
-    ]
-   },
-   "entitlementIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    }
-   },
-   "respondedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string",
-    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
    }
   }
  }

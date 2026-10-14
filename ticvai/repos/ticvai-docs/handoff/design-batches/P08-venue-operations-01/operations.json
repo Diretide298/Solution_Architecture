@@ -24,7 +24,7 @@
   "contract": "maintenance",
   "summary": "Cancel a work order",
   "permission": "WORK_ORDER_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -62,7 +62,7 @@
   "contract": "maintenance",
   "summary": "Administratively closed",
   "permission": "MAINTENANCE_APPROVE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

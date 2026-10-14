@@ -5,11 +5,12 @@
   "module": "Guests & Marketing",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "AUDIT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/audit-log",
-   "component": "apps/venue-management-web/src/routes/venue-operations/AuditLogDetail.tsx",
+   "component": "src/routes/venue-operations/AuditLogDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -220,11 +221,12 @@
   "module": "Guests & Marketing",
   "requiresModule": "marketing",
   "wave": 2,
+  "permission": "CASE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/lost-found-register",
-   "component": "apps/venue-management-web/src/routes/venue-operations/LostFoundRegisterDetail.tsx",
+   "component": "src/routes/venue-operations/LostFoundRegisterDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -423,11 +425,12 @@
   "module": "Guests & Marketing",
   "requiresModule": "ai",
   "wave": 1,
+  "permission": "AI_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/ai/policy",
-   "component": "apps/venue-management-web/src/routes/AiPolicySpend.tsx",
+   "component": "src/routes/AiPolicySpend.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -749,10 +752,11 @@
   "module": "Guests & Marketing",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/guests-marketing",
-   "component": "apps/venue-management-web/src/routes/home/GuestsMarketingList.tsx",
+   "component": "src/routes/home/GuestsMarketingList.tsx",
    "status": "notStarted"
   },
   "navigation": {

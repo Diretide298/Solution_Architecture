@@ -12,9 +12,9 @@
   "appOnly": 6
  },
  "severity": {
-  "high": 26,
-  "medium": 165,
-  "low": 222,
+  "high": 27,
+  "medium": 156,
+  "low": 218,
   "info": 3
  },
  "findings": [
@@ -106,14 +106,14 @@
    "severity": "high",
    "dimension": "operations",
    "where": "app only",
-   "detail": "bindCredentialDevice, claimTicketTransfer, enrolFacePass, getOrderCalendarEvent, getTransportDeparture, getVisitReminder, grantDelegation, listBookableOutlets, listCatalogueBundles, listTicketTransfers, registerGuestDevice, reserveMerchandise, setVisitReminder",
+   "detail": "bindCredentialDevice, claimTicketTransfer, enrolFacePass, enrolMfaMethod, getOrderCalendarEvent, getTransportDeparture, getVisitReminder, getWalletAutoReloadSetting, grantDelegation, listBookableOutlets, listCatalogueBundles, registerGuestDevice, reserveMerchandise, setVisitReminder, setWalletAutoReloadSetting, verifyMfaEnrolment",
    "fix": ""
   },
   {
    "severity": "high",
    "dimension": "operations",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "the web calls createCart, evaluatePromotions and the app cannot call it anywhere",
+   "detail": "the web calls evaluatePromotions and the app cannot call it anywhere",
    "fix": ""
   },
   {
@@ -148,14 +148,14 @@
    "severity": "high",
    "dimension": "operations",
    "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
-   "detail": "the app calls registerGuestDevice and the web cannot call it anywhere",
+   "detail": "the app calls enrolMfaMethod, registerGuestDevice, verifyMfaEnrolment and the web cannot call it anywhere",
    "fix": ""
   },
   {
    "severity": "high",
    "dimension": "operations",
    "where": "profile (WEB-020 ↔ GST-039)",
-   "detail": "the web calls getMyIdentityVerification, submitGuestIdentityDocument, updateGuestPreferences and the app cannot call it anywhere",
+   "detail": "the web calls updateGuestPreferences and the app cannot call it anywhere",
    "fix": ""
   },
   {
@@ -183,7 +183,7 @@
    "severity": "high",
    "dimension": "operations",
    "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
-   "detail": "the app calls claimTicketTransfer, listTicketTransfers and the web cannot call it anywhere",
+   "detail": "the app calls claimTicketTransfer and the web cannot call it anywhere",
    "fix": ""
   },
   {
@@ -196,8 +196,15 @@
   {
    "severity": "high",
    "dimension": "operations",
+   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
+   "detail": "the app calls getWalletAutoReloadSetting, setWalletAutoReloadSetting and the web cannot call it anywhere",
+   "fix": ""
+  },
+  {
+   "severity": "high",
+   "dimension": "operations",
    "where": "web only",
-   "detail": "createCart, evaluatePromotions, extendSeatHold, getMyChallenges, getMyIdentityVerification, getResourceAvailability, getWaiverStatus, submitGuestIdentityDocument, updateGuestPreferences",
+   "detail": "evaluatePromotions, extendSeatHold, getMyChallenges, getResourceAvailability, getWaiverStatus, updateGuestPreferences",
    "fix": ""
   },
   {
@@ -358,7 +365,7 @@
    "severity": "medium",
    "dimension": "bindings",
    "where": "venue-info (WEB-028 ↔ GST-029)",
-   "detail": "web shows ['PublishedTenantConfig'] only, app shows ['DiningOutlet', 'VenueContact'] only",
+   "detail": "web shows — only, app shows ['DiningOutlet'] only",
    "fix": "bind both twins to the same schemas"
   },
   {
@@ -897,14 +904,14 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "the app calls getMyProfile, listProductCategories, searchCatalogue here; the web calls getMyProfile on WEB-011/WEB-020; listProductCategories on WEB-002/WEB-005; searchCatalogue on WEB-002/WEB-003",
+   "detail": "the app calls getMyProfile, listProductCategories here; the web calls getMyProfile on WEB-011/WEB-020; listProductCategories on WEB-002/WEB-005",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
    "severity": "medium",
    "dimension": "operations",
    "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
-   "detail": "the app calls createAiConversation, getCart, getWaitTimes, requestSuggestion, sendAiMessage here; the web calls createAiConversation on WEB-044; getCart on WEB-006/WEB-010/WEB-011; getWaitTimes on WEB-002/WEB-004/WEB-039/WEB-040; requestSuggestion on WEB-044; sendAiMessage on WEB-044",
+   "detail": "the app calls createAiConversation, getWaitTimes, requestSuggestion, sendAiMessage here; the web calls createAiConversation on WEB-044; getWaitTimes on WEB-002/WEB-004/WEB-039/WEB-040; requestSuggestion on WEB-044; sendAiMessage on WEB-044",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -953,7 +960,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
-   "detail": "the app calls createMfaChallenge, getGuestSession, guestLogout, verifyGuestEmail, verifyMfaChallenge here; the web calls createMfaChallenge on WEB-016; getGuestSession on WEB-016; guestLogout on WEB-016; verifyGuestEmail on WEB-013/WEB-020; verifyMfaChallenge on WEB-016",
+   "detail": "the app calls getGuestSession, guestLogout, verifyGuestEmail here; the web calls getGuestSession on WEB-016; guestLogout on WEB-016; verifyGuestEmail on WEB-013/WEB-020",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -974,7 +981,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "search (WEB-003 ↔ GST-063)",
-   "detail": "the web calls listProducts here; the app calls listProducts on GST-001/GST-002/GST-003/GST-005/GST-007/GST-008/GST-015/GST-021/GST-038/GST-044/GST-050/GST-051/GST-052/GST-053/GST-075",
+   "detail": "the web calls listProducts here; the app calls listProducts on GST-001/GST-002/GST-003/GST-005/GST-007/GST-008/GST-015/GST-021/GST-038/GST-044/GST-050/GST-051/GST-052/GST-075",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1023,7 +1030,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "ticket-transfer (WEB-030 ↔ GST-014/GST-045)",
-   "detail": "the app calls listMyEntitlements here; the web calls listMyEntitlements on WEB-001/WEB-017/WEB-018/WEB-024",
+   "detail": "the app calls listMyEntitlements, listTicketTransfers here; the web calls listMyEntitlements on WEB-001/WEB-017/WEB-018/WEB-024; listTicketTransfers on WEB-018",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1037,14 +1044,7 @@
    "severity": "medium",
    "dimension": "operations",
    "where": "venue-info (WEB-028 ↔ GST-029)",
-   "detail": "the web calls getPublishedTenantConfig here; the app calls getPublishedTenantConfig on GST-001/GST-043/GST-047/GST-071",
-   "fix": "same operations on the same capability, so a guest finds it in the same place"
-  },
-  {
-   "severity": "medium",
-   "dimension": "operations",
-   "where": "venue-info (WEB-028 ↔ GST-029)",
-   "detail": "the app calls getTenantAppStatus, listDeliveryLocations, listDiningOutlets here; the web calls getTenantAppStatus on WEB-001/WEB-025/WEB-029/WEB-045/WEB-050; listDeliveryLocations on WEB-036; listDiningOutlets on WEB-036",
+   "detail": "the app calls listDeliveryLocations, listDiningOutlets here; the web calls listDeliveryLocations on WEB-036; listDiningOutlets on WEB-036",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1064,15 +1064,8 @@
   {
    "severity": "medium",
    "dimension": "operations",
-   "where": "virtual-queue (WEB-040 ↔ GST-023)",
-   "detail": "the app calls listQueues here; the web calls listQueues on WEB-039",
-   "fix": "same operations on the same capability, so a guest finds it in the same place"
-  },
-  {
-   "severity": "medium",
-   "dimension": "operations",
    "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
-   "detail": "the app calls getPublishedTenantConfig, listConsentPurposes, redeemLoyaltyPoints here; the web calls getPublishedTenantConfig on WEB-001/WEB-028/WEB-029; listConsentPurposes on WEB-011/WEB-020/WEB-024/WEB-027; redeemLoyaltyPoints on WEB-043",
+   "detail": "the app calls getPublishedTenantConfig, listConsentPurposes, redeemLoyaltyPoints here; the web calls getPublishedTenantConfig on WEB-001/WEB-029; listConsentPurposes on WEB-011/WEB-020/WEB-024/WEB-027; redeemLoyaltyPoints on WEB-043",
    "fix": "same operations on the same capability, so a guest finds it in the same place"
   },
   {
@@ -1136,6 +1129,13 @@
    "dimension": "platform",
    "where": "navigationSets",
    "detail": "web null · app {\"appTabs\": {\"destinations\": [\"GST-001\", \"GST-002\", \"GST-003\", \"GST-051\", \"GST-012\", \"GST-038\"], \"members\": [\"GST-001\", ",
+   "fix": ""
+  },
+  {
+   "severity": "medium",
+   "dimension": "platform",
+   "where": "packages",
+   "detail": "web only ['api-client', 'design-tokens', 'ui'], app only []",
    "fix": ""
   },
   {
@@ -1274,27 +1274,6 @@
   {
    "severity": "medium",
    "dimension": "unbound operations",
-   "where": "ai-concierge (WEB-044 ↔ GST-031/GST-032/GST-033)",
-   "detail": "GST-032 declares recordAnswerFeedback and no component in its layout calls it; the twin binds or lacks recordAnswerFeedback",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "medium",
-   "dimension": "unbound operations",
-   "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "WEB-010 declares createCart, getResourceHold and no component in its layout calls them; the twin binds or lacks createCart",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "medium",
-   "dimension": "unbound operations",
-   "where": "checkout-and-payment (WEB-011/WEB-012/WEB-014 ↔ GST-009)",
-   "detail": "WEB-011 declares recordConsentAnswers and no component in its layout calls it; the twin binds or lacks recordConsentAnswers",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "medium",
-   "dimension": "unbound operations",
    "where": "date-and-session (WEB-006 ↔ GST-007)",
    "detail": "GST-007 declares addCartLine, checkBookingEligibility, getCart, recordConsentAnswers and no component in its layout calls them; the twin binds or lacks addCartLine",
    "fix": "bind each to a component, or move it to the screen that calls it"
@@ -1310,20 +1289,6 @@
    "severity": "medium",
    "dimension": "unbound operations",
    "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
-   "detail": "GST-051 declares getWaitTimes and no component in its layout calls it; the twin binds or lacks getWaitTimes",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "medium",
-   "dimension": "unbound operations",
-   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
-   "detail": "GST-053 declares getCart, listProducts and no component in its layout calls them; the twin binds or lacks getCart, listProducts",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "medium",
-   "dimension": "unbound operations",
-   "where": "itinerary-planning (WEB-050 ↔ GST-051/GST-052/GST-053/GST-054/GST-059)",
    "detail": "GST-054 declares createAiConversation, requestSuggestion and no component in its layout calls them; the twin binds or lacks createAiConversation, requestSuggestion",
    "fix": "bind each to a component, or move it to the screen that calls it"
   },
@@ -1331,28 +1296,7 @@
    "severity": "medium",
    "dimension": "unbound operations",
    "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
-   "detail": "WEB-024 declares enrolMfaMethod, getCookieConsentRuntime, getDeviceConsentHistory, listPublishedTrackingTechnologies, recordDeviceConsent, removeMfaMethod, verifyMfaEnrolment and no component in its layout calls them; the twin binds or lacks enrolMfaMethod",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "medium",
-   "dimension": "unbound operations",
-   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
-   "detail": "GST-073 declares createMfaChallenge, registerGuestDevice, removeMfaMethod, verifyMfaChallenge, verifyMfaEnrolment and no component in its layout calls them; the twin binds or lacks createMfaChallenge, registerGuestDevice, verifyMfaChallenge",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "medium",
-   "dimension": "unbound operations",
-   "where": "profile (WEB-020 ↔ GST-039)",
-   "detail": "WEB-020 declares getMyIdentityVerification, submitGuestIdentityDocument and no component in its layout calls them; the twin binds or lacks getMyIdentityVerification, submitGuestIdentityDocument",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "medium",
-   "dimension": "unbound operations",
-   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
-   "detail": "WEB-021 declares getWalletAutoReloadSetting, getWalletExitBalance, setWalletAutoReloadSetting, settleWalletAtExit and no component in its layout calls them; the twin binds or lacks setWalletAutoReloadSetting",
+   "detail": "GST-073 declares registerGuestDevice, verifyMfaEnrolment and no component in its layout calls them; the twin binds or lacks registerGuestDevice, verifyMfaEnrolment",
    "fix": "bind each to a component, or move it to the screen that calls it"
   },
   {
@@ -1862,7 +1806,7 @@
   {
    "severity": "low",
    "dimension": "documents",
-   "where": "contracts/spine/catalogue.yaml:1272",
+   "where": "contracts/spine/catalogue.yaml:1608",
    "detail": "\"browses by category and cannot search\" — GST-063 Search exists since 17 August",
    "fix": "rewrite to the 12 September rule"
   },
@@ -2801,7 +2745,14 @@
    "severity": "low",
    "dimension": "unbound operations",
    "where": "cart (WEB-010 ↔ GST-041)",
-   "detail": "GST-041 declares getResourceHold and no component in its layout calls it",
+   "detail": "WEB-010 declares createCart, getResourceHold and no component in its layout calls them",
+   "fix": "bind each to a component, or move it to the screen that calls it"
+  },
+  {
+   "severity": "low",
+   "dimension": "unbound operations",
+   "where": "cart (WEB-010 ↔ GST-041)",
+   "detail": "GST-041 declares createCart, getResourceHold and no component in its layout calls them",
    "fix": "bind each to a component, or move it to the screen that calls it"
   },
   {
@@ -2815,49 +2766,14 @@
    "severity": "low",
    "dimension": "unbound operations",
    "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "WEB-001 declares decideRecommendations, getCookieConsentRuntime, recordDeviceConsent, recordRecommendationEvents, recordStorefrontSessionEvents and no component in its layout calls them",
+   "detail": "WEB-001 declares getCookieConsentRuntime, recordStorefrontSessionEvents and no component in its layout calls them",
    "fix": "bind each to a component, or move it to the screen that calls it"
   },
   {
    "severity": "low",
    "dimension": "unbound operations",
    "where": "home (WEB-001 ↔ GST-001)",
-   "detail": "GST-001 declares decideRecommendations, getCookieConsentRuntime, recordDeviceConsent, recordRecommendationEvents, recordStorefrontSessionEvents and no component in its layout calls them",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "low",
-   "dimension": "unbound operations",
-   "where": "loyalty (WEB-043 ↔ GST-036)",
-   "detail": "WEB-043 declares decideRecommendations, recordRecommendationEvents and no component in its layout calls them",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "low",
-   "dimension": "unbound operations",
-   "where": "loyalty (WEB-043 ↔ GST-036)",
-   "detail": "GST-036 declares decideRecommendations, recordRecommendationEvents and no component in its layout calls them",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "low",
-   "dimension": "unbound operations",
-   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
-   "detail": "WEB-023 declares createInstalmentPlan, listInstalmentPlans and no component in its layout calls them",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "low",
-   "dimension": "unbound operations",
-   "where": "memberships (WEB-022/WEB-023 ↔ GST-015)",
-   "detail": "GST-015 declares createInstalmentPlan, listInstalmentPlans and no component in its layout calls them",
-   "fix": "bind each to a component, or move it to the screen that calls it"
-  },
-  {
-   "severity": "low",
-   "dimension": "unbound operations",
-   "where": "privacy-security-devices (WEB-024 ↔ GST-066/GST-073)",
-   "detail": "GST-066 declares getCookieConsentRuntime, getDeviceConsentHistory, listPublishedTrackingTechnologies, recordDeviceConsent and no component in its layout calls them",
+   "detail": "GST-001 declares getCookieConsentRuntime, recordStorefrontSessionEvents and no component in its layout calls them",
    "fix": "bind each to a component, or move it to the screen that calls it"
   },
   {
@@ -2891,22 +2807,22 @@
   {
    "severity": "low",
    "dimension": "unbound operations",
-   "where": "transport (WEB-049 ↔ GST-076/GST-077/GST-078/GST-079)",
-   "detail": "WEB-049 declares getTransportRoute and no component in its layout calls it",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "WEB-018 declares listTicketTransfers and no component in its layout calls it",
    "fix": "bind each to a component, or move it to the screen that calls it"
   },
   {
    "severity": "low",
    "dimension": "unbound operations",
-   "where": "transport (WEB-049 ↔ GST-076/GST-077/GST-078/GST-079)",
-   "detail": "GST-077 declares getTransportRoute and no component in its layout calls it",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "GST-012 declares listTicketTransfers and no component in its layout calls it",
    "fix": "bind each to a component, or move it to the screen that calls it"
   },
   {
    "severity": "low",
    "dimension": "unbound operations",
-   "where": "wallet-and-payment-methods (WEB-021 ↔ GST-011/GST-071)",
-   "detail": "GST-011 declares getWalletAutoReloadSetting, getWalletExitBalance, settleWalletAtExit and no component in its layout calls them",
+   "where": "tickets (WEB-018 ↔ GST-012/GST-013)",
+   "detail": "GST-013 declares listTicketTransfers and no component in its layout calls it",
    "fix": "bind each to a component, or move it to the screen that calls it"
   },
   {

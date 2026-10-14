@@ -9,7 +9,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/sign-in",
-   "component": "apps/venue-staff-app/src/routes/operations/SignInDetail.tsx",
+   "component": "src/routes/operations/SignInDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -273,7 +273,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/select-venue-role",
-   "component": "apps/venue-staff-app/src/routes/operations/SelectVenueRoleDetail.tsx",
+   "component": "src/routes/operations/SelectVenueRoleDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -468,11 +468,12 @@
   "module": "Operations",
   "requiresModule": "maintenance",
   "wave": 1,
+  "permission": "REPORT_VIEW_WORKSTATION",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/home-on-duty",
-   "component": "apps/venue-staff-app/src/routes/operations/HomeOnDutyDetail.tsx",
+   "component": "src/routes/operations/HomeOnDutyDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1051,6 +1052,13 @@
     "invalidates": [
      "listIncidents"
     ]
+   },
+   {
+    "operationId": "uploadIncidentMedia",
+    "contract": "maintenance",
+    "purpose": "The signed upload for a photo or document the incident form attaches, requested when the form is sent; no control of its own",
+    "trigger": "background",
+    "provenance": "Block A audit, 14 October 2026 (CHG-SCP-009)"
    }
   ],
   "entryState": {
@@ -1172,11 +1180,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "SHIFT_OPEN",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/end-shift",
-   "component": "apps/venue-staff-app/src/routes/operations/EndShiftDetail.tsx",
+   "component": "src/routes/operations/EndShiftDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1357,6 +1366,9 @@
     "id": "confirmSuspendShift",
     "component": "confirmDialog",
     "trigger": "Suspend shift",
+    "confirm": {
+     "operation": "suspendShift"
+    },
     "body": "**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than the verb. A end shift this affects should be identified in the dialog, not just counted. **Collects what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.",
     "provenance": "contract shift.yaml POST /shifts/{shiftId}/suspend"
    },
@@ -1549,11 +1561,12 @@
   "module": "Operations",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "TICKET_LOOKUP",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/scan-ready",
-   "component": "apps/venue-staff-app/src/routes/operations/ScanReadyDetail.tsx",
+   "component": "src/routes/operations/ScanReadyDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1731,13 +1744,6 @@
     "contract": "access",
     "purpose": "Admit a group on one read",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "verifyAccreditationCredential",
-    "contract": "accreditation",
-    "purpose": "Verify a presented accreditation: photo, name, category, zones allowed now, validity",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1802,11 +1808,12 @@
   "module": "Operations",
   "requiresModule": "maintenance",
   "wave": 1,
+  "permission": "WORK_ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/task-list",
-   "component": "apps/venue-staff-app/src/routes/operations/TaskListDetail.tsx",
+   "component": "src/routes/operations/TaskListDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2105,11 +2112,12 @@
   "module": "Operations",
   "requiresModule": "maintenance",
   "wave": 1,
+  "permission": "WORK_ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/task-detail",
-   "component": "apps/venue-staff-app/src/routes/operations/TaskDetailDetail.tsx",
+   "component": "src/routes/operations/TaskDetailDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2328,7 +2336,7 @@
      ]
     },
     {
-     "name": "contextPanel",
+     "name": "partsPanel",
      "slot": "selection",
      "components": [
       {
@@ -2697,11 +2705,12 @@
   "module": "Operations",
   "requiresModule": "maintenance",
   "wave": 1,
+  "permission": "WORK_ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/raise-a-task",
-   "component": "apps/venue-staff-app/src/routes/operations/RaiseATaskDetail.tsx",
+   "component": "src/routes/operations/RaiseATaskDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3348,11 +3357,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "WORK_ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/handover-notes",
-   "component": "apps/venue-staff-app/src/routes/operations/HandoverNotesDetail.tsx",
+   "component": "src/routes/operations/HandoverNotesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3506,11 +3516,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "REPORT_VIEW_WORKSTATION",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/shift-summary",
-   "component": "apps/venue-staff-app/src/routes/operations/ShiftSummaryDetail.tsx",
+   "component": "src/routes/operations/ShiftSummaryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

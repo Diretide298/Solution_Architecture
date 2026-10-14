@@ -1,6 +1,6 @@
 # P06-operations-03 — P06 · Operations (3 of 5)
 
-**10 screens · 50 operations · 77 schemas · 23 permissions**
+**10 screens · 50 operations · 78 schemas · 23 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 23 permissions apply here:
   `AI_USE, ATTENDANCE_RECORD, CAPACITY_CONFIGURE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **22 of these operations work offline**: addCaseMessage, addIncidentPerson, applyManualDiscount, createCase, createOrder, getOrder, getProduct, getQueue
+- **28 of these operations work offline**: addCaseMessage, addIncidentPerson, applyManualDiscount, createCase, createOrder, escalateCase, getOrder, getProduct
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.

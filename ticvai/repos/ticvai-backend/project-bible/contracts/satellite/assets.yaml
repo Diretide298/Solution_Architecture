@@ -100,6 +100,29 @@ tags:
   - name: collection
   - name: rights
 
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  mediaAssetRecords:
+    module: assets
+    table: assets.media_asset
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The assets.media_asset rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MediaAsset'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its assets.media_asset rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
 paths:
   /media:
     get:
@@ -120,6 +143,10 @@ paths:
       description: >
         Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets nothing
         references — the working set for a library clear-out.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`, `failed`); a screen that shows only live rows filters on `status` itself.
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_VIEW
       x-ticvai-scope-level: venue
@@ -208,7 +235,10 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-010 Media Library"
         - "P13 CMS-075 Duplicate & Near-Duplicate Management"
-        - "P13 CMS-082 Asset Ownership & Responsibility Management"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'which products list the asset (409 in-use, MediaUsage surface product) (CHG-MOD-003)'
       x-ticvai-audience: [staff]
       summary: Amend metadata, tags or rights
       description: >
@@ -251,6 +281,7 @@ paths:
                   type: array
                   items: { type: string }
                 collectionIds:
+                  x-ticvai-stored-as: assets.media_collection_member.collection_id
                   type: array
                   items: { type: string, format: uuid }
                   description: >
@@ -289,6 +320,10 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-010 Media Library"
         - "P13 CMS-075 Duplicate & Near-Duplicate Management"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'which products list the asset (409 in-use, MediaUsage surface product) (CHG-MOD-003)'
       x-ticvai-audience: [staff]
       summary: Delete an asset
       description: >
@@ -313,6 +348,7 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
         '409':
+          x-ticvai-problem-types: [in-use]
           description: Asset is in use. Every reference is listed
           content:
             application/problem+json:
@@ -331,7 +367,6 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-010 Media Library"
         - "P13 CMS-076 Asset Version Control & Revision History"
-        - "P13 CMS-095 Asset Replacement & Propagation Management"
       x-ticvai-audience: [staff]
       summary: Replace the file behind an asset
       description: >
@@ -441,6 +476,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/UploadTicket' }
         '400':
+          x-ticvai-problem-types: [media-type-not-permitted, media-too-large]
           description: >
             Content type not permitted, or size beyond the limit for that kind. Checked here
             rather than after a guest has uploaded two hundred megabytes.
@@ -537,7 +573,6 @@ paths:
       operationId: listCollections
       x-ticvai-consumed-by:
         - "P13 CMS-010 Media Library"
-        - "P13 CMS-062 Central Digital Asset Library"
         - "P13 CMS-064 Folder, Collection & Workspace Management"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -673,6 +708,8 @@ paths:
       operationId: setMediaTaxonomy
       x-ticvai-consumed-by:
         - "P13 CMS-065 Metadata & Taxonomy Management"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Define categories, fields and keyword vocabularies
       tags:
       - assets
@@ -756,6 +793,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/MediaTag'
         '400':
+          x-ticvai-problem-types: [tag-not-in-vocabulary]
           description: >
             A tag names a closed vocabulary (`MediaTaxonomy.keywordVocabularies[].closed`) and
             its value is not one of that vocabulary's terms. `errors[]` carries one entry per refused tag, with `field` set to
@@ -811,6 +849,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaTag'
+        '409':
+          description: 'The asset is still `processing`, or is `failed` or `quarantined`, so there is no usable file to analyse. Nothing is queued.'
+          x-ticvai-problem-types: [media-asset-not-ready]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /media-assets/similar:
@@ -977,7 +1022,6 @@ paths:
       operationId: setMediaAssetRights
       x-ticvai-consumed-by:
         - "P13 CMS-083 Rights, License & Usage Policy Management"
-        - "P13 CMS-088 Rights Expiry, Renewal & Usage Impact"
       summary: Licence, permitted use and expiry
       description: 'Boards 3.3 and 3.8. **`getExpiringRights` existed and nothing set them.** A licence
         with a territory, a channel restriction and an end date is the difference between a photograph
@@ -1155,12 +1199,11 @@ paths:
                 $ref: '#/components/schemas/MediaDistribution'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /media-distribution/channels:
+  /media-distribution/channels/{code}:
     put:
       operationId: setMediaDistributionChannels
       x-ticvai-consumed-by:
         - "P13 CMS-093 Channel & Distribution Configuration"
-        - "P13 CMS-094 Secure Delivery URL, CDN & Rendition Delivery"
         - "P13 CMS-096 Fallback, Expiry & Distribution Continuity"
       summary: CDN, delivery URLs, fallbacks and expiry behaviour
       description: 'Boards 4.3, 4.4 and 4.6. **The fallback is the part that keeps a page from breaking.**
@@ -1176,6 +1219,11 @@ paths:
       - staff
       x-ticvai-scope-level: tenant
       parameters:
+      - name: code
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `code`, when sent, must equal it.'
+        schema: { type: string }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1276,7 +1324,6 @@ paths:
         - "P13 CMS-070 Asset Activity, Recent Assets & Library Health"
         - "P13 CMS-071 AI Asset Intelligence Command Center"
         - "P13 CMS-080 AI Quality, Intelligence Review & Recommendations"
-        - "P13 CMS-081 DAM Governance & Rights Command Center"
         - "P13 CMS-098 Delivery Monitoring & Integration Health"
         - "P13 CMS-099 Asset Usage & Performance Analytics"
         - "P13 CMS-100 Distribution Intelligence, AI Insights & Optimization"
@@ -1365,6 +1412,7 @@ paths:
 components:
   schemas:
     MediaTaxonomy:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by bulkUpdateMediaAssets
       type: object
       x-ticvai-persistence: assets.taxonomy
       description: 'Boards 1.5 and 1.6. **Metadata fields are per asset type**, because an image has
@@ -1373,6 +1421,8 @@ components:
         '
       properties:
         categories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1393,6 +1443,8 @@ components:
                 items:
                   type: string
         fields:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1414,6 +1466,8 @@ components:
                 items:
                   type: string
         keywordVocabularies:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -1565,6 +1619,7 @@ components:
         isCurrent:
           type: boolean
         usageImpact:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -1629,6 +1684,13 @@ components:
           nullable: true
         scopePath:
           type: string
+        assetId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          x-ticvai-references: assets.media_asset
+          description: The media asset this is a rendition of, from the path of `requestMediaRendition`.
     MediaAssetApproval:
       type: object
       x-ticvai-persistence: assets.approval
@@ -1647,6 +1709,7 @@ components:
           - published
           - archived
         eligibility:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -1763,6 +1826,7 @@ components:
           format: date-time
           nullable: true
     MediaDistributionChannel:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by getMediaDistribution
       type: object
       x-ticvai-persistence: assets.distribution_channel
       description: 'Boards 4.3, 4.4 and 4.6. **The fallback keeps a page from breaking.**'
@@ -2008,6 +2072,7 @@ components:
         - type: object
           properties:
             derivatives:
+              x-ticvai-persisted: false
               type: array
               description: >
                 Generated from the original, never uploaded separately. A new breakpoint is a
@@ -2025,6 +2090,7 @@ components:
               description: Every place this asset is referenced.
               items: { $ref: '#/components/schemas/MediaUsage' }
             collections:
+              x-ticvai-persisted: false
               type: array
               items:
                 type: object
@@ -2032,6 +2098,7 @@ components:
                   id: { type: string, format: uuid }
                   name: { type: string }
             previousVersions:
+              x-ticvai-persisted: false
               type: array
               items:
                 type: object
@@ -2171,8 +2238,8 @@ components:
       required: [id, collectionId, assetId]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        collectionId: { type: string, format: uuid }
-        assetId: { type: string, format: uuid }
+        collectionId: { type: string, format: uuid, x-ticvai-references: assets.media_collection }
+        assetId: { type: string, format: uuid, x-ticvai-references: assets.media_asset }
         addedByPrincipalId: { type: string, format: uuid, nullable: true }
         addedAt: { type: string, format: date-time }
 

@@ -269,6 +269,8 @@ summary:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `CAPACITY_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -420,6 +422,8 @@ kill:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `CAPACITY_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -566,6 +570,8 @@ buffer:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `CAPACITY_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -711,6 +717,8 @@ rule:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `CAPACITY_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -827,6 +835,8 @@ pair:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `CAPACITY_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -938,6 +948,8 @@ seat:
 - `setAccessibleSeating` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `CAPACITY_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1077,6 +1089,8 @@ route:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `CAPACITY_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1205,6 +1219,8 @@ eligibility:
 - `getAccessibleSeating` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `CAPACITY_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1343,6 +1359,8 @@ spacing:
 - `getSeatRules` → `CAPACITY_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `CAPACITY_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1504,6 +1522,8 @@ check:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `CAPACITY_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1649,7 +1669,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AccessibleSeating": {"type":"object","x-ticvai-persistence":"seating.accessible","description":"Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n","properties":{"seatMapId":{"type":"string","format":"uuid"},"spaces":{"type":"array","items":{"type":"object","properties":{"seatId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["wheelchairSpace","transferSeat","ambulant","easyAccess","assistanceDog","hearingLoop","visuallyImpaired"]},"routeDescription":{"type":"string","nullable":true},"stepFree":{"type":"boolean","default":true},"nearestAccessibleWc":{"type":"string","nullable":true}}}},"eligibility":{"type":"string","enum":["open","selfDeclared","verifiedOnce","verifiedEachTime"],"default":"selfDeclared","description":"**Contested in both directions.** Open sale leaves none for the guests who need them; hard gating turns people away at the door.\n"},"minimumProvisionPercent":{"type":"number","nullable":true},"scopePath":{"type":"string"}}},
+"AccessibleSeating": {"type":"object","x-ticvai-persistence":"seating.accessible","description":"Boards 7.6 to 7.8. **An accessible seat with no accessible route is not an accessible seat.**\n","properties":{"seatMapId":{"type":"string","format":"uuid"},"spaces":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"seatId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["wheelchairSpace","transferSeat","ambulant","easyAccess","assistanceDog","hearingLoop","visuallyImpaired"]},"routeDescription":{"type":"string","nullable":true},"stepFree":{"type":"boolean","default":true},"nearestAccessibleWc":{"type":"string","nullable":true}}}},"eligibility":{"type":"string","enum":["open","selfDeclared","verifiedOnce","verifiedEachTime"],"default":"selfDeclared","description":"**Contested in both directions.** Open sale leaves none for the guests who need them; hard gating turns people away at the door.\n"},"minimumProvisionPercent":{"type":"number","nullable":true},"scopePath":{"type":"string"}}},
 "SeatComplianceFinding": {"type":"object","description":"Board 7.10. **A map drifts below its obligation one kill rule at a time.**","properties":{"code":{"type":"string"},"severity":{"type":"string","enum":["breach","warning","advisory"]},"message":{"type":"string"},"required":{"type":"number","nullable":true},"actual":{"type":"number","nullable":true},"affectedSeatIds":{"type":"array","items":{"type":"string","format":"uuid"}}}},
 "SeatRules": {"type":"object","x-ticvai-persistence":"seating.seat_rules","description":"Board 7. **Four rules that move the same seats and are decided by different people.**\n","properties":{"seatMapId":{"type":"string","format":"uuid"},"killedSeatIds":{"type":"array","items":{"type":"string","format":"uuid"}},"killReasons":{"type":"object","additionalProperties":{"type":"string"}},"bufferRule":{"type":"object","properties":{"enabled":{"type":"boolean","default":false},"seatsEitherSide":{"type":"integer","default":1},"rowsEitherSide":{"type":"integer","default":0},"avoidSingleGaps":{"type":"boolean","default":true,"description":"**The commercial case for buffers.** A map leaving one empty seat between every party has lost those seats without anybody deciding to.\n"}}},"companionRule":{"type":"object","description":"**The one with legal weight.** Selling the companion seat separately strands a carer.\n","properties":{"enabled":{"type":"boolean","default":true},"pairs":{"type":"array","items":{"type":"object","properties":{"wheelchairSpaceId":{"type":"string","format":"uuid"},"companionSeatIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"releaseCompanionHoursBefore":{"type":"integer","nullable":true}}},"flexibleSpacing":{"type":"object","properties":{"enabled":{"type":"boolean","default":false},"densityPercent":{"type":"integer","nullable":true},"perPerformanceOverride":{"type":"boolean","default":true}}},"scopePath":{"type":"string"}}}
 }

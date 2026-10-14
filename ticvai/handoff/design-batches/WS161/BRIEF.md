@@ -163,7 +163,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-919` | AI Event Resource Forecasting | A | 10 | 19 | 6 | 49 | 0 | 0 | — | notStarted (—) |
 | `BO-920` | Event Resource Cost Estimator | B | 2 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-921` | Multi-Event Allocation & Conflict Optimizer | D | 4 | 15 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-922` | Event Resource Approval & Readiness Gate | B | 0 | 0 | 6 | 5 | 0 | 3 | — | notStarted (—) |
+| `BO-922` | Event Resource Approval & Readiness Gate | B | 0 | 20 | 6 | 5 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

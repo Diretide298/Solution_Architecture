@@ -5,11 +5,12 @@
   "module": "Operations",
   "requiresModule": "queue",
   "wave": 2,
+  "permission": "QUEUE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/queue-monitor",
-   "component": "apps/venue-staff-app/src/routes/operations/QueueMonitorDetail.tsx",
+   "component": "src/routes/operations/QueueMonitorDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -355,11 +356,12 @@
   "module": "Operations",
   "requiresModule": "queue",
   "wave": 1,
+  "permission": "QUEUE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/manual-wait-entry",
-   "component": "apps/venue-staff-app/src/routes/operations/ManualWaitEntryDetail.tsx",
+   "component": "src/routes/operations/ManualWaitEntryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -583,11 +585,12 @@
   "module": "Operations",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/capacity-view",
-   "component": "apps/venue-staff-app/src/routes/operations/CapacityViewDetail.tsx",
+   "component": "src/routes/operations/CapacityViewDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -824,11 +827,12 @@
   "module": "Operations",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/walk-up-sale",
-   "component": "apps/venue-staff-app/src/routes/operations/WalkUpSaleDetail.tsx",
+   "component": "src/routes/operations/WalkUpSaleDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1558,11 +1562,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/break-management",
-   "component": "apps/venue-staff-app/src/routes/operations/BreakManagementDetail.tsx",
+   "component": "src/routes/operations/BreakManagementDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1600,6 +1605,7 @@
   "pattern": "listDetail",
   "patternReason": "`listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Take a break without leaving a gate unstaffed.",
+  "division": "Shares `listAttendance`, `recordAttendance` with EMP-024; this screen is Break management: take a break without leaving a gate unstaffed.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1775,11 +1781,12 @@
   "module": "Operations",
   "requiresModule": "maintenance",
   "wave": 1,
+  "permission": "INCIDENT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/incident-report",
-   "component": "apps/venue-staff-app/src/routes/operations/IncidentReportDetail.tsx",
+   "component": "src/routes/operations/IncidentReportDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2115,11 +2122,12 @@
   "module": "Operations",
   "requiresModule": "maintenance",
   "wave": 2,
+  "permission": "INCIDENT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/incident-detail",
-   "component": "apps/venue-staff-app/src/routes/operations/IncidentDetailDetail.tsx",
+   "component": "src/routes/operations/IncidentDetailDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2307,6 +2315,13 @@
     "purpose": "Record that an external authority was notified, where required",
     "trigger": "onAction",
     "provenance": "wiring fix, 2 October 2026 (CHG-WIR-001)"
+   },
+   {
+    "operationId": "uploadIncidentMedia",
+    "contract": "maintenance",
+    "purpose": "The signed upload for a photo or document the incident form attaches, requested when the form is sent; no control of its own",
+    "trigger": "background",
+    "provenance": "Block A audit, 14 October 2026 (CHG-SCP-009)"
    }
   ],
   "entryState": {
@@ -2398,11 +2413,12 @@
   "module": "Operations",
   "requiresModule": "marketing",
   "wave": 2,
+  "permission": "CASE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/lost-found",
-   "component": "apps/venue-staff-app/src/routes/operations/LostFoundDetail.tsx",
+   "component": "src/routes/operations/LostFoundDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2790,11 +2806,12 @@
   "module": "Operations",
   "requiresModule": "marketing",
   "wave": 2,
+  "permission": "CASE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/guest-assistance",
-   "component": "apps/venue-staff-app/src/routes/operations/GuestAssistanceDetail.tsx",
+   "component": "src/routes/operations/GuestAssistanceDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3355,11 +3372,12 @@
   "module": "Operations",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "VENUE_MAP_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/venue-map",
-   "component": "apps/venue-staff-app/src/routes/operations/VenueMapDetail.tsx",
+   "component": "src/routes/operations/VenueMapDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3476,8 +3494,8 @@
    {
     "operationId": "getVenueMapLive",
     "contract": "venue-map",
-    "purpose": "The map with live operational state on it",
-    "trigger": "onLoad"
+    "purpose": "The live operational state on the venue map, refreshed while the map is open",
+    "trigger": "onInterval"
    }
   ],
   "entryState": {

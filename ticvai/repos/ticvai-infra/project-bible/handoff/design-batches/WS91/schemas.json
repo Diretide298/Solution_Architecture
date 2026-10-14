@@ -149,6 +149,8 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "lateFeeTiers": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -336,6 +338,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -389,6 +392,8 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "durationTiers": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Board 4.3. *30 min AED 40, 60 min AED 60, 90 min AED 80, 120 min AED 95.*",
     "items": {
@@ -424,6 +429,8 @@
     "default": "exactUsage"
    },
    "calendarRules": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Board 4.4. *Peak 16:00–20:00 AED 90/hr; off-peak 09:00–12:00 AED 50/hr; peak season 1 Nov – 31 Mar.*\n",
     "items": {
@@ -526,6 +533,7 @@
     "format": "uuid"
    },
    "productId": {
+    "x-ticvai-references": "rental.product",
     "type": "string",
     "format": "uuid",
     "description": "The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted."

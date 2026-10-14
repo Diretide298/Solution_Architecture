@@ -292,6 +292,8 @@ stage:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -427,6 +429,8 @@ order:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -543,6 +547,8 @@ transfer:
 - `listTicketOwnershipTransfer` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -663,6 +669,8 @@ revocation:
 - `listCredentialRevocationRegeneration` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -801,6 +809,8 @@ signal:
 - `listResaleFraudDuplicate` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -958,6 +968,8 @@ check:
 - `listCapacityInventoryReconciliation` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1140,6 +1152,8 @@ payout:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1288,6 +1302,8 @@ case:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1432,6 +1448,8 @@ history:
 - `listResaleConfirmationOwnership` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1581,6 +1599,8 @@ kpis:
 - `listResale` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1744,7 +1764,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ResaleConfirmationOwnershipTransferTicketDeliveryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Resale Confirmation, Ownership Transfer & Ticket Delivery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"dynamicQr":{"type":"string","description":"Dynamic QR"},"mobileTicket":{"type":"string","description":"Mobile Ticket"},"appleWallet":{"type":"string","description":"Apple Wallet"},"googleWallet":{"type":"string","description":"Google Wallet"},"otherSupportedCredentialMedia":{"type":"string","description":"Other supported credential media"},"rfidNfcAssignment":{"type":"string","description":"RFID/NFC assignment where applicable"},"ticketId":{"type":"string","description":"Ticket ID, unchanged through the resale (MoM 1 Sep)"},"currentOwner":{"type":"string","description":"Current owner"},"previousOwner":{"type":"string","description":"Previous owner"},"settlementStatus":{"type":"string","description":"Seller settlement status"}}},
 "ResaleFraudDuplicateSaleProtectionView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Resale Fraud & Duplicate Sale Protection displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"multipleResaleAttempts":{"type":"integer","description":"Multiple resale attempts"},"sameTicketListedSimultaneously":{"type":"string","description":"Same ticket listed simultaneously"},"unusualSellerVolume":{"type":"integer","description":"Unusual seller volume"},"highFrequencyResale":{"type":"string","description":"High-frequency resale"},"suspiciousPricing":{"type":"string","description":"Suspicious pricing"},"multipleAccounts":{"type":"integer","description":"Multiple accounts"},"paymentAnomalies":{"type":"integer","description":"Payment anomalies"},"identityMismatch":{"type":"string","description":"Identity mismatch"},"credentialReuse":{"type":"string","description":"Credential reuse"},"repeatedFailedTransactions":{"type":"integer","description":"Repeated failed transactions"},"revokedSellerCredential":{"type":"string","description":"Revoked seller credential"},"duplicatedCredentials":{"type":"string","description":"Duplicated credentials"},"invalidatedTickets":{"type":"string","description":"Invalidated tickets"},"accountDeviceAnomalies":{"type":"string","description":"Account/device anomalies where permitted"},"response":{"type":"string","enum":["allow","requireVerification","holdTransaction","requireManualReview"],"description":"Configured response to the signal."}}},
 "ResaleOperationsCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Resale Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"resaleTransactionsToday":{"type":"string","description":"Resale Transactions Today"},"grossResaleValue":{"type":"string","description":"Gross Resale Value"},"completedTransfers":{"type":"integer","description":"Completed Transfers"},"pendingTransfers":{"type":"integer","description":"Pending Transfers"},"failedTransfers":{"type":"integer","description":"Failed Transfers"},"credentialReissues":{"type":"integer","description":"Credential Reissues"},"pendingSellerSettlements":{"type":"integer","description":"Pending Seller Settlements"},"settlementValue":{"type":"string","description":"Settlement Value"},"transactionsUnderReview":{"type":"string","description":"Transactions Under Review"},"fraudAlerts":{"type":"integer","description":"Fraud Alerts"},"disputes":{"type":"integer","description":"Disputes"},"refunds":{"type":"integer","description":"Refunds"},"resaleTransactionId":{"type":"string","description":"Resale Transaction ID"},"listingId":{"type":"string","description":"Listing ID"},"originalOrderId":{"type":"string","description":"Original Order ID"},"originalTicketId":{"type":"string","description":"Original Ticket ID"},"event":{"type":"string","description":"Event"},"venue":{"type":"string","description":"Venue"},"seller":{"type":"string","description":"Seller"},"buyer":{"type":"string","description":"Buyer"},"sectionRowSeat":{"type":"string","description":"Section / Row / Seat"},"resalePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Resale Price"},"buyerTotal":{"type":"string","description":"Buyer Total"},"sellerProceeds":{"type":"string","description":"Seller Proceeds"},"purchaseStatus":{"type":"string","description":"Purchase Status"},"ownershipStatus":{"type":"string","description":"Ownership Status"},"credentialStatus":{"type":"string","description":"Credential Status"},"settlementStatus":{"type":"string","description":"Settlement Status"},"riskScore":{"type":"number","description":"Risk Score"},"transactionDate":{"type":"string","format":"date-time","description":"Transaction Date"},"statusesType":{"type":"string","enum":["paymentFailed","transferFailed","underReview","suspended","refunded","disputed","cancelled"],"description":"Vocabulary listed under Exception statuses."}}},
-"ResaleSettlement": {"type":"object","x-ticvai-persistence":"orders.resale_settlement","description":"**What one seller is owed for one sold listing, and when and how it is paid** (DM5, 29 September: data model for the agreed operations; MoM 1 Sep 4.14, Board 2: settlement to the original seller). The amounts are fixed from the listing's own fee snapshot at sale. `ResaleListing.payoutStatus` is the seller-facing summary of this row.\n**The seller is paid after the buyer is admitted, not after they pay**, so a dispute or a refund lands on a settlement that is still `pending` or `onHold`, never on money already paid out.","required":["id","resaleListingId","sellerSubjectId","listingPrice","sellerFee","sellerProceeds","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"resaleListingId":{"x-ticvai-references":"orders.resale_listing","type":"string","format":"uuid","description":"Unique; one settlement per sold listing."},"sellerSubjectId":{"type":"string","format":"uuid"},"listingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"sellerFee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"processingFee":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"tax":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"adjustments":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"sellerProceeds":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"payoutMethod":{"type":"string","nullable":true,"description":"Proposed values, client to correct (DM5).","enum":["originalPaymentMethod","bankTransfer","wallet"]},"settlementBatch":{"type":"string","maxLength":100,"nullable":true},"expectedPayoutDate":{"type":"string","format":"date","nullable":true},"status":{"type":"string","enum":["pending","scheduled","onHold","paid","failed","reversed"]},"holdReason":{"type":"string","nullable":true,"enum":["manualHold","complianceHold","refundDisputeHold"]},"paidAt":{"type":"string","format":"date-time","nullable":true},"failureReason":{"type":"string","maxLength":500,"nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
+"ResaleSettlement": {"type":"object","x-ticvai-persistence":"orders.resale_settlement","description":"**What one seller is owed for one sold listing, and when and how it is paid** (DM5, 29 September: data model for the agreed operations; MoM 1 Sep 4.14, Board 2: settlement to the original seller). The amounts are fixed from the listing's own fee snapshot at sale. `ResaleListing.payoutStatus` is the seller-facing summary of this row.\n**The seller is paid after the buyer is admitted, not after they pay**, so a dispute or a refund lands on a settlement that is still `pending` or `onHold`, never on money already paid out.","required":["id","resaleListingId","sellerSubjectId","listingPrice","sellerFee","sellerProceeds","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"resaleListingId":{"x-ticvai-references":"orders.resale_listing","type":"string","format":"uuid","description":"Unique; one settlement per sold listing."},"sellerSubjectId":{"x-ticvai-references":"pii.subject","type":"string","format":"uuid"},"listingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"sellerFee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"processingFee":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"tax":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"adjustments":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"sellerProceeds":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"payoutMethod":{"type":"string","nullable":true,"description":"Proposed values, client to correct (DM5).","enum":["originalPaymentMethod","bankTransfer","wallet"]},"settlementBatch":{"type":"string","maxLength":100,"nullable":true},"expectedPayoutDate":{"type":"string","format":"date","nullable":true},"status":{"type":"string","enum":["pending","scheduled","onHold","paid","failed","reversed"]},"holdReason":{"type":"string","nullable":true,"enum":["manualHold","complianceHold","refundDisputeHold"]},"paidAt":{"type":"string","format":"date-time","nullable":true},"failureReason":{"type":"string","maxLength":500,"nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
 "SellerSettlementPayoutManagementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Seller Settlement & Payout Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"settlementId":{"type":"string","description":"Settlement ID"},"resaleTransaction":{"type":"string","description":"Resale Transaction"},"seller":{"type":"string","description":"Seller"},"listingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Listing Price"},"sellerFee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Seller Fee"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission"},"processingFee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Processing fee"},"applicableTax":{"type":"string","description":"Applicable tax"},"adjustments":{"type":"integer","description":"Adjustments"},"sellerProceeds":{"type":"integer","description":"Seller Proceeds"},"currency":{"type":"string","description":"Currency"},"payoutMethod":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Payout method"},"settlementStatus":{"type":"integer","description":"Settlement status"},"expectedPayoutDate":{"type":"string","format":"date-time","description":"Expected payout date"},"statusesType":{"type":"string","enum":["onHold","failed","reversed","disputed"],"description":"Vocabulary listed under Exception statuses."},"minimumPayoutThreshold":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Minimum payout threshold"},"settlementBatches":{"type":"string","description":"Settlement batches"},"sellerVerification":{"type":"string","description":"Seller verification"},"paymentAccountVerification":{"type":"string","description":"Payment account verification"},"settlementTiming":{"type":"string","enum":["immediatelyAfterResale","xDaysAfterResale","afterEventCompletion","xDaysAfterEvent","afterAccessValidation","operatorDefinedSettlementCycle"],"description":"When sellers are paid (a venue may pay only after the event has taken place)."},"holdReason":{"type":"string","enum":["manualHold","complianceHold","refundDisputeHold"],"description":"Why a payout is on hold."}}},
 "TicketOwnershipTransferManagementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Ticket Ownership Transfer Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"customer":{"type":"string","description":"Customer"},"originalOrder":{"type":"string","description":"Original order"},"ticket":{"type":"string","description":"Ticket"},"ownershipStatus":{"type":"string","description":"Ownership status"},"newResaleOrder":{"type":"integer","description":"New resale order"},"identity":{"type":"string","description":"Identity"},"membershipAccount":{"type":"string","description":"Membership/account"},"event":{"type":"string","description":"Event"},"product":{"type":"string","description":"Product"},"seat":{"type":"string","description":"Seat"},"entitlements":{"type":"string","description":"Entitlements"},"validity":{"type":"string","description":"Validity"},"sellerOwnershipHistoricalTransferred":{"type":"string","description":"Seller Ownership: Historical / Transferred"},"buyerOwnershipActive":{"type":"integer","description":"Buyer Ownership: Active"},"admissionEntitlement":{"type":"string","description":"Admission entitlement"},"seatAssignment":{"type":"string","description":"Seat assignment"},"accessRights":{"type":"string","description":"Access rights"},"associatedBenefits":{"type":"string","description":"Associated benefits"},"addOns":{"type":"string","description":"Add-ons where permitted"}}}
 }

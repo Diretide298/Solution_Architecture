@@ -27,20 +27,20 @@ servicesCalled:
 - service: IdentityService
   operationCalls: 262
 - service: AiService
-  operationCalls: 259
+  operationCalls: 193
 - service: TenancyService
-  operationCalls: 26
+  operationCalls: 24
 - service: WhiteLabelService
   operationCalls: 24
 - service: ReportingService
   operationCalls: 5
-- service: LedgerService
-  operationCalls: 4
 - service: VenueOpsService
   operationCalls: 3
 - service: OrderService
   operationCalls: 3
 - service: CatalogueService
+  operationCalls: 1
+- service: LedgerService
   operationCalls: 1
 coverage:
   screens: 211
@@ -228,7 +228,6 @@ screens:
   wave: 2
   density: compact
   operations:
-  - getAiDecisionTrace
   - listAiInteractions
   - listAuditRecords
   - listOwnPlatformStaffGrants
@@ -422,7 +421,6 @@ screens:
   - getSubscription
   - getTenant
   - getTenantLicences
-  - listCreditNotes
   - listSubscriptionInvoices
   - listTenants
   states:
@@ -1360,10 +1358,8 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getVatReturn
   - listOwnPlatformStaffGrants
   - listTaxFeeCalculation
-  - listTaxInvoices
   - listTenants
   - openPlatformStaffGrant
   states:
@@ -1426,8 +1422,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getSubscription
-  - listTenants
+  - getCommercialMetrics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1481,7 +1476,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getEntitlementUsage
   - getSubscription
   states:
   - emptyFirstRun
@@ -1505,6 +1499,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getCommercialMetrics
   - scoreVsiAssessment
   states:
   - emptyFirstRun
@@ -1528,6 +1523,7 @@ screens:
   density: compact
   operations:
   - getBillingReconciliation
+  - getCommercialMetrics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1549,7 +1545,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listTenants
+  - getCommercialMetrics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1570,7 +1566,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getCommercialMetrics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1591,7 +1588,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getCommercialMetrics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1636,7 +1634,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getLicenceEnforcement
+  - getCommercialMetrics
   - getPlanRecommendations
   states:
   - emptyFirstRun
@@ -1891,6 +1889,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getCommercialMetrics
   - listLicensingModels
   states:
   - emptyFirstRun
@@ -2406,7 +2405,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createLegalEntity
   - getBillingEntity
   - listOwnPlatformStaffGrants
   - listTenants
@@ -2687,7 +2685,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - addLicenceAddOn
   - createPrincipal
   - getTenantLicences
   - listOwnPlatformStaffGrants
@@ -2928,7 +2925,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getLicenceEnforcement
   - getPlanRecommendations
   states:
   - emptyFirstRun
@@ -3085,6 +3081,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getCommercialMetrics
   - listSubscriptionInvoices
   states:
   - emptyFirstRun
@@ -3166,7 +3163,6 @@ screens:
   density: compact
   operations:
   - issueCreditNote
-  - listCreditNotes
   - listSubscriptionInvoices
   - recordInvoicePayment
   states:
@@ -3193,7 +3189,6 @@ screens:
   density: compact
   operations:
   - previewSubscriptionChange
-  - setSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3215,7 +3210,8 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - getCommercialMetrics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3370,7 +3366,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - answerConfigurationQuestion
   - attachConfigurationSource
   - listConfigurationSources
   - listOwnPlatformStaffGrants
@@ -3402,7 +3397,6 @@ screens:
   density: compact
   operations:
   - answerConfigurationQuestion
-  - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3549,7 +3543,6 @@ screens:
   density: compact
   operations:
   - decideBlueprintRecommendation
-  - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3578,9 +3571,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - answerConfigurationQuestion
   - attachConfigurationSource
-  - decideBlueprintRecommendation
   - getConfigurationBlueprint
   - listConfigurationSources
   - listOwnPlatformStaffGrants
@@ -3640,7 +3631,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - buildConfigurationPlan
   - getActionPlan
   - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
@@ -3682,7 +3672,6 @@ screens:
   operations:
   - decideBlueprintRecommendation
   - getActionPlan
-  - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3714,7 +3703,6 @@ screens:
   operations:
   - decideBlueprintRecommendation
   - getActionPlan
-  - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3746,7 +3734,6 @@ screens:
   operations:
   - decideBlueprintRecommendation
   - getActionPlan
-  - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3778,7 +3765,6 @@ screens:
   operations:
   - decideBlueprintRecommendation
   - getActionPlan
-  - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3810,7 +3796,6 @@ screens:
   operations:
   - decideBlueprintRecommendation
   - getActionPlan
-  - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3842,7 +3827,6 @@ screens:
   operations:
   - decideBlueprintRecommendation
   - getActionPlan
-  - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3874,7 +3858,6 @@ screens:
   operations:
   - decideBlueprintRecommendation
   - getActionPlan
-  - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3908,7 +3891,6 @@ screens:
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
-  - simulateActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -3933,7 +3915,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getActionPlan
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -3964,7 +3945,6 @@ screens:
   operations:
   - getActionPlan
   - getAiVenueSettings
-  - getEffectiveAiPolicy
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4032,7 +4012,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - decideBlueprintRecommendation
   - getConfigurationBlueprint
   - listOwnPlatformStaffGrants
   - listTenants
@@ -4062,10 +4041,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - decideProposedAction
-  - getActionPlan
   - listOwnPlatformStaffGrants
-  - listProposedActions
   - listTenants
   - openPlatformStaffGrant
   states:
@@ -4127,8 +4103,6 @@ screens:
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
-  - pauseActionPlan
-  - resumeActionPlan
   - retryActionStep
   states:
   - emptyFirstRun
@@ -4159,7 +4133,6 @@ screens:
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
-  - rollbackActionPlan
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4184,12 +4157,9 @@ screens:
   wave: 3
   density: compact
   operations:
-  - answerConfigurationQuestion
-  - buildConfigurationPlan
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
-  - startConfigurationSession
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4375,7 +4345,6 @@ screens:
   operations:
   - configureAnomalyDetector
   - getForecast
-  - listAiInsights
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4520,8 +4489,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - compareForecastScenarios
-  - createForecastScenario
   - getForecast
   - listOwnPlatformStaffGrants
   - listTenants
@@ -4583,7 +4550,6 @@ screens:
   density: compact
   operations:
   - getForecast
-  - listOperationalRequirements
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4621,7 +4587,6 @@ screens:
   operations:
   - configureAnomalyDetector
   - getForecast
-  - listAiInsights
   - listOperationalRequirements
   - listOwnPlatformStaffGrants
   - listTenants
@@ -4651,7 +4616,6 @@ screens:
   density: compact
   operations:
   - getForecast
-  - listOperationalRequirements
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4680,7 +4644,6 @@ screens:
   density: compact
   operations:
   - getForecast
-  - listOperationalRequirements
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4707,9 +4670,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getForecast
   - getStaffingCoverage
-  - listOperationalRequirements
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4736,8 +4697,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getForecast
-  - listOperationalRequirements
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4765,7 +4724,6 @@ screens:
   density: compact
   operations:
   - getForecast
-  - listOperationalRequirements
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4793,7 +4751,6 @@ screens:
   density: compact
   operations:
   - getForecast
-  - listOperationalRequirements
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4821,8 +4778,6 @@ screens:
   density: compact
   operations:
   - compareForecastScenarios
-  - createForecastScenario
-  - listOperationalRequirements
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4849,8 +4804,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - decideOperationalRequirement
-  - listOperationalRequirements
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -4880,12 +4833,9 @@ screens:
   operations:
   - listAiCapabilities
   - listAiCapabilityMaturity
-  - listAiGovernanceAlerts
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
-  - pauseAiCapability
-  - promoteAiRelease
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -4980,7 +4930,6 @@ screens:
   operations:
   - configureAiCapability
   - getEffectiveAiPolicy
-  - listAiCapabilities
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -5039,11 +4988,9 @@ screens:
   operations:
   - createAiGovernancePolicyDraft
   - listAiGovernancePolicyVersions
-  - listDataRetentionSettings
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
-  - setDataRetentionSetting
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5068,7 +5015,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createAiGovernancePolicyDraft
   - getEffectiveAiPolicy
   - listOwnPlatformStaffGrants
   - listTenants
@@ -5098,7 +5044,6 @@ screens:
   operations:
   - createAiPolicyException
   - getEffectiveAiPolicy
-  - listAiGovernancePolicyVersions
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -5186,7 +5131,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getActionPlan
   - listOwnPlatformStaffGrants
   - listProposedActions
   - listTenants
@@ -5224,10 +5168,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createAiGovernancePolicyDraft
   - evaluateApprovalRequirement
-  - listAiGovernancePolicyVersions
-  - listAiTools
   - listApprovalMatrices
   - listOwnPlatformStaffGrants
   - listTenants
@@ -5256,8 +5197,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - decideProposedAction
-  - getActionPlan
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -5323,8 +5262,6 @@ screens:
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
-  - overrideAiDecision
-  - sendAiMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -5484,7 +5421,6 @@ screens:
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
-  - simulateActionPlan
   - simulateAiGovernancePolicy
   states:
   - emptyFirstRun
@@ -5632,7 +5568,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - explainRecommendationDecision
   - getAiDecisionTrace
   - listOwnPlatformStaffGrants
   - listTenants
@@ -5720,7 +5655,6 @@ screens:
   density: compact
   operations:
   - getActionPlan
-  - getAiDecisionTrace
   - listOwnPlatformStaffGrants
   - listTenants
   - openPlatformStaffGrant
@@ -5903,7 +5837,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - decideAiGovernanceAlert
   - listAiGovernanceAlerts
   - listOwnPlatformStaffGrants
   - listTenants
@@ -5932,7 +5865,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - decideAiGovernanceAlert
   - listAiGovernanceAlerts
   - listOwnPlatformStaffGrants
   - listTenants
@@ -5998,7 +5930,6 @@ screens:
   - listAiGovernanceAlerts
   - listOwnPlatformStaffGrants
   - listTenants
-  - openAiIncident
   - openPlatformStaffGrant
   states:
   - emptyFirstRun
@@ -6060,7 +5991,6 @@ screens:
   density: compact
   operations:
   - exportAiEvidencePackage
-  - listAiControls
   - listAiRiskRegister
   - listOwnPlatformStaffGrants
   - listTenants
@@ -6088,7 +6018,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listAiGovernanceAlerts
   - listAiRiskRegister
   - listOwnPlatformStaffGrants
   - listTenants

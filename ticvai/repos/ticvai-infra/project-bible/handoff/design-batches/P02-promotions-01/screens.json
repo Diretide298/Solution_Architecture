@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/offers-and-promotions",
-   "component": "apps/guest-app/src/routes/general/OffersAndPromotionsDetail.tsx",
+   "component": "src/screens/general/OffersAndPromotionsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -40,7 +40,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
-  "purpose": "Find offers & promotions for this venue.",
+  "purpose": "The offers running at this venue, one opened in detail, and a code the guest typed checked.",
   "layout": {
    "template": "split",
    "regions": [

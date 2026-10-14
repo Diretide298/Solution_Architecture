@@ -902,7 +902,7 @@ operations:
   - ledger.account_mapping
 - operation: setEInvoicingProvider
   verb: PUT
-  path: /e-invoicing/providers
+  path: /e-invoicing/providers/{providerId}
   scope: tenant
   permission: TAX_CONFIGURE
   audience:
@@ -935,7 +935,7 @@ operations:
   - platform.region_settings
 - operation: setFxRate
   verb: PUT
-  path: /fx-rates
+  path: /fx-rates/{rateId}
   scope: region
   permission: LEDGER_APPROVE
   audience:
@@ -949,7 +949,7 @@ operations:
   - ledger.fx_rate
 - operation: setTaxInvoiceTemplate
   verb: PUT
-  path: /tax-invoice-templates
+  path: /tax-invoice-templates/{invoiceTemplateId}
   scope: tenant
   permission: TAX_CONFIGURE
   audience:

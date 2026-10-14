@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 77,
-  "operations": 219,
+  "operations": 211,
   "contracts": 19,
   "modules": 17,
   "undrawn": 0,
-  "operationsWithNoScreen": 14
+  "operationsWithNoScreen": 19
  },
  "waves": {
   "wave1": 77
@@ -144,15 +144,15 @@
  "contracts": [
   {
    "contract": "marketing-crm",
-   "operations": 40
+   "operations": 37
   },
   {
    "contract": "orders",
-   "operations": 35
+   "operations": 36
   },
   {
    "contract": "identity",
-   "operations": 21
+   "operations": 20
   },
   {
    "contract": "catalogue",
@@ -164,15 +164,11 @@
   },
   {
    "contract": "transport",
-   "operations": 13
+   "operations": 12
   },
   {
    "contract": "access",
    "operations": 12
-  },
-  {
-   "contract": "wallet",
-   "operations": 8
   },
   {
    "contract": "venue-map",
@@ -187,11 +183,15 @@
    "operations": 7
   },
   {
-   "contract": "finance",
+   "contract": "wallet",
    "operations": 6
   },
   {
    "contract": "resources",
+   "operations": 6
+  },
+  {
+   "contract": "finance",
    "operations": 6
   },
   {
@@ -203,7 +203,7 @@
    "operations": 4
   },
   {
-   "contract": "payments",
+   "contract": "promotions",
    "operations": 4
   },
   {
@@ -211,8 +211,8 @@
    "operations": 4
   },
   {
-   "contract": "promotions",
-   "operations": 4
+   "contract": "payments",
+   "operations": 2
   },
   {
    "contract": "games",
@@ -226,7 +226,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/home-default",
-   "operations": 12,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -316,7 +316,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 1,
    "route": "/general/wallet-overview",
-   "operations": 8,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -325,7 +325,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/my-tickets",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -334,7 +334,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/ticket-details",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -352,7 +352,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 1,
    "route": "/general/memberships",
-   "operations": 10,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -505,7 +505,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/ai-concierge-chat",
-   "operations": 10,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -541,7 +541,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 1,
    "route": "/loyalty-rewards",
-   "operations": 11,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -586,7 +586,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/checkout-entry",
-   "operations": 12,
+   "operations": 13,
    "drawn": true
   },
   {
@@ -676,7 +676,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/plan-your-adventure-start",
-   "operations": 4,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -694,7 +694,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/general/your-plan",
-   "operations": 7,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -793,7 +793,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account/privacy-my-data",
-   "operations": 9,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -856,7 +856,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account/security-sign-in",
-   "operations": 12,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -892,7 +892,7 @@
    "module": "Transport",
    "wave": 1,
    "route": "/transport/route-and-passengers",
-   "operations": 7,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -953,10 +953,22 @@
     "summary": "Identify which table a guest is sitting at"
    },
    {
+    "operation": "getMyIdentityVerification",
+    "contract": "identity",
+    "verb": "GET",
+    "summary": "The guest's own latest identity verification"
+   },
+   {
     "operation": "listCustomerMemberships",
     "contract": "identity",
     "verb": "GET",
     "summary": "Memberships a customer holds"
+   },
+   {
+    "operation": "submitGuestIdentityDocument",
+    "contract": "identity",
+    "verb": "POST",
+    "summary": "Submit an identity document for verification"
    },
    {
     "operation": "checkGuestCheckoutMatch",
@@ -969,6 +981,24 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Use the existing profile or keep this booking separate"
+   },
+   {
+    "operation": "getDeviceConsentHistory",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "A visitor's own cookie decisions, oldest first"
+   },
+   {
+    "operation": "listPublishedTrackingTechnologies",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "The approved cookie registry, as the preference centre shows it"
+   },
+   {
+    "operation": "recordDeviceConsent",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Record a visitor's cookie decision, before anyone is known"
    },
    {
     "operation": "uploadGuestDocument",

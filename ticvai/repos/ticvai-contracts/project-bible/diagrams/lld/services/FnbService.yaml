@@ -211,7 +211,7 @@ operationsByContract:
     writes: 2
   - operation: enterCountLine
     verb: POST
-    path: /stock-counts/{countId}/lines
+    path: /fnb-stock-counts/{countId}/lines
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: true
@@ -467,7 +467,7 @@ operationsByContract:
     writes: 0
   - operation: listFnbRecommendations
     verb: GET
-    path: /product-recommendations
+    path: /fnb-recommendations
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
@@ -803,7 +803,7 @@ operationsByContract:
     writes: 2
   - operation: requestRecount
     verb: POST
-    path: /stock-counts/{countId}/recount
+    path: /fnb-stock-counts/{countId}/recount
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
@@ -971,7 +971,7 @@ operationsByContract:
     writes: 4
   - operation: setOutletTemplate
     verb: PUT
-    path: /outlet-templates
+    path: /outlet-templates/{code}
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
@@ -987,7 +987,7 @@ operationsByContract:
     writes: 1
   - operation: setRecipe
     verb: PUT
-    path: /recipes
+    path: /recipes/{recipeId}
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
@@ -1035,7 +1035,7 @@ operationsByContract:
     writes: 2
   - operation: setTemperatureCheckpoint
     verb: PUT
-    path: /food-safety/checkpoints
+    path: /food-safety/checkpoints/{checkpointId}
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
@@ -1550,21 +1550,21 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.cold_chain_event
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
   - fnb
   foreignWriters: null
 - table: fnb.combo
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
   - fnb
   foreignWriters: null
 - table: fnb.combo_slot
-  columns: 6
+  columns: 7
   store: postgres
   parent: fnb.combo
   writtenBy:
@@ -1613,7 +1613,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.dining_table
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1633,7 +1633,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.kitchen_exception
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1654,7 +1654,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.kitchen_station
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -1689,7 +1689,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.menu_item
-  columns: 17
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -1765,7 +1765,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: fnb.production_plan
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1800,7 +1800,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.reservation_policy
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -1876,7 +1876,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.table_visit
-  columns: 16
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -1890,7 +1890,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.temperature_log
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:

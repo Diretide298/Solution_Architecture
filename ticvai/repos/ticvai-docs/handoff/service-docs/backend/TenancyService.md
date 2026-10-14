@@ -40,8 +40,8 @@
 | devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, BO-732, POS-016 |
 | general | [`getDeviceAssignment`](#getdeviceassignment) | GET | `/devices/{deviceId}/assignment` | core | 1 | POS-016 |
 | identity | [`setRolePermissions`](#setrolepermissions) | PUT | `/roles/{roleId}/permissions` | setup | 1 | BO-054 |
-| matrix | [`setApprovalExternalProvider`](#setapprovalexternalprovider) | PUT | `/approval-external-providers` | setup | 1 | ADM-354 |
-| matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices` | setup | 1 | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334 … |
+| matrix | [`setApprovalExternalProvider`](#setapprovalexternalprovider) | PUT | `/approval-external-providers/{externalProviderId}` | setup | 1 | ADM-354 |
+| matrix | [`setApprovalMatrix`](#setapprovalmatrix) | PUT | `/approval-matrices/{matrixId}` | setup | 1 | ADM-243, ADM-330, ADM-331, ADM-332, ADM-333, ADM-334 … |
 | region | [`getRegionSettings`](#getregionsettings) | GET | `/regions/{regionId}/settings` | core | 1 | ADM-037, ADM-426, BO-1064, BO-1065 |
 | region | [`updateRegionSettings`](#updateregionsettings) | PUT | `/regions/{regionId}/settings` | setup | 1 | ADM-426, BO-1065 |
 | request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-045, BO-1010, BO-1031, BO-1080, BO-1181 … |
@@ -638,7 +638,7 @@ What requires approval, and who grants it
 
 ### setApprovalExternalProvider
 
-**`PUT /approval-external-providers`**: Register a third-party workflow system as an approver
+**`PUT /approval-external-providers/{externalProviderId}`**: Register a third-party workflow system as an approver
 
 11.1.65. **A client that already runs approvals in ServiceNow, SAP or its own workflow tool can have a level decided there**, instead of re-keying the same decision in two systems. A rule names the provider (`ApprovalRule.externalProviderId`); when a request reaches that level, TICVAI sends the provider the request mapped through `requestMapping`, signed, with retry, and waits for the provider to call `recordExternalApprovalDecision`.
 
@@ -663,6 +663,7 @@ What requires approval, and who grants it
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| externalProviderId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApprovalExternalProvider`
@@ -726,7 +727,7 @@ What requires approval, and who grants it
 
 ### setApprovalMatrix
 
-**`PUT /approval-matrices`**: Configure what requires approval
+**`PUT /approval-matrices/{matrixId}`**: Configure what requires approval
 
 11.1.2. Rules are ordered and **the first match wins**, so adding a rule cannot silently change an unrelated one. A matrix with overlapping unordered rules is a matrix nobody can reason about, and the ordering is the thing that makes it reviewable.
 Changing a matrix creates a version (11.1.80). Requests in flight keep the version they were raised under — **a request must be decided by the rules it was raised under**, or an approver is answering a question that changed while they read it (confirmed 28 September, audit R129 (2)).
@@ -754,6 +755,7 @@ Changing a matrix creates a version (11.1.80). Requests in flight keep the versi
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| matrixId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ApprovalMatrix`
@@ -1600,6 +1602,8 @@ Where the position needs a till, the assignment names the workstation their shif
 **`GET /rota-assignments`**: The rota
 
 18.9.2. A supervisor sees the venue; a steward sees themselves. **The same operation, scoped by permission** — a steward without `WORKFORCE_VIEW` gets their own assignments and no one else's, which is what `EMP-022 My rota` renders.
+**Order.** Soonest first, by `startsAt` ascending, then by `id`.
+**Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.
 
 |  |  |
 |---|---|
@@ -1684,27 +1688,23 @@ Where the position needs a till, the assignment names the workstation their shif
 | assignmentId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
-**Request body**: `RotaAssignment`
+**Request body**: `UpdateRotaAssignmentRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| overtimeMinutes | integer |  | BL-044, 1.2.83. (read-only; nullable) |
 | restPeriodBefore | integer |  | Minutes since the previous shift ended. (nullable) |
-| breachesWorkingHourLimit | boolean |  | Flagged at assignment, not discovered at payroll. (default False; read-only) |
 | labourCost | object |  | Cost at the point of scheduling. |
 | labourCost.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
 | labourCost.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
 | labourCost.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| id | string (uuid) |  | (read-only) |
-| principalId | string (uuid) | yes |  |
-| displayName | string |  | (read-only) |
-| venueId | string (uuid) | yes |  |
+| principalId | string (uuid) |  |  |
+| venueId | string (uuid) |  |  |
 | departmentId | string (uuid) |  | (nullable) |
-| position | string | yes | What they are rostered to do — gate steward, cashier, lifeguard, technician. |
+| position | string |  | What they are rostered to do — gate steward, cashier, lifeguard, technician. |
 | requiredRoleId | string (uuid) |  | Checked on assignment. (nullable) |
 | workstationId | string (uuid) |  | Where the position needs a till. (nullable) |
-| startsAt | string (date-time) | yes |  |
-| endsAt | string (date-time) | yes |  |
+| startsAt | string (date-time) |  |  |
+| endsAt | string (date-time) |  |  |
 | status | RotaStatus: enum (planned, published, confirmed, swapPending, cancelled, completed, noShow) |  |  |
 | breakMinutes | integer |  | (nullable) |
 | note | string |  | (nullable) |
@@ -1801,6 +1801,8 @@ Where the position needs a till, the assignment names the workstation their shif
 ### listOrgUnits
 
 **`GET /org-units`**: List scope nodes visible to the session
+
+**Order.** Sorted by `name` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -1926,7 +1928,7 @@ Board 1 of the client's POS design set. **The package held `lastHeartbeatAt` and
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `platform.device`, `platform.device_heartbeat`, `platform.workstation` |
+| Reads | `platform.device`, `platform.workstation` |
 | Writes | - |
 | Called by | BO-036, BO-128, BO-129, POS-001, POS-025 |
 
@@ -2805,6 +2807,7 @@ A board `code` already used in the venue is `409 duplicate-code` (audit R108; CH
 Physical devices bound to workstations, and staff handsets (`mobileHandset`), which are bound to no workstation. Distinct from Device Management, which covers the full estate lifecycle — this is the binding a workstation needs at boot.
 **`platform.device` is the only device register** (ADR-0067, accepted 1 October). Every device's identity (kind, hardware type, model, serial), every version (firmware, configuration, rule package, credential package), health, heartbeat and its one lifecycle live here, whatever else refers to it, POS printers and turnstiles alike. Access keeps only where an access-control device is placed (`access.device_placement`, access `placeAccessDevice`), and reads the device through this contract, never with its own SQL.
 **`pushToken` is never in a row** (pull audit R164). It is `writeOnly`: a push token is a credential, and a list at venue level is not where a credential is read back.
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first).
 
 |  |  |
 |---|---|
@@ -2833,6 +2836,7 @@ Physical devices bound to workstations, and staff handsets (`mobileHandset`), wh
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of RegisteredDevice | yes |  |
+| items[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | items[].id | string (uuid) | yes | (read-only) |
 | items[].kind | DeviceKind: enum (receiptPrinter, ticketPrinter, labelPrinter, cashDrawer, barcodeScanner, rfidReader, nfcReader, cardReader, …) | yes | mobileHandset (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no workstation. |
 | items[].driver | string | yes | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. |
@@ -3097,7 +3101,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | decision | text | yes |  |
 | comment | text | no |  |
 | reason | text | no |  |
-| used_mfa | boolean | no |  |
+| did_use_mfa | boolean | no |  |
 | signature_ref | text | no |  |
 | decided_at | timestamptz | yes |  |
 | request_id | text | yes | Points at approvals.request. |
@@ -3172,7 +3176,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | id | text | yes |  |
 | kind | text | yes |  |
-| reroute_on_no_approver | boolean | no | BL-154. |
+| reroutes_on_no_approver | boolean | no | BL-154. |
 | out_of_office_delegate_id | uuid | no |  |
 | allow_email_approval | boolean | no | Approving from an email link with no second factor is the weakest path in the system, so it is off by default and available only below a configured value. |
 | reopened_from | uuid | no | Reopening a decided approval creates a new one that points back. |
@@ -3256,6 +3260,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | state | text | yes | The target state, not the current one. |
 | reason | text | no | Recorded on the tenancy.device_audit row, not on the device. |
 | test_result | jsonb | no | The acceptance test, recorded on the move to provisioned (DEC-245; CHG-CSP-011). |
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | kind | text | yes |  |
 | driver | text | yes | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. |
@@ -3294,13 +3299,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | tested_by_principal_id | uuid | no | Who recorded the device's acceptance test (DeviceEnrolment.testResult on the move to provisioned). |
 | approved_by_principal_id | uuid | no | Who approved the device into production, never the person who tested it (decided 2 October 2026, Chinmay, critical set 1, BO-203: "Approver must differ from the tester"; DEC-245; CHG-CSP-011). |
 | approved_at | timestamptz | no |  |
-
-### `platform.device_heartbeat`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes | Synthesised key. |
-| device_id | uuid | no | Points at platform.device. |
 
 ### `platform.outbox`
 
@@ -3347,12 +3345,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | outlet_id | uuid | yes | The parent row. |
 | day | text | yes |  |
 | from | text | yes | Local time, 24-hour HH:MM, when the outlet opens. |
 | to | text | yes | Local time, 24-hour HH:MM, when the outlet closes. |
 | ends_next_day | boolean | no | A late-night window is one window past midnight (decided 2 October 2026, Chinmay, batch 6 set 6a, BO-731; DEC-197; CHG-CSP-007). |
+| id | uuid | yes | Synthesised key. |
 
 ### `platform.region_settings`
 
@@ -3462,7 +3460,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | reporting | jsonb | no |  |
 | marketing | jsonb | no |  |
 | identity | jsonb | no |  |
-| org_unit_id | uuid | yes | Renamed from scope_node_id on 31 August. |
 
 ### `platform.workstation`
 
@@ -3489,7 +3486,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | configuration_profile_id | uuid | no | Which profile this workstation runs, and at which version. |
 | is_offline_capable | boolean | no | Derived from deploymentProfile. |
 | is_active | boolean | no |  |
-| org_unit_id | uuid | yes | Renamed from scope_node_id on 31 August. |
 
 ### `tenancy.device_assignment`
 

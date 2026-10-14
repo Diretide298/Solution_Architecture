@@ -153,7 +153,8 @@
    },
    "developerId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.developer_account"
    },
    "name": {
     "type": "string"
@@ -238,6 +239,13 @@
     "nullable": true,
     "readOnly": true,
     "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   },
+   "statusReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the client was suspended (`setApiClientStatus`)."
    }
   }
  },
@@ -258,7 +266,8 @@
    },
    "clientId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.api_client"
    },
    "sustainedPerMinute": {
     "type": "integer"
@@ -559,6 +568,7 @@
   ],
   "properties": {
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -1301,6 +1311,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -1359,7 +1370,8 @@
    "developerId": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-references": "control.developer_account"
    },
    "sandboxClientId": {
     "type": "string",
@@ -1547,6 +1559,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -1672,118 +1685,6 @@
    }
   }
  },
- "SubscriptionCreditNote": {
-  "type": "object",
-  "x-ticvai-persistence": "control.credit_note + control.credit_note_line",
-  "description": "**A credit note against one tenant invoice** (20.7.7, 29 September build): its own number, lines, tax and total. The invoice it credits is never edited.",
-  "required": [
-   "id",
-   "creditNoteNumber",
-   "invoiceId",
-   "tenantId",
-   "reasonCode",
-   "settlement",
-   "total",
-   "issuedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "creditNoteNumber": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**Gapless, per issuing legal entity, in its own sequence** (the R152 rule for invoices, decided 28 September, applied to credit notes): assigned at issue, never reused."
-   },
-   "invoiceId": {
-    "type": "string",
-    "description": "The invoice credited."
-   },
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "reasonCode": {
-    "type": "string",
-    "enum": [
-     "billingError",
-     "serviceCredit",
-     "disputeResolution",
-     "goodwill",
-     "other"
-    ]
-   },
-   "reason": {
-    "type": "string",
-    "maxLength": 500,
-    "nullable": true
-   },
-   "settlement": {
-    "type": "string",
-    "enum": [
-     "offsetNextInvoice",
-     "refund"
-    ]
-   },
-   "settlementStatus": {
-    "type": "string",
-    "enum": [
-     "pending",
-     "offset",
-     "refunded"
-    ],
-    "readOnly": true,
-    "description": "`offset` once a later invoice has taken it; `refunded` once the refund is recorded."
-   },
-   "lines": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "invoiceLineIndex": {
-       "type": "integer"
-      },
-      "description": {
-       "type": "string"
-      },
-      "quantity": {
-       "type": "number",
-       "nullable": true
-      },
-      "unitPrice": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      },
-      "amount": {
-       "$ref": "../shared/common.yaml#/components/schemas/Money"
-      }
-     }
-    }
-   },
-   "subtotal": {
-    "x-ticvai-column": "net_amount",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "taxAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "total": {
-    "x-ticvai-column": "gross_amount",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "issuedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "issuedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   }
-  }
- },
  "SubscriptionInvoice": {
   "x-ticvai-persistence": "control.invoice + control.invoice_line",
   "type": "object",
@@ -1807,6 +1708,7 @@
     "description": "A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the invoice is issued, never reused. A cancelled invoice keeps its number.\n"
    },
    "tenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },
@@ -1987,6 +1889,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

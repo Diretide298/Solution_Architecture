@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-680` | Accreditation Bulk Import | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
 | `BO-681` | Import Validation & Processing Monitor | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-682` | Accreditation Export & Data Extract Center | D | 7 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
-| `BO-683` | Delivery, Batch & Operational History | D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-683` | Delivery, Batch & Operational History | D | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

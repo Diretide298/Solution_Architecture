@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-538` | Group Rental & Participant Management | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-539` | Rental Agreement & Waiver Completion | D | 0 | 14 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-540` | Booking Commercial Summary & Payment | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-541` | Reservation Confirmation & QR Voucher | D | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (—) |
+| `BO-541` | Reservation Confirmation & QR Voucher | D | 0 | 20 | 6 | 0 | 1 | 2 | — | notStarted (—) |
 | `BO-542` | Reservation Modification, Cancellation & No-Show | D | 0 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-543` | Reservation Detail, Timeline & Readiness | D | 3 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 

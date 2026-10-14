@@ -5,10 +5,11 @@
   "module": "Stock on the Floor",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/retail-inventory-command-center",
-   "component": "apps/venue-staff-app/src/routes/operations/RetailInventoryCommandCenterDetail.tsx",
+   "component": "src/routes/operations/RetailInventoryCommandCenterDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -27,7 +28,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listStockMovements` reads the population and `getStockPositions` reads one of them — list, select, act",
-  "purpose": "Retail Inventory Command Center — from the client design board, 20 August.",
+  "purpose": "See a store's stock on hand and the movements behind it, by item, location and kind, from the floor.",
   "layout": {
    "template": "split",
    "regions": [
@@ -156,34 +157,6 @@
     "contract": "inventory",
     "purpose": "The movement ledger",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "getKpiValues",
-    "contract": "reporting",
-    "purpose": "Today's takings and revenue KPIs on the phone",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getDashboard",
-    "contract": "reporting",
-    "purpose": "Store manager's mobile dashboard",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAlerts",
-    "contract": "reporting",
-    "purpose": "Daily revenue alerts (also pushed, deliverTo push)",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "acknowledgeAlert",
-    "contract": "reporting",
-    "purpose": "Acknowledge an alert",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -248,10 +221,11 @@
   "module": "Stock on the Floor",
   "requiresModule": "retail",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/store-stock-sku-availability",
-   "component": "apps/venue-staff-app/src/routes/operations/StoreStockSkuAvailabilityDetail.tsx",
+   "component": "src/routes/operations/StoreStockSkuAvailabilityDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -279,7 +253,7 @@
   ],
   "pattern": "statusTracker",
   "patternReason": "`getStockPositions` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Store Stock & SKU Availability — from the client design board, 20 August.",
+  "purpose": "Check what an outlet has in stock, low stock first and beside its sibling outlets, and scan an item for its price and stock.",
   "gaps": [
    {
     "operation": "getHaccpStatus",
@@ -442,10 +416,11 @@
   "module": "Stock on the Floor",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PROCUREMENT_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/requisition-smart-store-replenishment",
-   "component": "apps/venue-staff-app/src/routes/operations/RequisitionSmartStoreReplenishmentDetail.tsx",
+   "component": "src/routes/operations/RequisitionSmartStoreReplenishmentDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -462,7 +437,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listRequisitions` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Requisition & Smart Store Replenishment — from the client design board, 20 August.",
+  "purpose": "Raise a requisition for the store, starting from the suggested below-par items, and change its lines before it is approved.",
   "layout": {
    "template": "split",
    "regions": [
@@ -698,10 +673,11 @@
   "module": "Stock on the Floor",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/store-to-store-warehouse-transfers",
-   "component": "apps/venue-staff-app/src/routes/operations/StoreToStoreWarehouseTransfersDetail.tsx",
+   "component": "src/routes/operations/StoreToStoreWarehouseTransfersDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -718,7 +694,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listStockLocations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Store-to-Store & Warehouse Transfers — from the client design board, 20 August.",
+  "purpose": "Send stock to another store or the warehouse, and receive inbound transfers against their manifest.",
   "layout": {
    "template": "split",
    "regions": [
@@ -951,10 +927,11 @@
   "module": "Stock on the Floor",
   "requiresModule": "inventory",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/receiving-store-put-away",
-   "component": "apps/venue-staff-app/src/routes/operations/ReceivingStorePutAwayDetail.tsx",
+   "component": "src/routes/operations/ReceivingStorePutAwayDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -994,7 +971,7 @@
   ],
   "pattern": "statusTracker",
   "patternReason": "`getStockTransfer` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Receiving & Store Put-Away — from the client design board, 20 August.",
+  "purpose": "Receive the expected supplier deliveries and inbound transfers, log the temperature a chilled delivery arrived at, and reject goods that fail.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -1167,7 +1144,7 @@
    {
     "operationId": "logColdChain",
     "contract": "fnb",
-    "purpose": "logColdChain",
+    "purpose": "The temperature a chilled delivery arrived at, and what was decided about it",
     "trigger": "onAction"
    },
    {
@@ -1247,10 +1224,11 @@
   "module": "Stock on the Floor",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/stock-count-cycle-count-management",
-   "component": "apps/venue-staff-app/src/routes/operations/StockCountCycleCountManagementDetail.tsx",
+   "component": "src/routes/operations/StockCountCycleCountManagementDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1280,7 +1258,7 @@
   ],
   "pattern": "statusTracker",
   "patternReason": "`getCountVariance` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Stock Count & Cycle Count Management — from the client design board, 20 August.",
+  "purpose": "Start a stock count, enter what is on the shelf line by line, and set which items are counted every day.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -1516,10 +1494,11 @@
   "module": "Stock on the Floor",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "INCIDENT_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/damage-loss-shrinkage-stock-adjustment",
-   "component": "apps/venue-staff-app/src/routes/operations/DamageLossShrinkageStockAdjustmentDetail.tsx",
+   "component": "src/routes/operations/DamageLossShrinkageStockAdjustmentDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1550,7 +1529,7 @@
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`recordWaste`, `createStockMovement`, `logTemperature`) and no read of a population — it is settings, not a list",
-  "purpose": "Damage, Loss, Shrinkage & Stock Adjustment — from the client design board, 20 August.",
+  "purpose": "Record waste and stock adjustments with a reason, log food-safety temperatures, and sign the corrective actions waiting for a supervisor.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1683,13 +1662,13 @@
    {
     "operationId": "logTemperature",
     "contract": "fnb",
-    "purpose": "logTemperature",
+    "purpose": "Record a food-safety temperature check, in range or not",
     "trigger": "onAction"
    },
    {
     "operationId": "signCorrectiveAction",
     "contract": "fnb",
-    "purpose": "signCorrectiveAction",
+    "purpose": "Say what was done about a food-safety finding, and put a name to it",
     "trigger": "onAction"
    },
    {
@@ -1835,10 +1814,11 @@
   "module": "Stock on the Floor",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/reservation-allocation-omnichannel-inventory",
-   "component": "apps/venue-staff-app/src/routes/operations/ReservationAllocationOmnichannelInDetail.tsx",
+   "component": "src/routes/operations/ReservationAllocationOmnichannelInDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1855,7 +1835,7 @@
   ],
   "pattern": "statusTracker",
   "patternReason": "`getStockPositions` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Reservation, Allocation & Omnichannel Inventory — from the client design board, 20 August.",
+  "purpose": "Hold an item for a guest to collect, see the stock it comes from, and mark the hold collected or release it.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -2040,10 +2020,11 @@
   "module": "Stock on the Floor",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/barcode-rfid-serialized-stock-traceability",
-   "component": "apps/venue-staff-app/src/routes/operations/BarcodeRfidSerializedStockTraceabiDetail.tsx",
+   "component": "src/routes/operations/BarcodeRfidSerializedStockTraceabiDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2060,7 +2041,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listSerialisedItems` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Barcode, RFID, Serialized Stock & Traceability — from the client design board, 20 August.",
+  "purpose": "Find where each serialised item is, by serial or status, and scan a barcode for its price and stock.",
   "layout": {
    "template": "split",
    "regions": [
@@ -2157,7 +2138,7 @@
    {
     "operationId": "listSerialisedItems",
     "contract": "inventory",
-    "purpose": "listSerialisedItems",
+    "purpose": "Where each serialised item is, found by serial or status",
     "trigger": "onLoad"
    },
    {
@@ -2218,10 +2199,11 @@
   "module": "Stock on the Floor",
   "requiresModule": "analytics",
   "wave": 2,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/inventory-exceptions-ai-replenishment-action-cen",
-   "component": "apps/venue-staff-app/src/routes/operations/InventoryExceptionsAiReplenishmentDetail.tsx",
+   "component": "src/routes/operations/InventoryExceptionsAiReplenishmentDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2238,7 +2220,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listAlerts` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Inventory Exceptions, AI Replenishment & Action Center — from the client design board, 20 August.",
+  "purpose": "Work the inventory alerts raised at the venue: acknowledge each one, and raise a requisition where stock needs replenishing.",
   "layout": {
    "template": "split",
    "regions": [

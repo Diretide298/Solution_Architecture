@@ -342,6 +342,7 @@ screens:
   module: Overview & Health
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   capability: C95
   implementation:
     app: ticvai-web
@@ -808,8 +809,8 @@ screens:
   pattern: listDetail
   patternReason: '`listTenants` reads the population and `getEntitlementUsage` reads one of them — list,
     select, act'
-  purpose: 'The platform operator''s home: every tenant with its status and plan, the cells it runs in, its
-    licence position and its usage against licensed limits, and the way into every other console screen.
+  purpose: 'The platform operator''s home: every tenant with its status and plan, the cells it runs in,
+    its licence position and its usage against licensed limits, and the way into every other console screen.
     Read-only; nothing is changed from here.'
   layout:
     template: split
@@ -964,6 +965,7 @@ screens:
   module: Overview & Health
   requiresModule: core
   wave: 1
+  permission: PLATFORM_CELL_VIEW
   capability: C95
   implementation:
     app: ticvai-web
@@ -1284,6 +1286,7 @@ screens:
   module: Overview & Health
   requiresModule: core
   wave: 2
+  permission: AI_AUDIT_VIEW
   capability: C97
   implementation:
     app: ticvai-web
@@ -1518,6 +1521,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   capability: C95
   implementation:
     app: ticvai-web
@@ -2029,6 +2033,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   capability: C20
   implementation:
     app: ticvai-web
@@ -2388,6 +2393,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   capability: C75
   implementation:
     app: ticvai-web
@@ -2680,6 +2686,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   capability: C74
   implementation:
     app: ticvai-web
@@ -3118,6 +3125,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 2
+  permission: PLATFORM_BILLING_VIEW
   capability: C74
   implementation:
     app: ticvai-web
@@ -3367,6 +3375,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 2
+  permission: PLATFORM_TENANT_VIEW
   capability: C74
   implementation:
     app: ticvai-web
@@ -3568,6 +3577,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 2
+  permission: PLATFORM_TENANT_VIEW
   capability: C75
   implementation:
     app: ticvai-web
@@ -3880,6 +3890,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -4138,6 +4149,7 @@ screens:
   module: Overview & Health
   requiresModule: core
   wave: 2
+  permission: PLATFORM_CELL_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -4336,6 +4348,7 @@ screens:
   module: Infrastructure & Resilience
   requiresModule: core
   wave: 3
+  permission: PLATFORM_CELL_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -4547,6 +4560,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   implementation:
     app: ticvai-web
     route: /general/api-rate-limit-and-quota-management
@@ -4862,6 +4876,14 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProductionAccessRequests`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: anomalyRuleId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApiAnomalyRule` takes it, from the record the user acts on.'
+    - name: quotaId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApiQuota` takes it, from the record the user acts on.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - Cell.id
@@ -4977,6 +4999,7 @@ screens:
   module: Branding & Localisation
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   capability: C57
   implementation:
     app: ticvai-web
@@ -5484,6 +5507,7 @@ screens:
   module: Branding & Localisation
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -5777,6 +5801,7 @@ screens:
   module: Branding & Localisation
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   capability: C57
   implementation:
     app: ticvai-web
@@ -6014,6 +6039,7 @@ screens:
   module: Branding & Localisation
   requiresModule: core
   wave: 2
+  permission: TENANT_VIEW
   capability: C95
   implementation:
     app: ticvai-web
@@ -6265,6 +6291,7 @@ screens:
   module: Access & Identity
   requiresModule: core
   wave: 1
+  permission: USER_MANAGE
   capability: C56
   implementation:
     app: ticvai-web
@@ -6534,6 +6561,7 @@ screens:
   module: Access & Identity
   requiresModule: core
   wave: 1
+  permission: ROLE_MANAGE
   capability: C56
   implementation:
     app: ticvai-web
@@ -7051,6 +7079,7 @@ screens:
   module: Releases & Environments
   requiresModule: core
   wave: 2
+  permission: PLATFORM_RELEASE_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -7322,6 +7351,7 @@ screens:
   module: Releases & Environments
   requiresModule: core
   wave: 2
+  permission: PLATFORM_RELEASE_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -7558,6 +7588,7 @@ screens:
   module: Releases & Environments
   requiresModule: core
   wave: 3
+  permission: PLATFORM_RELEASE_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -7737,6 +7768,7 @@ screens:
   module: Releases & Environments
   requiresModule: core
   wave: 2
+  permission: PLATFORM_RELEASE_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -7877,6 +7909,7 @@ screens:
   module: Releases & Environments
   requiresModule: core
   wave: 3
+  permission: PLATFORM_RELEASE_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -8145,6 +8178,7 @@ screens:
   module: Releases & Environments
   requiresModule: core
   wave: 1
+  permission: PLATFORM_MIGRATION_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -8385,6 +8419,7 @@ screens:
   module: Releases & Environments
   requiresModule: core
   wave: 2
+  permission: PLATFORM_RELEASE_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -8755,6 +8790,7 @@ screens:
   module: Overview & Health
   requiresModule: core
   wave: 2
+  permission: PLATFORM_CELL_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -9067,6 +9103,7 @@ screens:
   module: Infrastructure & Resilience
   requiresModule: core
   wave: 3
+  permission: PLATFORM_CELL_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -9255,6 +9292,7 @@ screens:
   module: Security & Compliance
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   capability: C97
   implementation:
     app: ticvai-web
@@ -9546,6 +9584,7 @@ screens:
   module: Security & Compliance
   requiresModule: core
   wave: 3
+  permission: PLATFORM_CELL_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -9668,6 +9707,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listWafRules`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: wafRuleId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listWafRules`.'
     coldEntry: '**A platform-admin link resolves against the tenant in the link and refuses if the operator
       does not hold that tenant.** A link is not authorisation. If the target is gone the screen says
       so and returns to the directory — **an admin console that silently shows the wrong tenant is worse
@@ -9731,6 +9774,7 @@ screens:
   module: Infrastructure & Resilience
   requiresModule: core
   wave: 2
+  permission: PLATFORM_CELL_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -9901,6 +9945,7 @@ screens:
   module: Infrastructure & Resilience
   requiresModule: core
   wave: 3
+  permission: PLATFORM_CELL_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -10048,6 +10093,7 @@ screens:
   module: Support & Communications
   requiresModule: core
   wave: 3
+  permission: PLATFORM_RELEASE_VIEW
   implementation:
     app: ticvai-web
     route: /general/support-and-escalation-console
@@ -10191,6 +10237,8 @@ screens:
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose "Answer a question without
     needing a person" was copied from a help screen; an escalation console works the escalation queue
     (design-notes correction platform-foundation ADM-035).'
+  division: 'Shares `listSupportNotices`, `publishSupportNotice` with ADM-036; this screen is Support
+    & Escalation Console: work the support escalations that reach TICVAI, and tell tenants what is known.'
   gaps:
   - operation: null
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-024): No operation lists or works the support
@@ -10201,6 +10249,7 @@ screens:
   module: Support & Communications
   requiresModule: core
   wave: 3
+  permission: PLATFORM_RELEASE_VIEW
   capability: C96
   implementation:
     app: ticvai-web
@@ -10361,11 +10410,14 @@ screens:
     source: contracts/satellite/workforce.yaml#publishAnnouncement
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template
     ("Push live platform notification broadcast for this venue").'
+  division: 'Shares `listSupportNotices`, `publishSupportNotice` with ADM-035; this screen is Platform
+    Notification Broadcast: broadcast a notice to every tenant, or to some of them.'
 - id: ADM-037
   name: AI Provider & Credentials
   module: AI
   requiresModule: core
   wave: 1
+  permission: AI_CONFIGURE
   capability: C00
   implementation:
     app: ticvai-web
@@ -10845,6 +10897,7 @@ screens:
   module: Commercial
   requiresModule: core
   wave: 3
+  permission: PRODUCT_VIEW
   source:
     pack: Pricing___Revenue_Management_Reference.pdf
     board: '3'
@@ -11192,6 +11245,7 @@ screens:
   module: Platform Ops
   requiresModule: core
   wave: 1
+  permission: PLATFORM_CELL_VIEW
   capability: C00
   implementation:
     app: ticvai-web
@@ -11455,6 +11509,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '1'
@@ -11584,7 +11639,8 @@ screens:
   apis:
   - operationId: getCommercialMetrics
     contract: subscription
-    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   wireframe:
@@ -11604,6 +11660,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '1'
@@ -11751,6 +11808,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '1'
@@ -11831,6 +11889,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '1'
@@ -11907,7 +11966,8 @@ screens:
   apis:
   - operationId: getCommercialMetrics
     contract: subscription
-    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   - operationId: scoreVsiAssessment
@@ -11936,6 +11996,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '1'
@@ -12055,7 +12116,8 @@ screens:
     provenance: board reading, 19 September 2026
   - operationId: getCommercialMetrics
     contract: subscription
-    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
@@ -12079,6 +12141,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '1'
@@ -12154,7 +12217,8 @@ screens:
   apis:
   - operationId: getCommercialMetrics
     contract: subscription
-    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   wireframe:
@@ -12313,7 +12377,8 @@ screens:
   apis:
   - operationId: getCommercialMetrics
     contract: subscription
-    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   wireframe:
@@ -12446,7 +12511,8 @@ screens:
   apis:
   - operationId: getCommercialMetrics
     contract: subscription
-    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
@@ -12470,6 +12536,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '1'
@@ -12561,6 +12628,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '1'
@@ -12762,7 +12830,8 @@ screens:
   apis:
   - operationId: getCommercialMetrics
     contract: subscription
-    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   - operationId: getPlanRecommendations
@@ -12904,6 +12973,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: TENANT_CONFIGURE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '2'
@@ -13061,6 +13131,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '2'
@@ -13162,6 +13233,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '2'
@@ -13241,6 +13313,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '2'
@@ -13351,6 +13424,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '2'
@@ -13470,6 +13544,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '2'
@@ -13549,6 +13624,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '2'
@@ -13639,6 +13715,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '2'
@@ -13719,6 +13796,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '2'
@@ -13799,6 +13877,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '3'
@@ -13920,7 +13999,8 @@ screens:
   apis:
   - operationId: getCommercialMetrics
     contract: subscription
-    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   - operationId: listLicensingModels
@@ -13941,6 +14021,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '3'
@@ -14054,6 +14135,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '3'
@@ -14136,6 +14218,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '3'
@@ -14227,6 +14310,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '3'
@@ -14319,11 +14403,18 @@ screens:
     0 labels bound to a contract property; 9 of 13 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: licensingModelId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setLicensingModel` takes it, from the record the user acts on.'
 - id: ADM-394
   name: Commercial & Licensing Model Configuration
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '3'
@@ -14486,11 +14577,18 @@ screens:
     0 labels bound to a contract property; 23 of 44 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: licensingModelId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setLicensingModel` takes it, from the record the user acts on.'
 - id: ADM-395
   name: Billable Unit, Minimum Guarantee & Enforcement Rules
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '3'
@@ -14615,11 +14713,18 @@ screens:
     0 labels bound to a contract property; 17 of 30 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: licensingModelId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setLicensingModel` takes it, from the record the user acts on.'
 - id: ADM-396
   name: Overage Pricing & Capacity Packs
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '3'
@@ -14727,11 +14832,18 @@ screens:
     0 labels bound to a contract property; 11 of 23 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: licensingModelId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setLicensingModel` takes it, from the record the user acts on.'
 - id: ADM-397
   name: Commercial Model & Rule Simulation
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '3'
@@ -14837,6 +14949,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '3'
@@ -14934,6 +15047,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '4'
@@ -15055,6 +15169,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '4'
@@ -15147,6 +15262,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '4'
@@ -15255,6 +15371,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '4'
@@ -15360,6 +15477,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '4'
@@ -15436,6 +15554,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '4'
@@ -15523,6 +15642,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '4'
@@ -15605,6 +15725,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '4'
@@ -15714,6 +15835,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '4'
@@ -16010,6 +16132,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -16100,6 +16223,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -16315,6 +16439,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -16546,6 +16671,10 @@ screens:
     - name: tenantId
       from: navigation
       optional: true
+    - name: providerId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPaymentProviders`.'
   purposeNote: 'Purpose corrected 2 October 2026 (CHG-SBO-011): `setPaymentProvider` configures how a
     tenant''s venue collects from guests; TICVAI''s own fees are subscription billing (ADM-009), not this
     screen.'
@@ -16557,6 +16686,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -16676,11 +16806,18 @@ screens:
     0 labels bound to a contract property; 16 of 32 pack bullets carried onto the screen — the rest are
     acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather
     than here.
+  entryState:
+    params:
+    - name: trialConfigurationId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setTrialConfiguration` takes it, from the record the user acts on.'
 - id: ADM-414
   name: Order & Commercial Pricing Review
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -16783,6 +16920,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -16888,6 +17026,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -16967,6 +17106,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -17052,6 +17192,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -17188,6 +17329,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_CELL_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -17324,6 +17466,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -17512,6 +17655,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -17710,6 +17854,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -17936,6 +18081,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -18012,6 +18158,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 1
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -18215,6 +18362,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: TENANT_CONFIGURE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -18388,6 +18536,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -18637,6 +18786,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -18707,6 +18857,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '9'
@@ -18823,6 +18974,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '9'
@@ -18903,6 +19055,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '9'
@@ -18983,6 +19136,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '9'
@@ -19053,6 +19207,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '9'
@@ -19159,6 +19314,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '9'
@@ -19249,6 +19405,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '9'
@@ -19345,6 +19502,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '9'
@@ -19419,6 +19577,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '9'
@@ -19498,6 +19657,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '9'
@@ -19610,6 +19770,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '10'
@@ -19785,7 +19946,8 @@ screens:
     provenance: board reading, 19 September 2026
   - operationId: getCommercialMetrics
     contract: subscription
-    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
@@ -19812,6 +19974,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '10'
@@ -19963,6 +20126,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '10'
@@ -20048,6 +20212,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '10'
@@ -20152,6 +20317,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '10'
@@ -20388,7 +20554,8 @@ screens:
   apis:
   - operationId: getCommercialMetrics
     contract: subscription
-    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
+    purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP,
+      CHG-SCO-006)
     trigger: onLoad
     provenance: audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)
   entryState:
@@ -20412,6 +20579,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '10'
@@ -20497,6 +20665,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '10'
@@ -20602,6 +20771,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '10'
@@ -20715,6 +20885,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '10'
@@ -20794,6 +20965,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '1'
@@ -21088,6 +21260,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '1'
@@ -21315,6 +21488,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '1'
@@ -21621,6 +21795,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '1'
@@ -21650,6 +21825,10 @@ screens:
     rather than passed off as a decision'
   purpose: Provide the main adaptive AI interview workspace. This is the core screen of Board 1. It should
     feel conversational but remain structured and controlled.
+  division: 'Shares `answerConfigurationQuestion`, `getConfigurationBlueprint` with ADM-473, ADM-474,
+    ADM-475; this screen is Guided Question & Answer Workspace (pack AI_Configuration_Assistant_Reference.pdf,
+    board 1.4, page 9): provide the main adaptive AI interview workspace. This is the core screen of Board
+    1. It should feel conversational but remain structured and controlled.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -21801,6 +21980,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '1'
@@ -21829,6 +22009,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Determine what the venue sells and how each product provides admission or entitlement.
+  division: 'Shares `answerConfigurationQuestion`, `getConfigurationBlueprint` with ADM-472, ADM-474,
+    ADM-475; this screen is Product & Admission Model Discovery (pack AI_Configuration_Assistant_Reference.pdf,
+    board 1.5, page 10): determine what the venue sells and how each product provides admission or entitlement.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -21980,6 +22163,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '1'
@@ -22008,6 +22192,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Understand the operational rules needed to deliver the configured products.
+  division: 'Shares `answerConfigurationQuestion`, `getConfigurationBlueprint` with ADM-472, ADM-473,
+    ADM-475; this screen is Operational Requirement Discovery (pack AI_Configuration_Assistant_Reference.pdf,
+    board 1.6, page 12): understand the operational rules needed to deliver the configured products.'
   gaps:
   - operation: null
     why: '**The pack names 1 actions on this screen and the screen declares 0 operations.** Unserved:
@@ -22166,6 +22353,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '1'
@@ -22195,6 +22383,10 @@ screens:
     rather than passed off as a decision'
   purpose: Understand how the venue intends to sell and commercially manage its products without actually
     configuring pricing yet.
+  division: 'Shares `answerConfigurationQuestion`, `getConfigurationBlueprint` with ADM-472, ADM-473,
+    ADM-474; this screen is Commercial Requirement Discovery (pack AI_Configuration_Assistant_Reference.pdf,
+    board 1.7, page 13): understand how the venue intends to sell and commercially manage its products
+    without actually configuring pricing yet.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -22346,6 +22538,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '1'
@@ -22516,6 +22709,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '1'
@@ -22702,6 +22896,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '1'
@@ -22882,6 +23077,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '2'
@@ -23129,6 +23325,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '2'
@@ -23158,6 +23355,10 @@ screens:
     rather than passed off as a decision'
   purpose: Convert the discovered business structure into the actual organizational and venue configuration
     required by TICVAI.
+  division: 'Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-481, ADM-482, ADM-483, ADM-484,
+    ADM-485, ADM-486; this screen is Venue & Organization Configuration (pack AI_Configuration_Assistant_Reference.pdf,
+    board 2.2, page 26): convert the discovered business structure into the actual organizational and
+    venue configuration required by TICVAI.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -23313,6 +23514,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '2'
@@ -23343,6 +23545,11 @@ screens:
   purpose: Convert Board 1 product requirements into actual proposed TICVAI ticket products and associated
     product rules. This screen should connect directly to the existing Ticketing module architecture,
     not create a separate AI product model.
+  division: 'Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-482, ADM-483, ADM-484,
+    ADM-485, ADM-486; this screen is Product Configuration Assistant (pack AI_Configuration_Assistant_Reference.pdf,
+    board 2.3, page 27): convert Board 1 product requirements into actual proposed TICVAI ticket products
+    and associated product rules. This screen should connect directly to the existing Ticketing module
+    architecture, not create a separate AI product model.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -23498,6 +23705,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '2'
@@ -23527,6 +23735,10 @@ screens:
     rather than passed off as a decision'
   purpose: Translate operating requirements into actual schedules, timeslots, reservation windows, and
     capacity structures.
+  division: 'Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-483, ADM-484,
+    ADM-485, ADM-486; this screen is Schedule, Capacity & Availability Configuration (pack AI_Configuration_Assistant_Reference.pdf,
+    board 2.4, page 29): translate operating requirements into actual schedules, timeslots, reservation
+    windows, and capacity structures.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -23682,6 +23894,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '2'
@@ -23709,6 +23922,10 @@ screens:
   patternReason: the pack gives this screen a display directory (§Show) and no metric row
   purpose: Convert commercial requirements into proposed pricing, tax, fee, and commercial rules using
     TICVAI's existing Pricing architecture.
+  division: 'Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-482, ADM-484,
+    ADM-485, ADM-486; this screen is Pricing & Commercial Configuration (pack AI_Configuration_Assistant_Reference.pdf,
+    board 2.5, page 30): convert commercial requirements into proposed pricing, tax, fee, and commercial
+    rules using TICVAI''s existing Pricing architecture.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -23788,6 +24005,7 @@ screens:
         notes: 'The pack groups this record''s detail under its own headings: “Child AED 80 AED 95”, “Customer
           Eligibility”, “Dynamic Pricing”.'
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 30 §Show
+        operation: getActionPlan
   states:
     loading: The pricing commercial list.
     error: Could not load. Names which read failed and leaves the pricing commercial untouched.
@@ -23883,6 +24101,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '2'
@@ -23912,6 +24131,10 @@ screens:
     rather than passed off as a decision'
   purpose: Convert identified commercial opportunities into proposed promotion, package, bundle, upsell,
     and cross- sell configuration. This screen should only become prominent when relevant.
+  division: 'Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-482, ADM-483,
+    ADM-485, ADM-486; this screen is Promotion, Bundle & Upsell Configuration (pack AI_Configuration_Assistant_Reference.pdf,
+    board 2.6, page 32): convert identified commercial opportunities into proposed promotion, package,
+    bundle, upsell, and cross- sell configuration. This screen should only become prominent when relevant.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -24067,6 +24290,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '2'
@@ -24097,6 +24321,11 @@ screens:
   purpose: Configure the operational rules required to fulfill and validate the products. The screen should
     adapt depending on venue type. For the museum example, seating is irrelevant and should not consume
     UI attention.
+  division: 'Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-482, ADM-483,
+    ADM-484, ADM-486; this screen is Seating, Access & Operational Configuration (pack AI_Configuration_Assistant_Reference.pdf,
+    board 2.7, page 33): configure the operational rules required to fulfill and validate the products.
+    The screen should adapt depending on venue type. For the museum example, seating is irrelevant and
+    should not consume UI attention.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -24252,6 +24481,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '2'
@@ -24280,6 +24510,10 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Determine how the proposed products are sold, delivered, and fulfilled across TICVAI channels.
+  division: 'Shares `decideBlueprintRecommendation`, `getActionPlan` with ADM-480, ADM-481, ADM-482, ADM-483,
+    ADM-484, ADM-485; this screen is Channel, Media & Fulfillment Configuration (pack AI_Configuration_Assistant_Reference.pdf,
+    board 2.8, page 34): determine how the proposed products are sold, delivered, and fulfilled across
+    TICVAI channels.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -24435,6 +24669,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '2'
@@ -24627,6 +24862,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '2'
@@ -24866,6 +25102,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '3'
@@ -25165,6 +25402,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '3'
@@ -25345,6 +25583,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '3'
@@ -25545,6 +25784,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '3'
@@ -25712,6 +25952,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '3'
@@ -25904,6 +26145,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '3'
@@ -26131,6 +26373,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '3'
@@ -26324,6 +26567,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '3'
@@ -26496,6 +26740,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '3'
@@ -26687,6 +26932,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: AI_Configuration_Assistant_Reference.pdf
     board: '3'
@@ -26715,6 +26961,10 @@ screens:
     directory (§For each configuration value show) — counts over a population, then the population
   purpose: Provide an immutable governance record showing how AI participated in every configuration decision
     and execution. This is essential for an enterprise AI system.
+  division: 'Shares `getAiDecisionTrace`, `searchAiDecisions` with ADM-537, ADM-540; this screen is AI
+    Configuration Audit & Governance (pack AI_Configuration_Assistant_Reference.pdf, board 3.10, page
+    57): provide an immutable governance record showing how AI participated in every configuration decision
+    and execution. This is essential for an enterprise AI system.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -27026,6 +27276,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -27287,6 +27538,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 1
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -27565,6 +27817,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -27756,6 +28009,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -27941,6 +28195,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -28173,6 +28428,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -28389,6 +28645,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -28624,6 +28881,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 1
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -28893,6 +29151,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -29083,6 +29342,7 @@ screens:
   module: AI
   requiresModule: core
   wave: 1
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -29357,6 +29617,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '2'
@@ -29625,6 +29886,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '2'
@@ -29816,6 +30078,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '2'
@@ -29995,6 +30258,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '2'
@@ -30158,6 +30422,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: WORKFORCE_VIEW
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '2'
@@ -30351,6 +30616,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '2'
@@ -30536,6 +30802,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '2'
@@ -30701,6 +30968,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '2'
@@ -30864,6 +31132,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '2'
@@ -31031,6 +31300,7 @@ screens:
   module: Analytics
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '2'
@@ -31223,6 +31493,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -31492,6 +31763,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -31521,6 +31793,10 @@ screens:
     rather than passed off as a decision'
   purpose: Maintain a controlled registry of every AI capability operating within TICVAI. Nothing should
     become an operational AI capability without being identifiable and governed.
+  division: 'Shares `configureAiCapability`, `listAiCapabilities` with ADM-521; this screen is AI Capability
+    Registry & Ownership (pack AI_Governance_Reference.pdf, board 1.2, page 5): maintain a controlled
+    registry of every AI capability operating within TICVAI. Nothing should become an operational AI capability
+    without being identifiable and governed.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -31718,6 +31994,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -31748,6 +32025,10 @@ screens:
   purpose: Classify AI capabilities and individual AI action types according to their potential business,
     customer, financial, operational, security and compliance impact. Risk should not be based only on
     which AI model is being used.
+  division: 'Shares `configureAiCapability`, `listAiCapabilities` with ADM-520; this screen is AI Risk
+    Classification & Assessment (pack AI_Governance_Reference.pdf, board 1.3, page 7): classify AI capabilities
+    and individual AI action types according to their potential business, customer, financial, operational,
+    security and compliance impact. Risk should not be based only on which AI model is being used.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -31899,6 +32180,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -32089,6 +32371,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 1
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -32359,6 +32642,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -32545,6 +32829,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -32721,6 +33006,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -32961,6 +33247,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 1
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -33159,6 +33446,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 1
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -33375,6 +33663,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '2'
@@ -33638,6 +33927,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: APPROVAL_CONFIGURE
   source:
     pack: AI_Governance_Reference.pdf
     board: '2'
@@ -33863,6 +34153,10 @@ screens:
     - name: tenantId
       from: navigation
       optional: true
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApprovalMatrices`.'
   notes: '**Tenant picker and platform-staff grant added 2 October 2026** (CHG-SBO-001; Chinmay, pre-apply
     round: console screens get the R098 tenant picker and grant, the ADM-412 pattern). The Console runs
     outside every cell; `createAiGovernancePolicyDraft` (AI_CONFIGURE), `listAiGovernancePolicyVersions`
@@ -33875,6 +34169,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '2'
@@ -34037,6 +34332,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '2'
@@ -34246,6 +34542,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '2'
@@ -34445,6 +34742,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '2'
@@ -34639,6 +34937,10 @@ screens:
     - name: tenantId
       from: navigation
       optional: true
+    - name: slaPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalSlaPolicy` takes it, from the record the user acts on.'
   overlays:
   - id: formOpenPlatformStaffGrant
     component: modal
@@ -34672,6 +34974,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '2'
@@ -34924,6 +35227,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '2'
@@ -35227,6 +35531,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '2'
@@ -35256,6 +35561,10 @@ screens:
     rather than passed off as a decision'
   purpose: Provide complete operational history of human involvement in AI activity. This is the human-oversight
     timeline; Board 3 will later provide deeper enterprise AI explainability and audit.
+  division: 'Shares `getAiDecisionTrace`, `searchAiDecisions` with ADM-498, ADM-540; this screen is Approval
+    & Intervention History / Decision Timeline (pack AI_Governance_Reference.pdf, board 2.9, page 42):
+    provide complete operational history of human involvement in AI activity. This is the human-oversight
+    timeline; Board 3 will later provide deeper enterprise AI explainability and audit.'
   gaps:
   - operation: null
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
@@ -35407,6 +35716,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '2'
@@ -35602,6 +35912,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '3'
@@ -35864,6 +36175,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '3'
@@ -35901,6 +36213,17 @@ screens:
     Engine Customer CUS-****821 Channel B2C Journey Stage Checkout Decision Recommend Fast Pass Rank #1
     Confidence 87% Model REC-v3.2 Status Delivered Relationship Search Allow navigation: Customer → Session
     → Decision → Delivery → Transaction'
+  division: 'Shares `getAiDecisionTrace`, `searchAiDecisions` with ADM-498, ADM-537; this screen is AI
+    Decision Explorer & Search (pack AI_Governance_Reference.pdf, board 3.2, page 56): allow authorized
+    users to locate any AI decision or AI-driven action across TICVAI. This becomes the entry point when
+    someone asks: “Why did TICVAI do this?” Search By Support: Decision ID Trace ID Approval ID Execution
+    ID Transaction ID Customer Reference Session ID User Product Ticket Order Venue AI Capability Model
+    Version Date / Time Example Search Transaction ORD-928410 Results: Time AI Capability Decision Related
+    Object Result 13:42 Recommendation AI Fast Pass ORD-928410 Accepted 13:44 Recommendation AI Family
+    Meal ORD-928410 Ignored 13:46 Fraud AI Risk Assessment ORD-928410 Low Risk Decision Card Selecting
+    a decision displays: Decision ID DEC-49102 Capability Recommendation Engine Customer CUS-****821 Channel
+    B2C Journey Stage Checkout Decision Recommend Fast Pass Rank #1 Confidence 87% Model REC-v3.2 Status
+    Delivered Relationship Search Allow navigation: Customer → Session → Decision → Delivery → Transaction.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -36062,6 +36385,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '3'
@@ -36249,6 +36573,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '3'
@@ -36449,6 +36774,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '3'
@@ -36647,6 +36973,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '3'
@@ -36873,6 +37200,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '3'
@@ -37056,6 +37384,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '3'
@@ -37226,6 +37555,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '3'
@@ -37414,6 +37744,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '3'
@@ -37610,6 +37941,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -37925,6 +38257,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -38126,6 +38459,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -38309,6 +38643,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -38525,6 +38860,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -38767,6 +39103,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 1
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -39057,6 +39394,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -39240,6 +39578,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 1
+  permission: AI_USE
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -39560,6 +39899,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -39756,6 +40096,7 @@ screens:
   module: Platform
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'
@@ -39920,6 +40261,7 @@ screens:
   module: Commercial
   requiresModule: core
   wave: 3
+  permission: SETTLEMENT_VIEW
   source:
     pack: Payment_Payment_Orchestration.pdf
     board: '7'
@@ -39952,6 +40294,8 @@ screens:
     - to: ADM-620
       trigger: Reconciliation Source & Import Manager\t141
       provenance: structural — pack board 7 wiring, 19 September 2026
+      carries:
+      - settlementId
     - to: ADM-621
       trigger: Transaction Matching & Reconciliation Engine\t142
       provenance: structural — pack board 7 wiring, 19 September 2026

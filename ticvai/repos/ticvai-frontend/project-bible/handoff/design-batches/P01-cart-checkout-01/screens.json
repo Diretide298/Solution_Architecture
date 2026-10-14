@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/cart-and-checkout/shopping-cart",
-   "component": "apps/guest-web/src/routes/cart-and-checkout/ShoppingCartDetail.tsx",
+   "component": "src/routes/cart-and-checkout/ShoppingCartDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -265,7 +265,7 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add something",
+    "purpose": "Add a suggested item from Add to your visit to the cart",
     "trigger": "onAction"
    },
    {
@@ -426,7 +426,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/cart-and-checkout/guest-details-and-attendee-forms",
-   "component": "apps/guest-web/src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx",
+   "component": "src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -525,7 +525,7 @@
        "label": "Booking consent questions",
        "bindsTo": "Cart.consentQuestions",
        "notes": "Any consent question in `Cart.consentQuestions` not answered yet (a flow with no date step, or a product added later): per person or once per booking, as each question says; answers go to `recordConsentAnswers`. Distinct from marketing consent above.",
-       "operation": "getCart",
+       "operation": "recordConsentAnswers",
        "provenance": "decided 29 September, rev 3 REV3-26"
       },
       {
@@ -742,7 +742,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/cart-and-checkout/checkout-payment",
-   "component": "apps/guest-web/src/routes/cart-and-checkout/CheckoutPaymentForm.tsx",
+   "component": "src/routes/cart-and-checkout/CheckoutPaymentForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1031,7 +1031,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/cart-and-checkout/order-confirmation",
-   "component": "apps/guest-web/src/routes/cart-and-checkout/OrderConfirmationDetail.tsx",
+   "component": "src/routes/cart-and-checkout/OrderConfirmationDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1346,7 +1346,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/pay/:token",
-   "component": "apps/guest-web/src/routes/cart-and-checkout/PayByLinkForm.tsx",
+   "component": "src/routes/cart-and-checkout/PayByLinkForm.tsx",
    "status": "notStarted"
   },
   "navigation": {

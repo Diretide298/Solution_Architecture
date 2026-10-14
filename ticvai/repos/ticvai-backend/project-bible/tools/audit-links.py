@@ -164,9 +164,13 @@ def audit(detail: bool = False) -> dict:
                 broken["state -> operation"].append(f"{f.stem} {tr.get('from')}->{tr.get('to')} "
                                                     f"names {o}")
 
+    # a read through a DB-READ-VIEWS view `<table>_for_<reader>` reads its table (CHG-R6G-007, CHG-GTE-001)
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from audit_guard import viewed_table
     for o, v in lin.items():
         for t in v.get("reads", []) + v.get("writes", []):
-            if "." in t and ":" not in t and t not in real:
+            if "." in t and ":" not in t and t not in real \
+                    and not (t in v.get("reads", []) and viewed_table(t, real)):
                 broken["operation -> table"].append(f"{o} -> {t}")
         if not v.get("audience"):
             broken["operation audience"].append(o)

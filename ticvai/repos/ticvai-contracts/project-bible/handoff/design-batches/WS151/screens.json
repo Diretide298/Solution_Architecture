@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/mixed-tender-credit-command-center-t93-adm-599",
-   "component": "apps/venue-management-web/src/routes/commercial/MixedTenderCreditCommandCenterT93.tsx",
+   "component": "src/routes/commercial/MixedTenderCreditCommandCenterT93.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -214,6 +215,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -223,7 +225,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/mixed-tender-rule-combination-builder-t93-adm-600",
-   "component": "apps/venue-management-web/src/routes/commercial/MixedTenderRuleCombinationBuilderT93.tsx",
+   "component": "src/routes/commercial/MixedTenderRuleCombinationBuilderT93.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -247,6 +249,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Card r t Credit; Card) and no metric row",
   "purpose": "Define which payment methods may be combined within a single transaction.",
+  "division": "Shares `getMixedTenderRules`, `setMixedTenderRules` with ADM-605; this screen is Mixed Tender Rule & Combination Builder (pack Payment_Payment_Orchestration.pdf, board 5.2, page 92): define which payment methods may be combined within a single transaction.",
   "gaps": [
    {
     "operation": null,
@@ -375,6 +378,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -384,7 +388,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/split-payment-tender-allocation-manager-t94-adm-601",
-   "component": "apps/venue-management-web/src/routes/commercial/SplitPaymentTenderAllocationManagerT94.tsx",
+   "component": "src/routes/commercial/SplitPaymentTenderAllocationManagerT94.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -436,7 +440,8 @@
        "derived": true,
        "impliedBy": "setMultiPaymentSplit",
        "label": "Save multi payment split",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setMultiPaymentSplit"
       },
       {
        "kind": "secondaryButton",
@@ -558,6 +563,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -567,7 +573,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/b2b-credit-account-limit-manager-t95-adm-602",
-   "component": "apps/venue-management-web/src/routes/commercial/B2bCreditAccountLimitManagerT95.tsx",
+   "component": "src/routes/commercial/B2bCreditAccountLimitManagerT95.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -714,6 +720,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -723,7 +730,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/b2b-invoice-on-account-payment-terms-configuration-t96-adm-603",
-   "component": "apps/venue-management-web/src/routes/commercial/B2bInvoiceOnAccountPaymentTermsConfigurationT96.tsx",
+   "component": "src/routes/commercial/B2bInvoiceOnAccountPaymentTermsConfigurationT96.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -911,6 +918,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -920,7 +928,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/stored-value-gift-card-voucher-tender-controls-t97-adm-604",
-   "component": "apps/venue-management-web/src/routes/commercial/StoredValueGiftCardVoucherTenderControlsT97.tsx",
+   "component": "src/routes/commercial/StoredValueGiftCardVoucherTenderControlsT97.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1071,6 +1079,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -1080,7 +1089,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/advanced-payment-eligibility-sequence-restriction-rules--adm-605",
-   "component": "apps/venue-management-web/src/routes/commercial/AdvancedPaymentEligibilitySequenceRestrictionRul.tsx",
+   "component": "src/routes/commercial/AdvancedPaymentEligibilitySequenceRestrictionRul.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1104,6 +1113,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Gift Card second) and no metric row",
   "purpose": "Provide advanced transaction-level payment rules beyond the general method availability configured in Board 1.",
+  "division": "Shares `getMixedTenderRules`, `setMixedTenderRules` with ADM-600; this screen is Advanced Payment Eligibility, Sequence & Restriction Rules (pack Payment_Payment_Orchestration.pdf, board 5.7, page 97): provide advanced transaction-level payment rules beyond the general method availability configured in Board 1.",
   "gaps": [
    {
     "operation": null,
@@ -1247,6 +1257,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_CONFIGURE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -1256,7 +1267,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/partial-payment-failure-recovery-manager-t100-adm-606",
-   "component": "apps/venue-management-web/src/routes/commercial/PartialPaymentFailureRecoveryManagerT100.tsx",
+   "component": "src/routes/commercial/PartialPaymentFailureRecoveryManagerT100.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1308,7 +1319,7 @@
         "AED 800 ✕"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listDunningCases",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card"
       }
      ]
@@ -1326,7 +1337,8 @@
         "AED 800 ✕"
        ],
        "notes": "The pack groups this record's detail under its own headings: “AED 200 successfully consumed”, “Partial Payment States”, “Timeout”, “Partially Paid”.",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 99 §Gift Card",
+       "operation": "getDunningPolicy"
       }
      ]
     }
@@ -1424,6 +1436,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -1433,7 +1446,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/mixed-tender-transaction-trace-allocation-audit-t100-adm-607",
-   "component": "apps/venue-management-web/src/routes/commercial/MixedTenderTransactionTraceAllocationAuditT100.tsx",
+   "component": "src/routes/commercial/MixedTenderTransactionTraceAllocationAuditT100.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1574,6 +1587,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -1583,7 +1597,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/mixed-tender-simulator-credit-exposure-ai-advisor-t102-adm-608",
-   "component": "apps/venue-management-web/src/routes/commercial/MixedTenderSimulatorCreditExposureAiAdvisorT102.tsx",
+   "component": "src/routes/commercial/MixedTenderSimulatorCreditExposureAiAdvisorT102.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1637,7 +1651,7 @@
         "→ Cash"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listB2bCreditAccounts",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 101 §Gift Card"
       }
      ]

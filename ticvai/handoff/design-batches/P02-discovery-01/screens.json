@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/search",
-   "component": "apps/guest-app/src/routes/Search.tsx",
+   "component": "src/screens/Search.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -108,6 +108,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-063",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-063.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",

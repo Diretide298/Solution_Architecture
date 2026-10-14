@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `CMS-061` | Digital Asset Management Command Center | B | 0 | 72 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `CMS-062` | Central Digital Asset Library | B | 3 | 18 | 6 | 9 | 1 | 0 | — | notStarted (—) |
-| `CMS-063` | Upload & Asset Ingestion Workspace | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `CMS-063` | Upload & Asset Ingestion Workspace | B | 17 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `CMS-064` | Folder, Collection & Workspace Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-065` | Metadata & Taxonomy Management | B | 18 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-066` | Tags, Keywords & Classification | B | 4 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
@@ -354,6 +354,8 @@ Every digital asset:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_VIEW`
+
 #### Requirements it meets
 
 5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -460,7 +462,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Shown**
 
-**Every central digital asset** (data table)
+**Every central digital asset** (data table, from `searchMedia`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -474,7 +476,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Owner | text | not in the schema: `owner` |
 | Updated date | text | not in the schema: `updated date` |
 
-**The selected central digital asset** (detail panel): The pack groups this record's detail under its own headings: “Image”, “Venue Media”, “Archive”.
+**The selected central digital asset** (detail panel, from `searchMedia`): The pack groups this record's detail under its own headings: “Image”, “Venue Media”, “Archive”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -498,7 +500,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Add to Collection (secondary button) | navigation or local | — | — | — | — |
 | Move (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `searchMedia` (onLoad, Browse and filter the library); `listCollections` (onLoad, Collections to file into)
+**Data it reads**: `searchMedia` (onLoad, Browse and filter the library)
 
 **Where the user goes next**
 
@@ -553,10 +555,11 @@ Every central digital asset:
 #### Permissions
 
 - `searchMedia` → `ASSET_LIBRARY_VIEW` (read) · staff
-- `listCollections` → `ASSET_LIBRARY_VIEW` (read) · staff
 - `semanticSearch` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -629,7 +632,27 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by *Bulk Upload*** (`completeUpload`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Title `title` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `completeUpload` body |
+| Alt text `altText` | text, one per language | optional | — | — | English and Arabic (Arabic right to left) | — | `completeUpload` body |
+| Tags `tags` | list of values (chips) | optional | — | — | — | — | `completeUpload` body |
+| Collections `collectionIds` | multi-picker: choose collections | optional | — | — | — | — | `completeUpload` body |
+| Rights `rights` | group | optional | — | — | — | Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item. | `completeUpload` body |
+| Licence kind `rights.licenceKind` | select | optional | — | Owned · Royalty free · Rights managed · Creative commons · Editorial only · Unknown | — | — | `completeUpload` body |
+| Licensor `rights.licensor` | text field | optional | — | — | — | — | `completeUpload` body |
+| Licence reference `rights.licenceReference` | text field | optional | — | — | — | — | `completeUpload` body |
+| Valid from `rights.validFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `completeUpload` body |
+| Valid to `rights.validTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `completeUpload` body |
+| Permitted uses `rights.permittedUses` | multi-select chips | optional | — | Web · Print · Social media · In venue · Advertising · Internal | — | — | `completeUpload` body |
+| Attribution required `rights.attributionRequired` | toggle | optional | off | — | — | — | `completeUpload` body |
+| Attribution text `rights.attributionText` | text field | optional | — | — | — | — | `completeUpload` body |
+| Permitted territories `rights.permittedTerritories` | list of values (chips) | optional | — | — | — | ISO country or region codes. Empty means unrestricted, which is a claim rather than an absence — an unknown territory and a worldwide licence are not the same thing, and … | `completeUpload` body |
+| Permitted channels `rights.permittedChannels` | list of values (chips) | optional | — | — | — | Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route. | `completeUpload` body |
+| Model release held `rights.modelReleaseHeld` | toggle | optional | off | — | — | — | `completeUpload` body |
+| Renewal owner `rights.renewalOwner` | picker: choose a renewal owner | optional | — | — | shows names, sends the id | — | `completeUpload` body |
 
 **Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
@@ -642,7 +665,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Browse Files (primary button) | navigation or local | — | — | — | — |
-| Bulk Upload (secondary button) | navigation or local | — | — | — | — |
+| Bulk Upload (secondary button) | `completeUpload` POST `/media/uploads/{uploadId}/complete` | inline | MediaAsset | 409 The transfer never finished (`transferIncomplete`), the upload ticket expired (`uploadExpired`), or the stored file is larger than the ticket allowed … (UploadRefusedProblem) | — |
 | Import from Approved Source (secondary button) | navigation or local | — | — | — | — |
 
 **Where the user goes next**
@@ -659,7 +682,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the upload asset ingestion are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Content type not permitted, or size beyond the limit for that kind. Checked here rather than after a guest has uploaded two hundred megabytes.; 409 The transfer never finished (`transferIncomplete`), the upload ticket expired (`uploadExpired`), or the stored file is larger than the ticket allowed … (UploadRefusedProblem) |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Content type not permitted, or size beyond the limit for that kind. Checked here rather than after a guest has uploaded two hundred megabytes.; 409 The asset is still `processing`, or is `failed` or `quarantined`, so there is no usable file to analyse.; 409 The transfer never finished (`transferIncomplete`), the upload ticket expired (`uploadExpired`), or the stored file is larger than the … |
 
 #### Edge cases to draw
 
@@ -688,6 +711,8 @@ uploads:
 - `analyseMediaAsset` → `ASSET_LIBRARY_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_MANAGE`
 
 #### Requirements it meets
 
@@ -720,7 +745,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 409).
+- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (400, 409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-063?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Browse Files, Bulk Upload, Import from Approved Source.
@@ -814,6 +839,8 @@ listCollections (Collection):
 - `createCollection` → `ASSET_LIBRARY_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -984,6 +1011,8 @@ fields:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1095,6 +1124,8 @@ form example:
 - `getMediaTaxonomy` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -1232,6 +1263,8 @@ searchMedia (MediaAsset):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_VIEW`
+
 #### Requirements it meets
 
 5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1317,7 +1350,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every digital asset 360°** (data table)
+**Every digital asset 360°** (data table, from `listMediaAssetVersions`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1340,7 +1373,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Tags | text | not in the schema: `Tags` |
 | Keywords | text | not in the schema: `Keywords` |
 
-**The selected digital asset 360°** (detail panel): The pack groups this record's detail under its own headings: “Preview”, “JPEG”, “Board Boundaries”.
+**The selected digital asset 360°** (detail panel, from `getMediaAsset`): The pack groups this record's detail under its own headings: “Preview”, “JPEG”, “Board Boundaries”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1408,6 +1441,8 @@ Every digital asset 360°:
 - `getMediaDistribution` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -1526,6 +1561,8 @@ inLiveUse: 38
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1605,7 +1642,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every asset activity recent** (data table)
+**Every asset activity recent** (data table, from `getMediaUsageAnalytics`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1617,7 +1654,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Used storage | text | not in the schema: `Used Storage` |
 | Monthly growth | text | not in the schema: `Monthly Growth` |
 
-**The selected asset activity recent** (detail panel): The pack groups this record's detail under its own headings: “Digital Asset Management”, “Activity Asset User Time”, “Orphaned Assets”, “DAM-IMG-008421”, “Physical File”, “Digital Asset Master Record”.
+**The selected asset activity recent** (detail panel, from `getMediaUsageAnalytics`): The pack groups this record's detail under its own headings: “Digital Asset Management”, “Activity Asset User Time”, “Orphaned Assets”, “DAM-IMG-008421”, “Physical File”, “Digital Asset Master Record”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1693,6 +1730,8 @@ Every asset activity recent:
 - `getMediaUsageAnalytics` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -1837,13 +1876,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "Collection": {"x-ticvai-persistence":"assets.media_collection","type":"object","required":["id","name","assetCount"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string","x-ticvai-unique":"tenant","description":"**Unique per tenant** (decided 28 September, audit R108). A name already used by any collection in the tenant, at any venue or level, is refused with `409 duplicate-code`.\n"},"description":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"parentCollectionId":{"type":"string","format":"uuid","nullable":true},"assetCount":{"type":"integer"},"coverAssetId":{"type":"string","format":"uuid","nullable":true}}},
 "MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/assets::MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/assets::LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/assets::LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/assets::LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
-"MediaAssetDetail": {"x-ticvai-persistence":"assets.media_asset","allOf":[{"$ref":"#/components/schemas/MediaAsset"},{"type":"object","properties":{"derivatives":{"type":"array","description":"Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n","items":{"type":"object","properties":{"label":{"type":"string"},"width":{"type":"integer"},"height":{"type":"integer"},"sizeBytes":{"type":"integer"},"url":{"type":"string"}}}},"usage":{"type":"array","description":"Every place this asset is referenced.","items":{"$ref":"#/components/schemas/MediaUsage"}},"collections":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"}}}},"previousVersions":{"type":"array","items":{"type":"object","properties":{"version":{"type":"integer"},"replacedAt":{"type":"string","format":"date-time"},"replacedByPrincipalId":{"type":"string","format":"uuid"}}}}}}]},
-"MediaAssetVersion": {"type":"object","x-ticvai-persistence":"assets.asset_version","description":"Boards 2.6 and 2.7. **Usage impact belongs to the version read**, because replacing a logo is routine or an incident depending on where it appears.\n","properties":{"assetId":{"type":"string","format":"uuid"},"version":{"type":"integer"},"fileName":{"type":"string"},"sizeBytes":{"type":"integer"},"checksum":{"type":"string","nullable":true},"createdBy":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"note":{"type":"string","nullable":true},"isCurrent":{"type":"boolean"},"usageImpact":{"type":"array","readOnly":true,"items":{"type":"object","properties":{"surface":{"type":"string","enum":["campaign","journey","ticketTemplate","screen","publishedPage","product","signage"]},"referenceId":{"type":"string","format":"uuid"},"label":{"type":"string"},"live":{"type":"boolean"}}}},"scopePath":{"type":"string"}}},
+"MediaAssetDetail": {"x-ticvai-persistence":"assets.media_asset","allOf":[{"$ref":"#/components/schemas/MediaAsset"},{"type":"object","properties":{"derivatives":{"x-ticvai-persisted":false,"type":"array","description":"Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n","items":{"type":"object","properties":{"label":{"type":"string"},"width":{"type":"integer"},"height":{"type":"integer"},"sizeBytes":{"type":"integer"},"url":{"type":"string"}}}},"usage":{"type":"array","description":"Every place this asset is referenced.","items":{"$ref":"#/components/schemas/MediaUsage"}},"collections":{"x-ticvai-persisted":false,"type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"}}}},"previousVersions":{"x-ticvai-persisted":false,"type":"array","items":{"type":"object","properties":{"version":{"type":"integer"},"replacedAt":{"type":"string","format":"date-time"},"replacedByPrincipalId":{"type":"string","format":"uuid"}}}}}}]},
+"MediaAssetVersion": {"type":"object","x-ticvai-persistence":"assets.asset_version","description":"Boards 2.6 and 2.7. **Usage impact belongs to the version read**, because replacing a logo is routine or an incident depending on where it appears.\n","properties":{"assetId":{"type":"string","format":"uuid"},"version":{"type":"integer"},"fileName":{"type":"string"},"sizeBytes":{"type":"integer"},"checksum":{"type":"string","nullable":true},"createdBy":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"},"note":{"type":"string","nullable":true},"isCurrent":{"type":"boolean"},"usageImpact":{"x-ticvai-persisted":false,"type":"array","readOnly":true,"items":{"type":"object","properties":{"surface":{"type":"string","enum":["campaign","journey","ticketTemplate","screen","publishedPage","product","signage"]},"referenceId":{"type":"string","format":"uuid"},"label":{"type":"string"},"live":{"type":"boolean"}}}},"scopePath":{"type":"string"}}},
 "MediaDistribution": {"type":"object","description":"Boards 4.2 and 4.5. **The usage map that makes replacement safe.**","properties":{"assetId":{"type":"string","format":"uuid"},"deliveryUrls":{"type":"array","items":{"type":"object","properties":{"channel":{"type":"string"},"rendition":{"type":"string"},"url":{"type":"string"},"cdn":{"type":"string","nullable":true}}}},"usedBy":{"type":"array","items":{"type":"object","properties":{"surface":{"type":"string"},"referenceId":{"type":"string","format":"uuid"},"label":{"type":"string"},"live":{"type":"boolean"}}}},"lastDeliveredAt":{"type":"string","format":"date-time","nullable":true}}},
 "MediaRights": {"x-ticvai-persistence":"none — embedded in asset","type":"object","description":"Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n","properties":{"licenceKind":{"type":"string","enum":["owned","royaltyFree","rightsManaged","creativeCommons","editorialOnly","unknown"]},"licensor":{"type":"string","nullable":true},"licenceReference":{"type":"string","nullable":true},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"permittedUses":{"type":"array","items":{"type":"string","enum":["web","print","socialMedia","inVenue","advertising","internal"]}},"attributionRequired":{"type":"boolean","default":false},"attributionText":{"type":"string","nullable":true},"permittedTerritories":{"type":"array","items":{"type":"string"},"description":"ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"},"permittedChannels":{"type":"array","items":{"type":"string"},"description":"Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"},"modelReleaseHeld":{"type":"boolean","default":false},"renewalOwner":{"type":"string","format":"uuid","nullable":true}}},
 "MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "MediaTag": {"type":"object","x-ticvai-persistence":"assets.tag","description":"Board 2.2. **A tag carries its origin and confidence**, so machine labels can be filtered without being deleted.\n","required":["value"],"properties":{"value":{"type":"string"},"vocabulary":{"type":"string","nullable":true},"source":{"type":"string","enum":["human","autoTag","import","inherited"],"default":"human"},"confidence":{"type":"number","nullable":true},"accepted":{"type":"boolean","default":true,"description":"A proposed auto-tag below the promotion threshold sits here as false."},"addedBy":{"type":"string","format":"uuid","nullable":true},"addedAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string"}}},
-"MediaTaxonomy": {"type":"object","x-ticvai-persistence":"assets.taxonomy","description":"Boards 1.5 and 1.6. **Metadata fields are per asset type**, because an image has dimensions and a contract has an expiry.\n","properties":{"categories":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"parentCategoryId":{"type":"string","format":"uuid","nullable":true},"applicableAssetTypes":{"type":"array","items":{"type":"string"}}}}},"fields":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"dataType":{"type":"string"},"applicableAssetTypes":{"type":"array","items":{"type":"string"}},"mandatory":{"type":"boolean"},"allowedValues":{"type":"array","items":{"type":"string"}}}}},"keywordVocabularies":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"terms":{"type":"array","items":{"type":"string"}},"closed":{"type":"boolean","default":false,"description":"**A closed vocabulary refuses terms not in the list.** Open vocabularies are how a library ends up with `logo`, `logos`, `Logo` and `brand-logo`.\n"}}}},"scopePath":{"type":"string"}}},
+"MediaTaxonomy": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"assets.taxonomy","description":"Boards 1.5 and 1.6. **Metadata fields are per asset type**, because an image has dimensions and a contract has an expiry.\n","properties":{"categories":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"parentCategoryId":{"type":"string","format":"uuid","nullable":true},"applicableAssetTypes":{"type":"array","items":{"type":"string"}}}}},"fields":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"dataType":{"type":"string"},"applicableAssetTypes":{"type":"array","items":{"type":"string"}},"mandatory":{"type":"boolean"},"allowedValues":{"type":"array","items":{"type":"string"}}}}},"keywordVocabularies":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"terms":{"type":"array","items":{"type":"string"}},"closed":{"type":"boolean","default":false,"description":"**A closed vocabulary refuses terms not in the list.** Open vocabularies are how a library ends up with `logo`, `logos`, `Logo` and `brand-logo`.\n"}}}},"scopePath":{"type":"string"}}},
 "MediaUsage": {"x-ticvai-persistence":"assets.media_usage","type":"object","description":"One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n","required":["surface","referenceId"],"properties":{"extractedText":{"type":"string","description":"**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.\n"},"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"surface":{"type":"string","enum":["tenantBranding","homepageBanner","promoBlock","contentPage","product","event","menuItem","merchandise","workOrder","incident","inspection","campaign"]},"referenceId":{"type":"string"},"label":{"type":"string"},"isLive":{"type":"boolean","description":"True where the referencing surface is published to guests."}}},
 "MediaUsageRow": {"type":"object","description":"Boards 1.10 and 4.9. **Assets never used is the number that justifies the library.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"assetCount":{"type":"integer"},"storageBytes":{"type":"integer"},"downloads":{"type":"integer"},"views":{"type":"integer"},"shares":{"type":"integer"},"neverUsedCount":{"type":"integer"},"unclassifiedCount":{"type":"integer"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},

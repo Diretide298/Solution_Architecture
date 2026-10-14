@@ -5,6 +5,7 @@
   "module": "Reports & Settlement",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "SETTLEMENT_VIEW",
   "capability": "C50",
   "implementation": {
    "app": "partner-web",
@@ -271,6 +272,7 @@
   "module": "Reports & Settlement",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PARTNER_MANAGE",
   "implementation": {
    "app": "partner-web",
    "route": "/general/commission-statement",
@@ -457,6 +459,7 @@
   "module": "Reports & Settlement",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "capability": "C21",
   "implementation": {
    "app": "partner-web",

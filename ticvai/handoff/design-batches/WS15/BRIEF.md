@@ -105,7 +105,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-335` | Risk-Based & Conditional Routing | B | 0 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
 | `ADM-336` | Approver Group & Decision Policy | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-337` | Routing Simulator & Conflict Detection | B | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `ADM-338` | AI Routing Advisor & Matrix Optimization | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-338` | AI Routing Advisor & Matrix Optimization | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

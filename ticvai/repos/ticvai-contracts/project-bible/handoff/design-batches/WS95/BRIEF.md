@@ -100,7 +100,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-564` | Rental Return Command Center | D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-565` | Return Scan & Rental Retrieval | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-565` | Return Scan & Rental Retrieval | D | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-566` | Return Summary & Actual Return Time | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-567` | Post-Rental Condition Inspection | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-568` | Before vs After Condition Comparison | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

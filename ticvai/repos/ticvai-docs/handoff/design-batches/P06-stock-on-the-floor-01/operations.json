@@ -5,7 +5,7 @@
   "contract": "reporting",
   "summary": "Mark it seen",
   "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -35,7 +35,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "MerchandiseReservation"
  },
  "collectMerchandiseReservation": {
   "method": "POST",
@@ -54,7 +54,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "MerchandiseReservation"
  },
  "createGoodsReceipt": {
   "method": "POST",
@@ -119,7 +119,7 @@
   "contract": "inventory",
   "summary": "Send stock to another location",
   "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -151,25 +151,6 @@
   "requestBody": null,
   "responds": null
  },
- "getDashboard": {
-  "method": "GET",
-  "path": "/dashboards/{dashboardId}",
-  "contract": "reporting",
-  "summary": "Read a dashboard with tile data",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "refresh",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "DashboardData"
- },
  "getHaccpStatus": {
   "method": "GET",
   "path": "/food-safety/status",
@@ -182,60 +163,6 @@
   "parameters": [],
   "requestBody": null,
   "responds": null
- },
- "getKpiValues": {
-  "method": "GET",
-  "path": "/kpi-values",
-  "contract": "reporting",
-  "summary": "Current values, against target, with movement",
-  "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "kpiIds",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "kpiCodes",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "scopePath",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "period",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "compareTo",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "interval",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "groupBy",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "module",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "KpiValue"
  },
  "getOutletStock": {
   "method": "GET",
@@ -755,7 +682,7 @@
   "contract": "inventory",
   "summary": "Receive a transfer",
   "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

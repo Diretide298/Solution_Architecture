@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-590` | Digital & Alternative Payment Method Manager | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-591` | Digital Wallet & Mobile Payment Configuration | C | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-592` | Payment Link Builder & Configuration | C | 13 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-593` | Payment Link Distribution & Customer Journey Manager | C | 1 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-593` | Payment Link Distribution & Customer Journey Manager | C | 3 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-594` | Hosted Checkout, Redirect & Return Flow Configuration | C | 10 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-595` | Digital Payment Session & Transaction Monitor | C | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-596` | Authentication, Tokenization & Recurring Payment Controls | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |

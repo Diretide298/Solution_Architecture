@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-694` | Event Catalogue Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-694` | Event Catalogue Command Center | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-695` | Event Type & Behaviour Configuration | B | 12 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-696` | Event Duplication & Clone Configuration | A | 8 | 3 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
@@ -150,7 +150,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listEvents`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Venue | the name it points at, never the id | — |
+| Parent event | the name it points at, never the id | For grouped events. |
+| Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
+| Is active | yes / no (icon or chip) | — |
+| Lifecycle state | chip: Draft, Planned, On sale, Live, Closed, Cancelled… | Where the event is in its lifecycle (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). |
+| Lifecycle state changed at | 1 Oct 2026, 14:30 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -193,6 +208,8 @@ events:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -220,7 +237,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-694?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-695`, `BO-696`.
@@ -243,7 +260,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `eventTypeId` (navigation) |
 | Route | `/sell/event-type-behaviour-configuration-bo-695` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
@@ -277,6 +294,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Default lifecycle `defaultLifecycle` | list of values (chips) | optional | — | — | — | — | `setEventType` body |
 | Scope path `scopePath` | text field | optional | — | — | — | — | `setEventType` body |
 
+Carried, not typed: `eventTypeId`
+
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **behaviour switches**: Each switch with its consequence ("Has performances off: an open-run exhibition sells by day"). *(source: contracts/spine/catalogue.yaml#setEventType)*
@@ -305,7 +324,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save event type (primary button) | `setEventType` PUT `/event-types` | EventType | EventType | — | opens modal first |
+| Save event type (primary button) | `setEventType` PUT `/event-types/{eventTypeId}` | EventType | EventType | — | opens modal first |
 
 **Data it reads**: `listEventTypes` (onLoad, Event types)
 
@@ -346,6 +365,8 @@ types:
 - `setEventType` → `EVENT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `EVENT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -496,6 +517,8 @@ clone:
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getEvent` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `cloneEvent`.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -633,7 +656,7 @@ Method, path, parameters, request and response for every operation these screens
 "getEvent": {"method":"GET","path":"/events/{eventId}","contract":"catalogue","summary":"Read an event","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Event"},
 "listEventTypes": {"method":"GET","path":"/event-types","contract":"catalogue","summary":"The kinds of event, and how each behaves","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"EventType"},
 "listEvents": {"method":"GET","path":"/events","contract":"catalogue","summary":"List events","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"setEventType": {"method":"PUT","path":"/event-types","contract":"catalogue","summary":"Define an event kind and its behaviour","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"EventType","responds":"EventType"}
+"setEventType": {"method":"PUT","path":"/event-types/{eventTypeId}","contract":"catalogue","summary":"Define an event kind and its behaviour","permission":"EVENT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"eventTypeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"EventType","responds":"EventType"}
 }
 ```
 
@@ -645,7 +668,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "CloneEventRequest": {"x-ticvai-persistence":"none — request only","type":"object","description":"The body of `cloneEvent`. Named on 6 October 2026 (CHG-R4-016) so the clone screen (BO-696) can bind its fields; the first three properties are unchanged from the inline body.\n","properties":{"include":{"type":"array","items":{"type":"string","enum":["schedule","pricing","seatMap","capacityProfile","resourceRequirements","staffPlan","registrationForm","accessRules"]}},"shiftDatesByDays":{"type":"integer","nullable":true},"newName":{"type":"string","nullable":true},"newCode":{"type":"string","maxLength":64,"nullable":true,"x-ticvai-unique":"tenant","description":"**The copy's event code** (6 October 2026, CHG-R4-016). Event codes are unique per tenant (`CreateEventRequest.code`, audit R108), so a copy cannot keep its source's. A code any event in the tenant already uses is refused `409 duplicate-code`. Omitted or null: the server gives the copy the source's code with the first free suffix `-2`, `-3`, ..., and returns it.\n"}}},
 "Event": {"x-ticvai-persistence":"catalogue.event","type":"object","required":["id","code","name","venueId","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentEventId":{"type":"string","format":"uuid","nullable":true,"description":"For grouped events."},"performanceCount":{"type":"integer","readOnly":true,"description":"How many performances the event has. Counted by the server; never sent by a client."},"isActive":{"type":"boolean"},"lifecycleState":{"type":"string","readOnly":true,"enum":["draft","planned","onSale","live","closed","cancelled","archived"],"description":"**Where the event is in its lifecycle** (4 October 2026, CHG-FXC-003; catalogue.event had nowhere to keep it). Written only by `setEventLifecycleState`, which checks the transition; `createEvent` and `cloneEvent` create an event in `draft`. `isActive` stays the switch that hides an event from sale without changing its state."},"lifecycleStateChangedAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true}}},
-"EventType": {"type":"object","x-ticvai-persistence":"catalogue.event_type","description":"Event board 1.2. **The type decides behaviour, not just a label.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"hasPerformances":{"type":"boolean","default":true,"description":"**An open-run exhibition has none**, and modelling it as 400 daily performances is how a schedule becomes unmanageable.\n"},"capacityBasis":{"type":"string","enum":["perPerformance","perDay","unlimited"],"description":"`perSession` was removed: a session is a Performance (decided 28 September, audit R165), so `perPerformance` covers it.\n"},"ticketNamesDate":{"type":"boolean","default":true},"multiDay":{"type":"boolean","default":false},"requiresRegistration":{"type":"boolean","default":false},"requiresAccreditation":{"type":"boolean","default":false},"seatingModesAllowed":{"type":"array","items":{"type":"string"}},"defaultLifecycle":{"type":"array","items":{"type":"string"}},"scopePath":{"type":"string"}}},
+"EventType": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"catalogue.event_type","description":"Event board 1.2. **The type decides behaviour, not just a label.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"hasPerformances":{"type":"boolean","default":true,"description":"**An open-run exhibition has none**, and modelling it as 400 daily performances is how a schedule becomes unmanageable.\n"},"capacityBasis":{"type":"string","enum":["perPerformance","perDay","unlimited"],"description":"`perSession` was removed: a session is a Performance (decided 28 September, audit R165), so `perPerformance` covers it.\n"},"ticketNamesDate":{"type":"boolean","default":true},"multiDay":{"type":"boolean","default":false},"requiresRegistration":{"type":"boolean","default":false},"requiresAccreditation":{"type":"boolean","default":false},"seatingModesAllowed":{"type":"array","items":{"type":"string"}},"defaultLifecycle":{"type":"array","items":{"type":"string"}},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
 }
 ```

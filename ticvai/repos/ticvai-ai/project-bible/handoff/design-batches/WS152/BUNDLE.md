@@ -252,6 +252,8 @@ row:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -366,7 +368,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Previously refunded: AED 200 | text | not in the schema: `Previously Refunded: AED 200` |
 | Maximum remaining refundable: AED 1,050 | text | not in the schema: `Maximum Remaining Refundable: AED 1,050` |
 
-**The selected refund request eligibility** (detail panel): The pack groups this record's detail under its own headings: “Find original transaction using”, “Before allowing the refund”, “Eligible for Refund”, “Refund Restricted”.
+**The selected refund request eligibility** (detail panel, from `getRefundPolicy`): The pack groups this record's detail under its own headings: “Find original transaction using”, “Before allowing the refund”, “Eligible for Refund”, “Refund Restricted”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -426,6 +428,8 @@ request:
 - `createRefund` → `ORDER_REFUND` (operate) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -673,6 +677,8 @@ allocation:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -818,6 +824,8 @@ void:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -887,7 +895,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every refund approval exception** (data table)
+**Every refund approval exception** (data table, from `listFraudRules`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -957,6 +965,8 @@ refund:
 - `setFraudRules` → `ORDER_MODIFY` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1093,6 +1103,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the refund processing provider are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The payment is not `pendingConfirmation`; its outcome is already known and there is nothing to ask the provider. |
 
 #### Sample data for the mock-up
 
@@ -1109,6 +1120,8 @@ refund:
 - `inquirePaymentStatus` → `ORDER_CREATE` (operate) · staff, guest, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_CREATE`
 
 #### Requirements it meets
 
@@ -1139,7 +1152,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-615?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1259,6 +1272,8 @@ correction:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1334,7 +1349,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every refund transaction trace** (data table)
+**Every refund transaction trace** (data table, from `listOrderPaymentDetail`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1404,6 +1419,8 @@ trace:
 - `listOrderPaymentDetail` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1694,7 +1711,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "CreateRefundRequest": {"type":"object","required":["id","amount","reason","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the refund, and its idempotency key — it must equal the `Idempotency-Key` header."},"lineIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Omit to refund the whole order."},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"reason":{"type":"string","minLength":3,"maxLength":500},"secondaryAuthorisation":{"type":"object","description":"Required above the venue's `requiresSecondUserAbove`. A second user — cashier or supervisor — names themselves. This is dual-authorisation, not escalation.\n","required":["principalId","credential"],"properties":{"principalId":{"type":"string","format":"uuid"},"credential":{"type":"string","maxLength":512,"description":"The second person's staff PIN, as they sign in at a till with it. **A PIN, never a password** (decided 28 September, audit R123 (7))."}}},"refundToOriginalTender":{"type":"boolean","default":true},"alternateTender":{"$ref":"#/components/schemas/TenderKind"},"recordedAt":{"type":"string","format":"date-time"}}},
 "ExchangeRateDecimal": {"type":"string","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,6)","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n","pattern":"^\\d+(\\.\\d{1,6})?$"},
-"FraudRule": {"type":"object","x-ticvai-persistence":"orders.fraud_rule","description":"BL-118. **Evaluated before the charge, and it holds rather than refuses.**\nA rule that declines outright turns a false positive into a lost sale with an angry guest. **A rule that flags for review turns it into a delay** — and at a gate, review means a supervisor rather than a rejection.\n","required":["id","name","condition","action","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"condition":{"type":"object","description":"Velocity, amount, issuer country, device reuse, mismatched billing.","additionalProperties":true},"appliesTo":{"type":"string","description":"**`refund` rules are evaluated on `createRefund` and `createRefundRequest`** (5.3.33, 29 September build pass), before the money moves: a hold sends the refund to approval rather than refusing it. `charge` rules are evaluated before a charge, as before.","enum":["charge","refund"],"default":"charge"},"signal":{"type":"string","nullable":true,"description":"The measured signal where the rule is one of the named ones; `condition` carries anything else. **`refundCount`, `refundValue` and `refundRatio` detect excessive refunds by one guest** (or one payment card, per `subjectKey`) over `windowDays`: the number of refunds, their total value, or refunds as a share of what that guest bought in the window. **Counted over every sales channel** (5.3.33): tickets, F&B, retail (a retail return raises its refund here, `RetailReturn.refundId`) and every other line, because every refund is an `orders.refund` whichever channel sold it. The access `excessiveRefunds` signal is the gate-side view of ticket refunds only.","enum":["velocityCount","velocityAmount","issuerCountry","deviceReuse","billingMismatch","refundCount","refundValue","refundRatio"]},"subjectKey":{"type":"string","enum":["guest","paymentToken","device"],"default":"guest"},"threshold":{"type":"number","nullable":true},"windowDays":{"type":"integer","minimum":1,"nullable":true},"action":{"type":"string","enum":["allow","flagForReview","requireStepUp","hold","decline"]},"riskWeight":{"type":"integer"},"isActive":{"type":"boolean"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
+"FraudRule": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"orders.fraud_rule","description":"BL-118. **Evaluated before the charge, and it holds rather than refuses.**\nA rule that declines outright turns a false positive into a lost sale with an angry guest. **A rule that flags for review turns it into a delay** — and at a gate, review means a supervisor rather than a rejection.\n","required":["id","name","condition","action","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"condition":{"type":"object","description":"Velocity, amount, issuer country, device reuse, mismatched billing.","additionalProperties":true},"appliesTo":{"type":"string","description":"**`refund` rules are evaluated on `createRefund` and `createRefundRequest`** (5.3.33, 29 September build pass), before the money moves: a hold sends the refund to approval rather than refusing it. `charge` rules are evaluated before a charge, as before.","enum":["charge","refund"],"default":"charge"},"signal":{"type":"string","nullable":true,"description":"The measured signal where the rule is one of the named ones; `condition` carries anything else. **`refundCount`, `refundValue` and `refundRatio` detect excessive refunds by one guest** (or one payment card, per `subjectKey`) over `windowDays`: the number of refunds, their total value, or refunds as a share of what that guest bought in the window. **Counted over every sales channel** (5.3.33): tickets, F&B, retail (a retail return raises its refund here, `RetailReturn.refundId`) and every other line, because every refund is an `orders.refund` whichever channel sold it. The access `excessiveRefunds` signal is the gate-side view of ticket refunds only.","enum":["velocityCount","velocityAmount","issuerCountry","deviceReuse","billingMismatch","refundCount","refundValue","refundRatio"]},"subjectKey":{"type":"string","enum":["guest","paymentToken","device"],"default":"guest"},"threshold":{"type":"number","nullable":true},"windowDays":{"type":"integer","minimum":1,"nullable":true},"action":{"type":"string","enum":["allow","flagForReview","requireStepUp","hold","decline"]},"riskWeight":{"type":"integer"},"isActive":{"type":"boolean"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
 "FraudRuleSet": {"type":"object","x-ticvai-persistence":"none — the whole set of orders.fraud_rule rows, in evaluation order","description":"**The whole set in one body**, as `setFraudRules` requires: a rule set edited one rule at a time spends time in states nobody intended. A rule left out of the set is deactivated, never deleted.\n","required":["rules"],"properties":{"rules":{"type":"array","description":"In evaluation order.","items":{"$ref":"#/components/schemas/FraudRule"}}}},
 "OrderPaymentDetailTransactionLedgerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Order Payment Detail & Transaction Ledger displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"orderNumber":{"type":"string","description":"Order Number"},"customer":{"type":"string","description":"Customer"},"orderTotal":{"type":"string","description":"Order Total"},"currency":{"type":"string","description":"Currency"},"paid":{"type":"string","description":"Paid"},"refunded":{"type":"string","description":"Refunded"},"outstanding":{"type":"string","description":"Outstanding"},"creditApplied":{"type":"string","description":"Credit Applied"},"paymentStatus":{"type":"integer","description":"Payment Status"},"settlementStatus":{"type":"integer","description":"Settlement Status"},"transactions":{"type":"array","description":"Every financial transaction on the order, one entry each","items":{"type":"object","properties":{"type":{"type":"string","enum":["authorization","capture","payment","deposit","additionalCollection","partialRefund","reversal","walletCredit","voucher","creditNote","adjustment"],"description":"Transaction type"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Amount"},"status":{"type":"string","description":"Status"},"gateway":{"type":"string","description":"Gateway"},"merchant":{"type":"string","description":"Merchant"},"terminal":{"type":"string","description":"Terminal"},"authorizationCode":{"type":"string","description":"Authorization code"},"gatewayTransactionId":{"type":"string","description":"Gateway transaction ID"},"settlementReference":{"type":"string","description":"Settlement reference"},"externalReference":{"type":"string","description":"External reference"},"occurredAt":{"type":"string","format":"date-time","description":"When"}}}}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},

@@ -297,10 +297,12 @@
     "readOnly": true
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "maxLength": 64,
     "nullable": true

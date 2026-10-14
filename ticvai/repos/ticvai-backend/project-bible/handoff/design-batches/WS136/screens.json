@@ -5,6 +5,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/data-governance-center-bo-744",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DataGovernanceCenter.tsx",
+   "component": "src/routes/engagement-support/DataGovernanceCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -116,7 +117,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listPrivacyCompliance",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listPrivacyCompliance"
       }
      ]
     }
@@ -180,6 +182,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "2",
@@ -189,7 +192,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/identity-resolution-rules-bo-745",
-   "component": "apps/venue-management-web/src/routes/engagement-support/IdentityResolutionRules.tsx",
+   "component": "src/routes/engagement-support/IdentityResolutionRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -359,6 +362,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "GUEST_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "2",
@@ -368,7 +372,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/duplicate-review-merge-bo-746",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DuplicateReviewMerge.tsx",
+   "component": "src/routes/engagement-support/DuplicateReviewMerge.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -425,7 +429,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listDuplicateCandidates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. **Only unverified matches arrive here** (decided 28 September, audit R120 (b)): a verified contact match attaches the order to the guest automatically at checkout, so this queue holds the matches no guest has proved."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. **Only unverified matches arrive here** (decided 28 September, audit R120 (b)): a verified contact match attaches the order to the guest automatically at checkout, so this queue holds the matches no guest has proved.",
+       "operation": "listDuplicateCandidates"
       },
       {
        "kind": "primaryButton",
@@ -527,6 +532,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "2",
@@ -536,7 +542,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/consent-policy-configuration-bo-747",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ConsentPolicyConfiguration.tsx",
+   "component": "src/routes/engagement-support/ConsentPolicyConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -581,7 +587,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listConsentPurposes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listConsentPurposes"
       },
       {
        "kind": "primaryButton",
@@ -724,6 +731,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "2",
@@ -733,7 +741,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/consent-capture-versions-bo-748",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ConsentCaptureVersions.tsx",
+   "component": "src/routes/engagement-support/ConsentCaptureVersions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -882,6 +890,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "2",
@@ -891,7 +900,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/guest-preference-center-bo-749",
-   "component": "apps/venue-management-web/src/routes/engagement-support/GuestPreferenceCenter.tsx",
+   "component": "src/routes/engagement-support/GuestPreferenceCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -943,7 +952,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getGuestConsents",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getGuestConsents"
       },
       {
        "kind": "secondaryButton",
@@ -1024,6 +1034,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "2",
@@ -1033,7 +1044,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/data-subject-requests-bo-750",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DataSubjectRequests.tsx",
+   "component": "src/routes/engagement-support/DataSubjectRequests.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1078,7 +1089,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listDataSubjectCustomer",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listDataSubjectCustomer"
       },
       {
        "kind": "primaryButton",
@@ -1161,7 +1173,16 @@
     "provenance": "contract marketing-crm.yaml PUT /data-subject-customer; wiring fix, 2 October 2026"
    }
   ],
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "requestId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listDataSubjectCustomer`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1191,6 +1212,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "TENANT_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "2",
@@ -1200,7 +1222,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/retention-anonymization-bo-751",
-   "component": "apps/venue-management-web/src/routes/engagement-support/RetentionAnonymization.tsx",
+   "component": "src/routes/engagement-support/RetentionAnonymization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1257,7 +1279,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listDataRetentionSettings",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listDataRetentionSettings"
       },
       {
        "kind": "secondaryButton",
@@ -1349,6 +1372,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "2",
@@ -1358,7 +1382,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/privacy-ai-governance-bo-752",
-   "component": "apps/venue-management-web/src/routes/engagement-support/PrivacyAiGovernance.tsx",
+   "component": "src/routes/engagement-support/PrivacyAiGovernance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1409,7 +1433,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listPrivacy",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listPrivacy"
       },
       {
        "kind": "secondaryButton",
@@ -1480,6 +1505,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "AUDIT_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "2",
@@ -1489,7 +1515,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/compliance-audit-dashboard-bo-753",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ComplianceAuditDashboard.tsx",
+   "component": "src/routes/engagement-support/ComplianceAuditDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1534,7 +1560,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listPrivacyEvidenceCompliance",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listPrivacyEvidenceCompliance"
       }
      ]
     }

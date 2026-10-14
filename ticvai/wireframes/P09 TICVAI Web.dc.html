@@ -260,7 +260,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div>
           <div class="hdr"><span class="code">ADM-002</span>
             <span class="ttl">Platform Dashboard</span><span class="pill named" title="Board archived to _dump/; the link is history and no drawn frame for this screen is in wireframes/">archived: Dashboards Board.dc.html#adm-002</span></div>
-          <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
+          <div class="pur">The platform operator&#x27;s home: every tenant with its status and plan, the cells it runs in, its licence position and its usage against licensed li</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>Overview &amp; Health</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
@@ -313,14 +313,14 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i><br><a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-004">ADM-004</a>  &mdash; <i>Platform Audit Log</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCancelDecommission &middot; <i>Cancel decommission</i></div><div class="ov"><b>modal</b> formDecommissionCell &middot; <i>Decommission cell</i> &middot; <b>Decommission cell</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formUpdateCellTier &middot; <i>Save cell tier</i> &middot; <b>Save cell tier</b> &middot; Cancel <span class="dis">discards tier · scheduledFor</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmCancelDecommission &middot; <i>Cancel decommission</i> &middot; <b>confirm</b></div><div class="ov"><b>modal</b> formDecommissionCell &middot; <i>Decommission cell</i> &middot; <b>Decommission cell</b> &middot; Cancel <span class="dis">discards reason</span></div><div class="ov"><b>modal</b> formUpdateCellTier &middot; <i>Save cell tier</i> &middot; <b>Save cell tier</b> &middot; Cancel <span class="dis">discards tier · scheduledFor</span></div></div>
         </div>
       </div>
       <div id="adm-004" class="scr">
         <div>
           <div class="hdr"><span class="code">ADM-004</span>
             <span class="ttl">Platform Audit Log</span></div>
-          <div class="pur">Find platform audit log for this venue.</div>
+          <div class="pur">Read what happened on the platform: the audit records of who did what, where and when, and every AI interaction with its prompt, response and outcome,</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>Overview &amp; Health</span></div><nav class="nav"><i class="">Tenants</i><i class="on">Cells</i><i class="">Releases</i><i class="">Health</i><i class="">Audit</i></nav></aside>
@@ -338,7 +338,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiInteractions · getAiDecisionTrace · listAuditRecords · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; listAiInteractions · listAuditRecords · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionRecordId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i><br><a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-003">ADM-003</a>  &mdash; <i>Cross-Tenant Health Dashboard</i></div>
@@ -493,7 +493,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i><br><a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-003">ADM-003</a>  &mdash; <i>Cross-Tenant Health Dashboard</i> <span class="car">cellId</span><br><a href="#adm-012">ADM-012</a>  &mdash; <i>Tenant Isolation &amp; Resource Pool</i> <span class="car">cellId · tenantId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveLicenceAddOn &middot; <i>Remove licence add on</i></div><div class="ov"><b>modal</b> formAddLicenceAddOn &middot; <i>Add licence add on</i> &middot; <b>Add licence add on</b> &middot; Cancel <span class="dis">discards moduleKey · limitOverrides · price · validFrom · validTo · note</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveLicenceAddOn &middot; <i>Remove licence add on</i> &middot; <b>confirm</b></div><div class="ov"><b>modal</b> formAddLicenceAddOn &middot; <i>Add licence add on</i> &middot; <b>Add licence add on</b> &middot; Cancel <span class="dis">discards moduleKey · limitOverrides · price · validFrom · validTo · note</span></div></div>
         </div>
       </div>
       <div id="adm-008" class="scr">
@@ -548,7 +548,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listSubscriptionInvoices · generateInvoice · getEntitlementUsage · getSubscription +4</div>
+          <div><b>OPERATIONS</b> &middot; listSubscriptionInvoices · generateInvoice · getEntitlementUsage · getSubscription +3</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i><br><a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-003">ADM-003</a>  &mdash; <i>Cross-Tenant Health Dashboard</i> <span class="car">cellId</span></div>
@@ -613,7 +613,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i><br><a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-003">ADM-003</a>  &mdash; <i>Cross-Tenant Health Dashboard</i> <span class="car">cellId</span><br><a href="#adm-007">ADM-007</a>  &mdash; <i>Module &amp; Feature Entitlement</i> <span class="car">tenantId</span></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveLicenceAddOn &middot; <i>Remove licence add on</i></div><div class="ov"><b>modal</b> formAddLicenceAddOn &middot; <i>Add licence add on</i> &middot; <b>Add licence add on</b> &middot; Cancel <span class="dis">discards moduleKey · limitOverrides · price · validFrom · validTo · note</span></div><div class="ov"><b>modal</b> formPreviewSubscriptionChange &middot; <i>Preview subscription change</i> &middot; <b>Preview subscription change</b> &middot; Cancel <span class="dis">discards planId · planVersion · effectiveFrom · prorate · note</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmRemoveLicenceAddOn &middot; <i>Remove licence add on</i> &middot; <b>confirm</b></div><div class="ov"><b>modal</b> formAddLicenceAddOn &middot; <i>Add licence add on</i> &middot; <b>Add licence add on</b> &middot; Cancel <span class="dis">discards moduleKey · limitOverrides · price · validFrom · validTo · note</span></div><div class="ov"><b>modal</b> formPreviewSubscriptionChange &middot; <i>Preview subscription change</i> &middot; <b>Preview subscription change</b> &middot; Cancel <span class="dis">discards planId · planVersion · effectiveFrom · prorate · note</span></div></div>
         </div>
       </div>
       <div id="adm-012" class="scr">
@@ -670,7 +670,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getTenantLicences · getEntitlementUsage · getTenant · listTenants +9</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
-          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002, requestId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;ADM-002, requestId&larr;navigation, anomalyRuleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i><br><a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-003">ADM-003</a>  &mdash; <i>Cross-Tenant Health Dashboard</i> <span class="car">cellId</span><br><a href="#adm-011">ADM-011</a>  &mdash; <i>Licence &amp; Seat Management</i> <span class="car">tenantId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetApiQuota &middot; <i>Save API quota</i> &middot; <b>Save API quota</b> &middot; Cancel <span class="dis">discards clientId · sustainedPerMinute · burstPerSecond · dailyCap · perOperationOverrides · onBreach</span></div><div class="ov"><b>modal</b> formDecideProductionAccess &middot; <i>Decide production access</i> &middot; <b>Decide production access</b> &middot; Cancel <span class="dis">discards decision · reason · scopes · credentialTtlDays</span></div><div class="ov"><b>modal</b> formSetApiAnomalyRule &middot; <i>Save anomaly rule</i> &middot; <b>Save anomaly rule</b> &middot; Cancel <span class="dis">discards ruleKey · clientId · measure · comparison · threshold · windowMinutes · action · isActive</span></div><div class="ov"><b>modal</b> formOpenPlatformStaffGrant &middot; <i>Open access grant</i> &middot; <b>Open access grant</b> &middot; Cancel <span class="dis">discards permissions · reason · ticketRef · expiresAt</span></div></div>
@@ -698,7 +698,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listTenants · getSubscription</div>
+          <div><b>OPERATIONS</b> &middot; getCommercialMetrics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-370">ADM-370</a>  &mdash; <i>Customer Subscription &amp; Commercial Portfolio</i><br><a href="#adm-371">ADM-371</a>  &mdash; <i>Customer Commercial 360°</i><br><a href="#adm-372">ADM-372</a>  &mdash; <i>Operational Profile, VSI &amp; Commercial Model </i><br><a href="#adm-373">ADM-373</a>  &mdash; <i>Revenue &amp; Commercial Model Analytics</i><br><a href="#adm-374">ADM-374</a>  &mdash; <i>Trial &amp; Conversion Monitor</i><br><a href="#adm-375">ADM-375</a>  &mdash; <i>Renewal &amp; Retention Center</i><br><a href="#adm-376">ADM-376</a>  &mdash; <i>Commercial Optimization &amp; Expansion Opportun</i><br><a href="#adm-377">ADM-377</a>  &mdash; <i>Subscription Exceptions &amp; Commercial Alerts</i><br><a href="#adm-378">ADM-378</a>  &mdash; <i>Executive AI Commercial Intelligence</i></div>
@@ -758,7 +758,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getSubscription · getEntitlementUsage</div>
+          <div><b>OPERATIONS</b> &middot; getSubscription</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-369">ADM-369</a>  &mdash; <i>Back to Commercial Command Center</i></div>
@@ -788,7 +788,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; scoreVsiAssessment</div>
+          <div><b>OPERATIONS</b> &middot; getCommercialMetrics · scoreVsiAssessment</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-369">ADM-369</a>  &mdash; <i>Back to Commercial Command Center</i></div>
@@ -818,7 +818,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getBillingReconciliation</div>
+          <div><b>OPERATIONS</b> &middot; getBillingReconciliation · getCommercialMetrics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-369">ADM-369</a>  &mdash; <i>Back to Commercial Command Center</i></div>
@@ -848,7 +848,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listTenants</div>
+          <div><b>OPERATIONS</b> &middot; getCommercialMetrics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-369">ADM-369</a>  &mdash; <i>Back to Commercial Command Center</i></div>
@@ -878,7 +878,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; getCommercialMetrics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-369">ADM-369</a>  &mdash; <i>Back to Commercial Command Center</i></div>
@@ -908,7 +908,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; getCommercialMetrics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-369">ADM-369</a>  &mdash; <i>Back to Commercial Command Center</i></div>
@@ -968,7 +968,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getLicenceEnforcement · getPlanRecommendations</div>
+          <div><b>OPERATIONS</b> &middot; getCommercialMetrics · getPlanRecommendations</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-369">ADM-369</a>  &mdash; <i>Back to Commercial Command Center</i></div>
@@ -1298,7 +1298,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listLicensingModels</div>
+          <div><b>OPERATIONS</b> &middot; getCommercialMetrics · listLicensingModels</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-390">ADM-390</a>  &mdash; <i>VSI Model Builder</i><br><a href="#adm-391">ADM-391</a>  &mdash; <i>VSI Scoring &amp; Tier Threshold Configuration</i><br><a href="#adm-392">ADM-392</a>  &mdash; <i>Subscription Tier Configuration</i><br><a href="#adm-393">ADM-393</a>  &mdash; <i>Tier Included Allowances</i><br><a href="#adm-394">ADM-394</a>  &mdash; <i>Commercial &amp; Licensing Model Configuration</i><br><a href="#adm-395">ADM-395</a>  &mdash; <i>Billable Unit, Minimum Guarantee &amp; Enforceme</i><br><a href="#adm-396">ADM-396</a>  &mdash; <i>Overage Pricing &amp; Capacity Packs</i><br><a href="#adm-397">ADM-397</a>  &mdash; <i>Commercial Model &amp; Rule Simulation</i><br><a href="#adm-398">ADM-398</a>  &mdash; <i>Rule Versioning, Approval &amp; Publication</i></div>
@@ -1420,7 +1420,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setLicensingModel</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; licensingModelId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-389">ADM-389</a>  &mdash; <i>Back to Commercial Rules Engine Overview</i></div>
           
           
@@ -1450,7 +1450,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setLicensingModel</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; licensingModelId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-389">ADM-389</a>  &mdash; <i>Back to Commercial Rules Engine Overview</i></div>
           
           
@@ -1480,7 +1480,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setLicensingModel</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; licensingModelId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-389">ADM-389</a>  &mdash; <i>Back to Commercial Rules Engine Overview</i></div>
           
           
@@ -1510,7 +1510,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setLicensingModel · addCapacityPack</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; licensingModelId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-389">ADM-389</a>  &mdash; <i>Back to Commercial Rules Engine Overview</i></div>
           
           
@@ -1958,7 +1958,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createLegalEntity · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant +2</div>
+          <div><b>OPERATIONS</b> &middot; listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant · getBillingEntity +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-409">ADM-409</a>  &mdash; <i>Back to Purchase / Trial Journey Selection</i></div>
@@ -1990,7 +1990,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; openPlatformStaffGrant · listTenants · setPaymentProvider · listOwnPlatformStaffGrants +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
-          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation, providerId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-409">ADM-409</a>  &mdash; <i>Back to Purchase / Trial Journey Selection</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formOpenPlatformStaffGrant &middot; <i>Open access grant</i> &middot; <b>Open access grant</b> &middot; Cancel <span class="dis">discards permissions · reason · ticketRef · expiresAt</span></div></div>
@@ -2020,7 +2020,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setTrialConfiguration</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; trialConfigurationId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-409">ADM-409</a>  &mdash; <i>Back to Purchase / Trial Journey Selection</i></div>
           
           
@@ -2288,7 +2288,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getTenantLicences · addLicenceAddOn · openPlatformStaffGrant · createPrincipal +3</div>
+          <div><b>OPERATIONS</b> &middot; getTenantLicences · openPlatformStaffGrant · createPrincipal · setPasswordPolicy +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-419">ADM-419</a>  &mdash; <i>Back to Provisioning Command Center</i></div>
@@ -2558,7 +2558,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getLicenceEnforcement · getPlanRecommendations</div>
+          <div><b>OPERATIONS</b> &middot; getPlanRecommendations</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-449">ADM-449</a>  &mdash; <i>Back to Usage &amp; License Command Center</i></div>
@@ -2768,7 +2768,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listSubscriptionInvoices</div>
+          <div><b>OPERATIONS</b> &middot; listSubscriptionInvoices · getCommercialMetrics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-460">ADM-460</a>  &mdash; <i>Billing Calculation &amp; Charge Breakdown</i> <span class="car">tenantId</span><br><a href="#adm-461">ADM-461</a>  &mdash; <i>Consumption Reconciliation &amp; Billing Approva</i><br><a href="#adm-462">ADM-462</a>  &mdash; <i>Invoice &amp; Payment Management</i> <span class="car">invoiceId</span><br><a href="#adm-463">ADM-463</a>  &mdash; <i>Subscription &amp; Commercial Change Management</i><br><a href="#adm-464">ADM-464</a>  &mdash; <i>Renewal Management Center</i><br><a href="#adm-465">ADM-465</a>  &mdash; <i>AI Upgrade, Downgrade &amp; Commercial Right-Siz</i><br><a href="#adm-466">ADM-466</a>  &mdash; <i>Commercial Scenario Simulator</i><br><a href="#adm-467">ADM-467</a>  &mdash; <i>Discount, Credit &amp; Commercial Override Manag</i> <span class="car">invoiceId</span><br><a href="#adm-468">ADM-468</a>  &mdash; <i>Renewal Approval, Activation &amp; Commercial Ha</i></div>
@@ -2858,7 +2858,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; recordInvoicePayment · listSubscriptionInvoices · issueCreditNote · listCreditNotes</div>
+          <div><b>OPERATIONS</b> &middot; recordInvoicePayment · listSubscriptionInvoices · issueCreditNote</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; invoiceId&larr;navigation, tenantId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-459">ADM-459</a>  &mdash; <i>Back to Billing &amp; Commercial Command Center</i></div>
@@ -2888,7 +2888,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; previewSubscriptionChange · setSubscription</div>
+          <div><b>OPERATIONS</b> &middot; previewSubscriptionChange</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-459">ADM-459</a>  &mdash; <i>Back to Billing &amp; Commercial Command Center</i></div>
@@ -2918,7 +2918,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; getCommercialMetrics</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#adm-459">ADM-459</a>  &mdash; <i>Back to Billing &amp; Commercial Command Center</i></div>
@@ -3008,7 +3008,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; cancelInvoice · disputeInvoice · issueCreditNote · listCreditNotes</div>
+          <div><b>OPERATIONS</b> &middot; issueCreditNote · listCreditNotes · cancelInvoice · disputeInvoice</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; invoiceId&larr;navigation, tenantId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-459">ADM-459</a>  &mdash; <i>Back to Billing &amp; Commercial Command Center</i></div>
@@ -3585,7 +3585,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listWafRules · setWafPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; cellId&larr;deepLink, wafRuleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-001">ADM-001</a>  &mdash; <i>Platform Login / MFA</i><br><a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="#adm-003">ADM-003</a>  &mdash; <i>Cross-Tenant Health Dashboard</i> <span class="car">cellId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetWafPolicy &middot; <i>Save waf policy</i> &middot; <b>Save waf policy</b> &middot; Cancel <span class="dis">discards name · action · matchOn · pattern · enabled · hitCount24h</span></div></div>
@@ -3735,7 +3735,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listTaxFeeCalculation · listTaxInvoices · getVatReturn · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; listTaxFeeCalculation · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Platform Dashboard</i><br><a href="P08%20Venue%20Management.dc.html#adm-069">ADM-069</a> <span class="away">other board</span>  &mdash; <i>Works in Tax Profile &amp; Jurisdiction Configur</i><br><a href="P08%20Venue%20Management.dc.html#adm-070">ADM-070</a> <span class="away">other board</span>  &mdash; <i>Works in Tax Rule &amp; Treatment Builder</i><br><a href="P08%20Venue%20Management.dc.html#adm-071">ADM-071</a> <span class="away">other board</span>  &mdash; <i>Works in Fee &amp; Surcharge Library</i><br><a href="P08%20Venue%20Management.dc.html#adm-072">ADM-072</a> <span class="away">other board</span>  &mdash; <i>Works in Fee Applicability &amp; Charging Rule B</i><br><a href="P08%20Venue%20Management.dc.html#adm-073">ADM-073</a> <span class="away">other board</span>  &mdash; <i>Works in Fee Waiver, Tax Exemption &amp; Excepti</i><br><a href="P08%20Venue%20Management.dc.html#adm-074">ADM-074</a> <span class="away">other board</span>  &mdash; <i>Works in Price Calculation Sequence &amp; Formul</i><br><a href="P08%20Venue%20Management.dc.html#adm-075">ADM-075</a> <span class="away">other board</span>  &mdash; <i>Works in Currency Precision, Rounding &amp; Mone</i><br><a href="P08%20Venue%20Management.dc.html#adm-076">ADM-076</a> <span class="away">other board</span>  &mdash; <i>Works in Price Breakdown, Calculation Simula</i><br><a href="P08%20Venue%20Management.dc.html#adm-077">ADM-077</a> <span class="away">other board</span>  &mdash; <i>Works in Calculation Validation, Reconciliat</i></div>
@@ -3768,7 +3768,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listSettlements · listReconciliationSources · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="P08%20Venue%20Management.dc.html#adm-620">ADM-620</a> <span class="away">other board</span>  &mdash; <i>Reconciliation Source &amp; Import Manager\t141</i><br><a href="P08%20Venue%20Management.dc.html#adm-621">ADM-621</a> <span class="away">other board</span>  &mdash; <i>Transaction Matching &amp; Reconciliation Engine</i><br><a href="P08%20Venue%20Management.dc.html#adm-622">ADM-622</a> <span class="away">other board</span>  &mdash; <i>Reconciliation Exception &amp; Investigation Cen</i> <span class="car">settlementId</span><br><a href="P08%20Venue%20Management.dc.html#adm-623">ADM-623</a> <span class="away">other board</span>  &mdash; <i>Settlement &amp; Payout Manager\t144</i><br><a href="P08%20Venue%20Management.dc.html#adm-624">ADM-624</a> <span class="away">other board</span>  &mdash; <i>Fees, Commission, FX &amp; Settlement Economics\</i><br><a href="P08%20Venue%20Management.dc.html#adm-625">ADM-625</a> <span class="away">other board</span>  &mdash; <i>Merchant Account &amp; Settlement Calendar Manag</i><br><a href="P08%20Venue%20Management.dc.html#adm-626">ADM-626</a> <span class="away">other board</span>  &mdash; <i>Settlement Posting, Finance Handoff &amp; Close </i><br><a href="P08%20Venue%20Management.dc.html#adm-627">ADM-627</a> <span class="away">other board</span>  &mdash; <i>Reconciliation Audit, Trace &amp; Evidence Cente</i><br><a href="P08%20Venue%20Management.dc.html#adm-628">ADM-628</a> <span class="away">other board</span>  &mdash; <i>Reconciliation Simulator, Forecast &amp; AI Oper</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="P08%20Venue%20Management.dc.html#adm-620">ADM-620</a> <span class="away">other board</span>  &mdash; <i>Reconciliation Source &amp; Import Manager\t141</i> <span class="car">settlementId</span><br><a href="P08%20Venue%20Management.dc.html#adm-621">ADM-621</a> <span class="away">other board</span>  &mdash; <i>Transaction Matching &amp; Reconciliation Engine</i><br><a href="P08%20Venue%20Management.dc.html#adm-622">ADM-622</a> <span class="away">other board</span>  &mdash; <i>Reconciliation Exception &amp; Investigation Cen</i> <span class="car">settlementId</span><br><a href="P08%20Venue%20Management.dc.html#adm-623">ADM-623</a> <span class="away">other board</span>  &mdash; <i>Settlement &amp; Payout Manager\t144</i><br><a href="P08%20Venue%20Management.dc.html#adm-624">ADM-624</a> <span class="away">other board</span>  &mdash; <i>Fees, Commission, FX &amp; Settlement Economics\</i><br><a href="P08%20Venue%20Management.dc.html#adm-625">ADM-625</a> <span class="away">other board</span>  &mdash; <i>Merchant Account &amp; Settlement Calendar Manag</i><br><a href="P08%20Venue%20Management.dc.html#adm-626">ADM-626</a> <span class="away">other board</span>  &mdash; <i>Settlement Posting, Finance Handoff &amp; Close </i><br><a href="P08%20Venue%20Management.dc.html#adm-627">ADM-627</a> <span class="away">other board</span>  &mdash; <i>Reconciliation Audit, Trace &amp; Evidence Cente</i><br><a href="P08%20Venue%20Management.dc.html#adm-628">ADM-628</a> <span class="away">other board</span>  &mdash; <i>Reconciliation Simulator, Forecast &amp; AI Oper</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formOpenPlatformStaffGrant &middot; <i>Open access grant</i> &middot; <b>Open access grant</b> &middot; Cancel <span class="dis">discards permissions · reason · ticketRef · expiresAt</span></div></div>
         </div>
@@ -3825,7 +3825,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; startConfigurationSession · listConfigurationSessions · attachConfigurationSource · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; startConfigurationSession · listConfigurationSessions · listTenants · listOwnPlatformStaffGrants +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-470">ADM-470</a>  &mdash; <i>Setup Type &amp; Business Intent Discovery</i> <span class="car">tenantId</span><br><a href="#adm-471">ADM-471</a>  &mdash; <i>Venue &amp; Business Model Discovery</i> <span class="car">tenantId</span><br><a href="#adm-472">ADM-472</a>  &mdash; <i>Guided Question &amp; Answer Workspace</i> <span class="car">tenantId</span><br><a href="#adm-473">ADM-473</a>  &mdash; <i>Product &amp; Admission Model Discovery</i> <span class="car">tenantId</span><br><a href="#adm-474">ADM-474</a>  &mdash; <i>Operational Requirement Discovery</i> <span class="car">tenantId</span><br><a href="#adm-475">ADM-475</a>  &mdash; <i>Commercial Requirement Discovery</i> <span class="car">tenantId</span><br><a href="#adm-476">ADM-476</a>  &mdash; <i>Required, Recommended &amp; Optional Decisions</i> <span class="car">tenantId</span><br><a href="#adm-477">ADM-477</a>  &mdash; <i>Missing Information &amp; Clarification Center</i> <span class="car">tenantId</span><br><a href="#adm-478">ADM-478</a>  &mdash; <i>Configuration Blueprint &amp; Dependency Map</i> <span class="car">tenantId</span></div>
@@ -3855,7 +3855,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; startConfigurationSession · answerConfigurationQuestion · attachConfigurationSource · listConfigurationSources +3</div>
+          <div><b>OPERATIONS</b> &middot; startConfigurationSession · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-469">ADM-469</a>  &mdash; <i>Back to AI Configuration Home &amp; Start</i> <span class="car">tenantId</span></div>
@@ -3885,7 +3885,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; answerConfigurationQuestion · getConfigurationBlueprint · setAiVenueSettings · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; answerConfigurationQuestion · setAiVenueSettings · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session, venueId&larr;session, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-469">ADM-469</a>  &mdash; <i>Back to AI Configuration Home &amp; Start</i> <span class="car">tenantId</span></div>
@@ -4035,7 +4035,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getConfigurationBlueprint · decideBlueprintRecommendation · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; decideBlueprintRecommendation · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionKey&larr;navigation, sessionId&larr;session, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-469">ADM-469</a>  &mdash; <i>Back to AI Configuration Home &amp; Start</i> <span class="car">tenantId</span></div>
@@ -4065,7 +4065,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; answerConfigurationQuestion · getConfigurationBlueprint · decideBlueprintRecommendation · attachConfigurationSource +4</div>
+          <div><b>OPERATIONS</b> &middot; getConfigurationBlueprint · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionKey&larr;navigation, sessionId&larr;session, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-469">ADM-469</a>  &mdash; <i>Back to AI Configuration Home &amp; Start</i> <span class="car">tenantId</span></div>
@@ -4125,7 +4125,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · getConfigurationBlueprint · buildConfigurationPlan · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · getConfigurationBlueprint · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation, sessionId&larr;session, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-480">ADM-480</a>  &mdash; <i>Venue &amp; Organization Configuration</i> <span class="car">decisionKey · planId</span><br><a href="#adm-481">ADM-481</a>  &mdash; <i>Product Configuration Assistant</i> <span class="car">decisionKey · planId</span><br><a href="#adm-482">ADM-482</a>  &mdash; <i>Schedule, Capacity &amp; Availability Configurat</i> <span class="car">decisionKey · planId</span><br><a href="#adm-483">ADM-483</a>  &mdash; <i>Pricing &amp; Commercial Configuration</i> <span class="car">decisionKey · planId</span><br><a href="#adm-484">ADM-484</a>  &mdash; <i>Promotion, Bundle &amp; Upsell Configuration</i> <span class="car">decisionKey · planId</span><br><a href="#adm-485">ADM-485</a>  &mdash; <i>Seating, Access &amp; Operational Configuration</i> <span class="car">decisionKey · planId</span><br><a href="#adm-486">ADM-486</a>  &mdash; <i>Channel, Media &amp; Fulfillment Configuration</i> <span class="car">decisionKey · planId</span><br><a href="#adm-487">ADM-487</a>  &mdash; <i>Cross-Module Conflict &amp; Dependency Validatio</i> <span class="car">planId</span><br><a href="#adm-488">ADM-488</a>  &mdash; <i>Configuration Preview &amp; Impact Analysis</i> <span class="car">planId</span></div>
@@ -4155,7 +4155,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · getConfigurationBlueprint · decideBlueprintRecommendation · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · decideBlueprintRecommendation · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionKey&larr;navigation, planId&larr;navigation, sessionId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-479">ADM-479</a>  &mdash; <i>Back to AI Configuration Build Command Cente</i> <span class="car">planId</span></div>
@@ -4185,7 +4185,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · getConfigurationBlueprint · decideBlueprintRecommendation · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · decideBlueprintRecommendation · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionKey&larr;navigation, planId&larr;navigation, sessionId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-479">ADM-479</a>  &mdash; <i>Back to AI Configuration Build Command Cente</i> <span class="car">planId</span></div>
@@ -4215,7 +4215,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · getConfigurationBlueprint · decideBlueprintRecommendation · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · decideBlueprintRecommendation · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionKey&larr;navigation, planId&larr;navigation, sessionId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-479">ADM-479</a>  &mdash; <i>Back to AI Configuration Build Command Cente</i> <span class="car">planId</span></div>
@@ -4245,7 +4245,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · getConfigurationBlueprint · decideBlueprintRecommendation · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · decideBlueprintRecommendation · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionKey&larr;navigation, planId&larr;navigation, sessionId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-479">ADM-479</a>  &mdash; <i>Back to AI Configuration Build Command Cente</i> <span class="car">planId</span></div>
@@ -4275,7 +4275,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · getConfigurationBlueprint · decideBlueprintRecommendation · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · decideBlueprintRecommendation · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionKey&larr;navigation, planId&larr;navigation, sessionId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-479">ADM-479</a>  &mdash; <i>Back to AI Configuration Build Command Cente</i> <span class="car">planId</span></div>
@@ -4305,7 +4305,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · getConfigurationBlueprint · decideBlueprintRecommendation · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · decideBlueprintRecommendation · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionKey&larr;navigation, planId&larr;navigation, sessionId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-479">ADM-479</a>  &mdash; <i>Back to AI Configuration Build Command Cente</i> <span class="car">planId</span></div>
@@ -4335,7 +4335,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · getConfigurationBlueprint · decideBlueprintRecommendation · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · decideBlueprintRecommendation · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionKey&larr;navigation, planId&larr;navigation, sessionId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-479">ADM-479</a>  &mdash; <i>Back to AI Configuration Build Command Cente</i> <span class="car">planId</span></div>
@@ -4365,7 +4365,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · simulateActionPlan · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-479">ADM-479</a>  &mdash; <i>Back to AI Configuration Build Command Cente</i> <span class="car">planId</span></div>
@@ -4395,7 +4395,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · simulateActionPlan · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; simulateActionPlan · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-479">ADM-479</a>  &mdash; <i>Back to AI Configuration Build Command Cente</i> <span class="car">planId</span></div>
@@ -4425,7 +4425,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getEffectiveAiPolicy · getActionPlan · getAiVenueSettings · setAiVenueSettings +3</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · getAiVenueSettings · setAiVenueSettings · listTenants +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation, venueId&larr;session, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-490">ADM-490</a>  &mdash; <i>Configuration Validation Results</i> <span class="car">planId</span><br><a href="#adm-491">ADM-491</a>  &mdash; <i>AI Recommendations &amp; Best-Practice Review</i> <span class="car">tenantId</span><br><a href="#adm-492">ADM-492</a>  &mdash; <i>Configuration Approval Workflow</i> <span class="car">planId</span><br><a href="#adm-493">ADM-493</a>  &mdash; <i>AI Configuration Execution Center</i> <span class="car">planId</span><br><a href="#adm-494">ADM-494</a>  &mdash; <i>Execution Progress &amp; Dependency Monitor</i> <span class="car">planId · stepNumber</span><br><a href="#adm-495">ADM-495</a>  &mdash; <i>Configuration Results &amp; Object Mapping</i> <span class="car">planId</span><br><a href="#adm-496">ADM-496</a>  &mdash; <i>Configuration Change &amp; Modification Assistan</i> <span class="car">tenantId</span><br><a href="#adm-497">ADM-497</a>  &mdash; <i>Configuration History, Versions &amp; Rollback</i> <span class="car">planId</span><br><a href="#adm-498">ADM-498</a>  &mdash; <i>AI Configuration Audit &amp; Governance</i> <span class="car">tenantId</span></div>
@@ -4485,7 +4485,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getConfigurationBlueprint · decideBlueprintRecommendation · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getConfigurationBlueprint · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionKey&larr;navigation, sessionId&larr;session, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-489">ADM-489</a>  &mdash; <i>Back to AI Configuration Readiness Center</i> <span class="car">planId · tenantId</span></div>
@@ -4515,7 +4515,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · listProposedActions · decideProposedAction · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; actionId&larr;navigation, planId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-489">ADM-489</a>  &mdash; <i>Back to AI Configuration Readiness Center</i> <span class="car">planId</span></div>
@@ -4575,7 +4575,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · pauseActionPlan · resumeActionPlan · retryActionStep +3</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation, stepNumber&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-489">ADM-489</a>  &mdash; <i>Back to AI Configuration Readiness Center</i> <span class="car">planId</span></div>
@@ -4605,7 +4605,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · rollbackActionPlan · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-489">ADM-489</a>  &mdash; <i>Back to AI Configuration Readiness Center</i> <span class="car">planId</span></div>
@@ -4635,7 +4635,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; startConfigurationSession · answerConfigurationQuestion · buildConfigurationPlan · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; sessionId&larr;session, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-489">ADM-489</a>  &mdash; <i>Back to AI Configuration Readiness Center</i> <span class="car">planId</span></div>
@@ -4725,7 +4725,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiCapabilities · pauseAiCapability · promoteAiRelease · listAiGovernanceAlerts +4</div>
+          <div><b>OPERATIONS</b> &middot; listAiCapabilities · listAiCapabilityMaturity · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; capabilityKey&larr;navigation, releaseId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-520">ADM-520</a>  &mdash; <i>AI Capability Registry &amp; Ownership</i> <span class="car">capabilityKey</span><br><a href="#adm-521">ADM-521</a>  &mdash; <i>AI Risk Classification &amp; Assessment</i> <span class="car">capabilityKey</span><br><a href="#adm-522">ADM-522</a>  &mdash; <i>AI Autonomy Level Configuration</i> <span class="car">capabilityKey</span><br><a href="#adm-523">ADM-523</a>  &mdash; <i>AI Action &amp; Permission Policy Builder</i> <span class="car">tenantId</span><br><a href="#adm-524">ADM-524</a>  &mdash; <i>AI Data Access &amp; Usage Policy</i> <span class="car">tenantId</span><br><a href="#adm-525">ADM-525</a>  &mdash; <i>Environment, Tenant &amp; Scope Governance</i> <span class="car">tenantId</span><br><a href="#adm-526">ADM-526</a>  &mdash; <i>AI Policy Conflict, Exception &amp; Override Man</i> <span class="car">tenantId</span><br><a href="#adm-527">ADM-527</a>  &mdash; <i>AI Policy Testing &amp; Governance Simulation</i> <span class="car">tenantId</span><br><a href="#adm-528">ADM-528</a>  &mdash; <i>AI Governance Policy Publication &amp; Effective</i> <span class="car">tenantId</span></div>
@@ -4815,7 +4815,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiCapabilities · configureAiCapability · getEffectiveAiPolicy · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; configureAiCapability · getEffectiveAiPolicy · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; capabilityKey&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-519">ADM-519</a>  &mdash; <i>Back to AI Governance Command Center</i> <span class="car">capabilityKey</span></div>
@@ -4875,7 +4875,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAiGovernancePolicyDraft · listAiGovernancePolicyVersions · listDataRetentionSettings · setDataRetentionSetting +3</div>
+          <div><b>OPERATIONS</b> &middot; createAiGovernancePolicyDraft · listAiGovernancePolicyVersions · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; dataClass&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-519">ADM-519</a>  &mdash; <i>Back to AI Governance Command Center</i> <span class="car">tenantId</span></div>
@@ -4905,7 +4905,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getEffectiveAiPolicy · createAiGovernancePolicyDraft · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getEffectiveAiPolicy · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-519">ADM-519</a>  &mdash; <i>Back to AI Governance Command Center</i> <span class="car">capabilityKey</span></div>
@@ -4935,7 +4935,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getEffectiveAiPolicy · listAiGovernancePolicyVersions · createAiPolicyException · revokeAiPolicyException +3</div>
+          <div><b>OPERATIONS</b> &middot; getEffectiveAiPolicy · createAiPolicyException · revokeAiPolicyException · listTenants +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; exceptionId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-519">ADM-519</a>  &mdash; <i>Back to AI Governance Command Center</i> <span class="car">capabilityKey</span></div>
@@ -5025,7 +5025,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · listProposedActions · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; listProposedActions · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-530">ADM-530</a>  &mdash; <i>AI Approval Requirement &amp; Routing Configurat</i> <span class="car">tenantId</span><br><a href="#adm-531">ADM-531</a>  &mdash; <i>AI Approval Review Workspace</i> <span class="car">planId</span><br><a href="#adm-532">ADM-532</a>  &mdash; <i>Conditional Approval &amp; Approval Conditions</i> <span class="car">planId</span><br><a href="#adm-533">ADM-533</a>  &mdash; <i>Human Review, Challenge &amp; AI Clarification W</i> <span class="car">tenantId</span><br><a href="#adm-534">ADM-534</a>  &mdash; <i>Escalation, Delegation &amp; Approval SLA Manage</i> <span class="car">planId</span><br><a href="#adm-535">ADM-535</a>  &mdash; <i>Live AI Execution Oversight &amp; Human Interven</i> <span class="car">planId</span><br><a href="#adm-536">ADM-536</a>  &mdash; <i>Human Override &amp; Manual Control Center</i> <span class="car">planId</span><br><a href="#adm-537">ADM-537</a>  &mdash; <i>Approval &amp; Intervention History / Decision T</i> <span class="car">tenantId</span><br><a href="#adm-538">ADM-538</a>  &mdash; <i>Human Oversight Workflow Simulator &amp; Readine</i> <span class="car">planId</span></div>
@@ -5055,9 +5055,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createAiGovernancePolicyDraft · listAiGovernancePolicyVersions · listAiTools · listApprovalMatrices +5</div>
+          <div><b>OPERATIONS</b> &middot; listApprovalMatrices · setApprovalMatrix · evaluateApprovalRequirement · listTenants +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
-          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
+          <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation, matrixId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-529">ADM-529</a>  &mdash; <i>Back to AI Human Oversight Command Center</i> <span class="car">planId · tenantId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetApprovalMatrix &middot; <i>Save approval matrix</i> &middot; <b>Save approval matrix</b> &middot; Cancel <span class="dis">discards levels · thresholds</span></div><div class="ov"><b>modal</b> formOpenPlatformStaffGrant &middot; <i>Open access grant</i> &middot; <b>Open access grant</b> &middot; Cancel <span class="dis">discards permissions · reason · ticketRef · expiresAt</span></div></div>
@@ -5085,7 +5085,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · simulateActionPlan · decideProposedAction · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; simulateActionPlan · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; actionId&larr;navigation, planId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-529">ADM-529</a>  &mdash; <i>Back to AI Human Oversight Command Center</i> <span class="car">planId</span></div>
@@ -5145,7 +5145,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; overrideAiDecision · getAiDecisionTrace · sendAiMessage · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getAiDecisionTrace · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; conversationId&larr;navigation, decisionRecordId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-529">ADM-529</a>  &mdash; <i>Back to AI Human Oversight Command Center</i> <span class="car">planId</span></div>
@@ -5295,7 +5295,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; simulateAiGovernancePolicy · simulateActionPlan · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; simulateAiGovernancePolicy · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; planId&larr;navigation, versionId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-529">ADM-529</a>  &mdash; <i>Back to AI Human Oversight Command Center</i> <span class="car">planId</span></div>
@@ -5445,7 +5445,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; explainRecommendationDecision · getAiDecisionTrace · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getAiDecisionTrace · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionId&larr;navigation, decisionRecordId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-539">ADM-539</a>  &mdash; <i>Back to AI Explainability &amp; Audit Command Ce</i> <span class="car">tenantId</span></div>
@@ -5535,7 +5535,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getActionPlan · getAiDecisionTrace · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getActionPlan · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionRecordId&larr;navigation, planId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-539">ADM-539</a>  &mdash; <i>Back to AI Explainability &amp; Audit Command Ce</i> <span class="car">tenantId</span></div>
@@ -5565,7 +5565,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; searchAiDecisions · exportAiEvidencePackage · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant · exportAiEvidencePackage +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-539">ADM-539</a>  &mdash; <i>Back to AI Explainability &amp; Audit Command Ce</i> <span class="car">tenantId</span></div>
@@ -5595,7 +5595,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getAiDecisionTrace · replayAiDecision · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getAiDecisionTrace · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; decisionRecordId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-539">ADM-539</a>  &mdash; <i>Back to AI Explainability &amp; Audit Command Ce</i> <span class="car">tenantId</span></div>
@@ -5655,7 +5655,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiRiskRegister · setAiRiskRegisterEntry · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant · listAiRiskRegister +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; entryId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-549">ADM-549</a>  &mdash; <i>Back to AI Governance Monitoring Command Cen</i> <span class="car">tenantId</span></div>
@@ -5715,7 +5715,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiGovernanceAlerts · decideAiGovernanceAlert · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; listAiGovernanceAlerts · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; alertId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-549">ADM-549</a>  &mdash; <i>Back to AI Governance Monitoring Command Cen</i> <span class="car">tenantId</span></div>
@@ -5745,7 +5745,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiGovernanceAlerts · decideAiGovernanceAlert · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; listAiGovernanceAlerts · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; alertId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-549">ADM-549</a>  &mdash; <i>Back to AI Governance Monitoring Command Cen</i> <span class="car">tenantId</span></div>
@@ -5805,7 +5805,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiGovernanceAlerts · decideAiGovernanceAlert · openAiIncident · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; listAiGovernanceAlerts · decideAiGovernanceAlert · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; alertId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-549">ADM-549</a>  &mdash; <i>Back to AI Governance Monitoring Command Cen</i> <span class="car">tenantId</span></div>
@@ -5865,7 +5865,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; exportAiEvidencePackage · listAiRiskRegister · listAiControls · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant · exportAiEvidencePackage +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-549">ADM-549</a>  &mdash; <i>Back to AI Governance Monitoring Command Cen</i> <span class="car">tenantId</span></div>
@@ -5895,7 +5895,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiGovernanceAlerts · listAiRiskRegister · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant · listAiRiskRegister</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess · emptyNoResults · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-549">ADM-549</a>  &mdash; <i>Back to AI Governance Monitoring Command Cen</i> <span class="car">tenantId</span></div>
@@ -5985,7 +5985,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setForecastDefinition · listForecastSignals · configureForecastSignalSource · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; setForecastDefinition · listForecastSignals · listTenants · listOwnPlatformStaffGrants +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; definitionKey&larr;navigation, signalKey&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-499">ADM-499</a>  &mdash; <i>Back to Forecasting Command Center</i> <span class="car">tenantId</span></div>
@@ -6015,7 +6015,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getForecast · configureAnomalyDetector · listAiInsights · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · configureAnomalyDetector · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; detectorKey&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-499">ADM-499</a>  &mdash; <i>Back to Forecasting Command Center</i> <span class="car">versionId</span></div>
@@ -6165,7 +6165,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getForecast · createForecastScenario · compareForecastScenarios · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-499">ADM-499</a>  &mdash; <i>Back to Forecasting Command Center</i> <span class="car">versionId</span></div>
@@ -6195,7 +6195,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-002">ADM-002</a>  &mdash; <i>Back to Platform Dashboard</i><br><a href="#adm-510">ADM-510</a>  &mdash; <i>Capacity &amp; Occupancy Forecast</i> <span class="car">tenantId</span><br><a href="#adm-511">ADM-511</a>  &mdash; <i>Attraction Utilization &amp; Queue Forecast</i> <span class="car">tenantId</span><br><a href="#adm-512">ADM-512</a>  &mdash; <i>Entry, Access &amp; Guest Flow Forecast</i> <span class="car">tenantId</span><br><a href="#adm-513">ADM-513</a>  &mdash; <i>Workforce Demand &amp; Staffing Forecast</i> <span class="car">tenantId</span><br><a href="#adm-514">ADM-514</a>  &mdash; <i>POS, Kiosk &amp; Frontline Service Forecast</i> <span class="car">tenantId</span><br><a href="#adm-515">ADM-515</a>  &mdash; <i>F&amp;B, Retail &amp; Inventory Demand Forecast</i> <span class="car">tenantId</span><br><a href="#adm-516">ADM-516</a>  &mdash; <i>Resource, Equipment &amp; Facility Requirement F</i> <span class="car">tenantId</span><br><a href="#adm-517">ADM-517</a>  &mdash; <i>Operational Scenario &amp; Readiness Simulator</i> <span class="car">tenantId</span><br><a href="#adm-518">ADM-518</a>  &mdash; <i>Operational Forecast Review, Recommendations</i> <span class="car">tenantId</span></div>
@@ -6225,7 +6225,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements · configureAnomalyDetector · listAiInsights +3</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements · configureAnomalyDetector · listTenants +2</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; detectorKey&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-509">ADM-509</a>  &mdash; <i>Back to Operational Forecasting Command Cent</i> <span class="car">tenantId</span></div>
@@ -6255,7 +6255,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements · requestSuggestion · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · requestSuggestion · listTenants · listOwnPlatformStaffGrants +1</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-509">ADM-509</a>  &mdash; <i>Back to Operational Forecasting Command Cent</i> <span class="car">tenantId</span></div>
@@ -6285,7 +6285,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-509">ADM-509</a>  &mdash; <i>Back to Operational Forecasting Command Cent</i> <span class="car">tenantId</span></div>
@@ -6315,7 +6315,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements · getStaffingCoverage · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; getStaffingCoverage · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-509">ADM-509</a>  &mdash; <i>Back to Operational Forecasting Command Cent</i> <span class="car">tenantId</span></div>
@@ -6345,7 +6345,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-509">ADM-509</a>  &mdash; <i>Back to Operational Forecasting Command Cent</i> <span class="car">tenantId</span></div>
@@ -6375,7 +6375,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-509">ADM-509</a>  &mdash; <i>Back to Operational Forecasting Command Cent</i> <span class="car">tenantId</span></div>
@@ -6405,7 +6405,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getForecast · listOperationalRequirements · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-509">ADM-509</a>  &mdash; <i>Back to Operational Forecasting Command Cent</i> <span class="car">tenantId</span></div>
@@ -6435,7 +6435,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; createForecastScenario · compareForecastScenarios · listOperationalRequirements · listTenants +2</div>
+          <div><b>OPERATIONS</b> &middot; compareForecastScenarios · listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-509">ADM-509</a>  &mdash; <i>Back to Operational Forecasting Command Cent</i> <span class="car">tenantId</span></div>
@@ -6465,7 +6465,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listOperationalRequirements · decideOperationalRequirement · listTenants · listOwnPlatformStaffGrants +1</div>
+          <div><b>OPERATIONS</b> &middot; listTenants · listOwnPlatformStaffGrants · openPlatformStaffGrant</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · grantRequired</span></div>
           <div><b>ARRIVES WITH</b> &middot; requirementId&larr;navigation, tenantId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#adm-509">ADM-509</a>  &mdash; <i>Back to Operational Forecasting Command Cent</i> <span class="car">tenantId</span></div>

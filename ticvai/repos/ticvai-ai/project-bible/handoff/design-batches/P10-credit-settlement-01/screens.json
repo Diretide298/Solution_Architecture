@@ -5,6 +5,7 @@
   "module": "Credit & Settlement",
   "requiresModule": "partner",
   "wave": 2,
+  "permission": "ORDER_CREATE",
   "capability": "C04",
   "implementation": {
    "app": "partner-web",
@@ -225,6 +226,7 @@
   "module": "Credit & Settlement",
   "requiresModule": "partner",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "capability": "C34",
   "implementation": {
    "app": "partner-web",
@@ -268,7 +270,7 @@
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getB2bCredit` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "See credit limit & balance for this venue.",
+  "purpose": "A partner sees its credit position: the limit, what it has used and what remains to book against.",
   "layout": {
    "template": "detail",
    "regions": [

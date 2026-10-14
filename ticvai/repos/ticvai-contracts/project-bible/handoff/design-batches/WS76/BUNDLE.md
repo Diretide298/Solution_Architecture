@@ -1,6 +1,6 @@
 # WS76 — Digital Asset Management DAM board 3
 
-**10 screens · 11 operations · 14 schemas · 7 permissions**
+**10 screens · 9 operations · 12 schemas · 7 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `CMS-081` | DAM Governance & Rights Command Center | B | 0 | 16 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `CMS-082` | Asset Ownership & Responsibility Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `CMS-082` | Asset Ownership & Responsibility Management | B | 0 | 20 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `CMS-083` | Rights, License & Usage Policy Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-084` | Asset Approval Workflow Management | B | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `CMS-085` | Publication Eligibility & Governance Validation | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -150,9 +150,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Within days | number field (days) | 60 | — | `getExpiringRights` ?withinDays |
-| From | date and time picker | — | — | `getMediaUsageAnalytics` ?from |
-| To | date and time picker | — | — | `getMediaUsageAnalytics` ?to |
-| Group by | radio group | — | Asset type · Category · Venue · Owner · Channel | `getMediaUsageAnalytics` ?groupBy |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -160,7 +157,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every dam governance rights** (data table)
+**Every dam governance rights** (data table, from `getExpiringRights`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -173,7 +170,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Blocked | text | not in the schema: `Blocked` |
 | Critical alerts | text | not in the schema: `Critical Alerts` |
 
-**The selected dam governance rights** (detail panel): The pack groups this record's detail under its own headings: “Digital Asset Management”.
+**The selected dam governance rights** (detail panel, from `getExpiringRights`): The pack groups this record's detail under its own headings: “Digital Asset Management”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -196,7 +193,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | External Shares (secondary button) | navigation or local | — | — | — | — |
 | Governance Issues (secondary button) | navigation or local | — | — | — | — |
 
-**Data it reads**: `getExpiringRights` (onLoad, Rights about to lapse); `getMediaUsageAnalytics` (onLoad, Governance coverage)
+**Data it reads**: `getExpiringRights` (onLoad, Rights about to lapse)
 
 **Where the user goes next**
 
@@ -261,9 +258,10 @@ Every dam governance rights:
 #### Permissions
 
 - `getExpiringRights` → `ASSET_LIBRARY_VIEW` (read) · staff
-- `getMediaUsageAnalytics` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -325,7 +323,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29618 (APP-CMS-CMS-082) |
-| Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -346,7 +344,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getMediaAsset`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Kind | chip: Image, Video, Audio, Document, Vector, Font… | `model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary (`model/gltf-binary`, `.glb`) venue model, at most 40 … |
+| Status | chip: Processing, Ready, Quarantined, Failed, Archived | — |
+| Filename | text | — |
+| Content type | text | — |
+| Size bytes | 1,234 | — |
+| Title | in the reader's language | — |
+| Description | in the reader's language | Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored. |
+| Alt text | in the reader's language | Required before use in a guest-facing surface. WCAG 2.2 AA. |
+| Width | 1,234 | — |
+| Height | 1,234 | — |
+| Duration seconds | 1,234.5 | — |
+| Custom metadata | grouped details | BL-178. `assets` is a strong contract and its metadata was fixed — kind, title, alt text, dimensions, rights. |
+| Shared with tenants | list or chips (count when long) | BL-178. Cross-tenant sharing, and it is refused by default for a reason. |
+| Tags | list or chips (count when long) | — |
+| Category | the name it points at, never the id | The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. |
+| Venue | the name it points at, never the id | — |
+| URL | text | Signed and expiring for private assets; stable CDN URL for public ones. |
+| Thumbnail URL | text | — |
+| Reference count | 1,234 | How many surfaces reference this asset. Non-zero refuses deletion. |
 
 **Actions and what each produces**
 
@@ -369,7 +390,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the asset ownership responsibility are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Status change refused: archiving an asset that is still referenced (`inUse`, with every reference listed), or a transition `states/media.yaml` does not allow … (MediaStatusRefusedProblem) |
 
 #### Edge cases to draw
 
@@ -397,10 +417,11 @@ getMediaAsset (MediaAssetDetail):
 
 #### Permissions
 
-- `updateMediaAsset` → `ASSET_LIBRARY_MANAGE` (configure) · staff
 - `getMediaAsset` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -431,12 +452,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-082?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Partner, Cancel.
 - [ ] Every transition is wired: `CMS-081`.
-- [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`.
+- [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -512,6 +533,8 @@ rights:
 - `setMediaAssetRights` → `ASSET_LIBRARY_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_MANAGE`
 
 #### Requirements it meets
 
@@ -630,6 +653,8 @@ sla: 1 day
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_APPROVE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -746,6 +771,8 @@ eligible: web and app only (signage not licensed)
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_APPROVE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -850,6 +877,8 @@ The role, the asset actions it may take (discover, view, edit, download, share, 
 | Effective to `effectiveTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createAuthorisationPolicy` body |
 | Delegated admin roles `delegatedAdminRoleIds` | multi-picker: choose delegated admin roles | optional | — | — | — | 3.3.35. Who may edit this policy without being a platform administrator. | `createAuthorisationPolicy` body |
 
+Errors to draw in the form: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …
+
 **Rules for these inputs** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
 - **Scope this applies at**: Not a free choice; each write has one level and the selector says it: createAuthorisationPolicy: tenant-wide only, no region or venue override is offered. Nearest ancestor wins; a workstation is assigned a profile, never configured. *(source: ADR-0018; ADR-0029; screens/_patterns.yaml#configEditor; contracts/spine/identity.yaml#createAuthorisationPolicy)*
@@ -872,7 +901,7 @@ The role, the asset actions it may take (discover, view, edit, download, share, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Grant an asset action to a role (primary button) | `createAuthorisationPolicy` POST `/authorisation-policies` | AuthorisationPolicy | AuthorisationPolicy | — | opens modal first |
+| Grant an asset action to a role (primary button) | `createAuthorisationPolicy` POST `/authorisation-policies` | AuthorisationPolicy | AuthorisationPolicy | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | opens modal first |
 
 **Data it reads**: `listAuthorisationPolicies` (onLoad, Who may see which assets); `listRoles` (onLoad, The roles a policy applies to (appliesToRoleIds), by name)
 
@@ -890,6 +919,7 @@ The role, the asset actions it may take (discover, view, edit, download, share, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the role-based asset access are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission (the screen's other reads need `ROLE_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for `createAuthorisationPolicy`. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Edge cases to draw
 
@@ -923,6 +953,8 @@ listAuthorisationPolicies (AuthorisationPolicy):
 - `listRoles` → `ROLE_MANAGE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission (the screen's other reads need `ROLE_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for `createAuthorisationPolicy`.
+
+Screen guard: `PERMISSION_VIEW`
 
 #### Requirements it meets
 
@@ -964,7 +996,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (24), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-086?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Grant an asset action to a role.
@@ -1057,6 +1089,8 @@ views: 6
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_SHARE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1103,7 +1137,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29633 (APP-CMS-CMS-088) |
-| Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
@@ -1134,7 +1168,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every rights expiry renewal** (data table)
+**Every rights expiry renewal** (data table, from `getExpiringRights`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1143,7 +1177,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Expires in 60 days | text | not in the schema: `Expires in 60 Days` |
 | Expired | text | not in the schema: `Expired` |
 
-**The selected rights expiry renewal** (detail panel): The pack groups this record's detail under its own headings: “Rights expire”, “Impact”, “Owner notification”, “Digital Asset Management”, “Escalation”, “Expired”.
+**The selected rights expiry renewal** (detail panel, from `getExpiringRights`): The pack groups this record's detail under its own headings: “Rights expire”, “Impact”, “Owner notification”, “Digital Asset Management”, “Escalation”, “Expired”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1214,9 +1248,10 @@ Every rights expiry renewal:
 #### Permissions
 
 - `getExpiringRights` → `ASSET_LIBRARY_VIEW` (read) · staff
-- `setMediaAssetRights` → `ASSET_LIBRARY_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -1252,7 +1287,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#CMS-088?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Renew Rights, Upload Renewal Document, Change Expiry, Find Replacement, Notify Owner, Expiry Workflow.
 - [ ] Every transition is wired: `CMS-081`.
-- [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`.
+- [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1327,6 +1362,8 @@ entries:
 - `listMediaAssetAudit` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -1404,7 +1441,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every governance risk compliance** (data table)
+**Every governance risk compliance** (data table, from `getExpiringRights`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1419,7 +1456,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Approval SLA breaches | text | not in the schema: `Approval SLA Breaches` |
 | Risk queue | text | not in the schema: `Risk Queue` |
 
-**The selected governance risk compliance** (detail panel): The pack groups this record's detail under its own headings: “Asset Risk Usage Severity Action”, “Digital Asset Management”, “Human Governance”, “Approved”, “However”, “Therefore”.
+**The selected governance risk compliance** (detail panel, from `getExpiringRights`): The pack groups this record's detail under its own headings: “Asset Risk Usage Severity Action”, “Digital Asset Management”, “Human Governance”, “Approved”, “However”, “Therefore”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1494,6 +1531,8 @@ Every governance risk compliance:
 - `getExpiringRights` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -1621,13 +1660,11 @@ Method, path, parameters, request and response for every operation these screens
 "createMediaShare": {"method":"POST","path":"/media-shares","contract":"assets","summary":"Share assets with somebody outside the platform, on terms","permission":"ASSET_LIBRARY_SHARE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaShare","responds":"MediaShare"},
 "getExpiringRights": {"method":"GET","path":"/media/rights-expiring","contract":"assets","summary":"Assets whose licence is expiring or expired","permission":"ASSET_LIBRARY_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"withinDays","in":"query","required":null}],"requestBody":null,"responds":"ExpiringMedia"},
 "getMediaAsset": {"method":"GET","path":"/media/{mediaId}","contract":"assets","summary":"Read an asset with derivatives and usage","permission":"ASSET_LIBRARY_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"MediaAssetDetail"},
-"getMediaUsageAnalytics": {"method":"GET","path":"/media-usage","contract":"assets","summary":"Downloads, views, shares and library health","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"MediaUsageRow"},
 "listAuthorisationPolicies": {"method":"GET","path":"/authorisation-policies","contract":"identity","summary":"Attribute-based authorisation policies","permission":"PERMISSION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"scopePath","in":"query","required":null}],"requestBody":null,"responds":"AuthorisationPolicy"},
 "listMediaAssetAudit": {"method":"GET","path":"/media-assets/{assetId}/audit","contract":"assets","summary":"Who did what to this asset, and who received it","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"MediaAuditRecord"},
 "listRoles": {"method":"GET","path":"/roles","contract":"identity","summary":"List roles","permission":"ROLE_MANAGE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setMediaAssetApproval": {"method":"POST","path":"/media-assets/{assetId}/approval","contract":"assets","summary":"Submit, approve, reject or publish an asset","permission":"ASSET_LIBRARY_APPROVE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaAssetApproval"},
-"setMediaAssetRights": {"method":"PUT","path":"/media-assets/{assetId}/rights","contract":"assets","summary":"Licence, permitted use and expiry","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaRights","responds":"MediaRights"},
-"updateMediaAsset": {"method":"PATCH","path":"/media/{mediaId}","contract":"assets","summary":"Amend metadata, tags or rights","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaAsset"}
+"setMediaAssetRights": {"method":"PUT","path":"/media-assets/{assetId}/rights","contract":"assets","summary":"Licence, permitted use and expiry","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaRights","responds":"MediaRights"}
 }
 ```
 
@@ -1638,17 +1675,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "AccessCondition": {"type":"object","description":"**One attribute, one operator, one value** — and the attribute names are an enum rather than free text, because a policy that reads `venu.type` silently never matches.\nThe enum is the matrix, row by row: user (3.3.7), employee (3.3.8), membership (3.3.9), accreditation (3.3.10), customer segment (3.3.11), resource classification (3.3.12), venue (3.3.13), attraction (3.3.14), device (3.3.15), day of week (3.3.16), season (3.3.17), event (3.3.18), capacity (3.3.19), occupancy (3.3.20), risk score (3.3.21), location (3.3.2) and time (3.3.3).\n","required":["attribute","operator"],"properties":{"attribute":{"type":"string","enum":["user.attribute","employee.attribute","employee.onShift","membership.tier","membership.status","accreditation.type","accreditation.status","customer.segment","resource.classification","venue.attribute","venue.id","attraction.attribute","device.kind","device.id","device.trusted","time.ofDay","time.dayOfWeek","time.season","time.withinOperatingHours","event.id","event.status","capacity.utilisationPercent","occupancy.level","risk.score","ticket.status","location.scopePath"]},"key":{"type":"string","nullable":true,"description":"For the `*.attribute` forms — which attribute, by code."},"operator":{"type":"string","enum":["equals","notEquals","in","notIn","greaterThan","lessThan","between","contains","startsWith","exists"]},"value":{"nullable":true,"description":"The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. Null for `exists`; `in`, `notIn` and `between` use `values`.\n"},"values":{"type":"array","items":{"type":"string"}}}},
-"AuthorisationPolicy": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy","description":"3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n","required":["code","name","effect"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"isTemplate":{"type":"boolean","default":false},"permissions":{"type":"array","items":{"type":"string"},"description":"**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"},"conditions":{"type":"array","x-ticvai-persistence-column":"jsonb","items":{"$ref":"#/components/schemas/AccessCondition"}},"combining":{"type":"string","enum":["allMustMatch","anyMayMatch"],"default":"allMustMatch"},"effect":{"type":"string","enum":["permit","deny"],"description":"**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"},"priority":{"type":"integer","default":0},"scopePath":{"type":"string","description":"3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"},"appliesToRoleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"status":{"type":"string","readOnly":true,"description":"**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n","enum":["draft","pendingApproval","active","suspended","retired"]},"version":{"type":"integer","default":1,"readOnly":true,"description":"Set by the server; every `updateAuthorisationPolicy` writes a new version."},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"delegatedAdminRoleIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"}}},
+"AuthorisationPolicy": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy","description":"3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n","required":["code","name","effect"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"isTemplate":{"type":"boolean","default":false},"permissions":{"type":"array","items":{"type":"string"},"description":"**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"},"conditions":{"type":"array","x-ticvai-persistence-column":"jsonb","items":{"$ref":"#/components/schemas/AccessCondition"}},"combining":{"type":"string","enum":["allMustMatch","anyMayMatch"],"default":"allMustMatch"},"effect":{"type":"string","enum":["permit","deny"],"description":"**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"},"priority":{"type":"integer","default":0},"scopePath":{"type":"string","description":"3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"},"appliesToRoleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"status":{"type":"string","readOnly":true,"description":"**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n","enum":["draft","pendingApproval","active","suspended","retired"]},"version":{"type":"integer","default":1,"readOnly":true,"description":"Set by the server; every `updateAuthorisationPolicy` writes a new version."},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"delegatedAdminRoleIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"},"statusReason":{"type":"string","nullable":true,"readOnly":true,"description":"Why the policy's state last changed (`setAuthorisationPolicyState`)."}}},
 "ExpiringMedia": {"x-ticvai-persistence":"none — computed","type":"object","required":["assetId","filename","validTo","isExpired","isInUse"],"properties":{"assetId":{"type":"string","format":"uuid"},"filename":{"type":"string"},"thumbnailUrl":{"type":"string","nullable":true},"licensor":{"type":"string","nullable":true},"validTo":{"type":"string","format":"date"},"daysRemaining":{"type":"integer"},"isExpired":{"type":"boolean"},"isInUse":{"type":"boolean","description":"True while `liveUsageCount` is above zero, that is, while live (published) content references the asset (audit R106 (10)). Drafts and collections do not count."},"liveUsageCount":{"type":"integer","description":"References from live (published) content only (audit R106 (10)). Expired and live is the combination that matters."}}},
 "MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/assets::MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/assets::LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/assets::LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/assets::LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
-"MediaAssetApproval": {"type":"object","x-ticvai-persistence":"assets.approval","description":"Boards 3.4 and 3.5. **Publication eligibility is computed from four facts.**","properties":{"assetId":{"type":"string","format":"uuid"},"state":{"type":"string","enum":["draft","pendingApproval","approved","rejected","published","archived"]},"eligibility":{"type":"array","readOnly":true,"items":{"type":"object","properties":{"check":{"type":"string","enum":["approved","rightsCurrent","renditionsReady","classificationComplete"]},"satisfied":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"approvedBy":{"type":"string","format":"uuid","nullable":true},"comment":{"type":"string","nullable":true},"at":{"type":"string","format":"date-time"},"scopePath":{"type":"string"}}},
-"MediaAssetDetail": {"x-ticvai-persistence":"assets.media_asset","allOf":[{"$ref":"#/components/schemas/MediaAsset"},{"type":"object","properties":{"derivatives":{"type":"array","description":"Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n","items":{"type":"object","properties":{"label":{"type":"string"},"width":{"type":"integer"},"height":{"type":"integer"},"sizeBytes":{"type":"integer"},"url":{"type":"string"}}}},"usage":{"type":"array","description":"Every place this asset is referenced.","items":{"$ref":"#/components/schemas/MediaUsage"}},"collections":{"type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"}}}},"previousVersions":{"type":"array","items":{"type":"object","properties":{"version":{"type":"integer"},"replacedAt":{"type":"string","format":"date-time"},"replacedByPrincipalId":{"type":"string","format":"uuid"}}}}}}]},
+"MediaAssetApproval": {"type":"object","x-ticvai-persistence":"assets.approval","description":"Boards 3.4 and 3.5. **Publication eligibility is computed from four facts.**","properties":{"assetId":{"type":"string","format":"uuid"},"state":{"type":"string","enum":["draft","pendingApproval","approved","rejected","published","archived"]},"eligibility":{"x-ticvai-persisted":false,"type":"array","readOnly":true,"items":{"type":"object","properties":{"check":{"type":"string","enum":["approved","rightsCurrent","renditionsReady","classificationComplete"]},"satisfied":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"approvedBy":{"type":"string","format":"uuid","nullable":true},"comment":{"type":"string","nullable":true},"at":{"type":"string","format":"date-time"},"scopePath":{"type":"string"}}},
+"MediaAssetDetail": {"x-ticvai-persistence":"assets.media_asset","allOf":[{"$ref":"#/components/schemas/MediaAsset"},{"type":"object","properties":{"derivatives":{"x-ticvai-persisted":false,"type":"array","description":"Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n","items":{"type":"object","properties":{"label":{"type":"string"},"width":{"type":"integer"},"height":{"type":"integer"},"sizeBytes":{"type":"integer"},"url":{"type":"string"}}}},"usage":{"type":"array","description":"Every place this asset is referenced.","items":{"$ref":"#/components/schemas/MediaUsage"}},"collections":{"x-ticvai-persisted":false,"type":"array","items":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"}}}},"previousVersions":{"x-ticvai-persisted":false,"type":"array","items":{"type":"object","properties":{"version":{"type":"integer"},"replacedAt":{"type":"string","format":"date-time"},"replacedByPrincipalId":{"type":"string","format":"uuid"}}}}}}]},
 "MediaAuditRecord": {"type":"object","x-ticvai-persistence":"assets.audit","description":"Board 3.9. **Distribution as well as edits** — the question asked afterwards is who had it.\n","properties":{"id":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"action":{"type":"string","enum":["uploaded","updated","retagged","versioned","approved","published","shared","downloaded","delivered","archived","deleted"]},"actorId":{"type":"string","format":"uuid","nullable":true},"recipient":{"type":"string","nullable":true},"detail":{"type":"string","nullable":true},"scopePath":{"type":"string"}}},
 "MediaRights": {"x-ticvai-persistence":"none — embedded in asset","type":"object","description":"Licensing terms. Tracked because an expired licence on a live surface is a legal exposure, not a housekeeping item.\n","properties":{"licenceKind":{"type":"string","enum":["owned","royaltyFree","rightsManaged","creativeCommons","editorialOnly","unknown"]},"licensor":{"type":"string","nullable":true},"licenceReference":{"type":"string","nullable":true},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"permittedUses":{"type":"array","items":{"type":"string","enum":["web","print","socialMedia","inVenue","advertising","internal"]}},"attributionRequired":{"type":"boolean","default":false},"attributionText":{"type":"string","nullable":true},"permittedTerritories":{"type":"array","items":{"type":"string"},"description":"ISO country or region codes. **Empty means unrestricted, which is a claim rather than an absence** — an unknown territory and a worldwide licence are not the same thing, and `licenceKind: unknown` is how the second is said.\n"},"permittedChannels":{"type":"array","items":{"type":"string"},"description":"Distribution channel codes, checked by `setMediaDistributionChannels`. Narrower than `permittedUses`, which describes the medium rather than the route.\n"},"modelReleaseHeld":{"type":"boolean","default":false},"renewalOwner":{"type":"string","format":"uuid","nullable":true}}},
 "MediaShare": {"type":"object","x-ticvai-persistence":"assets.share","description":"Board 3.7. **A licence grant with a link attached** — revocable, expiring and logged.","required":["assetIds","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"assetIds":{"type":"array","items":{"type":"string","format":"uuid"}},"recipientEmail":{"type":"string","nullable":true},"recipientOrganisation":{"type":"string","nullable":true},"allowDownload":{"type":"boolean","default":false},"allowedRenditions":{"type":"array","items":{"type":"string"}},"passwordProtected":{"type":"boolean","default":false},"expiresAt":{"type":"string","format":"date-time"},"revokedAt":{"type":"string","format":"date-time","nullable":true},"url":{"type":"string","readOnly":true},"openedCount":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
-"MediaStatus": {"type":"string","enum":["processing","ready","quarantined","failed","archived"]},
 "MediaUsage": {"x-ticvai-persistence":"assets.media_usage","type":"object","description":"One place an asset is used. **`surface: product` is written by catalogue** for each item of `Product.media` (decided 29 September, rev 3 23SEP-4): `referenceId` is the product id and `isLive` is true while the product is listed to guests, which is what stops an asset in use on a ticket card being archived from under it.\n","required":["surface","referenceId"],"properties":{"extractedText":{"type":"string","description":"**Text pulled out of an uploaded document**, after extraction. The generic retrieval path for anything a tenant uploads — a PDF nobody can search is a PDF nobody reads.\n"},"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"surface":{"type":"string","enum":["tenantBranding","homepageBanner","promoBlock","contentPage","product","event","menuItem","merchandise","workOrder","incident","inspection","campaign"]},"referenceId":{"type":"string"},"label":{"type":"string"},"isLive":{"type":"boolean","description":"True where the referencing surface is published to guests."}}},
-"MediaUsageRow": {"type":"object","description":"Boards 1.10 and 4.9. **Assets never used is the number that justifies the library.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"assetCount":{"type":"integer"},"storageBytes":{"type":"integer"},"downloads":{"type":"integer"},"views":{"type":"integer"},"shares":{"type":"integer"},"neverUsedCount":{"type":"integer"},"unclassifiedCount":{"type":"integer"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Role": {"x-ticvai-persistence":"identity.role","x-ticvai-rls":"grant-holder-read","type":"object","required":["id","code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","x-ticvai-unique":"tenant","description":"**Unique within the tenant** (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. Unique per tenant, not per venue, because a grant names a role anywhere in the tree; `createRole` refuses a duplicate with `409 duplicate-code`.\n**Compared case-insensitively** (`common.yaml`, `x-ticvai-unique`; ADAM CR-079, CHG-IDR-003): `ADMIN` and `admin` are one code, and the second is the duplicate. The code is kept as it was typed.\n"},"name":{"type":"string"},"description":{"type":"string"},"permissions":{"type":"array","description":"**A role that grants no permissions is not a role.** `Role` carried a code, a name and two counts until 18 August, and `identity.role_permission` derived from it with exactly one column — `role_id`. **A join table that joins to nothing**, found by Hrushikant in review and missed by the schema audit that ran the same day.\n**The audit asked whether every table had columns, a relationship and an owner, and this table had all three.** What it did not ask is whether a table with one column can do the job its name claims.\n**The role's own set, not revoked** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the `identity.role_permission` rows of this role with `is_active` true. A revoked row is history, not a permission. **Inherited permissions are not merged in**: a client reads `inheritsFromRoleId` and that role, the same shape `setRolePermissions` returns (`permissions` beside `inheritsFromRoleId`). The segregation check is the one place the two are taken together (ADAM CR-079).\n","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"inheritsFromRoleId":{"type":"string","format":"uuid","nullable":true,"description":"**Role composition, one level deep and no deeper.** A supervisor role that is a cashier plus three permissions is how venues actually describe them.\n**Cycles are refused and depth is capped at one**, because a permission set nobody can read off the screen is a permission set nobody audits.\n"},"isSystem":{"type":"boolean","default":false,"description":"**Seeded roles ship and are editable; deleting one is refused.** A venue that removes `cashier` and rebuilds it has two roles with one name in the audit log.\n**The seeded system roles are Cashier, Supervisor, Venue Manager, Finance and Tenant Admin** (proposed in `docs/active/seed-data-proposal.md` section 2, client to correct; audit R229).\n\n**Superseded 2 October 2026: no fixed default roles** (Chinmay; DEC-007; CHG-CSP-003). The five are presets (`CapabilityTemplate`, `isPreset`) a role starts from, not roles a tenant is given. The field stays for clients built at r1 and is false on every role created from 2 October.\n"},"presetCode":{"type":"string","nullable":true,"readOnly":true,"maxLength":64,"description":"**The preset this role was started from, for the record only** (decided 2 October 2026, Chinmay; DEC-007; CHG-CSP-003): the first of `createRole.presetCodes`, or null for a role ticked by hand. It binds nothing; a later edit of the preset never changes this role.\n"},"principalCount":{"type":"integer","readOnly":true,"x-ticvai-persisted":false,"description":"**Computed on read, never stored** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the distinct principals holding this role through a live grant (`identity.delegated_access` with this `role_id`, a `principal_id`, `effect` ALLOW, `revoked_at` null, now inside its validity window). **Counted under row-level security**, so only the grants the caller's own grants let it read are counted: a venue manager sees the venue's holders, not the tenant's."},"grantCount":{"type":"integer","readOnly":true,"x-ticvai-persisted":false,"description":"**Computed on read, never stored** (decided 14 October 2026, ADAM CR-077; CHG-IDR-002): the live grants of this role (the rows `principalCount` counts, one per grant, so a principal granted the role at two scopes counts twice). Counted under row-level security, as `principalCount`."}}}
 }

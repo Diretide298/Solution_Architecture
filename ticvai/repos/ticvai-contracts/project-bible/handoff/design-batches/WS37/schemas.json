@@ -643,6 +643,7 @@
     "description": "The change request whose publication is being rolled back."
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "enum": [
      "requested",
@@ -655,6 +656,7 @@
     "default": "requested"
    },
    "requestedByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true
@@ -751,7 +753,7 @@
  "PricingApprovalWorkflowAuthorityMatrixInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_envelope at 4%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.approval_policy` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Pricing Approval Workflow & Authority Matrix submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Every approval action records* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
    "venue": {
@@ -1189,7 +1191,7 @@
  "PricingChangeRequestWorkspaceInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.entitlement_template at 3%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.change_request` (with `catalogue.audit_entry`, `catalogue.change_request_line`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Pricing Change Request & Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "changeId": {
@@ -1900,7 +1902,7 @@
  "PricingPublicationEffectiveDateSchedulerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.change_request` (with `catalogue.audit_entry`, `catalogue.price_list_version`, `catalogue.pricing_publication`, `catalogue.pricing_publication_target`, `platform.outbox`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Pricing Publication & Effective-Date Scheduler submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "version": {

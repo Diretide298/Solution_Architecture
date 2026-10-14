@@ -15,6 +15,7 @@
     "type": "string"
    },
    "programmeId": {
+    "x-ticvai-references": "accreditation.programme",
     "type": "string",
     "format": "uuid"
    },
@@ -41,6 +42,7 @@
     "description": "Name, date of birth, nationality, contact — shaped by the requirements matrix."
    },
    "requirementStatus": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "items": {
@@ -152,6 +154,7 @@
     "format": "uuid"
    },
    "holderId": {
+    "x-ticvai-references": "accreditation.holder",
     "type": "string",
     "format": "uuid"
    },
@@ -248,6 +251,7 @@
     "readOnly": true
    },
    "credentialId": {
+    "x-ticvai-references": "accreditation.credential",
     "type": "string",
     "format": "uuid"
    },
@@ -316,74 +320,6 @@
     "format": "date-time",
     "nullable": true,
     "readOnly": true
-   },
-   "scopePath": {
-    "type": "string"
-   }
-  }
- },
- "AccreditationDocument": {
-  "type": "object",
-  "x-ticvai-persistence": "accreditation.document",
-  "description": "Board 2.5. **Submitted against a named requirement, not into a folder.**",
-  "required": [
-   "requirementCode",
-   "assetId"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "holderId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "applicationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "requirementCode": {
-    "type": "string"
-   },
-   "assetId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "submittedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "submitted",
-     "verified",
-     "rejected",
-     "expired"
-    ]
-   },
-   "verifiedBy": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "verifiedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "rejectionReason": {
-    "type": "string",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date",
-    "nullable": true,
-    "description": "**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"
    },
    "scopePath": {
     "type": "string"

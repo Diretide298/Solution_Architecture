@@ -90,6 +90,27 @@ def built(rows):
     return out
 
 
+def table_renames() -> dict:
+    """Every table name a declared rename or move retired -> its name now (tools/derive-schema-history.py RENAMES,
+    chains followed). CHG-TKT-009."""
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("derive_schema_history", g.ROOT / "tools" / "derive-schema-history.py")
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        step = {r["from"]: r["to"] for r in mod.RENAMES}
+    except Exception:                   # noqa: BLE001 -- no history: nothing was renamed
+        return {}
+    out = {}
+    for a in step:
+        b, seen = step[a], {a}
+        while b in step and b not in seen:
+            seen.add(b)
+            b = step[b]
+        out[a] = b
+    return out
+
+
 def first_block(blocks):
     return min(blocks, key=lambda b: RANK.get(b, 9)) if blocks else None
 
@@ -265,8 +286,19 @@ def main() -> int:
     else:
         before = built(ref_rows)
         used = set()
+        moved = table_renames()
         for art, bl in sorted(before.items()):
             here = now.get(art) or {}
+            # **A renamed or moved table is the same table** (14 October 2026, CHG-TKT-009): CHG-XDW-001 moved
+            # platform.guest_link, platform.dsar_request, platform.cross_region_entitlement and
+            # platform.wallet_authorisation into sync (derive-schema-history.py RENAMES); r5 built them under the old
+            # names and the plan builds them under the new, in the same pushed migrations (build-service-docs.py,
+            # CHG-TKT-013). Read under its name now, before it is called gone.
+            if not here and art.startswith("table ") and moved.get(art.split(" ", 1)[1]):
+                here = now.get(f"table {moved[art.split(' ', 1)[1]]}") or {}
+                if here:
+                    guard.note(f"renamed: {art} built by {ref} is table {moved[art.split(' ', 1)[1]]} now "
+                               f"({', '.join(here[first_block(here)][:2])})")
             if not here:
                 name = art.split(" ", 1)[1]
                 if art.startswith("operation ") and name in provisional:

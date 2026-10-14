@@ -14,6 +14,8 @@
     "readOnly": true
    },
    "tenantId": {
+    "readOnly": true,
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid"
    },
@@ -105,6 +107,7 @@
   ]
  },
  "AiModel": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "ai.model",
   "description": "**The model catalogue** (design 3.1 Registry, 3.3; AIC-013, AIC-026). One row per model a task can be routed to: large language models, embedding and reranking models, and classical models (LightGBM, statistical forecasters) registered the same way so lifecycle, release and audit are uniform. **Platform rows** are mastered in the control plane and replicated read-only into each tenant database with the tenant root as `scopePath`; a tenant row exists only where bring-your-own-key is enabled for the tenant.",
@@ -287,6 +290,8 @@
     "description": "The tenant residency classes whose calls this model may serve (CHG-CSA-002)."
    },
    "taskFitness": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "readOnly": true,
     "description": "**Evaluated fitness per task** (21 September minutes, M21-09, our proposal): a score from the task's golden set (`runAiEvaluation`) and the band the task needs. Below `floor` the model is underpowered for the task; far above `ceiling` it is overpowered (it costs more than the task needs). `setAiProvider` returns a warning (`AiProvider.fitnessWarnings`) when a choice falls outside the band, and ADM-037 shows the band beside `setAiModel`; neither refuses on it.",
@@ -336,6 +341,7 @@
   }
  },
  "AiPromptTemplate": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "ai.prompt_template",
   "description": "**The prompt registry** (design 3.1 Registry, AIC-022). Versioned and **immutable once published**: a change is a new version, so every decision record can name the exact template it used. Platform templates are replicated read-only like platform models; a tenant may publish its own variant of a task's template.",
@@ -571,6 +577,8 @@
     "description": "**Which agent tasks this provider serves** (21 September minutes, M21-03: different agents may use different models chosen for the task). Empty means every task of its `capability`. A task listed on two providers goes to the lower `priority`. **AI-D02 as amended on 2 October** (the AI residency decision, CHG-CSA-002): the managed provider depends on the tenant's residency class (Core42 Compass for `uaeOnly`, the default), with a Small and a Strong model per task; a second provider or a tenant's own key is added only where TICVAI enables it for the tenant (AI-D14, `setAiByokEnablement`). **Each task's model comes from TICVAI's curated range** (`AiModel.curatedRange`, CHG-CSA-001): the client cannot pick a model outside it."
    },
    "fitnessWarnings": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "readOnly": true,
     "description": "**The model-fitness check at the last write** (21 September minutes, M21-09). For each task in `taskKeys` whose model scores outside the task's band in `AiModel.taskFitness`, or has no score, one warning, shown on ADM-037 and kept so the choice is auditable. **A model outside TICVAI's curated range for a task is no longer a warning: it is refused** (`422 model-not-curated`; Chinmay, 2 October, workbook Q2, amending AI-D18; CHG-CSA-001). A warning now only describes a curated model's fit.",
@@ -948,6 +956,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -1190,6 +1199,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

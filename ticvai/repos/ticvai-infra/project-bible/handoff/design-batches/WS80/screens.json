@@ -5,6 +5,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/wallet-credit-management-dashboard-bo-414",
-   "component": "apps/venue-management-web/src/routes/games-rides/WalletCreditManagementDashboard.tsx",
+   "component": "src/routes/games-rides/WalletCreditManagementDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -117,7 +118,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -142,7 +143,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -158,7 +159,9 @@
       {
        "kind": "metricTile",
        "label": "Total Bonus Balance",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 23 §KPI Cards"
+       "provenance": "pack Game_and_Ride_Module.pdf, page 23 §KPI Cards",
+       "operation": "getWallet",
+       "bindsTo": "Wallet.bonusBalance"
       },
       {
        "kind": "metricTile",
@@ -198,7 +201,7 @@
         "Top-Ups"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listWalletTransactions",
        "provenance": "pack Game_and_Ride_Module.pdf, page 23 §Show"
       }
      ]
@@ -215,7 +218,8 @@
         "Top-Ups"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Page 23 of 105”, “Break down wallet value into”.",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 23 §Show"
+       "provenance": "pack Game_and_Ride_Module.pdf, page 23 §Show",
+       "operation": "getWallet"
       }
      ]
     }
@@ -287,6 +291,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "3",
@@ -296,7 +301,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/wallet-credit-type-configuration-bo-415",
-   "component": "apps/venue-management-web/src/routes/games-rides/WalletCreditTypeConfiguration.tsx",
+   "component": "src/routes/games-rides/WalletCreditTypeConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -440,6 +445,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "3",
@@ -449,7 +455,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/wallet-account-balance-view-bo-416",
-   "component": "apps/venue-management-web/src/routes/games-rides/WalletAccountBalanceView.tsx",
+   "component": "src/routes/games-rides/WalletAccountBalanceView.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -518,7 +524,8 @@
       {
        "kind": "secondaryButton",
        "label": "Block Wallet",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 25 §Actions"
+       "provenance": "pack Game_and_Ride_Module.pdf, page 25 §Actions",
+       "operation": "suspendWallet"
       }
      ]
     },
@@ -651,6 +658,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "3",
@@ -660,7 +668,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/top-up-configuration-bo-417",
-   "component": "apps/venue-management-web/src/routes/games-rides/TopUpConfiguration.tsx",
+   "component": "src/routes/games-rides/TopUpConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -682,6 +690,7 @@
   "notes": "**Superseded by `BO-1095` Top-Up Rule Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "Administrators can define permitted wallet top-up values and their applicable channels/effective periods.",
+  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-418; this screen is Top-Up Configuration (pack Game_and_Ride_Module.pdf, board 3.4, page 26): configure the rules governing customer wallet recharges.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure the rules governing customer wallet recharges.",
@@ -787,6 +796,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "3",
@@ -796,7 +806,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/top-up-bonus-rule-configuration-bo-418",
-   "component": "apps/venue-management-web/src/routes/games-rides/TopUpBonusRuleConfiguration.tsx",
+   "component": "src/routes/games-rides/TopUpBonusRuleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -818,6 +828,7 @@
   "notes": "**Superseded by `BO-1105` Credit Issuance Rule Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "The system automatically calculates and allocates the correct bonus based on the configured top-up rule.",
+  "division": "Shares `getWalletFundingRules`, `setWalletFundingRules` with BO-1095, BO-1096, BO-1097, BO-1098, BO-1099, BO-1101, BO-417; this screen is Top-Up Bonus Rule Configuration (pack Game_and_Ride_Module.pdf, board 3.5, page 27): configure promotional bonus value automatically awarded when a customer tops up. The requirement explicitly gives the example: Top-Up AED 100 → AED 100 Paid Credit + AED 25 Bonus.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure promotional bonus value automatically awarded when a customer tops up. The requirement explicitly gives the example: Top-Up AED 100 → AED 100 Paid Credit + AED 25 Bonus.",
@@ -923,6 +934,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "3",
@@ -932,7 +944,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/bonus-usage-restrictions-bo-419",
-   "component": "apps/venue-management-web/src/routes/games-rides/BonusUsageRestrictions.tsx",
+   "component": "src/routes/games-rides/BonusUsageRestrictions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1058,6 +1070,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "3",
@@ -1067,7 +1080,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/bonus-validity-expiry-configuration-bo-420",
-   "component": "apps/venue-management-web/src/routes/games-rides/BonusValidityExpiryConfiguration.tsx",
+   "component": "src/routes/games-rides/BonusValidityExpiryConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1089,6 +1102,7 @@
   "notes": "**Superseded by `BO-1108` Expiry & Validity Policy Configuration** from `Wallet_Configuration_Backend_Structure_v1.0.pdf`, 19 September 2026. This screen came from `Game_and_Ride_Module.pdf`, which describes the wallet incidentally; the wallet pack is the workshop dedicated to it and is backed by the 27 August MoM and matrix 4.3.28-4.3.35. It has zero components, so nothing rendered is lost. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "density": "compact",
   "purposeNote": "Every bonus allocation follows the configured validity rule and becomes unusable after expiry.",
+  "division": "Shares `listCreditTypes`, `updateCreditType` with BO-1105, BO-1108; this screen is Bonus Validity & Expiry Configuration (pack Game_and_Ride_Module.pdf, board 3.7, page 28): define how long promotional bonus credit remains valid. The source specifically requires the ability to set a validity period for the bonus.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define how long promotional bonus credit remains valid. The source specifically requires the ability to set a validity period for the bonus.",
@@ -1203,6 +1217,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "3",
@@ -1212,7 +1227,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/free-game-ride-credit-management-bo-421",
-   "component": "apps/venue-management-web/src/routes/games-rides/FreeGameRideCreditManagement.tsx",
+   "component": "src/routes/games-rides/FreeGameRideCreditManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1233,6 +1248,7 @@
   },
   "density": "compact",
   "purposeNote": "Authorized users can issue free-game/ride credits and restrict them to applicable attractions and validity periods.",
+  "division": "Shares `createGameEntitlement`, `listGameEntitlements` with BO-427, BO-430; this screen is Free Game & Ride Credit Management (pack Game_and_Ride_Module.pdf, board 3.8, page 29): configure and allocate free gameplay credits to customer wallets. The requirement explicitly requires the system to add credits for free games and rides to a guest's digital wallet, usable across applicable attractions.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Free Credit Configuration) and no display directory — it is settings, not a population",
   "purpose": "Configure and allocate free gameplay credits to customer wallets. The requirement explicitly requires the system to add credits for free games and rides to a guest's digital wallet, usable across applicable attractions.",
@@ -1348,6 +1364,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "3",
@@ -1357,7 +1374,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/refund-adjustment-manual-bonus-control-bo-422",
-   "component": "apps/venue-management-web/src/routes/games-rides/RefundAdjustmentManualBonusControl.tsx",
+   "component": "src/routes/games-rides/RefundAdjustmentManualBonusControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1492,6 +1509,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "3",
@@ -1501,7 +1519,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/wallet-credit-transaction-ledger-audit-bo-423",
-   "component": "apps/venue-management-web/src/routes/games-rides/WalletCreditTransactionLedgerAudit.tsx",
+   "component": "src/routes/games-rides/WalletCreditTransactionLedgerAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1550,7 +1568,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listWalletTransactions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listWalletTransactions"
       }
      ]
     }

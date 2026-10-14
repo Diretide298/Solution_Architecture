@@ -99,11 +99,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-334` | Virtual Ticket Command Center | C | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-335` | Virtual Ticket Identity & Master Record Configuration | A | 19 | 8 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-336` | Virtual Ticket Status & Lifecycle Model | C | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-336` | Virtual Ticket Status & Lifecycle Model | C | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-337` | Media Type & Credential Technology Registry | C | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-338` | Multi-Media Binding & Association Rules | C | 36 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-338` | Multi-Media Binding & Association Rules | C | 34 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-339` | Credential Identity, Token & Reference Mapping | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-340` | Entitlement & Cross-Media Synchronization Rules | C | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-340` | Entitlement & Cross-Media Synchronization Rules | C | 5 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-341` | Media Activation, Priority & Fallback Rules | C | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-342` | Media Replacement, Revocation & Rebinding Rules | C | 22 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | C | 9 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |

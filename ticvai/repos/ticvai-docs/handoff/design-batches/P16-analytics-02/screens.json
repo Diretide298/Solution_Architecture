@@ -5,6 +5,7 @@
   "module": "Analytics",
   "requiresModule": "ai",
   "wave": 3,
+  "permission": "AI_USE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/analytics/ai-maturity",

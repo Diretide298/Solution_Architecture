@@ -436,10 +436,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -520,6 +522,44 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003). `kind` is the fixed family a type belongs to; this is the tenant's own type within it, and the `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it."
+   },
+   "lifecycleState": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ResourceLifecycleState"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The lifecycle state `setResourceLifecycleState` set."
+   },
+   "lifecycleEffectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the lifecycle state takes effect (`setResourceLifecycleState`)."
+   },
+   "lifecycleReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the lifecycle state changed (`setResourceLifecycleState`)."
+   },
+   "replacementResourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "resources.resource",
+    "description": "The resource that replaces this one, where it was retired for a replacement."
+   },
+   "disposal": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "How a disposed resource left (`setResourceLifecycleState`), as given."
    }
   }
  },
@@ -717,6 +757,7 @@
     "readOnly": true
    },
    "resourceId": {
+    "x-ticvai-references": "resources.resource",
     "type": "string",
     "format": "uuid"
    },
@@ -785,6 +826,21 @@
   "x-ticvai-refuses": {
    "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
   }
+ },
+ "ResourceLifecycleState": {
+  "type": "string",
+  "description": "Board 1.10. **States of one machine**, whose allowed transitions are configuration.",
+  "enum": [
+   "draft",
+   "pendingApproval",
+   "approved",
+   "active",
+   "temporarilyUnavailable",
+   "underMaintenance",
+   "suspended",
+   "retired",
+   "archived"
+  ]
  },
  "ResourceUtilisation": {
   "type": "object",

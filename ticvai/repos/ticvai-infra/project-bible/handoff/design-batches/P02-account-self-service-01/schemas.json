@@ -23,6 +23,7 @@
     "description": "The guest (pii.subject)"
    },
    "entitlementId": {
+    "x-ticvai-references": "access.entitlement",
     "type": "string",
     "format": "uuid"
    },
@@ -32,6 +33,7 @@
     "nullable": true
    },
    "deviceId": {
+    "x-ticvai-references": "platform.device",
     "type": "string",
     "maxLength": 200
    },
@@ -123,6 +125,7 @@
   ]
  },
  "ConsentPurposeConfig": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.consent_purpose + marketing.consent_purpose_channel",
   "type": "object",
   "required": [
@@ -228,363 +231,6 @@
    }
   }
  },
- "CookieBannerPreferenceCenterDesignerView": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.cookie_banner_design",
-  "description": "One version of a cookie banner and preference-centre design (pack 17.1.6).",
-  "required": [
-   "channel",
-   "position",
-   "languages",
-   "rejectIsOneClick",
-   "categories"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "brandId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "Null for the corporate design every brand inherits."
-   },
-   "inheritsFromId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "channel": {
-    "type": "string",
-    "enum": [
-     "b2cWebsite",
-     "customerPortal",
-     "mobileApp",
-     "embeddedCheckout",
-     "whiteLabelSite",
-     "partnerMicrosite"
-    ]
-   },
-   "logoAssetId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "title": {
-    "$ref": "#/components/schemas/marketing-crm::LocalisedText"
-   },
-   "body": {
-    "$ref": "#/components/schemas/marketing-crm::LocalisedText"
-   },
-   "position": {
-    "type": "string",
-    "enum": [
-     "top",
-     "bottom",
-     "popup",
-     "modal"
-    ]
-   },
-   "themeId": {
-    "type": "string",
-    "nullable": true,
-    "description": "The white-label theme it takes colours and fonts from."
-   },
-   "buttons": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "action"
-     ],
-     "properties": {
-      "action": {
-       "type": "string",
-       "enum": [
-        "acceptAll",
-        "rejectNonEssential",
-        "managePreferences",
-        "savePreferences",
-        "doNotSellOrShare"
-       ]
-      },
-      "label": {
-       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
-      }
-     }
-    }
-   },
-   "rejectIsOneClick": {
-    "type": "boolean",
-    "default": true,
-    "description": "Must be true."
-   },
-   "links": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "label",
-      "policyKind"
-     ],
-     "properties": {
-      "label": {
-       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
-      },
-      "policyKind": {
-       "type": "string",
-       "enum": [
-        "privacy",
-        "cookie",
-        "termsAndConditions"
-       ]
-      }
-     }
-    }
-   },
-   "categories": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "object",
-     "required": [
-      "category",
-      "defaultOn"
-     ],
-     "properties": {
-      "category": {
-       "type": "string",
-       "enum": [
-        "strictlyNecessary",
-        "functional",
-        "analytics",
-        "personalisation",
-        "marketing"
-       ]
-      },
-      "description": {
-       "$ref": "#/components/schemas/marketing-crm::LocalisedText"
-      },
-      "defaultOn": {
-       "type": "boolean",
-       "description": "True only for `strictlyNecessary`, which is always active."
-      }
-     }
-    }
-   },
-   "languages": {
-    "type": "array",
-    "minItems": 1,
-    "items": {
-     "type": "string",
-     "maxLength": 10
-    },
-    "description": "Every language the storefront serves; Arabic renders right to left."
-   },
-   "regulatoryRegimes": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "gdpr",
-      "ePrivacy",
-      "ccpaCpra",
-      "lgpd",
-      "uaePdpl",
-      "saudiPdpl"
-     ]
-    },
-    "description": "2.6.60 (29 September, build). **The laws this design is published to satisfy**, so compliance is stated rather than assumed. The strictest posture (opt-in, one-click reject, every non-essential category off) already meets GDPR/ePrivacy, LGPD and both PDPLs; `ccpaCpra` adds the \"Do not sell or share\" button (`doNotSellOrShare`) and honours a Global Privacy Control signal as that opt-out."
-   },
-   "recordIpAddress": {
-    "type": "boolean",
-    "default": false,
-    "description": "2.6.55, \"if legally permitted\" (29 September, build). On, `recordDeviceConsent` writes the IP address and user agent to `pii.consent_identifier`; off, they are not kept anywhere. Off by default."
-   },
-   "noticeVersion": {
-    "type": "string",
-    "readOnly": true,
-    "description": "Moves with the cookie policy (white-label `setPolicy`, kind `cookie`)."
-   },
-   "version": {
-    "type": "integer",
-    "minimum": 1,
-    "readOnly": true
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "draft",
-     "published",
-     "superseded"
-    ],
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005)."
-   },
-   "updatedAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   }
-  }
- },
- "CookieCategory": {
-  "type": "string",
-  "enum": [
-   "strictlyNecessary",
-   "functional",
-   "analytics",
-   "personalisation",
-   "marketing"
-  ],
-  "description": "2.6.53. The five categories the banner design (`CookieBannerPreferenceCenterDesignerView.categories`) offers; the matrix's \"preference\" category is `personalisation` (British spelling, as `ConsentPurpose`)."
- },
- "CookieConsentChannel": {
-  "type": "string",
-  "enum": [
-   "b2cWebsite",
-   "customerPortal",
-   "mobileApp",
-   "embeddedCheckout",
-   "whiteLabelSite",
-   "partnerMicrosite"
-  ],
-  "description": "The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6)."
- },
- "CookieConsentRuntime": {
-  "type": "object",
-  "x-ticvai-persistence": "none — assembled at read time from marketing.cookie_banner_design, marketing.tracking_technology and marketing.device_consent",
-  "description": "What `getCookieConsentRuntime` gives the storefront tag loader and the app SDK gate (2.6.52, 2.6.58).",
-  "required": [
-   "banner",
-   "noticeVersion",
-   "requiresDecision",
-   "allowedTechnologies",
-   "consentModeSignals"
-  ],
-  "properties": {
-   "banner": {
-    "$ref": "#/components/schemas/CookieBannerPreferenceCenterDesignerView"
-   },
-   "noticeVersion": {
-    "type": "string"
-   },
-   "requiresDecision": {
-    "type": "boolean",
-    "description": "True with no decision, an expired one, or one given against a superseded notice."
-   },
-   "decision": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/DeviceConsent"
-     }
-    ],
-    "nullable": true,
-    "description": "The latest decision for the presented key; null without a key."
-   },
-   "allowedTechnologies": {
-    "type": "array",
-    "description": "Per category, the approved technologies it unlocks. Anything not listed never loads.",
-    "items": {
-     "type": "object",
-     "required": [
-      "category",
-      "technologies"
-     ],
-     "properties": {
-      "category": {
-       "$ref": "#/components/schemas/CookieCategory"
-      },
-      "granted": {
-       "type": "boolean",
-       "description": "Whether the presented decision grants it; always true for `strictlyNecessary`."
-      },
-      "technologies": {
-       "type": "array",
-       "items": {
-        "type": "object",
-        "required": [
-         "name",
-         "provider"
-        ],
-        "properties": {
-         "name": {
-          "type": "string"
-         },
-         "provider": {
-          "type": "string"
-         },
-         "technologyType": {
-          "type": "string"
-         }
-        }
-       }
-      }
-     }
-    }
-   },
-   "consentModeSignals": {
-    "type": "object",
-    "description": "**The decision in Google consent-mode terms** (2.6.65), so Analytics and Tag Manager are told, not left to guess. `denied` wherever no decision grants the category.",
-    "properties": {
-     "adStorage": {
-      "type": "string",
-      "enum": [
-       "granted",
-       "denied"
-      ]
-     },
-     "adUserData": {
-      "type": "string",
-      "enum": [
-       "granted",
-       "denied"
-      ]
-     },
-     "adPersonalization": {
-      "type": "string",
-      "enum": [
-       "granted",
-       "denied"
-      ]
-     },
-     "analyticsStorage": {
-      "type": "string",
-      "enum": [
-       "granted",
-       "denied"
-      ]
-     },
-     "functionalityStorage": {
-      "type": "string",
-      "enum": [
-       "granted",
-       "denied"
-      ]
-     },
-     "personalizationStorage": {
-      "type": "string",
-      "enum": [
-       "granted",
-       "denied"
-      ]
-     },
-     "securityStorage": {
-      "type": "string",
-      "enum": [
-       "granted"
-      ]
-     }
-    }
-   }
-  }
- },
  "CredentialDeviceBindingInput": {
   "type": "object",
   "x-ticvai-persistence": "none — request only; written as access.device_binding (declared 29 September, writers pass)",
@@ -620,137 +266,6 @@
    }
   }
  },
- "DeviceConsent": {
-  "type": "object",
-  "x-ticvai-persistence": "marketing.device_consent + marketing.device_consent_category",
-  "description": "**One cookie decision by a visitor nobody has identified yet** (BL-073 §4b, decided 29 September). Append-only: a change of mind is a new row. Keyed for the visitor by `consentKey`, which the platform mints; the categories are child rows. The IP address and user agent, where recorded at all, are in `pii.consent_identifier` (`ConsentCaptureIdentifier`), never here.",
-  "required": [
-   "consentKey",
-   "channel",
-   "action",
-   "categories",
-   "noticeVersion",
-   "decidedAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "consentKey": {
-    "type": "string",
-    "maxLength": 64,
-    "readOnly": true,
-    "description": "**Opaque, minted by us, not a device fingerprint.** It answers 2.6.55's \"user identifier/session ID\" and is the join key `claimDeviceConsent` needs. Shared by all the tenant's domains (2.6.62), never across tenants."
-   },
-   "channel": {
-    "$ref": "#/components/schemas/CookieConsentChannel"
-   },
-   "brandId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "bannerDesignId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The published `CookieBannerPreferenceCenterDesignerView` version the visitor was shown."
-   },
-   "action": {
-    "$ref": "#/components/schemas/DeviceConsentAction"
-   },
-   "categories": {
-    "type": "array",
-    "minItems": 1,
-    "description": "Every category of the design, with the decision this row gives it.",
-    "items": {
-     "type": "object",
-     "required": [
-      "category",
-      "decision"
-     ],
-     "properties": {
-      "category": {
-       "$ref": "#/components/schemas/CookieCategory"
-      },
-      "decision": {
-       "type": "string",
-       "enum": [
-        "granted",
-        "declined"
-       ]
-      }
-     }
-    }
-   },
-   "noticeVersion": {
-    "type": "string",
-    "description": "The cookie notice version decided against (white-label `setPolicy`, kind `cookie`)."
-   },
-   "language": {
-    "type": "string",
-    "maxLength": 10,
-    "nullable": true
-   },
-   "globalPrivacyControl": {
-    "type": "boolean",
-    "default": false,
-    "description": "The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing."
-   },
-   "source": {
-    "$ref": "#/components/schemas/ConsentSource"
-   },
-   "country": {
-    "type": "string",
-    "pattern": "^[A-Z]{2}$",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The edge's geolocation of the request, for the geographic statistics (2.6.63). The address is not kept here."
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true,
-    "description": "**A device consent expires and a subject consent does not.** Set from the tenant's device-consent term; after it the banner asks again."
-   },
-   "claimedBySubjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "Set once, by `claimDeviceConsent`. Never cleared."
-   },
-   "claimedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant."
-   }
-  }
- },
- "DeviceConsentAction": {
-  "type": "string",
-  "enum": [
-   "acceptAll",
-   "rejectNonEssential",
-   "savePreferences",
-   "withdraw",
-   "doNotSellOrShare"
-  ],
-  "description": "What the visitor pressed. `doNotSellOrShare` is the CCPA/CPRA opt-out link, shown where the design's `regulatoryRegimes` include `ccpaCpra`."
- },
  "Entitlement": {
   "type": "object",
   "x-ticvai-persistence": "access.entitlement",
@@ -772,6 +287,7 @@
     "description": "A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
+    "x-ticvai-references": "catalogue.entitlement_template",
     "type": "string",
     "format": "uuid",
     "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
@@ -1028,6 +544,7 @@
     "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
    },
    "taxInvoiceId": {
+    "x-ticvai-references": "ledger.tax_invoice",
     "type": "string",
     "format": "uuid"
    },
@@ -1064,6 +581,7 @@
     "nullable": true
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -1368,6 +886,7 @@
     "$ref": "#/components/schemas/FinTaxInvoiceStatus"
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -1729,6 +1248,7 @@
   "description": "**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six places the wire carries survive the database.\n"
  },
  "GuestPreferences": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.guest_preference",
   "description": "**What the guest likes, kept apart from what they permit** (consent) and from who they are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as tags because BL-134 gives them their own consent purpose and retention.\n",
@@ -1954,6 +1474,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -2176,7 +1697,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -2496,47 +2018,6 @@
    }
   }
  },
- "PublishedTrackingTechnology": {
-  "type": "object",
-  "x-ticvai-persistence": "none — the approved rows of marketing.tracking_technology, guest-facing fields only",
-  "description": "One approved technology as the preference centre shows it (2.6.54).",
-  "required": [
-   "name",
-   "provider",
-   "category",
-   "isThirdParty"
-  ],
-  "properties": {
-   "name": {
-    "type": "string"
-   },
-   "provider": {
-    "type": "string"
-   },
-   "category": {
-    "$ref": "#/components/schemas/CookieCategory"
-   },
-   "technologyType": {
-    "type": "string"
-   },
-   "purpose": {
-    "type": "string",
-    "nullable": true
-   },
-   "durationDays": {
-    "type": "integer",
-    "nullable": true,
-    "description": "Null for session storage."
-   },
-   "isThirdParty": {
-    "type": "boolean"
-   },
-   "privacyInformation": {
-    "type": "string",
-    "nullable": true
-   }
-  }
- },
  "RecordConsentRequest": {
   "x-ticvai-persistence": "none — request only",
   "type": "object",
@@ -2568,83 +2049,6 @@
     "$ref": "#/components/schemas/ConsentSource"
    },
    "recordedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "RecordDeviceConsentRequest": {
-  "type": "object",
-  "x-ticvai-persistence": "none — request only",
-  "description": "What the banner or preference centre sends to `recordDeviceConsent`.",
-  "required": [
-   "channel",
-   "action",
-   "noticeVersion",
-   "decidedAt"
-  ],
-  "properties": {
-   "consentKey": {
-    "type": "string",
-    "maxLength": 64,
-    "nullable": true,
-    "description": "The key the browser or app already holds; omitted on a first decision, and one is minted."
-   },
-   "channel": {
-    "$ref": "#/components/schemas/CookieConsentChannel"
-   },
-   "brandId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "bannerDesignId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "action": {
-    "$ref": "#/components/schemas/DeviceConsentAction"
-   },
-   "categories": {
-    "type": "array",
-    "description": "Required for `savePreferences`; ignored for the other actions, which decide every category themselves.",
-    "items": {
-     "type": "object",
-     "required": [
-      "category",
-      "decision"
-     ],
-     "properties": {
-      "category": {
-       "$ref": "#/components/schemas/CookieCategory"
-      },
-      "decision": {
-       "type": "string",
-       "enum": [
-        "granted",
-        "declined"
-       ]
-      }
-     }
-    }
-   },
-   "noticeVersion": {
-    "type": "string"
-   },
-   "language": {
-    "type": "string",
-    "maxLength": 10,
-    "nullable": true
-   },
-   "globalPrivacyControl": {
-    "type": "boolean",
-    "default": false
-   },
-   "source": {
-    "$ref": "#/components/schemas/ConsentSource"
-   },
-   "decidedAt": {
     "type": "string",
     "format": "date-time"
    }
@@ -2835,6 +2239,7 @@
     "nullable": true
    },
    "claimToken": {
+    "x-ticvai-secret": "blind-index",
     "type": "string",
     "format": "password",
     "writeOnly": true,
@@ -2964,6 +2369,7 @@
     "type": "string"
    },
    "authenticationToken": {
+    "x-ticvai-secret": "blind-index",
     "type": "string",
     "format": "password",
     "writeOnly": true,
@@ -3044,6 +2450,7 @@
     "description": "The guest who saved it. The wishlist is keyed by subject; there is no parent wishlist row."
    },
    "variantId": {
+    "x-ticvai-references": "catalogue.variant",
     "type": "string",
     "format": "uuid"
    },

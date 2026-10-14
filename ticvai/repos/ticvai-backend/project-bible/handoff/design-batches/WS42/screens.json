@@ -5,6 +5,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "2",
@@ -106,7 +107,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -266,6 +267,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW_PII",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "2",
@@ -398,6 +400,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "2",
@@ -461,6 +464,7 @@
        "kind": "detailPanel",
        "label": "The selected consent evidence history",
        "bindsTo": "ConsentEvidenceHistoryWithdrawalManagementView",
+       "operation": "listConsentEvidenceWithdrawal",
        "columns": [
         "ConsentEvidenceHistoryWithdrawalManagementView.propagation[].target",
         "ConsentEvidenceHistoryWithdrawalManagementView.propagation[].status"
@@ -535,6 +539,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "2",
@@ -720,6 +725,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW_PII",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "2",
@@ -859,6 +865,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "2",
@@ -1023,6 +1030,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "2",
@@ -1241,6 +1249,14 @@
     "DataRetentionExpiryLegalHoldOperationsView.underLegalHold",
     "DataRetentionExpiryLegalHoldOperationsView.processingFailures",
     "DataRetentionExpiryLegalHoldOperationsView.retentionExceptions"
+   ],
+   "params": [
+    {
+     "name": "holdId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listDataRetentionExpiry`."
+    }
    ]
   },
   "wireframe": {
@@ -1279,6 +1295,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "2",
@@ -1430,6 +1447,14 @@
     "PrivacyComplianceExceptionInvestigationWorkspaceView.severity",
     "PrivacyComplianceExceptionInvestigationWorkspaceView.system",
     "PrivacyComplianceExceptionInvestigationWorkspaceView.country"
+   ],
+   "params": [
+    {
+     "name": "exceptionId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listPrivacyComplianceExceptions`."
+    }
    ]
   },
   "wireframe": {
@@ -1468,6 +1493,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AUDIT_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "2",
@@ -1641,6 +1667,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "2",
@@ -1672,7 +1699,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -1737,6 +1764,7 @@
        "kind": "detailPanel",
        "label": "The selected privacy analytics compliance",
        "bindsTo": "PrivacyAnalyticsAiComplianceIntelligenceView",
+       "operation": "listPrivacyCompliance",
        "columns": [
         "PrivacyAnalyticsAiComplianceIntelligenceView.consentRate",
         "PrivacyAnalyticsAiComplianceIntelligenceView.withdrawalRate",

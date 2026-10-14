@@ -108,13 +108,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-983` | Inventory Command Center | C | 2 | 20 | 6 | 1 | 0 | 4 | — | notStarted (—) |
 | `BO-984` | Real-Time Seat Map | C | 2 | 17 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-985` | Status Model Configuration | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-986` | Availability Tracker | C | 0 | 0 | 6 | 8 | 1 | 0 | — | notStarted (—) |
-| `BO-987` | Hold Tracker | C | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-985` | Status Model Configuration | C | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-986` | Availability Tracker | C | 0 | 20 | 6 | 8 | 1 | 0 | — | notStarted (—) |
+| `BO-987` | Hold Tracker | C | 0 | 20 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-988` | Reservation Tracker | C | 2 | 21 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-989` | Sales & Allocation Tracker | C | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-989` | Sales & Allocation Tracker | C | 0 | 12 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-990` | Maintenance & Out of Service | C | 0 | 10 | 6 | 20 | 0 | 2 | — | notStarted (—) |
-| `BO-991` | Seat History | C | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
+| `BO-991` | Seat History | C | 0 | 15 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-992` | Audit & Reconciliation | C | 2 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

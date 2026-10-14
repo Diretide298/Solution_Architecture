@@ -16,9 +16,12 @@ operations:
   reads:
   - cache:idempotency
   - platform.scope
+  - retail.reservation
+  - retail.reservation_line
   writes:
   - cache:idempotency
   - inventory.movement
+  - retail.reservation
 - operation: collectMerchandiseReservation
   verb: POST
   path: /merchandise-reservations/{reservationId}/collect
@@ -30,9 +33,12 @@ operations:
   reads:
   - cache:idempotency
   - platform.scope
+  - retail.reservation
+  - retail.reservation_line
   writes:
   - cache:idempotency
   - inventory.movement
+  - retail.reservation
 - operation: collectShopAndDrop
   verb: POST
   path: /shop-and-drop/{dropId}/collect
@@ -139,6 +145,7 @@ operations:
   reads:
   - cache:idempotency
   - retail.shop_and_drop
+  - retail.shop_and_drop_line
   writes:
   - cache:idempotency
   - retail.shop_and_drop
@@ -152,6 +159,7 @@ operations:
   offline: false
   reads:
   - platform.outlet
+  - retail.merchandise
   writes: []
 - operation: getRetailSale
   verb: GET
@@ -212,6 +220,7 @@ operations:
   reads:
   - retail.return
   - retail.return_line
+  - retail.sale
   writes: []
 - operation: listRetailSales
   verb: GET
@@ -324,7 +333,7 @@ operations:
   - retail.return_policy
 - operation: setStoreRules
   verb: PUT
-  path: /store-rules
+  path: /store-rules/{storeRuleId}
   scope: venue
   permission: PRODUCT_CONFIGURE
   audience:

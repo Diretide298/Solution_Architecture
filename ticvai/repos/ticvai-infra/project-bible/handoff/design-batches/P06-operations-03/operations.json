@@ -138,7 +138,7 @@
   "contract": "marketing-crm",
   "summary": "Escalate a case",
   "permission": "CASE_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -302,7 +302,7 @@
   "scopeLevel": "venue",
   "parameters": [],
   "requestBody": null,
-  "responds": null
+  "responds": "VenueMapLiveState"
  },
  "getWaitTimes": {
   "method": "GET",
@@ -789,7 +789,7 @@
   "contract": "maintenance",
   "summary": "Record notification to an external authority",
   "permission": "INCIDENT_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
@@ -827,7 +827,7 @@
   "contract": "marketing-crm",
   "summary": "Reopen a resolved case",
   "permission": "CASE_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -1061,7 +1061,7 @@
   "contract": "marketing-crm",
   "summary": "Assign, reprioritise or resolve a case",
   "permission": "CASE_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -1080,7 +1080,7 @@
   "contract": "maintenance",
   "summary": "Investigate, escalate, close or reopen an incident",
   "permission": "INCIDENT_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
@@ -1099,7 +1099,7 @@
   "contract": "maintenance",
   "summary": "Add a photo, video or document to an incident",
   "permission": "INCIDENT_REPORT",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [

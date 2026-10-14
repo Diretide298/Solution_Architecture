@@ -472,7 +472,7 @@ operations:
   - cache:idempotency
 - operation: setAccessProfile
   verb: PUT
-  path: /accreditation-access-profiles
+  path: /accreditation-access-profiles/{accessProfileId}
   scope: venue
   permission: ACCREDITATION_CONFIGURE
   audience:
@@ -538,7 +538,7 @@ operations:
   - accreditation.validity
 - operation: setBadgeTemplate
   verb: PUT
-  path: /badge-templates
+  path: /badge-templates/{badgeTemplateId}
   scope: venue
   permission: ACCREDITATION_CONFIGURE
   audience:

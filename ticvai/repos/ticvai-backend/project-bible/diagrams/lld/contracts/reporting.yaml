@@ -597,7 +597,7 @@ operations:
   - reporting.report_parameter
 - operation: setAlertRule
   verb: PUT
-  path: /alert-rules
+  path: /alert-rules/{alertRuleId}
   scope: venue
   permission: REPORT_MANAGE
   audience:

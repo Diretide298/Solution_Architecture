@@ -5,10 +5,11 @@
   "module": "Floor Service",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/restaurant-service-command-center",
-   "component": "apps/venue-staff-app/src/routes/operations/RestaurantServiceCommandCenterDetail.tsx",
+   "component": "src/routes/operations/RestaurantServiceCommandCenterDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -25,7 +26,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listTableReservations` reads the population and `getTableMap` reads one of them — list, select, act",
-  "purpose": "Restaurant Service Command Center — from the client design board, 20 August.",
+  "purpose": "See a service period at a glance for one outlet: its table bookings, the F&B orders in flight and the table map with each table's live state.",
   "layout": {
    "template": "split",
    "regions": [
@@ -209,10 +210,11 @@
   "module": "Floor Service",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/floor-plan-table-map",
-   "component": "apps/venue-staff-app/src/routes/operations/FloorPlanTableMapDetail.tsx",
+   "component": "src/routes/operations/FloorPlanTableMapDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -229,7 +231,7 @@
   ],
   "pattern": "statusTracker",
   "patternReason": "`getTableMap` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Floor Plan & Table Map — from the client design board, 20 August.",
+  "purpose": "Show the outlet's floor as it is laid out, with each table's live state, so a host can see where to seat a party.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -346,10 +348,11 @@
   "module": "Floor Service",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "PRODUCT_CONFIGURE",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/table-seating-configuration",
-   "component": "apps/venue-staff-app/src/routes/operations/TableSeatingConfigurationDetail.tsx",
+   "component": "src/routes/operations/TableSeatingConfigurationDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -366,7 +369,7 @@
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`setTableLayout`) and no read of a population — it is settings, not a list",
-  "purpose": "Table & Seating Configuration — from the client design board, 20 August.",
+  "purpose": "Set out the outlet's tables (label, capacity, zone, position and shape) and which tables can be pushed together, and to what capacity.",
   "layout": {
    "template": "form",
    "regions": [
@@ -555,10 +558,11 @@
   "module": "Floor Service",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "ORDER_MODIFY",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/reservation-calendar-timeline",
-   "component": "apps/venue-staff-app/src/routes/operations/ReservationCalendarTimelineDetail.tsx",
+   "component": "src/routes/operations/ReservationCalendarTimelineDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -575,7 +579,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listTableReservations` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Reservation Calendar & Timeline — from the client design board, 20 August.",
+  "purpose": "See an outlet's table bookings for a date, on a calendar and as a list, with the double bookings still to resolve.",
   "layout": {
    "template": "split",
    "regions": [
@@ -736,10 +740,11 @@
   "module": "Floor Service",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/create-edit-reservation",
-   "component": "apps/venue-staff-app/src/routes/operations/CreateEditReservationDetail.tsx",
+   "component": "src/routes/operations/CreateEditReservationDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -756,7 +761,7 @@
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`createTableReservation`) and no read of a population — it is settings, not a list",
-  "purpose": "Create / Edit Reservation — from the client design board, 20 August.",
+  "purpose": "Book a table for a guest at the host stand (party size, time, tables, seating preference and occasion) after checking whether the guest already has a record, then send the confirmation.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1015,10 +1020,11 @@
   "module": "Floor Service",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "ORDER_MODIFY",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/walk-in-waitlist-management",
-   "component": "apps/venue-staff-app/src/routes/operations/WalkInWaitlistManagementDetail.tsx",
+   "component": "src/routes/operations/WalkInWaitlistManagementDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1035,7 +1041,7 @@
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`joinRestaurantWaitlist`) and no read of a population — it is settings, not a list",
-  "purpose": "Walk-In & Waitlist Management — from the client design board, 20 August.",
+  "purpose": "Put a walk-in party on the outlet's waitlist, quote them a wait, tell them when their table is ready, or take them off the list.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1261,10 +1267,11 @@
   "module": "Floor Service",
   "requiresModule": "marketing",
   "wave": 2,
+  "permission": "GUEST_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/guest-profile-dining-history",
-   "component": "apps/venue-staff-app/src/routes/operations/GuestProfileDiningHistoryDetail.tsx",
+   "component": "src/routes/operations/GuestProfileDiningHistoryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1281,7 +1288,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getGuestProfile` reads one of them — list, select, act",
-  "purpose": "Guest Profile & Dining History — from the client design board, 20 August.",
+  "purpose": "Read a guest's profile and their orders at the venue, and find and merge duplicate records of the same person once somebody has decided.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1575,10 +1582,11 @@
   "module": "Floor Service",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/live-table-service-management",
-   "component": "apps/venue-staff-app/src/routes/operations/LiveTableServiceManagementDetail.tsx",
+   "component": "src/routes/operations/LiveTableServiceManagementDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1628,7 +1636,7 @@
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`openTableVisit`, `updateTableVisit`, `mergeTableVisits`) and no read of a population — it is settings, not a list",
-  "purpose": "Live Table & Service Management — from the client design board, 20 August.",
+  "purpose": "Run a table during service: open the visit or seat a booked party, change covers, server or table, move the meal on a stage, place an order and fire or hold a course.",
   "layout": {
    "template": "form",
    "regions": [
@@ -2111,10 +2119,11 @@
   "module": "Floor Service",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/table-order-bill-payment-management",
-   "component": "apps/venue-staff-app/src/routes/operations/TableOrderBillPaymentManagementDetail.tsx",
+   "component": "src/routes/operations/TableOrderBillPaymentManagementDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2156,7 +2165,7 @@
   ],
   "pattern": "statusTracker",
   "patternReason": "`getBill` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Table Order, Bill & Payment Management — from the client design board, 20 August.",
+  "purpose": "Settle a table: read the bill, add an order, split the bill, comp or move items, take payment and close the visit.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -2493,10 +2502,11 @@
   "module": "Floor Service",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "ORDER_MODIFY",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/reservation-table-performance",
-   "component": "apps/venue-staff-app/src/routes/operations/ReservationTablePerformanceDetail.tsx",
+   "component": "src/routes/operations/ReservationTablePerformanceDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2524,7 +2534,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listTableReservations` reads the population and `getTableMap` reads one of them — list, select, act",
-  "purpose": "Reservation & Table Performance — from the client design board, 20 August.",
+  "purpose": "See how the outlet's bookings and tables perform: turn time, no-shows, covers and wait-quote accuracy, beside the bookings and the table map.",
   "layout": {
    "template": "split",
    "regions": [

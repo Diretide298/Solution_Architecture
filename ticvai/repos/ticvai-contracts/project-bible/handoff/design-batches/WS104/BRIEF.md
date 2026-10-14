@@ -189,7 +189,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-600` | Venue, Calendar & Operational Setup | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-601` | Product, Pricing & Sales Channel Setup | B | 16 | 8 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 | `BO-602` | POS, Payment & Access Setup | B | 13 | 0 | 6 | 10 | 0 | 0 | — | notStarted (—) |
-| `BO-603` | Configuration Health & AI Review | B | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-603` | Configuration Health & AI Review | B | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-604` | Setup Completion & Handoff to Go-Live | B | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

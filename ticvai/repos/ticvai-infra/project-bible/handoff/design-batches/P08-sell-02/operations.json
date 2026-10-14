@@ -143,7 +143,7 @@
   "contract": "inventory",
   "summary": "Send stock to another location",
   "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -1061,7 +1061,7 @@
  },
  "setRecipe": {
   "method": "PUT",
-  "path": "/recipes",
+  "path": "/recipes/{recipeId}",
   "contract": "fnb",
   "summary": "Define a recipe for a menu item",
   "permission": "PRODUCT_CONFIGURE",
@@ -1069,6 +1069,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "recipeId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

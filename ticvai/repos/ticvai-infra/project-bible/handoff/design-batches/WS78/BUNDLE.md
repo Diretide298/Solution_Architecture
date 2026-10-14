@@ -132,13 +132,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-394` | Game & Ride Operations Dashboard | D | 0 | 14 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-395` | Game & Ride Directory | A | 28 | 6 | 6 | 1 | 2 | 6 | — | notStarted (—) |
-| `BO-396` | Attraction Profile | D | 1 | 15 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-395` | Game & Ride Directory | A | 26 | 6 | 6 | 1 | 2 | 6 | — | notStarted (—) |
+| `BO-396` | Attraction Profile | D | 7 | 15 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-397` | Attraction Type Configuration | D | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-398` | Game & Ride Operational Configuration | D | 6 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-399` | Wallet & Credit Acceptance Mapping | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-400` | Attraction / Reader Mapping | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-401` | Game Package & Entitlement Association | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-401` | Game Package & Entitlement Association | D | 0 | 15 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-402` | Configuration Health & Validation | D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-403` | Attraction Audit, Dependencies & Governed Actions | B | 0 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
@@ -295,7 +295,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the game ride operations are still there. The pack's own statuses are Active — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move … |
 
 #### Edge cases to draw
 
@@ -380,6 +380,8 @@ rows:
 - `listReaders` → `DEVICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -491,7 +493,6 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createGame` body |
 | Code `code` | text field | required | — | max length 64 | — | — | `createGame` body |
 | Name `name` | text field | required | — | max length 200 | — | — | `createGame` body |
 | Venue `venueId` | picker: choose a venue | required | — | — | shows names, sends the id | — | `createGame` body |
@@ -502,10 +503,11 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Min points awarded `minPointsAwarded` | number field | optional | — | — | — | — | `createGame` body |
 | Max points awarded `maxPointsAwarded` | number field | optional | — | — | — | — | `createGame` body |
 | Height requirement cm `heightRequirementCm` | number field | optional | — | — | — | — | `createGame` body |
-| Status `status` | radio group | required | — | In service · Out of service · Maintenance · Retired | — | — | `createGame` body |
 | Plays today `playsToday` | number field | optional | — | — | — | — | `createGame` body |
 | Credits taken today `creditsTakenToday` | number field | optional | — | — | — | — | `createGame` body |
 | Points awarded today `pointsAwardedToday` | number field | optional | — | — | — | — | `createGame` body |
+
+Errors to draw in the form: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …
 
 **Form: Edit** (modal, opened by *Edit*; *Edit* calls `updateGame`, *Cancel* sends nothing)
 
@@ -560,7 +562,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create (primary button) | `createGame` POST `/games` | Game | Game | — | opens modal first |
+| Create (primary button) | `createGame` POST `/games` | Game | Game | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | opens modal first |
 | Edit (secondary button) | `updateGame` PATCH `/games/{gameId}` | inline | Game | 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move … | opens modal first |
 | Clone (secondary button) | `cloneGame` POST `/games/{gameId}/clone` | inline | Game | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 `code` already used by another game in the venue. | opens modal first |
 | Activate or deactivate (secondary button) | `updateGame` PATCH `/games/{gameId}` | inline | Game | 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move … | opens modal first |
@@ -593,7 +595,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the game ride are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move …; 409 `code` already used by another game in the venue. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move …; 409 `code` already used by another game in the venue. |
 
 #### Edge cases to draw
 
@@ -655,6 +657,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -695,7 +699,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (28), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (26), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-395?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create, Edit, Clone, Activate or deactivate.
@@ -756,6 +760,17 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|---|---|
 | Status | radio group | — | In service · Out of service · Maintenance · Retired | `listGames` ?status |
 
+**Sent by *Save game*** (`updateGame`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | optional | — | max length 200 | — | — | `updateGame` body |
+| Credit cost `creditCost` | number field | optional | — | min 1 | — | — | `updateGame` body |
+| Min points awarded `minPointsAwarded` | number field | optional | — | min 0 | — | — | `updateGame` body |
+| Max points awarded `maxPointsAwarded` | number field | optional | — | min 0 | — | — | `updateGame` body |
+| Status `status` | radio group | optional | — | In service · Out of service · Maintenance · Retired | — | — | `updateGame` body |
+| Height requirement cm `heightRequirementCm` | number field | optional | — | — | — | — | `updateGame` body |
+
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Attraction ID**: System generated; never an input (per VO-R03); shown read-only in the header after create. *(source: screens/P08-venue-back-office.yaml#BO-396)*
@@ -793,7 +808,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save game (primary button) | navigation or local | — | — | — | — |
+| Save game (primary button) | `updateGame` PATCH `/games/{gameId}` | inline | Game | 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move … | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
@@ -824,7 +839,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed while plays on this game are in flight, or `status` asks for a move … |
 
 #### Edge cases to draw
 
@@ -875,6 +890,8 @@ device:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -904,7 +921,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-396?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Save game, Cancel.
@@ -931,7 +948,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration Fields) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `attractionTypeId` (navigation) |
 | Route | `/games-rides/attraction-type-configuration-bo-397` |
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The attraction type library: reusable categories (Ride, Skill game, Video game, Redemption game) that carry the defaults every attraction of that type inherits - default reader type, which value types are allowed, retry and VIP pricing support, free play. The one thing to get right: the type decides which settings even apply (a ride has height and cycle time, a redemption game has a ticket payout), so the type editor shows both the pack's commercial switches and the contract's applicability flags.
@@ -1057,6 +1074,8 @@ types:
 - `setAttractionType` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -1234,6 +1253,8 @@ operations:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1360,6 +1381,8 @@ matrix:
 - `setCreditEligibilityRules` → `WALLET_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1551,6 +1574,8 @@ refusal: Ride reader cannot be assigned to this Video game under the selected co
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `DEVICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1635,7 +1660,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listGameEntitlements`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Kind | chip: All games pass, Unlimited single game, Limited single game, Package, Free play | — |
+| Games | list or chips (count when long) | — |
+| Attraction types | list or chips (count when long) | — |
+| Includes games added later | yes / no (icon or chip) | Whether a pass sold today covers a game added tomorrow (Chinmay, 2 October, workbook Q397: "venue configures; default yes"; CHG-CSA-028). |
+| Play count | 1,234 | For `limitedSingleGame` and `package`. Null means unlimited. |
+| Validity kind | chip: Same day, Days, Until date, Until used | — |
+| Validity days | 1,234 | — |
+| Activation kind | chip: On purchase, On first use, On date | On first use is what a guest expects from a day pass bought the night before. On purchase is what a venue defaults to by accident, and it … |
+| Daily play cap | 1,234 | — |
+| Cooldown minutes | 1,234 | Unlimited does not mean continuous. A cooldown is how one child does not hold a popular ride all afternoon. |
+| Linked product | the name it points at, never the id | — |
+| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1723,6 +1766,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1754,7 +1799,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-401?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: View Package.
 - [ ] Every transition is wired: `BO-394`.
@@ -1891,6 +1936,8 @@ findings:
 - `validateGameConfiguration` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -2191,7 +2238,7 @@ Method, path, parameters, request and response for every operation these screens
 "listGameplayTransactions": {"method":"GET","path":"/gameplay-transactions","contract":"games","summary":"Taps, decisions and what they cost","permission":"PRODUCT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"readerId","in":"query","required":null},{"name":"outcome","in":"query","required":null}],"requestBody":null,"responds":"GameplayTransaction"},
 "listGames": {"method":"GET","path":"/games","contract":"games","summary":"List games","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"status","in":"query","required":null}],"requestBody":null,"responds":"Game"},
 "listReaders": {"method":"GET","path":"/readers","contract":"games","summary":"Readers, their attractions and their health","permission":"DEVICE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"status","in":"query","required":null}],"requestBody":null,"responds":"Reader"},
-"setAttractionType": {"method":"PUT","path":"/attraction-types","contract":"games","summary":"Define a class of attraction","permission":"PRODUCT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AttractionType","responds":"AttractionType"},
+"setAttractionType": {"method":"PUT","path":"/attraction-types/{attractionTypeId}","contract":"games","summary":"Define a class of attraction","permission":"PRODUCT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"attractionTypeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"AttractionType","responds":"AttractionType"},
 "setCreditEligibilityRules": {"method":"PUT","path":"/credit-types/{creditTypeId}/eligibility","contract":"wallet","summary":"Where this credit may be spent, and on what","permission":"WALLET_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"CreditEligibility","responds":"CreditEligibility"},
 "setGameOperationalConfiguration": {"method":"PUT","path":"/games/{gameId}/operations","contract":"games","summary":"Capacity, cycle time, restrictions and staffing","permission":"PRODUCT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GameOperationalConfig","responds":"GameOperationalConfig"},
 "setReaderConfiguration": {"method":"PUT","path":"/readers/{readerId}","contract":"games","summary":"What this reader charges, opens, shows and refuses","permission":"DEVICE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Reader","responds":"Reader"},
@@ -2208,17 +2255,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AttractionType": {"type":"object","x-ticvai-persistence":"games.attraction_type","description":"Board 1.4. **The type decides which settings apply.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"family":{"type":"string","enum":["ride","arcadeGame","redemptionGame","crane","vrExperience","softPlay","attraction","show"]},"hasTicketPayout":{"type":"boolean","default":false},"hasDirectPay":{"type":"boolean","default":false},"hasCycleTime":{"type":"boolean","default":true},"hasHeightRestriction":{"type":"boolean","default":false},"supportsEntitlements":{"type":"boolean","default":true},"scopePath":{"type":"string"}}},
+"AttractionType": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"games.attraction_type","description":"Board 1.4. **The type decides which settings apply.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"family":{"type":"string","enum":["ride","arcadeGame","redemptionGame","crane","vrExperience","softPlay","attraction","show"]},"hasTicketPayout":{"type":"boolean","default":false},"hasDirectPay":{"type":"boolean","default":false},"hasCycleTime":{"type":"boolean","default":true},"hasHeightRestriction":{"type":"boolean","default":false},"supportsEntitlements":{"type":"boolean","default":true},"scopePath":{"type":"string"}}},
 "CreditEligibility": {"type":"object","x-ticvai-persistence":"wallet.credit_eligibility","description":"Board 3.4. **Where credit may be spent** — acceptance, not funding.","properties":{"creditTypeId":{"type":"string","format":"uuid"},"allowedVenueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowedOutletKinds":{"type":"array","items":{"type":"string"}},"allowedProductCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"excludedProductIds":{"type":"array","items":{"type":"string","format":"uuid"}},"allowedChannels":{"type":"array","items":{"type":"string"}},"minimumSpend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumPercentOfBasket":{"type":"number","nullable":true,"description":"**Caps how much of a purchase one credit type may cover.** A venue that lets promotional credit pay for everything has run a free day it did not intend.\n"},"validDaysOfWeek":{"type":"array","items":{"type":"string"}},"scopePath":{"type":"string"}}},
-"Game": {"x-ticvai-persistence":"games.game","type":"object","required":["id","code","name","venueId","creditCost","status"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"zone":{"type":"string","nullable":true},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"The machine. Taken out of service by maintenance, the game stops accepting play rather than swallowing credits.\n"},"readerId":{"type":"string","format":"uuid","nullable":true},"creditCost":{"type":"integer","minimum":1},"minPointsAwarded":{"type":"integer"},"maxPointsAwarded":{"type":"integer"},"heightRequirementCm":{"type":"integer","nullable":true},"status":{"$ref":"#/components/schemas/GameStatus"},"playsToday":{"type":"integer"},"creditsTakenToday":{"type":"integer"},"pointsAwardedToday":{"type":"integer"}}},
+"Game": {"x-ticvai-persistence":"games.game","type":"object","required":["id","code","name","venueId","creditCost","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"venue","type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"zone":{"type":"string","nullable":true},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"The machine. Taken out of service by maintenance, the game stops accepting play rather than swallowing credits.\n"},"readerId":{"type":"string","format":"uuid","nullable":true},"creditCost":{"type":"integer","minimum":1},"minPointsAwarded":{"type":"integer"},"maxPointsAwarded":{"type":"integer"},"heightRequirementCm":{"type":"integer","nullable":true},"status":{"readOnly":true,"$ref":"#/components/schemas/GameStatus"},"playsToday":{"type":"integer"},"creditsTakenToday":{"type":"integer"},"pointsAwardedToday":{"type":"integer"}}},
 "GameConfigurationHealth": {"x-ticvai-persistence":"none — computed","type":"object","description":"Board 1, p.10. The result of `validateGameConfiguration`; nothing is stored.","required":["venueId","checkedAt","games"],"properties":{"venueId":{"type":"string","format":"uuid"},"checkedAt":{"type":"string","format":"date-time"},"games":{"type":"array","items":{"type":"object","required":["gameId","health"],"properties":{"gameId":{"type":"string","format":"uuid"},"health":{"type":"string","enum":["healthy","warning","blocking"]},"findings":{"type":"array","items":{"type":"object","required":["check","severity"],"properties":{"check":{"type":"string","enum":["priceResolves","readerMapped","readerDeployed","edgePackageCurrent","entitlementCoverage","redemptionRule","assetInService"]},"severity":{"type":"string","enum":["warning","blocking"]},"message":{"type":"string"},"readerId":{"type":"string","format":"uuid","nullable":true},"fixOn":{"type":"string","nullable":true,"description":"The screen that fixes it, e.g. BO-407."}}}}}}}}},
-"GameEntitlement": {"type":"object","x-ticvai-persistence":"games.entitlement","description":"Board 4. **A right to play, not money** — consumed before money is.","required":["code","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["allGamesPass","unlimitedSingleGame","limitedSingleGame","package","freePlay"]},"gameIds":{"type":"array","items":{"type":"string","format":"uuid"}},"attractionTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"includesGamesAddedLater":{"type":"boolean","default":true,"description":"**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."},"playCount":{"type":"integer","nullable":true,"description":"For `limitedSingleGame` and `package`. Null means unlimited."},"validityKind":{"type":"string","enum":["sameDay","days","untilDate","untilUsed"]},"validityDays":{"type":"integer","nullable":true},"activationKind":{"type":"string","enum":["onPurchase","onFirstUse","onDate"],"default":"onFirstUse","description":"**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"},"dailyPlayCap":{"type":"integer","nullable":true},"cooldownMinutes":{"type":"integer","nullable":true,"description":"**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"},"linkedProductId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
-"GameOperationalConfig": {"type":"object","x-ticvai-persistence":"games.operational_config","description":"Board 1.5. **Cycle time is the number everything else derives from.**","properties":{"gameId":{"type":"string","format":"uuid"},"cycleSeconds":{"type":"integer","nullable":true},"riderCapacity":{"type":"integer","nullable":true},"throughputPerHour":{"type":"integer","readOnly":true},"minimumHeightCm":{"type":"integer","nullable":true},"maximumHeightCm":{"type":"integer","nullable":true},"minimumAge":{"type":"integer","nullable":true},"supervisionRequiredBelowAge":{"type":"integer","nullable":true},"healthRestrictions":{"type":"array","items":{"type":"string"}},"staffPositions":{"type":"integer","nullable":true},"operatingHours":{"type":"array","nullable":true,"description":"Weekly opening windows, in venue local time, in the same window shape as `GamePricing.peakPricing`. Null means the game follows the venue's hours.\n","items":{"type":"object","required":["daysOfWeek","from","to"],"properties":{"daysOfWeek":{"type":"array","items":{"type":"string"}},"from":{"type":"string","description":"Local time, HH:MM."},"to":{"type":"string","description":"Local time, HH:MM."}}}},"scopePath":{"type":"string"}}},
+"GameEntitlement": {"type":"object","x-ticvai-persistence":"games.entitlement","description":"Board 4. **A right to play, not money** — consumed before money is.","required":["code","kind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"kind":{"type":"string","enum":["allGamesPass","unlimitedSingleGame","limitedSingleGame","package","freePlay"]},"gameIds":{"type":"array","items":{"type":"string","format":"uuid"}},"attractionTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"includesGamesAddedLater":{"type":"boolean","default":true,"description":"**Whether a pass sold today covers a game added tomorrow** (Chinmay, 2 October, workbook Q397: \"venue configures; default yes\"; CHG-CSA-028). True, the default: an `allGamesPass`, or a pass bound by `attractionTypeIds`, covers games added after it was sold that match it; the coverage summary says so. False: it covers only the games that existed at sale. A pass listing `gameIds` covers those games only, whatever this says."},"playCount":{"type":"integer","nullable":true,"description":"For `limitedSingleGame` and `package`. Null means unlimited."},"validityKind":{"type":"string","enum":["sameDay","days","untilDate","untilUsed"]},"validityDays":{"type":"integer","nullable":true},"activationKind":{"type":"string","enum":["onPurchase","onFirstUse","onDate"],"default":"onFirstUse","description":"**On first use is what a guest expects from a day pass bought the night before.** On purchase is what a venue defaults to by accident, and it costs them a day.\n"},"dailyPlayCap":{"type":"integer","nullable":true},"cooldownMinutes":{"type":"integer","nullable":true,"description":"**Unlimited does not mean continuous.** A cooldown is how one child does not hold a popular ride all afternoon.\n"},"linkedProductId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"GameOperationalConfig": {"type":"object","x-ticvai-persistence":"games.operational_config","description":"Board 1.5. **Cycle time is the number everything else derives from.**","properties":{"gameId":{"type":"string","format":"uuid"},"cycleSeconds":{"type":"integer","nullable":true},"riderCapacity":{"type":"integer","nullable":true},"throughputPerHour":{"type":"integer","readOnly":true},"minimumHeightCm":{"type":"integer","nullable":true},"maximumHeightCm":{"type":"integer","nullable":true},"minimumAge":{"type":"integer","nullable":true},"supervisionRequiredBelowAge":{"type":"integer","nullable":true},"healthRestrictions":{"type":"array","items":{"type":"string"}},"staffPositions":{"type":"integer","nullable":true},"operatingHours":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","nullable":true,"description":"Weekly opening windows, in venue local time, in the same window shape as `GamePricing.peakPricing`. Null means the game follows the venue's hours.\n","items":{"type":"object","required":["daysOfWeek","from","to"],"properties":{"daysOfWeek":{"type":"array","items":{"type":"string"}},"from":{"type":"string","description":"Local time, HH:MM."},"to":{"type":"string","description":"Local time, HH:MM."}}}},"scopePath":{"type":"string"}}},
 "GameStatus": {"type":"string","enum":["inService","outOfService","maintenance","retired"]},
-"GameplayAuthorisation": {"type":"object","x-ticvai-persistence":"games.authorisation","description":"Board 4.9. **The refusal reason is the product.**","properties":{"id":{"type":"string","format":"uuid"},"decision":{"type":"string","enum":["allow","refuse"]},"reason":{"type":"string","nullable":true,"enum":["ok","cardNotFound","cardExpired","cardBlocked","retapTooSoon","heightRestriction","ageRestriction","insufficientFunds","entitlementExhausted","entitlementNotValidHere","cooldownActive","dailyCapReached","readerNotConfigured","gameUnavailable"]},"guestMessage":{"type":"string","nullable":true,"description":"***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"},"chargedFrom":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementId":{"type":"string","format":"uuid","nullable":true},"remainingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"remainingPlays":{"type":"integer","nullable":true},"trace":{"type":"array","items":{"type":"object","properties":{"check":{"type":"string"},"passed":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"decidedOffline":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
+"GameplayAuthorisation": {"type":"object","x-ticvai-persistence":"games.authorisation","description":"Board 4.9. **The refusal reason is the product.**","properties":{"id":{"type":"string","format":"uuid"},"decision":{"type":"string","enum":["allow","refuse"]},"reason":{"type":"string","nullable":true,"enum":["ok","cardNotFound","cardExpired","cardBlocked","retapTooSoon","heightRestriction","ageRestriction","insufficientFunds","entitlementExhausted","entitlementNotValidHere","cooldownActive","dailyCapReached","readerNotConfigured","gameUnavailable"]},"guestMessage":{"type":"string","nullable":true,"description":"***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"},"chargedFrom":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementId":{"type":"string","format":"uuid","nullable":true},"remainingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"remainingPlays":{"type":"integer","nullable":true},"trace":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"check":{"type":"string"},"passed":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"decidedOffline":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "GameplayAuthorisationRequest": {"type":"object","required":["readerId"],"properties":{"readerId":{"type":"string","format":"uuid"},"cardId":{"type":"string","format":"uuid","nullable":true},"credentialIdentifier":{"type":"string","nullable":true},"gameId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time","nullable":true},"guestHeightCm":{"type":"integer","nullable":true},"offline":{"type":"boolean","default":false}}},
 "GameplayTransaction": {"type":"object","x-ticvai-persistence":"games.gameplay_transaction","description":"Boards 8.2 and 8.5. **The refused ones are the valuable half.**","properties":{"id":{"type":"string","format":"uuid"},"readerId":{"type":"string","format":"uuid"},"gameId":{"type":"string","format":"uuid","nullable":true},"cardId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time"},"outcome":{"type":"string","enum":["allowed","refused","reversed"]},"reason":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargedFrom":{"type":"string","nullable":true},"entitlementId":{"type":"string","format":"uuid","nullable":true},"ticketsEarned":{"type":"integer","nullable":true},"decidedOffline":{"type":"boolean","default":false},"syncedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
-"Reader": {"type":"object","x-ticvai-persistence":"games.reader","description":"Board 2. **A `tenancy` device with a game configuration on it.**","required":["deviceId"],"properties":{"deviceId":{"type":"string","format":"uuid","description":"`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"},"gameId":{"type":"string","format":"uuid","nullable":true},"readerProfileId":{"type":"string","format":"uuid","nullable":true},"acceptedCreditTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"acceptsDirectPay":{"type":"boolean","default":false},"retapDelaySeconds":{"type":"integer","default":3,"description":"**The setting that stops a guest paying twice for one go.** A wristband held against a reader for a second and a half is two taps to the hardware and one intention to the guest.\n"},"displayRules":{"type":"object","properties":{"freeGameGlow":{"type":"boolean","default":true,"description":"**What tells a guest their entitlement was used rather than their money.** Without it the complaint arrives at the desk.\n"},"showBalance":{"type":"boolean","default":true},"showPrice":{"type":"boolean","default":true},"themeCode":{"type":"string","nullable":true},"languages":{"type":"array","items":{"type":"string"}}}},"ioMapping":{"type":"object","additionalProperties":true,"description":"Board 9.6. Which output starts the game, which input reports it finished. **Deliberately open.** The keys are the reader model's own I/O lines, so the shape belongs to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012, ADR-0015), not to this contract.\n"},"status":{"type":"string","enum":["unconfigured","active","offline","maintenance","disabled"]},"scopePath":{"type":"string"}}},
+"Reader": {"type":"object","x-ticvai-persistence":"games.reader","description":"Board 2. **A `tenancy` device with a game configuration on it.**","required":["deviceId"],"properties":{"deviceId":{"x-ticvai-references":"platform.device","type":"string","format":"uuid","description":"`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"},"gameId":{"type":"string","format":"uuid","nullable":true},"readerProfileId":{"type":"string","format":"uuid","nullable":true},"acceptedCreditTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"acceptsDirectPay":{"type":"boolean","default":false},"retapDelaySeconds":{"type":"integer","default":3,"description":"**The setting that stops a guest paying twice for one go.** A wristband held against a reader for a second and a half is two taps to the hardware and one intention to the guest.\n"},"displayRules":{"type":"object","properties":{"freeGameGlow":{"type":"boolean","default":true,"description":"**What tells a guest their entitlement was used rather than their money.** Without it the complaint arrives at the desk.\n"},"showBalance":{"type":"boolean","default":true},"showPrice":{"type":"boolean","default":true},"themeCode":{"type":"string","nullable":true},"languages":{"type":"array","items":{"type":"string"}}}},"ioMapping":{"type":"object","additionalProperties":true,"description":"Board 9.6. Which output starts the game, which input reports it finished. **Deliberately open.** The keys are the reader model's own I/O lines, so the shape belongs to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012, ADR-0015), not to this contract.\n"},"status":{"type":"string","enum":["unconfigured","active","offline","maintenance","disabled"]},"scopePath":{"type":"string"}}},
 "ReaderTestResult": {"type":"object","description":"Boards 2.10 and 9.9. **Each check separately**, because they send an engineer to different places.\n","properties":{"readerId":{"type":"string","format":"uuid"},"testedAt":{"type":"string","format":"date-time"},"checks":{"type":"array","items":{"type":"object","properties":{"check":{"type":"string","enum":["connectivity","cardRead","balanceCheck","display","sound","gameTrigger","gameCompleteSignal"]},"passed":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"overall":{"type":"string","enum":["pass","partial","fail"]}}}
 }
 ```

@@ -5,6 +5,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/event-catalogue-command-center-bo-694",
-   "component": "apps/venue-management-web/src/routes/sell/EventCatalogueCommandCenter.tsx",
+   "component": "src/routes/sell/EventCatalogueCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -75,7 +76,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listEvents",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listEvents"
       }
      ]
     }
@@ -132,6 +134,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "EVENT_CONFIGURE",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -141,7 +144,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/event-type-behaviour-configuration-bo-695",
-   "component": "apps/venue-management-web/src/routes/sell/EventTypeBehaviourConfiguration.tsx",
+   "component": "src/routes/sell/EventTypeBehaviourConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -266,6 +269,16 @@
     "provenance": "contract catalogue.yaml PUT /event-types"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "eventTypeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listEventTypes`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -295,6 +308,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -304,7 +318,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/event-duplication-clone-configuration-bo-696",
-   "component": "apps/venue-management-web/src/routes/sell/EventDuplicationCloneConfiguration.tsx",
+   "component": "src/routes/sell/EventDuplicationCloneConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {

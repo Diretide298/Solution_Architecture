@@ -309,7 +309,7 @@ operations:
   - games.reader_sync_status
 - operation: setAttractionType
   verb: PUT
-  path: /attraction-types
+  path: /attraction-types/{attractionTypeId}
   scope: tenant
   permission: PRODUCT_CONFIGURE
   audience:
@@ -421,7 +421,7 @@ operations:
   - games.reader
 - operation: setReaderProfile
   verb: PUT
-  path: /reader-profiles
+  path: /reader-profiles/{readerProfileId}
   scope: venue
   permission: PRODUCT_CONFIGURE
   audience:

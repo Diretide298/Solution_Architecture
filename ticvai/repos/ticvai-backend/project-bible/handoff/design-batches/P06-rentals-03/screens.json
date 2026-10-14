@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "sameAs": "BO-564",
    "book": "Rental_Management.pdf",
@@ -15,7 +16,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/rental-return-command-center-emp-091",
-   "component": "apps/venue-staff-app/src/routes/rentals/RentalReturnCommandCenter.tsx",
+   "component": "src/routes/rentals/RentalReturnCommandCenter.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -45,11 +46,12 @@
        ],
        "kind": "multiSelect",
        "label": "Filter by",
-       "notes": "The pack filters this screen by venue, return location, product, expected return, rental status, damage status and 2 more — which are present is a decision the pack already made.",
+       "notes": "The pack filters this screen by venue, return location, product, expected return, rental status, damage status and 2 more — which are present is a decision the pack already made. Sends `?status=` to `listRentalBookings` for Rental Status; Return Location sends `?locationId=` and Expected Return `?from=` and `?to=`; Venue, Product, Damage Status, Deposit Status and Group/Individual have no parameter on it yet (Block A audit, 14 October 2026, CHG-SCR-020).",
+       "operation": "listRentalBookings",
        "provenance": "pack Rental_Management.pdf, page 92 §Filters"
       }
      ],
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters"
     },
     {
@@ -277,6 +279,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "sameAs": "BO-565",
    "book": "Rental_Management.pdf",
@@ -287,7 +290,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/return-scan-rental-retrieval-emp-092",
-   "component": "apps/venue-staff-app/src/routes/rentals/ReturnScanRentalRetrieval.tsx",
+   "component": "src/routes/rentals/ReturnScanRentalRetrieval.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -303,7 +306,8 @@
        "derived": true,
        "impliedBy": "getRentalBooking",
        "kind": "detailPanel",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getRentalBooking"
       }
      ],
      "name": "contentBody"
@@ -367,8 +371,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -399,6 +403,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "sameAs": "BO-566",
    "book": "Rental_Management.pdf",
@@ -409,7 +414,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/return-summary-actual-return-time-emp-093",
-   "component": "apps/venue-staff-app/src/routes/rentals/ReturnSummaryActualReturnTime.tsx",
+   "component": "src/routes/rentals/ReturnSummaryActualReturnTime.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -502,8 +507,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -534,6 +539,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "sameAs": "BO-567",
    "book": "Rental_Management.pdf",
@@ -544,7 +550,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/post-rental-condition-inspection-emp-094",
-   "component": "apps/venue-staff-app/src/routes/rentals/PostRentalConditionInspection.tsx",
+   "component": "src/routes/rentals/PostRentalConditionInspection.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -634,8 +640,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -666,6 +672,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "sameAs": "BO-568",
    "book": "Rental_Management.pdf",
@@ -676,7 +683,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/before-vs-after-condition-comparison-emp-095",
-   "component": "apps/venue-staff-app/src/routes/rentals/BeforeVsAfterConditionComparison.tsx",
+   "component": "src/routes/rentals/BeforeVsAfterConditionComparison.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -728,8 +735,8 @@
    },
    {
     "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No read returns a rental booking's inspections.",
-    "source": "contracts/satellite/rental.yaml#recordRentalInspection"
+    "source": "contracts/satellite/rental.yaml#recordRentalInspection",
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No read returns a rental booking's inspections."
    }
   ],
   "apis": [
@@ -771,8 +778,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -803,6 +810,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "sameAs": "BO-569",
    "book": "Rental_Management.pdf",
@@ -813,7 +821,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/damage-assessment-charge-workflow-emp-096",
-   "component": "apps/venue-staff-app/src/routes/rentals/DamageAssessmentChargeWorkflow.tsx",
+   "component": "src/routes/rentals/DamageAssessmentChargeWorkflow.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -903,8 +911,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assessRentalDamage` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assessRentalDamage` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -935,6 +943,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "sameAs": "BO-570",
    "book": "Rental_Management.pdf",
@@ -945,7 +954,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/partial-return-missing-equipment-emp-097",
-   "component": "apps/venue-staff-app/src/routes/rentals/PartialReturnMissingEquipment.tsx",
+   "component": "src/routes/rentals/PartialReturnMissingEquipment.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -1038,8 +1047,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -1070,6 +1079,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "sameAs": "BO-571",
    "book": "Rental_Management.pdf",
@@ -1080,7 +1090,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/late-fees-damage-fees-final-settlement-emp-098",
-   "component": "apps/venue-staff-app/src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx",
+   "component": "src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -1173,8 +1183,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -1205,6 +1215,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "sameAs": "BO-572",
    "book": "Rental_Management.pdf",
@@ -1215,7 +1226,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/deposit-release-capture-customer-confirmation-emp-099",
-   "component": "apps/venue-staff-app/src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx",
+   "component": "src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -1241,9 +1252,9 @@
        "notes": "**A screen that can submit must be leaveable without submitting.**"
       },
       {
+       "bindsTo": "PaymentsDepositActivity",
        "kind": "dataTable",
        "label": "Deposit history",
-       "bindsTo": "PaymentsDepositActivity",
        "operation": "listDepositActivity",
        "provenance": "contract payments.yaml GET /deposits/{depositId}/activity; wiring fix, 2 October 2026"
       }
@@ -1288,11 +1299,11 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "listDepositActivity",
     "contract": "payments",
+    "operationId": "listDepositActivity",
+    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)",
     "purpose": "The deposit's movement history",
-    "trigger": "onLoad",
-    "provenance": "wiring fix, 2 October 2026 (CHG-WIR-008)"
+    "trigger": "onLoad"
    }
   ],
   "apisNote": "Regenerated 9 September 2026 from Rental_Management.pdf page 100. 0 of 0 labels bound to a contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
@@ -1322,12 +1333,12 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     },
     {
-     "name": "depositId",
-     "from": "navigation"
+     "from": "navigation",
+     "name": "depositId"
     }
    ]
   },
@@ -1358,6 +1369,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "sameAs": "BO-573",
    "book": "Rental_Management.pdf",
@@ -1368,7 +1380,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/return-completion-equipment-disposition-emp-100",
-   "component": "apps/venue-staff-app/src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx",
+   "component": "src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -1421,13 +1433,13 @@
    {
     "operation": "setAssetStatus",
     "removed": true,
-    "why": "Removed 2 October 2026 (CHG-WIR-008): setAssetStatus needs ASSET_MANAGE (a configure-tier grant on the staff app), offers six maintenance statuses and takes one asset per screen; the unit's next state belongs to the return (DI-500; design-notes correction fnb-retail EMP-100).",
-    "source": "contracts/satellite/maintenance.yaml#setAssetStatus | DI-500"
+    "source": "contracts/satellite/maintenance.yaml#setAssetStatus | DI-500",
+    "why": "Removed 2 October 2026 (CHG-WIR-008): setAssetStatus needs ASSET_MANAGE (a configure-tier grant on the staff app), offers six maintenance statuses and takes one asset per screen; the unit's next state belongs to the return (DI-500; design-notes correction fnb-retail EMP-100)."
    },
    {
     "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): returnRental carries no per-unit disposition.",
-    "source": "contracts/satellite/rental.yaml#returnRental | DI-500"
+    "source": "contracts/satellite/rental.yaml#returnRental | DI-500",
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): returnRental carries no per-unit disposition."
    }
   ],
   "apis": [
@@ -1472,8 +1484,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },

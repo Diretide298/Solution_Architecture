@@ -586,7 +586,7 @@
  },
  "setChannelConnectionConfiguration": {
   "method": "PUT",
-  "path": "/channel-connections",
+  "path": "/channel-connections/{connectionId}",
   "contract": "catalogue",
   "summary": "Create or update a channel connection",
   "permission": "PRODUCT_CONFIGURE",
@@ -594,6 +594,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "connectionId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

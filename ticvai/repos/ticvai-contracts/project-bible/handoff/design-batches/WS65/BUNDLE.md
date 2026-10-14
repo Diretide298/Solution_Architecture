@@ -282,6 +282,8 @@ kpis:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -405,6 +407,8 @@ path:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_CREATE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -520,6 +524,8 @@ rule: 'Day Pass to Annual: only before 16:00 on the visit day'
 - `listUpgradeEligibilityQualification` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -653,6 +659,8 @@ rule:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -775,6 +783,8 @@ rule:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -888,6 +898,8 @@ example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_CREATE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -998,6 +1010,8 @@ rule: Child to Adult when the guest turns 12 during the membership
 - `listPersonTypeProduct` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1139,6 +1153,8 @@ request:
 - `listBulkGroupAssisted` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1284,6 +1300,8 @@ execution:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1417,6 +1435,8 @@ event:
 - `listUpgradeException` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1566,7 +1586,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "BulkGroupAssistedUpgradeOperationsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Bulk, Group & Assisted Upgrade Operations displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"bulkAction":{"type":"string","enum":["upgradeAll","upgradeSelected","convertProduct","changePersonType","applyComplimentaryUpgrade","applyFixedUpgrade","moveToAlternativePerformance"],"description":"Bulk action previewed"},"selectedCount":{"type":"integer","description":"Tickets selected"},"eligibleCount":{"type":"integer","description":"Tickets eligible"},"notEligibleCount":{"type":"integer","description":"Tickets not eligible"},"ineligibilityReasons":{"type":"array","items":{"type":"string"},"description":"Reasons with counts, e.g. already used, expired, target unavailable"},"totalOriginalEligibleValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Total original eligible value"},"totalTargetValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Total target value"},"totalUpgradeDifference":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Total upgrade difference"},"fees":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Fees"},"taxes":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Taxes"},"finalCollectionOrRefund":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Final collection or refund requirement"},"partialProcessing":{"type":"string","enum":["processEligibleExcludeFailures","failEntireBatch"],"description":"Partial processing policy"}}},
-"OrdersUpgrade": {"type":"object","x-ticvai-persistence":"orders.upgrade","description":"**Taken from the backend workbook, 20 September.** Stores the real post-purchase upgrade transaction, including original line, upgraded line and additional amount. Existing orders.payment should be reused to collect the upgrade amount.","required":["number","orderId","originalOrderLineId","originalAmount","newAmount","amount","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"number":{"type":"string","maxLength":50},"orderId":{"type":"string","format":"uuid"},"originalOrderLineId":{"type":"string","format":"uuid"},"newOrderLineId":{"type":"string","format":"uuid","nullable":true},"ruleId":{"x-ticvai-references":"orders.upgrade_rule","type":"string","format":"uuid","nullable":true,"description":"The `UpgradeRule` (`orders.upgrade_rule`) this upgrade ran under; null for a supervisor override outside any rule (DM5, 29 September)."},"originalAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"newAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","maxLength":30},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","maxLength":500,"nullable":true},"createdAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"cancelledAt":{"type":"string","format":"date-time","nullable":true}}},
+"OrdersUpgrade": {"type":"object","x-ticvai-persistence":"orders.upgrade","description":"**Taken from the backend workbook, 20 September.** Stores the real post-purchase upgrade transaction, including original line, upgraded line and additional amount. Existing orders.payment should be reused to collect the upgrade amount.","required":["number","orderId","originalOrderLineId","originalAmount","newAmount","amount","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"number":{"type":"string","maxLength":50},"orderId":{"type":"string","format":"uuid"},"originalOrderLineId":{"x-ticvai-references":"orders.order_line","type":"string","format":"uuid"},"newOrderLineId":{"type":"string","format":"uuid","nullable":true},"ruleId":{"x-ticvai-references":"orders.upgrade_rule","type":"string","format":"uuid","nullable":true,"description":"The `UpgradeRule` (`orders.upgrade_rule`) this upgrade ran under; null for a supervisor override outside any rule (DM5, 29 September)."},"originalAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"newAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","maxLength":30},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","maxLength":500,"nullable":true},"createdAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"cancelledAt":{"type":"string","format":"date-time","nullable":true}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PersonTypeProductEntitlementConversionRulesView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Person-Type, Product & Entitlement Conversion Rules displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"conversionType":{"type":"string","enum":["childAdult","juniorAdult","seniorAdult","residentTourist","standardMember","customPersonTypes"],"description":"Person-type conversion."},"entitlementTreatment":{"type":"string","enum":["retained","replaced","added","removed","alreadyConsumed"],"description":"What happens to each entitlement on conversion."},"targetRequirements":{"type":"array","items":{"type":"string","enum":["age","residency","corporateAssociation","identityVerification","otherEligibilityRules"]},"description":"What the target product may require."},"sourceProduct":{"type":"string","description":"Source product"},"targetProduct":{"type":"string","description":"Target product"}}},
 "ProRataResidualValueEntitlementCreditConfigurationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; lands in the pro-rata columns of `orders.upgrade_rule` (DM5, 29 September)","description":"**What Pro-Rata, Residual Value & Entitlement Credit Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"appliesTo":{"type":"array","items":{"type":"string","enum":["multiDayPasses","memberships","annualPasses","multiAttractionProducts","packages","storedEntitlements"]},"description":"Products this policy applies to"},"proRataMethod":{"type":"string","enum":["timeBased","usageBased","valueBased","entitlementBased","fixedCredit"],"description":"Remaining days over original days; remaining uses over total uses; remaining commercial value; value of unconsumed benefits; or a configured fixed amount"},"fixedCreditAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"For fixedCredit: the configured amount"},"maximumCreditPercent":{"type":"number","description":"Maximum credit, percent of the original value"},"minimumUpgradeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Minimum upgrade amount"},"creditExpiryDays":{"type":"integer","description":"Days the credit stays usable"},"nonCreditableComponents":{"type":"array","items":{"type":"string"},"description":"Components that earn no credit"},"excludeFees":{"type":"boolean","description":"Fees are not credited"},"taxTreatment":{"type":"string","description":"How tax on the credit is treated"},"negativeDifferenceTreatment":{"type":"string","enum":["noRefund","refundDifference","walletCredit","voucherCredit","supervisorApproval"],"description":"When the target is worth less than the credit. No package default: the venue chooses when it enables downgrades"}}},

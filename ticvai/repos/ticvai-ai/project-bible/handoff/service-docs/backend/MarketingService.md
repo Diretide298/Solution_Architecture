@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 75 of 278 |
+| Operations in the slice | 72 of 278 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -38,20 +38,17 @@
 | campaign | [`updateCampaign`](#updatecampaign) | PATCH | `/campaigns/{campaignId}` | setup | 1 | BO-767, BO-768, BO-769, BO-772 |
 | consent | [`claimDeviceConsent`](#claimdeviceconsent) | POST | `/guests/{subjectId}/consents/claim-device` | core | 1 | GST-042, WEB-016 |
 | consent | [`createConsentQuestion`](#createconsentquestion) | POST | `/consent-questions` | core | 1 | CMS-018 |
-| consent | [`getCookieConsentRuntime`](#getcookieconsentruntime) | GET | `/storefront/cookie-consent` | core | 1 | GST-001, GST-066, WEB-001, WEB-024 |
-| consent | [`getDeviceConsentHistory`](#getdeviceconsenthistory) | GET | `/consent/device/history` | core | 1 | GST-066, WEB-024 |
+| consent | [`getCookieConsentRuntime`](#getcookieconsentruntime) | GET | `/storefront/cookie-consent` | core | 1 | GST-001, WEB-001 |
 | consent | [`getGuestConsents`](#getguestconsents) | GET | `/guests/{subjectId}/consents` | core | 1 | BO-737, BO-749, GST-039, GST-065, GST-066, WEB-020 … |
 | consent | [`listConsentAnswers`](#listconsentanswers) | GET | `/consent-answers` | core | 1 | CMS-018 |
-| consent | [`listConsentPurposes`](#listconsentpurposes) | GET | `/consent-purposes` | core | 1 | BO-747, CMS-018, GST-039, GST-065, GST-066, GST-071 … |
+| consent | [`listConsentPurposes`](#listconsentpurposes) | GET | `/consent-purposes` | core | 1 | BO-747, CMS-018, CMS-023, GST-039, GST-065, GST-066 … |
 | consent | [`listConsentQuestions`](#listconsentquestions) | GET | `/consent-questions` | core | 1 | BO-008, CMS-018, CMS-103 |
-| consent | [`listPublishedTrackingTechnologies`](#listpublishedtrackingtechnologies) | GET | `/storefront/cookie-consent/technologies` | core | 1 | GST-066, WEB-024 |
 | consent | [`recordConsent`](#recordconsent) | POST | `/guests/{subjectId}/consents` | core | 1 | BO-748, GST-039, GST-065, GST-066, POS-027, WEB-020 … |
 | consent | [`recordConsentAnswers`](#recordconsentanswers) | POST | `/consent-answers` | core | 1 | GST-007, WEB-006, WEB-011 |
-| consent | [`recordDeviceConsent`](#recorddeviceconsent) | POST | `/consent/device` | core | 1 | GST-001, GST-066, WEB-001, WEB-024 |
 | consent | [`setConsentPurposes`](#setconsentpurposes) | PUT | `/consent-purposes` | core | 1 | BO-747, CMS-018, CMS-023 |
-| consent | [`setCookieBannerDesign`](#setcookiebannerdesign) | PUT | `/cookie-banner-preference` | setup | 1 | CMS-026 |
-| consent | [`setDynamicFieldQuestion`](#setdynamicfieldquestion) | PUT | `/dynamic-field-question` | setup | 1 |  |
-| consent | [`setTrackingTechnology`](#settrackingtechnology) | PUT | `/cookie-tracking-digital` | setup | 1 | CMS-025 |
+| consent | [`setCookieBannerDesign`](#setcookiebannerdesign) | PUT | `/cookie-banner-preference/{bannerDesignId}` | setup | 1 | CMS-026 |
+| consent | [`setDynamicFieldQuestion`](#setdynamicfieldquestion) | PUT | `/dynamic-field-question/{formId}/{key}` | setup | 1 |  |
+| consent | [`setTrackingTechnology`](#settrackingtechnology) | PUT | `/cookie-tracking-digital/{technologyId}` | setup | 1 | CMS-025 |
 | consent | [`updateConsentQuestion`](#updateconsentquestion) | PATCH | `/consent-questions/{questionId}` | core | 1 | CMS-018 |
 | feedback | [`submitReview`](#submitreview) | POST | `/reviews` | core | 1 | GST-035, WEB-026 |
 | guest | [`addToWishlist`](#addtowishlist) | POST | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009 |
@@ -70,7 +67,7 @@
 | loyalty | [`listRewards`](#listrewards) | GET | `/loyalty/rewards` | core | 1 | BO-828, GST-036, WEB-043 |
 | loyalty | [`setLeaderboardNickname`](#setleaderboardnickname) | PUT | `/loyalty/leaderboard-nickname` | core | 1 | GST-036, WEB-043 |
 | loyalty | [`setLoyaltyRules`](#setloyaltyrules) | PUT | `/loyalty/programmes/{programmeId}/rules` | setup | 1 | BO-827, BO-828 |
-| loyalty | [`setReward`](#setreward) | PUT | `/loyalty/rewards` | setup | 1 | BO-828 |
+| loyalty | [`setReward`](#setreward) | PUT | `/loyalty/rewards/{rewardId}` | setup | 1 | BO-828 |
 | loyalty | [`updateLoyaltyProgramme`](#updateloyaltyprogramme) | PATCH | `/loyalty/programmes/{programmeId}` | setup | 1 | BO-827 |
 | marketing | [`createChallenge`](#createchallenge) | POST | `/challenges` | setup | 1 | BO-825, BO-829 |
 | marketing | [`createForm`](#createform) | POST | `/forms` | setup | 1 | BO-618, BO-747, BO-815, CMS-042, CMS-043 |
@@ -692,7 +689,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | Read routing | replica |
 | Reads | `marketing.cookie_banner_design`, `marketing.device_consent`, `marketing.device_consent_category`, `marketing.tracking_technology` |
 | Writes | - |
-| Called by | GST-001, GST-066, WEB-001, WEB-024 |
+| Called by | GST-001, WEB-001 |
 
 **Parameters**
 
@@ -780,69 +777,6 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 |---|---|---|
 | 200 |  | The runtime answer |
 | 404 |  | No published banner design for this channel (not-configured); the storefront loads nothing but strictlyNecessary |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### getDeviceConsentHistory
-
-**`GET /consent/device/history`**: A visitor's own cookie decisions, oldest first
-
-**What the preference centre shows a visitor who has not signed in** (2.6.61): every decision recorded against the key their browser or app holds, oldest first by `decidedAt` then `id`, keyset cursor. Changing or withdrawing is `recordDeviceConsent`; a signed-in guest reads their own consents with `getGuestConsents`, and deletion is identity `deleteGuestAccount`. **The key is the only credential**, so it travels in a header, not the URL. A key claimed by a guest answers 404: its decisions are that guest's now, and a shared browser must not show them to the next person.
-**No longer open** (system-design review SD-056, 29 September): `security: []` let anyone who guessed or copied a key read its history. The call now needs the device's own cookie-consent token (`consentKeyAuth`: the `X-Consent-Key` the storefront issued to that browser or app, bound to it, rotated when the visitor records a new decision) or a guest session, and answers only for that one key: self-scoped to the device, never a lookup by someone else's key.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `marketing.device_consent`, `marketing.device_consent_category` |
-| Writes | - |
-| Called by | GST-066, WEB-024 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| X-Consent-Key | header | yes | string | The key the visitor's browser or app holds |
-| pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| items | array of DeviceConsent | yes |  |
-| items[].id | string (uuid) |  | (read-only) |
-| items[].consentKey | string | yes | Opaque, minted by us, not a device fingerprint. (max length 64; read-only) |
-| items[].channel | CookieConsentChannel: enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes | The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6). |
-| items[].brandId | string (uuid) |  | (nullable) |
-| items[].bannerDesignId | string (uuid) |  | The published CookieBannerPreferenceCenterDesignerView version the visitor was shown. (nullable) |
-| items[].action | DeviceConsentAction: enum (acceptAll, rejectNonEssential, savePreferences, withdraw, doNotSellOrShare) | yes | What the visitor pressed. |
-| items[].categories | array of object | yes | Every category of the design, with the decision this row gives it. (min items 1) |
-| items[].categories[].category | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes | 2.6.53. |
-| items[].categories[].decision | enum (granted, declined) | yes |  |
-| items[].noticeVersion | string | yes | The cookie notice version decided against (white-label setPolicy, kind cookie). |
-| items[].language | string |  | (max length 10; nullable) |
-| items[].globalPrivacyControl | boolean |  | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. (default False) |
-| items[].source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) |  | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
-| items[].country | string |  | The edge's geolocation of the request, for the geographic statistics (2.6.63). (pattern ^[A-Z]{2}$; read-only; nullable) |
-| items[].decidedAt | string (date-time) | yes |  |
-| items[].expiresAt | string (date-time) |  | A device consent expires and a subject consent does not. (read-only; nullable) |
-| items[].claimedBySubjectId | string (uuid) |  | Set once, by claimDeviceConsent. (read-only; nullable) |
-| items[].claimedAt | string (date-time) |  | (read-only; nullable) |
-| items[].scopePath | string |  | The partition key (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant. (read-only) |
-| nextCursor | string |  |  |
-| hasMore | boolean | yes |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | The visitor's decisions |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getGuestConsents
@@ -962,6 +896,7 @@ Current position per purpose and channel, with the version of the notice consent
 **`GET /consent-purposes`**: Configured consent purposes
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the active consent purposes a guest is asked for, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `GUEST_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Order.** Sorted by `displayName` ascending.
 
 |  |  |
 |---|---|
@@ -975,7 +910,7 @@ Current position per purpose and channel, with the version of the notice consent
 | Guest callable | True |
 | Reads | `cache:resolution`, `marketing.consent_purpose`, `marketing.consent_purpose_channel` |
 | Writes | `cache:resolution` |
-| Called by | BO-747, CMS-018, GST-039, GST-065, GST-066, GST-071, WEB-011, WEB-020, WEB-024, WEB-027 |
+| Called by | BO-747, CMS-018, CMS-023, GST-039, GST-065, GST-066, GST-071, WEB-011, WEB-020, WEB-024, WEB-027 |
 
 **Parameters**
 
@@ -1059,57 +994,6 @@ Current position per purpose and channel, with the version of the notice consent
 |---|---|---|
 | 200 |  | Questions |
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### listPublishedTrackingTechnologies
-
-**`GET /storefront/cookie-consent/technologies`**: The approved cookie registry, as the preference centre shows it
-
-**The guest-facing view of the registry** (2.6.54): only `approved` technologies on the channel, with what the preference centre tells a visitor about each (name, provider, purpose, expiry in days, first or third party, category). `detected`, `blocked` and `retired` entries and the governance fields (`processingPurposeCode`, scan dates, `scopePath`) are never shown. Ordered by `category` then `name`; keyset cursor. Cached at the edge per tenant and channel.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `marketing.tracking_technology` |
-| Writes | - |
-| Called by | GST-066, WEB-024 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| channel | query | yes | CookieConsentChannel: enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) |  |
-| category | query |  | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) |  |
-| pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| items | array of PublishedTrackingTechnology | yes |  |
-| items[].name | string | yes |  |
-| items[].provider | string | yes |  |
-| items[].category | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes | 2.6.53. |
-| items[].technologyType | string |  |  |
-| items[].purpose | string |  | (nullable) |
-| items[].durationDays | integer |  | Null for session storage. (nullable) |
-| items[].isThirdParty | boolean | yes |  |
-| items[].privacyInformation | string |  | (nullable) |
-| nextCursor | string |  |  |
-| hasMore | boolean | yes |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Approved technologies |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### recordConsent
@@ -1252,86 +1136,6 @@ Every record captures the notice version, the channel, the purpose, the source a
 | 422 |  | A perPerson question answered without a person (personRequired), a question this cart does not ask (questionNotAsked), or a retired one (questionRetired). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### recordDeviceConsent
-
-**`POST /consent/device`**: Record a visitor's cookie decision, before anyone is known
-
-**The banner's and the preference centre's write, for a visitor nobody has identified yet** (2.6.52, 2.6.55). **Append-only, like `recordConsent`**: a change of mind or a withdrawal is a new row, never an edit, so the trail from first decision to last is the evidence (2.6.56). Where no `consentKey` is sent the server mints one and returns it; the browser or app keeps it as a first-party, strictly necessary cookie or local key, which is the one thing that may be set before consent. **The key is the tenant's, not the domain's** (2.6.62): the storefront on any of the tenant's verified domains (white-label `claimCustomDomain`) presents the same key and gets the same answer; it is never shared across tenants, because two tenants are two controllers.
-**What the action writes.** `acceptAll` grants every category; `rejectNonEssential` and `withdraw` decline every category but `strictlyNecessary`; `savePreferences` records the categories as sent, and a category not sent is declined (off by default, BL-073); `doNotSellOrShare` declines `marketing` (CCPA/CPRA). **A `globalPrivacyControl` signal declines `marketing` whatever else was chosen.** `strictlyNecessary` is always granted and cannot be declined (422). The decision expires after the tenant's device-consent term and the banner asks again; so does a new `noticeVersion`.
-**Personal data stays out of `marketing`** (ADR-0023, BL-073 §3): where the published banner design has `recordIpAddress` on, the request's IP address and user agent are written to `pii.consent_identifier` against this row, never beside it, by its owner: this calls identity `recordConsentIdentifier` (in `commerce`; ADR-0055 rule 4, CHG-XDW-004). `country` is the edge's geolocation of the request, kept for the geographic consent statistics (2.6.63) without keeping the address. A key already claimed by a guest (`claimDeviceConsent`) is closed: a decision sent against it mints a new key.
-**Publishes `consent.deviceConsentRecorded`** (29 September, build, 2.6.65) in the same transaction as the row, without the IP address or user agent, so a CDP or CRM subscribed through the webhook catalogue receives the consent signal; Google Analytics and Tag Manager read it in the page (`getCookieConsentRuntime`).
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | subject |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Config scope | subject |
-| Conflict policy | append |
-| Reads | `cache:idempotency`, `marketing.cookie_banner_design`, `marketing.device_consent`, `marketing.device_consent_category` |
-| Writes | `cache:idempotency`, `marketing.device_consent`, `marketing.device_consent_category`, `pii.consent_identifier`, `platform.outbox` |
-| Called by | GST-001, GST-066, WEB-001, WEB-024 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `RecordDeviceConsentRequest`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| consentKey | string |  | The key the browser or app already holds; omitted on a first decision, and one is minted. (max length 64; nullable) |
-| channel | CookieConsentChannel: enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes | The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6). |
-| brandId | string (uuid) |  | (nullable) |
-| bannerDesignId | string (uuid) |  | (nullable) |
-| action | DeviceConsentAction: enum (acceptAll, rejectNonEssential, savePreferences, withdraw, doNotSellOrShare) | yes | What the visitor pressed. |
-| categories | array of object |  | Required for savePreferences; ignored for the other actions, which decide every category themselves. |
-| categories[].category | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes | 2.6.53. |
-| categories[].decision | enum (granted, declined) | yes |  |
-| noticeVersion | string | yes |  |
-| language | string |  | (max length 10; nullable) |
-| globalPrivacyControl | boolean |  | (default False) |
-| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) |  | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
-| decidedAt | string (date-time) | yes |  |
-
-**Response**: `DeviceConsent`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| consentKey | string | yes | Opaque, minted by us, not a device fingerprint. (max length 64; read-only) |
-| channel | CookieConsentChannel: enum (b2cWebsite, customerPortal, mobileApp, embeddedCheckout, whiteLabelSite, partnerMicrosite) | yes | The six governed surfaces, as the registry and the banner design name them (pack 17.1.5-17.1.6). |
-| brandId | string (uuid) |  | (nullable) |
-| bannerDesignId | string (uuid) |  | The published CookieBannerPreferenceCenterDesignerView version the visitor was shown. (nullable) |
-| action | DeviceConsentAction: enum (acceptAll, rejectNonEssential, savePreferences, withdraw, doNotSellOrShare) | yes | What the visitor pressed. |
-| categories | array of object | yes | Every category of the design, with the decision this row gives it. (min items 1) |
-| categories[].category | CookieCategory: enum (strictlyNecessary, functional, analytics, personalisation, marketing) | yes | 2.6.53. |
-| categories[].decision | enum (granted, declined) | yes |  |
-| noticeVersion | string | yes | The cookie notice version decided against (white-label setPolicy, kind cookie). |
-| language | string |  | (max length 10; nullable) |
-| globalPrivacyControl | boolean |  | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. (default False) |
-| source | ConsentSource: enum (guestApp, website, kiosk, pos, callCentre, import, agentRecorded, cookieBanner, …) |  | checkout (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders checkoutCart marketingConsents[] and recorded by recordCheckoutConsents, bound to the order and the v… |
-| country | string |  | The edge's geolocation of the request, for the geographic statistics (2.6.63). (pattern ^[A-Z]{2}$; read-only; nullable) |
-| decidedAt | string (date-time) | yes |  |
-| expiresAt | string (date-time) |  | A device consent expires and a subject consent does not. (read-only; nullable) |
-| claimedBySubjectId | string (uuid) |  | Set once, by claimDeviceConsent. (read-only; nullable) |
-| claimedAt | string (date-time) |  | (read-only; nullable) |
-| scopePath | string |  | The partition key (ADR-0005), tenant-scoped: a decision with no subject still belongs to one tenant. (read-only) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Recorded; carries the consentKey to keep |
-| 400 |  | No published banner design with this id for the channel, or a category the design does not offer |
-| 409 |  | noticeVersion is no longer the published one (notice-superseded); read getCookieConsentRuntime again and show the current banner |
-| 422 |  | strictlyNecessary declined, or savePreferences with no categories |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### setConsentPurposes
 
 **`PUT /consent-purposes`**: Configure consent purposes
@@ -1379,7 +1183,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 ### setCookieBannerDesign
 
-**`PUT /cookie-banner-preference`**: Save a cookie banner design as a new version
+**`PUT /cookie-banner-preference/{bannerDesignId}`**: Save a cookie banner design as a new version
 
 **An upsert keyed on `brandId` + `channel` that always writes a new version** (the pack: banner wording and configuration must be version controlled). Saved as `draft`; publishing goes through `approvePrivacyTesting`. `rejectIsOneClick: false`, a non-essential category with `defaultOn: true` or a missing `strictlyNecessary` description is refused (422), and so is a design whose `regulatoryRegimes` include `ccpaCpra` with no `doNotSellOrShare` button (29 September, build). The published version is what visitors get from `getCookieConsentRuntime` and decide against with `recordDeviceConsent`. (decided 29 September, readiness close-out)
 
@@ -1400,6 +1204,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| bannerDesignId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CookieBannerPreferenceCenterDesignerView`
@@ -1479,7 +1284,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 ### setDynamicFieldQuestion
 
-**`PUT /dynamic-field-question`**: Create, change or remove one field of a draft waiver version
+**`PUT /dynamic-field-question/{formId}/{key}`**: Create, change or remove one field of a draft waiver version
 
 **An upsert keyed on `formId` + `formVersion` + `key`, on a `draft` version only** (409 once published: a change is a new version through `createForm`). Writes the `FormField` row and its rule row together. `deleted: true` removes the field, refused (409) while a layout block (`setDigitalWaiverForm`) still points at it. A condition naming a field that does not exist, a cycle between conditions, or validation that contradicts the type is refused (422). (decided 29 September, readiness close-out)
 
@@ -1500,6 +1305,8 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| formId | path | yes | string (uuid) | Addresses the item this write creates or replaces. |
+| key | path | yes | string | Addresses the item this write creates or replaces. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `DynamicFieldsQuestionsConditionalLogicView`
@@ -1581,7 +1388,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 ### setTrackingTechnology
 
-**`PUT /cookie-tracking-digital`**: Add, classify or retire a tracking technology
+**`PUT /cookie-tracking-digital/{technologyId}`**: Add, classify or retire a tracking technology
 
 **An upsert keyed on `name` + `provider` + `domainApplication`.** Approving a `detected` technology requires a `category`; `consentRequired` cannot be false for anything but `strictlyNecessary` (422). Retired rather than deleted: the registry is evidence of what a site did on a date. (decided 29 September, readiness close-out)
 
@@ -1602,6 +1409,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| technologyId | path | yes | string (uuid) | Addresses the item this write creates or replaces. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CookieTrackingDigitalTechnologyRegistryView`
@@ -1931,7 +1739,7 @@ Items whose product has been withdrawn are returned with `isAvailable: false` ra
 
 Here rather than in tenancy. `platform.device` is staff hardware bound to a workstation — printers, readers, turnstiles. A guest's phone is neither owned by the venue nor bound to anything, and it is registered for one reason: to be sent to. That makes it guest engagement.
 **Ordered by `registeredAt` descending, `id` as the tiebreak** (decided 14 October 2026, Chinmay, ADAM CR-088, CHG-MKT-003): the newest registration, usually the phone in the guest's hand, first. `registeredAt` is never null and is not changed by a re-registration, so a device does not move while a guest pages; the cursor is (`registeredAt`, `id`), as `PageCursor` says.
-**Every status is listed**, `active`, `failed` and `revoked`, each with its `status` and, for a revoked one, `revokedAt`: GST-073 and WEB-024 show a revoked device as revoked rather than dropping it, so a guest can see that the old phone that still held tickets was cut off, and a failed one as needing the app opened again. There is no status filter; a screen that wants active devices only filters what it is given.
+**Every status is listed**, `active`, `failed` and `revoked`, each with its `status` and, for a revoked one, `revokedAt`: GST-073 and WEB-024 show a revoked device as revoked rather than dropping it, so a guest can see that the old phone that still held tickets was cut off, and a failed one as needing the app opened again. **A revoked device is also signed out** (CHG-MOD-009): `revokeGuestDevice` ended its guest sessions and refresh tokens in Identity, so a revoked device is neither sent to nor signed in. There is no status filter; a screen that wants active devices only filters what it is given.
 **Guests only** (ADR-0025): `bearerAuth` is not accepted; a staff token has no permission here (CHG-MKT-003, as the developer of ticket 30707 proposed).
 
 |  |  |
@@ -2097,6 +1905,8 @@ Called on install and again whenever the provider rotates the token — which ha
 Sign-out, uninstall, or a guest removing a device they no longer have. Revoked rather than deleted — a token that starts failing needs a record explaining why, or the same dead token gets retried indefinitely.
 **A revoke is final and keeps no token** (decided 14 October 2026, Chinmay, ADAM CR-086, CHG-MKT-001): `status` `revoked`, `revokedAt` now, and `tokenRef`, `tokenFingerprint` and `installationId` cleared, so nothing can be sent to it and no later registration matches it. The row stays, with its platform, model and dates, as the guest's record of the device. Revoking a revoked device is `204` again.
 
+**A revoke also signs that device out** (decided 14 October 2026, Chinmay, the audit of ticket 27741; CHG-MOD-009). After the row is revoked, and only where it had an `installationId`, this calls Identity's `endGuestDeviceSessions` (serviceAuth, cell-internal: Identity is in `commerce`, this in `operations`, ADR-0055 rule 4) with the guest's `subjectId` and that `installationId`, which the app sent as `deviceId` when it signed in. Identity ends every guest session of this guest on that device and revokes each one's refresh token, so the old phone can neither refresh nor call again; the guest's other devices stay signed in. Revoking the device the guest is using signs it out too, so the app returns to sign-in. If Identity does not answer, the device stays revoked and this answers `502` `device-sessions-not-ended`; the client calls again, which is a `204` revoke that asks Identity again.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -2107,7 +1917,7 @@ Sign-out, uninstall, or a guest removing a device they no longer have. Revoked r
 | Config scope | subject |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.guest_device` |
-| Writes | `cache:idempotency`, `marketing.guest_device` |
+| Writes | `cache:idempotency`, `identity.guest_session`, `marketing.guest_device` |
 | Called by | GST-073, WEB-024 |
 | State model | Guest device ([states/guest-device.yaml](../../../states/guest-device.yaml)): moves `active` -> `revoked` |
 
@@ -2123,8 +1933,9 @@ Sign-out, uninstall, or a guest removing a device they no longer have. Revoked r
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 204 |  | Revoked |
+| 204 |  | Revoked, and the device signed out |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 502 |  | The device is revoked but Identity did not end its sessions (device-sessions-not-ended); call again to retry (CHG-MOD-009). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### searchGuests
@@ -2132,6 +1943,9 @@ Sign-out, uninstall, or a guest removing a device they no longer have. Revoked r
 **`GET /guests`**: Search guest profiles
 
 Returns profiles the caller's scope permits. Personal fields are returned only to principals holding `GUEST_VIEW_PII`; everyone else sees the opaque subject reference and behavioural attributes.
+
+
+**Order.** Sorted by `displayName` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -2232,7 +2046,7 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | sourceReferenceId | string (uuid) |  | (nullable) |
 | awardedAt | string (date-time) | yes |  |
 | expiresAt | string (date-time) |  | (nullable) |
-| status | string | yes | (max length 20) |
+| status | string | yes | (max length 20; read-only) |
 
 **Response**: `MarketingCustomerBadge`
 
@@ -2246,7 +2060,7 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | sourceReferenceId | string (uuid) |  | (nullable) |
 | awardedAt | string (date-time) | yes |  |
 | expiresAt | string (date-time) |  | (nullable) |
-| status | string | yes | (max length 20) |
+| status | string | yes | (max length 20; read-only) |
 
 **Responses**
 
@@ -2405,6 +2219,9 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 **A badge can expire and can be revoked**, so this returns the status rather than a list of names — a guest page showing a lapsed badge as current is a promise the venue did not make.
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own badges (`customerId` is the caller's); another guest's badges is refused exactly as one that does not exist, never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
+
+**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `MARKETING_VIEW` |
@@ -2439,7 +2256,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | items[].sourceReferenceId | string (uuid) |  | (nullable) |
 | items[].awardedAt | string (date-time) | yes |  |
 | items[].expiresAt | string (date-time) |  | (nullable) |
-| items[].status | string | yes | (max length 20) |
+| items[].status | string | yes | (max length 20; read-only) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -2457,6 +2274,9 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 22.6. **Everyone on the board is a nickname.** A leaderboard shows one guest something about another, so the entry carries a rank, a nickname and a score and **no subject identifier** — a nickname beside an id the client can resolve elsewhere is decoration over a disclosure.
 **The caller's own row is marked `isMe` rather than named**, which is how a client highlights it without being told who anybody else is.
 **A guest who has not set a nickname appears as a rank with no name.** Not hidden — the standings would be wrong and a board that omits people lies about who is second — and **never filled in from their real name**, which is the disclosure this exists to prevent and would arrive silently on the day they first placed.
+
+
+**Order.** Sorted by `rank` ascending.
 
 |  |  |
 |---|---|
@@ -2503,6 +2323,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 **`GET /loyalty/programmes`**: List loyalty programmes
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published loyalty programmes, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Order.** Sorted by `rank` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -2569,6 +2390,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 **`GET /loyalty/rewards`**: What points can be turned into
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published rewards, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Order.** Sorted by `name` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -2597,6 +2419,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of MarketingReward | yes |  |
+| items[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | items[].id | string (uuid) |  |  |
 | items[].loyaltyProgramId | string (uuid) | yes |  |
 | items[].code | string | yes | (max length 100) |
@@ -2727,6 +2550,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | tiers[].earnMultiplier | number |  | Applied to every earn rule while the guest holds this tier. (nullable) |
 | tiers[].isActive | boolean |  | (default True) |
 | redemptionRules | array of MarketingPointsRedemptionRule |  |  |
+| redemptionRules[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | redemptionRules[].id | string (uuid) |  |  |
 | redemptionRules[].loyaltyProgramId | string (uuid) | yes |  |
 | redemptionRules[].pointRedemptionRuleCode | string | yes | (max length 100) |
@@ -2769,6 +2593,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | tiers[].earnMultiplier | number |  | Applied to every earn rule while the guest holds this tier. (nullable) |
 | tiers[].isActive | boolean |  | (default True) |
 | redemptionRules | array of MarketingPointsRedemptionRule |  |  |
+| redemptionRules[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | redemptionRules[].id | string (uuid) |  |  |
 | redemptionRules[].loyaltyProgramId | string (uuid) | yes |  |
 | redemptionRules[].pointRedemptionRuleCode | string | yes | (max length 100) |
@@ -2793,7 +2618,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 
 ### setReward
 
-**`PUT /loyalty/rewards`**: Define a reward and its points cost
+**`PUT /loyalty/rewards/{rewardId}`**: Define a reward and its points cost
 
 |  |  |
 |---|---|
@@ -2812,12 +2637,14 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| rewardId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `MarketingReward`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) |  |  |
 | loyaltyProgramId | string (uuid) | yes |  |
 | code | string | yes | (max length 100) |
@@ -2833,6 +2660,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) |  |  |
 | loyaltyProgramId | string (uuid) | yes |  |
 | code | string | yes | (max length 100) |
@@ -3241,6 +3069,7 @@ BL-034. **The reward fires on the referee's qualifying act, not on the sign-up**
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Issued |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createUrlRedirect
@@ -3853,6 +3682,10 @@ Takes a token of any kind: a QR payload, an RFID or NFC serial, a membership car
 Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it was `getGuestOrderStatus` — **order tracking on a lost-property screen.**
 **Scoped to the caller, not filtered by it.** A guest-facing list that takes a subject parameter is a list somebody will call with another subject.
 
+
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+**Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -4003,7 +3836,7 @@ their own subject and they can read back only their own reports.
 | Scope level | venue |
 | Part of slice | core |
 | Wave | 1 |
-| Offline | yes |
+| Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `marketing.lost_item`, `pii.subject`, `venuemap.point` |
@@ -4193,6 +4026,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | description | string |  |  |
 | resolutionNote | string |  | (nullable) |
 | messages | array of CaseMessage |  |  |
+| messages[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | messages[].resolution | string |  | What was actually done about it. |
 | messages[].id | string | yes |  |
 | messages[].body | string | yes |  |
@@ -4203,6 +4037,7 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | messages[].attachmentRefs | array of string |  |  |
 | messages[].recordedAt | string (date-time) | yes | Device time — addCaseMessage is offline-capable. |
 | messages[].syncedAt | string (date-time) |  | Server time the message arrived. (read-only) |
+| messages[].caseId | string (uuid) | yes | The case this message belongs to, from the path of addCaseMessage (the opening one, createCase). (read-only) |
 
 **Responses**
 
@@ -4250,7 +4085,7 @@ written by OrderService (`access.entitlement` with `invitationId`, CHG-FXC-007).
 | response | enum (accept, decline) | yes |  |
 | plusOnes | integer |  | (default 0) |
 
-**Response**: `Invitation`
+**Response**: `CampaignInvitation`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
@@ -4589,7 +4424,7 @@ Where the form has an expiry, a live acceptance means **a returning participant 
 | Scope level | venue |
 | Part of slice | core |
 | Wave | 1 |
-| Offline | yes |
+| Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `marketing.consent_record`, `marketing.form_definition`, `marketing.form_submission`, `marketing.waiver_requirement`, `pii.subject` |
@@ -4725,7 +4560,7 @@ CF-96 fixed this class for 28 guest screens and the underlying pattern was never
 | Conflict policy | lastWriterWins |
 | Guest callable | True |
 | Reads | `cache:idempotency`, `marketing.guest_profile` |
-| Writes | `cache:idempotency`, `marketing.guest_profile`, `pii.subject` |
+| Writes | `cache:idempotency`, `marketing.guest_preference`, `marketing.guest_profile`, `pii.subject` |
 | Called by | GST-039, WEB-011, WEB-020 |
 
 **Parameters**
@@ -4905,6 +4740,7 @@ Per-language bodies with named merge fields. A template missing a version in an 
 |---|---|---|
 | 201 |  | Created |
 | 400 |  | Unknown merge field, or a required language is missing |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listMyNotifications
@@ -4913,6 +4749,9 @@ Per-language bodies with named merge fields. A template missing a version in an 
 
 **The in-venue notifications feed** (decided 29 September, rev 3 GAP-C1: the feed is in the first release, reversing the R242 deferral). Every in-app message dispatched to this guest — queue calls, order ready, booking changes, venue alerts — newest first. It reads the same `marketing.message_dispatch` rows a push or SMS is sent from, filtered to channel `inApp`, so a notification the guest sees is always one the venue actually sent.
 **Scoped to the caller, not filtered by it**, like `/me/cases`: there is no subject parameter. `unreadOnly` returns only what the guest has not opened. Agreed 29 September, our build plan.
+
+
+**Order.** Sorted by `title` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -5224,7 +5063,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | consent_purpose | text | no |  |
 | send_window | jsonb | no | Hours during which sending is permitted. |
 | send_time_mode | text | no | optimised sends each recipient at the hour ai.requestSuggestion (kind sendTime) gives for them, inside sendWindow (29 September, build pass, group G2; 22.3.19). |
-| optimise_channel | boolean | no | With sendTimeMode optimised, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). |
+| optimises_channel | boolean | no | With sendTimeMode optimised, route each recipient to the channel the suggestion names, among the channels they consented to (22.9.16). |
 | ab_test | jsonb | no | How the variants are tested. |
 | id | uuid | yes |  |
 | budget_cap | numeric(18,4) | no |  |
@@ -5295,6 +5134,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | resolution | text | no | What was actually done about it. |
 | id | text | yes |  |
 | body | text | yes |  |
@@ -5305,7 +5145,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | attachment_refs | text[] | no |  |
 | recorded_at | timestamptz | yes | Device time — addCaseMessage is offline-capable. |
 | synced_at | timestamptz | no | Server time the message arrived. |
-| case_id | uuid | no | Points at marketing.case. |
+| case_id | uuid | yes | The case this message belongs to, from the path of addCaseMessage (the opening one, createCase). |
 
 ### `marketing.challenge`
 
@@ -5452,7 +5292,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sender | text | yes | Resolved, never declared. |
 | sender_principal_id | uuid | no |  |
 | body | text | yes |  |
-| ai_interaction_id | uuid | no | Where the assistant sent it. |
+| ai_activity_id | uuid | no | Where the assistant sent it. |
 | sent_at | timestamptz | yes |  |
 | read_at | timestamptz | no |  |
 | conversation_id | uuid | yes | Points at marketing.conversation. |
@@ -5479,10 +5319,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 | body | jsonb | no |  |
 | position | text | yes |  |
 | theme_id | text | no | The white-label theme it takes colours and fonts from. |
-| reject_is_one_click | boolean | yes | Must be true. |
+| buttons | jsonb | no |  |
+| is_reject_one_click | boolean | yes | Must be true. |
+| links | jsonb | no |  |
+| categories | jsonb | yes |  |
 | languages | text[] | yes | Every language the storefront serves; Arabic renders right to left. |
 | regulatory_regimes | text[] | no | 2.6.60 (29 September, build). |
-| record_ip_address | boolean | no | 2.6.55, "if legally permitted" (29 September, build). |
+| records_ip_address | boolean | no | 2.6.55, "if legally permitted" (29 September, build). |
 | notice_version | text | no | Moves with the cookie policy (white-label setPolicy, kind cookie). |
 | version | integer | no |  |
 | status | text | no |  |
@@ -5515,7 +5358,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | action | text | yes |  |
 | notice_version | text | yes | The cookie notice version decided against (white-label setPolicy, kind cookie). |
 | language | text | no |  |
-| global_privacy_control | boolean | no | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. |
+| honours_global_privacy_control | boolean | no | The browser sent a Global Privacy Control signal; honoured as a CCPA/CPRA opt-out of sale and sharing. |
 | source | text | no |  |
 | country | text | no | The edge's geolocation of the request, for the geographic statistics (2.6.63). |
 | decided_at | timestamptz | yes |  |
@@ -5678,17 +5521,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| product_id | uuid | yes |  |
-| performance_id | uuid | no |  |
-| quantity | integer | yes |  |
-| reason | text | yes |  |
-| offered_by_principal_id | uuid | yes |  |
-| issued_by_principal_id | uuid | no | Who pressed the button, which is not always who offered it. |
-| recipient_name | text | no |  |
+| campaign_id | uuid | yes |  |
+| subject_id | uuid | no |  |
 | recipient_email | text | no |  |
-| cost_center_id | uuid | no |  |
+| token | text | yes | Single-use and unguessable. |
+| plus_ones | integer | no |  |
+| status | text | yes |  |
 | entitlement_ids | text[] | no |  |
-| issued_at | timestamptz | yes |  |
+| responded_at | timestamptz | no |  |
 | scope_path | text | no | The partition key (ADR-0005). |
 
 ### `marketing.invitation_campaign`
@@ -5848,6 +5688,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | loyalty_program_id | uuid | yes |  |
 | point_redemption_rule_code | text | yes |  |
@@ -5907,7 +5748,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | recorded_at | timestamptz | yes |  |
 | status | text | yes |  |
 | response | text | no |  |
-| response_is_public | boolean | no |  |
+| is_response_public | boolean | no |  |
 | responded_by_principal_id | uuid | no |  |
 | opened_case_id | uuid | no | Case raised automatically where the rating fell below the venue's threshold. |
 
@@ -5915,6 +5756,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | loyalty_program_id | uuid | yes |  |
 | code | text | yes |  |
@@ -6076,13 +5918,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-203 operations, added to this service in later releases without changing any of the above.
+206 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | campaign | `getCampaign`, `getCampaignPerformance`, `listCampaigns`, `pauseCampaign`, `testSendCampaign`, `unscheduleCampaign` |
 | case | `addCaseMessage`, `createCase`, `createCaseClassificationIntelligent`, `escalateCase`, `getCase`, `getCaseInvestigationResolution`, `listAgentWorkloadAvailability`, `listCaseCategories`, `listCaseResolutionClosure`, `listCases`, `listContact`, `listContactAutomation`, `listCustomerService`, `listCustomerServiceProfile`, `listEscalationCollaborationInternal`, `listEscalationCriticalCase`, `listIntelligentRoutingSkills`, `listQualityAgentEvaluation`, `listServiceQueues`, `listServiceRootCause`, `listSlaPolicyService`, `listUnifiedInteractionCommunication`, `reopenCase`, `setAgentServiceProfile`, `setCaseCategoryDefinition`, `setCaseInternalRequest`, `setCaseInvestigationResolution`, `setCaseResolution`, `setContactAutomation`, `setCustomerServiceCopilot`, `setIntelligentRoutingSkill`, `setOrderBookingTicket`, `setQualityEvaluation`, `setRefundCompensationService`, `setServiceQueueDefinition`, `updateCase` |
-| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
+| consent | `actOnWaiverRequirements`, `addSuppression`, `approvePrivacyTesting`, `approveWaiverTesting`, `getConsentHistory`, `getDeviceConsentHistory`, `getDigitalWaiverForm`, `getLocalizationBrandingCustomer`, `getSignatorySignatureGuardian`, `getSuppressionList`, `getWaiverTesting`, `listComplianceEvidenceWaiver`, `listConsentEvidenceWithdrawal`, `listConsentPreferenceCommunication`, `listCookieBannerPreference`, `listCookieScanFindings`, `listCookieScanPolicies`, `listCookieScans`, `listCookieTrackingDigital`, `listCustomerPrivacyConsent`, `listDataProcessingPurpose`, `listDataRetentionExpiry`, `listDataSubjectCustomer`, `listDeletionAnonymizationRestriction`, `listDeviceConsents`, `listDigitalSigningCollection`, `listDynamicFieldQuestion`, `listMinorGuardianGroup`, `listMissingExpiredInvalid`, `listParticipantWaiverStatus`, `listPrivacy`, `listPrivacyCompliance`, `listPrivacyComplianceExceptions`, `listPrivacyConsent`, `listPrivacyEvidenceCompliance`, `listPrivacyNoticePolicy`, `listProductEventExperience`, `listPublishedTrackingTechnologies`, `listSiteWaiverException`, `listTrackingTechnologyCatalogue`, `listVersioningEffectiveDate`, `listWaiver`, `listWaiverComplianceOperational`, `listWaiverComplianceRisk`, `listWaiverConsent`, `listWaiverTemplateMaster`, `listWaiverTriggerEligibility`, `listWaiverVerificationQueue`, `recordCheckoutConsents`, `recordCookieScan`, `recordDeviceConsent`, `setCommunicationPreferenceMarketing`, `setConsentCapturePoint`, `setCookieScanPolicy`, `setDataDiscoveryAccess`, `setDataProcessingPurpose`, `setDigitalWaiverForm`, `setLegalHold`, `setLocalizationBrandingCustomer`, `setMinorGuardianAge`, `setPrivacyAction`, `setPrivacyComplianceException`, `setPrivacyNoticePolicyGovernance`, `setPrivacyRequest`, `setPrivacyRequestTypes`, `setSignatorySignatureGuardian`, `setTrackingTechnologyCatalogueEntry`, `setWaiverAssociation`, `setWaiverException`, `setWaiverTemplateMaster`, `setWaiverTriggerRule`, `setWaiverVerificationValidation` |
 | feedback | `listCustomerSatisfactionFeedback`, `listReviews`, `respondToReview` |
 | general | `getCustomerServiceCopilot` |
 | guest | `getGuestProfile`, `mergeGuestProfiles`, `updateGuestProfile` |

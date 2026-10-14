@@ -8,6 +8,7 @@
 | Runtime | reactNativeTablet |
 | App | venue-pos |
 | Repository | P04 ticvai-pos; P15 none yet: ask the lead |
+| Repository layout | P04 ticvai-pos: assumed: reactNativeTablet (the package's runtime); package manager the one its lock file belongs to; screens in `src/routes/<area>/<Component>.tsx` (assumed); scripts: as its package.json says (not read: the clone of 2026-10-14 was refused; assumed; owner confirms) |
 | Offline | yes |
 | Themes | light, dark |
 | Directions | ltr, rtl |
@@ -33,7 +34,7 @@
 | [KIT-006](#kit-006-expeditor-order-assembly) | Expeditor & Order Assembly | Kitchen | 1 | 6 |
 | [KIT-007](#kit-007-guest-collection-buzzer-digital-notification) | Guest Collection, Buzzer & Digital Notification | Kitchen | 1 | 1 |
 | [KIT-008](#kit-008-exceptions-re-fire-unavailable-items) | Exceptions, Re-Fire & Unavailable Items | Kitchen | 1 | 5 |
-| [KIT-009](#kit-009-sla-priority-service-rules) | SLA, Priority & Service Rules | Kitchen | 1 | 3 |
+| [KIT-009](#kit-009-sla-priority-service-rules) | SLA, Priority & Service Rules | Kitchen | 1 | 4 |
 | [KIT-010](#kit-010-kitchen-performance-ai-operational-optimization) | Kitchen Performance, AI & Operational Optimization | Kitchen | 1 | 4 |
 | [POS-000](#pos-000-sign-in) | Sign In | Shift | 1 | 8 |
 | [POS-001](#pos-001-begin-shift) | Begin Shift | Shift | 1 | 7 |
@@ -46,7 +47,7 @@
 | [POS-008](#pos-008-reports) | Reports | Reports | 1 | 4 |
 | [POS-009](#pos-009-staff-roster) | Staff Roster | Shift | 1 | 3 |
 | [POS-010](#pos-010-add-to-existing-ticket) | Add to Existing Ticket | Sell | 1 | 4 |
-| [POS-011](#pos-011-returns-refunds-exchanges) | Returns, Refunds & Exchanges | Sell | 1 | 7 |
+| [POS-011](#pos-011-returns-refunds-exchanges) | Returns, Refunds & Exchanges | Sell | 1 | 8 |
 | [POS-012](#pos-012-omnichannel-order-fulfilment-center) | Omnichannel Order & Fulfilment Center | Sell | 1 | 6 |
 | [POS-013](#pos-013-mobile-pos-event-sales-offline-operations) | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 3 |
 | [POS-014](#pos-014-sales-exceptions-controls-operational-actions) | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 4 |
@@ -446,7 +447,7 @@
 |---|---|---|---|---|
 | `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
 | `setItemAvailability` | [FnbService](../backend/FnbService.md#setitemavailability) | onAction | Mark an item available or eighty-sixed | `PRODUCT_CONFIGURE` |
-| `getHaccpStatus` | [FnbService](../backend/FnbService.md#gethaccpstatus) | onLoad | getHaccpStatus | `INCIDENT_VIEW` |
+| `getHaccpStatus` | [FnbService](../backend/FnbService.md#gethaccpstatus) | onLoad | Where the venue's food-safety checks stand right now, beside the exceptions | `INCIDENT_VIEW` |
 | `list86Events` | [FnbService](../backend/FnbService.md#list86events) | onLoad | What came off the menu today, when, and for how long | `PRODUCT_VIEW` |
 | `logKitchenException` | [FnbService](../backend/FnbService.md#logkitchenexception) | onAction | Something went wrong that is not a refire | `INCIDENT_REPORT` |
 
@@ -496,6 +497,7 @@
 | `setKitchenSla` | [FnbService](../backend/FnbService.md#setkitchensla) | onAction | The outlet's kitchen service-time targets | `PRODUCT_CONFIGURE` |
 | `getKitchenSla` | [FnbService](../backend/FnbService.md#getkitchensla) | onLoad | The targets set now, so the rules editor loads what it changes (CHG-CSA-045) | `PRODUCT_VIEW` |
 | `getCourseRules` | [FnbService](../backend/FnbService.md#getcourserules) | onLoad | How this outlet courses by default, shown beside the targets (CHG-CSA-045) | `PRODUCT_VIEW` |
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | The station's queue depth and oldest ticket age, for the station-load tile (audit fix S-METRIC-NO-OP, CHG-SCO-006) | `ORDER_VIEW` |
 
 **States**
 
@@ -573,7 +575,7 @@
 | Route | `/sign-in` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SignInTerminal` |
-| Suggested location | `src/routes/SignInTerminal.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/SignInTerminal.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | form |
 
 **Entry parameters**
@@ -591,7 +593,7 @@
 | `listActiveSessions` | [IdentityService](../backend/IdentityService.md#listactivesessions) | onAction | Who holds this till now, read only after a supervisor's PIN step-up: nobody is signed in at the door (decided by Chinmay, 3 October 2026 (CHG-SPF-012)) | `SESSION_FORCE_LOGOUT` |
 | `forceLogout` | [IdentityService](../backend/IdentityService.md#forcelogout) | onAction | A supervisor ends the session of the operator holding the till, after login was refused 409 (audit R184) | `SESSION_FORCE_LOGOUT` |
 | `selectRole` | [IdentityService](../backend/IdentityService.md#selectrole) | onAction | Choose which role to work as when login returns more than one | `None` |
-| `getCurrentSession` | [IdentityService](../backend/IdentityService.md#getcurrentsession) | onAction | Read the session the login just created | `None` |
+| `getCurrentSession` | [IdentityService](../backend/IdentityService.md#getcurrentsession) | background | Read the session the login just created (role, venue and workstation every other screen reads), with no tap of its own | `None` |
 | `createMfaChallenge` | [IdentityService](../backend/IdentityService.md#createmfachallenge) | onAction | Second factor after login when the principal holds a permission in mfaRequiredForPermissions; action `signIn`, the primary method (authenticator app), or the email method as the fallback (decided 28 September, audit R135, R126 (5)) | `None` |
 | `verifyMfaChallenge` | [IdentityService](../backend/IdentityService.md#verifymfachallenge) | onAction | Completes sign-in with the code; the session is usable only after it. Five wrong codes lock step-up (audit R126 (6)) | `None` |
 
@@ -626,7 +628,7 @@
 | Route | `/shift/begin-shift` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `BeginShiftWizard` |
-| Suggested location | `src/routes/shift/BeginShiftWizard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/shift/BeginShiftWizard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | approvalInbox |
 
 **Entry parameters**
@@ -646,8 +648,8 @@
 | `approveShiftOpen` | [OrderService](../backend/OrderService.md#approveshiftopen) | onAction | Approve a shift opening outside tolerance | `SHIFT_APPROVE_OPEN` |
 | `resumeShift` | [OrderService](../backend/OrderService.md#resumeshift) | onAction | Resume a suspended shift | `SHIFT_OPEN` |
 | `selectRole` | [IdentityService](../backend/IdentityService.md#selectrole) | onAction | Choose a role for a multi-role session | `None` |
-| `getWorkstationHealth` | [TenancyService](../backend/TenancyService.md#getworkstationhealth) | onLoad | getWorkstationHealth | `DEVICE_VIEW` |
-| `listDenominations` | [OrderService](../backend/OrderService.md#listdenominations) | onLoad | listDenominations | `SHIFT_OPEN` |
+| `getWorkstationHealth` | [TenancyService](../backend/TenancyService.md#getworkstationhealth) | onLoad | Whether the till and its peripherals are well before the shift opens | `DEVICE_VIEW` |
+| `listDenominations` | [OrderService](../backend/OrderService.md#listdenominations) | onLoad | The notes and coins the opening float is counted in | `SHIFT_OPEN` |
 
 **States**
 
@@ -696,7 +698,7 @@
 | Route | `/sell/sell-ticket-catalogue` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SellTicketCatalogueBoard` |
-| Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -738,7 +740,7 @@
 | `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Price and stock check by barcode | `PRODUCT_VIEW` |
 | `issueGameCard` | [VenueOpsService](../backend/VenueOpsService.md#issuegamecard) | onAction | Issue or activate a game card | `ORDER_CREATE` |
 | `loadGameCredits` | [WalletService](../backend/WalletService.md#loadgamecredits) | onAction | Load credits onto a card | `WALLET_OPERATE` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put a product, with its date, session or seats, in the sale's cart | `None` |
 | `getGuestLoyalty` | [MarketingService](../backend/MarketingService.md#getguestloyalty) | onAction | The attached guest's points, tier and what is within reach | `GUEST_VIEW` |
 | `identifyGuest` | [MarketingService](../backend/MarketingService.md#identifyguest) | onAction | Resolve any identifier to a guest | `GUEST_VIEW` |
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | Every ticket, pass and membership this guest holds | `ORDER_VIEW` |
@@ -794,7 +796,7 @@
 | Route | `/sell/sell-ticket-catalogue/timedentry` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SellTicketCatalogueBoard` |
-| Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -850,7 +852,7 @@
 | Route | `/sell/sell-ticket-catalogue/seatmap` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SellTicketCatalogueBoard` |
-| Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/SellTicketCatalogueBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -905,7 +907,7 @@
 | Route | `/payment/payment` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `PaymentForm` |
-| Suggested location | `src/routes/payment/PaymentForm.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/payment/PaymentForm.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -970,7 +972,7 @@
 | Route | `/sell/held-orders` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `HeldOrdersBoard` |
-| Suggested location | `src/routes/sell/HeldOrdersBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/HeldOrdersBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1014,7 +1016,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| POS-002 | Recall this held sale | cart, cartHoldExpiresAt, guest, discount, table, orderType | sale.resume |
+| POS-002 | Recall this held sale | orderId, subjectId | sale.resume |
 | POS-003 | Sell — Timed Entry |  |  |
 | POS-004 | Sell — Seat Map | performanceId |  |
 
@@ -1030,7 +1032,7 @@
 | Route | `/shift/close-shift` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `CloseShiftWizard` |
-| Suggested location | `src/routes/shift/CloseShiftWizard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/shift/CloseShiftWizard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | approvalInbox |
 
 **Entry parameters**
@@ -1048,7 +1050,7 @@
 | `acceptShiftVariance` | [OrderService](../backend/OrderService.md#acceptshiftvariance) | onAction | Supervisor accepts a variance above threshold on the till, after closeShift left the shift pendingVariance (OVERSHORT_ACCEPT, PIN step-up; audit R080 (e)) | `OVERSHORT_ACCEPT` |
 | `getCurrentShift` | [OrderService](../backend/OrderService.md#getcurrentshift) | onLoad | The open or suspended shift on the session's workstation | `SHIFT_OPEN` |
 | `listCashMovements` | [OrderService](../backend/OrderService.md#listcashmovements) | onLoad | Lifts, adds and the opening float | `REPORT_VIEW_WORKSTATION` |
-| `listDenominations` | [OrderService](../backend/OrderService.md#listdenominations) | onLoad | listDenominations | `SHIFT_OPEN` |
+| `listDenominations` | [OrderService](../backend/OrderService.md#listdenominations) | onLoad | The notes and coins the drawer is counted in, blind | `SHIFT_OPEN` |
 | `rejectShiftVariance` | [OrderService](../backend/OrderService.md#rejectshiftvariance) | onAction | A supervisor sends a counted shift back for a recount, with a reason and their PIN; the shift stays pendingVariance (DEC-175; CHG-CSP-013) | `OVERSHORT_ACCEPT` |
 | `giveShiftVarianceReason` | [OrderService](../backend/OrderService.md#giveshiftvariancereason) | onAction | The cashier's reason for a difference within the threshold, given after the blind count is locked; closes the shift (the client's policy of 6 October 2026, T10.1; CHG-R4-019) | `SHIFT_CLOSE` |
 | `getShiftCountLines` | [OrderService](../backend/OrderService.md#getshiftcountlines) | onAction | The denominations the cashier counted, line by line, for the supervisor reviewing the shift; counted values only, never the expected figure (CHG-CSP-014) | `REPORT_VIEW_WORKSTATION` |
@@ -1092,7 +1094,7 @@
 | Route | `/reports/reports` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ReportsDashboard` |
-| Suggested location | `src/routes/reports/ReportsDashboard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/reports/ReportsDashboard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1140,7 +1142,7 @@
 | Route | `/sell/staff-roster` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `StaffRosterBoard` |
-| Suggested location | `src/routes/sell/StaffRosterBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/StaffRosterBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | approvalInbox |
 
 **Entry parameters**
@@ -1188,7 +1190,7 @@
 | Route | `/sell/add-to-existing-ticket` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `AddToExistingTicketDetail` |
-| Suggested location | `src/routes/sell/AddToExistingTicketDetail.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/AddToExistingTicketDetail.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | statusTracker |
 
 **Entry parameters**
@@ -1240,7 +1242,7 @@
 | Route | `/sell/returns-refunds-exchanges` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ReturnsRefundsExchangesBoard` |
-| Suggested location | `src/routes/sell/ReturnsRefundsExchangesBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/ReturnsRefundsExchangesBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1261,8 +1263,9 @@
 | `getReturnPolicy` | [RetailService](../backend/RetailService.md#getreturnpolicy) | onAction | Read the retail return policy | `ORDER_VIEW` |
 | `lookupRetailSale` | [RetailService](../backend/RetailService.md#lookupretailsale) | onAction | Find a sale from a receipt; returns a list with matchedBy, a pick list when several match (audit R215) | `ORDER_VIEW` |
 | `createRetailReturn` | [RetailService](../backend/RetailService.md#createretailreturn) | onAction | Accept a return | `ORDER_REFUND` |
-| `listSerialisedItems` | [InventoryService](../backend/InventoryService.md#listserialiseditems) | onLoad | listSerialisedItems | `PRODUCT_VIEW` |
+| `listSerialisedItems` | [InventoryService](../backend/InventoryService.md#listserialiseditems) | onLoad | The serialised items a return takes back, found by serial | `PRODUCT_VIEW` |
 | `issueCreditMemo` | [LedgerService](../backend/LedgerService.md#issuecreditmemo) | onAction | Issue a credit memo | `LEDGER_POST` |
+| `listOrderRefunds` | [OrderService](../backend/OrderService.md#listorderrefunds) | onInterval | Follows createRefund (202) until what it started settles: List refunds against an order | `ORDER_VIEW` |
 
 **States**
 
@@ -1285,7 +1288,7 @@
 
 ## POS-012 Omnichannel Order & Fulfilment Center
 
-**Omnichannel Order & Fulfilment Center — from the client design board, 20 August.**
+**Hand over the orders waiting at this outlet (takeaway, delivery and collection), reserve merchandise for a guest to collect, and hand dropped goods back to the guest.**
 
 |  |  |
 |---|---|
@@ -1295,7 +1298,7 @@
 | Route | `/sell/omnichannel-order-fulfilment-center` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `OmnichannelOrderFulfilmentCenterBoard` |
-| Suggested location | `src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1348,7 +1351,7 @@
 | Route | `/sell/mobile-pos-event-sales-offline-operations` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `MobilePosEventSalesOfflineOperatioBoard` |
-| Suggested location | `src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1389,7 +1392,7 @@
 
 ## POS-014 Sales Exceptions, Controls & Operational Actions
 
-**Sales Exceptions, Controls & Operational Actions — from the client design board, 20 August.**
+**Handle the till's exceptions on an order: open the drawer without a sale, with a reason, void an order, or apply a manual discount.**
 
 |  |  |
 |---|---|
@@ -1399,7 +1402,7 @@
 | Route | `/sell/sales-exceptions-controls-operational-actions` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SalesExceptionsControlsOperationalBoard` |
-| Suggested location | `src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1448,7 +1451,7 @@
 | Route | `/sell/cash-operations-dashboard` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `CashOperationsDashboardBoard` |
-| Suggested location | `src/routes/sell/CashOperationsDashboardBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/CashOperationsDashboardBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1495,7 +1498,7 @@
 | Route | `/sell/till-configuration` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `TillConfigurationBoard` |
-| Suggested location | `src/routes/sell/TillConfigurationBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/TillConfigurationBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1534,7 +1537,7 @@
 
 ## POS-017 Cash In / Cash Out Operations
 
-**Cash In / Cash Out Operations — from the client design board, 20 August.**
+**Record cash added to or lifted from the drawer during the shift, counted by denomination and with a reason, against the shift's movements so far.**
 
 |  |  |
 |---|---|
@@ -1544,7 +1547,7 @@
 | Route | `/sell/cash-in-cash-out-operations` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `CashInCashOutOperationsBoard` |
-| Suggested location | `src/routes/sell/CashInCashOutOperationsBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/CashInCashOutOperationsBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | configEditor |
 
 **Entry parameters**
@@ -1589,7 +1592,7 @@
 | Route | `/sell/safe-drop-cash-transfer-management` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SafeDropCashTransferManagementBoard` |
-| Suggested location | `src/routes/sell/SafeDropCashTransferManagementBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/SafeDropCashTransferManagementBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1638,7 +1641,7 @@
 | Route | `/sell/shift-templates-policies` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ShiftTemplatesPoliciesBoard` |
-| Suggested location | `src/routes/sell/ShiftTemplatesPoliciesBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/ShiftTemplatesPoliciesBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1676,7 +1679,7 @@
 
 ## POS-020 Shift Exceptions & Alerts
 
-**Shift Exceptions & Alerts — from the client design board, 20 August.**
+**Work the shift's alerts and the approval requests waiting for this supervisor, decide them, and record a no-sale.**
 
 |  |  |
 |---|---|
@@ -1686,7 +1689,7 @@
 | Route | `/sell/shift-exceptions-alerts` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ShiftExceptionsAlertsBoard` |
-| Suggested location | `src/routes/sell/ShiftExceptionsAlertsBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/ShiftExceptionsAlertsBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | approvalInbox |
 
 **Entry parameters**
@@ -1739,7 +1742,7 @@
 | Route | `/sell/sell---food-and-drink` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SellFoodDrinkBoard` |
-| Suggested location | `src/routes/sell/SellFoodDrinkBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/SellFoodDrinkBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1756,7 +1759,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onLoad | The menu a guest sees | `None` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put a menu item, with its modifiers, in the basket | `None` |
 | `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
 | `setItemAvailability` | [FnbService](../backend/FnbService.md#setitemavailability) | onAction | Mark an item available or eighty-sixed | `PRODUCT_CONFIGURE` |
 | `getOutlet` | [TenancyService](../backend/TenancyService.md#getoutlet) | onLoad | The outlet's paymentTiming (pay first or send first, POS-021 decision), which decides whether Pay or Send to kitchen comes first | `SCOPE_VIEW` |
@@ -1794,7 +1797,7 @@
 | Route | `/sell/send-to-kitchen` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SendToKitchenBoard` |
-| Suggested location | `src/routes/sell/SendToKitchenBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/SendToKitchenBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1848,7 +1851,7 @@
 | Route | `/sell/sell---merchandise` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SellMerchandiseBoard` |
-| Suggested location | `src/routes/sell/SellMerchandiseBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/SellMerchandiseBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1864,7 +1867,7 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `lookupMerchandise` | [RetailService](../backend/RetailService.md#lookupmerchandise) | onAction | Price and stock check by barcode | `PRODUCT_VIEW` |
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Put a scanned or chosen item in the basket | `None` |
 | `evaluatePromotions` | [CatalogueService](../backend/CatalogueService.md#evaluatepromotions) | onAction | Evaluate promotions against a cart | `PRICE_VIEW` |
 
 **States**
@@ -1899,7 +1902,7 @@
 | Route | `/sell/outlet-setup` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `OutletSetupBoard` |
-| Suggested location | `src/routes/sell/OutletSetupBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/OutletSetupBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -1950,7 +1953,7 @@
 | Route | `/home` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `TillHomeBoard` |
-| Suggested location | `src/routes/home/TillHomeBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/home/TillHomeBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | dashboard |
 
 **Entry parameters**
@@ -1966,7 +1969,7 @@
 |---|---|---|---|---|
 | `getWorkstationShift` | [OrderService](../backend/OrderService.md#getworkstationshift) | onLoad | Whose shift this is and when it opened, read on load under a view permission so a supervisor covering the till can load the home (CHG-DOOR-005); the shift id the actions use comes from here, not from navigation (CHG-SPO-002) | `REPORT_VIEW_WORKSTATION` |
 | `listSaleBoards` | [TenancyService](../backend/TenancyService.md#listsaleboards) | onLoad | Which sale boards this workstation may open | `SCOPE_VIEW` |
-| `getWorkstationHealth` | [TenancyService](../backend/TenancyService.md#getworkstationhealth) | onLoad | Whether the till and its peripherals are well | `DEVICE_VIEW` |
+| `getWorkstationHealth` | [TenancyService](../backend/TenancyService.md#getworkstationhealth) | onInterval | Whether the till and its peripherals are well, polled while the home is open; it feeds the Peripheral health cards' state | `DEVICE_VIEW` |
 | `listAlerts` | [ReportingService](../backend/ReportingService.md#listalerts) | onLoad | Anything the cashier must see before selling | `REPORT_VIEW_VENUE` |
 | `listDevices` | [TenancyService](../backend/TenancyService.md#listdevices) | onLoad | The peripherals bound to this workstation | `DEVICE_VIEW` |
 | `suspendShift` | [OrderService](../backend/OrderService.md#suspendshift) | onAction | Suspend the shift so another user can sign in | `SHIFT_SUSPEND` |
@@ -2015,7 +2018,7 @@
 | Route | `/sell/receipt` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ReceiptReprintBoard` |
-| Suggested location | `src/routes/sell/ReceiptReprintBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/ReceiptReprintBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | detail |
 
 **Entry parameters**
@@ -2071,7 +2074,7 @@
 | Route | `/sell/guests` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `GuestLookupBoard` |
-| Suggested location | `src/routes/sell/GuestLookupBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/GuestLookupBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2120,7 +2123,7 @@
 | Route | `/sell/tables` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `TableServiceBoard` |
-| Suggested location | `src/routes/sell/TableServiceBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/TableServiceBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | board |
 
 **Entry parameters**
@@ -2181,7 +2184,7 @@
 | Route | `/sell/queue` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `OrderQueueBoard` |
-| Suggested location | `src/routes/sell/OrderQueueBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/OrderQueueBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | board |
 
 **Entry parameters**
@@ -2231,7 +2234,7 @@
 | Route | `/sell/journal` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `SalesJournalBoard` |
-| Suggested location | `src/routes/sell/SalesJournalBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/SalesJournalBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**
@@ -2291,7 +2294,7 @@
 | Route | `/sell/reservations` |
 | Repository | ticvai-pos (http://gitlab.softlabsgroup.in/ticvai-frontend/ticvai-pos.git) |
 | Component | `ReservationsGroupArrivalsBoard` |
-| Suggested location | `src/routes/sell/ReservationsGroupArrivalsBoard.tsx` (match the repository's own layout if it differs) |
+| Suggested location | `src/routes/sell/ReservationsGroupArrivalsBoard.tsx` (assumed: the repository's layout has not been read yet; match the repository's own layout if it differs) |
 | Pattern | listDetail |
 
 **Entry parameters**

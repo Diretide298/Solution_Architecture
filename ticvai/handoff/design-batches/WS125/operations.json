@@ -70,7 +70,7 @@
  },
  "setEventType": {
   "method": "PUT",
-  "path": "/event-types",
+  "path": "/event-types/{eventTypeId}",
   "contract": "catalogue",
   "summary": "Define an event kind and its behaviour",
   "permission": "EVENT_CONFIGURE",
@@ -78,6 +78,11 @@
   "conflictPolicy": null,
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "eventTypeId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

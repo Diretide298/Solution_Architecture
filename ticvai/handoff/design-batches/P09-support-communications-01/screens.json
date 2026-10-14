@@ -5,6 +5,7 @@
   "module": "Support & Communications",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_RELEASE_VIEW",
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/support-and-escalation-console",
@@ -173,6 +174,7 @@
    }
   ],
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose \"Answer a question without needing a person\" was copied from a help screen; an escalation console works the escalation queue (design-notes correction platform-foundation ADM-035).",
+  "division": "Shares `listSupportNotices`, `publishSupportNotice` with ADM-036; this screen is Support & Escalation Console: work the support escalations that reach TICVAI, and tell tenants what is known.",
   "gaps": [
    {
     "operation": null,
@@ -210,6 +212,7 @@
   "module": "Support & Communications",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_RELEASE_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -397,6 +400,7 @@
    }
   ],
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Push live platform notification broadcast for this venue\").",
+  "division": "Shares `listSupportNotices`, `publishSupportNotice` with ADM-035; this screen is Platform Notification Broadcast: broadcast a notice to every tenant, or to some of them.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

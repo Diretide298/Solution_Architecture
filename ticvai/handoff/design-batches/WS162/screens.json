@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/ai-resource-intelligence-command-center-bo-923",
-   "component": "apps/venue-management-web/src/routes/rentals/AiResourceIntelligenceCommandCenter.tsx",
+   "component": "src/routes/rentals/AiResourceIntelligenceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -125,7 +126,7 @@
         "Time Horizons"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listResources",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 117 §Display"
       }
      ]
@@ -220,6 +221,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -229,7 +231,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/optimal-resource-recommendation-engine-bo-924",
-   "component": "apps/venue-management-web/src/routes/rentals/OptimalResourceRecommendationEngine.tsx",
+   "component": "src/routes/rentals/OptimalResourceRecommendationEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -325,6 +327,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -334,7 +337,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/ai-staff-recommendation-workforce-matching-bo-925",
-   "component": "apps/venue-management-web/src/routes/rentals/AiStaffRecommendationWorkforceMatching.tsx",
+   "component": "src/routes/rentals/AiStaffRecommendationWorkforceMatching.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -385,7 +388,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listOperationalRequirements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listOperationalRequirements"
       },
       {
        "kind": "primaryButton",
@@ -462,6 +466,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -471,7 +476,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-demand-forecasting-bo-926",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceDemandForecasting.tsx",
+   "component": "src/routes/rentals/ResourceDemandForecasting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -518,7 +523,7 @@
         "Actual"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listOperationalRequirements",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 121 §Display"
       }
      ]
@@ -537,7 +542,8 @@
         "Actual"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Expected Visitors”, “Expected Lesson Participants”, “Available”, “Confidence”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 121 §Display"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 121 §Display",
+       "operation": "getForecast"
       }
      ]
     }
@@ -608,6 +614,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -617,7 +624,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/ai-staffing-requirement-forecast-bo-927",
-   "component": "apps/venue-management-web/src/routes/rentals/AiStaffingRequirementForecast.tsx",
+   "component": "src/routes/rentals/AiStaffingRequirementForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -869,6 +876,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -878,7 +886,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/ai-conflict-resolution-assistant-bo-928",
-   "component": "apps/venue-management-web/src/routes/rentals/AiConflictResolutionAssistant.tsx",
+   "component": "src/routes/rentals/AiConflictResolutionAssistant.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1057,6 +1065,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -1066,7 +1075,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/automatic-schedule-optimization-bo-929",
-   "component": "apps/venue-management-web/src/routes/rentals/AutomaticScheduleOptimization.tsx",
+   "component": "src/routes/rentals/AutomaticScheduleOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1119,7 +1128,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listProposedActions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listProposedActions"
       },
       {
        "kind": "secondaryButton",
@@ -1213,6 +1223,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -1222,7 +1233,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/alternative-replacement-resource-bo-930",
-   "component": "apps/venue-management-web/src/routes/rentals/AlternativeReplacementResource.tsx",
+   "component": "src/routes/rentals/AlternativeReplacementResource.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1318,6 +1329,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -1327,7 +1339,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/operational-scenario-simulator-digital-twin-bo-931",
-   "component": "apps/venue-management-web/src/routes/rentals/OperationalScenarioSimulatorDigitalTwin.tsx",
+   "component": "src/routes/rentals/OperationalScenarioSimulatorDigitalTwin.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1445,6 +1457,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -1454,7 +1467,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/conversational-ai-resource-copilot-bo-932",
-   "component": "apps/venue-management-web/src/routes/rentals/ConversationalAiResourceCopilot.tsx",
+   "component": "src/routes/rentals/ConversationalAiResourceCopilot.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1500,7 +1513,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAiConversations",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAiConversations"
       },
       {
        "kind": "primaryButton",

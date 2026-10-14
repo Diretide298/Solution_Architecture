@@ -312,6 +312,7 @@ operations:
   offline: false
   reads:
   - payments.stored_forward
+  - payments.terminal
   writes: []
 - operation: receivePaymentProviderWebhook
   verb: POST
@@ -449,7 +450,7 @@ operations:
   - payments.instalment_policy
 - operation: setMerchantAccount
   verb: PUT
-  path: /merchant-accounts
+  path: /merchant-accounts/{merchantAccountId}
   scope: tenant
   permission: PAYMENT_CONFIGURE
   audience:
@@ -537,7 +538,7 @@ operations:
   - payments.fee_rule
 - operation: setPaymentTerminalConfiguration
   verb: PUT
-  path: /payment-terminals
+  path: /payment-terminals/{deviceId}
   scope: venue
   permission: PAYMENT_CONFIGURE
   audience:
@@ -563,7 +564,7 @@ operations:
   - payments.matching_rules
 - operation: setReconciliationSource
   verb: PUT
-  path: /reconciliation-sources
+  path: /reconciliation-sources/{sourceId}
   scope: tenant
   permission: PAYMENT_CONFIGURE
   audience:

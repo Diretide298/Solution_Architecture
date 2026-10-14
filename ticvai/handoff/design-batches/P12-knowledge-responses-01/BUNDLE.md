@@ -249,6 +249,8 @@ gaps:
 
 **A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `TENANT_CONFIGURE`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -288,7 +290,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 ### `SUP-007` Canned Response Management
 
-**Find canned response management for this venue.**
+**Support keeps the canned responses agents reuse: every message template by channel, and a new one when a reply recurs.**
 
 | | |
 |---|---|
@@ -334,7 +336,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Brand `brandId` | picker: choose a brand | optional | — | — | shows names, sends the id | The brand whose identity the template carries; null for the tenant default. | `createMessageTemplate` body |
 | Ownership `ownership` | segmented control | optional | Crm | Platform · Crm | — | `platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). | `createMessageTemplate` body |
 
-Errors to draw in the form: 400 Unknown merge field, or a required language is missing
+Errors to draw in the form: 400 Unknown merge field, or a required language is missing; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …
 
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -370,7 +372,7 @@ Errors to draw in the form: 400 Unknown merge field, or a required language is m
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create message template (primary button) | `createMessageTemplate` POST `/message-templates` | MessageTemplate | MessageTemplate | 400 Unknown merge field, or a required language is missing | opens modal first |
+| Create message template (primary button) | `createMessageTemplate` POST `/message-templates` | MessageTemplate | MessageTemplate | 400 Unknown merge field, or a required language is missing; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September … | opens modal first |
 
 **Data it reads**: `listMessageTemplates` (onLoad, from page inventory)
 
@@ -388,7 +390,7 @@ Errors to draw in the form: 400 Unknown merge field, or a required language is m
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on channel and the canned response are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createMessageTemplate`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -406,6 +408,8 @@ responses:
 - `createMessageTemplate` → `MARKETING_MANAGE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createMessageTemplate`.
+
+Screen guard: `MARKETING_VIEW`
 
 #### Requirements it meets
 
@@ -437,7 +441,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400).
+- [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 409).
 - [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create message template.
@@ -535,8 +539,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiKnowledgeGap": {"type":"object","x-ticvai-persistence":"ai.knowledge_gap","description":"**A question the assistant could not answer**, grouped so the content owner gets a task, not a log (AIC-061, AIC-062). Also written for an analytics question outside the semantic model (design 5.7).","required":["question","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"question":{"type":"string","description":"The normalised question."},"examples":{"type":"array","items":{"type":"string"},"description":"Up to ten phrasings as asked, with personal data masked."},"occurrences":{"type":"integer","minimum":1,"readOnly":true},"audience":{"type":"string","enum":["staff","guest"]},"locale":{"type":"string","nullable":true},"kind":{"type":"string","enum":["knowledge","analytics"]},"suggestedCollectionId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.knowledge_collection"},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal"},"status":{"type":"string","enum":["open","assigned","answered","dismissed"]},"resolvedDocumentId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.knowledge_document"},"lastAskedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "FaqCategory": {"x-ticvai-persistence":"whitelabel.faq_category + whitelabel.faq_entry","type":"object","required":["code","name","entries"],"properties":{"code":{"type":"string"},"name":{"$ref":"#/components/schemas/white-label::LocalisedText"},"sortOrder":{"type":"integer"},"entries":{"type":"array","items":{"type":"object","required":["id","question","answer"],"properties":{"id":{"type":"string","format":"uuid"},"question":{"$ref":"#/components/schemas/white-label::LocalisedText"},"answer":{"$ref":"#/components/schemas/LocalisedRichText"},"sortOrder":{"type":"integer"},"isPublished":{"type":"boolean"}}}},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
 "LocalisedRichText": {"x-ticvai-persistence":"none — jsonb column","type":"object","description":"Keyed by language code. Values are sanitised HTML.","additionalProperties":{"type":"string"}},
-"MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
-"MessageTemplate": {"x-ticvai-persistence":"marketing.message_template","type":"object","required":["id","code","name","channel","bodies"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"channel":{"$ref":"#/components/schemas/MessageChannel"},"subjects":{"type":"object","description":"Per language. Email only.","additionalProperties":{"type":"string"}},"bodies":{"type":"object","description":"Per language, keyed by ISO 639-1 code.","additionalProperties":{"type":"string"}},"mergeFields":{"type":"array","items":{"type":"string"}},"missingLanguages":{"type":"array","readOnly":true,"description":"Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n","items":{"type":"string"}},"providerTemplateId":{"type":"string","nullable":true,"description":"Required for WhatsApp, where templates are pre-approved by the provider."},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand whose identity the template carries; null for the tenant default."},"ownership":{"type":"string","enum":["platform","crm"],"default":"crm","description":"`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"}}},
+"MessageChannel": {"x-ticvai-rls":"grant-holder-read","type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
+"MessageTemplate": {"x-ticvai-rls":"grant-holder-read","x-ticvai-persistence":"marketing.message_template","type":"object","required":["id","code","name","channel","bodies"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"channel":{"$ref":"#/components/schemas/MessageChannel"},"subjects":{"type":"object","description":"Per language. Email only.","additionalProperties":{"type":"string"}},"bodies":{"type":"object","description":"Per language, keyed by ISO 639-1 code.","additionalProperties":{"type":"string"}},"mergeFields":{"type":"array","items":{"type":"string"}},"missingLanguages":{"type":"array","readOnly":true,"description":"Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n","items":{"type":"string"}},"providerTemplateId":{"type":"string","nullable":true,"description":"Required for WhatsApp, where templates are pre-approved by the provider."},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand whose identity the template carries; null for the tenant default."},"ownership":{"type":"string","enum":["platform","crm"],"default":"crm","description":"`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "SearchResult": {"type":"object","x-ticvai-persistence":"none — computed","properties":{"kind":{"type":"string"},"id":{"type":"string"},"title":{"type":"string"},"excerpt":{"type":"string"},"relevance":{"type":"number"},"collectionId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"For kind `media`, the asset (29 September, build; 23.1.6)."},"mediaType":{"type":"string","nullable":true,"enum":["image","video","audio","document"]},"matchedOn":{"type":"string","nullable":true,"enum":["title","description","tags","aiDescription"],"description":"Which text the match came from, so a wrong hit can be traced to a wrong tag."}}}
 }

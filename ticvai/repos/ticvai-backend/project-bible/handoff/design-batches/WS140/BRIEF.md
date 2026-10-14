@@ -1,6 +1,6 @@
 # WS140 — Marketing CRM Configuration Reference v1.0 board 6
 
-**10 screens · 15 operations · 13 schemas · 6 permissions**
+**10 screens · 16 operations · 13 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -126,15 +126,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-784` | Communications Center | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-784` | Communications Center | D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-785` | Template Library | A | 35 | 12 | 6 | 18 | 1 | 0 | — | notStarted (—) |
 | `BO-786` | Newsletter Builder | D | 0 | 0 | 6 | 12 | 0 | 0 | — | notStarted (—) |
 | `BO-787` | Content Blocks & Product Feed | D | 0 | 0 | 6 | 12 | 0 | 6 | — | notStarted (—) |
 | `BO-788` | Subscriptions & Preferences | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-789` | Transactional Notification Rules | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-790` | Scheduling, Priority & Approval | D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `BO-791` | Delivery, Retry & Failover | D | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
-| `BO-792` | Deliverability & Analytics | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-789` | Transactional Notification Rules | D | 0 | 20 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-790` | Scheduling, Priority & Approval | D | 0 | 20 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `BO-791` | Delivery, Retry & Failover | D | 1 | 20 | 6 | 6 | 1 | 0 | — | notStarted (—) |
+| `BO-792` | Deliverability & Analytics | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-793` | AI Content, Translation & Audit | D | 0 | 0 | 6 | 12 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

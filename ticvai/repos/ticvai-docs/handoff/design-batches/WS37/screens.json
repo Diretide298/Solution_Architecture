@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-governance-command-center-adm-078",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingGovernanceCommandCenter.tsx",
+   "component": "src/routes/commercial/PricingGovernanceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -118,7 +119,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -149,7 +150,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -381,6 +382,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "4",
@@ -390,7 +392,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-change-request-workspace-adm-079",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingChangeRequestWorkspace.tsx",
+   "component": "src/routes/commercial/PricingChangeRequestWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -647,6 +649,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "4",
@@ -656,7 +659,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/bulk-pricing-update-import-mass-maintenance-adm-080",
-   "component": "apps/venue-management-web/src/routes/commercial/BulkPricingUpdateImportMassMaintenance.tsx",
+   "component": "src/routes/commercial/BulkPricingUpdateImportMassMaintenance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -838,6 +841,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "4",
@@ -847,7 +851,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-version-baseline-management-adm-081",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingVersionBaselineManagement.tsx",
+   "component": "src/routes/commercial/PricingVersionBaselineManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -996,6 +1000,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "4",
@@ -1005,7 +1010,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-change-impact-analysis-adm-082",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingChangeImpactAnalysis.tsx",
+   "component": "src/routes/commercial/PricingChangeImpactAnalysis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1160,6 +1165,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "4",
@@ -1169,7 +1175,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-approval-workflow-authority-matrix-adm-083",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingApprovalWorkflowAuthorityMatrix.tsx",
+   "component": "src/routes/commercial/PricingApprovalWorkflowAuthorityMatrix.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1303,6 +1309,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "4",
@@ -1312,7 +1319,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-publication-effective-date-scheduler-adm-084",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingPublicationEffectiveDateScheduler.tsx",
+   "component": "src/routes/commercial/PricingPublicationEffectiveDateScheduler.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1444,6 +1451,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "4",
@@ -1453,7 +1461,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-distribution-synchronization-publication-monitor-adm-085",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingDistributionSynchronizationPublicationMon.tsx",
+   "component": "src/routes/commercial/PricingDistributionSynchronizationPublicationMon.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1585,6 +1593,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "4",
@@ -1594,7 +1603,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-rollback-emergency-control-center-adm-086",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingRollbackEmergencyControlCenter.tsx",
+   "component": "src/routes/commercial/PricingRollbackEmergencyControlCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1806,7 +1815,10 @@
     "component": "confirmDialog",
     "trigger": "Cancel pricing rollback",
     "body": "**Names what `cancelPricingRollback` changes and what it leaves alone**, in the consequence rather than the verb. A catalogue rollback action this affects should be identified in the dialog, not just counted. **Collects what `cancelPricingRollback` sends before it is called.** Required: `reason`.",
-    "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel"
+    "provenance": "contract catalogue.yaml POST /pricing-rollback-emergency/{actionId}/cancel",
+    "confirm": {
+     "operation": "cancelPricingRollback"
+    }
    }
   ],
   "_platform": {
@@ -1838,6 +1850,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "4",
@@ -1847,7 +1860,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-history-audit-compliance-explorer-adm-087",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingHistoryAuditComplianceExplorer.tsx",
+   "component": "src/routes/commercial/PricingHistoryAuditComplianceExplorer.tsx",
    "status": "notStarted"
   },
   "navigation": {

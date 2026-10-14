@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-680` | Accreditation Bulk Import | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
 | `BO-681` | Import Validation & Processing Monitor | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-682` | Accreditation Export & Data Extract Center | D | 7 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
-| `BO-683` | Delivery, Batch & Operational History | D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-683` | Delivery, Batch & Operational History | D | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -418,6 +418,8 @@ rules:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_CONFIGURE`
+
 #### Requirements it meets
 
 5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -577,6 +579,8 @@ expirySequence:
 - `setAccreditationNotificationRules` → `ACCREDITATION_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ACCREDITATION_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1061,6 +1065,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_MANAGE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1407,6 +1413,8 @@ history:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1499,7 +1507,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAccreditationAudit`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| At | 1 Oct 2026, 14:30 | — |
+| Holder | the name it points at, never the id | — |
+| Action | text | — |
+| Actor principal | the name it points at, never the id | — |
+| Previous value | text | — |
+| New value | text | — |
+| Reason | text | — |
+| Approval request | the name it points at, never the id | — |
+| Previous record hash | text | — |
+| Record hash | text | — |
+| Integrity | chip: Intact, Broken, Unverifiable | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1568,6 +1591,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1597,7 +1622,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-683?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-674`.
@@ -1723,9 +1748,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AccreditationAuditRecord": {"type":"object","x-ticvai-persistence":"accreditation.audit","description":"Board 8.7. **Who gave this person access to that place, when, and on whose authority.**\n","properties":{"id":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"holderId":{"type":"string","format":"uuid","nullable":true},"action":{"type":"string"},"actorPrincipalId":{"type":"string","format":"uuid","nullable":true},"previousValue":{"nullable":true},"newValue":{"nullable":true},"reason":{"type":"string","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"previousRecordHash":{"type":"string","nullable":true},"recordHash":{"type":"string"},"integrity":{"type":"string","readOnly":true,"enum":["intact","broken","unverifiable"]},"scopePath":{"type":"string"}}},
 "AccreditationDataExport": {"type":"object","x-ticvai-persistence":"accreditation.data_export","description":"12.1.55. **A spreadsheet of accredited people leaving the platform is an event someone should own.** Requested by `exportAccreditationData`, listed for BO-682, and fetched once `ready`.\n","required":["dataset","format"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"dataset":{"type":"string","enum":["holders","applications","credentials","accessAssignments","documents"]},"format":{"type":"string","enum":["csv","xlsx"]},"programmeId":{"type":"string","format":"uuid","nullable":true},"statusFilter":{"type":"string","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"categoryCode":{"type":"string","nullable":true},"validOn":{"type":"string","format":"date","nullable":true,"description":"Only accreditations valid on this date — the register for one performance"},"fields":{"type":"array","description":"The columns wanted. Omitted means the dataset's standard set","items":{"type":"string"}},"includePersonalData":{"type":"boolean","default":false,"description":"Contact details, date of birth, nationality and document references. Requires REPORT_EXPORT_PII and a purpose; recorded in the accreditation audit trail"},"purpose":{"type":"string","maxLength":500,"nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"requestedAt":{"type":"string","format":"date-time","readOnly":true},"recordCount":{"type":"integer","nullable":true,"readOnly":true},"status":{"type":"string","readOnly":true,"enum":["queued","running","ready","failed","expired"]},"downloadUrl":{"type":"string","nullable":true,"readOnly":true,"description":"Signed and expiring"},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}},
-"AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
+"AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"},"statusEffectiveFrom":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the status `setAccreditationStatus` set takes effect."},"statusReviewAt":{"type":"string","format":"date","nullable":true,"readOnly":true,"description":"When the status is due for review (`setAccreditationStatus`)."}}},
 "AccreditationImportResult": {"type":"object","description":"Board 7.8. **A bulk import is exactly where the same person gets accredited twice.**\n","properties":{"rowsRead":{"type":"integer"},"created":{"type":"integer"},"updated":{"type":"integer"},"rejected":{"type":"integer"},"identityConflicts":{"type":"integer"},"rows":{"type":"array","items":{"type":"object","properties":{"row":{"type":"integer"},"name":{"type":"string"},"outcome":{"type":"string"},"detail":{"type":"string","nullable":true}}}},"committed":{"type":"boolean"}}},
-"AccreditationNotificationRules": {"type":"object","x-ticvai-persistence":"accreditation.notification_rules","description":"Board 7.2. **Notices go to the organisation as well as the holder.**","properties":{"programmeId":{"type":"string","format":"uuid"},"rules":{"type":"array","items":{"type":"object","properties":{"event":{"type":"string","enum":["applicationReceived","informationRequested","approved","rejected","credentialReady","expiringSoon","renewalWindowOpen","expired","suspended","revoked"]},"daysBefore":{"type":"integer","nullable":true},"recipients":{"type":"array","items":{"type":"string","enum":["holder","organisation","sponsor","accreditationTeam"]}},"channels":{"type":"array","items":{"type":"string"}},"templateId":{"type":"string","format":"uuid","nullable":true}}}},"scopePath":{"type":"string"}}},
+"AccreditationNotificationRules": {"type":"object","x-ticvai-persistence":"accreditation.notification_rules","description":"Board 7.2. **Notices go to the organisation as well as the holder.**","properties":{"programmeId":{"type":"string","format":"uuid"},"rules":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"event":{"type":"string","enum":["applicationReceived","informationRequested","approved","rejected","credentialReady","expiringSoon","renewalWindowOpen","expired","suspended","revoked"]},"daysBefore":{"type":"integer","nullable":true},"recipients":{"type":"array","items":{"type":"string","enum":["holder","organisation","sponsor","accreditationTeam"]}},"channels":{"type":"array","items":{"type":"string"}},"templateId":{"type":"string","format":"uuid","nullable":true}}}},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
 }
 ```

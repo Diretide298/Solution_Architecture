@@ -352,6 +352,8 @@
     "description": "**Across tender kinds.** `wallet` decides the order within stored value."
    },
    "allowedCombinations": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -619,6 +621,7 @@
   }
  },
  "PayInstalmentPolicy": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "payments.instalment_policy",
   "description": "4.2.17, 2.14.19. Also the `setInstalmentPolicy` body.",

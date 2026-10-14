@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 98 of 299 |
+| Operations in the slice | 95 of 299 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -42,9 +42,9 @@
 | cart | [`applyCartPromoCode`](#applycartpromocode) | POST | `/carts/{cartId}/promo-codes` | core | 1 | GST-041, WEB-010 |
 | cart | [`checkoutCart`](#checkoutcart) | POST | `/carts/{cartId}/checkout` | core | 1 | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010 … |
 | cart | [`claimCart`](#claimcart) | POST | `/carts/{cartId}/claim` | core | 1 | GST-041, WEB-016 |
-| cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | WEB-010 |
+| cart | [`createCart`](#createcart) | POST | `/carts` | core | 1 | GST-041, WEB-010 |
 | cart | [`extendCart`](#extendcart) | POST | `/carts/{cartId}/extend` | core | 1 | GST-041, WEB-010 |
-| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, GST-048, GST-053 … |
+| cart | [`getCart`](#getcart) | GET | `/carts/{cartId}` | core | 1 | GST-007, GST-009, GST-032, GST-041, GST-048, KSK-006 … |
 | cart | [`removeCartLine`](#removecartline) | DELETE | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
 | cart | [`updateCartLine`](#updatecartline) | PATCH | `/carts/{cartId}/lines/{lineId}` | core | 1 | GST-041, PTR-010, WEB-010 |
 | cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-041, BO-042, POS-017, POS-018 |
@@ -64,7 +64,7 @@
 | order | [`getVisitReminder`](#getvisitreminder) | GET | `/orders/{orderId}/reminder` | core | 1 | GST-018 |
 | order | [`holdOrder`](#holdorder) | POST | `/orders/{orderId}/hold` | core | 1 | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-006 … |
 | order | [`listOrders`](#listorders) | GET | `/orders` | core | 1 | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-101 … |
-| order | [`listTicketTransfers`](#listtickettransfers) | GET | `/ticket-transfers` | core | 1 | GST-045 |
+| order | [`listTicketTransfers`](#listtickettransfers) | GET | `/ticket-transfers` | core | 1 | GST-012, GST-013, GST-045, WEB-018 |
 | order | [`modifyOrder`](#modifyorder) | POST | `/orders/{orderId}/modify` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315 … |
 | order | [`reprintOrder`](#reprintorder) | POST | `/orders/{orderId}/reprints` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`rescheduleOrder`](#rescheduleorder) | POST | `/orders/{orderId}/reschedule` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315 … |
@@ -88,7 +88,7 @@
 | orders | [`recordGroupCheckIn`](#recordgroupcheckin) | POST | `/group-bookings/{groupBookingId}/check-in` | core | 1 | BO-280, POS-031 |
 | orders | [`reissueEntitlement`](#reissueentitlement) | POST | `/entitlements/{entitlementId}/reissue` | core | 1 | POS-026 |
 | orders | [`requestGroupBooking`](#requestgroupbooking) | POST | `/group-booking-requests` | core | 1 | GST-072, WEB-031 |
-| orders | [`setPaymentProvider`](#setpaymentprovider) | PUT | `/payment-providers` | setup | 1 | ADM-412, SGN-021 |
+| orders | [`setPaymentProvider`](#setpaymentprovider) | PUT | `/payment-providers/{providerId}` | setup | 1 | ADM-412, SGN-021 |
 | orders | [`shareEntitlement`](#shareentitlement) | POST | `/entitlements/{entitlementId}/share` | core | 1 | GST-072, WEB-018 |
 | orders | [`storePaymentToken`](#storepaymenttoken) | POST | `/payment-tokens` | core | 1 | GST-071, WEB-021 |
 | orders | [`updateTicketTemplate`](#updatetickettemplate) | PATCH | `/ticket-templates/{templateId}` | setup | 1 | BO-344 |
@@ -96,11 +96,8 @@
 | payment | [`capturePayment`](#capturepayment) | POST | `/payments/{paymentId}/capture` | core | 1 | BO-024, EMP-035, POS-005, PTR-012 |
 | payment | [`createPayment`](#createpayment) | POST | `/payments` | core | 1 | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004 … |
 | payment | [`inquirePaymentStatus`](#inquirepaymentstatus) | POST | `/payments/{paymentId}/inquiry` | core | 1 | ADM-595, ADM-597, ADM-615, BO-024, EMP-035, GST-009 … |
-| payments | [`createInstalmentPlan`](#createinstalmentplan) | POST | `/instalment-plans` | core | 1 | BO-324, GST-015, WEB-023 |
 | payments | [`createPaymentProviderConnection`](#createpaymentproviderconnection) | POST | `/payment-providers` | setup | 1 | ADM-570, ADM-571 |
-| payments | [`listInstalmentPlans`](#listinstalmentplans) | GET | `/instalment-plans` | core | 1 | BO-324, GST-015, WEB-023 |
 | payments | [`setDunningPolicy`](#setdunningpolicy) | PUT | `/dunning-policy` | setup | 1 | ADM-606 |
-| payments | [`setInstalmentPolicy`](#setinstalmentpolicy) | PUT | `/instalment-policy` | setup | 1 | ADM-603 |
 | policy | [`setRefundPolicy`](#setrefundpolicy) | PUT | `/venues/{venueId}/refund-policy` | setup | 1 | BO-062, BO-065, BO-1146, BO-318 |
 | refund | [`createRefund`](#createrefund) | POST | `/orders/{orderId}/refunds` | core | 1 | ADM-610, ADM-616, BO-022, BO-023, BO-026, BO-047 … |
 | refund | [`createRefundRequest`](#createrefundrequest) | POST | `/refund-requests` | core | 1 | GST-067, WEB-019 |
@@ -175,7 +172,7 @@ Distinct from expiry: this is a decision, and the recovery campaign must not cha
 
 ### addCartLine
 
-**`POST /carts/{cartId}/lines`**: Add something
+**`POST /carts/{cartId}/lines`**: Add a line to the cart
 
 **A till's cart is the session's own** (decided 2 October 2026, CHG-SEED-013). On the till the cart belongs to the workstation session that opened it; `x-ticvai-self-scoped: subject` means the caller's own cart, and for a till that is the session's. A guest identified at the till is attached to the cart, never its owner, and there is no guest-scoped cart operation.
 **Staff since 1 October 2026**: the till adds lines to its own cart (`cartId` from the workstation session) on POS-002, POS-021, POS-023 and POS-030; the declaration said guest and partner while P04 called it.
@@ -493,7 +490,7 @@ The cart is retained, not deleted — a checkout that fails at payment must be r
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `catalogue.inventory_reservation`, `marketing.consent_question`, `orders.cart`, `orders.cart_line`, `orders.fraud_rule`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
-| Writes | `marketing.consent_record`, `orders.cart`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox` |
+| Writes | `marketing.consent_record`, `orders.cart`, `orders.deposit`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.sales_order`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | GST-009, GST-032, GST-041, KSK-006, PTR-010, WEB-010, WEB-012, WEB-033 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): moves `active` -> `checkedOut`, `expiring` -> `checkedOut`<br/>Order ([states/order.yaml](../../../states/order.yaml)): created as `pending` |
 
@@ -783,6 +780,7 @@ Where the guest already has a cart, the two **merge rather than one replacing th
 
 | Code | Shape | Meaning |
 |---|---|---|
+| 409 |  | The cart is checkedOut or abandoned (cart-not-open), or already belongs to another guest (cart-already-claimed). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 | 200 |  | Claimed, and merged where the guest already had one |
 
@@ -804,7 +802,7 @@ Created against a guest subject where one is known, or an anonymous token where 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `pii.subject`, `platform.scope` |
 | Writes | `cache:idempotency`, `orders.cart` |
-| Called by | WEB-010 |
+| Called by | GST-041, WEB-010 |
 | State model | Cart ([states/cart.yaml](../../../states/cart.yaml)): created as `active` |
 
 **Parameters**
@@ -1059,7 +1057,7 @@ Returns the conflicts (2.9.5) and the leases with their remaining time, so the i
 | Read routing | primary |
 | Reads | `catalogue.channel_capacity`, `catalogue.inventory_reservation`, `marketing.consent_question`, `marketing.consent_question_version`, `orders.cart`, `orders.cart_line`, `promotions.promotion` |
 | Writes | - |
-| Called by | GST-007, GST-009, GST-032, GST-041, GST-048, GST-053, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011 |
+| Called by | GST-007, GST-009, GST-032, GST-041, GST-048, KSK-006, POS-010, PTR-010, WEB-006, WEB-010, WEB-011 |
 
 **Parameters**
 
@@ -1522,6 +1520,8 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 
 **`GET /shifts/{shiftId}/cash-movements`**: Lifts, adds and the opening float
 
+**Order.** Newest first, by `recordedAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `REPORT_VIEW_WORKSTATION` |
@@ -1634,6 +1634,9 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 **`GET /guests/me/payment-issues`**: A guest's own failed recurring payments
 
 **Design gap, 23 September.** The membership billing statement in the design shows a declined renewal and lets the guest retry it. The recovery cases existed (BL-100) and only staff could see them. A soft decline (`declineClass: soft`) is retried on the venue's schedule anyway; this lets the guest act first.
+
+
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first).
 
 |  |  |
 |---|---|
@@ -2416,7 +2419,7 @@ The replacement is held before the original is released, never the other way rou
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.sales_order` |
-| Writes | `cache:idempotency`, `orders.order_event`, `orders.sales_order`, `platform.outbox` |
+| Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.sales_order`, `platform.outbox` |
 | Called by | BO-022, BO-023, BO-026, BO-047, BO-315, EMP-034, POS-006, POS-010, POS-011, PTR-002, PTR-008, PTR-015 |
 
 **Parameters**
@@ -3074,6 +3077,9 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 
 **The staff list: venue-scoped, filtered by venue, cashier, shift, terminal, customer and tender** (the last three added 1 October 2026, optional). A guest's own history is `listMyOrders`, which is scoped to the caller rather than filtered by a parameter (raised 24 August for `WEB-019` and `GST-019`). A guest surface does not load its list from here.
 
+
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -3143,6 +3149,9 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 **`TicketTransfer` was only ever the answer to a POST.** A guest who sent tickets had no way to see them again — whether the recipient claimed, whether the offer lapsed and the tickets came back — and `WEB-030` and `GST-014` bound their *every ticket transfer* table to the order list, which carries no transfer at all.
 **Scoped to the caller, not filtered by them** — the same shape as `listMyOrders`. A transfer appears where the caller is its sender (`fromSubjectId`) or, once claimed, its recipient (`toSubjectId`).
 
+
+**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -3154,7 +3163,7 @@ Held orders expire. A till that accumulates parked sales across a shift cannot b
 | Read routing | replica |
 | Reads | `orders.ticket_transfer` |
 | Writes | - |
-| Called by | GST-045 |
+| Called by | GST-012, GST-013, GST-045, WEB-018 |
 
 **Parameters**
 
@@ -4012,6 +4021,7 @@ Only before settlement and only within the same shift. After that it is a refund
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | name | string | yes |  |
 | isRecyclable | boolean |  | BL-103. (default False) |
@@ -4149,6 +4159,7 @@ Check the artwork with `printTicketProof` before activating.
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | name | string | yes |  |
 | isRecyclable | boolean |  | BL-103. (default False) |
@@ -4457,6 +4468,7 @@ Returns the lines, the total and the deadline. **Never the guest's other orders*
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | name | string | yes |  |
 | isRecyclable | boolean |  | BL-103. (default False) |
@@ -4542,6 +4554,9 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 **A statement is not a tax invoice.** `isTaxInvoice` is false and read-only. UAE e-invoicing is Peppol five-corner with the FTA as the fifth corner, PINT AE XML and 51 mandatory fields, and **CF-133 is open on it** — a statement that implied otherwise would be wrong in the one direction with a regulator at the end of it.
 **A guest sees their own and nothing else** (`x-ticvai-self-scoped: subject`); supplying another subject is 403 rather than silently honoured.
 
+
+**Order.** Newest first, by `occurredAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -4614,6 +4629,10 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 
 **Raised in review 24 August** against `GST-019` and `WEB-019`. `listOrders` was on both screens and it is the staff-scoped one — a guest reading their own history through an operation that takes a venue filter is a guest one parameter away from somebody else's.
 **Scoped to the caller, not filtered by it.** The same shape as `listMyCases` and `listMyEntitlements`: a guest-facing list that accepts a subject is a list somebody will call with another subject.
+
+
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+**Statuses.** Every `status` is returned, ended ones included (`failed`, `voided`); a screen that shows only live rows filters on `status` itself.
 
 |  |  |
 |---|---|
@@ -4753,6 +4772,9 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 **`GET /payment-tokens`**: A guest's saved payment methods
 
 **Masked, always.** The last four digits and the brand — enough to choose between two saved cards and not enough to use one.
+
+
+**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -5095,7 +5117,7 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 
 ### setPaymentProvider
 
-**`PUT /payment-providers`**: Configure a gateway and its routing
+**`PUT /payment-providers/{providerId}`**: Configure a gateway and its routing
 
 CF-131. **Network International and Stripe for Phase 1** — two gateways, which is the number that makes routing a real question rather than a future one.
 **The credential goes to the vault and never to the database.** `credentialRef` is what is stored, following the rule ADR-0020 set for AI providers and applied here: **no surface ever holds a provider key.**
@@ -5118,6 +5140,7 @@ CF-131. **Network International and Stripe for Phase 1** — two gateways, which
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| providerId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
@@ -5357,6 +5380,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | name | string | yes |  |
 | isRecyclable | boolean |  | BL-103. (default False) |
@@ -5720,87 +5744,11 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | 200 |  | Reconciled against the provider |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 503 |  | Provider unreachable (providerUnreachable). |
+| 409 |  | The payment is not pendingConfirmation; its outcome is already known and there is nothing to ask the provider. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
 ## Group: payments
-
-### createInstalmentPlan
-
-**`POST /instalment-plans`**: Split an order's payment into scheduled instalments on a stored card
-
-4.2.17, 2.14.19. **An instalment schedule, independent of the product's term**: an annual membership billed monthly is a twelve-month term with twelve instalments. Created for one order within the instalment policy; the first instalment (the share due at purchase) is charged with the order, and the rest are charged on their due dates to the stored card (`paymentTokenId`) under the recurring mandate. A failed instalment opens a dunning case; the plan is `inArrears` until it is paid. A guest may create a plan for their own order only.
-
-|  |  |
-|---|---|
-| Permission | `ORDER_CREATE` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `orders.payment`, `orders.sales_order`, `payments.instalment`, `payments.instalment_plan`, `payments.instalment_policy`, `payments.token` |
-| Writes | `cache:idempotency`, `orders.payment`, `payments.instalment`, `payments.instalment_plan`, `platform.outbox` |
-| Called by | BO-324, GST-015, WEB-023 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| orderId | string (uuid) | yes |  |
-| frequency | enum (monthly, quarterly, custom) | yes |  |
-| instalmentCount | integer | yes | (min 2) |
-| firstDueDate | string (date) |  |  |
-| customDueDates | array of string (date) |  | Required with custom; one per instalment after the first. |
-| paymentTokenId | string (uuid) | yes |  |
-
-**Response**: `PayInstalmentPlan`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes |  |
-| orderId | string (uuid) | yes |  |
-| subjectId | string (uuid) |  | (nullable) |
-| frequency | enum (monthly, quarterly, custom) | yes |  |
-| paymentTokenId | string (uuid) |  |  |
-| status | enum (active, completed, inArrears, cancelled) | yes |  |
-| total | Money | yes | On the wire this is three fields; in the database it is one column. |
-| total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| paidToDate | Money |  | On the wire this is three fields; in the database it is one column. |
-| paidToDate.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| paidToDate.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| paidToDate.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| nextDueDate | string (date) |  | (nullable) |
-| instalments | array of PayInstalment | yes |  |
-| instalments[].sequence | integer | yes | (min 1) |
-| instalments[].dueDate | string (date) | yes |  |
-| instalments[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
-| instalments[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| instalments[].amount.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| instalments[].amount.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| instalments[].status | enum (scheduled, paid, failed, waived, cancelled) | yes |  |
-| instalments[].paymentId | string (uuid) |  | (nullable) |
-| instalments[].dunningCaseId | string (uuid) |  | (nullable) |
-| instalments[].attemptedAt | string (date-time) |  | (nullable) |
-| createdAt | string (date-time) |  |  |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Plan created; the first instalment charged |
-| 409 |  | The order already has a plan, or is already paid in full. |
-| 422 |  | The order or product does not qualify under the instalment policy, or the count or frequency is outside it, or the first instalment was declined. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createPaymentProviderConnection
 
@@ -5882,74 +5830,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Connected |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### listInstalmentPlans
-
-**`GET /instalment-plans`**: Instalment plans and their schedules
-
-4.2.17. Plans with every instalment, its due date, amount and outcome. A guest sees their own; staff filter by order, status or the next due date. Ordered by the next instalment due, `id` as the tiebreak.
-
-|  |  |
-|---|---|
-| Permission | `PAYMENT_VIEW` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `payments.instalment`, `payments.instalment_plan` |
-| Writes | - |
-| Called by | BO-324, GST-015, WEB-023 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| orderId | query |  | string (uuid) |  |
-| status | query |  | enum (active, completed, inArrears, cancelled) |  |
-| pageSize | query |  | integer |  |
-| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
-
-**Response**: `object`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| items | array of PayInstalmentPlan | yes |  |
-| items[].id | string (uuid) | yes |  |
-| items[].orderId | string (uuid) | yes |  |
-| items[].subjectId | string (uuid) |  | (nullable) |
-| items[].frequency | enum (monthly, quarterly, custom) | yes |  |
-| items[].paymentTokenId | string (uuid) |  |  |
-| items[].status | enum (active, completed, inArrears, cancelled) | yes |  |
-| items[].total | Money | yes | On the wire this is three fields; in the database it is one column. |
-| items[].total.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| items[].total.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| items[].total.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| items[].paidToDate | Money |  | On the wire this is three fields; in the database it is one column. |
-| items[].paidToDate.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| items[].paidToDate.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| items[].paidToDate.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| items[].nextDueDate | string (date) |  | (nullable) |
-| items[].instalments | array of PayInstalment | yes |  |
-| items[].instalments[].sequence | integer | yes | (min 1) |
-| items[].instalments[].dueDate | string (date) | yes |  |
-| items[].instalments[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
-| items[].instalments[].status | enum (scheduled, paid, failed, waived, cancelled) | yes |  |
-| items[].instalments[].paymentId | string (uuid) |  | (nullable) |
-| items[].instalments[].dunningCaseId | string (uuid) |  | (nullable) |
-| items[].instalments[].attemptedAt | string (date-time) |  | (nullable) |
-| items[].createdAt | string (date-time) |  |  |
-| items[].scopePath | string |  | The partition key (ADR-0005). (read-only) |
-| nextCursor | string |  |  |
-| hasMore | boolean | yes |  |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Plans |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setDunningPolicy
@@ -6013,81 +5894,6 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
 | 200 |  | Set |
 | 422 |  | An attempt schedule that would breach the policy's own guard — more attempts than maxAttempts, two attempts inside minimumHoursBetweenAttempts, or a terminalAction the caller is not permitted to set. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### setInstalmentPolicy
-
-**`PUT /instalment-policy`**: Set which products may be paid in instalments, how many and how often
-
-4.2.17, 2.14.19. **The terms a plan is created within**: which product kinds qualify (an annual pass, a membership, a group booking), the minimum order value, the number of instalments allowed, the frequencies offered (`monthly`, `quarterly`, or `custom` dates), the share due at purchase, and whether a card on file is required. A failed instalment is chased by the dunning policy, never by a second schedule. What the guest is charged in total never changes with the plan: no interest and no fee unless `instalmentFee` is set.
-
-|  |  |
-|---|---|
-| Permission | `PAYMENT_CONFIGURE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `payments.instalment_policy` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | tenant |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `payments.instalment_policy` |
-| Writes | `cache:idempotency`, `cache:resolution`, `payments.instalment_policy` |
-| Called by | ADM-603 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `PayInstalmentPolicy`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| enabled | boolean |  | (default False) |
-| eligibleProductKinds | array of enum (membership, annualPass, seasonPass, groupBooking, event) |  |  |
-| minimumOrderValue | Money |  | On the wire this is three fields; in the database it is one column. |
-| minimumOrderValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| minimumOrderValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| minimumOrderValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| allowedFrequencies | array of enum (monthly, quarterly, custom) |  |  |
-| maximumInstalments | integer |  | (min 2) |
-| dueAtPurchasePercent | number |  | (min 0; max 100) |
-| instalmentFee | Money |  | On the wire this is three fields; in the database it is one column. |
-| instalmentFee.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| instalmentFee.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| instalmentFee.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| requireStoredCard | boolean |  | (default True) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-
-**Response**: `PayInstalmentPolicy`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| enabled | boolean |  | (default False) |
-| eligibleProductKinds | array of enum (membership, annualPass, seasonPass, groupBooking, event) |  |  |
-| minimumOrderValue | Money |  | On the wire this is three fields; in the database it is one column. |
-| minimumOrderValue.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| minimumOrderValue.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| minimumOrderValue.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| allowedFrequencies | array of enum (monthly, quarterly, custom) |  |  |
-| maximumInstalments | integer |  | (min 2) |
-| dueAtPurchasePercent | number |  | (min 0; max 100) |
-| instalmentFee | Money |  | On the wire this is three fields; in the database it is one column. |
-| instalmentFee.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| instalmentFee.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| instalmentFee.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| requireStoredCard | boolean |  | (default True) |
-| scopePath | string |  | The partition key (ADR-0005). (read-only) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 412 | PreconditionFailed | The row changed since the If-Match version was read (SD-013). |
-| 200 |  | Set |
-| 422 |  | A share due at purchase outside 0-100, or more instalments than the frequency allows within the product's term. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -6333,6 +6139,8 @@ Raised from the guest app. Enters the operations approval queue rather than refu
 **`GET /orders/{orderId}/refunds`**: List refunds against an order
 
 An unknown order, or one outside the caller's scope, is the shared 404; an order with no refunds is an empty list.
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+**Statuses.** Every `status` is returned, ended ones included (`failed`); a screen that shows only live rows filters on `status` itself.
 
 |  |  |
 |---|---|
@@ -6875,6 +6683,9 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 **Who sees what.** Staff see the reservations of every venue their grants reach. **A guest sees only reservations held for them** (`Reservation.subjectId` equal to the caller): a guest token never widens to another subject (`guestAuth`), so the venue scope narrows further to the caller for a guest session, and no parameter can widen it.
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own reservations; another guest's reservation is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
+
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -7137,6 +6948,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | closedByPrincipalId | string (uuid) |  | Flagged where it is not the holder. (nullable) |
 | allocatedAt | string (date-time) |  | When the device recorded the allocation. |
 | closedAt | string (date-time) |  | (nullable) |
+| recordedAt | string (date-time) |  | When the device made the write (R113; CHG-OFL-003): for an allocation, the same moment as allocatedAt, kept in recorded_at, the column every offline-written table carries for the sync to order replay… |
 
 **Response**: `DepositBox`
 
@@ -7194,6 +7006,7 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | closedByPrincipalId | string (uuid) |  | Flagged where it is not the holder. (nullable) |
 | allocatedAt | string (date-time) |  | When the device recorded the allocation. |
 | closedAt | string (date-time) |  | (nullable) |
+| recordedAt | string (date-time) |  | When the device made the write (R113; CHG-OFL-003): for an allocation, the same moment as allocatedAt, kept in recorded_at, the column every offline-written table carries for the sync to order replay… |
 
 **Responses**
 
@@ -7889,6 +7702,8 @@ Raised by Tanmay in the 20 August review, and **the table was built and nothing 
 
 5.8.1. **A deposit box is allocated to a cashier, not to a till.** A cashier moving between workstations takes their float with them, and a workstation used by three people in a day has three boxes through it.
 That separation is what makes a variance attributable to a person rather than to a counter.
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first).
+**Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
 
 |  |  |
 |---|---|
@@ -7956,6 +7771,7 @@ That separation is what makes a variance attributable to a person rather than to
 | items[].closedByPrincipalId | string (uuid) |  | Flagged where it is not the holder. (nullable) |
 | items[].allocatedAt | string (date-time) |  | When the device recorded the allocation. |
 | items[].closedAt | string (date-time) |  | (nullable) |
+| items[].recordedAt | string (date-time) |  | When the device made the write (R113; CHG-OFL-003): for an allocation, the same moment as allocatedAt, kept in recorded_at, the column every offline-written table carries for the sync to order replay… |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -7969,6 +7785,8 @@ That separation is what makes a variance attributable to a person rather than to
 ### listShifts
 
 **`GET /shifts`**: List shifts
+
+**Order.** Newest first, by `recordedAt` descending, then by `id`.
 
 |  |  |
 |---|---|
@@ -9028,6 +8846,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | closedByPrincipalId | string (uuid) |  | Flagged where it is not the holder. (nullable) |
 | allocatedAt | string (date-time) |  | When the device recorded the allocation. |
 | closedAt | string (date-time) |  | (nullable) |
+| recordedAt | string (date-time) |  | When the device made the write (R113; CHG-OFL-003): for an allocation, the same moment as allocatedAt, kept in recorded_at, the column every offline-written table carries for the sync to order replay… |
 
 **Responses**
 
@@ -9048,6 +8867,9 @@ Two people sign: the supervisor taking it and the cashier it came from.
 
 Needs operator attention. These will not retry — surfacing them is the difference between a reconciliation task and silent data loss behind an "all synced" indicator.
 A rejection leaves this list's unresolved view when `resolveSyncRejection` records what was done about it.
+
+
+**Order.** Newest first, by `recordedAt` descending, then by `id`.
 
 |  |  |
 |---|---|
@@ -9294,6 +9116,27 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sequence | integer | yes | Monotonic within the shift. |
 | synced_at | timestamptz | no |  |
 
+### `orders.deposit`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| id | uuid | yes |  |
+| order_id | uuid | yes |  |
+| customer_id | uuid | no |  |
+| rental_agreement_id | uuid | no |  |
+| table_reservation_id | uuid | no | The fnb.TableReservation this deposit secures, where the venue's DepositPolicy.dining is enabled (decided 29 September, rev 3 REV3-8b). |
+| currency_code | text | yes |  |
+| required_amount | numeric(18,4) | yes |  |
+| authorized_amount | numeric(18,4) | yes |  |
+| captured_amount | numeric(18,4) | yes |  |
+| released_amount | numeric(18,4) | yes |  |
+| forfeited_amount | numeric(18,4) | yes |  |
+| status | text | yes |  |
+| settled_at | timestamptz | no |  |
+| created_at | timestamptz | no |  |
+| updated_at | timestamptz | no |  |
+| ledger_deposit_id | uuid | no | The finance Deposit that holds this deposit's liability (4 October 2026, CHG-FXC-010; VM-BO-024): the depositId finance.settleDeposit takes. |
+
 ### `orders.deposit_box`
 
 | Column | Type | Required | Notes |
@@ -9313,6 +9156,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | closed_by_principal_id | uuid | no | Flagged where it is not the holder. |
 | allocated_at | timestamptz | no | When the device recorded the allocation. |
 | closed_at | timestamptz | no |  |
+| recorded_at | timestamptz | no | When the device made the write (R113; CHG-OFL-003): for an allocation, the same moment as allocatedAt, kept in recorded_at, the column every offline-written table carries for the sync to order replay… |
 
 ### `orders.deposit_box_foreign_holding`
 
@@ -9503,7 +9347,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | age_band | text | no | Infant under 3, child 3–12, junior 13–17, adult 18–59, senior 60+. |
 | age_years | integer | no |  |
 | height_band_index | integer | no |  |
-| confident_swimmer | boolean | no | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). |
+| is_confident_swimmer | boolean | no | Derived, kept for the gate check (decided 29 September, rev 3 REV3-26). |
 | is_guardian_signed | boolean | no |  |
 | id | uuid | yes | Synthesised key. |
 
@@ -9542,7 +9386,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | channel | text | no |  |
 | sent_to | text | no | Masked. |
 | expires_at | timestamptz | yes | The expiry releases the hold, not just the link. |
-| release_hold_on_expiry | boolean | no |  |
+| releases_reservation_on_expiry | boolean | no |  |
 | viewed_at | timestamptz | no |  |
 | paid_at | timestamptz | no |  |
 | resend_count | integer | no | A resend supersedes rather than duplicates. |
@@ -9741,6 +9585,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | name | text | yes |  |
 | is_recyclable | boolean | no | BL-103. |
@@ -9851,51 +9696,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | terminal_action | text | yes | What happens when the attempts run out, and it deliberately stops short of admission. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
-### `payments.instalment`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| instalment_plan_id | uuid | yes | The parent row. |
-| sequence | integer | yes |  |
-| due_date | date | yes |  |
-| due_amount | numeric(18,4) | yes |  |
-| status | text | yes |  |
-| payment_id | uuid | no |  |
-| dunning_case_id | uuid | no |  |
-| attempted_at | timestamptz | no |  |
-| id | uuid | yes | Synthesised key. |
-
-### `payments.instalment_plan`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| order_id | uuid | yes |  |
-| subject_id | uuid | no |  |
-| frequency | text | yes |  |
-| payment_token_id | uuid | no |  |
-| status | text | yes |  |
-| gross_amount | numeric(18,4) | yes |  |
-| paid_amount | numeric(18,4) | no |  |
-| next_due_date | date | no |  |
-| created_at | timestamptz | no |  |
-| scope_path | text | no | The partition key (ADR-0005). |
-
-### `payments.instalment_policy`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| is_enabled | boolean | no |  |
-| eligible_product_kinds | text[] | no |  |
-| minimum_order_amount | numeric(18,4) | no |  |
-| allowed_frequencies | text[] | no |  |
-| maximum_instalments | integer | no |  |
-| due_at_purchase_percent | numeric | no |  |
-| instalment_fee_amount | numeric(18,4) | no |  |
-| require_stored_card | boolean | no |  |
-| scope_path | text | no | The partition key (ADR-0005). |
-| id | uuid | yes | Synthesised key. |
-
 ### `payments.payment_attempt`
 
 | Column | Type | Required | Notes |
@@ -9933,7 +9733,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | supports_partial_capture | boolean | no |  |
 | accepted_on_channels | text[] | no | BL-115. |
 | presentment_currencies | text[] | no | BL-070. |
-| supports3ds | boolean | no |  |
+| supports_3ds | boolean | no |  |
 | terminal | jsonb | no | BL-119. |
 | credential_ref | text | no | A vault reference. |
 | scope_level | text | no |  |
@@ -9967,6 +9767,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | code | text | yes |  |
 | priority | integer | no |  |
 | conditions | jsonb | no |  |
+| targets | jsonb | no |  |
 | strategy | text | no |  |
 | scope_path | text | no |  |
 | is_active | boolean | no |  |
@@ -9987,7 +9788,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-201 operations, added to this service in later releases without changing any of the above.
+204 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -9996,7 +9797,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
 | order | `getDepositPolicy`, `setDepositPolicy` |
 | orders | `assignChargeback`, `authoriseStoredValue`, `cancelPaymentLink`, `captureStoredValue`, `cleanupFailedPayment`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
-| payments | `createB2bCreditAccount`, `createPaymentMethod`, `getB2bPaymentTerms`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
+| payments | `createB2bCreditAccount`, `createInstalmentPlan`, `createPaymentMethod`, `getB2bPaymentTerms`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listInstalmentPlans`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setHostedCheckoutConfiguration`, `setInstalmentPolicy`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
 | policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
 | refund | `approveRefund`, `createBulkRefund`, `simulateRefund` |
 | shift | `adjustDepositBoxFloat`, `approveShiftClose`, `closeDepositBoxes`, `getShift` |

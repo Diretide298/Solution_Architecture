@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "6",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-lifecycle-command-center-bo-664",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationLifecycleCommandCenter.tsx",
+   "component": "src/routes/access-venue/AccreditationLifecycleCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -131,7 +132,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAccreditationHolders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAccreditationHolders"
       }
      ]
     }
@@ -188,6 +190,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_MANAGE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "6",
@@ -197,7 +200,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-status-workflow-bo-665",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationStatusWorkflow.tsx",
+   "component": "src/routes/access-venue/AccreditationStatusWorkflow.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -331,6 +334,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_CONFIGURE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "6",
@@ -340,7 +344,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/validity-period-configuration-bo-666",
-   "component": "apps/venue-management-web/src/routes/access-venue/ValidityPeriodConfiguration.tsx",
+   "component": "src/routes/access-venue/ValidityPeriodConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -458,6 +462,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "6",
@@ -467,7 +472,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/event-venue-accreditation-assignment-bo-667",
-   "component": "apps/venue-management-web/src/routes/access-venue/EventVenueAccreditationAssignment.tsx",
+   "component": "src/routes/access-venue/EventVenueAccreditationAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -625,6 +630,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "6",
@@ -634,7 +640,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/multi-venue-accreditation-management-bo-668",
-   "component": "apps/venue-management-web/src/routes/access-venue/MultiVenueAccreditationManagement.tsx",
+   "component": "src/routes/access-venue/MultiVenueAccreditationManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -657,6 +663,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow one accreditation to operate across multiple approved venues.",
+  "division": "Shares `listAccessProfiles`, `setAccessProfile` with BO-655, BO-656, BO-657, BO-658; this screen is Multi-Venue Accreditation Management (pack ACCREDITATION.pdf, board 6.5, page 49): allow one accreditation to operate across multiple approved venues.",
   "gaps": [
    {
     "operation": null,
@@ -732,7 +739,16 @@
    "workshopBoard": "wireframes/WS06 ACCREDITATION Board 6.dc.html#bo-668"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 49. 0 of 0 labels bound to a contract property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "accessProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listAccessProfiles`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -762,6 +778,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "6",
@@ -771,7 +788,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/temporary-seasonal-accreditation-bo-669",
-   "component": "apps/venue-management-web/src/routes/access-venue/TemporarySeasonalAccreditation.tsx",
+   "component": "src/routes/access-venue/TemporarySeasonalAccreditation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -952,6 +969,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_MANAGE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "6",
@@ -961,7 +979,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/suspension-reactivation-management-bo-670",
-   "component": "apps/venue-management-web/src/routes/access-venue/SuspensionReactivationManagement.tsx",
+   "component": "src/routes/access-venue/SuspensionReactivationManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1105,6 +1123,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_MANAGE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "6",
@@ -1114,7 +1133,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-revocation-management-bo-671",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationRevocationManagement.tsx",
+   "component": "src/routes/access-venue/AccreditationRevocationManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1238,6 +1257,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "6",
@@ -1247,7 +1267,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/expiry-monitor-expiration-rules-bo-672",
-   "component": "apps/venue-management-web/src/routes/access-venue/ExpiryMonitorExpirationRules.tsx",
+   "component": "src/routes/access-venue/ExpiryMonitorExpirationRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1292,13 +1312,15 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAccreditationHolders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAccreditationHolders"
       },
       {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "renewAccreditation",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "renewAccreditation"
       },
       {
        "kind": "secondaryButton",
@@ -1392,6 +1414,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "6",
@@ -1401,7 +1424,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-renewal-workspace-bo-673",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationRenewalWorkspace.tsx",
+   "component": "src/routes/access-venue/AccreditationRenewalWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1452,13 +1475,15 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAccreditationHolders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAccreditationHolders"
       },
       {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "renewAccreditation",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "renewAccreditation"
       },
       {
        "kind": "secondaryButton",

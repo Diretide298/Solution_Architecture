@@ -114,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-103` | Market, Tourism, Holiday & Contextual Signal Hub | B | 24 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-104` | AI Demand Forecasting & Booking Curve Studio | B | 0 | 12 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
 | `ADM-105` | Price Elasticity & Revenue Response Intelligence | B | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `ADM-106` | AI Pricing Recommendation & Explainability Center | B | 5 | 0 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `ADM-106` | AI Pricing Recommendation & Explainability Center | A | 5 | 0 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `ADM-107` | AI Signal Registry, Data Quality & Model Governance | B | 18 | 48 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch

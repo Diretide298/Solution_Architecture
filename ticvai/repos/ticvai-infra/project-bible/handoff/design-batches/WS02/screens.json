@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-rule-command-center-bo-154",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessRuleCommandCenter.tsx",
+   "component": "src/routes/access-venue/AccessRuleCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -112,7 +113,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -292,6 +293,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "2",
@@ -301,7 +303,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/visual-access-rule-builder-bo-155",
-   "component": "apps/venue-management-web/src/routes/access-venue/VisualAccessRuleBuilder.tsx",
+   "component": "src/routes/access-venue/VisualAccessRuleBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -487,6 +489,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "2",
@@ -496,7 +499,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/entry-exit-re-entry-rules-bo-156",
-   "component": "apps/venue-management-web/src/routes/access-venue/EntryExitReEntryRules.tsx",
+   "component": "src/routes/access-venue/EntryExitReEntryRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -519,6 +522,7 @@
   },
   "density": "compact",
   "purposeNote": "The complete entry → exit → re-entry lifecycle can be configured independently by ticket/product/access policy.",
+  "division": "Shares `listAdmissionRules`, `updateAdmissionRules` with BO-160, BO-219; this screen is Entry, Exit & Re-entry Rules (pack Access Control Module_Reference.pdf, board 2.2.3, page 19): configure admission quantity and journey sequencing. The source matrix explicitly requires configurable quantities for entry, exit and same-day re-entry, anti- passback intervals, required exit before re-entry, and required entry before exit.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure admission quantity and journey sequencing. The source matrix explicitly requires configurable quantities for entry, exit and same-day re-entry, anti- passback intervals, required exit before re-entry, and required entry before exit.",
@@ -650,6 +654,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "2",
@@ -659,7 +664,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/anti-passback-journey-sequence-bo-157",
-   "component": "apps/venue-management-web/src/routes/access-venue/AntiPassbackJourneySequence.tsx",
+   "component": "src/routes/access-venue/AntiPassbackJourneySequence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -844,6 +849,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "2",
@@ -853,7 +859,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-validity-time-rules-bo-158",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessValidityTimeRules.tsx",
+   "component": "src/routes/access-venue/AccessValidityTimeRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1058,6 +1064,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "2",
@@ -1067,7 +1074,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/entitlement-consumption-engine-bo-159",
-   "component": "apps/venue-management-web/src/routes/access-venue/EntitlementConsumptionEngine.tsx",
+   "component": "src/routes/access-venue/EntitlementConsumptionEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1175,6 +1182,14 @@
   "entryState": {
    "preloaded": [
     "EntitlementConsumptionEngineView.entitlementType"
+   ],
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listEntitlementConsumption`."
+    }
    ]
   },
   "wireframe": {
@@ -1214,6 +1229,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "2",
@@ -1223,7 +1239,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/multi-park-crossover-rules-bo-160",
-   "component": "apps/venue-management-web/src/routes/access-venue/MultiParkCrossoverRules.tsx",
+   "component": "src/routes/access-venue/MultiParkCrossoverRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1248,6 +1264,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure complex access between multiple parks/venues. The matrix specifically requires multi-park access on different days, same-day crossover, park-specific entry quantities and conditional access based on previous park admission.",
+  "division": "Shares `listAdmissionRules`, `updateAdmissionRules` with BO-156, BO-219; this screen is Multi-Park & Crossover Rules (pack Access Control Module_Reference.pdf, board 2.2.7, page 23): configure complex access between multiple parks/venues. The matrix specifically requires multi-park access on different days, same-day crossover, park-specific entry quantities and conditional access based on previous park admission.",
   "gaps": [
    {
     "operation": null,
@@ -1367,6 +1384,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "2",
@@ -1376,7 +1394,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/guest-companion-eligibility-rules-bo-161",
-   "component": "apps/venue-management-web/src/routes/access-venue/GuestCompanionEligibilityRules.tsx",
+   "component": "src/routes/access-venue/GuestCompanionEligibilityRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1604,6 +1622,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "2",
@@ -1613,7 +1632,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/group-admission-quantity-validation-bo-162",
-   "component": "apps/venue-management-web/src/routes/access-venue/GroupAdmissionQuantityValidation.tsx",
+   "component": "src/routes/access-venue/GroupAdmissionQuantityValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1721,6 +1740,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "2",
@@ -1730,7 +1750,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/rule-simulation-conflict-check-publication-bo-163",
-   "component": "apps/venue-management-web/src/routes/access-venue/RuleSimulationConflictCheckPublication.tsx",
+   "component": "src/routes/access-venue/RuleSimulationConflictCheckPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1786,7 +1806,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
-       "provenance": "authored — required by check-screens for publishRuleConflictCheck"
+       "provenance": "authored — required by check-screens for publishRuleConflictCheck",
+       "operation": "publishRuleConflictCheck"
       },
       {
        "kind": "secondaryButton",

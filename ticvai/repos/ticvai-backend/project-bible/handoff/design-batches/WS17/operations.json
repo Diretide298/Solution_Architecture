@@ -207,7 +207,7 @@
  },
  "setApprovalSlaPolicy": {
   "method": "PUT",
-  "path": "/approval-sla-policies",
+  "path": "/approval-sla-policies/{slaPolicyId}",
   "contract": "approvals",
   "summary": "How long a decision may take, and what happens when it does not",
   "permission": "APPROVAL_CONFIGURE",
@@ -215,6 +215,11 @@
   "conflictPolicy": null,
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "slaPolicyId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -226,7 +231,7 @@
  },
  "setApproverAvailability": {
   "method": "PUT",
-  "path": "/approval-delegations/availability",
+  "path": "/approval-delegations/availability/{availabilityId}",
   "contract": "approvals",
   "summary": "Out of office, and who decides instead",
   "permission": "APPROVAL_DECIDE",
@@ -234,6 +239,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "availabilityId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

@@ -102,10 +102,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-406` | Reader Profile & Device Setup | D | 19 | 34 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-407` | Reader Credit & Payment Configuration | D | 4 | 28 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-408` | Reader / Attraction Assignment | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-409` | Retap Delay & Transaction Protection | D | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-409` | Retap Delay & Transaction Protection | D | 16 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-410` | Free Game Glow & Reader Display Rules | D | 6 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-411` | Reader Theme & Experience Configuration | D | 11 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-412` | Real-Time Tap Validation & Reader Response | D | 15 | 2 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-412` | Real-Time Tap Validation & Reader Response | D | 14 | 2 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-413` | Balance Check Reader & Device Test Console | D | 0 | 4 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

@@ -40,16 +40,16 @@
 | access | [`listMyEntitlements`](#listmyentitlements) | GET | `/guests/me/entitlements` | core | 1 | GST-001, GST-012, GST-028, GST-045, GST-055, GST-062 … |
 | access | [`listParkingFacilities`](#listparkingfacilities) | GET | `/parking-facilities` | core | 1 | BO-006, GST-027, GST-028, WEB-041 |
 | access | [`revokeFacePass`](#revokefacepass) | DELETE | `/face-pass/enrolments/{enrolmentId}` | core | 1 | GST-069, WEB-024 |
-| access | [`setAccessPointGroup`](#setaccesspointgroup) | PUT | `/access-point-groups` | setup | 1 | BO-151 |
+| access | [`setAccessPointGroup`](#setaccesspointgroup) | PUT | `/access-point-groups/{groupId}` | setup | 1 | BO-151 |
 | access | [`setBiometricVerificationProfile`](#setbiometricverificationprofile) | PUT | `/biometric-verification-profile` | setup | 1 | BO-185 |
 | access | [`setBleBeaconGeofence`](#setblebeacongeofence) | PUT | `/ble-beacon-geofence` | setup | 1 | BO-168 |
-| access | [`setCredentialActivationDisplay`](#setcredentialactivationdisplay) | PUT | `/credential-activation-display` | setup | 1 | BO-166 |
+| access | [`setCredentialActivationDisplay`](#setcredentialactivationdisplay) | PUT | `/credential-activation-display/{credentialPolicyId}` | setup | 1 | BO-166 |
 | access | [`setDeviceBindingPolicy`](#setdevicebindingpolicy) | PUT | `/device-binding-policy` | setup | 1 | BO-167 |
-| access | [`setFaceMatchingVerification`](#setfacematchingverification) | PUT | `/face-matching-verification` | setup | 1 | BO-189 |
+| access | [`setFaceMatchingVerification`](#setfacematchingverification) | PUT | `/face-matching-verification/{profileId}` | setup | 1 | BO-189 |
 | access | [`setFacePassEnrollment`](#setfacepassenrollment) | PUT | `/face-pass-enrollment` | setup | 1 | BO-186 |
-| access | [`setFaceTagTemporaryEnrollment`](#setfacetagtemporaryenrollment) | PUT | `/face-tag-temporary` | setup | 1 | BO-188 |
-| access | [`setGateModePolicy`](#setgatemodepolicy) | PUT | `/gate-mode-policies` | setup | 1 | BO-201 |
-| access | [`setParkingFacility`](#setparkingfacility) | PUT | `/parking-facilities` | setup | 1 | BO-006 |
+| access | [`setFaceTagTemporaryEnrollment`](#setfacetagtemporaryenrollment) | PUT | `/face-tag-temporary/{profileId}` | setup | 1 | BO-188 |
+| access | [`setGateModePolicy`](#setgatemodepolicy) | PUT | `/gate-mode-policies/{gateModePolicyId}` | setup | 1 | BO-201 |
+| access | [`setParkingFacility`](#setparkingfacility) | PUT | `/parking-facilities/{parkingFacilityId}` | setup | 1 | BO-006 |
 | access | [`setVirtualTicketIdentity`](#setvirtualticketidentity) | PUT | `/virtual-ticket-identity` | setup | 1 | BO-335 |
 | access | [`setVisualAccessRule`](#setvisualaccessrule) | PUT | `/visual-access-rule` | setup | 1 | BO-155 |
 | access | [`updateParkingEntitlement`](#updateparkingentitlement) | PATCH | `/parking-entitlements/{entitlementId}` | core | 1 | GST-027, WEB-041 |
@@ -623,6 +623,9 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 **Raised in review 24 August** against `WEB-018`. `listMyEntitlements` returns what is currently usable; the web account page shows a history — used, expired, transferred away.
 **Two operations rather than a flag**, because the hot path is the gate. `listMyEntitlements` is read at admission and must stay narrow; a history query that scans every entitlement a guest has ever held does not belong on the same endpoint.
 
+
+**Order.** Soonest first, by `validFrom` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -701,6 +704,9 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 **Raised in review by Pranay and Deep, independently, on four screens.** `GST-012 My Tickets`, `GST-013 Ticket Details`, `GST-019 Order History` and `WEB-018` each declared one operation — `transferOrderTickets` — so **a guest could give a ticket away and could not read it.**
 `getMediaEntitlements` and `lookupTicket` both exist and are both staff-only. **The read surface a guest needs was never built**, which only became visible once `access.entitlement` existed at all.
 **Grouped by validity, not by purchase date.** A guest opening this at a gate wants what works today at the top; the order they bought things in is the operator's question.
+
+
+**Order.** Soonest first, by `validFrom` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -783,6 +789,9 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 **What a guest gets back.** The permission is the staff case (ADR-0025: audience and permission are orthogonal); a guest needs none, because car parks are what a guest chooses between when buying parking. **A guest is never shown the integration** — `vendorName`, `endpoint`, `credentialRef`, `pushLeadMinutes` and `vendorSwapTargetDays` are omitted from a guest response. They are how the platform talks to a vendor, not anything a guest decides on.
 **The staff permission is `PARKING_CONFIGURE`**, the same one `setParkingFacility` writes with. It was `ACCESS_POINT_CONFIGURE`, which let somebody who could configure a car park fail to read the one they had just configured.
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the car parks offered to guests, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PARKING_CONFIGURE` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+
+**Order.** Sorted by `name` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -873,7 +882,7 @@ Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 
 ### setAccessPointGroup
 
-**`PUT /access-point-groups`**: Create or replace an access-point group
+**`PUT /access-point-groups/{groupId}`**: Create or replace an access-point group
 
 **The write behind Access Location Grouping** (BO-151): a named group of access points in one venue (e.g. Main Entrance), optionally nested under another group, whose counts roll up to a common occupancy.
 
@@ -898,18 +907,19 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| groupId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AccessAccessPointGroup`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | venueId | string (uuid) | yes |  |
 | name | string | yes | Group name, e.g. |
 | parentGroupId | string (uuid) |  | Enclosing group, for nested groups (nullable) |
 | accessPointIds | array of string (uuid) |  | Member access points (access.access_point) |
-| scopePath | string | yes | ltree of the owning scope node (ADR-0005) |
+| scopePath | string | yes | ltree of the owning scope node (ADR-0005) (read-only) |
 | createdAt | string (date-time) |  | (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 
@@ -917,12 +927,12 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | venueId | string (uuid) | yes |  |
 | name | string | yes | Group name, e.g. |
 | parentGroupId | string (uuid) |  | Enclosing group, for nested groups (nullable) |
 | accessPointIds | array of string (uuid) |  | Member access points (access.access_point) |
-| scopePath | string | yes | ltree of the owning scope node (ADR-0005) |
+| scopePath | string | yes | ltree of the owning scope node (ADR-0005) (read-only) |
 | createdAt | string (date-time) |  | (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 
@@ -1083,7 +1093,7 @@ A group may not be its own ancestor (`409 group-cycle`), and every member access
 
 ### setCredentialActivationDisplay
 
-**`PUT /credential-activation-display`**: Save a credential activation and display rule
+**`PUT /credential-activation-display/{credentialPolicyId}`**: Save a credential activation and display rule
 
 **The write behind Credential Activation & Display Rules** (decided 29 September, VM close-out). `listCredentialActivationDisplay` read these rules and nothing wrote them.
 
@@ -1108,6 +1118,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| credentialPolicyId | path | yes | string (uuid) | Addresses the activation and display rule this write creates or replaces. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CredentialActivationDisplayRulesInput`
@@ -1225,7 +1236,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 ### setFaceMatchingVerification
 
-**`PUT /face-matching-verification`**: Save face matching and verification thresholds
+**`PUT /face-matching-verification/{profileId}`**: Save face matching and verification thresholds
 
 **The write behind Face Matching & Verification Thresholds** (decided 29 September, VM close-out).
 
@@ -1251,6 +1262,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| profileId | path | yes | string (uuid) | Addresses the item this write creates or replaces. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FaceMatchingVerificationThresholdsInput`
@@ -1367,7 +1379,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 ### setFaceTagTemporaryEnrollment
 
-**`PUT /face-tag-temporary`**: Save a Face Tag profile
+**`PUT /face-tag-temporary/{profileId}`**: Save a Face Tag profile
 
 **The write behind Face Tag Temporary Enrollment** (decided 29 September, VM close-out). Where a Face Tag may be captured, what it binds to and when it is deleted.
 
@@ -1395,6 +1407,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| profileId | path | yes | string (uuid) | Addresses the item this write creates or replaces. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FaceTagTemporaryEnrollmentInput`
@@ -1438,7 +1451,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 ### setGateModePolicy
 
-**`PUT /gate-mode-policies`**: Set a policy for a non-standard gate mode
+**`PUT /gate-mode-policies/{gateModePolicyId}`**: Set a policy for a non-standard gate mode
 
 **The write behind Gate Modes, Free Spin & Emergency Controls** (BO-201): for `freeFlow` or `dropArm` (R221 vocabulary), who may activate it, on which gate group, whether a reason is required, the emergency code, notification and whether activation opens an incident. `setTurnstileMode` enforces it: a caller whose role is not in `whoCanActivate` is refused, and a missing reason where `reasonRequired` is refused.
 
@@ -1462,13 +1475,14 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| gateModePolicyId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `AccessGateModePolicy`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | venueId | string (uuid) | yes |  |
 | mode | enum (freeFlow, dropArm) | yes | Non-standard operating mode governed (R221 vocabulary) |
 | whoCanActivate | array of string |  | Roles allowed to activate this mode |
@@ -1477,7 +1491,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | emergencyCode | string |  | (nullable) |
 | automaticNotification | boolean |  | (default False) |
 | createsIncident | boolean |  | Activation creates an incident record (default False) |
-| scopePath | string | yes | ltree of the owning scope node (ADR-0005) |
+| scopePath | string | yes | ltree of the owning scope node (ADR-0005) (read-only) |
 | createdAt | string (date-time) |  | (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 
@@ -1485,7 +1499,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | venueId | string (uuid) | yes |  |
 | mode | enum (freeFlow, dropArm) | yes | Non-standard operating mode governed (R221 vocabulary) |
 | whoCanActivate | array of string |  | Roles allowed to activate this mode |
@@ -1494,7 +1508,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 | emergencyCode | string |  | (nullable) |
 | automaticNotification | boolean |  | (default False) |
 | createsIncident | boolean |  | Activation creates an incident record (default False) |
-| scopePath | string | yes | ltree of the owning scope node (ADR-0005) |
+| scopePath | string | yes | ltree of the owning scope node (ADR-0005) (read-only) |
 | createdAt | string (date-time) |  | (read-only) |
 | updatedAt | string (date-time) |  | (read-only) |
 
@@ -1511,7 +1525,7 @@ A rule takes effect for credentials rendered after the save; a QR already shown 
 
 ### setParkingFacility
 
-**`PUT /parking-facilities`**: Configure a car park and its integration
+**`PUT /parking-facilities/{parkingFacilityId}`**: Configure a car park and its integration
 
 **The mode is the decision, and the three are not variations of one thing.**
 `none` — TICVAI issues its own QR and security verifies it by eye. No integration, and the guest experience depends on a person.
@@ -1537,6 +1551,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| parkingFacilityId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ParkingFacility`
@@ -1910,6 +1925,8 @@ Denies outright regardless of entitlement state. Included in the offline package
 | geofence.allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
 | isActive | boolean | yes |  |
 | lastHeartbeatAt | string (date-time) |  | (nullable) |
+| directionEffectiveAt | string (date-time) |  | When a direction change set by setAccessPointDirection takes effect; held pending until then. (read-only; nullable) |
+| directionChangeReason | string |  | Why the gate was last turned round (setAccessPointDirection). (max length 200; read-only; nullable) |
 
 **Responses**
 
@@ -1917,6 +1934,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 |---|---|---|
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createAdmissionRules
@@ -2041,6 +2059,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setAccessPointDirection
@@ -2060,7 +2079,7 @@ Denies outright regardless of entitlement state. Included in the offline package
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.access_point`, `access.gate_mode_change` |
-| Writes | `access.access_point` |
+| Writes | `access.access_point`, `access.configuration_change`, `access.gate_mode_change` |
 | Called by | BO-230, SCN-016 |
 
 **Parameters**
@@ -2110,6 +2129,8 @@ Denies outright regardless of entitlement state. Included in the offline package
 | geofence.allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
 | isActive | boolean | yes |  |
 | lastHeartbeatAt | string (date-time) |  | (nullable) |
+| directionEffectiveAt | string (date-time) |  | When a direction change set by setAccessPointDirection takes effect; held pending until then. (read-only; nullable) |
+| directionChangeReason | string |  | Why the gate was last turned round (setAccessPointDirection). (max length 200; read-only; nullable) |
 
 **Responses**
 
@@ -2191,6 +2212,8 @@ Enforcement is configurable — `off`, `warn` or `deny` — because GPS accuracy
 | geofence.allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
 | isActive | boolean | yes |  |
 | lastHeartbeatAt | string (date-time) |  | (nullable) |
+| directionEffectiveAt | string (date-time) |  | When a direction change set by setAccessPointDirection takes effect; held pending until then. (read-only; nullable) |
+| directionChangeReason | string |  | Why the gate was last turned round (setAccessPointDirection). (max length 200; read-only; nullable) |
 
 **Responses**
 
@@ -2274,6 +2297,8 @@ Podium operation. Changes what the gate does, not who may pass it.
 | geofence.allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
 | isActive | boolean | yes |  |
 | lastHeartbeatAt | string (date-time) |  | (nullable) |
+| directionEffectiveAt | string (date-time) |  | When a direction change set by setAccessPointDirection takes effect; held pending until then. (read-only; nullable) |
+| directionChangeReason | string |  | Why the gate was last turned round (setAccessPointDirection). (max length 200; read-only; nullable) |
 
 **Responses**
 
@@ -2358,6 +2383,8 @@ Podium operation. Changes what the gate does, not who may pass it.
 | geofence.allowProximityBeacon | boolean |  | Accept a BLE proximity assertion in place of GPS. |
 | isActive | boolean | yes |  |
 | lastHeartbeatAt | string (date-time) |  | (nullable) |
+| directionEffectiveAt | string (date-time) |  | When a direction change set by setAccessPointDirection takes effect; held pending until then. (read-only; nullable) |
+| directionChangeReason | string |  | Why the gate was last turned round (setAccessPointDirection). (max length 200; read-only; nullable) |
 
 **Responses**
 
@@ -2496,6 +2523,7 @@ Changes take effect at terminals after the next offline package refresh, not imm
 | 200 |  | Updated |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 422 |  | A count missing for an n* entry mode, days missing for a relative validity anchor, or validity.to before validity.from |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -2585,7 +2613,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | external_credential_sources | jsonb | no | BL-108. |
 | scan_anomaly_rules | jsonb | no | BL-104. |
 | operating_mode | text | yes | Set by the podium with setTurnstileMode, and it wins (audit R221). |
-| vehicle_location_capture | boolean | no | BL-023. |
+| captures_vehicle_location | boolean | no | BL-023. |
 | mode | text | no | Narrows operatingMode only: freeRotation or closed within normal or podium, null otherwise and whenever the turnstile validates in its fixed direction (audit R221). |
 | direction | text | no | Fixed per access point (audit R221): set in the back office by createAccessPoint and updateAccessPoint, never by the podium. |
 | temporary_closure | jsonb | no | What the access point does while its attraction is temporarily closed (decided 2 October 2026, Chinmay, batch 6 set 9, BO-147: "Deny + reopening time + a virtual-queue return window where enabled"; D… |
@@ -2595,6 +2623,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | geofence | jsonb | no | Written by setAccessPointGeofence; null until one is set. |
 | is_active | boolean | yes |  |
 | last_heartbeat_at | timestamptz | no |  |
+| direction_effective_at | timestamptz | no | When a direction change set by setAccessPointDirection takes effect; held pending until then. |
+| direction_change_reason | text | no | Why the gate was last turned round (setAccessPointDirection). |
 
 ### `access.access_point_group`
 
@@ -2626,7 +2656,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | exit_scan | text | no | (decided 29 September, VM close-out) required: re-entry needs a recorded exit. |
 | max_exits | integer | no | Null is unlimited (decided 29 September, VM close-out) |
 | re_entry_window_minutes | integer | no | Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out) |
-| same_day_only | boolean | no | Re-entry only on the day of the exit (decided 29 September, VM close-out) |
+| is_same_day_only | boolean | no | Re-entry only on the day of the exit (decided 29 September, VM close-out) |
 | designated_access_point_ids | text[] | no | Re-entry only through these access points; empty is any allowed access point (decided 29 September, VM close-out) |
 | validity | jsonb | no | When the credential is valid (decided 29 September, VM close-out). |
 | crossover | jsonb | no | Crossover between parks (decided 29 September, VM close-out). |
@@ -2681,9 +2711,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_identity_check_required | boolean | no | facePassEnrolment rows |
 | number_of_capture_attempts | integer | no | facePassEnrolment rows |
 | minimum_image_quality | text | no | facePassEnrolment rows. |
-| operator_verification | boolean | no | facePassEnrolment rows. |
+| requires_operator_verification | boolean | no | facePassEnrolment rows. |
 | enrollment_expiry_days | integer | no | facePassEnrolment rows. |
-| duplicate_face_check | boolean | no | facePassEnrolment rows - block a face already associated with another annual pass (the operation's duplicateFaceDetection); faceMatch rows - duplicate-face check at verification, true unless set |
+| has_duplicate_face_check | boolean | no | facePassEnrolment rows - block a face already associated with another annual pass (the operation's duplicateFaceDetection); faceMatch rows - duplicate-face check at verification, true unless set |
 | bind_to | text | no | faceTagEnrolment rows. |
 | deletion_trigger | text | no | faceTagEnrolment rows. |
 | retention_threshold_hours | integer | no | faceTagEnrolment rows, required when deletionTrigger is operationalRetentionThreshold. |
@@ -2692,11 +2722,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | high_confidence_min | numeric | no | faceMatch rows. |
 | review_range_min | numeric | no | faceMatch rows. |
 | retry_quantity | integer | no | faceMatch rows; 2 unless set |
-| liveness_check | boolean | no | faceMatch rows; true unless set |
+| has_liveness_check | boolean | no | faceMatch rows; true unless set |
 | image_quality | text | no | faceMatch rows. |
 | capture_timeout_seconds | integer | no | faceMatch rows (the operation's captureTimeout); 10 unless set |
 | mask_obstruction_handling | text | no | faceMatch rows; operatorReview unless set |
-| operator_fallback | boolean | no | faceMatch rows. |
+| has_operator_fallback | boolean | no | faceMatch rows. |
 | created_at | timestamptz | no |  |
 | updated_at | timestamptz | no |  |
 
@@ -2730,6 +2760,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | changed_by_principal_id | uuid | yes | Actor |
 | changed_at | timestamptz | yes |  |
 | scope_path | text | yes | ltree of the owning scope node (ADR-0005) |
+| reason | text | no | Why the change was made, where the operation asks for one (setAccessAreaCapacity). |
 
 ### `access.credential_policy`
 
@@ -2744,11 +2775,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | activation_triggers | text[] | no | activationDisplay - what activates the credential, e.g. |
 | is_transfer_allowed | boolean | no | transfer |
 | number_of_transfers | integer | no | transfer |
-| before_first_validation_only | boolean | no | transfer |
+| is_before_first_validation_only | boolean | no | transfer |
 | require_recipient_account | boolean | no | transfer |
 | require_otp | boolean | no | transfer |
 | require_acceptance | boolean | no | transfer |
-| return_to_sender | boolean | no | transfer |
+| returns_to_sender | boolean | no | transfer |
 | transfer_deadline_hours | integer | no | transfer - hours before the visit after which transfer closes |
 | is_cancel_pending_allowed | boolean | no | transfer |
 | is_transfer_audit_required | boolean | no | transfer |
@@ -2776,7 +2807,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | subject_id | uuid | no | The guest (pii.subject) |
 | entitlement_id | uuid | yes |  |
 | credential_binding_id | uuid | no |  |
-| device_id | text | yes |  |
+| device_id | uuid | yes |  |
 | device_reference | text | no |  |
 | app_installation_id | text | no |  |
 | os | text | no |  |
@@ -2851,7 +2882,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| admission_profile_id | uuid | yes |  |
+| admission_rules_id | uuid | yes |  |
 | access_point_id | uuid | yes |  |
 | is_active | boolean | yes |  |
 | created_at | timestamptz | yes |  |
@@ -2906,7 +2937,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | access_point_group_id | uuid | no | Gate group the policy applies to (access.access_point_group); null for the whole venue |
 | is_reason_required | boolean | no |  |
 | emergency_code | text | no |  |
-| automatic_notification | boolean | no |  |
+| has_automatic_notification | boolean | no |  |
 | creates_incident | boolean | no | Activation creates an incident record |
 | scope_path | text | yes | ltree of the owning scope node (ADR-0005) |
 | created_at | timestamptz | no |  |
@@ -2956,7 +2987,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | access_point_id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | scope_path | text | no |  |
-| ticket_id | uuid | no | The Entitlement.id scanned; null where the media resolved to nothing. |
+| entitlement_id | uuid | no | The Entitlement.id scanned; null where the media resolved to nothing. |
 | media_code | text | no |  |
 | outcome | text | yes |  |
 | deny_reason | text | no |  |

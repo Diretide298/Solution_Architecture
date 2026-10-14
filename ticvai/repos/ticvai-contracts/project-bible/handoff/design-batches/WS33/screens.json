@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/payment-order-financial-command-center-bo-324",
-   "component": "apps/venue-management-web/src/routes/orders-money/PaymentOrderFinancialCommandCenter.tsx",
+   "component": "src/routes/orders-money/PaymentOrderFinancialCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -112,7 +113,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -283,6 +284,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "3",
@@ -292,7 +294,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/order-payment-detail-transaction-ledger-bo-325",
-   "component": "apps/venue-management-web/src/routes/orders-money/OrderPaymentDetailTransactionLedger.tsx",
+   "component": "src/routes/orders-money/OrderPaymentDetailTransactionLedger.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -489,6 +491,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "3",
@@ -498,7 +501,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/multi-payment-split-tender-payment-allocation-configurat-bo-326",
-   "component": "apps/venue-management-web/src/routes/orders-money/MultiPaymentSplitTenderPaymentAllocationConfigur.tsx",
+   "component": "src/routes/orders-money/MultiPaymentSplitTenderPaymentAllocationConfigur.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -704,6 +707,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "3",
@@ -713,7 +717,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/deposit-partial-payment-outstanding-balance-management-bo-327",
-   "component": "apps/venue-management-web/src/routes/orders-money/DepositPartialPaymentOutstandingBalanceManagemen.tsx",
+   "component": "src/routes/orders-money/DepositPartialPaymentOutstandingBalanceManagemen.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -966,6 +970,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "3",
@@ -975,7 +980,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/order-split-merge-transaction-relationship-management-bo-328",
-   "component": "apps/venue-management-web/src/routes/orders-money/OrderSplitMergeTransactionRelationshipManagement.tsx",
+   "component": "src/routes/orders-money/OrderSplitMergeTransactionRelationshipManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1115,7 +1120,10 @@
     "component": "confirmDialog",
     "trigger": "Merge orders",
     "body": "**Names what `mergeOrders` changes and what it leaves alone**, in the consequence rather than the verb. A order this affects should be identified in the dialog, not just counted. **Collects what `mergeOrders` sends before it is called.** Required: `sourceOrderIds`. Optional: `reason`.",
-    "provenance": "contract orders.yaml POST /orders/{orderId}/merge"
+    "provenance": "contract orders.yaml POST /orders/{orderId}/merge",
+    "confirm": {
+     "operation": "mergeOrders"
+    }
    }
   ],
   "_platform": {
@@ -1147,6 +1155,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "3",
@@ -1156,7 +1165,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/related-order-transaction-relationship-explorer-bo-329",
-   "component": "apps/venue-management-web/src/routes/orders-money/RelatedOrderTransactionRelationshipExplorer.tsx",
+   "component": "src/routes/orders-money/RelatedOrderTransactionRelationshipExplorer.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1186,7 +1195,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -1316,6 +1325,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "3",
@@ -1325,7 +1335,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/external-payment-partner-settlement-reference-mapping-bo-330",
-   "component": "apps/venue-management-web/src/routes/orders-money/ExternalPaymentPartnerSettlementReferenceMapping.tsx",
+   "component": "src/routes/orders-money/ExternalPaymentPartnerSettlementReferenceMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1577,6 +1587,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "3",
@@ -1586,7 +1597,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/payment-reconciliation-exception-management-bo-331",
-   "component": "apps/venue-management-web/src/routes/orders-money/PaymentReconciliationExceptionManagement.tsx",
+   "component": "src/routes/orders-money/PaymentReconciliationExceptionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1705,6 +1716,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "3",
@@ -1714,7 +1726,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/financial-traceability-control-audit-explorer-bo-332",
-   "component": "apps/venue-management-web/src/routes/orders-money/FinancialTraceabilityControlAuditExplorer.tsx",
+   "component": "src/routes/orders-money/FinancialTraceabilityControlAuditExplorer.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1812,6 +1824,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "3",
@@ -1821,7 +1834,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/order-financial-analytics-ai-reconciliation-intelligence-bo-333",
-   "component": "apps/venue-management-web/src/routes/orders-money/OrderFinancialAnalyticsAiReconciliationIntellige.tsx",
+   "component": "src/routes/orders-money/OrderFinancialAnalyticsAiReconciliationIntellige.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1843,7 +1856,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {

@@ -5,6 +5,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "3",
@@ -139,7 +140,7 @@
         "Critical Alerts"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getExpiringRights",
        "provenance": "pack Digital Asset Management DAM.pdf, page 43 §Display"
       }
      ]
@@ -152,6 +153,7 @@
        "kind": "detailPanel",
        "label": "The selected dam governance rights",
        "bindsTo": null,
+       "operation": "getExpiringRights",
        "columns": [
         "Active Assets",
         "Pending Approval",
@@ -214,13 +216,6 @@
     "purpose": "Rights about to lapse",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "getMediaUsageAnalytics",
-    "contract": "assets",
-    "purpose": "Governance coverage",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
    }
   ],
   "entryState": {
@@ -268,6 +263,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "3",
@@ -336,6 +332,7 @@
      "components": [
       {
        "kind": "detailPanel",
+       "operation": "getMediaAsset",
        "derived": true,
        "impliedBy": "getMediaAsset",
        "notes": "One record, read-only."
@@ -359,13 +356,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "updateMediaAsset",
-    "contract": "assets",
-    "purpose": "Set owner and responsibility",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "getMediaAsset",
     "contract": "assets",
@@ -419,6 +409,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_MANAGE",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "3",
@@ -556,6 +547,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_APPROVE",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "3",
@@ -709,6 +701,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_APPROVE",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "3",
@@ -852,6 +845,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PERMISSION_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "3",
@@ -1035,6 +1029,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_SHARE",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "3",
@@ -1193,6 +1188,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "3",
@@ -1254,7 +1250,7 @@
         "Expired"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getExpiringRights",
        "provenance": "pack Digital Asset Management DAM.pdf, page 52 §Show"
       }
      ]
@@ -1267,6 +1263,7 @@
        "kind": "detailPanel",
        "label": "The selected rights expiry renewal",
        "bindsTo": null,
+       "operation": "getExpiringRights",
        "columns": [
         "Expires in 7 Days",
         "Expires in 30 Days",
@@ -1330,17 +1327,6 @@
     "purpose": "What lapses, and what it would break",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "setMediaAssetRights",
-    "contract": "assets",
-    "purpose": "Renew",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getMediaAsset",
-     "getExpiringRights"
-    ]
    }
   ],
   "entryState": {
@@ -1394,6 +1380,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "3",
@@ -1519,6 +1506,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "3",
@@ -1581,7 +1569,7 @@
         "Risk Queue"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getExpiringRights",
        "provenance": "pack Digital Asset Management DAM.pdf, page 54 §Display"
       }
      ]
@@ -1594,6 +1582,7 @@
        "kind": "detailPanel",
        "label": "The selected governance risk compliance",
        "bindsTo": null,
+       "operation": "getExpiringRights",
        "columns": [
         "Assets Without Rights",
         "Expired Assets",

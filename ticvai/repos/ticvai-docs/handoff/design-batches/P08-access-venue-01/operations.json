@@ -39,7 +39,7 @@
  },
  "configureQueueFeed": {
   "method": "PUT",
-  "path": "/queue-feeds",
+  "path": "/queue-feeds/{feedId}",
   "contract": "queue",
   "summary": "Configure a sensor feed",
   "permission": "QUEUE_MANAGE",
@@ -47,6 +47,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "feedId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -521,7 +526,7 @@
  },
  "setParkingFacility": {
   "method": "PUT",
-  "path": "/parking-facilities",
+  "path": "/parking-facilities/{parkingFacilityId}",
   "contract": "access",
   "summary": "Configure a car park and its integration",
   "permission": "PARKING_CONFIGURE",
@@ -529,6 +534,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "parkingFacilityId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -639,7 +649,7 @@
   "contract": "maintenance",
   "summary": "Supervisor verification",
   "permission": "WORK_ORDER_VERIFY",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

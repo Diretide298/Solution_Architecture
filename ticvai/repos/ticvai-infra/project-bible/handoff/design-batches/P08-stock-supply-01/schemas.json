@@ -817,10 +817,12 @@
     "format": "uuid"
    },
    "supplierId": {
+    "x-ticvai-references": "inventory.supplier",
     "type": "string",
     "format": "uuid"
    },
    "number": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 100
    },
@@ -1594,6 +1596,7 @@
     "format": "uuid"
    },
    "locationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
@@ -1683,6 +1686,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -1830,10 +1834,12 @@
     "type": "string"
    },
    "fromLocationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
    "toLocationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
@@ -2012,6 +2018,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -2082,6 +2089,17 @@
    "scopePath": {
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.** Suppliers are owned at tenant and venues quote against them (decided 28 September, audit R183)."
+   },
+   "contacts": {
+    "type": "array",
+    "readOnly": true,
+    "x-ticvai-persistence-kind": "valueObject",
+    "x-ticvai-persistence-column": "jsonb",
+    "description": "Every contact `updateSupplier` was given; the first is also the primary contact's three fields.",
+    "items": {
+     "type": "object",
+     "additionalProperties": true
+    }
    }
   }
  },

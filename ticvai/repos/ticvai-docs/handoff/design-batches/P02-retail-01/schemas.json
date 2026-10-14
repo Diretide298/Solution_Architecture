@@ -124,12 +124,14 @@
     }
    },
    "conflicts": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "$ref": "#/components/schemas/CartConflict"
     }
    },
    "consentQuestions": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
@@ -469,7 +471,8 @@
    },
    "barcode": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "x-ticvai-unique": "venue"
    },
    "name": {
     "type": "string"

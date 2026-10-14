@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "TICVAI Finance Backend Structure Reference v1.0.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/admissions-revenue-bo-1082",
-   "component": "apps/venue-management-web/src/routes/orders-money/AdmissionsRevenue.tsx",
+   "component": "src/routes/orders-money/AdmissionsRevenue.tsx",
    "status": "notStarted"
   },
   "navigation": {

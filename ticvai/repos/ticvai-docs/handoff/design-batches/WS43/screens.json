@@ -5,6 +5,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/product-lifecycle-command-center-adm-118",
-   "component": "apps/venue-management-web/src/routes/catalogue/ProductLifecycleCommandCenter.tsx",
+   "component": "src/routes/catalogue/ProductLifecycleCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -188,6 +189,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "1",
@@ -197,7 +199,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/product-directory/product-creation-workspace-adm-119",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ProductDirectoryDetail.tsx",
+   "component": "src/routes/venue-operations/ProductDirectoryDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-007"
   },
@@ -325,6 +327,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "1",
@@ -334,7 +337,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/lifecycle-status-workflow-configuration-adm-120",
-   "component": "apps/venue-management-web/src/routes/catalogue/LifecycleStatusWorkflowConfiguration.tsx",
+   "component": "src/routes/catalogue/LifecycleStatusWorkflowConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -466,7 +469,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/product-import-governance-ai-configuration-assistant/bulk-product-creation-catalogue-import-adm-121",
-   "component": "apps/venue-management-web/src/routes/sell/ProductImportGovernanceAiConfigurationList.tsx",
+   "component": "src/routes/sell/ProductImportGovernanceAiConfigurationList.tsx",
    "status": "notStarted",
    "sectionOf": "BO-117"
   },
@@ -583,6 +586,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "1",
@@ -592,7 +596,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/product-import-export-environment-transfer-adm-122",
-   "component": "apps/venue-management-web/src/routes/catalogue/ProductImportExportEnvironmentTransfer.tsx",
+   "component": "src/routes/catalogue/ProductImportExportEnvironmentTransfer.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -705,6 +709,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "1",
@@ -714,7 +719,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/product-context-ownership-assignment-adm-123",
-   "component": "apps/venue-management-web/src/routes/catalogue/ProductContextOwnershipAssignment.tsx",
+   "component": "src/routes/catalogue/ProductContextOwnershipAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -837,6 +842,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "1",
@@ -846,7 +852,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/channel-publication-availability-adm-124",
-   "component": "apps/venue-management-web/src/routes/catalogue/ChannelPublicationAvailability.tsx",
+   "component": "src/routes/catalogue/ChannelPublicationAvailability.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -967,6 +973,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "1",
@@ -976,7 +983,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/publication-activation-scheduler-adm-125",
-   "component": "apps/venue-management-web/src/routes/catalogue/PublicationActivationScheduler.tsx",
+   "component": "src/routes/catalogue/PublicationActivationScheduler.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1074,6 +1081,16 @@
    "workshopBoard": "wireframes/WS104 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-125"
   },
   "apisNote": "Regenerated 9 September 2026 from Product_Lifecycle___Catalogue_Governance_Reference.pdf page 10. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "lifecycleActionId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listScheduledLifecycleActions`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1103,6 +1120,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "1",
@@ -1112,7 +1130,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/product-duplication-template-library-adm-126",
-   "component": "apps/venue-management-web/src/routes/catalogue/ProductDuplicationTemplateLibrary.tsx",
+   "component": "src/routes/catalogue/ProductDuplicationTemplateLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1291,6 +1309,16 @@
     "provenance": "contract catalogue.yaml PUT /configuration-templates"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "configurationTemplateId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setConfigurationTemplate` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1320,6 +1348,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "1",
@@ -1329,7 +1358,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/ai-catalogue-builder-configuration-review-adm-127",
-   "component": "apps/venue-management-web/src/routes/catalogue/AiCatalogueBuilderConfigurationReview.tsx",
+   "component": "src/routes/catalogue/AiCatalogueBuilderConfigurationReview.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -1581,15 +1581,24 @@ def main() -> int:
     # 2 + 8. tables
     wb = H / "TICVAI_Schema_Reference.xlsx"
     tables: set[str] = set()
+    views: set[str] = set()
     if wb.exists():
         try:
             import openpyxl
-            ws = openpyxl.load_workbook(wb, data_only=True)["Tables"]
+            book = openpyxl.load_workbook(wb, data_only=True)
+            ws = book["Tables"]
             tables = {ws.cell(r, 2).value for r in range(5, ws.max_row + 1) if ws.cell(r, 2).value}
+            # **A read view is in the schema reference too** (14 October 2026, CHG-R6G-007, CHG-GTE-001, tracker F27):
+            # the lineage names a read through a DB-READ-VIEWS view by the view, and build-schema-workbook.py lists
+            # every such view on `Read views` (column A) over a table it has. A view is read, never written.
+            if "Read views" in book.sheetnames:
+                wv = book["Read views"]
+                views = {wv.cell(r, 1).value for r in range(5, wv.max_row + 1) if wv.cell(r, 1).value}
         except Exception as e:  # noqa: BLE001
             WARNINGS.append(f"could not read the schema workbook: {e}")
     if tables:
-        for t in sorted({t for v in lin.values() for t in v["reads"] + v["writes"]} - tables):
+        named = ({t for v in lin.values() for t in v["reads"]} - views) | {t for v in lin.values() for t in v["writes"]}
+        for t in sorted(named - tables):
             ERRORS.append(f"lineage names table '{t}' which the schema reference does not have")
         for t in sorted(tables):
             if "." not in str(t):

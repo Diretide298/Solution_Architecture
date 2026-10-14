@@ -143,6 +143,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: TENANT_CONFIGURE
   source:
     sameAs: ADM-380
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -309,6 +310,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-381
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -420,6 +422,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-382
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -509,6 +512,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-383
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -629,6 +633,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-384
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -758,6 +763,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-385
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -847,6 +853,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-386
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -947,6 +954,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-387
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1037,6 +1045,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-388
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1127,6 +1136,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-399
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1248,6 +1258,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     sameAs: ADM-400
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1345,6 +1356,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-401
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1458,6 +1470,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-402
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1568,6 +1581,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-403
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1649,6 +1663,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-404
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1741,6 +1756,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_MANAGE
   source:
     sameAs: ADM-405
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1915,6 +1931,7 @@ screens:
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_MANAGE
   source:
     sameAs: ADM-410
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -2015,6 +2032,7 @@ screens:
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: TENANT_CONFIGURE
   source:
     book: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -2159,6 +2177,7 @@ screens:
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: TENANT_CONFIGURE
   source:
     book: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -2261,11 +2280,18 @@ screens:
     - to: SGN-022
       trigger: Order & Commercial Pricing Review
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
+  entryState:
+    params:
+    - name: providerId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setPaymentProvider` takes it, from the record the user acts on.'
 - id: SGN-022
   name: Order & Commercial Pricing Review
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     sameAs: ADM-414
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -2378,6 +2404,7 @@ screens:
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     sameAs: ADM-415
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -2492,6 +2519,7 @@ screens:
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_MANAGE
   source:
     sameAs: ADM-417
     book: Subscription_Licensing_AI_Self_Service.pdf

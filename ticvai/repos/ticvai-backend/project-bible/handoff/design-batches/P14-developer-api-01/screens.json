@@ -5,6 +5,7 @@
   "module": "Developer & API",
   "requiresModule": "developerApi",
   "wave": 1,
+  "permission": "DEVELOPER_VIEW",
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/reference",
@@ -206,6 +207,7 @@
   "module": "Developer & API",
   "requiresModule": "developerApi",
   "wave": 1,
+  "permission": "DEVELOPER_VIEW",
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/organisation",
@@ -422,6 +424,7 @@
   "module": "Developer & API",
   "requiresModule": "developerApi",
   "wave": 1,
+  "permission": "DEVELOPER_VIEW",
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/clients",
@@ -751,6 +754,7 @@
   "module": "Developer & API",
   "requiresModule": "developerApi",
   "wave": 2,
+  "permission": "DEVELOPER_VIEW",
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/sandbox",
@@ -1046,6 +1050,7 @@
   "module": "Developer & API",
   "requiresModule": "developerApi",
   "wave": 2,
+  "permission": "DEVELOPER_VIEW",
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/webhooks",
@@ -1121,6 +1126,7 @@
       {
        "kind": "dataTable",
        "bindsTo": "WebhookDelivery[]",
+       "operation": "listWebhookDeliveries",
        "notes": "Status, attempts, response code and an excerpt of the receiver's own error. **The excerpt is what makes the log useful** — a 500 with their own message in it answers the question without a support conversation.\n",
        "provenance": "carried from the previous definition"
       },
@@ -1181,6 +1187,7 @@
       {
        "kind": "cardList",
        "bindsTo": "WebhookSubscription[]",
+       "operation": "listWebhookSubscriptions",
        "notes": "Failing subscriptions sort first and carry the consecutive-failure count. **A developer is told before it is disabled, not after.**\n",
        "provenance": "carried from the previous definition"
       }
@@ -1228,13 +1235,6 @@
     "invalidates": [
      "listWebhookSubscriptions"
     ]
-   },
-   {
-    "operationId": "listWebhookEventTypes",
-    "contract": "public-api",
-    "purpose": "Events a subscription can take",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -1333,6 +1333,7 @@
   "module": "Developer & API",
   "requiresModule": "developerApi",
   "wave": 2,
+  "permission": "DEVELOPER_VIEW",
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/usage",
@@ -1387,6 +1388,7 @@
       },
       {
        "kind": "metricTile",
+       "operation": "getApiUsage",
        "notes": "Calls, success rate, p95 latency, quota headroom.",
        "provenance": "carried from the previous definition"
       },
@@ -1479,6 +1481,7 @@
   "module": "Developer & API",
   "requiresModule": "developerApi",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/marketplace",
@@ -1680,6 +1683,7 @@
   "module": "Developer & API",
   "requiresModule": "developerApi",
   "wave": 1,
+  "permission": "DEVELOPER_VIEW",
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/admin",
@@ -2004,6 +2008,24 @@
      "name": "requestId",
      "from": "navigation",
      "optional": true
+    },
+    {
+     "name": "anomalyRuleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listApiAnomalyRules`."
+    },
+    {
+     "name": "licenceId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listApiLicences`."
+    },
+    {
+     "name": "quotaId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listApiQuotas`."
     }
    ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `listingId`, `version`."

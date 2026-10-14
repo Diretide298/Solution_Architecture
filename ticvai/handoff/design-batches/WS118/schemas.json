@@ -618,52 +618,6 @@
    }
   }
  },
- "AiConfigurationTurn": {
-  "type": "object",
-  "x-ticvai-persistence": "none — the answer is written to ai.blueprint_decision and the session",
-  "description": "The result of one answer: what was extracted with its provenance, the next question and progress.",
-  "required": [
-   "session"
-  ],
-  "properties": {
-   "session": {
-    "$ref": "#/components/schemas/AiConfigurationSession"
-   },
-   "extracted": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "decisionKey": {
-       "type": "string"
-      },
-      "value": {
-       "type": "object",
-       "additionalProperties": true,
-       "nullable": true
-      },
-      "provenance": {
-       "$ref": "#/components/schemas/AiProvenance"
-      }
-     }
-    }
-   },
-   "nextQuestion": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/AiConfigurationQuestion"
-     }
-    ],
-    "nullable": true
-   },
-   "clarificationsNeeded": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   }
-  }
- },
  "AiDecisionRecord": {
   "type": "object",
   "x-ticvai-persistence": "ai.decision_record",
@@ -781,6 +735,8 @@
     "description": "`approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit)."
    },
    "annotations": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -871,75 +827,6 @@
    }
   }
  },
- "AiEffectivePolicy": {
-  "type": "object",
-  "x-ticvai-persistence": "none — resolved from published policy versions, exceptions and ai.policy",
-  "description": "**The policy in force for a capability at a scope** (AIC-153, AIC-165; ADM-525, ADM-528): the intersection of the capability, governance policy and the tenant or venue AI policy, with where each part came from.",
-  "required": [
-   "capabilityKey",
-   "autonomyLevel",
-   "rules"
-  ],
-  "properties": {
-   "capabilityKey": {
-    "type": "string"
-   },
-   "scopePath": {
-    "type": "string"
-   },
-   "autonomyLevel": {
-    "$ref": "#/components/schemas/AiAutonomyLevel"
-   },
-   "autonomyCeiling": {
-    "$ref": "#/components/schemas/AiAutonomyLevel"
-   },
-   "rules": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "rule": {
-       "$ref": "#/components/schemas/AiGovernanceRule"
-      },
-      "policyKey": {
-       "type": "string"
-      },
-      "version": {
-       "type": "integer"
-      },
-      "scopePath": {
-       "type": "string"
-      }
-     }
-    }
-   },
-   "exceptions": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AiPolicyException"
-    }
-   },
-   "conflicts": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "description": {
-       "type": "string"
-      },
-      "resolvedTo": {
-       "$ref": "#/components/schemas/AiGovernanceOutcome"
-      }
-     }
-    },
-    "description": "Conflicting rules and the more restrictive result they resolved to (AIC-161)."
-   },
-   "resolvedAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "AiEvidenceItemList": {
   "type": "array",
   "x-ticvai-persistence-kind": "valueObject",
@@ -960,95 +847,6 @@
    "block"
   ],
   "description": "What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). `block` is an answer, not an error, and is logged as outcome `refused`."
- },
- "AiGovernanceRule": {
-  "type": "object",
-  "x-ticvai-persistence": "none — held in the jsonb rules column of ai.governance_policy_version, through AiGovernanceRuleList",
-  "description": "One rule of a governance policy version: which actions on which data, under which conditions, get which outcome (AIC-147..160).",
-  "required": [
-   "effect"
-  ],
-  "properties": {
-   "effect": {
-    "$ref": "#/components/schemas/AiGovernanceOutcome"
-   },
-   "capabilityKeys": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Registered capabilities it applies to. Empty means every capability the policy names."
-   },
-   "actions": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "read",
-      "analyze",
-      "recommend",
-      "generate",
-      "prepare",
-      "create",
-      "modify",
-      "publish",
-      "execute",
-      "delete"
-     ]
-    },
-    "description": "ADM-523: what AI may do, from reading to executing."
-   },
-   "dataCategories": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Data categories (ADM-524), e.g. `customerContact`, `payment`, `financial`, `operational`."
-   },
-   "purposes": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Permitted purposes for those categories (AIC-156, AIR-182)."
-   },
-   "maxAmount": {
-    "allOf": [
-     {
-      "$ref": "../shared/common.yaml#/components/schemas/Money"
-     }
-    ],
-    "nullable": true,
-    "description": "Above this value the effect escalates one step (for example to `approvalRequired`)."
-   },
-   "roleIds": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "format": "uuid"
-    },
-    "description": "Roles the rule applies to; empty means every role."
-   },
-   "environments": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "development",
-      "sandbox",
-      "staging",
-      "production"
-     ]
-    },
-    "description": "ADM-525. Empty means every environment. **`sandbox`** (18 September minutes, M18-01): the developer sandbox and a tenant's trial environment, governed apart from staging so a rule can allow in sandbox what it blocks in production."
-   },
-   "conditions": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "Conditions attached to an `allowWithConditions` effect, for example `maskFields` or `requireCitation`."
-   }
-  }
  },
  "AiInteraction": {
   "type": "object",
@@ -1292,90 +1090,6 @@
    }
   }
  },
- "AiPolicyException": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.policy_exception",
-  "description": "**A temporary, recorded exception to a governance policy** (AIC-162, ADM-526): an expiry, an approver and compensating controls. Governance is never bypassed silently.",
-  "required": [
-   "policyId",
-   "reason",
-   "expiresAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "policyId": {
-    "type": "string",
-    "format": "uuid",
-    "x-ticvai-references": "ai.governance_policy"
-   },
-   "capabilityKey": {
-    "type": "string",
-    "nullable": true
-   },
-   "reason": {
-    "type": "string",
-    "maxLength": 2000
-   },
-   "compensatingControls": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    }
-   },
-   "startsAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Required. An exception with no end is a policy change, and goes through publication."
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "expired",
-     "revoked"
-    ],
-    "readOnly": true
-   },
-   "approvedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "revokedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "revokedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true
-   },
-   "revokeReason": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
  "AiProvenance": {
   "type": "string",
   "enum": [
@@ -1427,6 +1141,8 @@
     "nullable": true
    },
    "openingHours": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "The usual week. Exceptions come from the venue calendar.",
     "items": {
@@ -1748,6 +1464,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -1786,133 +1503,6 @@
    }
   }
  },
- "ProposedAction": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.proposed_action",
-  "required": [
-   "id",
-   "kind",
-   "targetContract",
-   "targetOperation",
-   "payload",
-   "status"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "interactionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "translationJobId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "pricing",
-     "promotion",
-     "operational",
-     "financial",
-     "configuration",
-     "content",
-     "audience"
-    ],
-    "description": "`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."
-   },
-   "targetContract": {
-    "type": "string",
-    "description": "Which contract would perform it. The assistant never performs it itself."
-   },
-   "targetOperation": {
-    "type": "string"
-   },
-   "payload": {
-    "type": "object",
-    "additionalProperties": true,
-    "description": "The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"
-   },
-   "summary": {
-    "type": "string"
-   },
-   "status": {
-    "type": "string",
-    "description": "**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n",
-    "enum": [
-     "proposed",
-     "approved",
-     "rejected",
-     "applied",
-     "expired"
-    ]
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-derived": "onWrite",
-    "description": "When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."
-   },
-   "approvalLevel": {
-    "type": "integer",
-    "minimum": 1,
-    "maximum": 2,
-    "description": "8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"
-   },
-   "decidedByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "decisionReason": {
-    "type": "string",
-    "nullable": true,
-    "description": "Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"
-   },
-   "proposedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "decidedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"
-   },
-   "planId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "ai.action_plan",
-    "description": "The plan this action presents for a decision (AI design 2.2 D, 3.8)."
-   },
-   "approvalRequestId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."
-   },
-   "changeSetHash": {
-    "type": "string",
-    "nullable": true,
-    "readOnly": true,
-    "description": "Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."
-   }
-  }
- },
  "SuspensionMode": {
   "type": "string",
   "description": "Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n",
@@ -1938,6 +1528,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

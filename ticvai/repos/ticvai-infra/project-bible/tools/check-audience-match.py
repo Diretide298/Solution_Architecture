@@ -33,7 +33,7 @@ The kiosk (P05) runs on a registered device, so `device` operations are its own.
                     a staff operation on a guest app's ticket, a guest-only one on a staff app's (14 October 2026,
                     CHG-SWP-002: #27741, AM-IDENTITY-SECURITY-P02 on the guest app, listed the staff-only
                     searchGuests; no screen bound it, so the screen rules above never saw it). Read from
-                    handoff/service-docs/plan-tasks.csv; the feature #27741 itself is not baselined (batch GAP)
+                    handoff/service-docs/plan-tasks.csv; the feature #27741 itself is never baselined (CHG-TKT-002)
 
 and notes, without counting, operations bound on a screen that declare no audience at all.
 

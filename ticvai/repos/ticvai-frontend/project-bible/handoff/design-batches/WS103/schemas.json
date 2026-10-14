@@ -227,6 +227,8 @@
     ]
    },
    "groups": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -296,51 +298,6 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
-   }
-  }
- },
- "LicenceAddOn": {
-  "x-ticvai-persistence": "control.licence_add_on + control.licence_add_on_limit",
-  "x-ticvai-retired-columns": [
-   "plan_id"
-  ],
-  "description": "**Belongs to the tenant, not the plan.** Add-ons survive a plan change unless explicitly removed (`addLicenceAddOn`), so a row keyed on `plan_id` would be lost, or silently re-applied to every tenant on that plan, at the first plan change. The tenant comes from the path. `limitOverrides` are child rows in `control.licence_add_on_limit`.",
-  "type": "object",
-  "required": [
-   "moduleKey"
-  ],
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "description": "The tenant the add-on was sold to — the `tenantId` in the path, never the body."
-   },
-   "moduleKey": {
-    "type": "string"
-   },
-   "limitOverrides": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/EntitlementLimit"
-    }
-   },
-   "price": {
-    "x-ticvai-column": "list_price",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "validFrom": {
-    "type": "string",
-    "format": "date"
-   },
-   "validTo": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "note": {
-    "type": "string",
-    "maxLength": 500
    }
   }
  },
@@ -1021,6 +978,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -1075,6 +1033,7 @@
     "format": "uuid"
    },
    "username": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "displayName": {
@@ -1357,6 +1316,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -1477,6 +1437,9 @@
   ]
  },
  "VenueSettings": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",

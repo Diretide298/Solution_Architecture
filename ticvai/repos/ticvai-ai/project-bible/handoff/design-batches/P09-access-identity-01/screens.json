@@ -330,6 +330,7 @@
   "module": "Access & Identity",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "USER_MANAGE",
   "capability": "C56",
   "implementation": {
    "app": "ticvai-web",
@@ -665,6 +666,7 @@
   "module": "Access & Identity",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "ROLE_MANAGE",
   "capability": "C56",
   "implementation": {
    "app": "ticvai-web",

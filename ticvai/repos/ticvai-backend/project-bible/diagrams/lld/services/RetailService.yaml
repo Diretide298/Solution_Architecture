@@ -30,16 +30,16 @@ operationsByContract:
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: collectMerchandiseReservation
     verb: POST
     path: /merchandise-reservations/{reservationId}/collect
     scope: venue
     permission: ORDER_CREATE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 4
+    writes: 3
   - operation: collectShopAndDrop
     verb: POST
     path: /shop-and-drop/{dropId}/collect
@@ -94,7 +94,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
-    reads: 2
+    reads: 3
     writes: 2
   - operation: getOutletStock
     verb: GET
@@ -102,7 +102,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: getRetailSale
     verb: GET
@@ -142,7 +142,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 2
+    reads: 3
     writes: 0
   - operation: listRetailSales
     verb: GET
@@ -210,7 +210,7 @@ operationsByContract:
     writes: 3
   - operation: setStoreRules
     verb: PUT
-    path: /store-rules
+    path: /store-rules/{storeRuleId}
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false

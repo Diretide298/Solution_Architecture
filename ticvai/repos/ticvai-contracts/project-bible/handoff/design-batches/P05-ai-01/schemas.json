@@ -60,89 +60,6 @@
    }
   }
  },
- "AiAnswerFeedback": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.answer_feedback",
-  "description": "**What a person thought of an answer** (AIC-062). One label per message per person; it feeds the golden sets and the knowledge-gap list, never an online update (design 3.5).",
-  "required": [
-   "messageId",
-   "rating"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "messageId": {
-    "type": "string",
-    "format": "uuid",
-    "x-ticvai-references": "ai.message"
-   },
-   "conversationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "x-ticvai-references": "ai.conversation"
-   },
-   "rating": {
-    "type": "string",
-    "enum": [
-     "helpful",
-     "notHelpful"
-    ]
-   },
-   "reason": {
-    "type": "string",
-    "enum": [
-     "wrong",
-     "outdated",
-     "incomplete",
-     "notGrounded",
-     "unsafe",
-     "other"
-    ],
-    "nullable": true
-   },
-   "comment": {
-    "type": "string",
-    "nullable": true,
-    "maxLength": 1000
-   },
-   "audience": {
-    "type": "string",
-    "enum": [
-     "staff",
-     "guest"
-    ],
-    "readOnly": true
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "readOnly": true,
-    "description": "The guest, where the audience is `guest`."
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
  "AiConversation": {
   "type": "object",
   "x-ticvai-persistence": "ai.conversation",
@@ -344,12 +261,14 @@
     }
    },
    "conflicts": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "$ref": "#/components/schemas/CartConflict"
     }
    },
    "consentQuestions": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
@@ -801,6 +720,9 @@
   ]
  },
  "ConversationMessage": {
+  "x-ticvai-retired-columns": [
+   "ai_interaction_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "marketing.conversation_message + marketing.conversation_message_attachment",
   "required": [
@@ -856,6 +778,8 @@
     }
    },
    "aiInteractionId": {
+    "x-ticvai-references": "ai.activity",
+    "x-ticvai-column": "ai_activity_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1079,13 +1003,15 @@
     "type": "string",
     "format": "uuid",
     "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164).",
     "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
    },
    "approvedByPrincipalId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164)."
    },
    "responsibleDepartmentId": {
     "type": "string",
@@ -1191,6 +1117,8 @@
     "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 6,
     "items": {
@@ -1419,6 +1347,9 @@
   }
  },
  "ProposedAction": {
+  "x-ticvai-retired-columns": [
+   "interaction_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "ai.proposed_action",
   "required": [
@@ -1435,6 +1366,8 @@
     "format": "uuid"
    },
    "interactionId": {
+    "x-ticvai-references": "ai.activity",
+    "x-ticvai-column": "activity_id",
     "type": "string",
     "format": "uuid"
    },

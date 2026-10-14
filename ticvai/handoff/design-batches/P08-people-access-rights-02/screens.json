@@ -5,11 +5,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/approvals/approval-analytics",
-   "component": "apps/venue-management-web/src/routes/approvals/ApprovalAnalytics.tsx",
+   "component": "src/routes/approvals/ApprovalAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -133,10 +134,11 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/people-access-rights",
-   "component": "apps/venue-management-web/src/routes/home/PeopleAccessRightsList.tsx",
+   "component": "src/routes/home/PeopleAccessRightsList.tsx",
    "status": "notStarted"
   },
   "navigation": {

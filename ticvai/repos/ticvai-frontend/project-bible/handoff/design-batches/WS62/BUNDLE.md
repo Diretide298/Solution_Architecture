@@ -310,6 +310,8 @@ kpis:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -456,6 +458,8 @@ rule:
 - `setResaleEligibilityRule` → `ORDER_CREATE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_CREATE`
 
 #### Requirements it meets
 
@@ -656,6 +660,8 @@ config:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -819,6 +825,8 @@ listing:
 - `getResaleMarketplaceConfig` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1007,6 +1015,8 @@ guardrail:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1145,6 +1155,8 @@ fees:
 - `setResaleFeePolicy` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1319,6 +1331,8 @@ queue:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1430,6 +1444,8 @@ inventory:
 - `listResaleInventoryAvailability` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1547,6 +1563,8 @@ listing:
 - `listListingLifecycleExpiry` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1685,6 +1703,8 @@ recommendation: 'Raise the cap to 125% for sold-out Fridays: +AED 3,200.00 fees'
 - `getResaleMarketplaceConfig` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1851,7 +1871,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "FeesSellerProceedsListingConfirmationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Fees, Seller Proceeds & Listing Confirmation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"marketplaceTerms":{"type":"integer","description":"Marketplace Terms"},"sellerTerms":{"type":"integer","description":"Seller Terms"},"cancellationPolicy":{"type":"string","description":"Cancellation Policy"},"settlementConditions":{"type":"integer","description":"Settlement Conditions"},"eventCancellationTreatment":{"type":"string","description":"Event Cancellation Treatment"},"applicablePrivacyNotice":{"type":"string","description":"Applicable privacy notice"},"sellingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Selling price"},"fee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Fee"},"estimatedProceeds":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Estimated seller proceeds"},"termsVersion":{"type":"string","description":"Terms version the seller accepts; stored with the acceptance"}}},
 "ListingApprovalModerationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; lands in the moderation columns of `orders.resale_listing` (DM5, 29 September)","description":"**What Listing Approval & Moderation submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"reviewReasons":{"type":"array","items":{"type":"string","enum":["highResalePrice","unusualDiscount","highValueTicket","vipTicket","sellerRisk","newSeller","multipleListings","identityIssue","paymentIssue","ticketOwnershipConcern","fraudIndicator"]},"description":"Why the listing is under review."},"decision":{"type":"string","enum":["approve","reject","requestInformation"],"description":"Moderation decision"},"reason":{"type":"string","description":"Reason"}}},
 "ListingApprovalModerationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Listing Approval & Moderation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"listing":{"type":"string","description":"Listing"},"seller":{"type":"string","description":"Seller"},"ticket":{"type":"string","description":"Ticket"},"event":{"type":"string","description":"Event"},"originalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Original price"},"listingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Listing price"},"priceVariance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Price variance"},"riskScore":{"type":"number","description":"Risk score"},"submittedDate":{"type":"string","format":"date-time","description":"Submitted date"},"reviewReasons":{"type":"array","items":{"type":"string","enum":["highResalePrice","unusualDiscount","highValueTicket","vipTicket","sellerRisk","newSeller","multipleListings","identityIssue","paymentIssue","ticketOwnershipConcern","fraudIndicator"]},"description":"Why the listing is under review."},"decision":{"type":"string","enum":["approve","reject","requestInformation"],"description":"Moderation decision"}}},
-"ListingCreationSellerConfigurationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Listing Creation & Seller Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"event":{"type":"string","description":"Event"},"venue":{"type":"string","description":"Venue"},"dateTime":{"type":"string","format":"date-time","description":"Date/time"},"ticketType":{"type":"string","description":"Ticket type"},"section":{"type":"string","description":"Section"},"row":{"type":"string","description":"Row"},"seat":{"type":"string","description":"Seat"},"originalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Original price"},"ticketStatus":{"type":"string","description":"Ticket status"},"listingId":{"type":"string","description":"Listing ID"},"ticketId":{"type":"string","description":"Ticket ID"},"seller":{"type":"string","description":"Seller"},"listingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Listing price"},"fee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Fee"},"estimatedProceeds":{"type":"string","description":"Estimated proceeds"},"listingDate":{"type":"string","format":"date-time","description":"Listing date"},"expiration":{"type":"string","description":"Expiration"},"sellerTermsAcceptance":{"type":"string","description":"Seller terms acceptance"},"listingType":{"type":"string","enum":["singleTicketListing","multipleTicketListing","adjacentSeatGroup"],"description":"What is listed."}}},
+"ListingCreationSellerConfigurationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; applied to `orders.resale_listing`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept","description":"**What Listing Creation & Seller Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"event":{"type":"string","description":"Event"},"venue":{"type":"string","description":"Venue"},"dateTime":{"type":"string","format":"date-time","description":"Date/time"},"ticketType":{"type":"string","description":"Ticket type"},"section":{"type":"string","description":"Section"},"row":{"type":"string","description":"Row"},"seat":{"type":"string","description":"Seat"},"originalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Original price"},"ticketStatus":{"type":"string","description":"Ticket status"},"listingId":{"type":"string","description":"Listing ID"},"ticketId":{"type":"string","description":"Ticket ID"},"seller":{"type":"string","description":"Seller"},"listingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Listing price"},"fee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Fee"},"estimatedProceeds":{"type":"string","description":"Estimated proceeds"},"listingDate":{"type":"string","format":"date-time","description":"Listing date"},"expiration":{"type":"string","description":"Expiration"},"sellerTermsAcceptance":{"type":"string","description":"Seller terms acceptance"},"listingType":{"type":"string","enum":["singleTicketListing","multipleTicketListing","adjacentSeatGroup"],"description":"What is listed."}}},
 "ListingCreationSellerConfigurationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Listing Creation & Seller Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"event":{"type":"string","description":"Event"},"venue":{"type":"string","description":"Venue"},"dateTime":{"type":"string","format":"date-time","description":"Date/time"},"ticketType":{"type":"string","description":"Ticket type"},"section":{"type":"string","description":"Section"},"row":{"type":"string","description":"Row"},"seat":{"type":"string","description":"Seat"},"originalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Original price"},"ticketStatus":{"type":"string","description":"Ticket status"},"listingId":{"type":"string","description":"Listing ID"},"ticketId":{"type":"string","description":"Ticket ID"},"seller":{"type":"string","description":"Seller"},"listingPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Listing price"},"fee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Fee"},"estimatedProceeds":{"type":"string","description":"Estimated proceeds"},"listingDate":{"type":"string","format":"date-time","description":"Listing date"},"expiration":{"type":"string","description":"Expiration"},"sellerTermsAcceptance":{"type":"string","description":"Seller terms acceptance"},"listingType":{"type":"string","enum":["singleTicketListing","multipleTicketListing","adjacentSeatGroup"],"description":"What is listed."}}},
 "ListingLifecycleExpiryCancellationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Listing Lifecycle, Expiry & Cancellation displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"cancellationCutoff":{"type":"string","description":"Cancellation cutoff"},"cancellationFee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Cancellation fee"},"maximumWithdrawals":{"type":"string","description":"Maximum withdrawals"},"closure":{"type":"string","enum":["rejected","suspended","withdrawn","cancelled","expired"],"description":"How the listing left the market: moderation outcome, or the resale-listing state it ended in (states/resale-listing.yaml)."},"expiryRule":{"type":"string","enum":["xMinutesBeforeEvent","xHoursBeforeEvent","atEventStart","atConfiguredDate"],"description":"When the listing expires."},"withdrawalPolicy":{"type":"string","enum":["sellerCanWithdrawAnytime","sellerCannotWithdrawWhileReserved"],"description":"When the seller may withdraw."},"autoCancellationReason":{"type":"string","enum":["ticketBecomesInvalid","eventIsCancelled","eventChangesMaterially","ticketIsRefunded","ticketIsTransferred","paymentIsReversed","eligibilityChanges","fraudIsDetected"],"description":"Why the listing was cancelled automatically."},"expiryOffset":{"type":"integer","description":"Minutes or hours for the xMinutes/xHours rules"},"listingId":{"type":"string","description":"Listing ID"}}},
 "MyTicketsResaleMarketplaceEntryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What My Tickets & Resale Marketplace Entry displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"eventProduct":{"type":"string","description":"Event/Product"},"venue":{"type":"string","description":"Venue"},"dateTime":{"type":"string","format":"date-time","description":"Date/Time"},"ticketType":{"type":"string","description":"Ticket Type"},"sectionRowSeat":{"type":"string","description":"Section/Row/Seat"},"ticketHolder":{"type":"string","description":"Ticket Holder"},"virtualTicketIdReference":{"type":"string","description":"Virtual Ticket ID reference"},"ticketStatus":{"type":"string","description":"Ticket Status"},"resaleStatus":{"type":"string","description":"Resale Status"},"availableActions":{"type":"string","description":"Available Actions"},"clientLogo":{"type":"string","description":"Client logo"},"brand":{"type":"string","description":"Brand"},"colors":{"type":"string","description":"Colors"},"typography":{"type":"string","description":"Typography"},"language":{"type":"string","description":"Language"},"supportDetails":{"type":"string","description":"Support details"},"marketplaceName":{"type":"string","description":"Marketplace name"},"authenticationMethod":{"type":"string","enum":["customerAccount","sso","passwordlessLogin","otp","appAuthentication"],"description":"How the guest signs in to the marketplace"}}},

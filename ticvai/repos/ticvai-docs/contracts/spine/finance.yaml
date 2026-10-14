@@ -91,10 +91,187 @@ tags:
 - name: variance
 - name: reporting
 - name: fiscal
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  accountRecords:
+    module: finance
+    table: ledger.account
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.account rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Account'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.account rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Ledger implements, and asked from another
+      deployable through Ledger's service route (serviceAuth).
+    served: [in-process, service]
+  accountMappingRecords:
+    module: finance
+    table: ledger.account_mapping
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.account_mapping rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccountMapping'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.account_mapping rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Ledger implements.
+    served: [in-process]
+  fiscalPeriodRecords:
+    module: finance
+    table: ledger.fiscal_period
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.fiscal_period rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/FiscalPeriod'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.fiscal_period rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Ledger implements.
+    served: [in-process]
+  fxRateRecords:
+    module: finance
+    table: ledger.fx_rate
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.fx_rate rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/FxRate'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.fx_rate rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Ledger implements, and asked from another
+      deployable through Ledger's service route (serviceAuth).
+    served: [in-process, service]
+  legalEntityRecords:
+    module: finance
+    table: ledger.legal_entity
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.legal_entity rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/LegalEntity'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.legal_entity rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Ledger's service route (serviceAuth).
+    served: [service]
+  postingRecords:
+    module: finance
+    table: ledger.posting
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.posting rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Posting'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.posting rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Ledger implements, and asked from another
+      deployable through Ledger's service route (serviceAuth).
+    served: [in-process, service]
+  settlementRecords:
+    module: finance
+    table: ledger.settlement
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.settlement rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Settlement'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.settlement rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Ledger implements.
+    served: [in-process]
+  settlementExceptionRecords:
+    module: finance
+    table: ledger.settlement_exception
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.settlement_exception rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SettlementException'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.settlement_exception rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Ledger implements.
+    served: [in-process]
+  taxInvoiceLineRecords:
+    module: finance
+    table: ledger.tax_invoice_line
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The ledger.tax_invoice_line rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Ledger stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/FinTaxInvoice'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Ledger answers with its ledger.tax_invoice_line rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Ledger implements.
+    served: [in-process]
 paths:
   /internal/order-postings:
     post:
       operationId: postOrderRevenue
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       security:
       - serviceAuth: []
       x-ticvai-audience:
@@ -162,6 +339,10 @@ paths:
   /write-offs:
     post:
       operationId: recordWriteOff
+      x-ticvai-read-via:
+      - query: subscription#partnerAgreementRecords
+        route: service
+        for: 'its read of control.partner_agreement, Platform''s data (CHG-MOD-001)'
       summary: Write off an uncollectable balance
       description: '**Credit write-off was not a posting event type**, so a partner balance nobody will
         collect had nowhere to go and sat in receivables making the ledger look healthier than it is.
@@ -229,6 +410,10 @@ paths:
       operationId: validateRecognitionSchedules
       x-ticvai-consumed-by:
         - "P08 BO-076 Revenue Recognition"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: in-process
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: Find product kinds claimed by more than one schedule
       description: '**The defect this exists to catch is silent.** Two schedules claiming one product
         kind means revenue recognised twice, and the numbers look plausible — nothing fails, the period
@@ -282,6 +467,10 @@ paths:
       operationId: recordDeposit
       x-ticvai-consumed-by:
         - "P08 BO-1029 Quote, Deposit & Payment"
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Money taken before the sale is complete
       description: '**A deposit is not deferred revenue and the distinction is a balance-sheet one.**
         `deferredRevenue` covers a sold entitlement not yet consumed — the sale happened. A deposit is
@@ -474,6 +663,13 @@ paths:
         - "P08 BO-1081 Finance Dashboard"
         - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
         - "P16 ANL-072 Finance Dashboard"
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: in-process
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: wallet#walletTransactionRecords
+        route: in-process
+        for: 'its read of wallet.wallet_transaction, Wallet''s data (CHG-MOD-001)'
       summary: Every money source against the ledger, in one view
       description: '4.2.19. **Reconciliation was per provider and the question is not per provider.**
         `ingestSettlementFile` and its siblings are good and gateway-scoped; **a venue closing a day needs
@@ -729,6 +925,7 @@ paths:
       operationId: listAccounts
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -953,7 +1150,9 @@ paths:
       description: 'Maps revenue, tax, payment, refund, variance and breakage events to accounts. This
         is the table that makes posting deterministic rather than hard-coded.
 
-        '
+        
+
+        **Order.** Sorted by `creditAccountId` descending (a UUIDv7, so newest first).'
       tags:
       - accounts
       parameters:
@@ -983,6 +1182,8 @@ paths:
       operationId: setAccountMappings
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per region, the caller''s region: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: region
@@ -1048,6 +1249,7 @@ paths:
       operationId: listCostCenters
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1124,6 +1326,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CostCenter'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-codes:
@@ -1131,6 +1335,7 @@ paths:
       operationId: listTaxCodes
       x-ticvai-consumed-by:
         - "P08 BO-075 Account Mapping"
+      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1210,6 +1415,8 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-codes/{taxCodeId}:
@@ -1318,6 +1525,8 @@ paths:
       x-ticvai-read-routing: replica
       summary: List tax exemptions
       description: Exemption by account, product class or channel — diplomatic, export, B2B.
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `id`.
       tags:
       - tax
       parameters:
@@ -1379,6 +1588,13 @@ paths:
   /tax/calculate:
     post:
       operationId: calculateTax
+      x-ticvai-read-via:
+      - query: catalogue#taxProfileRecords
+        route: in-process
+        for: 'its read of catalogue.tax_profile, Catalogue''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Compute tax for a set of lines
@@ -1425,6 +1641,7 @@ paths:
       operationId: listRecognitionSchedules
       x-ticvai-consumed-by:
         - "P08 BO-076 Revenue Recognition"
+      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1507,6 +1724,10 @@ paths:
       operationId: getDeferredRevenue
       x-ticvai-consumed-by:
         - "P08 BO-076 Revenue Recognition"
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -1553,6 +1774,10 @@ paths:
       operationId: runRecognition
       x-ticvai-consumed-by:
         - "P08 BO-076 Revenue Recognition"
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Recognise earned revenue for a period
@@ -1615,6 +1840,7 @@ paths:
       operationId: listJournalEntries
       x-ticvai-consumed-by:
         - "P08 BO-089 Journal Entries"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2028,7 +2254,9 @@ paths:
         force, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not
         found. `LEDGER_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
-        '
+        
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       tags:
       - ledger
       x-ticvai-permission: LEDGER_VIEW
@@ -2079,6 +2307,7 @@ paths:
                           $ref: '#/components/schemas/FxRate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /fx-rates/{rateId}:
     put:
       operationId: setFxRate
       x-ticvai-consumed-by:
@@ -2117,6 +2346,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: rateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2156,6 +2390,13 @@ paths:
   /fx/foreign-tender:
     get:
       operationId: getForeignTenderReport
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: in-process
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: shift#posShiftRecords
+        route: in-process
+        for: 'its read of orders.pos_shift, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: What was taken in which currency
@@ -2222,7 +2463,9 @@ paths:
         Neither entity ever holds a balance in a currency that is not its own. That is the whole of the
         policy, applied twice.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - ledger
       x-ticvai-permission: LEDGER_VIEW
@@ -2341,6 +2584,7 @@ paths:
       operationId: listLedgerEntries
       x-ticvai-consumed-by:
         - "P08 BO-043 Daily Reconciliation"
+      description: '**Order.** Newest first, by `postedAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -2461,7 +2705,9 @@ paths:
         The threshold is `orders.RefundPolicy.varianceThreshold`, a venue setting with a tenant default
         (decided 28 September, audit R094; proposed default AED 5.00 per order line, client to correct).
 
-        '
+        
+
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
       tags:
       - variance
       x-ticvai-permission: LEDGER_VIEW
@@ -2591,6 +2837,7 @@ paths:
         - "P08 BO-101 Orders & Money"
         - "P09 ADM-619 Reconciliation & Settlement Command Center"
         - "P10 PTR-014 Settlement & Payment History"
+      description: '**Order.** Soonest first, by `periodStart` ascending, then by `id`.'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
@@ -2643,6 +2890,10 @@ paths:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-read-via:
+      - query: payments#providerConnectionRecords
+        route: in-process
+        for: 'its read of payments.provider_connection, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -2752,6 +3003,7 @@ paths:
     get:
       operationId: getSettlement
       x-ticvai-consumed-by:
+        - "P08 ADM-620 Reconciliation Source & Import Manager"
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
         - "P10 PTR-014 Settlement & Payment History"
@@ -2805,7 +3057,9 @@ paths:
         **An unknown or out-of-scope `settlementId` is 404, not an empty page**: the path addresses the
         settlement. An empty page means a settlement that exists and has no exceptions.
 
-        '
+        
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       tags:
       - settlement
       x-ticvai-permission: SETTLEMENT_VIEW
@@ -2840,6 +3094,10 @@ paths:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
         - "P10 PTR-014 Settlement & Payment History"
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: in-process
+        for: 'the payment matchedPaymentId names (400) (CHG-MOD-003)'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -2937,7 +3195,9 @@ paths:
       description: 'One per country of operation. Carries the country, currency, tax registration and
         fiscal calendar (12 Aug §14).
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - fiscal
       parameters:
@@ -2967,7 +3227,6 @@ paths:
       operationId: createLegalEntity
       x-ticvai-consumed-by:
         - "P08 BO-074 Chart of Accounts"
-        - "P09 ADM-411 Billing & Legal Entity Information"
       x-ticvai-audience:
       - staff
       summary: Create a legal entity
@@ -2995,6 +3254,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LegalEntity'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /fiscal-periods:
@@ -3004,6 +3265,7 @@ paths:
         - "P08 BO-090 Period Close"
         - "P08 BO-1170 Wallet Financial Period & Closing Controls"
         - "P08 BO-1172 Finance Validation, Reporting & Audit Center"
+      description: '**Order.** Newest first, by `occurredAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3432,6 +3694,10 @@ paths:
       operationId: ingestFxRates
       x-ticvai-consumed-by:
         - "P08 BO-077 FX Rates & Variances"
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
       summary: Pull rates from the configured provider
       description: '**Scheduled ingestion, which had no home.** `setFxRate` is a `PUT` carrying `setByPrincipalId`
         — a person setting a rate — so a daily provider pull had to be modelled as a person doing it,
@@ -3554,6 +3820,12 @@ paths:
   /fx-rates/providers:
     put:
       operationId: setFxProvider
+      x-ticvai-read-via:
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per region, the caller''s region: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: Which provider serves which purpose
       description: '**Per purpose, per region.** A tender rate and a statutory reporting rate can come
         from different places and usually should — **`uaeCentralBank` for AED reporting because it is
@@ -3678,12 +3950,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [tax-exemption-expired, tax-exemption-not-required]
           description: The exemption is `expired`, or `notRequired`.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [evidence-document-required, rejection-note-required]
           description: '`verified` with no evidence document on the record or in the request, or `rejected`
             without a `note`.'
           content:
@@ -3701,7 +3975,6 @@ paths:
         - "P04 POS-026 Receipt & Reprint"
         - "P08 BO-022 Order Detail"
         - "P08 BO-1081 Finance Dashboard"
-        - "P09 ADM-068 Tax, Fee & Calculation Command Center"
         - "P16 ANL-072 Finance Dashboard"
       x-ticvai-audience:
       - staff
@@ -3783,6 +4056,16 @@ paths:
         - "P04 POS-026 Receipt & Reprint"
         - "P04 POS-030 Sales Journal"
         - "P08 BO-022 Order Detail"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: in-process
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: in-process
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: in-process
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       - guest
@@ -3949,6 +4232,10 @@ paths:
         - "P04 POS-011 Returns, Refunds & Exchanges"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
+      x-ticvai-read-via:
+      - query: orders#refundRecords
+        route: in-process
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       - service
@@ -4098,6 +4385,7 @@ paths:
   /tax-documents/{documentId}/rendition:
     parameters:
     - name: documentId
+      x-ticvai-column: ledger.tax_invoice.id
       in: path
       required: true
       description: A tax invoice id or a credit memo id.
@@ -4156,6 +4444,7 @@ paths:
       operationId: listTaxInvoiceTemplates
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
+      description: '**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 5.7.93 template, numbering, language); shape follows listLegalEntities'
@@ -4191,6 +4480,7 @@ paths:
                         $ref: '#/components/schemas/FinTaxInvoiceTemplate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tax-invoice-templates/{invoiceTemplateId}:
     put:
       operationId: setTaxInvoiceTemplate
       x-ticvai-consumed-by:
@@ -4216,6 +4506,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: invoiceTemplateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4252,6 +4547,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
         - "P08 ADM-077 Calculation Validation, Reconciliation & Service Interface"
+      description: '**Order.** Sorted by `id` descending (a UUIDv7, so newest first).'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 6.1.1); shape follows listLegalEntities'
@@ -4282,6 +4578,7 @@ paths:
                         $ref: '#/components/schemas/FinEInvoicingProvider'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /e-invoicing/providers/{providerId}:
     put:
       operationId: setEInvoicingProvider
       x-ticvai-consumed-by:
@@ -4309,6 +4606,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: providerId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4555,6 +4857,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [transmission-already-accepted]
           description: The transmission is already `accepted`.
           content:
             application/problem+json:
@@ -4567,7 +4870,6 @@ paths:
       operationId: getVatReturn
       x-ticvai-consumed-by:
         - "P08 BO-090 Period Close"
-        - "P09 ADM-068 Tax, Fee & Calculation Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (retrace 6.1.23); shape follows getFinancialReport'
@@ -4627,6 +4929,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FinVatReturn'
         '422':
+          x-ticvai-problem-types: [period-not-whole-tax-months, legal-entity-not-tax-registered]
           description: The period is not whole tax months, or the legal entity has no tax registration number.
           content:
             application/problem+json:
@@ -4825,6 +5128,7 @@ components:
         status:
           $ref: '#/components/schemas/FinTaxInvoiceStatus'
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         templateId:
@@ -5094,6 +5398,7 @@ components:
           readOnly: true
           description: Server-assigned from the legal entity's credit memo series, in sequence without gaps.
         taxInvoiceId:
+          x-ticvai-references: ledger.tax_invoice
           type: string
           format: uuid
         taxInvoiceNumber:
@@ -5122,6 +5427,7 @@ components:
           format: uuid
           nullable: true
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         buyerSubjectId:
@@ -5257,6 +5563,7 @@ components:
           format: uuid
           readOnly: true
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         documentKind:
@@ -5365,6 +5672,7 @@ components:
           format: uuid
           readOnly: true
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         providerName:
@@ -5440,6 +5748,7 @@ components:
         documentNumber:
           type: string
         legalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
         providerId:
@@ -5604,6 +5913,8 @@ components:
         actualCost:
           $ref: ../shared/common.yaml#/components/schemas/Money
         costLines:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -5626,6 +5937,7 @@ components:
               actual:
                 $ref: ../shared/common.yaml#/components/schemas/Money
     Deposit:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by recordDeposit, settleDeposit
       type: object
       x-ticvai-persistence: ledger.deposit
       description: '**Money taken before the sale is complete.** Not deferred revenue — that is a sold
@@ -5940,6 +6252,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -5954,6 +6267,7 @@ components:
         isActive:
           type: boolean
     TaxCode:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by calculateTax, createTaxCode, getVatReturn, issueTaxInvoice and others
       x-ticvai-persistence: ledger.tax_code
       type: object
       required:
@@ -5964,7 +6278,12 @@ components:
       - rate
       - effectiveFrom
       - isActive
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -6064,6 +6383,8 @@ components:
           format: date
           description: A day in the region's time zone, local midnight to local midnight.
     TaxExemption:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by calculateTax, createTaxExemption, listTaxExemptions, verifyTaxExemption
+      x-ticvai-retired-columns: [evidence_document_id]
       x-ticvai-persistence: ledger.tax_exemption
       type: object
       description: 'Also the `createTaxExemption` body. **`id` is server-owned** (`readOnly`): a client does
@@ -6076,7 +6397,12 @@ components:
       - scope
       - taxCodeId
       - reason
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -6120,6 +6446,8 @@ components:
           description: 'Tax Exemption Evidence: reference, e.g. the exemption certificate, diplomatic card or
             export declaration number.'
         evidenceDocumentId:
+          x-ticvai-column: evidence_asset_id
+          x-ticvai-references: assets.media_asset
           type: string
           format: uuid
           nullable: true
@@ -6284,6 +6612,7 @@ components:
       - perVisit
       - onExpiry
     RecognitionSchedule:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by closeFiscalPeriod, createRecognitionSchedule, listRecognitionSchedules
       x-ticvai-persistence: ledger.recognition_schedule
       type: object
       description: 'Also the `createRecognitionSchedule` body. **`id` is server-owned** (`readOnly`): a client
@@ -6295,7 +6624,12 @@ components:
       - name
       - method
       - productKinds
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -6518,6 +6852,7 @@ components:
       - credit
       properties:
         accountId:
+          x-ticvai-references: ledger.account
           type: string
           format: uuid
         debit:
@@ -6556,6 +6891,7 @@ components:
           type: string
           format: uuid
         postingDate:
+          x-ticvai-stored-as: ledger.journal_entry.posting_date
           type: string
           format: date
           description: A day in the region's time zone, local midnight to local midnight.
@@ -6664,6 +7000,12 @@ components:
           type: string
           format: date-time
           nullable: true
+        postingDate:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: The accounting day the entry posts on, in the region's time zone (`createJournalEntry`).
     Posting:
       x-ticvai-persistence: ledger.posting
       type: object
@@ -6990,10 +7332,12 @@ components:
           description: Server-created when the obligation arises, so a UUID, as the `obligationId` path
             parameter types it.
         fromLegalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
           description: The selling entity. Holds the liability, and therefore the FX exposure.
         toLegalEntityId:
+          x-ticvai-references: ledger.legal_entity
           type: string
           format: uuid
           description: The consuming entity, which provided the service at redemption.
@@ -7293,6 +7637,7 @@ components:
           format: date-time
           nullable: true
     LegalEntity:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by closeFiscalPeriod, getVatReturn, issueTaxInvoice, runFxRevaluation
       x-ticvai-persistence: ledger.legal_entity
       type: object
       description: 'Also the `createLegalEntity` body. **`id` and `scopePath` are server-owned** (`readOnly`)
@@ -7313,6 +7658,7 @@ components:
           format: uuid
           readOnly: true
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
@@ -7439,6 +7785,7 @@ components:
           nullable: true
           description: Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps.
         principalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
           description: Who took the step.

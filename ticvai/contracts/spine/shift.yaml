@@ -218,7 +218,6 @@ paths:
   /shifts:
     get:
       operationId: listShifts
-      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
@@ -232,6 +231,7 @@ paths:
         - "P08 BO-043 Daily Reconciliation"
         - "P08 BO-053 Staff Directory"
         - "P08 BO-100 Venue Home"
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
       summary: List shifts
@@ -280,6 +280,8 @@ paths:
 
     post:
       operationId: openShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: in-process
@@ -290,8 +292,6 @@ paths:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
       x-ticvai-audience: [staff]
       summary: Open a shift
       description: >
@@ -431,6 +431,10 @@ paths:
   /denominations:
     get:
       operationId: listDenominations
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
+        - "P04 POS-007 Close Shift"
+        - "P08 BO-1065 Currency, Timezone & Channels"
       x-ticvai-read-via:
       - query: tenancy#denominationRecords
         route: in-process
@@ -438,10 +442,6 @@ paths:
       - query: tenancy#regionSettingsRecords
         route: in-process
         for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
-        - "P04 POS-007 Close Shift"
-        - "P08 BO-1065 Currency, Timezone & Channels"
       summary: The notes and coins a till counts
       description: >
         Raised by Tanmay in the 20 August review, and **the table was built and nothing read it** —
@@ -477,14 +477,14 @@ paths:
 
     put:
       operationId: setDenominations
+      x-ticvai-consumed-by:
+        - "P08 BO-1065 Currency, Timezone & Channels"
       x-ticvai-read-via:
       - query: tenancy#denominationRecords
         route: in-process
         for: 'its read of platform.denomination, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per currency, the one the body''s `currencyCode` names, within the caller''s region: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-1065 Currency, Timezone & Channels"
       summary: Set the notes and coins a region's tills count
       description: >
         **`listDenominations` read a table nothing wrote**, so every till's count screen was empty
@@ -555,14 +555,14 @@ paths:
   /deposit-boxes:
     get:
       operationId: listDepositBoxes
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: in-process
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-015 Cash Operations Dashboard"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Cash boxes and who holds them
       description: >
@@ -606,6 +606,8 @@ paths:
 
     post:
       operationId: allocateDepositBox
+      x-ticvai-consumed-by:
+        - "P04 POS-016 Till Configuration"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: in-process
@@ -613,8 +615,6 @@ paths:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-016 Till Configuration"
       x-ticvai-audience: [staff]
       summary: Give a cashier a box and a float
       description: >
@@ -840,12 +840,12 @@ paths:
   /deposit-boxes/close:
     post:
       operationId: closeDepositBoxes
+      x-ticvai-consumed-by:
+        - "P08 BO-024 Payment Exceptions"
       x-ticvai-read-via:
       - query: finance#fxRateRecords
         route: in-process
         for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-024 Payment Exceptions"
       x-ticvai-audience: [staff]
       summary: Close one box or all of them
       description: >
@@ -919,16 +919,16 @@ paths:
   /shifts/current:
     get:
       operationId: getCurrentShift
-      x-ticvai-read-via:
-      - query: tenancy#workstationRecords
-        route: in-process
-        for: 'the session''s workstation (404 no-current-shift) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the session''s workstation (404 no-current-shift) (CHG-MOD-003)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # cash position drives close-out
       summary: The open or suspended shift on the session's workstation
@@ -957,13 +957,13 @@ paths:
   /shifts/current/overview:
     get:
       operationId: getWorkstationShift
+      x-ticvai-consumed-by:
+        - "P04 POS-025 Till Home"
+        - "P06 EMP-003 Home — on duty"
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'the session''s workstation (404 no-current-shift) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P04 POS-025 Till Home"
-        - "P06 EMP-003 Home — on duty"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # the till home shows the live shift, not a replica's
       summary: Read the open or suspended shift on the session's workstation, without the right to open one
@@ -1238,12 +1238,12 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: resumeShift
+      x-ticvai-consumed-by:
+        - "P04 POS-001 Begin Shift"
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'the shift''s workstation (409 shift-already-open) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P04 POS-001 Begin Shift"
       x-ticvai-audience: [staff]
       summary: Resume a suspended shift
       description: >
@@ -1715,6 +1715,9 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: submitShiftCount
+      x-ticvai-consumed-by:
+        - "P04 POS-007 Close Shift"
+        - "P06 EMP-009 End shift"
       x-ticvai-read-via:
       - query: finance#fxRateRecords
         route: in-process
@@ -1722,9 +1725,6 @@ paths:
       - query: tenancy#venueSettingsRecords
         route: in-process
         for: 'its read of platform.venue_settings, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-007 Close Shift"
-        - "P06 EMP-009 End shift"
       x-ticvai-audience: [staff]
       summary: The cashier's blind count, closing their own shift
       description: >
@@ -2030,7 +2030,6 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: listCashMovements
-      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P04 POS-015 Cash Operations Dashboard"
@@ -2040,6 +2039,7 @@ paths:
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Lifts, adds and the opening float

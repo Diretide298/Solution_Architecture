@@ -171,6 +171,7 @@
     "format": "uuid"
    },
    "segmentId": {
+    "x-ticvai-references": "marketing.segment",
     "type": "string",
     "format": "uuid"
    },
@@ -268,6 +269,7 @@
   }
  },
  "AudienceList": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "marketing.audience_list",
   "description": "Board 3.3. **Consent basis is required on the import, not optional metadata.**",
@@ -492,6 +494,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -522,6 +525,9 @@
   }
  },
  "ProposedAction": {
+  "x-ticvai-retired-columns": [
+   "interaction_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "ai.proposed_action",
   "required": [
@@ -538,6 +544,8 @@
     "format": "uuid"
    },
    "interactionId": {
+    "x-ticvai-references": "ai.activity",
+    "x-ticvai-column": "activity_id",
     "type": "string",
     "format": "uuid"
    },

@@ -826,6 +826,7 @@
     "description": "Unique; one settlement per sold listing."
    },
    "sellerSubjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },

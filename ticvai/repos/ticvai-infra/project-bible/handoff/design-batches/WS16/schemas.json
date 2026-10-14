@@ -1,5 +1,6 @@
 {
  "ApprovalControlPolicy": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "approvals.control_policy",
   "description": "Approvals boards 6.2 and 6.3. **Which decisions one person may not take alone** — distinct from which roles one person may not hold, which is `identity.setSegregationRules`.\n",
@@ -195,6 +196,8 @@
     "nullable": true
    },
    "policyVersions": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "**What the rules were at the time**, because they have changed since.",
     "items": {
@@ -321,6 +324,7 @@
     "type": "integer"
    },
    "pendingApprovers": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -628,6 +632,7 @@
     "format": "uuid"
    },
    "approvalRequestId": {
+    "x-ticvai-references": "approvals.request",
     "type": "string",
     "format": "uuid"
    },
@@ -744,6 +749,7 @@
   }
  },
  "StepUpPolicy": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "approvals.step_up_policy",
   "type": "object",
   "required": [

@@ -5,10 +5,11 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "SCOPE_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/software-configuration-version-management",
-   "component": "apps/venue-management-web/src/routes/ops/SoftwareConfigurationVersionManagementList.tsx",
+   "component": "src/routes/ops/SoftwareConfigurationVersionManagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -182,7 +183,7 @@
    {
     "operationId": "setConfigurationProfile",
     "contract": "tenancy",
-    "purpose": "setConfigurationProfile",
+    "purpose": "What a class of workstation is configured to be",
     "trigger": "onAction",
     "invalidates": [
      "listWorkstations"
@@ -191,7 +192,7 @@
    {
     "operationId": "deployConfigurationProfile",
     "contract": "tenancy",
-    "purpose": "deployConfigurationProfile",
+    "purpose": "Push a version to a fleet, in stages",
     "trigger": "onAction",
     "invalidates": [
      "listWorkstations"
@@ -200,7 +201,7 @@
    {
     "operationId": "getWorkstationHealth",
     "contract": "tenancy",
-    "purpose": "getWorkstationHealth",
+    "purpose": "A score a manager can sort by, and what is dragging it down",
     "trigger": "onAction"
    },
    {
@@ -375,10 +376,11 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/offline-policy-rules-configuration",
-   "component": "apps/venue-management-web/src/routes/ops/OfflinePolicyRulesConfigurationList.tsx",
+   "component": "src/routes/ops/OfflinePolicyRulesConfigurationList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -423,7 +425,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listSyncRejections` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Offline Policy & Rules Configuration — from the client design board, 20 August.",
+  "purpose": "Offline Policy & Rules Configuration: shows entries the server refused (`listSyncRejections`); the offline policy saved at one scope node (`getOfflinePolicy`), and acts with what a workstation may do with no network, and for how long (`setOfflinePolicy`); record what was done about a refused entry (`resolveSyncRejection`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -542,7 +544,7 @@
    {
     "operationId": "setOfflinePolicy",
     "contract": "tenancy",
-    "purpose": "setOfflinePolicy",
+    "purpose": "What a workstation may do with no network, and for how long",
     "trigger": "onAction",
     "invalidates": [
      "listSyncRejections"
@@ -683,10 +685,11 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "TENANT_CONFIGURE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/connectivity-auto-switch-settings",
-   "component": "apps/venue-management-web/src/routes/ops/ConnectivityAutoSwitchSettingsList.tsx",
+   "component": "src/routes/ops/ConnectivityAutoSwitchSettingsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -794,7 +797,7 @@
    {
     "operationId": "setConnectivityThresholds",
     "contract": "tenancy",
-    "purpose": "setConnectivityThresholds",
+    "purpose": "When a workstation decides it is offline, and when it is back",
     "trigger": "onAction"
    }
   ],
@@ -843,10 +846,11 @@
   "module": "Venue Operations",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/offline-transaction-monitor-sync-queue",
-   "component": "apps/venue-management-web/src/routes/ops/OfflineTransactionMonitorSyncQueueList.tsx",
+   "component": "src/routes/ops/OfflineTransactionMonitorSyncQueueList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -870,7 +874,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listSyncRejections` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Offline Transaction Monitor & Sync Queue — from the client design board, 20 August.",
+  "purpose": "Offline Transaction Monitor & Sync Queue: shows entries the server refused (`listSyncRejections`), and acts with replay orders recorded offline (`syncOrders`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -1052,10 +1056,11 @@
   "module": "Venue Operations",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/offline-alerts-limits-audit",
-   "component": "apps/venue-management-web/src/routes/ops/OfflineAlertsLimitsAuditList.tsx",
+   "component": "src/routes/ops/OfflineAlertsLimitsAuditList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1078,7 +1083,10 @@
      "trigger": "The connection returns",
      "provenance": "flow F33 step 4→5",
      "crossesDevice": true,
-     "back": false
+     "back": false,
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
@@ -1089,7 +1097,7 @@
   ],
   "pattern": "approvalInbox",
   "patternReason": "`decideApprovalRequest` decides items that `listSyncRejections` queues — every row is waiting for a person, so the empty state is success",
-  "purpose": "Offline Alerts, Limits & Audit — from the client design board, 20 August.",
+  "purpose": "Offline Alerts, Limits & Audit: shows entries the server refused (`listSyncRejections`); what is currently wrong (`listAlerts`), and acts with run a report (`runReport`); watch a metric and tell somebody (`setAlertRule`); record what was done about a refused entry (`resolveSyncRejection`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -1321,6 +1329,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSyncRejections` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "alertRuleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setAlertRule` takes it, from the record the user acts on."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. An approval request opened from the queue.",

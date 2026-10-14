@@ -5,6 +5,7 @@
   "module": "Overview",
   "requiresModule": "partner",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "capability": "C34",
   "implementation": {
    "app": "partner-web",

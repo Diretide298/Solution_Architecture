@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-657` | Operational Area Permission Management | D | 0 | 16 | 6 | 6 | 1 | 5 | — | notStarted (—) |
 | `BO-658` | Date & Time Access Rules | D | 0 | 16 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `BO-659` | Access Schedule Management | D | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `BO-660` | Holder Access Assignment | D | 0 | 50 | 6 | 7 | 0 | 0 | — | notStarted (—) |
+| `BO-660` | Holder Access Assignment | D | 0 | 52 | 6 | 7 | 0 | 0 | — | notStarted (—) |
 | `BO-661` | Temporary Access & Exception Management | D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-662` | Access Revocation & Suspension | D | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-663` | Access Rights Preview, Impact & Synchronization | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |

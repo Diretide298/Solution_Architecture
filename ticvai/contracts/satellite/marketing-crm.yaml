@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 235
+  x-ticvai-screen-count: 232
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -379,16 +379,16 @@ paths:
   /my/cases:
     get:
       operationId: listMyCases
-      x-ticvai-read-via:
-      - query: identity#subjectRecords
-        route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-025 Help Centre / FAQ"
         - "P01 WEB-034 Lost & Found"
         - "P02 GST-034 Lost & Found"
         - "P02 GST-040 Help & Support"
         - "P02 GST-068 Help & My Cases"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -797,10 +797,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestMatchPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-745 Identity Resolution Rules"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Set how returning guests are recognised
       description: '**Design gap, 23 September.** The booking design matches a guest checking out without
         an account to an existing profile, by email, mobile or either, and asks them whether it is them.
@@ -974,13 +974,13 @@ paths:
   /guests/match:
     post:
       operationId: matchGuest
+      x-ticvai-consumed-by:
+        - "P06 EMP-055 Create / Edit Reservation"
+        - "P06 EMP-057 Guest Profile & Dining History"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-055 Create / Edit Reservation"
-        - "P06 EMP-057 Guest Profile & Dining History"
       summary: Is this the same person we already have?
       description: 'Board 4E, 24 August. **A restaurant creates a duplicate guest every time somebody
         books by phone with a different number**, and a CRM that cannot recognise them reports two visits
@@ -1044,13 +1044,13 @@ paths:
   /guests/merge:
     post:
       operationId: mergeGuests
+      x-ticvai-consumed-by:
+        - "P06 EMP-057 Guest Profile & Dining History"
+        - "P08 BO-746 Duplicate Review & Merge"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-057 Guest Profile & Dining History"
-        - "P08 BO-746 Duplicate Review & Merge"
       x-ticvai-write-via:
       - table: pii.subject
         event: guest.merged
@@ -1325,14 +1325,14 @@ paths:
         type: string
     post:
       operationId: respondToInvitation
+      x-ticvai-consumed-by:
+        - "P01 WEB-017 My Account Dashboard"
+        - "P02 GST-072 Share & Group Booking"
       x-ticvai-read-via:
       - query: orders#invitationRecords
         route: service
         for: 'its read of orders.invitation, Orders''s data (CHG-MOD-001)'
       x-ticvai-names-for-context: [access.entitlement]
-      x-ticvai-consumed-by:
-        - "P01 WEB-017 My Account Dashboard"
-        - "P02 GST-072 Share & Group Booking"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1398,12 +1398,12 @@ paths:
   /privacy-incidents:
     post:
       operationId: recordPrivacyIncident
+      x-ticvai-consumed-by:
+        - "P08 BO-752 Privacy & AI Governance"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-752 Privacy & AI Governance"
       summary: Log a personal-data breach and start the clock
       description: 'BL-176. **UAE PDPL gives 72 hours from discovery**, and nothing recorded one.
 
@@ -1498,16 +1498,16 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createForm
-      x-ticvai-read-via:
-      - query: catalogue#productRecords
-        route: service
-        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-618 Accreditation Form Builder"
         - "P08 BO-747 Consent Policy Configuration"
         - "P08 BO-815 Survey Builder"
         - "P13 CMS-042 Waiver Template Library & Master Setup"
         - "P13 CMS-043 Digital Waiver & Form Builder"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: Define a waiver, survey or capture form
       description: 'CF-129. **One mechanism, three uses.** A waiver is this with a signature, a survey
         is this with a scale, a capture is this at the point of sale.
@@ -1600,13 +1600,13 @@ paths:
   /form-submissions:
     post:
       operationId: submitForm
+      x-ticvai-consumed-by:
+        - "P01 WEB-026 Survey & Feedback"
+        - "P02 GST-035 Feedback & Ratings"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-026 Survey & Feedback"
-        - "P02 GST-035 Feedback & Ratings"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1661,6 +1661,9 @@ paths:
         format: uuid
     get:
       operationId: getWaiverStatus
+      x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P08 BO-852 Documents, Search & Retention"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -1668,9 +1671,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P08 BO-852 Documents, Search & Retention"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1774,13 +1774,13 @@ paths:
   /challenges:
     post:
       operationId: createChallenge
+      x-ticvai-consumed-by:
+        - "P08 BO-825 Challenge Builder"
+        - "P08 BO-829 Family, Team & Event Challenges"
       x-ticvai-read-via:
       - query: catalogue#eventRecords
         route: service
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-825 Challenge Builder"
-        - "P08 BO-829 Family, Team & Event Challenges"
       summary: Define a challenge, mission or streak
       description: '22.6.1. **Gamification is not loyalty** — loyalty pays for spend, and a challenge
         pays for behaviour the venue wants that spend does not produce: a second visit, a quiet Tuesday,
@@ -2006,12 +2006,12 @@ paths:
   /seo-metadata:
     get:
       operationId: getSeoMetadata
+      x-ticvai-consumed-by:
+        - "P13 CMS-013 SEO & Metadata"
       x-ticvai-read-via:
       - query: platform-ops#seoMetadataRecords
         route: in-process
         for: 'its read of control.seo_metadata, Platform''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-013 SEO & Metadata"
       summary: The metadata in force for one page
       description: '**The read `setSeoMetadata` had none of**, so the editor could not show what was there
         before replacing it.
@@ -2065,6 +2065,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSeoMetadata
+      x-ticvai-consumed-by:
+        - "P08 BO-842 SEO Management"
+        - "P13 CMS-013 SEO & Metadata"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
@@ -2074,9 +2077,6 @@ paths:
         for: 'its read of control.seo_metadata, Platform''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per entity and locale, the one the body''s `entityId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-842 SEO Management"
-        - "P13 CMS-013 SEO & Metadata"
       summary: Titles, descriptions, canonicals and hreflang
       description: '22.11.1 and 22.11.11. **SEO is not a marketing nicety for a venue selling online**
         — an attraction that does not appear in search sells through OTAs at OTA commission.
@@ -2116,13 +2116,13 @@ paths:
   /seo-redirects:
     post:
       operationId: createUrlRedirect
+      x-ticvai-consumed-by:
+        - "P08 BO-842 SEO Management"
+        - "P13 CMS-013 SEO & Metadata"
       x-ticvai-read-via:
       - query: platform-ops#urlRedirectRecords
         route: in-process
         for: 'its read of control.url_redirect, Platform''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-842 SEO Management"
-        - "P13 CMS-013 SEO & Metadata"
       summary: 301, 302 and custom redirects
       description: '22.11.7. **A redirect chain is the failure mode.** A to B to C loses ranking at every
         hop, so a new redirect whose target is itself a redirect is **collapsed rather than appended.**
@@ -2159,12 +2159,12 @@ paths:
   /lost-items:
     get:
       operationId: listLostItems
+      x-ticvai-consumed-by:
+        - "P08 BO-073 Lost & Found Register"
       x-ticvai-read-via:
       - query: venue-map#pointRecords
         route: in-process
         for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-073 Lost & Found Register"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2210,6 +2210,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: recordLostItem
+      x-ticvai-consumed-by:
+        - "P01 WEB-034 Lost & Found"
+        - "P02 GST-034 Lost & Found"
+        - "P08 BO-073 Lost & Found Register"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
@@ -2217,10 +2221,6 @@ paths:
       - query: venue-map#pointRecords
         route: in-process
         for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-034 Lost & Found"
-        - "P02 GST-034 Lost & Found"
-        - "P08 BO-073 Lost & Found Register"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2304,14 +2304,14 @@ paths:
   /referrals:
     post:
       operationId: createReferral
-      x-ticvai-read-via:
-      - query: promotions#promotionRecords
-        route: service
-        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
         - "P08 BO-830 Referral & Streak Management"
+      x-ticvai-read-via:
+      - query: promotions#promotionRecords
+        route: service
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -2519,9 +2519,6 @@ paths:
   /journeys:
     get:
       operationId: listJourneys
-      description: '**Order.** Sorted by `name` ascending, then by `id`.
-
-        **Statuses.** Every `status` is returned, ended ones included (`archived`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-consumed-by:
         - "P08 BO-120 Omnichannel Commerce & Journey Configuration"
         - "P08 BO-774 Journey Automation Center"
@@ -2529,6 +2526,9 @@ paths:
         - "P08 BO-780 Guest Engagement Journeys"
         - "P08 BO-782 AI Journey Optimization"
         - "P08 BO-783 Journey Analytics & Audit"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`); a screen that shows only live rows filters on `status` itself.'
       summary: Automated journeys
       tags:
       - marketing
@@ -2713,9 +2713,9 @@ paths:
   /message-triggers:
     get:
       operationId: listMessageTriggers
-      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-776 Trigger Event Catalog"
+      description: '**Order.** Sorted by `priority` ascending, then by `id`.'
       summary: What fires a message, and when
       tags:
       - marketing
@@ -2935,6 +2935,9 @@ paths:
   /guests/identify:
     post:
       operationId: identifyGuest
+      x-ticvai-consumed-by:
+        - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-027 Guest Lookup"
       x-ticvai-read-via:
       - query: access#blacklistRecords
         route: service
@@ -2945,9 +2948,6 @@ paths:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-002 Sell — Ticket Catalogue"
-        - "P04 POS-027 Guest Lookup"
       summary: Resolve any identifier to a guest
       description: '**A resolver over identifiers, not new data.** `searchGuests` finds by name and contact
         and `lookupTicket` resolves a ticket, so a cashier handed a wristband had to know which operation
@@ -3060,12 +3060,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateMyProfile
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'The caller''s own profile: one per signed-in guest, so there is no key in the path.'
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-039 Profile"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own profile: one per signed-in guest, so there is no key in the path.'
       x-ticvai-write-via:
       - table: pii.subject
         operation: updateGuestSubjectDetails
@@ -3316,10 +3316,6 @@ paths:
   /conversations:
     get:
       operationId: listConversations
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: service
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-794 Omnichannel Command Center"
         - "P08 BO-795 Unified Inbox"
@@ -3327,6 +3323,10 @@ paths:
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-008 Agent Performance & SLA View"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: The omnichannel inbox
@@ -3390,14 +3390,14 @@ paths:
         format: uuid
     get:
       operationId: getConversation
-      x-ticvai-read-via:
-      - query: identity#subjectRecords
-        route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-796 Guest Conversation 360"
         - "P08 BO-799 Agent Workspace"
         - "P12 SUP-005 Live Chat Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: One conversation and everything before it
@@ -3662,13 +3662,13 @@ paths:
         format: uuid
     post:
       operationId: transferConversation
+      x-ticvai-consumed-by:
+        - "P12 SUP-004 Conversation Queue"
+        - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P12 SUP-004 Conversation Queue"
-        - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-audience:
       - staff
       summary: Pass it to another agent or queue
@@ -3789,15 +3789,15 @@ paths:
   /agent-availability:
     put:
       operationId: setAgentAvailability
+      x-ticvai-consumed-by:
+        - "P12 SUP-002 Agent Dashboard"
+        - "P12 SUP-003 Availability & Routing Settings"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'The caller''s own availability: one per signed-in staff member, so there is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P12 SUP-002 Agent Dashboard"
-        - "P12 SUP-003 Availability & Routing Settings"
       x-ticvai-audience:
       - staff
       summary: An agent goes available, away or offline
@@ -3857,6 +3857,8 @@ paths:
   /kiosk-assists:
     post:
       operationId: startKioskAssist
+      x-ticvai-consumed-by:
+        - "P08 BO-799 Agent Workspace"
       x-ticvai-read-via:
       - query: orders#cartRecords
         route: service
@@ -3864,8 +3866,6 @@ paths:
       - query: tenancy#deviceRecords
         route: service
         for: 'its read of platform.device, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-799 Agent Workspace"
       x-ticvai-audience:
       - staff
       summary: A staff member helps a guest at a kiosk, remotely
@@ -4128,12 +4128,12 @@ paths:
   /loyalty/leaderboard-nickname:
     put:
       operationId: setLeaderboardNickname
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'The caller''s own leaderboard nickname: one per signed-in guest, so there is no key in the path.'
-      x-ticvai-names-for-context: [pii.subject]
       x-ticvai-consumed-by:
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own leaderboard nickname: one per signed-in guest, so there is no key in the path.'
+      x-ticvai-names-for-context: [pii.subject]
       x-ticvai-audience:
       - guest
       summary: Choose the name shown on the board
@@ -4269,13 +4269,6 @@ paths:
         format: uuid
     get:
       operationId: getGuestProfile
-      x-ticvai-read-via:
-      - query: identity#subjectContactRecords
-        route: service
-        for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
-      - query: identity#subjectRecords
-        route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-057 Guest Profile & Dining History"
         - "P08 ADM-680 Customer Recommendation Profile"
@@ -4284,6 +4277,13 @@ paths:
         - "P08 BO-738 Activity Timeline"
         - "P08 BO-740 Family & Guardians"
         - "P08 BO-799 Agent Workspace"
+      x-ticvai-read-via:
+      - query: identity#subjectContactRecords
+        route: service
+        for: 'its read of pii.subject_contact, Identity''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -4443,10 +4443,6 @@ paths:
         format: uuid
     get:
       operationId: getGuestConsents
-      x-ticvai-read-via:
-      - query: identity#subjectRecords
-        route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-020 Profile & Preferences"
         - "P01 WEB-024 Devices, Wishlist & Consent"
@@ -4456,6 +4452,10 @@ paths:
         - "P02 GST-066 Privacy & My Data"
         - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-749 Guest Preference Center"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -4830,6 +4830,7 @@ paths:
         - "P02 GST-071 Payment Methods"
         - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
+        - "P13 CMS-023 Consent Purpose & Consent Type Builder"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -4877,12 +4878,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setConsentPurposes
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
         - "P13 CMS-023 Consent Purpose & Consent Type Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Configure consent purposes
@@ -5257,10 +5258,10 @@ paths:
         format: uuid
     get:
       operationId: listGuestDevices
-      x-ticvai-names-for-context: [platform.device]
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
+      x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - guest
       summary: A guest's registered devices
@@ -5443,14 +5444,14 @@ paths:
         format: uuid
     delete:
       operationId: revokeGuestDevice
+      x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-073 Security & Sign-in"
       x-ticvai-write-via:
       - table: identity.guest_session
         operation: endGuestDeviceSessions
       x-ticvai-calls:
       - identity.endGuestDeviceSessions
-      x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-073 Security & Sign-in"
       x-ticvai-audience:
       - guest
       summary: Revoke a device registration
@@ -5515,7 +5516,6 @@ paths:
   /segments:
     get:
       operationId: listSegments
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-121 Personalized Offers & Guest Engagement"
@@ -5525,6 +5525,7 @@ paths:
         - "P08 BO-757 Behavioral Segmentation"
         - "P08 BO-766 Campaign Builder"
         - "P16 ANL-007 Guest & Conversion Intelligence"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5742,12 +5743,12 @@ paths:
   /campaigns:
     get:
       operationId: listCampaigns
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-107 Guests & Marketing"
         - "P08 BO-118 Campaign & Audience Management"
         - "P08 BO-764 Campaign Command Center"
         - "P08 BO-766 Campaign Builder"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6324,7 +6325,6 @@ paths:
   /message-templates:
     get:
       operationId: listMessageTemplates
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-766 Campaign Builder"
         - "P08 BO-768 Multichannel Composer"
@@ -6332,6 +6332,7 @@ paths:
         - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-785 Template Library"
         - "P12 SUP-007 Canned Response Management"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -6534,7 +6535,6 @@ paths:
   /cases:
     get:
       operationId: listCases
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
@@ -6544,6 +6544,7 @@ paths:
         - "P10 PTR-021 Support & Contact"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-005 Live Chat Workspace"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -7185,11 +7186,11 @@ paths:
   /reviews:
     get:
       operationId: listReviews
+      x-ticvai-consumed-by:
+        - "P08 BO-819 Review Collection & Rating Rules"
       description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.
 
         **Statuses.** Every `status` is returned, ended ones included (`rejected`); a screen that shows only live rows filters on `status` itself.'
-      x-ticvai-consumed-by:
-        - "P08 BO-819 Review Collection & Rating Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -7377,11 +7378,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMarketingSubscription
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per guest, channel and list, the one the body''s `subjectId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P01 WEB-027 Newsletter Subscription"
         - "P02 GST-065 Newsletter & Preferences"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per guest, channel and list, the one the body''s `subjectId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -8657,11 +8658,11 @@ paths:
   /communication-preference-marketing:
     put:
       operationId: setCommunicationPreferenceMarketing
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per communication preference category, the one the body''s `categoryCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-749 Guest Preference Center"
         - "P13 CMS-024 Communication Preference & Marketing Permission Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per communication preference category, the one the body''s `categoryCode` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.8-9 (17.1.4); MoM 20 Aug §4.3 (no opt-in, no promotional communication); MoM 31 Aug §4.6'
@@ -9007,10 +9008,10 @@ paths:
   /consent-capture-point:
     put:
       operationId: setConsentCapturePoint
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per capture point and channel, the one the body''s `capturePoint` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-027 Consent Capture Point & Customer Journey Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per capture point and channel, the one the body''s `capturePoint` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.12-13 (17.1.7); guardian threshold from setMinorGuardianAge (per country, no shipped default)'
@@ -9147,13 +9148,13 @@ paths:
   /privacy-notice-policy/{governanceId}:
     put:
       operationId: setPrivacyNoticePolicyGovernance
+      x-ticvai-consumed-by:
+        - "P13 CMS-028 Privacy Notice, Policy & Terms Version Management"
+        - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
       x-ticvai-read-via:
       - query: white-label#policyRecords
         route: in-process
         for: 'its read of whitelabel.policy, WhiteLabel''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-028 Privacy Notice, Policy & Terms Version Management"
-        - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: writers pass; marketing.privacy_notice_governance had no writer, listPrivacyNoticePolicy only reads it (DM6); pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.14-15 (17.1.8: lifecycle Draft, Review, Approved, Scheduled, Published, Superseded, Archived; change marked by an authorised user, never by AI); approval through the approvals engine as approvePrivacyTesting does'
@@ -9238,10 +9239,10 @@ paths:
   /minor-guardian-age:
     put:
       operationId: setMinorGuardianAge
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-029 Minor, Guardian & Age-Based Privacy Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.15-16 (17.1.9: configure by jurisdiction, do not hard-code 13, 16 or 18); the ages are the tenant''s configuration per country with no shipped default, so no age is guessed'
@@ -9297,10 +9298,10 @@ paths:
   /privacy-testing:
     put:
       operationId: approvePrivacyTesting
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per privacy change set, the one the body''s `changeSetId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-030 Privacy Configuration Testing, Approval & Publication"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per privacy change set, the one the body''s `changeSetId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.16-18 (17.1.10); approval runs through the approvals engine (configurable workflow, no hard-coded job titles)'
@@ -9504,12 +9505,12 @@ paths:
   /customer-privacy-consent:
     get:
       operationId: listCustomerPrivacyConsent
+      x-ticvai-consumed-by:
+        - "P13 CMS-032 Customer Privacy, Consent & Preference 360°"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-032 Customer Privacy, Consent & Preference 360°"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.22-24 (17.2.2); MoM 20 Aug §4.3; composed from existing consent, profile and request reads'
@@ -9845,11 +9846,11 @@ paths:
   /data-discovery-access:
     put:
       operationId: setDataDiscoveryAccess
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per privacy request, the one the body''s `requestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-750 Data Subject Requests"
         - "P13 CMS-035 Data Discovery, Access, Export & Correction Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per privacy request, the one the body''s `requestId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Privacy__Consent___Preference_Management_Reference.pdf'' pp.28-29 (17.2.5); exportSubjectData already assembles an export from the lineage; MoM 20 Aug §4.3 (access, correction, deletion)'
@@ -10629,6 +10630,10 @@ paths:
   /customer-service-profile:
     get:
       operationId: listCustomerServiceProfile
+      x-ticvai-consumed-by:
+        - "P08 BO-737 Customer 360 Profile"
+        - "P12 SUP-009 Customer Service Command Center"
+        - "P12 SUP-010 Customer 360° Service Profile"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -10648,10 +10653,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-737 Customer 360 Profile"
-        - "P12 SUP-009 Customer Service Command Center"
-        - "P12 SUP-010 Customer 360° Service Profile"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1; pack ''Customer Service_Reference.pdf'' pp.5-7 (10.1.2); CRM stays the source of truth (pack p.7), ADR-0023 for the personal data'
@@ -10863,10 +10864,10 @@ paths:
   /case-investigation-resolution:
     put:
       operationId: setCaseInvestigationResolution
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per case and linked record, the one the body''s `caseId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per case and linked record, the one the body''s `caseId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (agents act from the case; AI summariser compiles actions on a case); pack ''Customer Service_Reference.pdf'' pp.11-13 (10.1.5 Related Records, Case Actions)'
@@ -10959,13 +10960,13 @@ paths:
   /order-booking-ticket/{serviceActionId}:
     put:
       operationId: setOrderBookingTicket
+      x-ticvai-consumed-by:
+        - "P08 BO-801 Sales & Service Actions"
+        - "P12 SUP-014 Order, Booking & Ticket Service Workspace"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
         route: service
         for: 'the order and its policies (422 not-permitted-by-policy) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P08 BO-801 Sales & Service Actions"
-        - "P12 SUP-014 Order, Booking & Ticket Service Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (agents act on bookings from the case: date change, reschedule, resend); pack ''Customer Service_Reference.pdf'' pp.13-14 (10.1.6, Guardrail: agents cannot bypass Ticketing or Pricing rules)'
@@ -11440,11 +11441,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCustomerServiceCopilot
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-798 Intent & Knowledge Management"
         - "P12 SUP-018 AI Customer Service Copilot & Knowledge Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.1 (AI summariser on a case); pack ''Customer Service_Reference.pdf'' pp.19-21 (10.1.10); inherits getAiPolicy (ADR-0018: a venue narrows, never widens)'
@@ -11913,13 +11914,13 @@ paths:
   /escalation-critical-case:
     get:
       operationId: listEscalationCriticalCase
+      x-ticvai-consumed-by:
+        - "P08 BO-810 Escalation Rules"
+        - "P12 SUP-024 Escalation & Critical Case Monitor"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-810 Escalation Rules"
-        - "P12 SUP-024 Escalation & Critical Case Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.2 (escalation and case monitoring, unresolved cases escalated further); pack ''Customer Service_Reference.pdf'' pp.32-34 (10.2.6)'
@@ -12355,13 +12356,13 @@ paths:
   /service-root-cause:
     get:
       operationId: listServiceRootCause
+      x-ticvai-consumed-by:
+        - "P08 BO-823 VOC Analytics & Audit"
+        - "P12 SUP-027 Service Analytics & Root-Cause Intelligence"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-823 VOC Analytics & Audit"
-        - "P12 SUP-027 Service Analytics & Root-Cause Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.2 (week-over-week case volume trends); pack ''Customer Service_Reference.pdf'' pp.37-39 (10.2.9)'
@@ -12912,11 +12913,11 @@ paths:
   /digital-waiver-form:
     put:
       operationId: setDigitalWaiverForm
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-845 Waiver Template Builder"
         - "P13 CMS-043 Digital Waiver & Form Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (drag-and-drop fields, builder fully configurable, conditional questions, mobile view); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.9-11 (11.1.3)'
@@ -13169,12 +13170,12 @@ paths:
   /signatory-signature-guardian:
     put:
       operationId: setSignatorySignatureGuardian
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-848 Signature Experience Setup"
         - "P08 BO-849 Guardian & Group Signing"
         - "P13 CMS-045 Signatory, Signature & Guardian Rule Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (signatory = participant or parent/guardian; minor/guardian handling); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.13-14 (11.1.5), which also settles the legal question: signature method and evidence are configured per waiver and approved by the organisation''s legal/compliance reviewer, TICVAI assumes none is sufficient everywhere'
@@ -13242,6 +13243,7 @@ paths:
       operationId: getSignatorySignatureGuardian
       x-ticvai-consumed-by:
         - "P08 BO-848 Signature Experience Setup"
+        - "P13 CMS-045 Signatory, Signature & Guardian Rule Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.13-14 (11.1.5); the configuration screen needs to load what it saved'
@@ -13668,10 +13670,10 @@ paths:
   /localization-branding-customer:
     put:
       operationId: setLocalizationBrandingCustomer
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-049 Localization, Branding & Customer Experience Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (mobile view; waiver reachable by QR code; delivery by email/WhatsApp/SMS); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.19-20 (11.1.9)'
@@ -13781,10 +13783,10 @@ paths:
   /waiver-testing:
     put:
       operationId: approveWaiverTesting
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per waiver form, the one the body''s `formId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-050 Waiver Approval, Testing & Publication Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per waiver form, the one the body''s `formId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (approval/testing/publication; templates published vs draft; versioning); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.19 (Emergency Suspension, Re-Sign Rules), 21-23 (11.1.10); states/form-definition.yaml'
@@ -13956,6 +13958,9 @@ paths:
   /waiver:
     get:
       operationId: listWaiver
+      x-ticvai-consumed-by:
+        - "P08 BO-844 Waiver Command Center"
+        - "P13 CMS-051 Waiver Operations Command Center"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
         route: service
@@ -13966,9 +13971,6 @@ paths:
       - query: orders#orderLineRecords
         route: service
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-844 Waiver Command Center"
-        - "P13 CMS-051 Waiver Operations Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (tracking per participant, incomplete waiver can block download, activation, check-in or access); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.26-27 (11.2.1); filters are the pack''s Filters'
@@ -14097,6 +14099,10 @@ paths:
   /participant-waiver-statu:
     get:
       operationId: listParticipantWaiverStatus
+      x-ticvai-consumed-by:
+        - "P08 BO-850 Pre-Arrival Completion"
+        - "P08 BO-851 Verification & Access Control"
+        - "P13 CMS-052 Participant Waiver Status & Tracking"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
         route: service
@@ -14110,10 +14116,6 @@ paths:
       - query: orders#orderLineRecords
         route: service
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-850 Pre-Arrival Completion"
-        - "P08 BO-851 Verification & Access Control"
-        - "P13 CMS-052 Participant Waiver Status & Tracking"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (tracking per participant with delivery channel; purchaser, participant and signatory kept apart); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.28-29 (11.2.2)'
@@ -14496,6 +14498,9 @@ paths:
   /minor-guardian-group:
     get:
       operationId: listMinorGuardianGroup
+      x-ticvai-consumed-by:
+        - "P08 BO-850 Pre-Arrival Completion"
+        - "P13 CMS-054 Minor, Guardian & Group Consent Management"
       x-ticvai-read-via:
       - query: identity#subjectContactRecords
         route: service
@@ -14509,9 +14514,6 @@ paths:
       - query: orders#orderLineRecords
         route: service
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-850 Pre-Arrival Completion"
-        - "P13 CMS-054 Minor, Guardian & Group Consent Management"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (signatory = participant or parent/guardian; minor/guardian handling); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.31-33 (11.2.4), whose Important Rule settles who may sign for a group'
@@ -14632,12 +14634,12 @@ paths:
   /waiver-verification-validation:
     get:
       operationId: listWaiverVerificationQueue
+      x-ticvai-consumed-by:
+        - "P13 CMS-055 Waiver Verification & Validation Workspace"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-055 Waiver Verification & Validation Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (verification workspace flags missing/expired/invalid); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.33-34 (11.2.5 Verification Queue); the workspace needs its read'
@@ -14789,6 +14791,8 @@ paths:
   /missing-expired-invalid:
     get:
       operationId: listMissingExpiredInvalid
+      x-ticvai-consumed-by:
+        - "P13 CMS-056 Missing, Expired & Invalid Waiver Management"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
         route: service
@@ -14802,8 +14806,6 @@ paths:
       - query: orders#orderLineRecords
         route: service
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-056 Missing, Expired & Invalid Waiver Management"
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (verification workspace flags missing/expired/invalid; incomplete waiver can block access); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.34-36 (11.2.6)'
@@ -15104,14 +15106,14 @@ paths:
   /compliance-evidence-waiver:
     get:
       operationId: listComplianceEvidenceWaiver
-      x-ticvai-read-via:
-      - query: identity#subjectRecords
-        route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-852 Documents, Search & Retention"
         - "P08 BO-853 Legal Evidence & Audit"
         - "P13 CMS-058 Compliance Evidence, Audit & Waiver Repository"
+      x-ticvai-read-via:
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
         - staff
       x-ticvai-agreed: '29 September: MoM 31 Aug §4.9 (versioning; signatory = participant or parent/guardian); pack ''Waiver, Consent & Digital Form Management_Reference.pdf'' pp.38-39 (11.2.8); legal posture: record more evidence rather than less, retention per ADR-0047'
@@ -15451,10 +15453,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestAttributeModel
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-736 Guest Master Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Change the model, as a version
       description: '**Versioned and audited, because a guest record answers questions years later.** A
         field whose meaning changed in March makes every value before it ambiguous unless the change is
@@ -15500,6 +15502,12 @@ paths:
         format: uuid
     get:
       operationId: getGuestTimeline
+      x-ticvai-consumed-by:
+        - "P08 BO-737 Customer 360 Profile"
+        - "P08 BO-738 Activity Timeline"
+        - "P08 BO-739 Contact & Preferences"
+        - "P08 BO-742 Commerce & Documents"
+        - "P08 BO-796 Guest Conversation 360"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -15507,12 +15515,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-737 Customer 360 Profile"
-        - "P08 BO-738 Activity Timeline"
-        - "P08 BO-739 Contact & Preferences"
-        - "P08 BO-742 Commerce & Documents"
-        - "P08 BO-796 Guest Conversation 360"
       summary: Everything this guest did, in order, across the platform
       description: 'Board 1.5. Purchases, scans, reservations, visits, membership changes, loyalty,
         wallet, campaigns, messages, cases, surveys and waivers — **twelve contexts, one chronology.**
@@ -15658,14 +15660,14 @@ paths:
         format: uuid
     get:
       operationId: getGuestIntelligence
-      x-ticvai-read-via:
-      - query: orders#salesOrderRecords
-        route: service
-        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-743 AI Guest Intelligence"
         - "P08 BO-832 AI Engagement Optimization"
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Value, engagement, churn and propensity, with their reasons
       description: 'Board 1.10 — *"turn the unified record into **explainable** customer insight."*
 
@@ -15721,10 +15723,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setIdentityResolutionRules
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-745 Identity Resolution Rules"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Matching weights, thresholds and survivorship
       description: 'Board 2.2. **`mergeGuests` existed and nothing said which records were duplicates or
         which value survives.**
@@ -16017,9 +16019,9 @@ paths:
   /audience-lists:
     get:
       operationId: listAudienceLists
-      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-756 Static Lists & Imports"
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.'
       summary: Static and imported audiences
       tags:
       - guests
@@ -16094,11 +16096,11 @@ paths:
   /audience-activations:
     get:
       operationId: listAudienceActivations
+      x-ticvai-consumed-by:
+        - "P08 BO-763 Activation & Governance"
       description: '**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
 
         **Statuses.** Every `status` is returned, ended ones included (`expired`, `failed`); a screen that shows only live rows filters on `status` itself.'
-      x-ticvai-consumed-by:
-        - "P08 BO-763 Activation & Governance"
       summary: Where audiences are being used, and whether they are still in sync
       tags:
       - guests
@@ -16224,10 +16226,10 @@ paths:
   /loyalty/programmes/{programmeId}/rules:
     get:
       operationId: getLoyaltyRules
-      x-ticvai-names-for-context: [marketing.loyalty_programme]
       x-ticvai-consumed-by:
         - "P08 BO-827 Points & Activity Rules"
         - "P08 BO-828 Milestones & Reward Rules"
+      x-ticvai-names-for-context: [marketing.loyalty_programme]
       summary: Every rule a loyalty programme runs on
       description: 'Decision 8 of the schema merge. **`marketing.loyalty_programme` holds no rules** —
         it is a header with a code, a name and an expiry. The rules were taken from the backend
@@ -16272,13 +16274,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setLoyaltyRules
+      x-ticvai-consumed-by:
+        - "P08 BO-827 Points & Activity Rules"
+        - "P08 BO-828 Milestones & Reward Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'whether a rule''s product exists (409 unknown-reward-or-product) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P08 BO-827 Points & Activity Rules"
-        - "P08 BO-828 Milestones & Reward Rules"
       summary: Replace a programme's rules as one set
       description: '**Applied whole or not at all.** Setting rules one at a time leaves a live
         programme inconsistent in the middle, which means guests earning under one rule and
@@ -16677,9 +16679,9 @@ paths:
   /badges:
     get:
       operationId: listBadges
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-826 Achievement & Badge Engine"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -16909,10 +16911,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestExtraFields
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-736 Guest Master Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per venue, the caller''s venue: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       summary: Define the extra guest fields
       description: >
         **Set whole, because removing an option is only safe when the values are in view.** An
@@ -17372,14 +17374,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: recordConsentAnswers
-      x-ticvai-read-via:
-      - query: orders#cartRecords
-        route: service
-        for: 'the questions the cart asks (409, 422 question-not-asked) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Performance Selection"
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P02 GST-007 Select Date & Time"
+      x-ticvai-read-via:
+      - query: orders#cartRecords
+        route: service
+        for: 'the questions the cart asks (409, 422 question-not-asked) (CHG-MOD-003)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -17841,11 +17843,6 @@ paths:
   /consent/device:
     post:
       operationId: recordDeviceConsent
-      x-ticvai-consumed-by:
-        - "P01 WEB-001 Home / Landing"
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-001 Home"
-        - "P02 GST-066 Privacy & My Data"
       x-ticvai-write-via:
       - table: pii.consent_identifier
         operation: recordConsentIdentifier
@@ -17942,10 +17939,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listDeviceConsents
-      x-ticvai-names-for-context: [pii.consent_identifier]
       x-ticvai-consumed-by:
         - "P13 CMS-033 Consent Evidence, History & Withdrawal Management"
         - "P13 CMS-039 Privacy Audit, Evidence & Compliance Reporting"
+      x-ticvai-names-for-context: [pii.consent_identifier]
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
       - staff
@@ -18040,9 +18037,6 @@ paths:
   /consent/device/history:
     get:
       operationId: getDeviceConsentHistory
-      x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-066 Privacy & My Data"
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
       - anonymous
@@ -18186,9 +18180,7 @@ paths:
       operationId: getCookieConsentRuntime
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
-        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-001 Home"
-        - "P02 GST-066 Privacy & My Data"
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
       - anonymous
@@ -18267,9 +18259,6 @@ paths:
   /storefront/cookie-consent/technologies:
     get:
       operationId: listPublishedTrackingTechnologies
-      x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-066 Privacy & My Data"
       x-ticvai-requires-module: core   # cookie consent is the law on every storefront, licensed marketing or not (decided 29 September, build)
       x-ticvai-audience:
       - anonymous

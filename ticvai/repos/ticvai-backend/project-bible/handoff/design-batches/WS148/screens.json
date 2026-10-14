@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-orchestration-command-center-t27-adm-569",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentOrchestrationCommandCenterT27.tsx",
+   "component": "src/routes/commercial/PaymentOrchestrationCommandCenterT27.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -106,7 +107,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -122,7 +123,9 @@
       {
        "kind": "metricTile",
        "label": "Authorization Rate",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 25 §KPI Cards"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 25 §KPI Cards",
+       "operation": "getPaymentProviderHealth",
+       "bindsTo": "ProviderHealth.authorisationRate"
       },
       {
        "kind": "metricTile",
@@ -186,7 +189,7 @@
         "Rerouted Value"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listPaymentProviderConnections",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 25 §Display"
       }
      ]
@@ -207,7 +210,8 @@
         "Rerouted Value"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Provider Value Success Status”, “Provider AED”, “Provider AED Warnin”.",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 25 §Display"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 25 §Display",
+       "operation": "getPaymentProviderHealth"
       }
      ]
     }
@@ -271,6 +275,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",
@@ -280,7 +285,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/gateway-psp-acquirer-directory-t28-adm-570",
-   "component": "apps/venue-management-web/src/routes/commercial/GatewayPspAcquirerDirectoryT28.tsx",
+   "component": "src/routes/commercial/GatewayPspAcquirerDirectoryT28.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -474,6 +479,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",
@@ -483,7 +489,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/provider-connection-adapter-configuration-t29-adm-571",
-   "component": "apps/venue-management-web/src/routes/commercial/ProviderConnectionAdapterConfigurationT29.tsx",
+   "component": "src/routes/commercial/ProviderConnectionAdapterConfigurationT29.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -696,6 +702,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",
@@ -705,7 +712,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/gateway-capability-payment-method-mapping-t30-adm-572",
-   "component": "apps/venue-management-web/src/routes/commercial/GatewayCapabilityPaymentMethodMappingT30.tsx",
+   "component": "src/routes/commercial/GatewayCapabilityPaymentMethodMappingT30.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -751,7 +758,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listPaymentProviderConnections",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listPaymentProviderConnections"
       }
      ]
     }
@@ -808,6 +816,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",
@@ -817,7 +826,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-routing-rule-builder-t31-adm-573",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentRoutingRuleBuilderT31.tsx",
+   "component": "src/routes/commercial/PaymentRoutingRuleBuilderT31.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -841,6 +850,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure the rules that determine which provider should receive each payment transaction.",
+  "division": "Shares `listPaymentRoutingRules`, `setPaymentRoutingRules` with ADM-574; this screen is Payment Routing Rule Builder (pack Payment_Payment_Orchestration.pdf, board 2.5, page 29): configure the rules that determine which provider should receive each payment transaction.",
   "gaps": [
    {
     "operation": null,
@@ -979,6 +989,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",
@@ -988,7 +999,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/routing-strategy-priority-load-distribution-t33-adm-574",
-   "component": "apps/venue-management-web/src/routes/commercial/RoutingStrategyPriorityLoadDistributionT33.tsx",
+   "component": "src/routes/commercial/RoutingStrategyPriorityLoadDistributionT33.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1012,6 +1023,7 @@
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen a metric directory (§AED Card / B2C) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's",
   "purpose": "Manage how payment traffic is distributed when several valid providers are available.",
+  "division": "Shares `listPaymentRoutingRules`, `setPaymentRoutingRules` with ADM-573; this screen is Routing Strategy, Priority & Load Distribution (pack Payment_Payment_Orchestration.pdf, board 2.6, page 31): manage how payment traffic is distributed when several valid providers are available.",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1107,6 +1119,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_CONFIGURE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",
@@ -1116,7 +1129,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/failover-retry-resilience-manager-t34-adm-575",
-   "component": "apps/venue-management-web/src/routes/commercial/FailoverRetryResilienceManagerT34.tsx",
+   "component": "src/routes/commercial/FailoverRetryResilienceManagerT34.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1257,6 +1270,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",
@@ -1266,7 +1280,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/provider-health-sla-performance-monitor-t35-adm-576",
-   "component": "apps/venue-management-web/src/routes/commercial/ProviderHealthSlaPerformanceMonitorT35.tsx",
+   "component": "src/routes/commercial/ProviderHealthSlaPerformanceMonitorT35.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1301,7 +1315,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1312,7 +1326,9 @@
       {
        "kind": "metricTile",
        "label": "Authorization rate",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics",
+       "operation": "getPaymentProviderHealth",
+       "bindsTo": "ProviderHealth.authorisationRate"
       },
       {
        "kind": "metricTile",
@@ -1322,7 +1338,9 @@
       {
        "kind": "metricTile",
        "label": "Decline rate",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 33 §Health Metrics",
+       "operation": "getPaymentProviderHealth",
+       "bindsTo": "ProviderHealth.declineRate"
       },
       {
        "kind": "metricTile",
@@ -1392,7 +1410,8 @@
         "Historical baseline"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Health State”, “Authorization Rate”, “Normal Baseline”, “Change”.",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 33 §Compare"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 33 §Compare",
+       "operation": "getPaymentProviderHealth"
       }
      ]
     }
@@ -1449,6 +1468,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",
@@ -1458,7 +1478,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/provider-cost-commercial-routing-economics-t36-adm-577",
-   "component": "apps/venue-management-web/src/routes/commercial/ProviderCostCommercialRoutingEconomicsT36.tsx",
+   "component": "src/routes/commercial/ProviderCostCommercialRoutingEconomicsT36.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1569,6 +1589,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",
@@ -1578,7 +1599,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-routing-simulator-decision-trace-ai-advisor-t37-adm-578",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentRoutingSimulatorDecisionTraceAiAdvisorT37.tsx",
+   "component": "src/routes/commercial/PaymentRoutingSimulatorDecisionTraceAiAdvisorT37.tsx",
    "status": "notStarted"
   },
   "navigation": {

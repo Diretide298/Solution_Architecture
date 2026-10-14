@@ -14,7 +14,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/redemption-operations-dashboard-bo-444",
-   "component": "apps/venue-management-web/src/routes/games-rides/RedemptionOperationsDashboard.tsx",
+   "component": "src/routes/games-rides/RedemptionOperationsDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -96,7 +96,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -225,6 +225,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "6",
@@ -234,7 +235,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/redemption-credit-rule-configuration-bo-445",
-   "component": "apps/venue-management-web/src/routes/games-rides/RedemptionCreditRuleConfiguration.tsx",
+   "component": "src/routes/games-rides/RedemptionCreditRuleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -384,6 +385,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "6",
@@ -393,7 +395,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/ticket-based-redemption-ticket-eater-integration-bo-446",
-   "component": "apps/venue-management-web/src/routes/games-rides/TicketBasedRedemptionTicketEaterIntegration.tsx",
+   "component": "src/routes/games-rides/TicketBasedRedemptionTicketEaterIntegration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -520,6 +522,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "6",
@@ -529,7 +532,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/ticketless-redemption-game-integration-bo-447",
-   "component": "apps/venue-management-web/src/routes/games-rides/TicketlessRedemptionGameIntegration.tsx",
+   "component": "src/routes/games-rides/TicketlessRedemptionGameIntegration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -670,6 +673,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "6",
@@ -679,7 +683,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/redemption-wallet-balance-view-bo-448",
-   "component": "apps/venue-management-web/src/routes/games-rides/RedemptionWalletBalanceView.tsx",
+   "component": "src/routes/games-rides/RedemptionWalletBalanceView.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -725,7 +729,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getWallet",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getWallet"
       }
      ]
     }
@@ -792,6 +797,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "6",
@@ -801,7 +807,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/redemption-counter-prize-checkout-bo-449",
-   "component": "apps/venue-management-web/src/routes/games-rides/RedemptionCounterPrizeCheckout.tsx",
+   "component": "src/routes/games-rides/RedemptionCounterPrizeCheckout.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -853,7 +859,7 @@
         "Redemption Balance: 2,450"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listPrizes",
        "provenance": "pack Game_and_Ride_Module.pdf, page 58 §Scan / Tap Customer Card"
       }
      ]
@@ -1004,6 +1010,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "6",
@@ -1013,7 +1020,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/prize-catalogue-credit-cost-configuration-bo-450",
-   "component": "apps/venue-management-web/src/routes/games-rides/PrizeCatalogueCreditCostConfiguration.tsx",
+   "component": "src/routes/games-rides/PrizeCatalogueCreditCostConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1065,7 +1072,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listPrizes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listPrizes"
       }
      ]
     },
@@ -1193,6 +1201,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "6",
@@ -1202,7 +1211,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/prize-inventory-integration-bo-451",
-   "component": "apps/venue-management-web/src/routes/games-rides/PrizeInventoryIntegration.tsx",
+   "component": "src/routes/games-rides/PrizeInventoryIntegration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1350,6 +1359,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "6",
@@ -1359,7 +1369,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/direct-pay-crane-prize-machine-configuration-bo-452",
-   "component": "apps/venue-management-web/src/routes/games-rides/DirectPayCranePrizeMachineConfiguration.tsx",
+   "component": "src/routes/games-rides/DirectPayCranePrizeMachineConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1595,6 +1605,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "6",
@@ -1604,7 +1615,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/redemption-transaction-ledger-reconciliation-audit-bo-453",
-   "component": "apps/venue-management-web/src/routes/games-rides/RedemptionTransactionLedgerReconciliationAudit.tsx",
+   "component": "src/routes/games-rides/RedemptionTransactionLedgerReconciliationAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {

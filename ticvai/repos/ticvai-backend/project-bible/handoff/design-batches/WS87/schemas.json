@@ -1226,6 +1226,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -1278,6 +1279,7 @@
   }
  },
  "Wallet": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [
@@ -1438,6 +1440,7 @@
     "format": "uuid"
    },
    "walletId": {
+    "x-ticvai-references": "wallet.wallet",
     "type": "string",
     "format": "uuid"
    },

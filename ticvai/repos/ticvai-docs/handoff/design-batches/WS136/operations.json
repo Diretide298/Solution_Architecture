@@ -664,7 +664,7 @@
  },
  "setPrivacyRequest": {
   "method": "PUT",
-  "path": "/data-subject-customer",
+  "path": "/data-subject-customer/{requestId}",
   "contract": "marketing-crm",
   "summary": "Raise or progress a privacy request",
   "permission": "GUEST_MANAGE",
@@ -672,6 +672,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "requestId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

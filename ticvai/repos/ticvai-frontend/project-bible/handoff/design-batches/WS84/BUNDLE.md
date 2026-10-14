@@ -1,6 +1,6 @@
 # WS84 — Game and Ride board 7
 
-**10 screens · 6 operations · 6 schemas · 3 permissions**
+**10 screens · 6 operations · 6 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_OPERATE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PRODUCT_CONFIGURE, PRODUCT_VIEW, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -100,7 +100,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-454` | Card Lifecycle Command Center | D | 2 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-455` | Card / Credential Profile | D | 0 | 18 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-456` | Card Expiry Rule Configuration | D | 4 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-457` | Last Recharge & Last Activity Tracking | D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-457` | Last Recharge & Last Activity Tracking | D | 0 | 15 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-458` | Expiry Monitoring & Upcoming Expiration | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-459` | Card Expiry Runtime Validation | D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-460` | Card Block, Suspend & Reactivation Control | D | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | Block D · task VM-BO-454 |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
@@ -273,9 +273,11 @@ cards:
 
 #### Permissions
 
-- `getGameCard` → no permission · guest
+- `getGameCard` → `WALLET_VIEW` (read) · guest, staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -322,7 +324,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-454?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-455`, `BO-456`, `BO-457`, `BO-458`, `BO-459`, `BO-460`, `BO-461`, `BO-462`, `BO-463`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -340,7 +342,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | Block D · task VM-BO-455 |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Card Information) and no metric row |
 | Offline | online only |
@@ -389,7 +391,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Card type | text | not in the schema: `Card Type` |
 | Status | text | not in the schema: `Status` |
 
-**The selected card credential profile** (detail panel): The pack groups this record's detail under its own headings: “Linked Values”, “Page 65 of 105”.
+**The selected card credential profile** (detail panel, from `getGameCard`): The pack groups this record's detail under its own headings: “Linked Values”, “Page 65 of 105”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -465,9 +467,11 @@ values:
 
 #### Permissions
 
-- `getGameCard` → no permission · guest
+- `getGameCard` → `WALLET_VIEW` (read) · guest, staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -504,7 +508,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-455?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-454`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 3 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -626,6 +630,8 @@ example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -674,7 +680,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | Block D · task VM-BO-457 |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -709,7 +715,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getGameCard`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Card code | text | A pre-printed card keeps the code printed on it. A generated code (a digital card, or a card issued with no printed code) is the venue … |
+| Kind | text | — |
+| Venue | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Credits | 1,234 | Bought with money. Buys plays. |
+| Bonus credits | 1,234 | From a promotion. Typically non-refundable and spent before paid credits. |
+| Points | 1,234 | Won by playing. Buys prizes. |
+| Status | chip: Active, Blocked, Expired, Transferred | — |
+| Blocked reason | text | — |
+| Transferred to card code | text | — |
+| Last played at | 1 Oct 2026, 14:30 | — |
+| Issued at | 1 Oct 2026, 14:30 | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| ID | the name it points at, never the id | The card's own id (4 October 2026, CHG-FXC-006): the `{cardId}` of `setGameCardLifecycle`, which had no column to match, and the `id` of … |
+| Wallet | the name it points at, never the id | Where the card's credits are held (4 October 2026, CHG-FXC-006). Set when the card is registered to a guest who has a wallet: credits … |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -772,9 +796,11 @@ card:
 
 #### Permissions
 
-- `getGameCard` → no permission · guest
+- `getGameCard` → `WALLET_VIEW` (read) · guest, staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -807,11 +833,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-457?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-454`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -1103,6 +1129,8 @@ expired:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1282,6 +1310,8 @@ block:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1445,6 +1475,8 @@ preserved:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1499,7 +1531,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Games & Rides · wave 3 · needs the `games` module |
 | Block | Block D · task VM-BO-462 |
-| Who uses it | venue; in the flows as venue manager |
+| Who uses it | venue staff holding `WALLET_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Card Information) and no metric row |
 | Offline | online only |
@@ -1536,7 +1568,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Card expiry: 08 mar 2027 | text | not in the schema: `Card Expiry: 08 Mar 2027` |
 | Bonus expiry: 30 sep 2026 | text | not in the schema: `Bonus Expiry: 30 Sep 2026` |
 
-**The selected customer balance credential** (detail panel): The pack groups this record's detail under its own headings: “Customer View”, “Redemption Credits”, “Free Games”, “Entitlements”.
+**The selected customer balance credential** (detail panel, from `getGameCard`): The pack groups this record's detail under its own headings: “Customer View”, “Redemption Credits”, “Free Games”, “Entitlements”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1604,9 +1636,11 @@ matrix:
 
 #### Permissions
 
-- `getGameCard` → no permission · guest
+- `getGameCard` → `WALLET_VIEW` (read) · guest, staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -1641,7 +1675,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#BO-462?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-454`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `WALLET_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -1696,7 +1730,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every card lifecycle audit** (data table)
+**Every card lifecycle audit** (data table, from `listGameplayTransactions`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1777,6 +1811,8 @@ timeline:
 - `listGameplayTransactions` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -1906,7 +1942,7 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"getGameCard": {"method":"GET","path":"/game-cards/{cardCode}","contract":"games","summary":"Read a card's balances","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GameCard"},
+"getGameCard": {"method":"GET","path":"/game-cards/{cardCode}","contract":"games","summary":"Read a card's balances","permission":"WALLET_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"GameCard"},
 "linkWalletCredential": {"method":"POST","path":"/wallet-credentials","contract":"wallet","summary":"Bind a wristband, card or device to a wallet","permission":"WALLET_OPERATE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"WalletCredential","responds":"WalletCredential"},
 "listGameplayTransactions": {"method":"GET","path":"/gameplay-transactions","contract":"games","summary":"Taps, decisions and what they cost","permission":"PRODUCT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":null},{"name":"readerId","in":"query","required":null},{"name":"outcome","in":"query","required":null}],"requestBody":null,"responds":"GameplayTransaction"},
 "setGameCardExpiryRules": {"method":"PUT","path":"/game-card-expiry-rules","contract":"games","summary":"When a card lapses, and what warns the guest first","permission":"PRODUCT_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"GameCardExpiryRules","responds":"GameCardExpiryRules"},
@@ -1923,9 +1959,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "GameCard": {"x-ticvai-persistence":"games.card","type":"object","required":["cardCode","venueId","credits","bonusCredits","points","status","issuedAt"],"properties":{"cardCode":{"type":"string","description":"**A pre-printed card keeps the code printed on it. A generated code** (a digital card, or a card issued with no printed code) **is the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Each till holds a reserved range of that sequence, so a card issued offline takes its code at once. Not gapless; only tax invoices are gapless, per legal entity.\n"},"kind":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"credits":{"type":"integer","description":"Bought with money. Buys plays."},"bonusCredits":{"type":"integer","description":"From a promotion. Typically non-refundable and spent before paid credits.\n"},"points":{"type":"integer","description":"Won by playing. Buys prizes. **Not interchangeable with credits** — a guest who wins should not simply be able to play more.\n"},"status":{"type":"string","enum":["active","blocked","expired","transferred"]},"blockedReason":{"type":"string","nullable":true},"transferredToCardCode":{"type":"string","nullable":true},"lastPlayedAt":{"type":"string","format":"date-time","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"id":{"type":"string","format":"uuid","readOnly":true,"description":"**The card's own id** (4 October 2026, CHG-FXC-006): the `{cardId}` of `setGameCardLifecycle`, which had no column to match, and the `id` of the Wallet view `wallet.loadGameCredits` and `wallet.adjustGameCard` return for a card with no wallet."},"walletId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Where the card's credits are held** (4 October 2026, CHG-FXC-006). Set when the card is registered to a guest who has a wallet: credits loaded to it are wallet credit lots. Null for an anonymous card, whose credits are held on the card row itself (`credits`, `bonusCredits`)."}}},
 "GameCardExpiryRules": {"type":"object","x-ticvai-persistence":"games.card_expiry_rules","description":"Boards 7.3 to 7.6. **Measured from last activity, and the warning is part of the rule.**\n","properties":{"basis":{"type":"string","enum":["fromIssue","fromLastActivity","fromLastRecharge"],"default":"fromLastActivity"},"validityMonths":{"type":"integer"},"warnBeforeDays":{"type":"array","items":{"type":"integer"},"description":"**Expiring a balance with no notice is what ends up on social media.**"},"warningChannels":{"type":"array","items":{"type":"string"}},"extendOnRecharge":{"type":"boolean","default":true},"onExpiry":{"type":"string","enum":["forfeit","holdForClaim","transferToBreakage"],"default":"holdForClaim"},"holdForClaimDays":{"type":"integer","nullable":true},"scopePath":{"type":"string"}}},
-"GameplayAuthorisation": {"type":"object","x-ticvai-persistence":"games.authorisation","description":"Board 4.9. **The refusal reason is the product.**","properties":{"id":{"type":"string","format":"uuid"},"decision":{"type":"string","enum":["allow","refuse"]},"reason":{"type":"string","nullable":true,"enum":["ok","cardNotFound","cardExpired","cardBlocked","retapTooSoon","heightRestriction","ageRestriction","insufficientFunds","entitlementExhausted","entitlementNotValidHere","cooldownActive","dailyCapReached","readerNotConfigured","gameUnavailable"]},"guestMessage":{"type":"string","nullable":true,"description":"***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"},"chargedFrom":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementId":{"type":"string","format":"uuid","nullable":true},"remainingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"remainingPlays":{"type":"integer","nullable":true},"trace":{"type":"array","items":{"type":"object","properties":{"check":{"type":"string"},"passed":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"decidedOffline":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
+"GameplayAuthorisation": {"type":"object","x-ticvai-persistence":"games.authorisation","description":"Board 4.9. **The refusal reason is the product.**","properties":{"id":{"type":"string","format":"uuid"},"decision":{"type":"string","enum":["allow","refuse"]},"reason":{"type":"string","nullable":true,"enum":["ok","cardNotFound","cardExpired","cardBlocked","retapTooSoon","heightRestriction","ageRestriction","insufficientFunds","entitlementExhausted","entitlementNotValidHere","cooldownActive","dailyCapReached","readerNotConfigured","gameUnavailable"]},"guestMessage":{"type":"string","nullable":true,"description":"***\"No plays left on your pass\"* rather than *\"Declined\"*.** One is a guest who understands; the other is a member of staff walking over.\n"},"chargedFrom":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementId":{"type":"string","format":"uuid","nullable":true},"remainingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"remainingPlays":{"type":"integer","nullable":true},"trace":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"check":{"type":"string"},"passed":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"decidedOffline":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "GameplayAuthorisationRequest": {"type":"object","required":["readerId"],"properties":{"readerId":{"type":"string","format":"uuid"},"cardId":{"type":"string","format":"uuid","nullable":true},"credentialIdentifier":{"type":"string","nullable":true},"gameId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time","nullable":true},"guestHeightCm":{"type":"integer","nullable":true},"offline":{"type":"boolean","default":false}}},
 "GameplayTransaction": {"type":"object","x-ticvai-persistence":"games.gameplay_transaction","description":"Boards 8.2 and 8.5. **The refused ones are the valuable half.**","properties":{"id":{"type":"string","format":"uuid"},"readerId":{"type":"string","format":"uuid"},"gameId":{"type":"string","format":"uuid","nullable":true},"cardId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time"},"outcome":{"type":"string","enum":["allowed","refused","reversed"]},"reason":{"type":"string","nullable":true},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargedFrom":{"type":"string","nullable":true},"entitlementId":{"type":"string","format":"uuid","nullable":true},"ticketsEarned":{"type":"integer","nullable":true},"decidedOffline":{"type":"boolean","default":false},"syncedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
-"WalletCredential": {"type":"object","x-ticvai-persistence":"wallet.credential","description":"Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n","required":["walletId","kind","identifier"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["card","wristband","nfc","rfid","qr","mobileApp","digitalKey"]},"identifier":{"type":"string"},"linkedAt":{"type":"string","format":"date-time"},"unlinkedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","lost","replaced","blocked","expired"]},"replacedByCredentialId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}}
+"WalletCredential": {"type":"object","x-ticvai-persistence":"wallet.credential","description":"Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n","required":["walletId","kind","identifier"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"x-ticvai-references":"wallet.wallet","type":"string","format":"uuid"},"kind":{"type":"string","enum":["card","wristband","nfc","rfid","qr","mobileApp","digitalKey"]},"identifier":{"type":"string"},"linkedAt":{"type":"string","format":"date-time"},"unlinkedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","lost","replaced","blocked","expired"]},"replacedByCredentialId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"recordedAt":{"type":"string","format":"date-time","description":"**When the device made the write** (R113; CHG-OFL-003). `linkWalletCredential` is offline-capable, so the client sets this from its own clock and keeps it on replay; `created_at` is when the server heard of it. Omitted online, the server sets it to the time it received the call."}}}
 }
 ```

@@ -5,6 +5,7 @@
   "module": "Orders & Fulfilment",
   "requiresModule": "partner",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "capability": "C34",
   "implementation": {
    "app": "partner-web",
@@ -53,7 +54,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrderStatement` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
+  "purpose": "A partner reads its orders with their statements and refunds, and acts on one: modify, exchange, reschedule, hold, resume or reprint.",
+  "division": "Shares `createOrder`, `exchangeOrderLines`, `getOrder`, `getOrderStatement` and more with PTR-008; this screen is Order History: a partner reads its orders with their statements and refunds, and acts on one: modify, exchange, reschedule, hold, resume or reprint.",
   "layout": {
    "template": "split",
    "regions": [
@@ -549,6 +551,7 @@
   "module": "Orders & Fulfilment",
   "requiresModule": "partner",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "capability": "C09",
   "implementation": {
    "app": "partner-web",
@@ -586,7 +589,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listOrderRefunds` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Work with voucher / ticket download for this venue.",
+  "purpose": "A partner reprints or resends the vouchers and tickets of an order, beside the order, its statement and its refunds.",
   "layout": {
    "template": "split",
    "regions": [

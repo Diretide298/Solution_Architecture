@@ -561,7 +561,7 @@
   "contract": "workforce",
   "summary": "Ask someone to take your shift",
   "permission": "WORKFORCE_VIEW",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/seat-map-command-center-bo-953",
-   "component": "apps/venue-management-web/src/routes/access-venue/SeatMapCommandCenter.tsx",
+   "component": "src/routes/access-venue/SeatMapCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -113,7 +114,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatMaps",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatMaps"
       }
      ]
     }
@@ -175,6 +177,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "1",
@@ -184,7 +187,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/venue-canvas-bo-954",
-   "component": "apps/venue-management-web/src/routes/access-venue/VenueCanvas.tsx",
+   "component": "src/routes/access-venue/VenueCanvas.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -230,7 +233,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatMap",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatMap"
       },
       {
        "kind": "primaryButton",
@@ -369,6 +373,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "1",
@@ -378,7 +383,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/sections-zones-bo-955",
-   "component": "apps/venue-management-web/src/routes/access-venue/SectionsZones.tsx",
+   "component": "src/routes/access-venue/SectionsZones.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -423,14 +428,16 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatMap",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatMap"
       },
       {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "setMapZones",
        "label": "Save map zones",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setMapZones"
       },
       {
        "kind": "secondaryButton",
@@ -552,6 +559,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "1",
@@ -561,7 +569,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/rows-seats-bo-956",
-   "component": "apps/venue-management-web/src/routes/access-venue/RowsSeats.tsx",
+   "component": "src/routes/access-venue/RowsSeats.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -606,7 +614,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeats",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeats"
       },
       {
        "kind": "primaryButton",
@@ -735,6 +744,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "1",
@@ -744,7 +754,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/standing-zones-bo-957",
-   "component": "apps/venue-management-web/src/routes/access-venue/StandingZones.tsx",
+   "component": "src/routes/access-venue/StandingZones.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -767,6 +777,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure non-assigned areas with controlled capacity and density. Draw standing, general-admission, pit, dance-floor or hospitality zones and assign type, capacity, density and color. Calculate capacity from area and approved density while allowing an authorized lower operating limit. Associate entrances, exits, age rules, access products, pricing bands and event-specific restrictions. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatMap`, `setMapZones` with BO-958, BO-960, BO-961; this screen is Standing Zones (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 1.05, page 6): configure non-assigned areas with controlled capacity and density. Draw standing, general-admission, pit, dance-floor or hospitality zones and assign type, capacity, density and color. Calculate capacity from area and approved density while allowing an authorized lower operating limit. Associate entrances, exits, age rules, access products, pricing bands and event-specific restrictions. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -878,6 +889,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "1",
@@ -887,7 +899,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/suites-boxes-bo-958",
-   "component": "apps/venue-management-web/src/routes/access-venue/SuitesBoxes.tsx",
+   "component": "src/routes/access-venue/SuitesBoxes.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -910,6 +922,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Model suites, boxes and hospitality spaces as sellable seating inventory. Create suites and boxes with code, capacity, internal seat layout, standing allowance, amenities and accessibility attributes. Support whole-suite, per-seat, shared and configurable sales models with linked products and price categories. Maintain owner, contract, allocation, entrance, service area and operational-status references without duplicating CRM or contract data. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 6",
+  "division": "Shares `getSeatMap`, `setMapZones` with BO-957, BO-960, BO-961; this screen is Suites & Boxes (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 1.06, page 6): model suites, boxes and hospitality spaces as sellable seating inventory. Create suites and boxes with code, capacity, internal seat layout, standing allowance, amenities and accessibility attributes. Support whole-suite, per-seat, shared and configurable sales models with linked products and price categories. Maintain owner, contract, allocation, entrance, service area and operational-status references without duplicating CRM or contract data. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 6.",
   "gaps": [
    {
     "operation": null,
@@ -1021,6 +1034,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "1",
@@ -1030,7 +1044,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/stage-focal-point-bo-959",
-   "component": "apps/venue-management-web/src/routes/access-venue/StageFocalPoint.tsx",
+   "component": "src/routes/access-venue/StageFocalPoint.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1171,6 +1185,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "1",
@@ -1180,7 +1195,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/entrances-exits-aisles-bo-960",
-   "component": "apps/venue-management-web/src/routes/access-venue/EntrancesExitsAisles.tsx",
+   "component": "src/routes/access-venue/EntrancesExitsAisles.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1203,6 +1218,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Map circulation elements used by access, accessibility and safety operations. Create entrances, exits, gates, portals, vomitories, concourses, stairways and aisles with unique identifiers and attributes. Define width, direction, level, connected zones, access-control device, accessible status and emergency designation. Validate disconnected zones, blocked paths, minimum aisle width and route continuity against configured venue rules. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatMap`, `setMapZones` with BO-957, BO-958, BO-961; this screen is Entrances, Exits & Aisles (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 1.08, page 7): map circulation elements used by access, accessibility and safety operations. Create entrances, exits, gates, portals, vomitories, concourses, stairways and aisles with unique identifiers and attributes. Define width, direction, level, connected zones, access-control device, accessible status and emergency designation. Validate disconnected zones, blocked paths, minimum aisle width and route continuity against configured venue rules. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -1314,6 +1330,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "1",
@@ -1323,7 +1340,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/amenities-obstructions-bo-961",
-   "component": "apps/venue-management-web/src/routes/access-venue/AmenitiesObstructions.tsx",
+   "component": "src/routes/access-venue/AmenitiesObstructions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1346,6 +1363,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Add guest facilities, service points and view-affecting objects to the venue map. Place restrooms, concessions, bars, first aid, merchandise, lifts, escalators, information, prayer and accessibility facilities. Map pillars, cameras, speaker arrays, lighting trusses, barriers and production structures with obstruction type and dimensions. Expose approved amenity and view attributes to filters, seat previews, operations and accessibility routing. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatMap`, `setMapZones` with BO-957, BO-958, BO-960; this screen is Amenities & Obstructions (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 1.09, page 7): add guest facilities, service points and view-affecting objects to the venue map. Place restrooms, concessions, bars, first aid, merchandise, lifts, escalators, information, prayer and accessibility facilities. Map pillars, cameras, speaker arrays, lighting trusses, barriers and production structures with obstruction type and dimensions. Expose approved amenity and view attributes to filters, seat previews, operations and accessibility routing. Version geometry and property changes, enforce venue-scoped permissions, validate affected capacity and preserve before/after audit evidence. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -1457,6 +1475,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "1",
@@ -1466,7 +1485,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/templates-validation-publish-bo-962",
-   "component": "apps/venue-management-web/src/routes/access-venue/TemplatesValidationPublish.tsx",
+   "component": "src/routes/access-venue/TemplatesValidationPublish.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1511,7 +1530,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatMapTemplates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatMapTemplates"
       },
       {
        "kind": "primaryButton",
@@ -1531,7 +1551,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Replaces the map every channel sells from.** Seats already sold keep their labels; seats that no longer exist in the new map are listed before this proceeds.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "publishSeatMap"
       }
      ]
     }

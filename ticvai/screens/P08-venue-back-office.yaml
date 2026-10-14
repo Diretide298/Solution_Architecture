@@ -1906,6 +1906,11 @@ screens:
     - AccessPoint.name
     - AccessPoint.venueId
     - AccessPoint.scopePath
+    params:
+    - name: parkingFacilityId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listParkingFacilities`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -5019,6 +5024,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listChannelCapacities`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: listingId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listChannelListings`.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -6001,6 +6010,12 @@ screens:
       - bands
       - walkIn
     provenance: contract catalogue.yaml PUT /performance-templates
+  entryState:
+    params:
+    - name: performanceTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPerformanceTemplates`.'
 - id: BO-017
   name: Capacity Management
   module: Sell
@@ -16265,6 +16280,14 @@ screens:
     - name: principalId
       from: navigation
       optional: true
+    - name: jobTitleId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listJobTitles`.'
+    - name: workAssignmentId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listWorkAssignments`.'
     coldEntry: Opened from the Venue Management menu; lists everyone in scope. The selected person comes
       from the row, not the session.
     preloaded:
@@ -16563,6 +16586,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRoles`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: capabilityTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listCapabilityTemplates`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -22297,6 +22324,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPriceVariances`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: rateId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listFxRates`.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -24593,6 +24624,11 @@ screens:
     - ApprovalMatrix.scopeLevel
     - ApprovalMatrix.scopePath
     - ApprovalMatrix.rules
+    params:
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApprovalMatrices`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -24833,6 +24869,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovalDelegations`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApprovalMatrices`.'
     coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
       redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
       or never existed, because those are three different next actions. **The scope is resolved from the
@@ -29168,7 +29208,7 @@ screens:
       trigger: Queue Integration Setup
       provenance: 'derived — BO-003 declares entryState.params feedId, orderId and BO-103 holds none of
         them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-003 finds
-        feedId (configureQueueFeed) itself, and BO-003 opens on its own'
+        feedId (listQueueFeeds) itself, and BO-003 opens on its own'
     - to: BO-004
       trigger: Manual Wait Time Entry
       provenance: 'derived — BO-004 declares entryState.params queueId and BO-103 holds none of them.
@@ -33215,6 +33255,10 @@ screens:
     params:
     - name: venueId
       from: session
+    - name: profileId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setConfigurationProfile` takes it, from the record the user acts on.'
     coldEntry: Resolves from the session. A principal with more than one venue is asked which before the
       page renders.
     preloaded:
@@ -35066,6 +35110,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSyncRejections`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: alertRuleId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setAlertRule` takes it, from the record the user acts on.'
     coldEntry: Resolves from the session. A principal with more than one venue is asked which first. An
       approval request opened from the queue.
     preloaded:
@@ -36253,6 +36301,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getMenu`;
         an edge that holds one may still carry it to open on that record.'
+    - name: checkpointId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listTemperatureCheckpoints`.'
     coldEntry: Resolves from the session. A principal with more than one venue is asked which first.
     preloaded:
     - StockBatch.id
@@ -36618,6 +36670,10 @@ screens:
     params:
     - name: venueId
       from: session
+    - name: storeRuleId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listStoreRules`.'
     coldEntry: Resolves from the session. A principal with more than one venue is asked which first.
     preloaded:
     - VenueSettings.id
@@ -38998,6 +39054,11 @@ screens:
   entryState:
     preloaded:
     - EntitlementConsumptionEngineView.entitlementType
+    params:
+    - name: ruleId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listEntitlementConsumption`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -39889,6 +39950,11 @@ screens:
   entryState:
     preloaded:
     - CredentialActivationDisplayRulesView.beforeActivationDisplay
+    params:
+    - name: credentialPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listCredentialActivationDisplay`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -41099,6 +41165,12 @@ screens:
       one record, one read and one write that every media picker reads (BO-175, BO-337).'
     source: contracts/spine/access.yaml#listMediaTypeTechnology | contracts/spine/access.yaml#listMediaTypeCredential
       | contracts/spine/access.yaml#setMediaTypeTechnology
+  entryState:
+    params:
+    - name: mediaTypeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listMediaTypeTechnology`.'
 - id: BO-176
   name: Virtual Credential & Media Association
   module: Access & Venue
@@ -41410,6 +41482,11 @@ screens:
     - MediaIssuanceEncodingProfileView.identifierCollisionCheckEnabled
     - MediaIssuanceEncodingProfileView.randomizationEnabled
     - Duplicate Prevention — ENABLED
+    params:
+    - name: encodingProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listMediaIssuanceEncoding`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -41784,6 +41861,11 @@ screens:
     trigger: onAction
   entryState:
     preloaded: []
+    params:
+    - name: integrationId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listHotelWalletExternal`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -42639,6 +42721,12 @@ screens:
   notes: '**Face Tag has its own enrolment operation (`enrolFaceTag`), separate from Face Pass, and it
     may capture at the entry gate** as the pack and the minutes say; the "never at a gate" rule is Face
     Pass''s (CHG-CSP-018, DEC-236).'
+  entryState:
+    params:
+    - name: profileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listFaceTagTemporary`.'
 - id: BO-189
   name: Face Matching & Verification Thresholds
   module: Access & Venue
@@ -42783,6 +42871,12 @@ screens:
       - maskObstructionHandling
       - operatorFallback
     provenance: contract access.yaml PUT /face-matching-verification
+  entryState:
+    params:
+    - name: profileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listFaceMatchingVerification`.'
 - id: BO-190
   name: Face Change, Re-enrollment & Identity Protection
   module: Access & Venue
@@ -43122,6 +43216,12 @@ screens:
     bound to a contract property; 4 of 20 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: retentionSettingId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listDataRetentionSettings`.'
 - id: BO-193
   name: Biometric Simulation, Audit & Publication
   module: Access & Venue
@@ -43585,6 +43685,11 @@ screens:
   entryState:
     preloaded:
     - DeviceTypeHardwareLibraryView.hardwareType
+    params:
+    - name: modelId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setHardwareModel` takes it, from the record the user acts on.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -44483,6 +44588,12 @@ screens:
       - createsIncident
     provenance: contract access.yaml PUT /gate-mode-policies
   notes: '**Mode (the upsert key) and createsIncident added to the form 4 October 2026** (CHG-FXS-002)'
+  entryState:
+    params:
+    - name: gateModePolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setGateModePolicy` takes it, from the record the user acts on.'
 - id: BO-202
   name: Device Software, Content & Remote Configuration
   module: Access & Venue
@@ -46060,6 +46171,11 @@ screens:
     - GuestJourneyCommandCenterViewSummary.familyJourneys
     - GuestJourneyCommandCenterViewSummary.reEntryGuests
     - GuestJourneyCommandCenterViewSummary.crossoversToday
+    params:
+    - name: journeyProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listGuestJourney`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -46477,6 +46593,12 @@ screens:
     bound to a contract property; 5 of 14 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: ruleId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listFamilyChildPod`.'
 - id: BO-219
   name: Re-entry & Temporary Exit Journey
   module: Access & Venue
@@ -46805,6 +46927,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listQueues`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: fastPassProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setFastPassProfile` takes it, from the record the user acts on.'
   overlays:
   - id: formSetFastPassProfile
     component: modal
@@ -46960,6 +47086,12 @@ screens:
       (BO-237, which declares it); a context policy is a different object from a special-event admission
       (design-notes correction venue-operations BO-222).'
     source: contracts/spine/access.yaml#setContextTimeEvent
+  entryState:
+    params:
+    - name: entryId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setOperatingCalendarEntry` takes it, from the record the user acts on.'
 - id: BO-223
   name: Journey Simulation, Audit & Publication
   module: Access & Venue
@@ -48717,6 +48849,11 @@ screens:
     trigger: onAction
   entryState:
     preloaded: []
+    params:
+    - name: attributeKey
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listAccessAttributeCatalog`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -48996,6 +49133,11 @@ screens:
   entryState:
     preloaded:
     - IdentityMembershipAccreditationPoliciesView.identityType
+    params:
+    - name: accessProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setAccessProfile` takes it, from the record the user acts on.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -49091,6 +49233,12 @@ screens:
     bound to a contract property; 4 of 25 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: policyId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPolicyScopeHierarchy`.'
 - id: BO-240
   name: Authorization Governance & Temporary Access
   module: Access & Venue
@@ -49956,6 +50104,11 @@ screens:
   entryState:
     preloaded:
     - FraudDetectionRuleSignalLibraryView.signal
+    params:
+    - name: ruleId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listFraudDetectionRule`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -52678,6 +52831,11 @@ screens:
     - GroupCustomerOrganizationProfileView.totalGuests
     - GroupCustomerOrganizationProfileView.revenue
     - GroupCustomerOrganizationProfileView.cancellationHistory
+    params:
+    - name: organisationId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listGroupCustomerOrganization`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -55333,6 +55491,12 @@ screens:
       - downgradePath
       - catalogueProductId
     provenance: contract subscription.yaml PUT /membership-product-tier
+  entryState:
+    params:
+    - name: programId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setMembershipProgramme` takes it, from the record the user acts on.'
 - id: BO-286
   name: Membership Eligibility & Qualification Rule Builder
   module: Sell
@@ -55686,6 +55850,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listEntitlementTemplates`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: benefitId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setMembershipBenefit` takes it, from the record the user acts on.'
 - id: BO-289
   name: Membership Usage, Visit & Consumption Rules
   module: Sell
@@ -63220,6 +63388,12 @@ screens:
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract
     change: `setMediaReplacementRevocation`.'
+  entryState:
+    params:
+    - name: replacementReason
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listMediaReplacementRevocation`.'
 - id: BO-343
   name: Virtual Ticket Architecture Testing, Governance & Audit
   module: Access & Venue
@@ -68938,6 +69112,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 4 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: availabilityId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApproverAvailability` takes it, from the record the user acts on.'
 - id: BO-387
   name: Out-of-Office & Substitute Routing
   module: Venue Operations
@@ -69019,6 +69199,12 @@ screens:
     0 of 0 labels bound to a contract property; 7 of 23 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: availabilityId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApproverAvailability` takes it, from the record the user acts on.'
 - id: BO-388
   name: Approval SLA Policy Configuration
   module: Venue Operations
@@ -69107,6 +69293,12 @@ screens:
   notes: '**One SLA policy screen (decided 2 October 2026, merge as proposed; CHG-SBO-021):** reminders
     and breach notifications (BO-389) and the escalation policy (BO-390) are sections of this one policy
     object.'
+  entryState:
+    params:
+    - name: slaPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalSlaPolicy` takes it, from the record the user acts on.'
 - id: BO-389
   name: Reminder & Breach Notification Rules
   module: Venue Operations
@@ -70226,6 +70418,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 6. 0 of 0 labels bound to
     a contract property; 5 of 27 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: attractionTypeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listAttractionTypes`.'
 - id: BO-398
   name: Game & Ride Operational Configuration
   module: Games & Rides
@@ -71903,6 +72101,11 @@ screens:
   entryState:
     preloaded:
     - ↓
+    params:
+    - name: readerProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setReaderProfile` takes it, from the record the user acts on.'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-412
@@ -78838,7 +79041,12 @@ screens:
     dismiss:
       label: Cancel
     provenance: contract access.yaml PUT /hardware-models; wiring fix, 2 October 2026
-  entryState: {}
+  entryState:
+    params:
+    - name: modelId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setHardwareModel` takes it, from the record the user acts on.'
   gaps:
   - operation: setReaderProfile
     removed: true
@@ -78937,6 +79145,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from Game_and_Ride_Module.pdf page 88. 0 of 0 labels bound to
     a contract property; 10 of 26 pack bullets carried onto the screen — the rest are acceptance prose,
     worked examples and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: readerProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setReaderProfile` takes it, from the record the user acts on.'
 - id: BO-477
   name: Reader Command & Event Mapping
   module: Games & Rides
@@ -96604,6 +96818,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 23. 0 of 0 labels bound to a contract
     property; 0 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
 - id: BO-640
   name: Rejection & Resubmission Management
   module: Access & Venue
@@ -97441,7 +97661,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 30. 0 of 0 labels bound to a contract
     property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: badgeTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listBadgeTemplates`.'
 - id: BO-648
   name: Badge Printing & Print Queue
   module: Access & Venue
@@ -98243,6 +98468,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 38. 0 of 0 labels bound to a contract
     property; 9 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: accessProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listAccessProfiles`.'
 - id: BO-656
   name: Venue & Zone Access Matrix
   module: Access & Venue
@@ -98339,7 +98570,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 39. 0 of 0 labels bound to a contract
     property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: accessProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listAccessProfiles`.'
 - id: BO-657
   name: Operational Area Permission Management
   module: Access & Venue
@@ -98435,7 +98671,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 40. 0 of 0 labels bound to a contract
     property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: accessProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listAccessProfiles`.'
 - id: BO-658
   name: Date & Time Access Rules
   module: Access & Venue
@@ -98531,7 +98772,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 40. 0 of 0 labels bound to a contract
     property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: accessProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listAccessProfiles`.'
 - id: BO-659
   name: Access Schedule Management
   module: Access & Venue
@@ -98613,6 +98859,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 41. 0 of 0 labels bound to a contract
     property; 0 of 6 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
+  entryState:
+    params:
+    - name: accessProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setAccessProfile` takes it, from the record the user acts on.'
 - id: BO-660
   name: Holder Access Assignment
   module: Access & Venue
@@ -99520,7 +99772,12 @@ screens:
   apisNote: Regenerated 9 September 2026 from ACCREDITATION.pdf page 49. 0 of 0 labels bound to a contract
     property; 0 of 16 pack bullets carried onto the screen — the rest are acceptance prose, worked examples
     and AI narrative, which belong to the matrix and the contracts rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: accessProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listAccessProfiles`.'
 - id: BO-669
   name: Temporary & Seasonal Accreditation
   module: Access & Venue
@@ -102172,6 +102429,12 @@ screens:
       - seatingModesAllowed
       - defaultLifecycle
     provenance: contract catalogue.yaml PUT /event-types
+  entryState:
+    params:
+    - name: eventTypeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listEventTypes`.'
 - id: BO-696
   name: Event Duplication & Clone Configuration
   module: Sell
@@ -102822,7 +103085,12 @@ screens:
     page 82. 0 of 0 labels bound to a contract property; 0 of 41 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: spaceId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listSpaces`.'
 - id: BO-702
   name: Space Access Rules Configuration
   module: Sell
@@ -102923,6 +103191,11 @@ screens:
     preloaded:
     - AI Proposal
     - Existing / Approved Configuration
+    params:
+    - name: spaceId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listSpaces`.'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-702
@@ -104266,6 +104539,11 @@ screens:
     preloaded:
     - AI Proposal
     - Existing / Approved Configuration
+    params:
+    - name: shiftTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setShiftTemplate` takes it, from the record the user acts on.'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-714
@@ -105071,6 +105349,12 @@ screens:
     page 82. 0 of 0 labels bound to a contract property; 0 of 41 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: performanceTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPerformanceTemplates`.'
 - id: BO-722
   name: Prepaid Minute Package & Customer Balance Configuration
   module: Sell
@@ -105168,6 +105452,12 @@ screens:
     page 85. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: prepaidMinutesId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setPrepaidMinutePackage` takes it, from the record the user acts on.'
 - id: BO-723
   name: Peak, Off-Peak & Super Prime Time Configuration
   module: Sell
@@ -105265,6 +105555,11 @@ screens:
   entryState:
     preloaded:
     - Target vs Actual
+    params:
+    - name: performanceTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPerformanceTemplates`.'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-723
@@ -105373,7 +105668,12 @@ screens:
     page 87. 0 of 0 labels bound to a contract property; 0 of 36 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: performanceTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPerformanceTemplates`.'
 - id: BO-725
   name: Performance Operations Command Center
   module: Sell
@@ -105918,6 +106218,12 @@ screens:
     the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the
     contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by
     a contract change: `setOutletTemplate`, `listOutletTemplates`.'
+  entryState:
+    params:
+    - name: code
+      from: deepLink
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listOutletTemplates`.'
 - id: BO-731
   name: Operating Hours & Service Periods
   module: Operations
@@ -108461,7 +108767,12 @@ screens:
     dismiss:
       label: Cancel
     provenance: contract marketing-crm.yaml PUT /data-subject-customer; wiring fix, 2 October 2026
-  entryState: {}
+  entryState:
+    params:
+    - name: requestId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listDataSubjectCustomer`.'
 - id: BO-751
   name: Retention & Anonymization
   module: Engagement & Support
@@ -114513,6 +114824,16 @@ screens:
       - isActive
       - overflowWaitSeconds
     provenance: contract marketing-crm.yaml PUT /service-queues
+  entryState:
+    params:
+    - name: queueId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listAgentWorkloadAvailability`.'
+    - name: routingRuleId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setIntelligentRoutingSkill` takes it, from the record the user acts on.'
 - id: BO-801
   name: Sales & Service Actions
   module: Engagement & Support
@@ -114600,6 +114921,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: serviceActionId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setOrderBookingTicket` takes it, from the record the user acts on.'
 - id: BO-802
   name: Sentiment, Quality & Escalation
   module: Engagement & Support
@@ -115320,6 +115647,12 @@ screens:
       - parentCategoryId
       - defaultPriority
     provenance: contract marketing-crm.yaml PUT /case-categories
+  entryState:
+    params:
+    - name: caseCategoryId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listCaseCategories`.'
 - id: BO-808
   name: Assignment & Workload
   module: Engagement & Support
@@ -115556,6 +115889,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: slaPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listSlaPolicyService`.'
 - id: BO-810
   name: Escalation Rules
   module: Engagement & Support
@@ -117294,6 +117633,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `awardBadge` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+    - name: badgeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listBadges`.'
     coldEntry: Opened from BO-824 with the guest picked there. Opened cold (a bookmark or a refresh),
       it shows the list to pick from rather than an empty record, and says plainly if the guest no longer
       exists.
@@ -117536,6 +117879,10 @@ screens:
     params:
     - name: programmeId
       from: navigation
+    - name: loyaltyCampaignId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listLoyaltyCampaigns`.'
   notes: '**Defined 4 October 2026 from LoyaltyProgramme.earnRules (trigger, points, productKinds, multiplier),
     LoyaltyRuleSet.campaignRules and MarketingLoyaltyCampaign. Earning rules are saved with updateLoyaltyProgramme
     (agreed in the ledger), since setLoyaltyRules leaves them out. Daily and monthly limits and rounding
@@ -117793,6 +118140,10 @@ screens:
       optional: true
       notes: Opened without it, the screen lists the programmes (listLoyaltyProgrammes) and the user picks
         one (CHG-FXS-001).
+    - name: rewardId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listRewards`.'
   notes: '**Defined 4 October 2026: a milestone is a programme tier (MarketingProgrammeTier, a lifetime-points
     threshold), saved with setLoyaltyRules after reading getLoyaltyRules; rewards are MarketingReward
     through setReward. ''Save milestones and rewards'' no longer calls createLoyaltyProgramme, which creates
@@ -120315,6 +120666,11 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listComplianceEvidenceWaiver`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: verificationId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setWaiverVerificationValidation` takes it, from the record the user acts
+        on.'
 - id: BO-853
   name: Legal Evidence & Audit
   module: Engagement & Support
@@ -121931,6 +122287,14 @@ screens:
     params:
     - name: resourceId
       from: navigation
+    - name: controlPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalControlPolicy` takes it, from the record the user acts on.'
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
   gaps:
   - operation: createResource
     removed: true
@@ -124115,6 +124479,16 @@ screens:
     0 of 0 labels bound to a contract property; 6 of 28 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: shiftPatternId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listShiftPatterns`.'
+    - name: shiftTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listShiftTemplates`.'
 - id: BO-880
   name: Break, Leave & Absence Configuration
   module: Rentals
@@ -124243,6 +124617,12 @@ screens:
     0 of 0 labels bound to a contract property; 10 of 37 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here. **Pack actions reconciled 29 September (VM close-out):** Administrative block: `createResourceBlock`.'
+  entryState:
+    params:
+    - name: leaveTypeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listLeaveTypes`.'
 - id: BO-881
   name: Overtime & Working-Hour Rules
   module: Rentals
@@ -125062,6 +125442,12 @@ screens:
     p.53; pack Resource_Management_Configuration_Reference.pdf p.54; contract workforce.yaml GET /staffing-coverage.
     Pack labels with no schema field yet (shown as plain labels): Live operational gap, Checked-in (actual
     attendance), Gap type, Recommended employee, Match score.'
+  entryState:
+    params:
+    - name: alertRuleId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setAlertRule` takes it, from the record the user acts on.'
 - id: BO-887
   name: Shift Marketplace & Workforce Requests
   module: Rentals
@@ -125685,6 +126071,11 @@ screens:
     - Forecast
     - Actual
     - Variance
+    params:
+    - name: labourBudgetId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listLabourBudgets`.'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-891
@@ -139746,6 +140137,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: holdTypeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listSeatHoldTypes`.'
 - id: BO-1005
   name: Hold Pool Creation
   module: Access & Venue
@@ -139974,7 +140371,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: holdTypeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listSeatHoldTypes`.'
 - id: BO-1007
   name: Expiration Rules
   module: Access & Venue
@@ -140084,7 +140486,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: holdTypeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listSeatHoldTypes`.'
 - id: BO-1008
   name: Automatic Hold Release
   module: Access & Venue
@@ -140532,6 +140939,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: holdTypeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listSeatHoldPools`.'
 - id: BO-1012
   name: Hold Utilization & Audit
   module: Access & Venue
@@ -147457,6 +147870,10 @@ screens:
     params:
     - name: seatMapId
       from: navigation
+    - name: profileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listConfigurationProfiles`.'
 - id: BO-1071
   name: Integration Command Center
   module: Access & Venue
@@ -154110,6 +154527,10 @@ screens:
     params:
     - name: sharedWalletId
       from: navigation
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApprovalMatrices`.'
 - id: BO-1121
   name: Shared Wallet Transfers & Balance Reallocation
   module: Orders & Money
@@ -154559,6 +154980,10 @@ screens:
     params:
     - name: cardCode
       from: navigation
+    - name: giftCardProductId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setGiftCardProduct` takes it, from the record the user acts on.'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1123
@@ -154738,6 +155163,11 @@ screens:
     - Fixed / variable value
     - Minimum value
     - Maximum value
+    params:
+    - name: giftCardProductId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setGiftCardProduct` takes it, from the record the user acts on.'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1124
@@ -158261,6 +158691,10 @@ screens:
     params:
     - name: subjectId
       from: navigation
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApprovalMatrices`.'
 - id: BO-1150
   name: Wallet Block, Freeze & Restriction Management
   module: Orders & Money
@@ -165730,6 +166164,11 @@ screens:
     - listPriceCategoryRate
   entryState:
     preloaded: []
+    params:
+    - name: priceCategoryId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setPriceCategoryRateType` takes it, from the record the user acts on.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -166351,6 +166790,12 @@ screens:
       - inheritsFromParent
       - fxReferenceRate
     provenance: contract catalogue.yaml PUT /pricing-markets
+  entryState:
+    params:
+    - name: marketId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setMarketPricingConfiguration` takes it, from the record the user acts on.'
 - id: ADM-055
   name: Price Hierarchy & Inheritance Configuration
   module: Commercial
@@ -166609,6 +167054,12 @@ screens:
       - isAiDrafted
       - ownerPrincipalId
     provenance: contract catalogue.yaml PUT /configuration-templates
+  entryState:
+    params:
+    - name: configurationTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setConfigurationTemplate` takes it, from the record the user acts on.'
 - id: ADM-057
   name: Commercial Pricing Structure Validation
   module: Commercial
@@ -168243,6 +168694,16 @@ screens:
     of 3 October: one tax-profile read, a list only if the design needs it); the legal entities come from
     listLegalEntities, which fills the invoice-template and e-invoicing calls and tells whether the entity
     is UAE VAT-registered** (CHG-FXS-001)'
+  entryState:
+    params:
+    - name: invoiceTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listTaxInvoiceTemplates`.'
+    - name: providerId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listEInvoicingProviders`.'
 - id: ADM-070
   name: Tax Rule & Treatment Builder
   module: Commercial
@@ -168561,6 +169022,12 @@ screens:
       - effectiveFrom
       - effectiveTo
     provenance: contract catalogue.yaml PUT /fees
+  entryState:
+    params:
+    - name: feeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listFeeSurcharge`.'
 - id: ADM-072
   name: Fee Applicability & Charging Rule Builder
   module: Commercial
@@ -168971,6 +169438,12 @@ screens:
       - effectiveTo
       - steps
     provenance: contract catalogue.yaml PUT /calculation-profiles
+  entryState:
+    params:
+    - name: calculationProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPriceCalculationSequence`.'
 - id: ADM-075
   name: Currency Precision, Rounding & Monetary Rules
   module: Commercial
@@ -169078,6 +169551,11 @@ screens:
   entryState:
     preloaded:
     - AED 199.50
+    params:
+    - name: roundingProfileId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setCurrencyRoundingRule` takes it, from the record the user acts on.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -173910,6 +174388,11 @@ screens:
     - AiSignalRegistryDataQualityModelGovernanceView.source
     - AiSignalRegistryDataQualityModelGovernanceView.internalExternal
     - AiSignalRegistryDataQualityModelGovernanceView.market
+    params:
+    - name: signalId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setSignalRegistryPolicy` takes it, from the record the user acts on.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -175397,6 +175880,11 @@ screens:
     - AiLearningModelPerformanceOptimizationFeedbackView.elasticityAccuracy
     - AiLearningModelPerformanceOptimizationFeedbackView.recommendationSuccess
     - AiLearningModelPerformanceOptimizationFeedbackView.confidenceCalibration
+    params:
+    - name: signalId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setSignalRegistryPolicy` takes it, from the record the user acts on.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -176267,6 +176755,12 @@ screens:
     10. 0 of 0 labels bound to a contract property; 0 of 28 pack bullets carried onto the screen — the
     rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
+  entryState:
+    params:
+    - name: lifecycleActionId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listScheduledLifecycleActions`.'
 - id: ADM-126
   name: Product Duplication & Template Library
   module: Catalogue
@@ -176433,6 +176927,12 @@ screens:
       - isAiDrafted
       - ownerPrincipalId
     provenance: contract catalogue.yaml PUT /configuration-templates
+  entryState:
+    params:
+    - name: configurationTemplateId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setConfigurationTemplate` takes it, from the record the user acts on.'
 - id: ADM-127
   name: AI Catalogue Builder & Configuration Review
   module: Catalogue
@@ -191409,6 +191909,12 @@ screens:
     page 13. 0 of 0 labels bound to a contract property; 15 of 39 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
+  entryState:
+    params:
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApprovalMatrices`.'
 - id: ADM-244
   name: SLA, Escalation, Reminder & Timeout Rules
   module: Platform
@@ -191538,7 +192044,12 @@ screens:
     dismiss:
       label: Cancel
     provenance: contract approvals.yaml PUT /approval-sla-policies; wiring fix, 2 October 2026
-  entryState: {}
+  entryState:
+    params:
+    - name: slaPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalSlaPolicy` takes it, from the record the user acts on.'
 - id: ADM-245
   name: Trigger, Action & Cross-Module Orchestration Configuration
   module: Platform
@@ -204851,7 +205362,10 @@ screens:
     bound to a contract property; 8 of 32 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
-  entryState: {}
+  entryState:
+    params:
+    - name: deviceId
+      from: session
 - id: ADM-584
   name: Payment Server & Terminal Connectivity Manager
   module: Commercial
@@ -205234,6 +205748,8 @@ screens:
     - Retry status
     params:
     - name: terminalId
+      from: session
+    - name: deviceId
       from: session
   wireframe:
     status: notStarted
@@ -209469,6 +209985,10 @@ screens:
       optional: true
       notes: 'Optional: opened without it, `ingestSettlementFile` answers 202 with it and `getSettlement`
         follows it.'
+    - name: sourceId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listReconciliationSources`.'
 - id: ADM-621
   name: Transaction Matching & Reconciliation Engine
   module: Commercial
@@ -210109,6 +210629,11 @@ screens:
     - Expected settlement date
     - Actual settlement date
     - Status
+    params:
+    - name: merchantAccountId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listMerchantAccounts`.'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-625
@@ -219229,7 +219754,12 @@ screens:
     page 6. 0 of 0 labels bound to a contract property; 12 of 37 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: communicationProviderId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setChannelProvider` takes it, from the record the user acts on.'
 - id: ADM-040
   name: Sender Identity, Domain & Brand Configuration
   module: Platform
@@ -219362,7 +219892,12 @@ screens:
     page 7. 0 of 0 labels bound to a contract property; 19 of 36 pack bullets carried onto the screen
     — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and
     the contracts rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: senderIdentityId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setSenderIdentityDomain` takes it, from the record the user acts on.'
 - id: ADM-041
   name: System Transactional Template Registry
   module: Platform
@@ -221327,7 +221862,12 @@ screens:
     0 of 0 labels bound to a contract property; 9 of 17 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
 - id: ADM-331
   name: Organizational Hierarchy Routing
   module: Platform
@@ -221416,7 +221956,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
 - id: ADM-332
   name: Department-Based Approval Matrix
   module: Platform
@@ -221496,7 +222041,12 @@ screens:
     0 of 0 labels bound to a contract property; 2 of 12 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
 - id: ADM-333
   name: Venue & Tenant Approval Matrix
   module: Platform
@@ -221586,7 +222136,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
 - id: ADM-334
   name: Value & Threshold Routing
   module: Platform
@@ -221676,7 +222231,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
 - id: ADM-335
   name: Risk-Based & Conditional Routing
   module: Platform
@@ -221765,7 +222325,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: matrixId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalMatrix` takes it, from the record the user acts on.'
 - id: ADM-336
   name: Approver Group & Decision Policy
   module: Platform
@@ -221855,7 +222420,12 @@ screens:
     0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: controlPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalControlPolicy` takes it, from the record the user acts on.'
 - id: ADM-337
   name: Routing Simulator & Conflict Detection
   module: Platform
@@ -222394,7 +222964,12 @@ screens:
     0 of 0 labels bound to a contract property; 7 of 11 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: controlPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApprovalControlPolicies`.'
 - id: ADM-342
   name: Authentication & MFA Policy Manager
   module: Platform
@@ -223032,6 +223607,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDataRetentionSettings`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: retentionPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setApprovalRetentionPolicy` takes it, from the record the user acts on.'
 - id: ADM-347
   name: Regulatory Audit & Evidence Center
   module: Platform
@@ -223860,7 +224439,12 @@ screens:
     0 of 0 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest
     are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts
     rather than here.
-  entryState: {}
+  entryState:
+    params:
+    - name: externalProviderId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApprovalExternalProviders`.'
   gaps:
   - operation: listApiClients
     removed: true

@@ -855,7 +855,7 @@
   "contract": "maintenance",
   "summary": "Record notification to an external authority",
   "permission": "INCIDENT_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
@@ -1085,7 +1085,7 @@
   "contract": "maintenance",
   "summary": "Investigate, escalate, close or reopen an incident",
   "permission": "INCIDENT_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [

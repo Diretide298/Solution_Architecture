@@ -100,12 +100,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-854` | Resource Management Command Center | D | 30 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-855` | Resource Type Configuration | D | 13 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-856` | Resource Category Management | D | 15 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-857` | Resource Creation & Profile | A | 60 | 22 | 6 | 46 | 1 | 0 | — | notStarted (—) |
+| `BO-857` | Resource Creation & Profile | A | 58 | 22 | 6 | 46 | 1 | 0 | — | notStarted (—) |
 | `BO-858` | Configurable Attribute Builder | D | 15 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-859` | Resource Hierarchy & Parent–Child Relationships | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-859` | Resource Hierarchy & Parent–Child Relationships | D | 0 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-860` | Resource Dependency Rules | D | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-861` | Resource Package & Bundle Configuration | A | 59 | 25 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-862` | Multi-Venue Resource Assignment | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-862` | Multi-Venue Resource Assignment | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-863` | Resource Lifecycle, Governance & Audit | D | 9 | 0 | 6 | 49 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

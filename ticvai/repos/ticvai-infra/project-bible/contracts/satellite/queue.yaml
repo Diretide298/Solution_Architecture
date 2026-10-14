@@ -104,6 +104,47 @@ tags:
   - name: feed
   - name: signage
 
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  queueRecords:
+    module: queue
+    table: queue.queue
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The queue.queue rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/QueueDetail'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its queue.queue rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
+  readingRecords:
+    module: queue
+    table: queue.reading
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The queue.reading rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/QueueReading'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its queue.reading rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
 paths:
   # ---------------------------------------------------------------- queues
   /queues:
@@ -111,6 +152,7 @@ paths:
       operationId: listQueues
       x-ticvai-consumed-by:
         - "P01 WEB-039 Venue Map & Wait Times"
+        - "P01 WEB-040 Virtual Queue"
         - "P02 GST-023 Virtual Queue"
         - "P06 EMP-031 Queue monitor"
         - "P08 BO-001 Queue Directory"
@@ -139,6 +181,10 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets queues that are open and
         visible, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not
         found. `QUEUE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `name` ascending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
       tags: [queue]
       x-ticvai-permission: QUEUE_VIEW
       x-ticvai-guest-callable: true
@@ -205,6 +251,8 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Queue' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -415,6 +463,13 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-040 Virtual Queue"
         - "P02 GST-023 Virtual Queue"
+      x-ticvai-read-via:
+      - query: marketing-crm#loyaltyPositionRecords
+        route: in-process
+        for: 'its read of marketing.loyalty_position, Marketing''s data (CHG-MOD-001)'
+      - query: promotions#promotionRecords
+        route: service
+        for: 'its read of promotions.promotion, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience: [guest]
       summary: Join a virtual queue
       description: >
@@ -541,6 +596,7 @@ paths:
             X-Consistency-Token:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
         '409':
+          x-ticvai-problem-types: [queue-entry-not-waiting]
           description: Already called or redeemed
           content:
             application/problem+json:
@@ -641,6 +697,13 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/QueueRedemptionResult' }
+        '409':
+          description: 'The entry was already `redeemed` (`queue-entry-already-redeemed`), or was `cancelled` or `released` from the queue (`queue-entry-cancelled`); there is no failed redemption to override. Nobody is admitted.'
+          x-ticvai-problem-types: [queue-entry-already-redeemed, queue-entry-cancelled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -700,6 +763,13 @@ paths:
                     type: array
                     items: { type: string, format: uuid }
                   remainingInQueue: { type: integer }
+        '409':
+          description: 'The queue is `paused` or `closed`; parties are called only from an `open` or `atCapacity` queue. Nobody is called.'
+          x-ticvai-problem-types: [queue-not-open]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -720,6 +790,8 @@ paths:
       x-ticvai-read-routing: primary
       summary: List entries in a queue
       description: Operator view. Position order, with no-shows and expiries visible.
+
+        **Order.** Sorted by `positionInQueue` ascending, then by `joinedAt`.
       tags: [entry]
       x-ticvai-permission: QUEUE_VIEW
       x-ticvai-scope-level: venue
@@ -762,7 +834,6 @@ paths:
         - "P02 GST-022 Attraction Wait Times"
         - "P02 GST-023 Virtual Queue"
         - "P02 GST-038 At the Venue"
-        - "P02 GST-051 Plan"
         - "P02 GST-053 Your Plan"
         - "P02 GST-054 AI Planner"
         - "P02 GST-059 Plan in Progress"
@@ -912,7 +983,7 @@ paths:
                 items: { $ref: '#/components/schemas/QueueFeed' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-
+  /queue-feeds/{feedId}:
     put:
       operationId: configureQueueFeed
       x-ticvai-consumed-by:
@@ -942,6 +1013,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+        - name: feedId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       requestBody:
         required: true
@@ -963,17 +1039,20 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/QueueFeed' }
         '409':
+          x-ticvai-problem-types: [feed-belongs-to-other-queue]
           description: The feed with this `id` belongs to a different queue. A feed does not move between queues
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '400':
+          x-ticvai-problem-types: [unknown-adaptor, adaptor-credentials-missing]
           description: Unknown adaptor, or credentials missing for the selected adaptor
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
 
   /queue-feeds/readings:
     post:
@@ -1221,7 +1300,7 @@ components:
       type: object
       required: [code, name, venueId, capacityPerCycle, cycleMinutes]
       properties:
-        code: { type: string, maxLength: 64 }
+        code: { type: string, maxLength: 64, x-ticvai-unique: venue }
         name: { $ref: '#/components/schemas/LocalisedText' }
         venueId: { type: string, format: uuid }
         attractionProductId: { type: string, format: uuid }
@@ -1316,6 +1395,7 @@ components:
           description: Share of each cycle reserved for Fast Pass holders.
         zone: { type: string, nullable: true }
         fastPass:
+          x-ticvai-persisted: false
           allOf:
             - $ref: '#/components/schemas/QueueFastPass'
           nullable: true
@@ -1684,7 +1764,7 @@ components:
       type: object
       required: [id, queueId, adaptor, isEnabled]
       properties:
-        id: { type: string, format: uuid }
+        id: { type: string, format: uuid, readOnly: true }
         queueId: { type: string, format: uuid }
         adaptor: { $ref: '#/components/schemas/QueueFeedAdaptor' }
         adaptorName:

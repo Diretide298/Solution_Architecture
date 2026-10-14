@@ -1,6 +1,6 @@
 # P11-reviewer-internal-01 — P11 · Reviewer (Internal)
 
-**3 screens · 7 operations · 5 schemas · 2 permissions**
+**3 screens · 7 operations · 4 schemas · 3 permissions**
 
 Platform P11 Accreditation Web · ships as **ticvai-control** ·
 public audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 2 permissions apply here:
-  `ACCREDITATION_APPROVE, ACCREDITATION_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `ACCREDITATION_APPROVE, ACCREDITATION_MANAGE, ACCREDITATION_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -97,9 +97,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ACC-006` | Reviewer Queue | D | 8 | 4 | 6 | 8 | 0 | 6 | — | notStarted (generated) |
-| `ACC-007` | Reviewer Application Detail | D | 0 | 0 | 6 | 10 | 1 | 0 | — | notStarted (generated) |
-| `ACC-008` | Credential Register | D | 2 | 12 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `ACC-006` | Reviewer Queue | D | 8 | 24 | 6 | 8 | 0 | 6 | — | notStarted (generated) |
+| `ACC-007` | Reviewer Application Detail | D | 6 | 40 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
+| `ACC-008` | Credential Register | D | 13 | 25 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

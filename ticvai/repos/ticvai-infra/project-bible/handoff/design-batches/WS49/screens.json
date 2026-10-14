@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/packages-bundles/bundle-combo-command-center-adm-178",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
+   "component": "src/routes/venue-operations/PackagesBundlesDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-011"
   },
@@ -114,7 +115,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -298,6 +299,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "5",
@@ -307,7 +309,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/packages-bundles/bundle-definition-setup-adm-179",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
+   "component": "src/routes/venue-operations/PackagesBundlesDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-011"
   },
@@ -508,6 +510,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "5",
@@ -517,7 +520,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/packages-bundles/bundle-component-builder-adm-180",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
+   "component": "src/routes/venue-operations/PackagesBundlesDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-011"
   },
@@ -665,6 +668,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "5",
@@ -674,7 +678,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/packages-bundles/guest-choice-build-your-own-bundle-designer-adm-181",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
+   "component": "src/routes/venue-operations/PackagesBundlesDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-011"
   },
@@ -812,6 +816,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "5",
@@ -821,7 +826,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/bundle-pricing-commercial-model-adm-182",
-   "component": "apps/venue-management-web/src/routes/commercial/BundlePricingCommercialModel.tsx",
+   "component": "src/routes/commercial/BundlePricingCommercialModel.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -958,6 +963,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "5",
@@ -967,7 +973,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/bundle-availability-capacity-validation-adm-183",
-   "component": "apps/venue-management-web/src/routes/commercial/BundleAvailabilityCapacityValidation.tsx",
+   "component": "src/routes/commercial/BundleAvailabilityCapacityValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1089,6 +1095,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "5",
@@ -1098,7 +1105,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/bundle-validity-scheduling-redemption-rules-adm-184",
-   "component": "apps/venue-management-web/src/routes/commercial/BundleValiditySchedulingRedemptionRules.tsx",
+   "component": "src/routes/commercial/BundleValiditySchedulingRedemptionRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1213,6 +1220,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "5",
@@ -1222,7 +1230,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/partner-external-product-bundle-manager-adm-185",
-   "component": "apps/venue-management-web/src/routes/commercial/PartnerExternalProductBundleManager.tsx",
+   "component": "src/routes/commercial/PartnerExternalProductBundleManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1411,6 +1419,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "5",
@@ -1420,7 +1429,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/revenue-allocation-cost-settlement-rules-adm-186",
-   "component": "apps/venue-management-web/src/routes/commercial/RevenueAllocationCostSettlementRules.tsx",
+   "component": "src/routes/commercial/RevenueAllocationCostSettlementRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1554,6 +1563,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "5",
@@ -1563,7 +1573,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/bundle-preview-simulation-ai-recommendation-adm-187",
-   "component": "apps/venue-management-web/src/routes/commercial/BundlePreviewSimulationAiRecommendation.tsx",
+   "component": "src/routes/commercial/BundlePreviewSimulationAiRecommendation.tsx",
    "status": "notStarted"
   },
   "navigation": {

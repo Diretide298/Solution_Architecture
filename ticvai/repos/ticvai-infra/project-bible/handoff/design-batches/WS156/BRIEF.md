@@ -1,6 +1,6 @@
 # WS156 — Resource Management Configuration board 2
 
-**9 screens · 15 operations · 10 schemas · 4 permissions**
+**9 screens · 15 operations · 11 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

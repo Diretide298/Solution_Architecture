@@ -411,6 +411,7 @@
     "description": "The `batchId` that `generateCouponCodes` returned."
    },
    "campaignId": {
+    "x-ticvai-references": "promotions.campaign",
     "type": "string",
     "format": "uuid"
    },
@@ -487,6 +488,7 @@
   ],
   "properties": {
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },

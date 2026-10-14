@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "13",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/integration-command-center-bo-1071",
-   "component": "apps/venue-management-web/src/routes/access-venue/IntegrationCommandCenter.tsx",
+   "component": "src/routes/access-venue/IntegrationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -113,7 +114,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listApiClients",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listApiClients"
       }
      ]
     }
@@ -179,7 +181,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/seat-management-apis-bo-1072",
-   "component": "apps/venue-management-web/src/routes/access-venue/SeatManagementApis.tsx",
+   "component": "src/routes/access-venue/SeatManagementApis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -277,6 +279,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "13",
@@ -286,7 +289,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/api-access-oauth-bo-1073",
-   "component": "apps/venue-management-web/src/routes/access-venue/ApiAccessOauth.tsx",
+   "component": "src/routes/access-venue/ApiAccessOauth.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -353,7 +356,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listApiClients",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listApiClients"
       }
      ]
     }
@@ -424,6 +428,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "13",
@@ -433,7 +438,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/webhook-configuration-bo-1074",
-   "component": "apps/venue-management-web/src/routes/access-venue/WebhookConfiguration.tsx",
+   "component": "src/routes/access-venue/WebhookConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -478,7 +483,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listWebhookSubscriptions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. Lists the tenant's subscriptions; an API client filter passes `?clientId=` (decided 28 September, audit R214 (4))."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows. Lists the tenant's subscriptions; an API client filter passes `?clientId=` (decided 28 September, audit R214 (4)).",
+       "operation": "listWebhookSubscriptions"
       },
       {
        "kind": "primaryButton",
@@ -563,6 +569,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "13",
@@ -572,7 +579,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/seat-event-catalog-bo-1075",
-   "component": "apps/venue-management-web/src/routes/access-venue/SeatEventCatalog.tsx",
+   "component": "src/routes/access-venue/SeatEventCatalog.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -617,7 +624,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listApiVersions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listWebhookEventTypes"
       }
      ]
     }
@@ -674,6 +682,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "13",
@@ -683,7 +692,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/concurrency-idempotency-limits-bo-1076",
-   "component": "apps/venue-management-web/src/routes/access-venue/ConcurrencyIdempotencyLimits.tsx",
+   "component": "src/routes/access-venue/ConcurrencyIdempotencyLimits.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -787,6 +796,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "13",
@@ -796,7 +806,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/mapping-transformation-bo-1077",
-   "component": "apps/venue-management-web/src/routes/access-venue/MappingTransformation.tsx",
+   "component": "src/routes/access-venue/MappingTransformation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -841,7 +851,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listWebhookSubscriptions",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listWebhookSubscriptions"
       }
      ]
     }
@@ -898,6 +909,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "13",
@@ -907,7 +919,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/monitoring-retry-reconciliation-bo-1078",
-   "component": "apps/venue-management-web/src/routes/access-venue/MonitoringRetryReconciliation.tsx",
+   "component": "src/routes/access-venue/MonitoringRetryReconciliation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -952,7 +964,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listWebhookDeliveries",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listWebhookDeliveries"
       }
      ]
     }
@@ -1019,6 +1032,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "AUDIT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "13",
@@ -1028,7 +1042,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/immutable-seat-audit-logs-bo-1079",
-   "component": "apps/venue-management-web/src/routes/access-venue/ImmutableSeatAuditLogs.tsx",
+   "component": "src/routes/access-venue/ImmutableSeatAuditLogs.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1185,6 +1199,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "APPROVAL_REQUEST",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "13",
@@ -1194,7 +1209,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/integration-approval-compliance-bo-1080",
-   "component": "apps/venue-management-web/src/routes/access-venue/IntegrationApprovalCompliance.tsx",
+   "component": "src/routes/access-venue/IntegrationApprovalCompliance.tsx",
    "status": "notStarted"
   },
   "navigation": {

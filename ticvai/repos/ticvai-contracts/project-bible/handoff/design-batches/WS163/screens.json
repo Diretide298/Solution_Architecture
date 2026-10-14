@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "9",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/my-resource-operations-home-bo-933",
-   "component": "apps/venue-management-web/src/routes/rentals/MyResourceOperationsHome.tsx",
+   "component": "src/routes/rentals/MyResourceOperationsHome.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -132,7 +133,7 @@
         "“What am I supposed to do now?”"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listResourceBookings",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 136 §The screen shall display"
       }
      ]
@@ -229,6 +230,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "9",
@@ -238,7 +240,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/my-schedule-assignment-calendar-bo-934",
-   "component": "apps/venue-management-web/src/routes/rentals/MyScheduleAssignmentCalendar.tsx",
+   "component": "src/routes/rentals/MyScheduleAssignmentCalendar.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -399,6 +401,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "9",
@@ -408,7 +411,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/assignment-detail-operational-brief-bo-935",
-   "component": "apps/venue-management-web/src/routes/rentals/AssignmentDetailOperationalBrief.tsx",
+   "component": "src/routes/rentals/AssignmentDetailOperationalBrief.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -461,7 +464,7 @@
         "Operational Information"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listResourceBookings",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Display"
       }
      ]
@@ -486,7 +489,8 @@
         "Operational Information"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Depending on assignment type”, “Where appropriate, provide”, “Equipment Required”, “Customer Information”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Display"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 138 §Display",
+       "operation": "getResource"
       }
      ]
     },
@@ -643,6 +647,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ATTENDANCE_RECORD",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "9",
@@ -652,7 +657,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/mobile-staff-check-in-check-out-bo-936",
-   "component": "apps/venue-management-web/src/routes/rentals/MobileStaffCheckInCheckOut.tsx",
+   "component": "src/routes/rentals/MobileStaffCheckInCheckOut.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -797,6 +802,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_BOOK",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "9",
@@ -806,7 +812,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-collection-handover-return-bo-937",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceCollectionHandoverReturn.tsx",
+   "component": "src/routes/rentals/ResourceCollectionHandoverReturn.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -934,6 +940,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "9",
@@ -943,7 +950,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/employee-requests-resource-support-bo-938",
-   "component": "apps/venue-management-web/src/routes/rentals/EmployeeRequestsResourceSupport.tsx",
+   "component": "src/routes/rentals/EmployeeRequestsResourceSupport.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1098,6 +1105,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "9",
@@ -1107,7 +1115,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/shift-change-swap-pickup-release-bo-939",
-   "component": "apps/venue-management-web/src/routes/rentals/ShiftChangeSwapPickupRelease.tsx",
+   "component": "src/routes/rentals/ShiftChangeSwapPickupRelease.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1159,7 +1167,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listShiftSwapRequests",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listShiftSwapRequests"
       },
       {
        "kind": "secondaryButton",
@@ -1240,6 +1249,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "9",
@@ -1249,7 +1259,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/manager-mobile-approval-center-bo-940",
-   "component": "apps/venue-management-web/src/routes/rentals/ManagerMobileApprovalCenter.tsx",
+   "component": "src/routes/rentals/ManagerMobileApprovalCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1273,6 +1283,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow authorized supervisors and managers to approve operational requests without requiring access to the desktop backend.",
   "purposeNote": "Authorized managers can review and action operational approvals from mobile with sufficient validation context to make an informed decision.",
+  "division": "Shares `decideApprovalRequest`, `listApprovalRequests` with BO-374; this screen is Manager Mobile Approval Center (pack Resource_Management_Configuration_Reference.pdf, board 9.08, page 144): allow authorized supervisors and managers to approve operational requests without requiring access to the desktop backend.",
   "gaps": [
    {
     "operation": null,
@@ -1300,7 +1311,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listApprovalRequests",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listApprovalRequests"
       },
       {
        "kind": "primaryButton",
@@ -1387,6 +1399,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "9",
@@ -1396,7 +1409,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/operational-notifications-live-alerts-bo-941",
-   "component": "apps/venue-management-web/src/routes/rentals/OperationalNotificationsLiveAlerts.tsx",
+   "component": "src/routes/rentals/OperationalNotificationsLiveAlerts.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1547,7 +1560,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/mobile-operations-control-offline-sync-bo-942",
-   "component": "apps/venue-management-web/src/routes/rentals/MobileOperationsControlOfflineSync.tsx",
+   "component": "src/routes/rentals/MobileOperationsControlOfflineSync.tsx",
    "status": "notStarted"
   },
   "navigation": {

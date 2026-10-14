@@ -144,7 +144,9 @@ def _target_of(ref: str, schemas: dict):
 
 
 # The scalar item types whose arrays keep their type as a column (R227); everything else is text[].
-_SCALAR_ARRAY = {"integer": "integer[]", "boolean": "boolean[]"}
+# CHG-STO-013 (check-contract-storage ST-TYPE-MISMATCH): a number array is `numeric[]`; the column type follows the
+# field type (the ruling of 14 October), and `MediaFingerprint.embedding` was the one number array left `text[]`.
+_SCALAR_ARRAY = {"integer": "integer[]", "boolean": "boolean[]", "number": "numeric[]"}
 
 
 def _array_type(items, schemas: dict, persisted: dict) -> str:
@@ -164,9 +166,9 @@ def _array_type(items, schemas: dict, persisted: dict) -> str:
     array fell through to `text[]`, so `ProductEligibilityRule.heightBandsCm` (`[120, 140]`)
     became `height_bands_cm text[]` and the band edges would compare as strings (`'90' > '140'`);
     six more integer arrays (`peakMonths`, `warnBeforeDays`, `attemptOffsetDays`, ...) with it.
-    Booleans keep their type the same way. Strings and enums stay `text[]`; a `number` array stays
-    `text[]` for now because the one in the package is `MediaFingerprint.embedding`, whose storage
-    is a vector-store question (ADR-0049), not a column type.
+    Booleans keep their type the same way, and a `number` array is `numeric[]` (CHG-STO-013, 14 October 2026:
+    `MediaFingerprint.embedding` had stayed `text[]` while its storage was a vector-store question; the column
+    type follows the field type). Strings and enums stay `text[]`.
     """
     if not isinstance(items, dict):
         return "text[]"
@@ -302,6 +304,14 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
 # `line_total`, `balance` …) need a gross/net decision per column; `*_at` columns typed `date`
 # need a decision on whether the field is a day or an instant; index and policy names are
 # `derive-ddl.py`'s.
+# **The keys of columns no contract field describes** (CHG-STO-002, 14 October 2026, check-storage-promises
+# SP-KEY-UNDECLARED and SP-KEY-GUESSED): `(table, column) -> target table`, or `none` for a column that is not a key.
+# A contract-described column is declared on its field (`x-ticvai-references`); these have no field to carry it.
+STORAGE_REFERENCES = {
+    ("pii.subject", "erasure_request_id"): "approvals.request",    # the erasure request (identity.yaml deleteGuestAccount)
+    ("wallet.wallet_transaction", "subject_id"): "pii.subject",    # the guest whose wallet moved (relationship graph)
+}
+
 _RESERVED_RENAME = {"from": "valid_from", "to": "valid_to", "order": "sort_order",
                     "table": "table_name"}
 _ASSERTING = {"is", "has", "have", "can", "requires", "require", "should", "allows", "allow",
@@ -311,6 +321,139 @@ _ASSERTING = {"is", "has", "have", "can", "requires", "require", "should", "allo
               "show", "shows", "notify", "exclude", "explain", "respect", "prevent", "restore",
               "retain", "release", "refund", "reroute", "revalidate", "skip", "extend", "degrade",
               "cache", "cascade", "failover", "alert", "offer", "force", "capture", "no"}
+
+
+# **A boolean reads as an assertion** (naming-and-style 6.1; CHG-STO-009, 14 October 2026). The check
+# (check-ddl-conventions D-NAMING) and this generator used two different word lists, so 211 boolean columns the
+# generator kept (`offline_capability`, `same_day_only`, `cache_answers`) failed the check for ever. One rule now, read
+# by both (the check loads this file): a name reads as an assertion when it starts with an asserting word, or with a
+# third-person verb (`creates_incident`, `crosses_cells`), or ends with a participle the standard lists.
+BOOL_ASSERTING = {
+    # the standard's own (check-ddl-conventions BOOL_OK before 14 October)
+    "is", "has", "can", "require", "requires", "allows", "allow", "should", "was", "were", "did", "does", "must",
+    "needs", "include", "includes", "show", "shows", "auto", "use", "uses", "supports", "accepts", "enable",
+    "enabled", "send", "notify", "override",
+    # modal and third-person verbs: a sentence about the row (`holder may`, `creates incident`, `crosses cells`)
+    "may", "will", "admits", "alerts", "applies", "blocks", "breaches", "caches", "captures", "carries", "cascades",
+    "contains", "counts", "creates", "crosses", "degrades", "ends", "enforces", "excludes", "expires", "explains",
+    "extends", "fails", "forces", "holds", "honours", "inherits", "keeps", "locks", "maps", "matches", "offers",
+    "optimises", "overrides", "participates", "prefers", "prefills", "prevents", "propagates", "records", "refunds",
+    "releases", "replies", "reroutes", "resets", "respects", "restores", "restricts", "retains", "returns",
+    "revalidates", "reverses", "skips", "submits", "takes", "touches", "validates",
+}
+BOOL_PARTICIPLE_END = {"enabled", "required", "allowed", "visible", "active", "locked", "verified", "confirmed",
+                       "approved"}
+# an imperative first word becomes the third person (`cache_answers` -> `caches_answers`)
+_BOOL_IMPERATIVE = {"cache", "cascade", "retain", "refund", "degrade", "reroute", "exclude", "capture", "extend",
+                    "prefill", "force", "revalidate", "enforce", "optimise", "respect", "skip", "record", "offer",
+                    "restrict", "reply", "keep", "release", "alert", "explain", "reverse", "prevent", "restore",
+                    "submit", "return", "lock", "validate", "support"}
+# a last word naming a feature the row has (`biometric_capability` -> `supports_biometric`)
+_BOOL_SUPPORTS_END = {"capability", "support"}
+_BOOL_REQUIRES_END = {"requirement"}
+_BOOL_REQUIRES_WHOLE_END = {"approval", "verification", "validation", "revalidation"}
+_BOOL_HAS_END = {"check", "fallback", "access", "notification", "retry", "expiration", "switch", "rollout",
+                 "allocation", "priority", "billing", "benefits", "ownership", "inconsistency", "circuit"}
+# Where the mechanical rule would read wrong, the name a person chose (the meaning kept, never inverted).
+BOOL_NAMES = {
+    "fell_back": "did_fall_back",
+    "used_mfa": "did_use_mfa",
+    "tool_calling": "supports_tool_calling",
+    "structured_output": "supports_structured_output",
+    "signed_urls": "uses_signed_urls",
+    "no_index": "is_excluded_from_index",
+    "tickets_expire": "has_expiring_tickets",
+    "email_preference": "prefers_email",
+    "push_preference": "prefers_push",
+    "sms_preference": "prefers_sms",
+    "whatsapp_preference": "prefers_whatsapp",
+    "kill_switch": "is_kill_switch_engaged",
+    "global_privacy_control": "honours_global_privacy_control",
+    "response_is_public": "is_response_public",
+    "duration_is_dynamic": "is_duration_dynamic",
+    "reject_is_one_click": "is_reject_one_click",
+    "higher_is_better": "is_higher_better",
+    "creator_cannot_give_final_approval": "is_creator_barred_from_final_approval",
+    "holder_may_differ_from_owner": "can_holder_differ_from_owner",
+    "seller_can_edit_price": "can_seller_edit_price",
+    "fees_shown_to_seller": "shows_fees_to_seller",
+    "renewal_requires_reverification": "requires_renewal_reverification",
+    "renewal_requires_approval": "requires_renewal_approval",
+    "extension_requires_approval": "requires_extension_approval",
+    "uae_pass_satisfies_id_document": "accepts_uae_pass_as_id_document",
+    "band_multipliers_apply": "applies_band_multipliers",
+    "guardian_signs_for_each_minor": "requires_guardian_signature_per_minor",
+    "guardian_signature_for_minor": "requires_guardian_signature_for_minor",
+    "ticket_names_date": "is_ticket_dated",
+    "inspection_required_before_release": "requires_inspection_before_release",
+    "payment_method_required_up_front": "requires_payment_method_up_front",
+    "assignment_required_at_checkout": "requires_assignment_at_checkout",
+    "reason_mandatory": "requires_reason",
+    "statistical_significance": "is_statistically_significant",
+    "price_inconsistency": "has_price_inconsistency",
+    "differing_access": "has_differing_access",
+    "pinned_instance": "is_instance_pinned",
+    "consolidated_billing": "has_consolidated_billing",
+    "cutlery_opt_in": "is_cutlery_opted_in",
+    "joined_existing_visit": "has_joined_existing_visit",
+    "decided_offline": "was_decided_offline",
+    "first_aid_given": "was_first_aid_given",
+    "sticky_ownership": "has_sticky_ownership",
+    "shared_benefits": "has_shared_benefits",
+    "void_dual_authorisation": "requires_void_dual_authorisation",
+    "vip_allocation": "is_vip",                     # not `allocation` (banned in DDL; an Envelope is)
+    "booking_match": "is_order_match",             # not `booking` (banned in DDL); the waiver's order
+    "release_hold_on_expiry": "releases_reservation_on_expiry",
+    "resale_immediately_after_purchase": "allows_resale_immediately_after_purchase",
+    "failover_to_next_provider": "fails_over_to_next_provider",
+    "supports3ds": "supports_3ds",
+    "accessibility_priority": "has_accessibility_priority",
+    "contained_personal_data": "did_contain_personal_data",
+    "refund_issued": "is_refund_issued",
+    "eligibility_revalidation": "requires_eligibility_revalidation",
+    "promotional_pricing_eligibility": "is_eligible_for_promotional_pricing",
+    "separate_purchase_and_activation_rules": "has_separate_purchase_and_activation_rules",
+    "offline_availability": "is_offline_available",
+    "re_entry": "allows_re_entry",
+    "guardrail_short_circuit": "has_guardrail_short_circuit",
+    "validate_only": "is_validation_only",
+    "vehicle_location_capture": "captures_vehicle_location",
+    "shared_pool": "is_shared_across_venues",
+    "refund_capability": "supports_refund",
+}
+
+
+def bool_reads_as_assertion(column: str) -> bool:
+    tokens = column.split("_")
+    return tokens[0] in BOOL_ASSERTING or (len(tokens) > 1 and tokens[-1] in BOOL_PARTICIPLE_END)
+
+
+def _third_person(verb: str) -> str:
+    if verb.endswith("y") and verb[-2:-1] not in "aeiou":
+        return verb[:-1] + "ies"
+    if verb.endswith(("s", "sh", "ch", "x", "z", "o")):
+        return verb + "es"
+    return verb + "s"
+
+
+def bool_assertion_name(column: str) -> str:
+    """The boolean column name the standard asks for; the input where it already reads as an assertion."""
+    if column in BOOL_NAMES:
+        return BOOL_NAMES[column]
+    if bool_reads_as_assertion(column):
+        return column
+    tokens = column.split("_")
+    if tokens[0] in _BOOL_IMPERATIVE:
+        return "_".join([_third_person(tokens[0])] + tokens[1:])
+    if len(tokens) > 1 and tokens[-1] in _BOOL_SUPPORTS_END:
+        return "supports_" + "_".join(tokens[:-1])
+    if len(tokens) > 1 and tokens[-1] in _BOOL_REQUIRES_END:
+        return "requires_" + "_".join(tokens[:-1])
+    if len(tokens) > 1 and tokens[-1] in _BOOL_REQUIRES_WHOLE_END:
+        return "requires_" + column
+    if len(tokens) > 1 and tokens[-1] in _BOOL_HAS_END:
+        return "has_" + column
+    return "is_" + column
 
 
 def conventional_name(column: str, ctype: str, references: str | None) -> str:
@@ -330,14 +473,18 @@ def conventional_name(column: str, ctype: str, references: str | None) -> str:
         return base + "_id"
     if ctype == "boolean":
         tokens = column.split("_")
+        name = column
         if tokens[0] in _ASSERTING:
-            return column
-        if len(tokens) == 1 and not column.endswith("s"):
-            return "is_" + column            # enabled -> is_enabled, active -> is_active
-        if tokens[0] == "auto":
-            return "is_" + column            # auto_switch -> is_auto_switch
-        if len(tokens) > 1 and re.search(r"(ed|able|ible)$", tokens[-1]):
-            return "is_" + column            # attendee_capture_required -> is_attendee_capture_required
+            name = column
+        elif len(tokens) == 1 and not column.endswith("s"):
+            name = "is_" + column            # enabled -> is_enabled, active -> is_active
+        elif tokens[0] == "auto":
+            name = "is_" + column            # auto_switch -> is_auto_switch
+        elif len(tokens) > 1 and re.search(r"(ed|able|ible)$", tokens[-1]):
+            name = "is_" + column            # attendee_capture_required -> is_attendee_capture_required
+        # CHG-STO-009: and then the one rule the check reads too (`cache_answers` -> `caches_answers`,
+        # `offline_capability` -> `supports_offline`); a name that already reads as an assertion is kept.
+        return name if bool_reads_as_assertion(name) and name not in BOOL_NAMES else bool_assertion_name(name)
     return column
 
 
@@ -556,6 +703,10 @@ def main() -> int:
     # carries the link from the next graph on.
     _tmap = {r["from"]: r["to"] for r in _declared_renames()}
     _cgone = {(r["table"], r["from"]) for r in _declared_renames("COLUMN_RENAMES")}
+    # A retired table (derive-schema-history.py RETIRED_TABLES, CHG-STO-008): no edge re-creates it.
+    _tgone = {r["table"] for r in _declared_renames("RETIRED_TABLES")}
+    if _tgone:
+        edges = {k: v for k, v in edges.items() if k[0] not in _tgone and v.get("to") not in _tgone}
     if _tmap or _cgone:
         _moved = {}
         for (_f, _c), _r in edges.items():
@@ -1047,7 +1198,24 @@ def main() -> int:
             else:
                 continue
             _xrefs += 1
-    print(f"  contract-declared references read from x-ticvai-references: {_xrefs}")
+    # **A column no contract field describes is declared here** (CHG-STO-002, 14 October 2026): a storage-only column
+    # (`pii.subject`, kept as-is) or one the relationship graph added has no property to carry `x-ticvai-references`,
+    # so its key stayed the name rule's guess (`pii.subject.erasure_request_id` -> `approvals.request` is what the
+    # erasure flow says it is; the rule had it by convention only).
+    _sref = 0
+    for (_t, _col), _v in STORAGE_REFERENCES.items():
+        for _c in existing.get(_t, []):
+            if _c.get("column") != _col or str(_c.get("source", "")).count(".") >= 2 \
+                    and not str(_c.get("source", "")).startswith(("relationship-graph", "storage only")):
+                continue
+            if _v == "none":
+                for _k in ("references", "referenceKind", "referenceHow", "enforced"):
+                    _c.pop(_k, None)
+            elif _v in existing:
+                _c.update({"references": _v, "referenceKind": "foreignKey", "referenceHow": "declared",
+                           "enforced": "yes"})
+            _sref += 1
+    print(f"  contract-declared references read from x-ticvai-references: {_xrefs}; storage-only keys declared: {_sref}")
 
     def _from_contract(c) -> bool:
         return str(c.get("source", "")).count(".") >= 2 and not str(c.get("source", "")).startswith(
@@ -1339,6 +1507,16 @@ def main() -> int:
     # restating them. Only where the new name has columns and the contracts no longer describe the old one:
     # a rename declared ahead of its contract edit must not delete a table that is still live.
     # The hand-written note travels with the table, because it describes the same rows.
+    # **A declared retirement retires the table here** (CHG-STO-008): only one the contracts do not describe.
+    for _r in _declared_renames("RETIRED_TABLES"):
+        _old = _r["table"]
+        if _old not in existing or _old in derived:
+            continue
+        existing.pop(_old, None)
+        for _k in ("storage", "store", "origin", "lineage"):
+            if isinstance(S.get(_k), dict):
+                S[_k].pop(_old, None)
+        print(f"  table retired (derive-schema-history.py RETIRED_TABLES): {_old}")
     _renamed_tables = []
     for _r in _declared_renames():
         _old, _new = _r["from"], _r["to"]

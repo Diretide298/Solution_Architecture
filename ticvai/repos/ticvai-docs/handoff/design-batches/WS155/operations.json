@@ -314,7 +314,7 @@
  },
  "setApprovalControlPolicy": {
   "method": "PUT",
-  "path": "/approval-control-policies",
+  "path": "/approval-control-policies/{controlPolicyId}",
   "contract": "approvals",
   "summary": "Require a second, independent pair of eyes",
   "permission": "APPROVAL_CONFIGURE",
@@ -322,6 +322,11 @@
   "conflictPolicy": null,
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "controlPolicyId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -333,7 +338,7 @@
  },
  "setApprovalMatrix": {
   "method": "PUT",
-  "path": "/approval-matrices",
+  "path": "/approval-matrices/{matrixId}",
   "contract": "approvals",
   "summary": "Configure what requires approval",
   "permission": "APPROVAL_CONFIGURE",
@@ -341,6 +346,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "matrixId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

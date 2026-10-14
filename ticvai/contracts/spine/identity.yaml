@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Identity & Authorisation
   version: 1.0.0
-  x-ticvai-screen-count: 81
+  x-ticvai-screen-count: 79
   x-ticvai-tier: spine
   x-ticvai-module: 19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth
   x-ticvai-requirements: 107
@@ -750,11 +750,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPasswordPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
         - "P09 ADM-422 Administrator & Security Initialization"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Length, breach check, lockout and step-up
       description: 'BL-144. **Modelled on NIST SP 800-63B rather than on habit.** Length beats composition,
         and `requireBreachCheck` stops more account takeovers than every composition rule combined.
@@ -1078,10 +1078,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSegregationRules
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-340 Segregation of Duties Policy Manager"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-config-scope: tenant
       summary: Which permissions may not be held together
       description: 'BL-147, 3.3.31. **Checked at grant time, not at use time** — discovering the conflict
@@ -1737,13 +1737,13 @@ paths:
   /auth/sessions/{sessionId}/force-logout:
     post:
       operationId: forceLogout
+      x-ticvai-consumed-by:
+        - "P04 POS-000 Sign In"
+        - "P08 BO-053 Staff Directory"
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
         route: in-process
         for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-000 Sign In"
-        - "P08 BO-053 Staff Directory"
       x-ticvai-audience:
       - staff
       - partner
@@ -3180,12 +3180,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: guestLogout
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'The caller''s own session: one per signed-in guest, so there is no key in the path.'
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
         - "P02 GST-073 Security & Sign-in"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own session: one per signed-in guest, so there is no key in the path.'
       x-ticvai-audience:
       - guest
       summary: End a guest session
@@ -3296,11 +3296,11 @@ paths:
   /auth/guest/account:
     delete:
       operationId: deleteGuestAccount
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'The caller''s own account: one per signed-in guest, so there is no key in the path.'
       x-ticvai-consumed-by:
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'The caller''s own account: one per signed-in guest, so there is no key in the path.'
       x-ticvai-audience:
       - guest
       summary: Self-service account deletion
@@ -3592,10 +3592,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSsoConfig
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-005 Tenant Directory"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -3688,7 +3688,6 @@ paths:
     post:
       operationId: enrolMfaMethod
       x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-001 Platform Login / MFA"
@@ -3794,7 +3793,6 @@ paths:
     post:
       operationId: verifyMfaEnrolment
       x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-001 Platform Login / MFA"
@@ -3867,8 +3865,6 @@ paths:
     delete:
       operationId: removeMfaMethod
       x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-073 Security & Sign-in"
         - "P06 EMP-042 Profile"
         - "P09 ADM-699 My Account & Security"
       security:
@@ -3928,7 +3924,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
-        - "P02 GST-073 Security & Sign-in"
         - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
         - "P07 SCN-001 Sign in"
@@ -4052,7 +4047,6 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
-        - "P02 GST-073 Security & Sign-in"
         - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
         - "P07 SCN-001 Sign in"
@@ -6005,8 +5999,6 @@ paths:
   /auth/guest/identity-verifications:
     post:
       operationId: submitGuestIdentityDocument
-      x-ticvai-consumed-by:
-        - "P01 WEB-020 Profile & Preferences"
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "ID verification, and configurable identity
         workflows"; BL-096); document storage follows pii.subject_document'
       summary: Submit an identity document for verification
@@ -6077,8 +6069,6 @@ paths:
   /auth/guest/identity-verifications/current:
     get:
       operationId: getMyIdentityVerification
-      x-ticvai-consumed-by:
-        - "P01 WEB-020 Profile & Preferences"
       x-ticvai-agreed: '29 September: our build plan (5.3.21); shape follows getGuestSession'
       summary: The guest's own latest identity verification
       description: 'Status, outcome and, where it was refused or needs resubmission, the reason the guest is shown.
@@ -6281,10 +6271,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setGuestVerificationPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-agreed: '29 September: our build plan (5.3.21 "configurable identity workflows"); shape follows
         setPasswordPolicy'
       x-ticvai-make-or-break: 'The provider is decided (ICP, release 1; Chinmay 2 October, DEC-457); the client''s
@@ -6345,6 +6335,9 @@ paths:
   /role-suggestions:
     get:
       operationId: suggestRoleAssignment
+      x-ticvai-consumed-by:
+        - "P08 BO-053 Staff Directory"
+        - "P08 BO-054 Role Assignment"
       x-ticvai-read-via:
       - query: workforce#employeeRecords
         route: in-process
@@ -6352,9 +6345,6 @@ paths:
       - query: workforce#workAssignmentRecords
         route: in-process
         for: 'its read of workforce.work_assignment, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-053 Staff Directory"
-        - "P08 BO-054 Role Assignment"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (7.1.35, 7.1.56 role-assignment and provisioning recommendations);
@@ -6525,6 +6515,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createAccessReviewCampaign
+      x-ticvai-consumed-by:
+        - "P08 BO-1066 Roles, Permissions & Masking"
       x-ticvai-read-via:
       - query: workforce#employeeRecords
         route: in-process
@@ -6532,8 +6524,6 @@ paths:
       - query: workforce#workAssignmentRecords
         route: in-process
         for: 'its read of workforce.work_assignment, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-1066 Roles, Permissions & Masking"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: our build plan (7.1.35, 7.1.56 periodic access reviews, pre-filled from

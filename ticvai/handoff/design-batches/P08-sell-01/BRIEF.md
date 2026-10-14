@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-010` | Promotions & Coupons | A | 165 | 39 | 6 | 51 | 3 | 2 | — | notStarted (generated) |
 | `BO-011` | Packages & Bundles | A | 69 | 56 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
 | `BO-012` | Membership Products | A | 119 | 36 | 6 | 112 | 0 | 0 | — | notStarted (generated) |
-| `BO-013` | Channel & Distribution | A | 40 | 32 | 6 | 34 | 2 | 0 | — | notStarted (generated) |
+| `BO-013` | Channel & Distribution | A | 39 | 32 | 6 | 34 | 2 | 0 | — | notStarted (generated) |
 | `BO-014` | Catalogue Publishing | B | 8 | 19 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
 | `BO-015` | Performance Calendar | A | 44 | 47 | 6 | 38 | 5 | 0 | — | notStarted (generated) |
 | `BO-016` | Performance Template | B | 19 | 15 | 6 | 0 | 5 | 0 | — | notStarted (generated) |

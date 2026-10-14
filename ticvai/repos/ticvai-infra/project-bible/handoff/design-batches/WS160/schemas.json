@@ -644,11 +644,13 @@
    },
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "tenant"
    },
    "name": {
     "type": "string",
@@ -857,6 +859,8 @@
   "description": "Boards 3.2, 3.3 and 3.9. **The hold-release rule is the one that quietly loses stock.**\n",
   "properties": {
    "operatingWindows": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -895,6 +899,15 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "rental.product",
+    "x-ticvai-unique": "tenant",
+    "description": "The rental product these rules are for (one set per product), from the path."
    }
   }
  },
@@ -918,6 +931,7 @@
     "type": "string"
    },
    "productId": {
+    "x-ticvai-references": "rental.product",
     "type": "string",
     "format": "uuid"
    },
@@ -983,6 +997,7 @@
     "nullable": true
    },
    "depositAuthorisationId": {
+    "x-ticvai-references": "orders.stored_value_authorisation",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -992,6 +1007,7 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "readiness": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "**Computed, not stored** — agreement, requirements, deposit, equipment.",
@@ -1019,6 +1035,12 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "changeReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the booking was last changed (`updateRentalBooking`)."
    }
   }
  },
@@ -1122,6 +1144,14 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "bookingId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "rental.booking",
+    "description": "The rental booking assessed, from the path of `assessRentalDamage`."
    }
   }
  },
@@ -1222,6 +1252,7 @@
     "format": "uuid"
    },
    "assetId": {
+    "x-ticvai-references": "maintenance.asset",
     "type": "string",
     "format": "uuid",
     "description": "A `maintenance.Asset`, which is also a `resources` resource where the product is schedule-controlled."
@@ -1249,6 +1280,14 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "bookingId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "rental.booking",
+    "description": "The rental booking the equipment is assigned to, from the path of `assignRentalEquipment`."
    }
   }
  },
@@ -1285,6 +1324,8 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "lateFeeTiers": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1375,6 +1416,8 @@
     "description": "**26 August: simplified state attributes.** *\"rental/equipment items can be tracked with simplified state attributes (e.g., available, rented, faulty) rather than requiring granular custom attributes for this category — agreed by Allam.\"* So the condition is a short enum, and anything finer belongs in the note or the photographs.\n"
    },
    "checklist": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1413,6 +1456,19 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the device made the write** (R113; CHG-OFL-003). `recordRentalInspection` is offline-capable, so the client sets this from its own clock and keeps it on replay; `created_at` is when the server heard of it. Omitted online, the server sets it to the time it received the call."
+   },
+   "bookingId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "rental.booking",
+    "description": "The rental booking inspected, from the path of `recordRentalInspection`."
    }
   }
  },
@@ -1442,6 +1498,8 @@
     "description": "Pooled only. *150 lockers.*"
    },
    "components": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "**Hybrid only** — *one serialised kayak, two pooled paddles, two pooled life jackets.* One booking, two mechanisms.\n",
     "items": {
@@ -1486,14 +1544,32 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "productId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "rental.product",
+    "x-ticvai-unique": "tenant",
+    "description": "The rental product this model is for (one per product), from the path."
    }
   }
  },
  "RentalParticipant": {
+  "required": [
+   "scopePath"
+  ],
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "rental.participant",
   "description": "Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n",
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -1547,6 +1623,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -1756,10 +1833,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -1840,6 +1919,44 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003). `kind` is the fixed family a type belongs to; this is the tenant's own type within it, and the `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it."
+   },
+   "lifecycleState": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ResourceLifecycleState"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The lifecycle state `setResourceLifecycleState` set."
+   },
+   "lifecycleEffectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the lifecycle state takes effect (`setResourceLifecycleState`)."
+   },
+   "lifecycleReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the lifecycle state changed (`setResourceLifecycleState`)."
+   },
+   "replacementResourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "resources.resource",
+    "description": "The resource that replaces this one, where it was retired for a replacement."
+   },
+   "disposal": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "How a disposed resource left (`setResourceLifecycleState`), as given."
    }
   }
  },
@@ -1859,6 +1976,7 @@
     "format": "uuid"
    },
    "resourceId": {
+    "x-ticvai-references": "resources.resource",
     "type": "string",
     "format": "uuid"
    },
@@ -1949,6 +2067,7 @@
     "description": "Ties the occurrences of a recurring booking. **Cancelling one week does not cancel the series**, and cancelling the series is a separate act with a separate confirmation.\n"
    },
    "depositAuthorisationId": {
+    "x-ticvai-references": "orders.stored_value_authorisation",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -1983,6 +2102,12 @@
     "nullable": true,
     "readOnly": true,
     "description": "When the latest offline check-out or check-in write reached the server. **The device times are `checkedOutAt` and `returnedAt`**, taken from each write's `recordedAt`; this is the server's half of the pair naming-and-style 5.2 requires. Null while pending.\n"
+   },
+   "changeReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the booking was last changed (`updateResourceBooking`)."
    }
   }
  },
@@ -2058,6 +2183,7 @@
     "readOnly": true
    },
    "resourceId": {
+    "x-ticvai-references": "resources.resource",
     "type": "string",
     "format": "uuid"
    },
@@ -2171,7 +2297,8 @@
    },
    "templateId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.inspection_template"
    },
    "venueId": {
     "type": "string",

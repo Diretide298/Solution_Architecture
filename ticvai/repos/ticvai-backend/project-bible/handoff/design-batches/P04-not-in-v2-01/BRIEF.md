@@ -156,7 +156,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `POS-017` | Cash In / Cash Out Operations | A | 21 | 6 | 5 | 0 | 2 | 6 | — | notStarted (designed) |
 | `POS-018` | Safe Drop & Cash Transfer Management | A | 27 | 20 | 6 | 1 | 1 | 6 | — | notStarted (designed) |
 | `POS-019` | Shift Templates & Policies | A | 10 | 24 | 6 | 1 | 1 | 6 | — | notStarted (designed) |
-| `POS-024` | Outlet Setup | A | 21 | 27 | 6 | 4 | 0 | 0 | — | notStarted (designed) |
+| `POS-024` | Outlet Setup | A | 20 | 27 | 6 | 4 | 0 | 0 | — | notStarted (designed) |
 
 ## Design inputs from the client meetings
 

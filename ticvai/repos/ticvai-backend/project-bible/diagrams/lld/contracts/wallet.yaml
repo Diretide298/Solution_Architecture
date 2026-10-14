@@ -686,7 +686,7 @@ operations:
   - wallet.credit_eligibility
 - operation: setGiftCardProduct
   verb: PUT
-  path: /gift-card-products
+  path: /gift-card-products/{giftCardProductId}
   scope: tenant
   permission: WALLET_CONFIGURE
   audience:
@@ -836,6 +836,7 @@ operations:
   - wallet.risk_rule
   - wallet.risk_rule_set
   writes:
+  - wallet.risk_rule
   - wallet.risk_rule_set
 - operation: setWalletRiskRules
   verb: PUT

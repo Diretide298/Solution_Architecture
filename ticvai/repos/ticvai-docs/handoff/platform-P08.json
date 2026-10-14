@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1663,
-  "operations": 1889,
+  "operations": 1892,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
-  "operationsWithNoScreen": 186
+  "operationsWithNoScreen": 185
  },
  "waves": {
   "wave1": 141,
@@ -230,12 +230,12 @@
    "operations": 47
   },
   {
-   "contract": "payments",
+   "contract": "tenancy",
    "operations": 46
   },
   {
-   "contract": "tenancy",
-   "operations": 45
+   "contract": "payments",
+   "operations": 46
   },
   {
    "contract": "subscription",
@@ -246,15 +246,15 @@
    "operations": 44
   },
   {
+   "contract": "identity",
+   "operations": 41
+  },
+  {
    "contract": "workforce",
    "operations": 41
   },
   {
    "contract": "maintenance",
-   "operations": 41
-  },
-  {
-   "contract": "identity",
    "operations": 41
   },
   {
@@ -267,7 +267,7 @@
   },
   {
    "contract": "reporting",
-   "operations": 25
+   "operations": 27
   },
   {
    "contract": "transport",
@@ -3801,7 +3801,7 @@
    "module": "Commercial",
    "wave": 3,
    "route": "/commercial/reconciliation-source-import-manager-t141-adm-620",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -5988,7 +5988,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/heat-maps-drill-down-bo-1059",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -6006,7 +6006,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/report-builder-export-audit-bo-1060",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -6078,7 +6078,7 @@
    "module": "Access & Venue",
    "wave": 3,
    "route": "/access-venue/lifecycle-environment-promotion-bo-1068",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -7185,7 +7185,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/campaign-audience-management",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -11640,7 +11640,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/configuration-health-ai-review-bo-603",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -11667,7 +11667,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/automated-validation-plan-bo-606",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -11676,7 +11676,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/ticketing-product-validation-bo-607",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -11685,7 +11685,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/end-to-end-sales-channel-testing-bo-608",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -11694,7 +11694,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/payment-financial-validation-bo-609",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -11703,7 +11703,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/ticket-qr-access-validation-bo-610",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -11712,7 +11712,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/user-security-integration-validation-bo-611",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -11721,7 +11721,7 @@
    "module": "Setup & Go-Live",
    "wave": 3,
    "route": "/setup-go-live/communication-customer-journey-validation-bo-612",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -13062,7 +13062,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/predictive-audiences-bo-762",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -13341,7 +13341,7 @@
    "module": "Engagement & Support",
    "wave": 3,
    "route": "/engagement-support/ai-content-translation-audit-bo-793",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -16304,12 +16304,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Devices that report having been interfered with"
-   },
-   {
-    "operation": "listProfileDeployments",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Recent deployments, with a date, a target and an outcome"
    },
    {
     "operation": "recordDeviceTamperEvent",

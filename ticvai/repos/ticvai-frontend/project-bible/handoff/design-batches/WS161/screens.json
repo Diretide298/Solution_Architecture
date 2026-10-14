@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "EVENT_CONFIGURE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/event-resource-planning-command-center-bo-913",
-   "component": "apps/venue-management-web/src/routes/rentals/EventResourcePlanningCommandCenter.tsx",
+   "component": "src/routes/rentals/EventResourcePlanningCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -112,7 +113,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -190,7 +191,8 @@
         "Event Readiness"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Corporate Gala”, “Concert A”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 99 §Display"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 99 §Display",
+       "operation": "getEventResourcePlan"
       }
      ]
     }
@@ -263,6 +265,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "EVENT_CONFIGURE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -272,7 +275,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/event-resource-requirement-builder-bo-914",
-   "component": "apps/venue-management-web/src/routes/rentals/EventResourceRequirementBuilder.tsx",
+   "component": "src/routes/rentals/EventResourceRequirementBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -299,6 +302,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Define every resource required to deliver a specific event.",
   "purposeNote": "Event managers can define a complete structured resource requirement plan for each event.",
+  "division": "Shares `getEventResourcePlan`, `setEventResourcePlan` with BO-711, BO-713, BO-715; this screen is Event Resource Requirement Builder (pack Resource_Management_Configuration_Reference.pdf, board 7.02, page 100): define every resource required to deliver a specific event.",
   "gaps": [
    {
     "operation": null,
@@ -450,6 +454,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "EVENT_CONFIGURE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -459,7 +464,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/venue-space-allocation-bo-915",
-   "component": "apps/venue-management-web/src/routes/rentals/VenueSpaceAllocation.tsx",
+   "component": "src/routes/rentals/VenueSpaceAllocation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -513,7 +518,7 @@
         "Operational restrictions"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listSpaces",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 102 §Display"
       }
      ]
@@ -613,6 +618,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_BOOK",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -622,7 +628,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/equipment-asset-allocation-bo-916",
-   "component": "apps/venue-management-web/src/routes/rentals/EquipmentAssetAllocation.tsx",
+   "component": "src/routes/rentals/EquipmentAssetAllocation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -732,6 +738,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORKFORCE_MANAGE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -741,7 +748,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/event-staff-personnel-allocation-bo-917",
-   "component": "apps/venue-management-web/src/routes/rentals/EventStaffPersonnelAllocation.tsx",
+   "component": "src/routes/rentals/EventStaffPersonnelAllocation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -916,6 +923,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -925,7 +933,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/event-resource-template-library-bo-918",
-   "component": "apps/venue-management-web/src/routes/rentals/EventResourceTemplateLibrary.tsx",
+   "component": "src/routes/rentals/EventResourceTemplateLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -949,6 +957,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
   "purpose": "Allow frequently used event-resource configurations to be saved as reusable templates.",
   "purposeNote": "Reusable event-resource templates significantly reduce manual event setup while maintaining controlled versioning.",
+  "division": "Shares `createResourcePackage`, `listResourcePackages`, `updateResourcePackage` with BO-861, BO-895; this screen is Event Resource Template Library (pack Resource_Management_Configuration_Reference.pdf, board 7.06, page 106): allow frequently used event-resource configurations to be saved as reusable templates.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1127,6 +1136,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -1136,7 +1146,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/ai-event-resource-forecasting-bo-919",
-   "component": "apps/venue-management-web/src/routes/rentals/AiEventResourceForecasting.tsx",
+   "component": "src/routes/rentals/AiEventResourceForecasting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1369,6 +1379,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "EVENT_CONFIGURE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -1378,7 +1389,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/event-resource-cost-estimator-bo-920",
-   "component": "apps/venue-management-web/src/routes/rentals/EventResourceCostEstimator.tsx",
+   "component": "src/routes/rentals/EventResourceCostEstimator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1416,7 +1427,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -1477,7 +1488,8 @@
         "Variance"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Budget Variance”, “Estimated saving”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Display"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 108 §Display",
+       "operation": "getEventResourcePlan"
       }
      ]
     },
@@ -1576,6 +1588,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -1585,7 +1598,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/multi-event-allocation-conflict-optimizer-bo-921",
-   "component": "apps/venue-management-web/src/routes/rentals/MultiEventAllocationConflictOptimizer.tsx",
+   "component": "src/routes/rentals/MultiEventAllocationConflictOptimizer.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1654,7 +1667,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1785,6 +1798,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "EVENT_CONFIGURE",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",
@@ -1794,7 +1808,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/event-resource-approval-readiness-gate-bo-922",
-   "component": "apps/venue-management-web/src/routes/rentals/EventResourceApprovalReadinessGate.tsx",
+   "component": "src/routes/rentals/EventResourceApprovalReadinessGate.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1843,7 +1857,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getEventResourcePlan",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getEventResourcePlan"
       },
       {
        "kind": "primaryButton",

@@ -5,6 +5,7 @@
   "module": "Access",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-scanner",

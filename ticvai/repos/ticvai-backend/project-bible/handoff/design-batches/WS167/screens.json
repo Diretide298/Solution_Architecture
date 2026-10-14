@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/layout-command-center-bo-973",
-   "component": "apps/venue-management-web/src/routes/access-venue/LayoutCommandCenter.tsx",
+   "component": "src/routes/access-venue/LayoutCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -113,7 +114,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatMaps",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatMaps"
       }
      ]
     }
@@ -170,6 +172,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "3",
@@ -179,7 +182,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/template-library-bo-974",
-   "component": "apps/venue-management-web/src/routes/access-venue/TemplateLibrary.tsx",
+   "component": "src/routes/access-venue/TemplateLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -224,7 +227,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatMapTemplates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatMapTemplates"
       },
       {
        "kind": "primaryButton",
@@ -303,6 +307,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "3",
@@ -312,7 +317,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/event-specific-layout-bo-975",
-   "component": "apps/venue-management-web/src/routes/access-venue/EventSpecificLayout.tsx",
+   "component": "src/routes/access-venue/EventSpecificLayout.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -357,14 +362,16 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatMap",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatMap"
       },
       {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "publishSeatMap",
        "label": "Publish seat map",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "publishSeatMap"
       },
       {
        "kind": "secondaryButton",
@@ -484,6 +491,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "3",
@@ -493,7 +501,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/clone-inheritance-bo-976",
-   "component": "apps/venue-management-web/src/routes/access-venue/CloneInheritance.tsx",
+   "component": "src/routes/access-venue/CloneInheritance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -635,6 +643,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "3",
@@ -644,7 +653,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/version-compare-bo-977",
-   "component": "apps/venue-management-web/src/routes/access-venue/VersionCompare.tsx",
+   "component": "src/routes/access-venue/VersionCompare.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -698,7 +707,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -830,6 +839,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "3",
@@ -839,7 +849,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/multi-performance-assignment-bo-978",
-   "component": "apps/venue-management-web/src/routes/access-venue/MultiPerformanceAssignment.tsx",
+   "component": "src/routes/access-venue/MultiPerformanceAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -890,7 +900,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatMaps",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatMaps"
       },
       {
        "kind": "publishGate",
@@ -1003,6 +1014,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "3",
@@ -1012,7 +1024,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/temporary-seat-blocking-bo-979",
-   "component": "apps/venue-management-web/src/routes/access-venue/TemporarySeatBlocking.tsx",
+   "component": "src/routes/access-venue/TemporarySeatBlocking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1035,6 +1047,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Temporarily remove seats from sale for production or operational reasons. Select section, row, seat or polygon on the map and define block type, reason, owner and effective period. Preview affected available, held, reserved and sold inventory with required remediation or approval. Support camera, equipment, safety, maintenance, sightline, house and event-production block categories. Preserve version lineage and require impact analysis for every change affecting capacity, products, sold seats, holds, access routes or pricing. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 15",
+  "division": "Shares `createSeatHoldPool`, `listSeatHoldPools` with BO-1005; this screen is Temporary Seat Blocking (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 3.07, page 15): temporarily remove seats from sale for production or operational reasons. Select section, row, seat or polygon on the map and define block type, reason, owner and effective period. Preview affected available, held, reserved and sold inventory with required remediation or approval. Support camera, equipment, safety, maintenance, sightline, house and event-production block categories. Preserve version lineage and require impact analysis for every change affecting capacity, products, sold seats, holds, access routes or pricing. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 15.",
   "gaps": [
    {
     "operation": null,
@@ -1064,7 +1077,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatHoldPools",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatHoldPools"
       },
       {
        "kind": "secondaryButton",
@@ -1140,6 +1154,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "3",
@@ -1149,7 +1164,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/scheduled-seat-release-bo-980",
-   "component": "apps/venue-management-web/src/routes/access-venue/ScheduledSeatRelease.tsx",
+   "component": "src/routes/access-venue/ScheduledSeatRelease.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1201,7 +1216,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatHoldTypes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatHoldTypes"
       },
       {
        "kind": "secondaryButton",
@@ -1293,6 +1309,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "3",
@@ -1302,7 +1319,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/conflict-impact-simulation-bo-981",
-   "component": "apps/venue-management-web/src/routes/access-venue/ConflictImpactSimulation.tsx",
+   "component": "src/routes/access-venue/ConflictImpactSimulation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1436,6 +1453,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "3",
@@ -1445,7 +1463,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/approval-publish-rollback-bo-982",
-   "component": "apps/venue-management-web/src/routes/access-venue/ApprovalPublishRollback.tsx",
+   "component": "src/routes/access-venue/ApprovalPublishRollback.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1490,7 +1508,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "validateSeatMap",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "validateSeatMap"
       },
       {
        "kind": "secondaryButton",
@@ -1503,7 +1522,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Replaces the map every channel sells from.** Seats already sold keep their labels; seats that no longer exist in the new map are listed before this proceeds.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "publishSeatMap"
       },
       {
        "kind": "detailPanel",

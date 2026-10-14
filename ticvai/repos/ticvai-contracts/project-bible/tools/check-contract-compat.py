@@ -363,9 +363,18 @@ def approval(entries: list[dict], contract: str, line: str) -> dict | None:
     names a `change`, a change whose description contains it."""
     o, _, why = line.partition(": ")
     for e in entries:
-        if str(e["contract"]) == contract and str(e["operation"]) == o and str(e.get("change") or "") in why:
+        if str(e["contract"]) == contract and o in entry_operations(e) and str(e.get("change") or "") in why:
             return e
     return None
+
+
+def entry_operations(e: dict) -> set:
+    """`operation`, plus `operations` where one reason covers several operations of one contract (14 October 2026,
+    CHG-SHP-003: 123 writes took a path key for one reason, grouped per contract). `operation` names the first, so a
+    reader that knows only that field still finds the entry."""
+    out = {str(e["operation"])}
+    out |= {str(x) for x in (e.get("operations") or []) if x}
+    return out
 
 
 def release_shapes(commit: str, names: set) -> dict:

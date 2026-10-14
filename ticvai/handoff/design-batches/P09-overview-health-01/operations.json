@@ -37,25 +37,6 @@
   "requestBody": null,
   "responds": null
  },
- "getAiDecisionTrace": {
-  "method": "GET",
-  "path": "/decision-records/{decisionRecordId}/trace",
-  "contract": "ai",
-  "summary": "The full trace of a decision",
-  "permission": "AI_AUDIT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "depth",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiDecisionTrace"
- },
  "getCell": {
   "method": "GET",
   "path": "/cells/{cellId}",

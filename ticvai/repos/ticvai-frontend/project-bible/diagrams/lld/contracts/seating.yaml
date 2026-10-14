@@ -316,6 +316,7 @@ operations:
   - seating.seat_reservation
   - seating.seat_reservation_item
   - seating.seat_rules
+  - seating.section_row
   writes: []
 - operation: getSeatMap
   verb: GET
@@ -338,6 +339,7 @@ operations:
   - staff
   offline: false
   reads:
+  - seating.import_job
   - seating.seat_map
   writes: []
 - operation: getSeatRecommendationRules
@@ -658,7 +660,7 @@ operations:
   - seating.zone
 - operation: setSeatHoldType
   verb: PUT
-  path: /seat-hold-types
+  path: /seat-hold-types/{holdTypeId}
   scope: venue
   permission: CAPACITY_CONFIGURE
   audience:

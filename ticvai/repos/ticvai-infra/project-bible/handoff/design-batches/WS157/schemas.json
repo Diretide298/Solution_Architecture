@@ -37,6 +37,7 @@
     "format": "uuid"
    },
    "principalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid"
    },
@@ -79,6 +80,7 @@
     ]
    },
    "coverageImpact": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "items": {
@@ -130,6 +132,7 @@
     "format": "uuid"
    },
    "username": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "displayName": {
@@ -252,13 +255,15 @@
     "type": "string",
     "format": "uuid",
     "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164).",
     "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
    },
    "approvedByPrincipalId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164)."
    },
    "responsibleDepartmentId": {
     "type": "string",
@@ -364,6 +369,8 @@
     "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 6,
     "items": {
@@ -685,10 +692,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -769,6 +778,44 @@
     "format": "uuid",
     "nullable": true,
     "description": "**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003). `kind` is the fixed family a type belongs to; this is the tenant's own type within it, and the `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it."
+   },
+   "lifecycleState": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/ResourceLifecycleState"
+     }
+    ],
+    "nullable": true,
+    "readOnly": true,
+    "description": "The lifecycle state `setResourceLifecycleState` set."
+   },
+   "lifecycleEffectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the lifecycle state takes effect (`setResourceLifecycleState`)."
+   },
+   "lifecycleReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the lifecycle state changed (`setResourceLifecycleState`)."
+   },
+   "replacementResourceId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true,
+    "x-ticvai-references": "resources.resource",
+    "description": "The resource that replaces this one, where it was retired for a replacement."
+   },
+   "disposal": {
+    "type": "object",
+    "additionalProperties": true,
+    "nullable": true,
+    "readOnly": true,
+    "description": "How a disposed resource left (`setResourceLifecycleState`), as given."
    }
   }
  },
@@ -788,6 +835,7 @@
     "format": "uuid"
    },
    "resourceId": {
+    "x-ticvai-references": "resources.resource",
     "type": "string",
     "format": "uuid"
    },
@@ -892,6 +940,21 @@
    "mealPlan": "**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."
   }
  },
+ "ResourceLifecycleState": {
+  "type": "string",
+  "description": "Board 1.10. **States of one machine**, whose allowed transitions are configuration.",
+  "enum": [
+   "draft",
+   "pendingApproval",
+   "approved",
+   "active",
+   "temporarilyUnavailable",
+   "underMaintenance",
+   "suspended",
+   "retired",
+   "archived"
+  ]
+ },
  "ResourceRequirement": {
   "type": "object",
   "x-ticvai-persistence": "resources.resource_requirement",
@@ -982,6 +1045,8 @@
     ]
    },
    "windows": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1033,6 +1098,8 @@
     "nullable": true
    },
    "exceptions": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1128,6 +1195,8 @@
     "type": "string"
    },
    "breaks": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1471,6 +1540,7 @@
     "format": "uuid"
    },
    "tenantId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid"
    },
@@ -1598,6 +1668,7 @@
     "format": "uuid"
    },
    "employeeId": {
+    "x-ticvai-references": "workforce.employee",
     "type": "string",
     "format": "uuid"
    },
@@ -1744,6 +1815,7 @@
     "nullable": true
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "enum": [
      "active",
@@ -1774,6 +1846,8 @@
     "format": "uuid"
    },
    "tenantId": {
+    "readOnly": true,
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid"
    },
@@ -1794,6 +1868,7 @@
     "type": "boolean"
    },
    "createdAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    },
@@ -1824,10 +1899,12 @@
     "format": "uuid"
    },
    "employeeId": {
+    "x-ticvai-references": "workforce.employee",
     "type": "string",
     "format": "uuid"
    },
    "typeId": {
+    "x-ticvai-references": "workforce.leave_type",
     "type": "string",
     "format": "uuid"
    },
@@ -1871,6 +1948,8 @@
     "format": "uuid"
    },
    "tenantId": {
+    "readOnly": true,
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid"
    },
@@ -1892,6 +1971,7 @@
     "type": "boolean"
    },
    "createdAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    }
@@ -1917,6 +1997,8 @@
     "format": "uuid"
    },
    "tenantId": {
+    "readOnly": true,
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid"
    },
@@ -1967,6 +2049,7 @@
     "format": "uuid"
    },
    "sourceId": {
+    "x-ticvai-references": "workforce.integration_source",
     "type": "string",
     "format": "uuid"
    },
@@ -2054,6 +2137,7 @@
     "format": "uuid"
    },
    "sourceId": {
+    "x-ticvai-references": "workforce.integration_source",
     "type": "string",
     "format": "uuid"
    },
@@ -2123,10 +2207,12 @@
     "format": "uuid"
    },
    "employeeId": {
+    "x-ticvai-references": "workforce.employee",
     "type": "string",
     "format": "uuid"
    },
    "jobTitleId": {
+    "x-ticvai-references": "workforce.job_title",
     "type": "string",
     "format": "uuid"
    },
@@ -2162,10 +2248,12 @@
     "type": "boolean"
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "maxLength": 30
    },
    "createdAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    }

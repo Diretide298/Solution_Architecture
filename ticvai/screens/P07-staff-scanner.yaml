@@ -243,6 +243,7 @@ screens:
   module: Access
   requiresModule: access
   wave: 1
+  permission: SCOPE_VIEW
   capability: C00
   implementation:
     app: venue-scanner
@@ -444,6 +445,7 @@ screens:
   module: Access
   requiresModule: access
   wave: 1
+  permission: TICKET_LOOKUP
   capability: C00
   implementation:
     app: venue-scanner
@@ -726,6 +728,7 @@ screens:
   module: Access
   requiresModule: access
   wave: 1
+  permission: ACCESS_VALIDATE
   capability: C00
   implementation:
     app: venue-scanner
@@ -900,6 +903,7 @@ screens:
   module: Access
   requiresModule: access
   wave: 1
+  permission: ACCESS_VALIDATE
   capability: C00
   implementation:
     app: venue-scanner
@@ -1080,6 +1084,7 @@ screens:
   module: Access
   requiresModule: access
   wave: 1
+  permission: ACCESS_VALIDATE
   capability: C00
   implementation:
     app: venue-scanner
@@ -1284,6 +1289,7 @@ screens:
   module: Access
   requiresModule: core
   wave: 1
+  permission: TICKET_LOOKUP
   capability: C00
   implementation:
     app: venue-scanner
@@ -1409,6 +1415,7 @@ screens:
   module: Access
   requiresModule: access
   wave: 1
+  permission: ACCESS_VALIDATE
   capability: C00
   implementation:
     app: venue-scanner
@@ -1635,6 +1642,7 @@ screens:
   module: Access
   requiresModule: access
   wave: 1
+  permission: ORDER_VIEW
   capability: C00
   implementation:
     app: venue-scanner
@@ -1931,6 +1939,7 @@ screens:
   module: Access
   requiresModule: access
   wave: 1
+  permission: ACCESS_VALIDATE
   capability: C00
   implementation:
     app: venue-scanner
@@ -2083,6 +2092,7 @@ screens:
   module: Access
   requiresModule: access
   wave: 1
+  permission: SCOPE_VIEW
   capability: C00
   implementation:
     app: venue-scanner

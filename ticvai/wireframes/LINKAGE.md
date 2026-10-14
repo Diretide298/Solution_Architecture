@@ -20,7 +20,7 @@
 | Screen -> board | `wireframe.board` on every screen: `wireframes/<file>#<id>` |
 | Platform -> board | `platform.wireframeBoard` |
 | Board -> screen | The anchor `id` on each frame, matched by id |
-| Screen -> operations | `apis[].operationId`, validated against 2,802 |
+| Screen -> operations | `apis[].operationId`, validated against 2,804 |
 | Operation -> tables | `handoff/api-data-lineage.json` |
 | Screen -> everything | **`handoff/screen-index.json`** - the join, pre-computed |
 
@@ -33,12 +33,12 @@
 | Screens defined | 2,453 |
 | Screens with a board anchor | 2,453 |
 | **Screens with no anchor** | **0** |
-| Screens declaring at least one operation | 2,389 |
-| Screens whose operations resolve to a table | 2,384 |
+| Screens declaring at least one operation | 2,392 |
+| Screens whose operations resolve to a table | 2,382 |
 | Anchored links inside the boards | 5,495 |
 | Cross-platform reaches declared | 6 |
 
-**64 screens declare no operation.** They are real screens with a purpose and nothing specified yet, and `screen-index.json` says so by returning empty arrays rather than guessing. **5 declare operations that reach no table** - mostly configuration reads served from a cache, and navigation screens that only route.
+**61 screens declare no operation.** They are real screens with a purpose and nothing specified yet, and `screen-index.json` says so by returning empty arrays rather than guessing. **10 declare operations that reach no table** - mostly configuration reads served from a cache, and navigation screens that only route.
 
 ## What the checker enforces
 

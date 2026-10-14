@@ -167,6 +167,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -304,6 +305,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -439,13 +441,6 @@
   },
   "apis": [
    {
-    "operationId": "createLegalEntity",
-    "contract": "finance",
-    "purpose": "Billing and legal entity",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "listTenants",
     "contract": "subscription",
     "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
@@ -572,6 +567,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -847,6 +843,12 @@
      "name": "tenantId",
      "from": "navigation",
      "optional": true
+    },
+    {
+     "name": "providerId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listPaymentProviders`."
     }
    ]
   },
@@ -882,6 +884,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -924,81 +927,97 @@
       {
        "kind": "selectField",
        "label": "Trial Start",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "Trial End",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "Duration",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "Modules Enabled",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "POS Limit",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "Access Limit",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "User Limit",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "Transaction Limit",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "Ticket Limit",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "API Limit",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "Storage Limit",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration"
       },
       {
        "kind": "selectField",
        "label": "Free Trial",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Paid Trial",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Trial Credit",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Limited Usage",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Full Package Trial",
+       "operation": "setTrialConfiguration",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Configure"
       }
      ]
@@ -1027,6 +1046,16 @@
    "workshopBoard": "wireframes/WS157 Subscription Licensing AI Self Service Board 5.dc.html#adm-413"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 62. 0 of 0 labels bound to a contract property; 16 of 32 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "trialConfigurationId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setTrialConfiguration` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1057,6 +1086,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -1114,7 +1144,7 @@
         "Expiry"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "previewSubscriptionChange",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 64 §Show"
       }
      ]
@@ -1127,6 +1157,7 @@
        "kind": "detailPanel",
        "label": "The selected order commercial pricing",
        "bindsTo": null,
+       "operation": "previewSubscriptionChange",
        "columns": [
         "Discount Type",
         "Value",
@@ -1208,6 +1239,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_CELL_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -1360,6 +1392,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -1479,6 +1512,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -1607,6 +1641,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -1678,7 +1713,7 @@
         "Provisioning Request"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getSubscription",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Show"
       }
      ]
@@ -1691,6 +1726,7 @@
        "kind": "detailPanel",
        "label": "The selected subscription lifecycle trial-to-paid",
        "bindsTo": null,
+       "operation": "getSubscription",
        "columns": [
         "Trial Usage",
         "Trial Ticket Volume",

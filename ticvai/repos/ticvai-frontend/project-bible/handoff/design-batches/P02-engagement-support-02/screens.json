@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/plan-my-day-in-progress",
-   "component": "apps/guest-app/src/routes/general/PlanMyDayInProgressDetail.tsx",
+   "component": "src/screens/general/PlanMyDayInProgressDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -207,7 +207,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/account/help-my-cases",
-   "component": "apps/guest-app/src/routes/account/HelpMyCases.tsx",
+   "component": "src/screens/account/HelpMyCases.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -223,10 +223,7 @@
     {
      "to": "GST-039",
      "trigger": "Profile",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-068 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-039 declares entryState.params  and GST-068 holds none of them. The edge carries nothing: GST-039 needs nothing to open"
     }
    ]
   },

@@ -921,6 +921,7 @@ operations:
   - staff
   offline: false
   reads:
+  - catalogue.change_request
   - catalogue.product
   - catalogue.product_link
   - catalogue.variant
@@ -946,7 +947,7 @@ operations:
   writes: []
 - operation: listChannel2
   verb: GET
-  path: /channel
+  path: /channel-2
   scope: venue
   permission: PRODUCT_VIEW
   audience:
@@ -1060,6 +1061,7 @@ operations:
   offline: false
   reads:
   - catalogue.audit_entry
+  - catalogue.channel_incident
   - orders.sales_order
   writes: []
 - operation: listChannelPerformanceCommercial
@@ -2281,7 +2283,7 @@ operations:
   - catalogue.waitlist_entry
 - operation: publishActivationScheduler
   verb: PUT
-  path: /activation-scheduler
+  path: /activation-scheduler/{lifecycleActionId}
   scope: venue
   permission: PRODUCT_CONFIGURE
   audience:
@@ -2617,7 +2619,7 @@ operations:
   - catalogue.channel_envelope
 - operation: setChannelConnectionConfiguration
   verb: PUT
-  path: /channel-connections
+  path: /channel-connections/{connectionId}
   scope: venue
   permission: PRODUCT_CONFIGURE
   audience:
@@ -2700,7 +2702,7 @@ operations:
   - catalogue.channel_sync
 - operation: setConfigurationTemplate
   verb: PUT
-  path: /configuration-templates
+  path: /configuration-templates/{configurationTemplateId}
   scope: venue
   permission: PRODUCT_CONFIGURE
   audience:
@@ -2717,7 +2719,7 @@ operations:
   - catalogue.configuration_template
 - operation: setCurrencyRoundingRule
   verb: PUT
-  path: /rounding-profiles
+  path: /rounding-profiles/{roundingProfileId}
   scope: tenant
   permission: PRICE_CONFIGURE
   audience:
@@ -2801,7 +2803,7 @@ operations:
   - platform.outbox
 - operation: setDynamicPricingStrategy
   verb: PUT
-  path: /dynamic-pricing-strategy
+  path: /dynamic-pricing-strategy-2
   scope: venue
   permission: PRODUCT_CONFIGURE
   audience:
@@ -2827,6 +2829,7 @@ operations:
   reads:
   - catalogue.entitlement_template
   writes:
+  - catalogue.audit_entry
   - catalogue.entitlement_template
 - operation: setEventCapacityProfile
   verb: PUT
@@ -2912,7 +2915,7 @@ operations:
   - catalogue.event_schedule
 - operation: setEventType
   verb: PUT
-  path: /event-types
+  path: /event-types/{eventTypeId}
   scope: tenant
   permission: EVENT_CONFIGURE
   audience:
@@ -2940,7 +2943,7 @@ operations:
   - catalogue.fee_rule
 - operation: setFeeDefinition
   verb: PUT
-  path: /fees
+  path: /fees/{feeId}
   scope: venue
   permission: PRICE_CONFIGURE
   audience:
@@ -2982,7 +2985,7 @@ operations:
   - catalogue.lifecycle_workflow
 - operation: setMarketPricingConfiguration
   verb: PUT
-  path: /pricing-markets
+  path: /pricing-markets/{marketId}
   scope: tenant
   permission: PRICE_CONFIGURE
   audience:
@@ -2999,7 +3002,7 @@ operations:
   - catalogue.pricing_market
 - operation: setMembershipBenefit
   verb: PUT
-  path: /membership-benefits
+  path: /membership-benefits/{benefitId}
   scope: venue
   permission: CATALOGUE_MANAGE
   audience:
@@ -3011,7 +3014,7 @@ operations:
   - catalogue.membership_benefit
 - operation: setMembershipProgramme
   verb: PUT
-  path: /membership-programmes
+  path: /membership-programmes/{programId}
   scope: venue
   permission: CATALOGUE_MANAGE
   audience:
@@ -3041,7 +3044,7 @@ operations:
   - catalogue.package_pricing
 - operation: setPerformanceTemplate
   verb: PUT
-  path: /performance-templates
+  path: /performance-templates/{performanceTemplateId}
   scope: venue
   permission: PERFORMANCE_CONFIGURE
   audience:
@@ -3065,7 +3068,7 @@ operations:
   - catalogue.plan_benefit
 - operation: setPrepaidMinutePackage
   verb: PUT
-  path: /prepaid-minute-packages
+  path: /prepaid-minute-packages/{prepaidMinutesId}
   scope: venue
   permission: PRICE_CONFIGURE
   audience:
@@ -3077,7 +3080,7 @@ operations:
   - catalogue.prepaid_minutes
 - operation: setPriceCalculationPolicy
   verb: PUT
-  path: /calculation-profiles
+  path: /calculation-profiles/{calculationProfileId}
   scope: venue
   permission: PRICE_CONFIGURE
   audience:
@@ -3095,7 +3098,7 @@ operations:
   - catalogue.calculation_step
 - operation: setPriceCategoryRateType
   verb: PUT
-  path: /price-categories
+  path: /price-categories/{priceCategoryId}
   scope: tenant
   permission: PRICE_CONFIGURE
   audience:
@@ -3160,7 +3163,7 @@ operations:
   - catalogue.price_list
 - operation: setPricing
   verb: PUT
-  path: /pricing
+  path: /pricing-2
   scope: venue
   permission: PRODUCT_CONFIGURE
   audience:
@@ -3183,7 +3186,7 @@ operations:
   - catalogue.pricing_simulation
 - operation: setPricingChangeRequest
   verb: PUT
-  path: /pricing-change-request
+  path: /pricing-change-request/{changeId}
   scope: venue
   permission: PRODUCT_CONFIGURE
   audience:
@@ -3367,7 +3370,7 @@ operations:
   - catalogue.seat_pricing_rule
 - operation: setSignalRegistryPolicy
   verb: PUT
-  path: /signal-registry
+  path: /signal-registry/{signalId}
   scope: tenant
   permission: AI_CONFIGURE
   audience:
@@ -3382,7 +3385,7 @@ operations:
   - catalogue.signal_registry
 - operation: setSpace
   verb: PUT
-  path: /spaces
+  path: /spaces/{spaceId}
   scope: venue
   permission: EVENT_CONFIGURE
   audience:

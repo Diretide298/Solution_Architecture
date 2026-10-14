@@ -25,6 +25,15 @@ caught a screen whose every write is online-only; these catch the rest of the co
                         is not offline-capable (4.4: disabled offline), on a screen with other offline-capable
                         writes; or a web app's screen (no offline store) promises to queue its writes
 
+**The contract decides, and it may narrow** (14 October 2026, CHG-OFL-001; the lead: "POS createOrder and payments are
+offline-capable on the POS", and the client-approved screens are not changed). `x-ticvai-offline-apps` lists the
+platform codes a write queues on (createPayment: P04, because only a till takes cash); `x-ticvai-offline-refused-on`
+lists the screens where the approved UI refuses it offline (createOrder on the seat map, ADR-0013), with the reason in
+`x-ticvai-offline-condition`. On any other platform or on a listed screen the write counts as online-only in all
+three rules. `x-ticvai-outbox-replay: true` marks the outbox's own replay call (syncOrders), which a screen never
+queues and never has to call disabled. S-OFFLINE-CLAIM, like S-OFFLINE-QUEUED, reads an offline state that also refuses ("Nothing here is
+offered offline ... a request queued and never sent is worse") as a refusal, not a promise.
+
 Read-only. Exit 1 on a finding not in `handoff/audit-baseline.json` (see tools/audit_guard.py).
 
     python3 tools/check-screen-wiring.py [--all] [--update-baseline]
@@ -35,6 +44,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import audit_guard as g  # noqa: E402
+from typed_props import DEVICE_GUEST_PLATFORMS  # noqa: E402
 
 RULES = {
     "S-STATE-BOILERPLATE": "empty-state text promises a create action, filter or permission the screen lacks (R250)",
@@ -114,6 +124,18 @@ OFFLINE_REFUSAL = re.compile(r"(not offered|not available|nothing here is offere
                              r"with the reason|connect to)", re.I)
 
 
+def offline_here(op: dict, plat: str, sid: str) -> bool:
+    """The write may queue on this screen (frontend-patterns 4.4, CHG-OFL-001): the contract marks it
+    `x-ticvai-offline-capable: true`, this platform is in its `x-ticvai-offline-apps` where it lists any, and
+    this screen is not in its `x-ticvai-offline-refused-on`."""
+    if op.get("x-ticvai-offline-capable") is not True:
+        return False
+    apps = op.get("x-ticvai-offline-apps")
+    if apps and str(plat)[:3] not in {str(a)[:3] for a in apps}:
+        return False
+    return sid not in set(op.get("x-ticvai-offline-refused-on") or [])
+
+
 def required_body(op: dict) -> bool:
     rb = op.get("requestBody")
     if not isinstance(rb, dict):
@@ -168,6 +190,10 @@ def main() -> int:
         # --- R100 workstation operations off the till ------------------------------------------
         for o in sorted(op_ids):
             f = ops.get(o)
+            # A workstation-scoped operation a guest may call in its own session (`x-ticvai-guest-callable`, CHG-GCF-003:
+            # createPayment, inquirePaymentStatus) is the guest variant on a guest platform (CHG-SCR-012).
+            if f and plat.startswith(GUEST_CODES) and f["op"].get("x-ticvai-guest-callable"):
+                continue
             if f and f["op"].get("x-ticvai-scope-level") == "workstation" and plat not in ws_platforms:
                 guard.add("S-WORKSTATION-OP", f"{sid}:{o}",
                           f"{sid} ({plat}): {o} is workstation-scoped and nothing on {plat} signs a workstation in")
@@ -176,7 +202,10 @@ def main() -> int:
             for o in sorted(op_ids):
                 f = ops.get(o)
                 aud = (f or {}).get("op", {}).get("x-ticvai-audience") or []
-                if f and aud and not ({"guest", "public", "anonymous"} & set(aud)) \
+                # The kiosk is a guest surface on a registered device: device operations are its own
+                # (typed_props.DEVICE_GUEST_PLATFORMS; CHG-SCR-013).
+                ok = {"guest", "public", "anonymous"} | ({"device"} if plat.startswith(DEVICE_GUEST_PLATFORMS) else set())
+                if f and aud and not (ok & set(aud)) \
                         and not f["op"].get("x-ticvai-guest-callable") and f["op"].get("x-ticvai-auth") != "none":
                     guard.add("S-GUEST-AUDIENCE", f"{sid}:{o}",
                               f"{sid}: a guest screen calls {o}, audience {', '.join(aud)}")
@@ -278,8 +307,12 @@ def main() -> int:
             guard.add("S-NO-READ", sid, f"{sid}: edits a record ({', '.join(sorted(methods))}) and reads nothing")
         # --- R288 asynchronous operations ------------------------------------------------------
         gets = {o for o, f in facts.items() if f and f["method"] == "get"}
+        # A shell beacon sent in the background (an append-only batch of events, `record...Events`) has nothing to
+        # follow (Block A audit, 14 October 2026, CHG-SCR-011); every other 202 still needs its read.
+        beacons = {a["operationId"] for a in apis if a.get("trigger") == "background"
+                   and re.match(r"^record\w*Events$", a["operationId"])}
         for o, f in facts.items():
-            if f and "202" in {str(k) for k in (f["op"].get("responses") or {})}:
+            if f and o not in beacons and "202" in {str(k) for k in (f["op"].get("responses") or {})}:
                 same = {x for x in gets if ops[x]["contract"] == f["contract"]}
                 if not same:
                     guard.add("S-ASYNC-POLL", f"{sid}:{o}",
@@ -344,18 +377,32 @@ def main() -> int:
         fam = lambda n: re.sub(r"(Summary|Detail|View|Row|Item|Line)$", "", n)
         if len(tables) == 1 and len(panels) == 1 and fam(tables[0]) != fam(panels[0]) \
                 and not fam(panels[0]).startswith(fam(tables[0])) and not fam(tables[0]).startswith(fam(panels[0])):
-            guard.add("S-PANEL-ENTITY", sid, f"{sid}: the table shows {tables[0]}, the panel {panels[0]}")
+            # **A related record is not a wrong one** (Block A audit, 14 October 2026, CHG-SCR-014). The panel shows
+            # another entity on purpose when its read needs no id the screen does not hold: the id comes from the
+            # selected row (the reader's device, a shared wallet's balance) or from the screen itself (the rules
+            # beside the performance they produce). It fails when the panel's read needs an id nothing gives it.
+            panel_op = next((c.get("operation") for c in comps if c.get("kind") == "detailPanel"
+                             and str(c.get("bindsTo") or "").replace("[]", "").split(".")[0] == panels[0]), None)
+            table_props = set()
+            for (st, n), node in by_schema.items():
+                if n == tables[0]:
+                    table_props |= set((node.get("properties") or {}).keys())
+            held = table_props | {p.get("name") if isinstance(p, dict) else str(p)
+                                  for p in ((s.get("entryState") or {}).get("params") or [])}
+            needs = set(re.findall(r"\{(\w+)\}", (ops.get(panel_op) or {}).get("path", ""))) if panel_op else {"?"}
+            if needs - held - {"id"}:
+                guard.add("S-PANEL-ENTITY", sid, f"{sid}: the table shows {tables[0]}, the panel {panels[0]}")
         # --- R257 offline promises -------------------------------------------------------------
         off = str(states.get("offline") or "")
-        if off and OFFLINE_PROMISE.search(off):
+        if off and OFFLINE_PROMISE.search(off) and not OFFLINE_REFUSAL.search(off):
             writes = [o for o, f in facts.items() if f and f["method"] in WRITES]
-            if writes and not any(facts[o]["op"].get("x-ticvai-offline-capable") for o in writes):
+            if writes and not any(offline_here(facts[o]["op"], plat, sid) for o in writes):
                 guard.add("S-OFFLINE-CLAIM", sid,
                           f"{sid}: offline state promises to queue or sync and none of its "
                           f"{len(writes)} write(s) is x-ticvai-offline-capable")
         # --- CHG-SWP-004 offline writes against frontend-patterns 4.4 ---------------------------
         writes = [o for o, f in facts.items() if f and f["method"] in WRITES]
-        capable = [o for o in writes if facts[o]["op"].get("x-ticvai-offline-capable") is True]
+        capable = [o for o in writes if offline_here(facts[o]["op"], plat, sid)]
         offline_app = bool(offline_platforms.get(plat))
         refuses = bool(off and OFFLINE_REFUSAL.search(off))
         promises = bool(off and QUEUE_PROMISE.search(off))
@@ -367,7 +414,9 @@ def main() -> int:
         if promises and not refuses:
             if offline_app and capable:
                 for o in writes:
-                    if o not in capable and o not in off:
+                    # The outbox's own replay call (x-ticvai-outbox-replay: syncOrders) runs when the link is
+                    # back; it is never queued and never "disabled offline" (CHG-OFL-002).
+                    if o not in capable and o not in off and not facts[o]["op"].get("x-ticvai-outbox-replay"):
                         guard.add("S-OFFLINE-QUEUED", f"{sid}:{o}",
                                   f"{sid} ({plat[:3]}): offline state promises to queue or sync and does not say "
                                   f"{o} (not offline-capable) is disabled offline: {off[:90]}")
@@ -377,8 +426,11 @@ def main() -> int:
                               f"{sid} ({plat[:3]}): a web app has no offline store, and its offline state queues "
                               f"{o}: {off[:90]}")
     pairs = g.load_yaml(g.SCREENS / "_guest-pairs.yaml") or {}
+    division = {s["id"]: bool(str(s.get("division") or "").strip()) for _, s in all_screens}
     for (plat, sig), ids in sorted(sigs.items(), key=lambda kv: kv[1]):
-        if len(ids) > 1:
+        # **A stated division is the answer** (Block A audit, 14 October 2026, CHG-SCR-009): screens are never merged
+        # to clear this (client-approved UI); each member says what it is for (`division`, derive-screen-wiring.py).
+        if len(ids) > 1 and not all(division.get(i) for i in ids):
             guard.add("S-DUP-SCREEN", "+".join(sorted(ids)),
                       f"{plat}: {', '.join(sorted(ids))} declare the same {len(sig)} operations")
     return guard.finish()

@@ -100,13 +100,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-174` | Media & Credential Command Center | C | 2 | 240 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-175` | Media Type & Technology Library | C | 19 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-176` | Virtual Credential & Media Association | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-177` | Verification Method Selection & Locking | C | 8 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-177` | Verification Method Selection & Locking | C | 6 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-178` | Media Issuance & Encoding Profile | C | 9 | 6 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-179` | Media Swap & Replacement | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-180` | RFID & NFC Configuration | C | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-181` | External & Partner Credential Mapping | C | 5 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-182` | Hotel, Wallet & External Media Integration | C | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-183` | Media Compatibility, Testing & Publication | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-183` | Media Compatibility, Testing & Publication | C | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -570,6 +570,8 @@ directory:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `SCOPE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -631,7 +633,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Each profile defines) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `mediaTypeId` (navigation) |
 | Route | `/access-venue/media-type-technology-library-bo-175` |
 
 **Known gaps.** Contract gap recorded 2 October 2026 (CHG-WIR-004): Merge the two media-type catalogues into one record, one read and one write that every media picker reads (BO-175, BO-337).
@@ -693,7 +695,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save media type (primary button) | `setMediaTypeTechnology` PUT `/media-type-technology` | MediaTypeTechnologyLibraryInput | MediaTypeTechnologyLibraryView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Retiring a media type an active encoding profile still uses | — |
+| Save media type (primary button) | `setMediaTypeTechnology` PUT `/media-type-technology/{mediaTypeId}` | MediaTypeTechnologyLibraryInput | MediaTypeTechnologyLibraryView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Retiring a media type an active encoding profile still uses | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -765,6 +767,8 @@ types:
 - `setMediaTypeTechnology` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `SCOPE_VIEW`
 
 #### Requirements it meets
 
@@ -915,6 +919,8 @@ priority: Primary Dynamic QR; alternatives RFID, NFC, Face Pass
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `SCOPE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -985,14 +991,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | The policyId of listVerificationMethodSelection | `setVerificationMethodPolicy` body |
 | Product `productId` | picker: choose a product | required | — | — | shows names, sends the id | Unique per scope | `setVerificationMethodPolicy` body |
 | Available methods `availableMethods` | multi-select chips | required | — | Dynamic QR · Physical card · RFID · Face pass · Face tag | — | — | `setVerificationMethodPolicy` body |
 | Lock on first successful access `lockOnFirstSuccessfulAccess` | toggle | required | on | — | — | — | `setVerificationMethodPolicy` body |
 | Change after lock `changeAfterLock` | segmented control | required | Supervisor approval | Not allowed · Supervisor approval | — | Who may change the method once locked; guests may not | `setVerificationMethodPolicy` body |
 | Reason codes `reasonCodes` | multi-select chips | optional | — | Lost phone · Damaged wristband · Accessibility · Device failure · Guest service · Other | — | Reason vocabulary for a method change after lock | `setVerificationMethodPolicy` body |
 | Credential format override `credentialFormatOverride` | segmented control | optional | — | Platform signed QR · Static QR · RFID card | — | The per-product override of MOM-0330 (MoM 2 Sep 2026 §4.7; CHG-R6-031): a product whose tickets must not carry dynamic QR (a VIP invitation, a B2B or reseller ticket type) sets … | `setVerificationMethodPolicy` body |
-| Scope path `scopePath` | text field | required | — | — | — | ltree of the owning scope node | `setVerificationMethodPolicy` body |
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 422 A method named is not enabled at this venue.
 
@@ -1078,6 +1082,8 @@ policies:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `SCOPE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1101,7 +1107,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403, 422).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-177?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save verification method policy.
@@ -1127,7 +1133,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `encodingProfileId` (navigation) |
 | Route | `/access-venue/media-issuance-encoding-profile-bo-178` |
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Encoding profiles: how a ticket's identity is written onto each medium (the pack's "RFID Wristband - Adventure Park"): credential identifier, randomised media identifier, ticket ID reference, secure token, encoding format, offline payload, checksum or signature, for outputs E-ticket, M-ticket, paper wristband, RFID wristband, physical card, wallet. Uniqueness controls (collision check, randomisation, duplicate prevention) are shown as ENABLED. The one thing to get right: no key material on the page - the signing profile is chosen from the platform's managed list.
@@ -1187,7 +1193,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save issuance and encoding profile (primary button) | `setMediaIssuanceEncoding` PUT `/media-issuance-encoding` | MediaIssuanceEncodingProfileInput | MediaIssuanceEncodingProfileView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 The media type is retired or does not exist | — |
+| Save issuance and encoding profile (primary button) | `setMediaIssuanceEncoding` PUT `/media-issuance-encoding/{encodingProfileId}` | MediaIssuanceEncodingProfileInput | MediaIssuanceEncodingProfileView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 The media type is retired or does not exist | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1251,6 +1257,8 @@ profiles:
 - `setMediaIssuanceEncoding` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `SCOPE_VIEW`
 
 #### Requirements it meets
 
@@ -1402,6 +1410,8 @@ history:
 - `listMediaSwapReplacement` → `SCOPE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `SCOPE_VIEW`
 
 #### Requirements it meets
 
@@ -1570,6 +1580,8 @@ profiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCESS_POINT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1719,6 +1731,8 @@ fields:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `SCOPE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1768,7 +1782,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `integrationId` (navigation) |
 | Route | `/access-venue/hotel-wallet-external-media-integration-bo-182` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
@@ -1814,7 +1828,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save integration (primary button) | `setHotelWalletExternal` PUT `/hotel-wallet-external` | HotelWalletExternalMediaIntegrationInput | HotelWalletExternalMediaIntegrationView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Activating an integration that has no connectionSecretRef | — |
+| Save integration (primary button) | `setHotelWalletExternal` PUT `/hotel-wallet-external/{integrationId}` | HotelWalletExternalMediaIntegrationInput | HotelWalletExternalMediaIntegrationView | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Activating an integration that has no connectionSecretRef | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1887,6 +1901,8 @@ example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `SCOPE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1958,7 +1974,19 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by *What publishing changes*** (`publishMediaCompatibilityTesting`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Media profile `mediaProfileId` | text field | required | — | — | — | Media profile being published | `publishMediaCompatibilityTesting` body |
+| Tenant `tenantId` | text field | optional | — | — | — | Tenant | `publishMediaCompatibilityTesting` body |
+| Venue `venueId` | text field | required | — | — | — | Venue | `publishMediaCompatibilityTesting` body |
+| Park `parkId` | text field | optional | — | — | — | Park | `publishMediaCompatibilityTesting` body |
+| Gate `gateId` | text field | optional | — | — | — | Gate | `publishMediaCompatibilityTesting` body |
+| Device group `deviceGroupId` | text field | optional | — | — | — | Device group | `publishMediaCompatibilityTesting` body |
+| Stage `stage` | radio group | optional | — | Draft · Compatibility test · Validate · Approval · Published | — | — | `publishMediaCompatibilityTesting` body |
+| Compatibility warnings `compatibilityWarnings` | list of values (chips) | optional | — | — | — | Warnings from the compatibility test, e.g. | `publishMediaCompatibilityTesting` body |
+| Exception reason `exceptionReason` | text field | optional | — | — | — | Required when publishing to a device with a compatibility warning | `publishMediaCompatibilityTesting` body |
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1974,7 +2002,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Publish (primary button) | navigation or local | — | — | — | — |
-| What publishing changes (publish gate) | navigation or local | — | — | — | — |
+| What publishing changes (publish gate) | `publishMediaCompatibilityTesting` PUT `/media-compatibility-testing` | MediaCompatibilityTestingPublicationInput | MediaCompatibilityTestingPublicationView | — | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -2042,6 +2070,8 @@ test:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCESS_POINT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -2067,7 +2097,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-183?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Publish, What publishing changes.
@@ -2185,9 +2215,9 @@ Method, path, parameters, request and response for every operation these screens
 "listVerificationMethodSelection": {"method":"GET","path":"/verification-method-selection","contract":"access","summary":"Verification Method Selection & Locking","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"VerificationMethodSelectionLockingView"},
 "listVirtualCredentialMedia": {"method":"GET","path":"/virtual-credential-media","contract":"access","summary":"Virtual Credential & Media Association","permission":"SCOPE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "publishMediaCompatibilityTesting": {"method":"PUT","path":"/media-compatibility-testing","contract":"access","summary":"Media Compatibility, Testing & Publication","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaCompatibilityTestingPublicationInput","responds":"MediaCompatibilityTestingPublicationView"},
-"setHotelWalletExternal": {"method":"PUT","path":"/hotel-wallet-external","contract":"access","summary":"Save a hotel, wallet or external media integration","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"HotelWalletExternalMediaIntegrationInput","responds":"HotelWalletExternalMediaIntegrationView"},
-"setMediaIssuanceEncoding": {"method":"PUT","path":"/media-issuance-encoding","contract":"access","summary":"Save a media issuance and encoding profile","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaIssuanceEncodingProfileInput","responds":"MediaIssuanceEncodingProfileView"},
-"setMediaTypeTechnology": {"method":"PUT","path":"/media-type-technology","contract":"access","summary":"Add, amend or retire a media type","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaTypeTechnologyLibraryInput","responds":"MediaTypeTechnologyLibraryView"},
+"setHotelWalletExternal": {"method":"PUT","path":"/hotel-wallet-external/{integrationId}","contract":"access","summary":"Save a hotel, wallet or external media integration","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"integrationId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"HotelWalletExternalMediaIntegrationInput","responds":"HotelWalletExternalMediaIntegrationView"},
+"setMediaIssuanceEncoding": {"method":"PUT","path":"/media-issuance-encoding/{encodingProfileId}","contract":"access","summary":"Save a media issuance and encoding profile","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"encodingProfileId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"MediaIssuanceEncodingProfileInput","responds":"MediaIssuanceEncodingProfileView"},
+"setMediaTypeTechnology": {"method":"PUT","path":"/media-type-technology/{mediaTypeId}","contract":"access","summary":"Add, amend or retire a media type","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"mediaTypeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"MediaTypeTechnologyLibraryInput","responds":"MediaTypeTechnologyLibraryView"},
 "setRfidNfc": {"method":"PUT","path":"/rfid-nfc","contract":"access","summary":"RFID & NFC Configuration","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RfidNfcConfigurationInput","responds":"RfidNfcConfigurationView"},
 "setVerificationMethodPolicy": {"method":"PUT","path":"/verification-method-policies","contract":"access","summary":"Set the verification method policy of a product","permission":"ACCESS_POINT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccessVerificationMethodPolicy","responds":"AccessVerificationMethodPolicy"}
 }
@@ -2199,11 +2229,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AccessVerificationMethodPolicy": {"type":"object","x-ticvai-persistence":"access.verification_method_policy","description":"The verification method selection and locking policy for one product - methods the guest may choose, lock on first successful access, who may change it after lock and the reason vocabulary (declared 29 September, data-model close-out DM1).","required":["id","productId","availableMethods","lockOnFirstSuccessfulAccess","changeAfterLock","scopePath"],"properties":{"id":{"type":"string","format":"uuid","description":"The policyId of listVerificationMethodSelection"},"productId":{"type":"string","format":"uuid","description":"Unique per scope"},"availableMethods":{"type":"array","items":{"type":"string","enum":["dynamicQr","physicalCard","rfid","facePass","faceTag"]}},"lockOnFirstSuccessfulAccess":{"type":"boolean","default":true},"changeAfterLock":{"type":"string","enum":["notAllowed","supervisorApproval"],"default":"supervisorApproval","description":"Who may change the method once locked; guests may not"},"reasonCodes":{"type":"array","items":{"type":"string","enum":["lostPhone","damagedWristband","accessibility","deviceFailure","guestService","other"]},"description":"Reason vocabulary for a method change after lock"},"credentialFormatOverride":{"allOf":[{"$ref":"#/components/schemas/TicketCredentialFormat"}],"nullable":true,"description":"**The per-product override of MOM-0330** (MoM 2 Sep 2026 §4.7; CHG-R6-031): a product whose tickets must not carry dynamic QR (a VIP invitation, a B2B or reseller ticket type) sets `staticQr` or `rfidCard`, even inside a fully dynamic event. Null: the product takes its sales channel's `ticketCredentialFormat` (catalogue `SalesChannelProfile`), and that null, the platform's signed QR. Wins over the channel when `issueOrderEntitlements` resolves the format."},"scopePath":{"type":"string","description":"ltree of the owning scope node"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"AccessVerificationMethodPolicy": {"type":"object","x-ticvai-persistence":"access.verification_method_policy","description":"The verification method selection and locking policy for one product - methods the guest may choose, lock on first successful access, who may change it after lock and the reason vocabulary (declared 29 September, data-model close-out DM1).","required":["id","productId","availableMethods","lockOnFirstSuccessfulAccess","changeAfterLock","scopePath"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid","description":"The policyId of listVerificationMethodSelection"},"productId":{"x-ticvai-references":"catalogue.product","type":"string","format":"uuid","description":"Unique per scope"},"availableMethods":{"type":"array","items":{"type":"string","enum":["dynamicQr","physicalCard","rfid","facePass","faceTag"]}},"lockOnFirstSuccessfulAccess":{"type":"boolean","default":true},"changeAfterLock":{"type":"string","enum":["notAllowed","supervisorApproval"],"default":"supervisorApproval","description":"Who may change the method once locked; guests may not"},"reasonCodes":{"type":"array","items":{"type":"string","enum":["lostPhone","damagedWristband","accessibility","deviceFailure","guestService","other"]},"description":"Reason vocabulary for a method change after lock"},"credentialFormatOverride":{"allOf":[{"$ref":"#/components/schemas/TicketCredentialFormat"}],"nullable":true,"description":"**The per-product override of MOM-0330** (MoM 2 Sep 2026 §4.7; CHG-R6-031): a product whose tickets must not carry dynamic QR (a VIP invitation, a B2B or reseller ticket type) sets `staticQr` or `rfidCard`, even inside a fully dynamic event. Null: the product takes its sales channel's `ticketCredentialFormat` (catalogue `SalesChannelProfile`), and that null, the platform's signed QR. Wins over the channel when `issueOrderEntitlements` resolves the format."},"scopePath":{"readOnly":true,"type":"string","description":"ltree of the owning scope node"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "ExternalPartnerCredentialMappingView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What External & Partner Credential Mapping displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"validationMode":{"type":"string","enum":["localMapping","apiValidation","tokenValidation","cachedValidation","offlineMapping","hybrid"],"description":"How the partner credential is validated"},"mappingId":{"type":"string"},"partnerName":{"type":"string","description":"e.g. Hotel Package Provider"},"credentialFormat":{"type":"string","description":"Partner barcode/QR format"},"fieldMappings":{"type":"array","items":{"type":"string"},"description":"Partner field to TICVAI field pairs, e.g. ProductCode, VisitDate, GuestType, Entitlement"},"unrecognisedOutcome":{"type":"string","enum":["deny","referToOperator"],"description":"What happens when a partner credential cannot be resolved"},"status":{"type":"string","enum":["draft","active","inactive"]}}},
 "HotelWalletExternalMediaIntegrationInput": {"type":"object","x-ticvai-persistence":"none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)","description":"**What Hotel, Wallet & External Media Integration submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.","required":["name","integrationType","externalSystem"],"properties":{"integrationId":{"type":"string","format":"uuid","description":"Absent creates an integration"},"name":{"type":"string","maxLength":200},"integrationType":{"type":"string","enum":["hotelRoomCard","hotelPms","digitalWallet","otherExternal"]},"externalSystem":{"type":"string","maxLength":200,"description":"The external system, e.g. the hotel PMS product"},"connectionSecretRef":{"type":"string","description":"Reference to the stored credentials of the external system. **Never the secret itself.** The client supplies the account and keys (vendor credential); the reference is set once they are stored"},"roomChargeEnabled":{"type":"boolean","default":false},"mapsToVirtualCredential":{"type":"boolean","default":true,"description":"The external card maps to a TICVAI Virtual Ticket rather than being validated by the external system"},"status":{"type":"string","enum":["draft","active","inactive"],"default":"draft"}}},
 "HotelWalletExternalMediaIntegrationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Hotel, Wallet & External Media Integration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"connectionSecretRef":{"type":"string","description":"Reference to the stored credentials of the external system, never the secret itself (decided 29 September, VM close-out)"},"integrationId":{"type":"string"},"integrationType":{"type":"string","enum":["hotelRoomCard","hotelPms","digitalWallet","otherExternal"]},"name":{"type":"string"},"externalSystem":{"type":"string","description":"External system name, e.g. the hotel PMS or wallet provider"},"roomChargeEnabled":{"type":"boolean","description":"Attraction/service may be charged to the guest room via the PMS"},"mapsToVirtualCredential":{"type":"boolean","description":"Credential resolves to a TICVAI virtual credential and follows the normal access decision"},"status":{"type":"string","enum":["draft","active","inactive"]}}},
-"MediaCompatibilityTestingPublicationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Media Compatibility, Testing & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"mediaProfileId":{"type":"string","description":"Media profile being published"},"tenantId":{"type":"string","description":"Tenant"},"venueId":{"type":"string","description":"Venue"},"parkId":{"type":"string","description":"Park"},"gateId":{"type":"string","description":"Gate"},"deviceGroupId":{"type":"string","description":"Device group"},"stage":{"type":"string","enum":["draft","compatibilityTest","validate","approval","published"]},"compatibilityWarnings":{"type":"array","items":{"type":"string"},"description":"Warnings from the compatibility test, e.g. a reader that cannot validate NFC offline"},"exceptionReason":{"type":"string","description":"Required when publishing to a device with a compatibility warning"}},"required":["mediaProfileId","venueId"]},
+"MediaCompatibilityTestingPublicationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; applied to `access.media_compatibility_test`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept","description":"**What Media Compatibility, Testing & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"mediaProfileId":{"type":"string","description":"Media profile being published"},"tenantId":{"type":"string","description":"Tenant"},"venueId":{"type":"string","description":"Venue"},"parkId":{"type":"string","description":"Park"},"gateId":{"type":"string","description":"Gate"},"deviceGroupId":{"type":"string","description":"Device group"},"stage":{"type":"string","enum":["draft","compatibilityTest","validate","approval","published"]},"compatibilityWarnings":{"type":"array","items":{"type":"string"},"description":"Warnings from the compatibility test, e.g. a reader that cannot validate NFC offline"},"exceptionReason":{"type":"string","description":"Required when publishing to a device with a compatibility warning"}},"required":["mediaProfileId","venueId"]},
 "MediaCompatibilityTestingPublicationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Media Compatibility, Testing & Publication displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"mediaProfileId":{"type":"string","description":"Media profile being published"},"tenantId":{"type":"string","description":"Tenant"},"venueId":{"type":"string","description":"Venue"},"parkId":{"type":"string","description":"Park"},"gateId":{"type":"string","description":"Gate"},"deviceGroupId":{"type":"string","description":"Device group"},"stage":{"type":"string","enum":["draft","compatibilityTest","validate","approval","published"]},"compatibilityWarnings":{"type":"array","items":{"type":"string"},"description":"Warnings from the compatibility test, e.g. a reader that cannot validate NFC offline"},"exceptionReason":{"type":"string","description":"Required when publishing to a device with a compatibility warning"}},"required":["mediaProfileId","venueId"]},
 "MediaCredentialCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Media & Credential Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"mediaProfileId":{"type":"string","description":"Media profile identifier"},"mediaProfile":{"type":"string","description":"Media profile name, e.g. Mobile Dynamic QR"},"technology":{"type":"string","description":"Technology, e.g. QR, RFID, NFC, Wallet"},"credentialType":{"type":"string","description":"Credential type, e.g. Digital Ticket, Wristband, Membership, External Ticket"},"status":{"type":"string","enum":["active","inactive"]},"offlineSupport":{"type":"string","enum":["yes","no","conditional"],"description":"Whether the medium validates offline"}}},
 "MediaCredentialCommandCenterViewSummary": {"type":"object","x-ticvai-persistence":"none - aggregate computed at read time over the rows the page lists","description":"The KPI tiles shown above the list on this screen. Computed over the whole filtered set, not the current page (decided 29 September, readiness close-out).","properties":{"activeMediaProfiles":{"type":"integer","description":"Active Media Profiles"},"qrCredentials":{"type":"integer","description":"QR Credentials"},"rfidCredentials":{"type":"integer","description":"RFID Credentials"},"nfcCredentials":{"type":"integer","description":"NFC Credentials"},"walletCredentials":{"type":"integer","description":"Wallet Credentials"},"biometricCredentials":{"type":"integer","description":"Biometric Credentials"},"externalCredentials":{"type":"integer","description":"External Credentials"},"mediaSwapsToday":{"type":"integer","description":"Media Swaps Today"},"failedMediaReads":{"type":"integer","description":"Failed Media Reads"},"unknownCredentials":{"type":"integer","description":"Unknown Credentials"},"verificationExceptions":{"type":"integer","description":"Verification Exceptions"},"ai":{"type":"array","items":{"type":"string"},"description":"Advisory AI highlights (failing media profiles, unusual read errors, duplicate identifiers, obsolete media, incompatible device/media combinations). Read-only; AI does not change ticket validity."}}},
@@ -2213,7 +2243,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "MediaTypeTechnologyLibraryInput": {"type":"object","x-ticvai-persistence":"none — request only; the write configures the rules the matching View reads back (decided 29 September, VM close-out)","description":"**What Media Type & Technology Library submits** (decided 29 September, VM close-out). The writable fields of its View; the figures the screen computes are deliberately absent, because a figure the system computed is not a figure a client may send back.","required":["name","mediaType","technology","onlineOfflineCapability"],"properties":{"mediaTypeId":{"type":"string","format":"uuid","description":"Absent adds a media type"},"name":{"type":"string","maxLength":200},"mediaType":{"type":"string","enum":["linearBarcode","twoDimensionalBarcode","qr","rfidContact","rfidProximity","rfidIso15693","rfidOtherStandard","appCredential","mobileWallet","paperTicket","wristband","plasticCard","hotelCard","facePass","faceTag","partnerQr","externalBarcode","thirdPartyCredential"]},"technology":{"type":"string","enum":["barcode","rfid","nfc","magneticStripe","mobile","physical","biometric","external"]},"encodingFormat":{"type":"string","maxLength":100},"supportedReaderTypes":{"type":"array","items":{"type":"string"}},"onlineOfflineCapability":{"type":"string","enum":["onlineOnly","offlineOnly","onlineAndOffline"]},"writableReadOnly":{"type":"string","enum":["writable","readOnly"]},"securityClassification":{"type":"string","maxLength":100},"applicableVenues":{"type":"array","items":{"type":"string"},"description":"Empty means every venue of the tenant"},"applicableProducts":{"type":"array","items":{"type":"string"},"description":"Empty means every product"},"active":{"type":"boolean","default":true,"description":"False retires the media type: no new credential is issued on it; credentials already issued stay valid until they expire"}}},
 "MediaTypeTechnologyLibraryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Media Type & Technology Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"active":{"type":"boolean","description":"False once retired through `setMediaTypeTechnology`; issued credentials stay valid (decided 29 September, VM close-out)"},"mediaType":{"type":"string","enum":["linearBarcode","twoDimensionalBarcode","qr","rfidContact","rfidProximity","rfidIso15693","rfidOtherStandard","appCredential","mobileWallet","paperTicket","wristband","plasticCard","hotelCard","facePass","faceTag","partnerQr","externalBarcode","thirdPartyCredential"],"description":"The kind of medium this profile defines"},"technology":{"type":"string","enum":["barcode","rfid","nfc","magneticStripe","mobile","physical","biometric","external"],"description":"Technology family"},"encodingFormat":{"type":"string","description":"encoding format"},"supportedReaderTypes":{"type":"array","items":{"type":"string"},"description":"supported reader types"},"onlineOfflineCapability":{"type":"string","enum":["onlineOnly","offlineOnly","onlineAndOffline"],"description":"online/offline capability"},"writableReadOnly":{"type":"string","enum":["writable","readOnly"],"description":"writable/read-only"},"securityClassification":{"type":"string","description":"security classification"},"applicableVenues":{"type":"array","items":{"type":"string"},"description":"Venue ids"},"applicableProducts":{"type":"array","items":{"type":"string"},"description":"Product ids"},"mediaTypeId":{"type":"string","description":"Media type profile identifier"},"name":{"type":"string","description":"Profile name"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"RfidNfcConfigurationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What RFID & NFC Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"name":{"type":"string"},"rfidNfcProfileId":{"type":"string","description":"RFID/NFC profile identifier"},"rfidStandard":{"type":"string","description":"RFID standard"},"tagCardType":{"type":"string","description":"tag/card type"},"frequencyInterfaceProfile":{"type":"string","description":"frequency/interface profile"},"readerCompatibility":{"type":"array","items":{"type":"string"},"description":"reader compatibility"},"readWriteBehavior":{"type":"string","description":"read/write behavior"},"encodingProfile":{"type":"string","description":"encoding profile"},"securityProfile":{"type":"string","description":"security profile"},"nfcUses":{"type":"array","items":{"type":"string","enum":["nfcTicket","membership","mobileDevice","walletCredential"]},"description":"NFC credential uses enabled by this profile"},"supportedReaders":{"type":"array","items":{"type":"string"},"description":"supported readers"},"offlineCapability":{"type":"boolean","description":"offline capability"},"venueId":{"type":"string","description":"Venue"},"zoneId":{"type":"string","description":"Zone"},"gateId":{"type":"string","description":"Gate"},"credentialType":{"type":"string","description":"Credential"},"journey":{"type":"string","description":"Journey"},"readRange":{"type":"string","enum":["near","medium","far"],"description":"Read range associated with the venue, zone, gate, credential or journey"}},"required":["rfidNfcProfileId","venueId","name"]},
+"RfidNfcConfigurationInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; applied to `access.media_encoding_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept","description":"**What RFID & NFC Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"name":{"type":"string"},"rfidNfcProfileId":{"type":"string","description":"RFID/NFC profile identifier"},"rfidStandard":{"type":"string","description":"RFID standard"},"tagCardType":{"type":"string","description":"tag/card type"},"frequencyInterfaceProfile":{"type":"string","description":"frequency/interface profile"},"readerCompatibility":{"type":"array","items":{"type":"string"},"description":"reader compatibility"},"readWriteBehavior":{"type":"string","description":"read/write behavior"},"encodingProfile":{"type":"string","description":"encoding profile"},"securityProfile":{"type":"string","description":"security profile"},"nfcUses":{"type":"array","items":{"type":"string","enum":["nfcTicket","membership","mobileDevice","walletCredential"]},"description":"NFC credential uses enabled by this profile"},"supportedReaders":{"type":"array","items":{"type":"string"},"description":"supported readers"},"offlineCapability":{"type":"boolean","description":"offline capability"},"venueId":{"type":"string","description":"Venue"},"zoneId":{"type":"string","description":"Zone"},"gateId":{"type":"string","description":"Gate"},"credentialType":{"type":"string","description":"Credential"},"journey":{"type":"string","description":"Journey"},"readRange":{"type":"string","enum":["near","medium","far"],"description":"Read range associated with the venue, zone, gate, credential or journey"}},"required":["rfidNfcProfileId","venueId","name"]},
 "RfidNfcConfigurationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What RFID & NFC Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"name":{"type":"string"},"rfidNfcProfileId":{"type":"string","description":"RFID/NFC profile identifier"},"rfidStandard":{"type":"string","description":"RFID standard"},"tagCardType":{"type":"string","description":"tag/card type"},"frequencyInterfaceProfile":{"type":"string","description":"frequency/interface profile"},"readerCompatibility":{"type":"array","items":{"type":"string"},"description":"reader compatibility"},"readWriteBehavior":{"type":"string","description":"read/write behavior"},"encodingProfile":{"type":"string","description":"encoding profile"},"securityProfile":{"type":"string","description":"security profile"},"nfcUses":{"type":"array","items":{"type":"string","enum":["nfcTicket","membership","mobileDevice","walletCredential"]},"description":"NFC credential uses enabled by this profile"},"supportedReaders":{"type":"array","items":{"type":"string"},"description":"supported readers"},"offlineCapability":{"type":"boolean","description":"offline capability"},"venueId":{"type":"string","description":"Venue"},"zoneId":{"type":"string","description":"Zone"},"gateId":{"type":"string","description":"Gate"},"credentialType":{"type":"string","description":"Credential"},"journey":{"type":"string","description":"Journey"},"readRange":{"type":"string","enum":["near","medium","far"],"description":"Read range associated with the venue, zone, gate, credential or journey"}},"required":["rfidNfcProfileId","venueId","name"]},
 "TicketCredentialFormat": {"type":"string","enum":["platformSignedQr","staticQr","rfidCard"],"description":"**The credential a ticket is issued with** (MoM 2 Sep 2026 §4.7, MOM-0330: VIP invitations and B2B/reseller tickets \"may need to fall back to a standard QR code or RFID card\", with \"a per-product override to disable dynamic QR for specific ticket types\"; 12 October 2026, CHG-R6-031). `platformSignedQr` is the default: the platform's own signed QR as the event issues it, rotating where the event sells dynamic QR (`getEntitlementCredential` `rotation`). `staticQr` is the platform's signed QR issued once and never rotated, for a ticket that leaves the app (a reseller's batch, a printed invitation): dynamic QR is off for it even in a fully dynamic event. `rfidCard` issues no QR; the ticket is collected as an RFID card or wristband and bound then (`AccessCredentialBinding`). A partner's own barcode symbology is not issued by the platform: tickets a partner issues itself are imported and validated (BO-181), not this."},
 "VerificationMethodSelectionLockingView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Verification Method Selection & Locking displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"availableMethods":{"type":"array","items":{"type":"string","enum":["dynamicQr","physicalCard","rfid","facePass","faceTag"]},"description":"Verification methods the guest may choose from"},"reason":{"type":"string","enum":["lostPhone","damagedWristband","accessibility","deviceFailure","guestService","other"],"description":"Reason code vocabulary for a method change; every change is audited"},"policyId":{"type":"string","description":"Verification method policy identifier"},"productId":{"type":"string","description":"Product the policy applies to"},"lockOnFirstSuccessfulAccess":{"type":"boolean","description":"The chosen method locks at the first successful access"},"changeAfterLock":{"type":"string","enum":["notAllowed","supervisorApproval"],"description":"Who may change the method once locked; guests may not"}}},

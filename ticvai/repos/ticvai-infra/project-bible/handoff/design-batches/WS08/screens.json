@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/guest-journey-command-center-bo-214",
-   "component": "apps/venue-management-web/src/routes/access-venue/GuestJourneyCommandCenter.tsx",
+   "component": "src/routes/access-venue/GuestJourneyCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -111,7 +112,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -260,6 +261,14 @@
     "GuestJourneyCommandCenterViewSummary.familyJourneys",
     "GuestJourneyCommandCenterViewSummary.reEntryGuests",
     "GuestJourneyCommandCenterViewSummary.crossoversToday"
+   ],
+   "params": [
+    {
+     "name": "journeyProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listGuestJourney`."
+    }
    ]
   },
   "wireframe": {
@@ -333,6 +342,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "8",
@@ -342,7 +352,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/group-b2b-admission-profile-builder-bo-215",
-   "component": "apps/venue-management-web/src/routes/access-venue/GroupB2bAdmissionProfileBuilder.tsx",
+   "component": "src/routes/access-venue/GroupB2bAdmissionProfileBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -482,6 +492,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "8",
@@ -491,7 +502,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/group-leader-fast-b2b-validation-bo-216",
-   "component": "apps/venue-management-web/src/routes/access-venue/GroupLeaderFastB2bValidation.tsx",
+   "component": "src/routes/access-venue/GroupLeaderFastB2bValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -622,6 +633,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "8",
@@ -631,7 +643,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/group-attendance-partial-entry-manager-bo-217",
-   "component": "apps/venue-management-web/src/routes/access-venue/GroupAttendancePartialEntryManager.tsx",
+   "component": "src/routes/access-venue/GroupAttendancePartialEntryManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -746,6 +758,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "8",
@@ -755,7 +768,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/family-child-pod-companion-journey-bo-218",
-   "component": "apps/venue-management-web/src/routes/access-venue/FamilyChildPodCompanionJourney.tsx",
+   "component": "src/routes/access-venue/FamilyChildPodCompanionJourney.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -856,6 +869,16 @@
    "workshopBoard": "wireframes/WS25 Access Control Board 8.dc.html#bo-218"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 105. 0 of 0 labels bound to a contract property; 5 of 14 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listFamilyChildPod`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -885,6 +908,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "8",
@@ -894,7 +918,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/re-entry-temporary-exit-journey-bo-219",
-   "component": "apps/venue-management-web/src/routes/access-venue/ReEntryTemporaryExitJourney.tsx",
+   "component": "src/routes/access-venue/ReEntryTemporaryExitJourney.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -917,6 +941,7 @@
   },
   "density": "compact",
   "purposeNote": "Temporary exit and re-entry are tracked as distinct journey events rather than being counted as new normal admissions.",
+  "division": "Shares `listAdmissionRules`, `updateAdmissionRules` with BO-156, BO-160; this screen is Re-entry & Temporary Exit Journey (pack Access Control Module_Reference.pdf, board 8.8.6, page 106): manage guests temporarily leaving and returning to the venue. The source matrix requires configurable re-entry and also describes a journey using a designated re-entry gate with both ticket verification and a UV stamp.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Manage guests temporarily leaving and returning to the venue. The source matrix requires configurable re-entry and also describes a journey using a designated re-entry gate with both ticket verification and a UV stamp.",
@@ -1030,6 +1055,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "8",
@@ -1039,7 +1065,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/multi-park-crossover-journey-orchestrator-bo-220",
-   "component": "apps/venue-management-web/src/routes/access-venue/MultiParkCrossoverJourneyOrchestrator.tsx",
+   "component": "src/routes/access-venue/MultiParkCrossoverJourneyOrchestrator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1193,6 +1219,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "8",
@@ -1202,7 +1229,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/fast-pass-attraction-access-journey-bo-221",
-   "component": "apps/venue-management-web/src/routes/access-venue/FastPassAttractionAccessJourney.tsx",
+   "component": "src/routes/access-venue/FastPassAttractionAccessJourney.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1324,6 +1351,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listQueues` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "fastPassProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setFastPassProfile` takes it, from the record the user acts on."
     }
    ]
   },
@@ -1384,6 +1417,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "8",
@@ -1393,7 +1427,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/special-event-free-view-alternative-admission-bo-222",
-   "component": "apps/venue-management-web/src/routes/access-venue/SpecialEventFreeViewAlternativeAdmission.tsx",
+   "component": "src/routes/access-venue/SpecialEventFreeViewAlternativeAdmission.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1532,6 +1566,16 @@
     "source": "contracts/spine/access.yaml#setContextTimeEvent"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "entryId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setOperatingCalendarEntry` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1561,6 +1605,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "8",
@@ -1570,7 +1615,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/journey-simulation-audit-publication-bo-223",
-   "component": "apps/venue-management-web/src/routes/access-venue/JourneySimulationAuditPublication.tsx",
+   "component": "src/routes/access-venue/JourneySimulationAuditPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {

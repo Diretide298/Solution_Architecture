@@ -5,6 +5,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "9",
@@ -111,6 +112,7 @@
      "components": [
       {
        "kind": "detailPanel",
+       "operation": "getEntitlementUsage",
        "derived": true,
        "impliedBy": "getEntitlementUsage",
        "notes": "One record, read-only."
@@ -179,6 +181,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "9",
@@ -231,6 +234,7 @@
      "components": [
       {
        "kind": "detailPanel",
+       "operation": "getTenantLicences",
        "derived": true,
        "impliedBy": "getTenantLicences",
        "notes": "One record, read-only."
@@ -299,6 +303,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "9",
@@ -351,6 +356,7 @@
      "components": [
       {
        "kind": "detailPanel",
+       "operation": "getUsageMetering",
        "derived": true,
        "impliedBy": "getUsageMetering",
        "notes": "One record, read-only."
@@ -419,6 +425,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "9",
@@ -481,13 +488,6 @@
   },
   "apis": [
    {
-    "operationId": "getLicenceEnforcement",
-    "contract": "subscription",
-    "purpose": "Thresholds and position",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "getPlanRecommendations",
     "contract": "subscription",
     "purpose": "What to do about a unit approaching or over its limit (tier versus capacity pack)",
@@ -531,6 +531,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "9",
@@ -686,6 +687,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "9",
@@ -740,7 +742,7 @@
         "Projected variable billing basis: AED 32,850"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getLicenceEnforcement",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 114 §Forecast"
       }
      ]
@@ -753,6 +755,7 @@
        "kind": "detailPanel",
        "label": "The selected minimum guarantee variable",
        "bindsTo": null,
+       "operation": "getLicenceEnforcement",
        "columns": [
         "Projected month-end billable tickets",
         "Projected variable billing basis: AED 32,850"
@@ -822,6 +825,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "9",
@@ -864,46 +868,55 @@
       {
        "kind": "selectField",
        "label": "Resource",
+       "operation": "addCapacityPack",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields"
       },
       {
        "kind": "selectField",
        "label": "Quantity",
+       "operation": "addCapacityPack",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields"
       },
       {
        "kind": "selectField",
        "label": "Start",
+       "operation": "addCapacityPack",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields"
       },
       {
        "kind": "selectField",
        "label": "Expiry",
+       "operation": "addCapacityPack",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields"
       },
       {
        "kind": "selectField",
        "label": "Venue",
+       "operation": "addCapacityPack",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields"
       },
       {
        "kind": "selectField",
        "label": "Reason",
+       "operation": "addCapacityPack",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields"
       },
       {
        "kind": "selectField",
        "label": "Requested By",
+       "operation": "addCapacityPack",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields"
       },
       {
        "kind": "selectField",
        "label": "Commercial Treatment",
+       "operation": "addCapacityPack",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields"
       },
       {
        "kind": "selectField",
        "label": "Approval",
+       "operation": "addCapacityPack",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields"
       }
      ]
@@ -966,6 +979,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "9",
@@ -1086,6 +1100,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "9",
@@ -1138,6 +1153,7 @@
      "components": [
       {
        "kind": "detailPanel",
+       "operation": "getEntitlementUsage",
        "derived": true,
        "impliedBy": "getEntitlementUsage",
        "notes": "One record, read-only."
@@ -1206,6 +1222,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "9",
@@ -1267,7 +1284,7 @@
         "Effective Date"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getUsageMetering",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 119 §Track"
       }
      ]
@@ -1280,6 +1297,7 @@
        "kind": "detailPanel",
        "label": "The selected license metering commercial",
        "bindsTo": null,
+       "operation": "getUsageMetering",
        "columns": [
         "Contract Version",
         "License Version",

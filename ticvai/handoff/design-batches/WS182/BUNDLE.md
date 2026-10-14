@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-659` | Cross-Sell Command Center | C | 0 | 2 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-659` | Cross-Sell Command Center | C | 0 | 66 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-660` | Cross-Sell Relationship Builder | C | 0 | 21 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-661` | Product Affinity Matrix & Relationship Map | C | 2 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-662` | Frequently Bought Together & Basket Pattern Engine | C | 0 | 14 | 6 | 1 | 0 | 0 | — | notStarted (—) |
@@ -175,17 +175,93 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Cross-Sell Recommendations** (metric tile)
 
-**Recommendations Accepted** (metric tile)
+**Recommendations Accepted** (metric tile, from `listUpsellCrossSell`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Cross sell revenue | AED 1,234.50 | Cross-Sell Revenue |
+| Upsell revenue | AED 1,234.50 | Upsell Revenue |
+| Attach rate | 12.5% | Attach Rate |
+| Items per transaction | text | Items per Transaction |
+| Revenue per transaction | AED 1,234.50 | Revenue per Transaction |
+| Recommended offer acceptance | text | Recommended Offer Acceptance |
+| Incremental basket value | text | Incremental Basket Value |
+| Cross category conversion | 1,234.5 | Cross-Category Conversion |
+| Ticket ticket | text | Ticket → Ticket |
+| Ticket FB | text | Ticket → F&B |
+| Ticket retail | text | Ticket → Retail |
+| Ticket experience | text | Ticket → Experience |
+| Ticket membership | text | Ticket → Membership |
+| F b retail | text | F&B → Retail |
+| Retail FB | text | Retail → F&B |
+| Membership experience | text | Membership → Experience |
 
 **Cross-Sell Conversion** (metric tile)
 
-**Cross-Sell Revenue** (metric tile)
+**Cross-Sell Revenue** (metric tile, from `listUpsellCrossSell`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Cross sell revenue | AED 1,234.50 | Cross-Sell Revenue |
+| Upsell revenue | AED 1,234.50 | Upsell Revenue |
+| Attach rate | 12.5% | Attach Rate |
+| Items per transaction | text | Items per Transaction |
+| Revenue per transaction | AED 1,234.50 | Revenue per Transaction |
+| Recommended offer acceptance | text | Recommended Offer Acceptance |
+| Incremental basket value | text | Incremental Basket Value |
+| Cross category conversion | 1,234.5 | Cross-Category Conversion |
+| Ticket ticket | text | Ticket → Ticket |
+| Ticket FB | text | Ticket → F&B |
+| Ticket retail | text | Ticket → Retail |
+| Ticket experience | text | Ticket → Experience |
+| Ticket membership | text | Ticket → Membership |
+| F b retail | text | F&B → Retail |
+| Retail FB | text | Retail → F&B |
+| Membership experience | text | Membership → Experience |
 
 **Estimated Incremental Revenue** (metric tile)
 
-**Attach Rate** (metric tile)
+**Attach Rate** (metric tile, from `listUpsellCrossSell`)
 
-**Items per Transaction** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Cross sell revenue | AED 1,234.50 | Cross-Sell Revenue |
+| Upsell revenue | AED 1,234.50 | Upsell Revenue |
+| Attach rate | 12.5% | Attach Rate |
+| Items per transaction | text | Items per Transaction |
+| Revenue per transaction | AED 1,234.50 | Revenue per Transaction |
+| Recommended offer acceptance | text | Recommended Offer Acceptance |
+| Incremental basket value | text | Incremental Basket Value |
+| Cross category conversion | 1,234.5 | Cross-Category Conversion |
+| Ticket ticket | text | Ticket → Ticket |
+| Ticket FB | text | Ticket → F&B |
+| Ticket retail | text | Ticket → Retail |
+| Ticket experience | text | Ticket → Experience |
+| Ticket membership | text | Ticket → Membership |
+| F b retail | text | F&B → Retail |
+| Retail FB | text | Retail → F&B |
+| Membership experience | text | Membership → Experience |
+
+**Items per Transaction** (metric tile, from `listUpsellCrossSell`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Cross sell revenue | AED 1,234.50 | Cross-Sell Revenue |
+| Upsell revenue | AED 1,234.50 | Upsell Revenue |
+| Attach rate | 12.5% | Attach Rate |
+| Items per transaction | text | Items per Transaction |
+| Revenue per transaction | AED 1,234.50 | Revenue per Transaction |
+| Recommended offer acceptance | text | Recommended Offer Acceptance |
+| Incremental basket value | text | Incremental Basket Value |
+| Cross category conversion | 1,234.5 | Cross-Category Conversion |
+| Ticket ticket | text | Ticket → Ticket |
+| Ticket FB | text | Ticket → F&B |
+| Ticket retail | text | Ticket → Retail |
+| Ticket experience | text | Ticket → Experience |
+| Ticket membership | text | Ticket → Membership |
+| F b retail | text | F&B → Retail |
+| Retail FB | text | Retail → F&B |
+| Membership experience | text | Membership → Experience |
 
 **AOV Uplift** (metric tile)
 
@@ -193,13 +269,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Suppressed Recommendations** (metric tile)
 
-**Every cross-sell** (data table)
+**Every cross-sell** (data table, from `listUpsellCrossSell`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Recommendations → acceptances → purchases → revenue | text | not in the schema: `Recommendations → Acceptances → Purchases → Revenue` |
 
-**The selected cross-sell** (detail panel): The pack groups this record's detail under its own headings: “Break down by”, “Relationships classified”.
+**The selected cross-sell** (detail panel, from `getRecommendationPerformance`): The pack groups this record's detail under its own headings: “Break down by”, “Relationships classified”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -253,6 +329,8 @@ row:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -293,7 +371,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (66 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-659?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `ADM-660`, `ADM-661`, `ADM-662`, `ADM-663`, `ADM-664`, `ADM-665`, `ADM-666`, `ADM-667`, `ADM-668`.
@@ -430,6 +508,8 @@ relationship:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -548,6 +628,8 @@ affinity:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -643,7 +725,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Pre visit purchases | text | not in the schema: `Pre-visit purchases` |
 | Post purchase additions | text | not in the schema: `Post-purchase additions` |
 
-**The selected frequently bought together** (detail panel): The pack groups this record's detail under its own headings: “Water Park Admission”, “Purchase Rate”, “Photo”, “Package”, “Suggested new relationship”.
+**The selected frequently bought together** (detail panel, from `getProductAffinity`): The pack groups this record's detail under its own headings: “Water Park Admission”, “Purchase Rate”, “Photo”, “Package”, “Suggested new relationship”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -694,6 +776,8 @@ pattern:
 - `getProductAffinity` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -832,6 +916,8 @@ relationship:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -964,6 +1050,8 @@ relationship:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1089,6 +1177,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the basket-aware cross-sell duplicate are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -1104,6 +1193,8 @@ rule: Annual pass holders are never offered a Day Pass
 - `listRecommendationStrategies` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -1129,7 +1220,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-665?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
@@ -1229,6 +1320,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -1244,6 +1336,8 @@ rule: Do not suggest a slot under 10% remaining
 - `listRecommendationStrategies` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -1271,7 +1365,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (4), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (4), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-666?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1358,6 +1452,8 @@ candidate:
 - `getProductAffinity` → `PRODUCT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_VIEW`
 
 #### Requirements it meets
 
@@ -1537,6 +1633,8 @@ result:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1681,9 +1779,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "ProductAffinity": {"type":"object","description":"Upsell boards 3.3 and 3.4. **Support and lift together**, because high support with no lift is two popular products rather than a relationship.\n","properties":{"fromProductId":{"type":"string","format":"uuid"},"toProductId":{"type":"string","format":"uuid"},"basketsTogether":{"type":"integer"},"support":{"type":"number"},"confidence":{"type":"number"},"lift":{"type":"number"},"windowDays":{"type":"integer"},"computedAt":{"type":"string","format":"date-time"}}},
-"ProductRelationship": {"type":"object","x-ticvai-persistence":"promotions.product_relationship","description":"Upsell boards 2.2 and 3.2. **Declared, and distinguishable from measured affinity.**","required":["fromProductId","toProductId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"fromProductId":{"type":"string","format":"uuid"},"toProductId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["upgradesTo","downgradesTo","crossSell","accessory","substitute","requires","incompatibleWith"]},"ladderPosition":{"type":"integer","nullable":true,"description":"**For upgrade ladders only.** Standard → Premium → VIP is ordered, and an unordered set cannot answer *what is the next step up*.\n"},"source":{"type":"string","enum":["declared","measured","aiProposed"],"default":"declared"},"strength":{"type":"number","nullable":true},"effectiveFrom":{"type":"string","format":"date","nullable":true},"effectiveTo":{"type":"string","format":"date","nullable":true},"scopePath":{"type":"string"}}},
+"ProductRelationship": {"type":"object","x-ticvai-persistence":"promotions.product_relationship","description":"Upsell boards 2.2 and 3.2. **Declared, and distinguishable from measured affinity.**","required":["fromProductId","toProductId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"fromProductId":{"x-ticvai-references":"catalogue.product","type":"string","format":"uuid"},"toProductId":{"x-ticvai-references":"catalogue.product","type":"string","format":"uuid"},"kind":{"type":"string","enum":["upgradesTo","downgradesTo","crossSell","accessory","substitute","requires","incompatibleWith"]},"ladderPosition":{"type":"integer","nullable":true,"description":"**For upgrade ladders only.** Standard → Premium → VIP is ordered, and an unordered set cannot answer *what is the next step up*.\n"},"source":{"type":"string","enum":["declared","measured","aiProposed"],"default":"declared"},"strength":{"type":"number","nullable":true},"effectiveFrom":{"type":"string","format":"date","nullable":true},"effectiveTo":{"type":"string","format":"date","nullable":true},"scopePath":{"type":"string"}}},
 "RecommendationPerformance": {"type":"object","description":"Board 6.5. **Attributed and incremental reported apart** — the first flatters.","properties":{"key":{"type":"string"},"label":{"type":"string"},"impressions":{"type":"integer"},"clicks":{"type":"integer"},"accepted":{"type":"integer"},"acceptanceRate":{"type":"number"},"attributedRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"incrementalRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"holdoutAcceptanceRate":{"type":"number","nullable":true},"lift":{"type":"number","nullable":true}}},
-"RecommendationStrategy": {"type":"object","x-ticvai-persistence":"promotions.recommendation_strategy","description":"Upsell board 1. **Objective, placement, ranking and guardrail in one record**, because any one of them alone produces a recommender that is either aimless or dangerous.\n","required":["code","name","objective"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"objective":{"type":"string","enum":["attachRevenue","averageOrderValue","upgradeRate","visitFrequency","inventoryBalance","guestSatisfaction"]},"kinds":{"type":"array","items":{"type":"string","enum":["upsell","upgrade","crossSell","bundle","nextBestOffer","reactivation"]}},"itemKinds":{"type":"array","description":"What the strategy may put in a slot (29 September, build pass, group G2, from group G1's handoff; 8.6.30 to 8.6.36, 5.4.21, 22.6.18): `product` (the default and the behaviour before), `offer` (a live promotion marked `recommendable`), `reward` (a marketing-crm loyalty reward the guest can redeem) and `challenge` (a challenge they can join). Mirrors `ai.decideRecommendations` item kinds.","default":["product"],"items":{"type":"string","enum":["product","offer","reward","challenge"]}},"placements":{"type":"array","description":"`homepage` (8.6.10) and `loyalty` (5.4.21, 22.6.18) added 29 September (build pass, group G2), matching the placements `ai.decideRecommendations` fills.","items":{"type":"string","enum":["productPage","cart","checkout","postPurchase","preVisitEmail","inVenueApp","kiosk","pos","signage","callCentre","homepage","loyalty"]}},"channels":{"type":"array","items":{"type":"string"}},"maxRecommendations":{"type":"integer","default":3,"description":"**A guardrail before it is a layout choice.** Nine upsells at checkout is not a denser page, it is an abandoned basket.\n"},"minConfidence":{"type":"number","nullable":true},"rankingWeights":{"type":"object","additionalProperties":{"type":"number"},"description":"Propensity, margin, inventory pressure, affinity, recency."},"requireAvailability":{"type":"boolean","default":true},"excludeInBasket":{"type":"boolean","default":true},"guardrails":{"type":"object","properties":{"maxDiscountPercent":{"type":"number","nullable":true},"minMarginPercent":{"type":"number","nullable":true},"neverRecommendCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requireHumanApproval":{"type":"boolean","default":false}}},"status":{"type":"string","enum":["draft","active","paused","retired"]},"effectiveFrom":{"type":"string","format":"date","nullable":true},"effectiveTo":{"type":"string","format":"date","nullable":true},"scopePath":{"type":"string"}}},
+"RecommendationStrategy": {"type":"object","x-ticvai-persistence":"promotions.recommendation_strategy","description":"Upsell board 1. **Objective, placement, ranking and guardrail in one record**, because any one of them alone produces a recommender that is either aimless or dangerous.\n","required":["code","name","objective"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"objective":{"type":"string","enum":["attachRevenue","averageOrderValue","upgradeRate","visitFrequency","inventoryBalance","guestSatisfaction"]},"kinds":{"type":"array","items":{"type":"string","enum":["upsell","upgrade","crossSell","bundle","nextBestOffer","reactivation"]}},"itemKinds":{"type":"array","description":"What the strategy may put in a slot (29 September, build pass, group G2, from group G1's handoff; 8.6.30 to 8.6.36, 5.4.21, 22.6.18): `product` (the default and the behaviour before), `offer` (a live promotion marked `recommendable`), `reward` (a marketing-crm loyalty reward the guest can redeem) and `challenge` (a challenge they can join). Mirrors `ai.decideRecommendations` item kinds.","default":["product"],"items":{"type":"string","enum":["product","offer","reward","challenge"]}},"placements":{"type":"array","description":"`homepage` (8.6.10) and `loyalty` (5.4.21, 22.6.18) added 29 September (build pass, group G2), matching the placements `ai.decideRecommendations` fills.","items":{"type":"string","enum":["productPage","cart","checkout","postPurchase","preVisitEmail","inVenueApp","kiosk","pos","signage","callCentre","homepage","loyalty"]}},"channels":{"type":"array","items":{"type":"string"}},"maxRecommendations":{"type":"integer","default":3,"description":"**A guardrail before it is a layout choice.** Nine upsells at checkout is not a denser page, it is an abandoned basket.\n"},"minConfidence":{"type":"number","nullable":true},"rankingWeights":{"type":"object","additionalProperties":{"type":"number"},"description":"Propensity, margin, inventory pressure, affinity, recency."},"requireAvailability":{"type":"boolean","default":true},"excludeInBasket":{"type":"boolean","default":true},"guardrails":{"type":"object","properties":{"maxDiscountPercent":{"type":"number","nullable":true},"minMarginPercent":{"type":"number","nullable":true},"neverRecommendCategoryIds":{"type":"array","items":{"type":"string","format":"uuid"}},"requireHumanApproval":{"type":"boolean","default":false}}},"status":{"type":"string","enum":["draft","active","paused","retired"]},"effectiveFrom":{"type":"string","format":"date","nullable":true},"effectiveTo":{"type":"string","format":"date","nullable":true},"scopePath":{"type":"string"}}},
 "UpsellCrossSellAttachRateAnalyticsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What Upsell, Cross-Sell & Attach-Rate Analytics displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"crossSellRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Cross-Sell Revenue"},"upsellRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Upsell Revenue"},"attachRate":{"type":"number","description":"Attach Rate"},"itemsPerTransaction":{"type":"string","description":"Items per Transaction"},"revenuePerTransaction":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue per Transaction"},"recommendedOfferAcceptance":{"type":"string","description":"Recommended Offer Acceptance"},"incrementalBasketValue":{"type":"string","description":"Incremental Basket Value"},"crossCategoryConversion":{"type":"number","description":"Cross-Category Conversion"},"ticketTicket":{"type":"string","description":"Ticket → Ticket"},"ticketFB":{"type":"string","description":"Ticket → F&B"},"ticketRetail":{"type":"string","description":"Ticket → Retail"},"ticketExperience":{"type":"string","description":"Ticket → Experience"},"ticketMembership":{"type":"string","description":"Ticket → Membership"},"fBRetail":{"type":"string","description":"F&B → Retail"},"retailFB":{"type":"string","description":"Retail → F&B"},"membershipExperience":{"type":"string","description":"Membership → Experience"}}}
 }
 ```

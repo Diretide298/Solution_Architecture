@@ -204,11 +204,11 @@ paths:
   /accreditation-requirements:
     put:
       operationId: setAccreditationRequirements
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-621 Applicant Type Configuration"
         - "P08 BO-622 Application Requirements Matrix"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: What each applicant type must supply and pass
       description: 'Board 1.8 — the requirements matrix. **Different applicant types are vetted
@@ -568,7 +568,6 @@ paths:
         - "P08 BO-630 Document Verification Queue"
         - "P08 BO-636 Application Review Workspace"
         - "P08 BO-672 Expiry Monitor & Expiration Rules"
-        - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.18, 12.1.19); pack ACCREDITATION.pdf pages 14-15
         (BO-629, BO-630); P11 ACC-007 listAccreditationDocuments gap; shape follows listAccreditationApplications'
       summary: Documents supplied, by holder, application, requirement or state
@@ -644,8 +643,6 @@ paths:
       operationId: submitAccreditationDocument
       x-ticvai-consumed-by:
         - "P08 BO-629 Document Repository"
-        - "P11 ACC-002 Registration Form"
-        - "P11 ACC-004 Application Status Tracking"
       x-ticvai-conflict-policy: append
       security:
       - guestAuth: []
@@ -700,7 +697,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-630 Document Verification Queue"
         - "P08 BO-636 Application Review Workspace"
-        - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-conflict-policy: serverWins
       summary: Accept or refuse a submitted document
       description: 'Board 2.6. **The verifier is recorded and so is the refusal reason**, because a
@@ -1373,11 +1369,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAccreditationValidity
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-666 Validity Period Configuration"
         - "P08 BO-669 Temporary & Seasonal Accreditation"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Validity periods, renewal windows and expiry behaviour
       description: 'Boards 6.3 and 6.10. **Expiry is the control that keeps an accreditation estate
@@ -1417,11 +1413,11 @@ paths:
   /accreditation-notifications:
     put:
       operationId: setAccreditationNotificationRules
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-675 Notification Rule Management"
         - "P08 BO-676 Expiry & Renewal Notification Scheduler"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Who is told what, and when
       description: 'Boards 7.2 and 7.3. **Expiry notices go to the organisation as well as the
@@ -1897,6 +1893,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-636 Application Review Workspace"
         - "P08 BO-640 Rejection & Resubmission Management"
+        - "P11 ACC-002 Registration Form"
         - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-agreed: '29 September: build pass, BL-180; P11 ACC-007 fetched a list to show one application;
         shape follows getAccreditationHolder'
@@ -1930,8 +1927,6 @@ paths:
         - "P08 BO-617 New Accreditation Application"
         - "P08 BO-640 Rejection & Resubmission Management"
         - "P11 ACC-002 Registration Form"
-        - "P11 ACC-003 Application Review & Submit"
-        - "P11 ACC-004 Application Status Tracking"
       x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
@@ -2076,7 +2071,6 @@ paths:
       operationId: resubmitAccreditationApplication
       x-ticvai-consumed-by:
         - "P08 BO-640 Rejection & Resubmission Management"
-        - "P11 ACC-004 Application Status Tracking"
       x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
@@ -2523,10 +2517,9 @@ paths:
   /accreditation-credentials/verify:
     get:
       operationId: verifyAccreditationCredential
-      x-ticvai-names-for-context: [access.accreditation_credential]
       x-ticvai-consumed-by:
-        - "P06 EMP-010 Scan — ready"
         - "P07 SCN-003 Ready to scan"
+      x-ticvai-names-for-context: [access.accreditation_credential]
       x-ticvai-agreed: '29 September: build pass, BL-181 (18.8.3 staff verifying a presented accreditation);
         shape follows access lookupTicket'
       summary: Who holds this credential, and where may they go
@@ -2729,6 +2722,7 @@ paths:
       operationId: exportAccreditationData
       x-ticvai-consumed-by:
         - "P08 BO-682 Accreditation Export & Data Extract Center"
+        - "P11 ACC-008 Credential Register"
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.55); pack ACCREDITATION.pdf page 61 (BO-682);
         shape follows reporting exportReportResult'
@@ -2804,6 +2798,7 @@ paths:
       operationId: getAccreditationExport
       x-ticvai-consumed-by:
         - "P08 BO-682 Accreditation Export & Data Extract Center"
+        - "P11 ACC-008 Credential Register"
       x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.55); shape follows reporting getReportExport'
       summary: One export, and its download link once ready
       description: 'The download link is signed and expires; an `expired` export is taken again rather than

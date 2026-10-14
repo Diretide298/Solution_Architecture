@@ -232,14 +232,13 @@ paths:
 
     patch:
       operationId: updateMediaAsset
+      x-ticvai-consumed-by:
+        - "P13 CMS-010 Media Library"
+        - "P13 CMS-075 Duplicate & Near-Duplicate Management"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'which products list the asset (409 in-use, MediaUsage surface product) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-010 Media Library"
-        - "P13 CMS-075 Duplicate & Near-Duplicate Management"
-        - "P13 CMS-082 Asset Ownership & Responsibility Management"
       x-ticvai-audience: [staff]
       summary: Amend metadata, tags or rights
       description: >
@@ -318,13 +317,13 @@ paths:
 
     delete:
       operationId: deleteMediaAsset
+      x-ticvai-consumed-by:
+        - "P13 CMS-010 Media Library"
+        - "P13 CMS-075 Duplicate & Near-Duplicate Management"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'which products list the asset (409 in-use, MediaUsage surface product) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-010 Media Library"
-        - "P13 CMS-075 Duplicate & Near-Duplicate Management"
       x-ticvai-audience: [staff]
       summary: Delete an asset
       description: >
@@ -368,7 +367,6 @@ paths:
       x-ticvai-consumed-by:
         - "P13 CMS-010 Media Library"
         - "P13 CMS-076 Asset Version Control & Revision History"
-        - "P13 CMS-095 Asset Replacement & Propagation Management"
       x-ticvai-audience: [staff]
       summary: Replace the file behind an asset
       description: >
@@ -575,7 +573,6 @@ paths:
       operationId: listCollections
       x-ticvai-consumed-by:
         - "P13 CMS-010 Media Library"
-        - "P13 CMS-062 Central Digital Asset Library"
         - "P13 CMS-064 Folder, Collection & Workspace Management"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -709,10 +706,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMediaTaxonomy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-065 Metadata & Taxonomy Management"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Define categories, fields and keyword vocabularies
       tags:
       - assets
@@ -1025,7 +1022,6 @@ paths:
       operationId: setMediaAssetRights
       x-ticvai-consumed-by:
         - "P13 CMS-083 Rights, License & Usage Policy Management"
-        - "P13 CMS-088 Rights Expiry, Renewal & Usage Impact"
       summary: Licence, permitted use and expiry
       description: 'Boards 3.3 and 3.8. **`getExpiringRights` existed and nothing set them.** A licence
         with a territory, a channel restriction and an end date is the difference between a photograph
@@ -1208,7 +1204,6 @@ paths:
       operationId: setMediaDistributionChannels
       x-ticvai-consumed-by:
         - "P13 CMS-093 Channel & Distribution Configuration"
-        - "P13 CMS-094 Secure Delivery URL, CDN & Rendition Delivery"
         - "P13 CMS-096 Fallback, Expiry & Distribution Continuity"
       summary: CDN, delivery URLs, fallbacks and expiry behaviour
       description: 'Boards 4.3, 4.4 and 4.6. **The fallback is the part that keeps a page from breaking.**
@@ -1329,7 +1324,6 @@ paths:
         - "P13 CMS-070 Asset Activity, Recent Assets & Library Health"
         - "P13 CMS-071 AI Asset Intelligence Command Center"
         - "P13 CMS-080 AI Quality, Intelligence Review & Recommendations"
-        - "P13 CMS-081 DAM Governance & Rights Command Center"
         - "P13 CMS-098 Delivery Monitoring & Integration Health"
         - "P13 CMS-099 Asset Usage & Performance Analytics"
         - "P13 CMS-100 Distribution Intelligence, AI Insights & Optimization"

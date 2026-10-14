@@ -5,6 +5,7 @@
   "module": "Platform Ops",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_CELL_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "ticvai-web",

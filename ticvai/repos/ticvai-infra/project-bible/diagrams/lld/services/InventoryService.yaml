@@ -240,7 +240,7 @@ operationsByContract:
     scope: venue
     permission: PRODUCT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: listExpiringBatches
     verb: GET
@@ -807,7 +807,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: inventory.supplier
-  columns: 16
+  columns: 17
   store: postgres
   parent: null
   writtenBy:

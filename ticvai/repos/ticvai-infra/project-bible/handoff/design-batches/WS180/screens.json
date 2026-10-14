@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/recommendation-command-center-adm-639",
-   "component": "apps/venue-management-web/src/routes/commercial/RecommendationCommandCenter.tsx",
+   "component": "src/routes/commercial/RecommendationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -153,7 +154,7 @@
         "Suspended"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listRecommendationStrategies",
        "provenance": "pack Upsell,CrossSellEngine.pdf, page 7 §Display"
       }
      ]
@@ -189,7 +190,8 @@
         "Suspended"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Break down by”.",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 7 §Display"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 7 §Display",
+       "operation": "getRecommendationPerformance"
       }
      ]
     }
@@ -263,6 +265,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "1",
@@ -272,7 +275,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/recommendation-strategy-manager-adm-640",
-   "component": "apps/venue-management-web/src/routes/commercial/RecommendationStrategyManager.tsx",
+   "component": "src/routes/commercial/RecommendationStrategyManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -323,7 +326,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listRecommendationStrategies",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listRecommendationStrategies"
       },
       {
        "kind": "primaryButton",
@@ -424,6 +428,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "1",
@@ -433,7 +438,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/recommendation-objective-kpi-configuration-adm-641",
-   "component": "apps/venue-management-web/src/routes/commercial/RecommendationObjectiveKpiConfiguration.tsx",
+   "component": "src/routes/commercial/RecommendationObjectiveKpiConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -456,6 +461,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Administrators may configure) and no display directory — it is settings, not a population",
   "purpose": "Define exactly what the recommendation engine should optimize. This is important because the \"best\" recommendation depends on the business objective. Allow weighted objectives.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-643, ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Recommendation Objective & KPI Configuration (pack Upsell,CrossSellEngine.pdf, board 1.3, page 11): define exactly what the recommendation engine should optimize. This is important because the \"best\" recommendation depends on the business objective. Allow weighted objectives.",
   "gaps": [
    {
     "operation": null,
@@ -610,6 +616,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "1",
@@ -619,7 +626,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/recommendation-type-product-relationship-manager-adm-642",
-   "component": "apps/venue-management-web/src/routes/commercial/RecommendationTypeProductRelationshipManager.tsx",
+   "component": "src/routes/commercial/RecommendationTypeProductRelationshipManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -643,6 +650,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define the commercial relationships from which recommendations can be generated.",
+  "division": "Shares `listProductRelationships`, `setProductRelationships` with ADM-650, ADM-660, ADM-663, ADM-664; this screen is Recommendation Type & Product Relationship Manager (pack Upsell,CrossSellEngine.pdf, board 1.4, page 13): define the commercial relationships from which recommendations can be generated.",
   "gaps": [
    {
     "operation": null,
@@ -781,6 +789,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "1",
@@ -790,7 +799,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/recommendation-placement-touchpoint-manager-adm-643",
-   "component": "apps/venue-management-web/src/routes/commercial/RecommendationPlacementTouchpointManager.tsx",
+   "component": "src/routes/commercial/RecommendationPlacementTouchpointManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -814,6 +823,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define where in the customer journey recommendations are permitted to appear. This is a major requirement for the engine.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Recommendation Placement & Touchpoint Manager (pack Upsell,CrossSellEngine.pdf, board 1.5, page 15): define where in the customer journey recommendations are permitted to appear. This is a major requirement for the engine.",
   "gaps": [
    {
     "operation": null,
@@ -933,6 +943,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "1",
@@ -942,7 +953,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-journey-strategy-manager-adm-644",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelJourneyStrategyManager.tsx",
+   "component": "src/routes/commercial/ChannelJourneyStrategyManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -966,6 +977,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control recommendation behavior across TICVAI's omnichannel environment.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Channel & Journey Strategy Manager (pack Upsell,CrossSellEngine.pdf, board 1.6, page 17): control recommendation behavior across TICVAI's omnichannel environment.",
   "gaps": [
    {
     "operation": null,
@@ -1085,6 +1097,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "1",
@@ -1094,7 +1107,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/recommendation-priority-ranking-suppression-manager17-adm-645",
-   "component": "apps/venue-management-web/src/routes/commercial/RecommendationPriorityRankingSuppressionManager1.tsx",
+   "component": "src/routes/commercial/RecommendationPriorityRankingSuppressionManager1.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1279,6 +1292,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "1",
@@ -1288,7 +1302,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/recommendation-guardrails-business-controls-adm-646",
-   "component": "apps/venue-management-web/src/routes/commercial/RecommendationGuardrailsBusinessControls.tsx",
+   "component": "src/routes/commercial/RecommendationGuardrailsBusinessControls.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1312,6 +1326,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Protect the business and customer experience from inappropriate AI or rule- generated recommendations.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Recommendation Guardrails & Business Controls (pack Upsell,CrossSellEngine.pdf, board 1.8, page 20): protect the business and customer experience from inappropriate AI or rule- generated recommendations.",
   "gaps": [
    {
     "operation": null,
@@ -1426,6 +1441,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "1",
@@ -1435,7 +1451,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/recommendation-policy-ai-control-governance-adm-647",
-   "component": "apps/venue-management-web/src/routes/commercial/RecommendationPolicyAiControlGovernance.tsx",
+   "component": "src/routes/commercial/RecommendationPolicyAiControlGovernance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1459,6 +1475,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Define how much authority the TICVAI AI layer has over recommendation decisions.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-684, ADM-695; this screen is Recommendation Policy, AI Control & Governance (pack Upsell,CrossSellEngine.pdf, board 1.9, page 22): define how much authority the TICVAI AI layer has over recommendation decisions.",
   "gaps": [
    {
     "operation": null,
@@ -1481,7 +1498,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listRecommendationStrategies",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listRecommendationStrategies"
       }
      ]
     },
@@ -1582,6 +1600,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "1",
@@ -1591,7 +1610,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/recommendation-strategy-simulator-ai-advisor-adm-648",
-   "component": "apps/venue-management-web/src/routes/commercial/RecommendationStrategySimulatorAiAdvisor.tsx",
+   "component": "src/routes/commercial/RecommendationStrategySimulatorAiAdvisor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1616,6 +1635,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
   "purpose": "Allow administrators to test recommendation strategies before activating them. This should become the final validation screen for Board 1. ↓ Board 2 shall provide TICVAI with the specialized Upsell & Upgrade Recommendation Engine responsible for identifying when a customer can be moved from their current product, ticket, experience, membership, bundle, or service to a higher-value or more valuable alternative. Board 1 established the overall recommendation strategy, placements, ranking, guardrails, and AI governance.",
   "purposeNote": "Board 1 shall be complete when: 1. Administrators have a centralized Recommendation Command Center. 2. Recommendation strategies can be created and managed. 3. Strategies can have different commercial objectives. 4. Multi-objective optimization can be configured. 5. Recommendation relationships can be defined centrally. 6. Upsell, upgrade, cross-sell, add-on, bundle and membership relationships are supported. 7. Relationships can be manual, rule-generated or AI-discovered. 8. Recommendation placements can be configured. 9. Journey-stage-specific placements are supported. 10.Channel-specific be",
+  "division": "Shares `listRecommendationStrategies`, `simulateRecommendationStrategy` with ADM-658, ADM-668, ADM-688, ADM-698; this screen is Recommendation Strategy Simulator & AI Advisor (pack Upsell,CrossSellEngine.pdf, board 1.10, page 24): allow administrators to test recommendation strategies before activating them. This should become the final validation screen for Board 1. ↓ Board 2 shall provide TICVAI with the specialized Upsell & Upgrade Recommendation Engine responsible for identifying when a customer can be moved from their current product, ticket, experience, membership, bundle, or service to a higher-value or more valuable alternative. Board 1 established the overall recommendation strategy, placements, ranking, guardrails, and AI governance.",
   "layout": {
    "template": "form",
    "regions": [

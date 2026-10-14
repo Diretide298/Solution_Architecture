@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "9",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-finance-liability-command-center-bo-1163",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletFinanceLiabilityCommandCenter.tsx",
+   "component": "src/routes/orders-money/WalletFinanceLiabilityCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -193,7 +194,8 @@
         "Alerts"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Highlight”.",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 102 §Display"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 102 §Display",
+       "operation": "getWalletLiability"
       }
      ]
     }
@@ -260,6 +262,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "9",
@@ -269,7 +272,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-financial-classification-accounting-mapping-bo-1164",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletFinancialClassificationAccountingMapping.tsx",
+   "component": "src/routes/orders-money/WalletFinancialClassificationAccountingMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -479,6 +482,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "9",
@@ -488,7 +492,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-sub-ledger-balance-control-bo-1165",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletSubLedgerBalanceControl.tsx",
+   "component": "src/routes/orders-money/WalletSubLedgerBalanceControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -542,7 +546,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -676,6 +680,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "9",
@@ -685,7 +690,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/multi-source-reconciliation-configuration-bo-1166",
-   "component": "apps/venue-management-web/src/routes/orders-money/MultiSourceReconciliationConfiguration.tsx",
+   "component": "src/routes/orders-money/MultiSourceReconciliationConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -943,6 +948,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "9",
@@ -952,7 +958,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/reconciliation-exception-resolution-workbench-bo-1167",
-   "component": "apps/venue-management-web/src/routes/orders-money/ReconciliationExceptionResolutionWorkbench.tsx",
+   "component": "src/routes/orders-money/ReconciliationExceptionResolutionWorkbench.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1035,7 +1041,8 @@
         "Status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Workflow”.",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 106 §Display"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 106 §Display",
+       "operation": "getWalletReconciliation"
       }
      ]
     }
@@ -1122,6 +1129,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "9",
@@ -1131,7 +1139,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/gift-card-liability-management-bo-1168",
-   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardLiabilityManagement.tsx",
+   "component": "src/routes/orders-money/GiftCardLiabilityManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1232,7 +1240,8 @@
         "Aging Analysis"
        ],
        "notes": null,
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 107 §Display"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 107 §Display",
+       "operation": "getWalletLiability"
       }
      ]
     }
@@ -1299,6 +1308,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "9",
@@ -1308,7 +1318,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/breakage-revenue-recognition-policy-bo-1169",
-   "component": "apps/venue-management-web/src/routes/orders-money/BreakageRevenueRecognitionPolicy.tsx",
+   "component": "src/routes/orders-money/BreakageRevenueRecognitionPolicy.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1445,6 +1455,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "LEDGER_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "9",
@@ -1454,7 +1465,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-financial-period-closing-controls-bo-1170",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletFinancialPeriodClosingControls.tsx",
+   "component": "src/routes/orders-money/WalletFinancialPeriodClosingControls.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1665,6 +1676,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "9",
@@ -1674,7 +1686,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-analytics-management-reporting-bo-1171",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletAnalyticsManagementReporting.tsx",
+   "component": "src/routes/orders-money/WalletAnalyticsManagementReporting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1767,7 +1779,8 @@
         "AI Insights"
        ],
        "notes": null,
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 110 §Compare"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 110 §Compare",
+       "operation": "getWalletLiability"
       }
      ]
     }
@@ -1834,6 +1847,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "9",
@@ -1843,7 +1857,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/finance-validation-reporting-audit-center-bo-1172",
-   "component": "apps/venue-management-web/src/routes/orders-money/FinanceValidationReportingAuditCenter.tsx",
+   "component": "src/routes/orders-money/FinanceValidationReportingAuditCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1891,7 +1905,7 @@
         "Configuration Audit"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listFiscalPeriods",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 111 §Compare"
       }
      ]

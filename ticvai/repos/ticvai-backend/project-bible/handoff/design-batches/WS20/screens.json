@@ -5,6 +5,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approval-executive-kpi-dashboard-adm-359",
-   "component": "apps/venue-management-web/src/routes/platform/ApprovalExecutiveKpiDashboard.tsx",
+   "component": "src/routes/platform/ApprovalExecutiveKpiDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -184,6 +185,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "8",
@@ -193,7 +195,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approval-volume-outcome-analytics-adm-360",
-   "component": "apps/venue-management-web/src/routes/platform/ApprovalVolumeOutcomeAnalytics.tsx",
+   "component": "src/routes/platform/ApprovalVolumeOutcomeAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -290,6 +292,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "8",
@@ -299,7 +302,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approval-processing-time-analytics-adm-361",
-   "component": "apps/venue-management-web/src/routes/platform/ApprovalProcessingTimeAnalytics.tsx",
+   "component": "src/routes/platform/ApprovalProcessingTimeAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -396,6 +399,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "8",
@@ -405,7 +409,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/bottleneck-analysis-heatmap-adm-362",
-   "component": "apps/venue-management-web/src/routes/platform/BottleneckAnalysisHeatmap.tsx",
+   "component": "src/routes/platform/BottleneckAnalysisHeatmap.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -545,6 +549,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "8",
@@ -554,7 +559,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approval-trend-comparative-analytics-adm-363",
-   "component": "apps/venue-management-web/src/routes/platform/ApprovalTrendComparativeAnalytics.tsx",
+   "component": "src/routes/platform/ApprovalTrendComparativeAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -651,6 +656,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "8",
@@ -660,7 +666,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approver-team-performance-analytics-adm-364",
-   "component": "apps/venue-management-web/src/routes/platform/ApproverTeamPerformanceAnalytics.tsx",
+   "component": "src/routes/platform/ApproverTeamPerformanceAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -801,6 +807,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "8",
@@ -810,7 +817,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/risk-governance-analytics-adm-365",
-   "component": "apps/venue-management-web/src/routes/platform/RiskGovernanceAnalytics.tsx",
+   "component": "src/routes/platform/RiskGovernanceAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -930,6 +937,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "8",
@@ -939,7 +947,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/ai-approval-intelligence-center-adm-366",
-   "component": "apps/venue-management-web/src/routes/platform/AiApprovalIntelligenceCenter.tsx",
+   "component": "src/routes/platform/AiApprovalIntelligenceCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -985,7 +993,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getApprovalRequestScore",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getApprovalRequestScore"
       }
      ]
     }
@@ -1057,6 +1066,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "8",
@@ -1066,7 +1076,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/ai-optimization-what-if-simulator-adm-367",
-   "component": "apps/venue-management-web/src/routes/platform/AiOptimizationWhatIfSimulator.tsx",
+   "component": "src/routes/platform/AiOptimizationWhatIfSimulator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1177,6 +1187,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "8",
@@ -1186,7 +1197,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/ai-governance-executive-advisor-adm-368",
-   "component": "apps/venue-management-web/src/routes/platform/AiGovernanceExecutiveAdvisor.tsx",
+   "component": "src/routes/platform/AiGovernanceExecutiveAdvisor.tsx",
    "status": "notStarted"
   },
   "navigation": {

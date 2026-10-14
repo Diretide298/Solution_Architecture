@@ -127,14 +127,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-734` | CRM Command Center | D | 1 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-735` | Guest Directory | D | 13 | 18 | 6 | 16 | 1 | 0 | — | notStarted (—) |
+| `BO-734` | CRM Command Center | D | 1 | 20 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-735` | Guest Directory | D | 13 | 38 | 6 | 16 | 1 | 0 | — | notStarted (—) |
 | `BO-736` | Guest Master Configuration | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-737` | Customer 360 Profile | D | 0 | 70 | 6 | 12 | 3 | 0 | — | notStarted (—) |
-| `BO-738` | Activity Timeline | D | 0 | 11 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-739` | Contact & Preferences | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-740` | Family & Guardians | D | 11 | 9 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-741` | Corporate & Groups | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-737` | Customer 360 Profile | D | 0 | 90 | 6 | 12 | 3 | 0 | — | notStarted (—) |
+| `BO-738` | Activity Timeline | D | 0 | 31 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-739` | Contact & Preferences | B | 0 | 27 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-740` | Family & Guardians | D | 11 | 29 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-741` | Corporate & Groups | D | 0 | 9 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-742` | Commerce & Documents | D | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-743` | AI Guest Intelligence | D | 0 | 20 | 6 | 9 | 0 | 0 | — | notStarted (—) |
 

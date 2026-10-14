@@ -1,6 +1,6 @@
 # P06-operations-05 — P06 · Operations (5 of 5)
 
-**6 screens · 11 operations · 25 schemas · 7 permissions**
+**6 screens · 12 operations · 27 schemas · 8 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -48,10 +48,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 7 permissions apply here:
-  `ACCESS_VALIDATE, INCIDENT_MANAGE, INCIDENT_VIEW, INSPECTION_SUBMIT, INSPECTION_VIEW, REPORT_VIEW_VENUE, WORKFORCE_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 8 permissions apply here:
+  `ACCESS_VALIDATE, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, INSPECTION_SUBMIT, INSPECTION_VIEW, REPORT_VIEW_VENUE, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **5 of these operations work offline**: acknowledgeAnnouncement, listAnnouncements, listInspectionTemplates, logout, submitInspection
+- **7 of these operations work offline**: acknowledgeAnnouncement, listAnnouncements, listInspectionTemplates, logout, submitInspection, updateIncident, uploadIncidentMedia
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.

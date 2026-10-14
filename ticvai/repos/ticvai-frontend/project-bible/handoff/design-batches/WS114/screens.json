@@ -14,7 +14,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-communications-command-center-bo-674",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationCommunicationsCommandCenter.tsx",
+   "component": "src/routes/access-venue/AccreditationCommunicationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -173,6 +173,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_CONFIGURE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "7",
@@ -182,7 +183,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/notification-rule-management-bo-675",
-   "component": "apps/venue-management-web/src/routes/access-venue/NotificationRuleManagement.tsx",
+   "component": "src/routes/access-venue/NotificationRuleManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -319,6 +320,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_CONFIGURE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "7",
@@ -328,7 +330,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/expiry-renewal-notification-scheduler-bo-676",
-   "component": "apps/venue-management-web/src/routes/access-venue/ExpiryRenewalNotificationScheduler.tsx",
+   "component": "src/routes/access-venue/ExpiryRenewalNotificationScheduler.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -452,7 +454,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/communication-template-library-bo-677",
-   "component": "apps/venue-management-web/src/routes/access-venue/CommunicationTemplateLibrary.tsx",
+   "component": "src/routes/access-venue/CommunicationTemplateLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -537,7 +539,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/channel-language-branding-configuration-bo-678",
-   "component": "apps/venue-management-web/src/routes/access-venue/ChannelLanguageBrandingConfiguration.tsx",
+   "component": "src/routes/access-venue/ChannelLanguageBrandingConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -681,7 +683,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/manual-bulk-communication-center-bo-679",
-   "component": "apps/venue-management-web/src/routes/access-venue/ManualBulkCommunicationCenter.tsx",
+   "component": "src/routes/access-venue/ManualBulkCommunicationCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -779,6 +781,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_MANAGE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "7",
@@ -788,7 +791,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-bulk-import-bo-680",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationBulkImport.tsx",
+   "component": "src/routes/access-venue/AccreditationBulkImport.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -910,7 +913,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/import-validation-processing-monitor-bo-681",
-   "component": "apps/venue-management-web/src/routes/access-venue/ImportValidationProcessingMonitor.tsx",
+   "component": "src/routes/access-venue/ImportValidationProcessingMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1059,6 +1062,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "7",
@@ -1068,7 +1072,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-export-data-extract-center-bo-682",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationExportDataExtractCenter.tsx",
+   "component": "src/routes/access-venue/AccreditationExportDataExtractCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1233,6 +1237,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "7",
@@ -1242,7 +1247,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/delivery-batch-operational-history-bo-683",
-   "component": "apps/venue-management-web/src/routes/access-venue/DeliveryBatchOperationalHistory.tsx",
+   "component": "src/routes/access-venue/DeliveryBatchOperationalHistory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1287,7 +1292,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAccreditationAudit",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAccreditationAudit"
       }
      ]
     }

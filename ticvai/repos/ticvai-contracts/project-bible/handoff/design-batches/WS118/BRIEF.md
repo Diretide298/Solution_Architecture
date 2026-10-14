@@ -1,6 +1,6 @@
 # WS118 — AI Configuration Assistant board 3
 
-**10 screens · 23 operations · 28 schemas · 6 permissions**
+**10 screens · 15 operations · 23 schemas · 6 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -95,16 +95,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-489` | AI Configuration Readiness Center | D | 20 | 14 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-490` | Configuration Validation Results | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-489` | AI Configuration Readiness Center | D | 20 | 174 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-490` | Configuration Validation Results | D | 6 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-491` | AI Recommendations & Best-Practice Review | D | 6 | 20 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-492` | Configuration Approval Workflow | D | 6 | 6 | 7 | 2 | 0 | 3 | — | notStarted (—) |
-| `ADM-493` | AI Configuration Execution Center | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-492` | Configuration Approval Workflow | D | 6 | 6 | 7 | 1 | 0 | 3 | — | notStarted (—) |
+| `ADM-493` | AI Configuration Execution Center | D | 8 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-494` | Execution Progress & Dependency Monitor | D | 6 | 48 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-495` | Configuration Results & Object Mapping | D | 6 | 22 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-496` | Configuration Change & Modification Assistant | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-497` | Configuration History, Versions & Rollback | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-498` | AI Configuration Audit & Governance | D | 8 | 16 | 7 | 5 | 1 | 0 | — | notStarted (—) |
+| `ADM-497` | Configuration History, Versions & Rollback | D | 8 | 46 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-498` | AI Configuration Audit & Governance | D | 8 | 576 | 7 | 5 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-844` | Waiver Command Center | D | 0 | 0 | 6 | 0 | 1 | 4 | — | notStarted (—) |
+| `BO-844` | Waiver Command Center | D | 0 | 20 | 6 | 0 | 1 | 4 | — | notStarted (—) |
 | `BO-845` | Waiver Template Builder | D | 20 | 20 | 6 | 0 | 1 | 4 | — | notStarted (—) |
-| `BO-846` | Assignment Rules | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-846` | Assignment Rules | D | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-847` | Version, Expiry & Renewal | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-848` | Signature Experience Setup | D | 17 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-849` | Guardian & Group Signing | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-850` | Pre-Arrival Completion | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-851` | Verification & Access Control | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-852` | Documents, Search & Retention | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-853` | Legal Evidence & Audit | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-850` | Pre-Arrival Completion | D | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-851` | Verification & Access Control | D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-852` | Documents, Search & Retention | D | 0 | 23 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-853` | Legal Evidence & Audit | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -171,7 +171,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listWaiver`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Waivers required | 1,234 | Requirements assigned, excluding `superseded`. |
+| Completed | 1,234 | Requirements `completed` or `verified`. |
+| Pending | 1,234 | Requirements `assigned`, `sent` or `opened`, not yet started. |
+| Partially completed | 1,234 | Requirements `inProgress`, and participants with some but not all waivers complete. |
+| Expiring | 1,234 | Completed requirements whose acceptance (`FormSubmission.expiresAt`) ends before the activity starts. |
+| Invalid | 1,234 | Requirements `expired`, or completed against a superseded version. |
+| Rejected | 1,234 | — |
+| Guardian consent pending | 1,234 | Minor participants whose guardian has not yet signed. |
+| Upcoming participants missing waiver | 1,234 | Participants with at least one mandatory requirement not complete. |
+| Access blocked | 1,234 | Participants whose ticket download, activation, check-in or access is currently blocked by a waiver. |
+| Manual exceptions | 1,234 | Approved exceptions (`setWaiverException`) in force. |
+| Completion rate | 12.5% | `completed` / `waiversRequired`. |
+| By period | list or chips (count when long) | Today, tomorrow and this week, in that order, whatever the window. |
+| Period | chip: Today, Tomorrow, This week | — |
+| Waivers required | 1,234 | — |
+| Completed | 1,234 | — |
+| Missing | 1,234 | — |
+| Breakdown | list or chips (count when long) | One entry per value of `breakdownBy`, lowest completion first. |
+| Key | text | The id of the venue, event, product, performance, group booking, booking or waiver form. |
+| Label | text | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -222,6 +245,8 @@ atRisk: Deep Dive 14:00 - 12 participants - 3 unsigned (2 minors awaiting guardi
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -261,7 +286,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-844?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-845`, `BO-846`, `BO-847`, `BO-848`, `BO-849`, `BO-850`, `BO-851`, `BO-852`, `BO-853`.
@@ -406,6 +431,8 @@ template: Deep Dive liability release v3 - EN/AR - owner Legal - approved
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -487,7 +514,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listWaiverTemplateMaster`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Waiver | the name it points at, never the id | The `FormDefinition.id`; the natural key. |
+| Waiver name | text | `FormDefinition.name`, shown here, written by `createForm`. |
+| Internal description | text | — |
+| Waiver type | chip: Liability waiver, Parent guardian consent, Participation consent, Medical … | — |
+| Custom type label | text | The tenant's own classification name; required when `waiverType` is `customForm`. |
+| Owner user | the name it points at, never the id | — |
+| Department | text | — |
+| Brand | the name it points at, never the id | Null for a corporate waiver every brand may use. |
+| Legal entity | the name it points at, never the id | The finance legal entity the waiver is given in favour of. |
+| Default language | text | — |
+| Applicable countries | list or chips (count when long) | ISO 3166-1 alpha-2. Empty means the waiver is not yet scoped, which blocks publication. |
+| Applicable jurisdiction | text | A sub-national jurisdiction where the law differs within a country. |
+| Status | chip: Draft, Review, Pending approval, Approved, Scheduled, Published… | The lifecycle status of the latest version (see `listWaiverConsent`). |
+| Template source | chip: Create new, Duplicate existing, Master template, Corporate template | — |
+| Source waiver | the name it points at, never the id | The waiver it was duplicated or created from; required unless `createNew`. |
+| Source version | 1,234 | — |
+| Is master template | yes / no (icon or chip) | Offered in the reusable library. A corporate template is a master template with no `brandId`. |
+| Business owner user | the name it points at, never the id | — |
+| Legal reviewer user | the name it points at, never the id | — |
 
 **Assignment rules** (data table, from `listWaiverTriggerEligibility`)
 
@@ -547,6 +597,8 @@ rule: Deep Dive and Flow Rider products -> Water activity waiver v3 required bef
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -571,7 +623,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-846?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-844`.
@@ -675,6 +727,8 @@ version: v4 effective 1 Nov 2026 - clause 6 medical changed - all future booking
 - `listVersioningEffectiveDate` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `GUEST_VIEW`
 
 #### Requirements it meets
 
@@ -841,6 +895,8 @@ setup: Waiver station at Deep Dive desk - tablet - signature + initials on claus
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -946,6 +1002,8 @@ rule: Under 16 - one guardian signs for up to 5 linked children; school groups -
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1034,7 +1092,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listMinorGuardianGroup`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Minor | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Name | text | — |
+| Age | 1,234 | — |
+| Booking | the name it points at, never the id | The order id. |
+| Visit date | 1 Oct 2026, 14:30 | — |
+| Guardians | list or chips (count when long) | Everyone holding a parent or guardian relationship to the minor; empty when none is recorded. |
+| Relationship | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Name | text | — |
+| Relationship | chip: Parent, Guardian | — |
+| Contact | text | The address the guardian link goes to (email or mobile). |
+| May waive | yes / no (icon or chip) | The relationship carries the `signWaiver` authority and is in effect. |
+| Verification status | chip: Verified, Unverified | `verified` when `GuestRelationship.verifiedAt` is set. |
+| Signature status | chip: Not requested, Sent, Opened, Signed, Rejected, Expired | — |
+| Consent status | chip: Complete, Pending, Rejected | `complete` when every mandatory guardian consent for the minor on this booking is signed by an authorised signatory. |
+| Group | grouped details | The group booking the minor is part of, and its leader. |
+| Group booking | the name it points at, never the id | — |
+| Organization | text | The school, club or company. |
 
 **Participants to chase** (data table, from `listParticipantWaiverStatus`)
 
@@ -1094,6 +1175,8 @@ booking: ORD-55821 - Deep Dive Sat 3 Oct 14:00 - 3 participants - 1 signed, 2 pe
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW_PII`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1118,7 +1201,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-850?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-844`.
@@ -1171,7 +1254,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listParticipantWaiverStatus`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Participant | the name it points at, never the id | The participant's subject id. |
+| Participant | text | The participant's name. |
+| Customer purchaser | grouped details | Who bought the booking; may differ from the participant. |
+| Subject | the name it points at, never the id | — |
+| Name | text | — |
+| Booking | the name it points at, never the id | The order id. |
+| Ticket | the name it points at, never the id | The ticket (entitlement) id. |
+| Product | grouped details | — |
+| Product | the name it points at, never the id | — |
+| Name | text | — |
+| Event | grouped details | — |
+| Event | the name it points at, never the id | — |
+| Performance | the name it points at, never the id | — |
+| Name | text | — |
+| Visit date | 1 Oct 2026, 14:30 | — |
+| Age category | chip: Adult, Minor | From the participant's date of birth against the age of majority configured for the venue's jurisdiction (no shipped default). |
+| Group | grouped details | — |
+| Group booking | the name it points at, never the id | — |
+| Name | text | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -1209,6 +1315,8 @@ result: Layla Haddad - Water activity waiver v3 missing - guardian must sign - B
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW_PII`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1235,7 +1343,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-851?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-844`.
@@ -1258,7 +1366,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | `subjectId` (navigation) |
+| Opens with | `subjectId` (navigation), `verificationId` (navigation) |
 | Route | `/engagement-support/documents-search-retention-bo-852` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
@@ -1290,7 +1398,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getWaiverStatus`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Is satisfied | yes / no (icon or chip) | — |
+| Missing forms | list or chips (count when long) | — |
+| Expiring within days | 1,234 | — |
 
 **Signed waivers** (data table, from `listComplianceEvidenceWaiver`)
 
@@ -1362,6 +1476,8 @@ record: Fatima Al Mansoori - Water activity waiver v3 - signed 26 Sep 2026 10:12
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW_PII`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1388,7 +1504,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-852?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
 - [ ] Every transition is wired: `BO-844`.
@@ -1441,7 +1557,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listComplianceEvidenceWaiver`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Submission | the name it points at, never the id | — |
+| Signature | the name it points at, never the id | The `MarketingWaiverSignature` row. |
+| Waiver | the name it points at, never the id | The waiver form (`FormDefinition.id`). |
+| Waiver name | text | — |
+| Exact version | 1,234 | The form version presented and signed; `getForm` with this `version` returns its wording and questions. |
+| Participant | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Name | text | — |
+| Date of birth | 1 Oct 2026 | — |
+| Signatory | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Name | text | — |
+| Signed name | text | The name as typed or drawn at signing. |
+| Signatory type | chip: Participant, Guardian, Organisation representative | — |
+| Guardian relationship | the name it points at, never the id | The `GuestRelationship` relied on when a guardian or representative signed. |
+| Submitted at | 1 Oct 2026, 14:30 | Device time of signing. |
+| Synced at | 1 Oct 2026, 14:30 | Server time the submission arrived. |
+| Channel | text | `FormSubmission.capturedAtChannel`. |
+| Collection method | chip: Email, SMS, Whatsapp, Guest web, Guest app, Group portal… | — |
 
 **Data it reads**: `listComplianceEvidenceWaiver` (onLoad, Documents, search and retention)
 
@@ -1480,6 +1619,8 @@ evidence: v3 hash 9f2c...e1 - signed by guardian Khalid Al Suwaidi for Mariam (9
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW_PII`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1506,7 +1647,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-853?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-844`.
@@ -1619,7 +1760,7 @@ Method, path, parameters, request and response for every operation these screens
 "listWaiverTriggerEligibility": {"method":"GET","path":"/waiver-trigger-eligibility","contract":"marketing-crm","summary":"Waiver Trigger, Eligibility & Completion Rules","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"formId","in":"query","required":false},{"name":"triggerPoint","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setDigitalWaiverForm": {"method":"PUT","path":"/digital-waiver-form","contract":"marketing-crm","summary":"Save the layout of a draft waiver version","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"DigitalWaiverFormBuilderInput","responds":"DigitalWaiverFormBuilderView"},
 "setSignatorySignatureGuardian": {"method":"PUT","path":"/signatory-signature-guardian","contract":"marketing-crm","summary":"Set who must sign a draft waiver version, and how","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SignatorySignatureGuardianRuleConfigurationInput","responds":"SignatorySignatureGuardianRuleConfigurationView"},
-"setWaiverVerificationValidation": {"method":"PUT","path":"/waiver-verification-validation","contract":"marketing-crm","summary":"Record a reviewer's verification decision on a waiver submission","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"WaiverVerificationValidationWorkspaceInput","responds":"WaiverVerificationValidationWorkspaceView"}
+"setWaiverVerificationValidation": {"method":"PUT","path":"/waiver-verification-validation/{verificationId}","contract":"marketing-crm","summary":"Record a reviewer's verification decision on a waiver submission","permission":"GUEST_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"verificationId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"WaiverVerificationValidationWorkspaceInput","responds":"WaiverVerificationValidationWorkspaceView"}
 }
 ```
 
@@ -1631,18 +1772,18 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "ComplianceEvidenceAuditWaiverRepositoryView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.form_submission, marketing.waiver_signature, marketing.form_definition + marketing.form_definition_field, marketing.guest_document, marketing.waiver_verification (new), marketing.waiver_requirement (new) and marketing.waiver_requirement_event (new); names from pii.subject","description":"One signed waiver as evidence. Nothing here changes after signing except the verification and the audit events appended to it.","required":["submissionId","waiverId","exactVersion","participant","signatory","submittedAt","documentHash","auditEvents"],"properties":{"submissionId":{"type":"string","format":"uuid"},"signatureId":{"type":"string","format":"uuid","nullable":true,"description":"The `MarketingWaiverSignature` row."},"waiverId":{"type":"string","format":"uuid","description":"The waiver form (`FormDefinition.id`)."},"waiverName":{"type":"string"},"exactVersion":{"type":"integer","minimum":1,"description":"The form version presented and signed; `getForm` with this `version` returns its wording and questions."},"participant":{"type":"object","properties":{"subjectId":{"type":"string","format":"uuid"},"name":{"type":"string"},"dateOfBirth":{"type":"string","format":"date","nullable":true}}},"signatory":{"type":"object","properties":{"subjectId":{"type":"string","format":"uuid"},"name":{"type":"string"},"signedName":{"type":"string","description":"The name as typed or drawn at signing."}}},"signatoryType":{"type":"string","enum":["participant","guardian","organisationRepresentative"]},"guardianRelationshipId":{"type":"string","format":"uuid","nullable":true,"description":"The `GuestRelationship` relied on when a guardian or representative signed."},"submittedAt":{"type":"string","format":"date-time","description":"Device time of signing."},"syncedAt":{"type":"string","format":"date-time","description":"Server time the submission arrived."},"channel":{"type":"string","description":"`FormSubmission.capturedAtChannel`."},"collectionMethod":{"type":"string","nullable":true,"enum":["email","sms","whatsapp","guestWeb","guestApp","groupPortal","qrCode","pos","kiosk","staffAssistedDevice"]},"assistedByStaffId":{"type":"string","format":"uuid","nullable":true,"description":"The staff member who helped on a staff-assisted device; never the signer."},"responses":{"type":"object","description":"`FormSubmission.answers`, keyed by field key.","additionalProperties":true},"acknowledgements":{"type":"array","items":{"type":"object","required":["key","accepted"],"properties":{"key":{"type":"string"},"label":{"type":"string","description":"The wording as presented in `exactVersion`."},"accepted":{"type":"boolean"}}}},"signatureEvidence":{"type":"object","properties":{"signatureKind":{"type":"string","enum":["drawn","typed","checkbox"]},"signatureAssetId":{"type":"string","format":"uuid","nullable":true},"signedDocumentId":{"type":"string","format":"uuid","nullable":true,"description":"The rendered document as signed (`GuestDocument`, kind `signedWaiver`)."}}},"documentHash":{"type":"string","maxLength":128,"description":"Hash of the rendered document as signed."},"deviceEvidence":{"type":"object","nullable":true,"description":"Personal data (ADR-0023); null once the subject is erased.","properties":{"ipAddress":{"type":"string","nullable":true},"deviceInfo":{"type":"string","nullable":true}}},"verification":{"type":"object","nullable":true,"properties":{"result":{"type":"string","enum":["automaticallyValidated","pendingManualVerification","verified","correctionRequired","rejected","escalated"]},"reviewedBy":{"type":"string","format":"uuid","nullable":true},"reviewedAt":{"type":"string","format":"date-time","nullable":true}}},"relatedBooking":{"type":"string","format":"uuid","nullable":true},"relatedTicket":{"type":"string","format":"uuid","nullable":true},"applicableProductId":{"type":"string","format":"uuid","nullable":true},"applicablePerformanceId":{"type":"string","format":"uuid","nullable":true},"retainUntil":{"type":"string","format":"date-time","nullable":true,"description":"From the retention policy in force."},"auditEvents":{"type":"array","description":"The requirement's timeline, oldest first (link issued, opened, completed, signed, validated, verified and every staff action).","items":{"type":"object","required":["at","event","actor"],"properties":{"at":{"type":"string","format":"date-time"},"event":{"type":"string","enum":["linkIssued","linkOpened","participantIdentified","guardianInformationCompleted","questionsCompleted","acknowledgementsAccepted","signatureSubmitted","validationPassed","validationFailed","markedComplete","verified","rejected","correctionRequested","signatoryReplaced","exceptionApproved","evidenceViewed"]},"actor":{"type":"string","enum":["participant","guardian","staff","system"]},"staffId":{"type":"string","format":"uuid","nullable":true}}}}}},
 "DigitalWaiverFormBuilderInput": {"description":"The request body of `setDigitalWaiverForm`, the layout record itself; read-only properties are ignored.","allOf":[{"$ref":"#/components/schemas/DigitalWaiverFormBuilderView"}]},
-"DigitalWaiverFormBuilderView": {"type":"object","x-ticvai-persistence":"marketing.waiver_form_layout","description":"The layout of one waiver version (pack 11.1.3), keyed on `formId` + `formVersion`. Immutable once the version is published, like the version itself.","required":["formId","formVersion","sections"],"properties":{"formId":{"type":"string","format":"uuid"},"formVersion":{"type":"integer","minimum":1},"sections":{"type":"array","minItems":1,"items":{"type":"object","required":["sectionKey","kind","blocks"],"properties":{"sectionKey":{"type":"string","maxLength":60},"kind":{"type":"string","enum":["header","participantInformation","waiverTerms","safetyAcknowledgements","questions","consent","signature","custom"]},"title":{"$ref":"#/components/schemas/marketing-crm::LocalisedText"},"numbered":{"type":"boolean","default":false},"mandatoryReading":{"type":"boolean","default":false,"description":"The signatory must tick \"I have read and understood this section\" before continuing."},"acknowledgementText":{"$ref":"#/components/schemas/marketing-crm::LocalisedText"},"showWhen":{"type":"object","nullable":true,"description":"Shown only when the condition holds, e.g. `isMinor` equals `true` shows the guardian section.","required":["subject","operator"],"properties":{"subject":{"type":"string","maxLength":60,"description":"A field key of this version, or `isMinor` (resolved from the waiver's guardian threshold)."},"operator":{"type":"string","enum":["equals","notEquals","in","lessThan","greaterThan","isAnswered"]},"value":{"type":"string","maxLength":200,"nullable":true}}},"blocks":{"type":"array","items":{"type":"object","required":["blockKey","kind"],"properties":{"blockKey":{"type":"string","maxLength":60},"kind":{"type":"string","enum":["heading","paragraph","legalText","instructions","imageLogo","divider","informationBox","checkbox","acknowledgement","question","signature","initials","date","customerDetails","guardianDetails"]},"content":{"$ref":"#/components/schemas/marketing-crm::LocalisedText"},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"The image for an `imageLogo` block."},"fieldKey":{"type":"string","maxLength":60,"nullable":true,"description":"The `FormField.key` an input block collects; required for input kinds."},"mandatoryNotice":{"type":"boolean","default":false,"description":"Rendered as a notice that cannot be collapsed."}}}}}}},"status":{"type":"string","readOnly":true,"enum":["draft","published","superseded","retired"],"description":"`FormDefinition.status` of this version."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
+"DigitalWaiverFormBuilderView": {"type":"object","x-ticvai-persistence":"marketing.waiver_form_layout","description":"The layout of one waiver version (pack 11.1.3), keyed on `formId` + `formVersion`. Immutable once the version is published, like the version itself.","required":["formId","formVersion","sections"],"properties":{"formId":{"type":"string","format":"uuid"},"formVersion":{"type":"integer","minimum":1},"sections":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","minItems":1,"items":{"type":"object","required":["sectionKey","kind","blocks"],"properties":{"sectionKey":{"type":"string","maxLength":60},"kind":{"type":"string","enum":["header","participantInformation","waiverTerms","safetyAcknowledgements","questions","consent","signature","custom"]},"title":{"$ref":"#/components/schemas/marketing-crm::LocalisedText"},"numbered":{"type":"boolean","default":false},"mandatoryReading":{"type":"boolean","default":false,"description":"The signatory must tick \"I have read and understood this section\" before continuing."},"acknowledgementText":{"$ref":"#/components/schemas/marketing-crm::LocalisedText"},"showWhen":{"type":"object","nullable":true,"description":"Shown only when the condition holds, e.g. `isMinor` equals `true` shows the guardian section.","required":["subject","operator"],"properties":{"subject":{"type":"string","maxLength":60,"description":"A field key of this version, or `isMinor` (resolved from the waiver's guardian threshold)."},"operator":{"type":"string","enum":["equals","notEquals","in","lessThan","greaterThan","isAnswered"]},"value":{"type":"string","maxLength":200,"nullable":true}}},"blocks":{"type":"array","items":{"type":"object","required":["blockKey","kind"],"properties":{"blockKey":{"type":"string","maxLength":60},"kind":{"type":"string","enum":["heading","paragraph","legalText","instructions","imageLogo","divider","informationBox","checkbox","acknowledgement","question","signature","initials","date","customerDetails","guardianDetails"]},"content":{"$ref":"#/components/schemas/marketing-crm::LocalisedText"},"assetId":{"type":"string","format":"uuid","nullable":true,"description":"The image for an `imageLogo` block."},"fieldKey":{"type":"string","maxLength":60,"nullable":true,"description":"The `FormField.key` an input block collects; required for input kinds."},"mandatoryNotice":{"type":"boolean","default":false,"description":"Rendered as a notice that cannot be collapsed."}}}}}}},"status":{"type":"string","readOnly":true,"enum":["draft","published","superseded","retired"],"description":"`FormDefinition.status` of this version."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"MessageChannel": {"x-ticvai-rls":"grant-holder-read","type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "MinorGuardianGroupConsentManagementView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.guest_relationship, marketing.waiver_requirement (new), marketing.form_submission, orders.group_booking and orders.order_line; names and contacts from pii.subject and pii.subject_contact","description":"One minor participant on one booking, their guardians and their group.","required":["minor","booking","guardians","consentStatus"],"properties":{"minor":{"type":"object","required":["subjectId","name"],"properties":{"subjectId":{"type":"string","format":"uuid"},"name":{"type":"string"},"age":{"type":"integer","minimum":0,"nullable":true}}},"booking":{"type":"string","format":"uuid","description":"The order id."},"visitDate":{"type":"string","format":"date-time","nullable":true},"guardians":{"type":"array","description":"Everyone holding a parent or guardian relationship to the minor; empty when none is recorded.","items":{"type":"object","required":["subjectId","name","relationship","verificationStatus","signatureStatus"],"properties":{"relationshipId":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"name":{"type":"string"},"relationship":{"type":"string","enum":["parent","guardian"]},"contact":{"type":"string","nullable":true,"description":"The address the guardian link goes to (email or mobile)."},"mayWaive":{"type":"boolean","description":"The relationship carries the `signWaiver` authority and is in effect."},"verificationStatus":{"type":"string","enum":["verified","unverified"],"description":"`verified` when `GuestRelationship.verifiedAt` is set."},"signatureStatus":{"type":"string","enum":["notRequested","sent","opened","signed","rejected","expired"]}}}},"consentStatus":{"type":"string","enum":["complete","pending","rejected"],"description":"`complete` when every mandatory guardian consent for the minor on this booking is signed by an authorised signatory."},"group":{"type":"object","nullable":true,"description":"The group booking the minor is part of, and its leader.","properties":{"groupBookingId":{"type":"string","format":"uuid"},"organization":{"type":"string","nullable":true,"description":"The school, club or company."},"groupLeader":{"type":"object","properties":{"subjectId":{"type":"string","format":"uuid"},"name":{"type":"string"}}},"contact":{"type":"string","nullable":true,"description":"The leader's email or mobile."},"groupBooking":{"type":"string","format":"uuid","description":"The group's order id."},"responsibility":{"type":"string","enum":["coordinatorOnly","supervisingAdult","organisationRepresentative"],"description":"`organisationRepresentative` when the leader's `GuestRelationship` (kind `groupLeader`) carries `signWaiver`; `supervisingAdult` when the leader is a participant on the booking; otherwise `coordinatorOnly`."},"permittedActions":{"type":"array","description":"What the leader may do for this group under the form's signatory rule.","items":{"type":"string","enum":["viewStatus","sendLinks","receiveNotifications","signOnBehalf"]}}}}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "ParticipantWaiverStatusTrackingView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.waiver_requirement (new), marketing.form_definition, marketing.form_submission, marketing.waiver_verification (new), marketing.waiver_exception (new), orders.order_line, orders.group_booking and catalogue.performance; names from pii.subject","description":"One participant on one booking and the waivers that participant needs. Purchaser, participant and each waiver's signatory are separate people.","required":["participantId","participant","booking","waiverRequirements","completionStatus"],"properties":{"participantId":{"type":"string","format":"uuid","description":"The participant's subject id."},"participant":{"type":"string","description":"The participant's name."},"customerPurchaser":{"type":"object","nullable":true,"description":"Who bought the booking; may differ from the participant.","properties":{"subjectId":{"type":"string","format":"uuid"},"name":{"type":"string"}}},"booking":{"type":"string","format":"uuid","description":"The order id."},"ticket":{"type":"string","format":"uuid","nullable":true,"description":"The ticket (entitlement) id."},"product":{"type":"object","properties":{"productId":{"type":"string","format":"uuid"},"name":{"type":"string"}}},"event":{"type":"object","nullable":true,"properties":{"eventId":{"type":"string","format":"uuid"},"performanceId":{"type":"string","format":"uuid"},"name":{"type":"string"}}},"visitDate":{"type":"string","format":"date-time","nullable":true},"ageCategory":{"type":"string","enum":["adult","minor"],"description":"From the participant's date of birth against the age of majority configured for the venue's jurisdiction (no shipped default). A participant whose age cannot be established is treated as a minor."},"group":{"type":"object","nullable":true,"properties":{"groupBookingId":{"type":"string","format":"uuid"},"name":{"type":"string"}}},"waiverRequirements":{"type":"array","description":"Each waiver this participant needs on this booking.","items":{"type":"object","required":["requirementId","formId","formName","mandatory","status"],"properties":{"requirementId":{"type":"string","format":"uuid"},"formId":{"type":"string","format":"uuid"},"formName":{"type":"string"},"formVersion":{"type":"integer","minimum":1,"nullable":true,"description":"The version assigned, or signed once completed."},"mandatory":{"type":"boolean","description":"False for an optional consent (e.g. media), which never blocks readiness."},"status":{"type":"string","enum":["notAssigned","assigned","sent","opened","inProgress","completed","verified","rejected","expired","superseded"]},"declined":{"type":"boolean","default":false,"description":"An optional consent answered no."},"signatory":{"type":"object","nullable":true,"properties":{"subjectId":{"type":"string","format":"uuid"},"name":{"type":"string"},"signatoryType":{"type":"string","enum":["participant","guardian","organisationRepresentative"]}}},"deliveryChannel":{"type":"string","nullable":true,"enum":["email","sms","whatsapp","push","inApp","qrCode","pos","kiosk","staffAssistedDevice","groupPortal"]},"lastSentAt":{"type":"string","format":"date-time","nullable":true},"completedAt":{"type":"string","format":"date-time","nullable":true},"submissionId":{"type":"string","format":"uuid","nullable":true},"blocks":{"type":"array","description":"What an incomplete requirement blocks, from the trigger configuration.","items":{"type":"string","enum":["ticketDownload","activation","checkIn","access"]}}}}},"completionStatus":{"type":"string","enum":["ready","notReady","exceptionApproved"],"description":"`ready` when every mandatory requirement is completed or verified; `exceptionApproved` when the gap is covered by an approved exception."}}},
 "SignatorySignatureGuardianRuleConfigurationInput": {"description":"The request body of `setSignatorySignatureGuardian`, the rule record itself; read-only properties are ignored.","allOf":[{"$ref":"#/components/schemas/SignatorySignatureGuardianRuleConfigurationView"}]},
-"SignatorySignatureGuardianRuleConfigurationView": {"type":"object","x-ticvai-persistence":"marketing.waiver_signatory_rule","description":"The signatory rules of one waiver version (pack 11.1.5), keyed on `formId` + `formVersion`; immutable once the version is published.","required":["formId","formVersion","primarySignatory","acceptanceMethod","requiresGuardianForMinors"],"properties":{"formId":{"type":"string","format":"uuid"},"formVersion":{"type":"integer","minimum":1},"primarySignatory":{"type":"string","enum":["ticketHolder","purchaser","participant","parent","legalGuardian","groupLeader","corporateRepresentative","member","rentalCustomer","otherAuthorizedSignatory"]},"allowedSignatories":{"type":"array","items":{"type":"string","enum":["ticketHolder","purchaser","participant","parent","legalGuardian","groupLeader","corporateRepresentative","member","rentalCustomer","otherAuthorizedSignatory"]},"description":"Who else may sign in the primary signatory's place."},"coSignature":{"type":"string","nullable":true,"enum":["participantAndGuardian","customerAndAuthorizedRepresentative"],"description":"Set when two people must both sign."},"signatureRequired":{"type":"boolean","default":true},"initialsRequired":{"type":"boolean","default":false},"acceptanceMethod":{"type":"string","enum":["drawnSignature","typedName","checkbox"],"description":"Kept equal to `FormDefinition.signatureKind` (drawn, typed, checkbox)."},"captureRelationship":{"type":"boolean","default":true,"description":"Whoever signs for someone else states their relationship."},"identityVerification":{"type":"string","enum":["none","signedInAccount","oneTimeCode","idDocumentCheck"],"default":"none"},"requiresGuardianForMinors":{"type":"boolean","description":"Written to `FormDefinition.requiresGuardianForMinors`."},"guardianThresholdAge":{"type":"integer","minimum":1,"maximum":25,"nullable":true,"description":"A participant under this age needs a guardian. Written to `FormDefinition.minimumAge`. No default."},"guardianThresholdByCountry":{"type":"array","items":{"type":"object","required":["country","age"],"properties":{"country":{"type":"string","pattern":"^[A-Z]{2}$"},"age":{"type":"integer","minimum":1,"maximum":25}}},"description":"Per-country thresholds that override `guardianThresholdAge`."},"guardianSignsForEachMinor":{"type":"boolean","default":true,"description":"One guardian signature per minor, never one for the family."},"groupSigningModes":{"type":"array","items":{"type":"string","enum":["eachParticipantIndividually","guardianForEachMinor","groupLeaderForGroup","organisationRepresentativeDeclaration"]},"description":"The modes a group booking may use. Empty means each participant signs individually."},"recordedEvidence":{"type":"array","readOnly":true,"items":{"type":"string","enum":["timestamp","waiverVersion","signatory","authenticationMethod","transactionReference","customerReference","documentHash","deviceInfo","consentEvidence"]},"description":"Always all of them; listed so the reviewer sees what is kept."},"legalApprovedBy":{"type":"string","nullable":true,"readOnly":true,"description":"`FormDefinition.legalReviewedBy`, set at the legal/compliance step of `approveWaiverTesting`."},"legalApprovedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"SignatorySignatureGuardianRuleConfigurationView": {"type":"object","x-ticvai-persistence":"marketing.waiver_signatory_rule","description":"The signatory rules of one waiver version (pack 11.1.5), keyed on `formId` + `formVersion`; immutable once the version is published.","required":["formId","formVersion","primarySignatory","acceptanceMethod","requiresGuardianForMinors"],"properties":{"formId":{"type":"string","format":"uuid"},"formVersion":{"type":"integer","minimum":1},"primarySignatory":{"type":"string","enum":["ticketHolder","purchaser","participant","parent","legalGuardian","groupLeader","corporateRepresentative","member","rentalCustomer","otherAuthorizedSignatory"]},"allowedSignatories":{"type":"array","items":{"type":"string","enum":["ticketHolder","purchaser","participant","parent","legalGuardian","groupLeader","corporateRepresentative","member","rentalCustomer","otherAuthorizedSignatory"]},"description":"Who else may sign in the primary signatory's place."},"coSignature":{"type":"string","nullable":true,"enum":["participantAndGuardian","customerAndAuthorizedRepresentative"],"description":"Set when two people must both sign."},"signatureRequired":{"type":"boolean","default":true},"initialsRequired":{"type":"boolean","default":false},"acceptanceMethod":{"type":"string","enum":["drawnSignature","typedName","checkbox"],"description":"Kept equal to `FormDefinition.signatureKind` (drawn, typed, checkbox)."},"captureRelationship":{"type":"boolean","default":true,"description":"Whoever signs for someone else states their relationship."},"identityVerification":{"type":"string","enum":["none","signedInAccount","oneTimeCode","idDocumentCheck"],"default":"none"},"requiresGuardianForMinors":{"type":"boolean","description":"Written to `FormDefinition.requiresGuardianForMinors`."},"guardianThresholdAge":{"type":"integer","minimum":1,"maximum":25,"nullable":true,"description":"A participant under this age needs a guardian. Written to `FormDefinition.minimumAge`. No default."},"guardianThresholdByCountry":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","required":["country","age"],"properties":{"country":{"type":"string","pattern":"^[A-Z]{2}$"},"age":{"type":"integer","minimum":1,"maximum":25}}},"description":"Per-country thresholds that override `guardianThresholdAge`."},"guardianSignsForEachMinor":{"type":"boolean","default":true,"description":"One guardian signature per minor, never one for the family."},"groupSigningModes":{"type":"array","items":{"type":"string","enum":["eachParticipantIndividually","guardianForEachMinor","groupLeaderForGroup","organisationRepresentativeDeclaration"]},"description":"The modes a group booking may use. Empty means each participant signs individually."},"recordedEvidence":{"type":"array","readOnly":true,"items":{"type":"string","enum":["timestamp","waiverVersion","signatory","authenticationMethod","transactionReference","customerReference","documentHash","deviceInfo","consentEvidence"]},"description":"Always all of them; listed so the reviewer sees what is kept."},"legalApprovedBy":{"type":"string","nullable":true,"readOnly":true,"description":"`FormDefinition.legalReviewedBy`, set at the legal/compliance step of `approveWaiverTesting`."},"legalApprovedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "VersioningEffectiveDatesLegalChangeControlView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.form_definition, marketing.waiver_version_control (new), marketing.form_submission and marketing.waiver_signature","description":"One version of one waiver and its change control (pack 11.1.8).","required":["formId","versionNumber","status","createdAt"],"properties":{"formId":{"type":"string","format":"uuid"},"waiverName":{"type":"string"},"versionNumber":{"type":"integer","minimum":1},"status":{"type":"string","enum":["draft","published","superseded","retired"],"description":"`FormDefinition.status` (states/form-definition.yaml)."},"lifecycleStatus":{"type":"string","enum":["draft","review","pendingApproval","approved","scheduled","published","suspended","expired","archived"]},"createdByUserId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"changeReason":{"type":"string","maxLength":1000,"nullable":true},"legalReviewer":{"type":"string","nullable":true,"description":"`FormDefinition.legalReviewedBy`."},"legalReviewedAt":{"type":"string","format":"date-time","nullable":true},"approvedByUserId":{"type":"string","format":"uuid","nullable":true},"approvedAt":{"type":"string","format":"date-time","nullable":true},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"resignRule":{"type":"string","enum":["noResign","resignAtNextBooking","resignBeforeNextVisit"],"description":"Whether people who signed an earlier version must sign this one."},"suspended":{"type":"boolean","default":false},"suspensionReason":{"type":"string","maxLength":500,"nullable":true},"signatureCount":{"type":"integer","minimum":0,"description":"Signatures taken against this exact version."},"comparison":{"type":"object","nullable":true,"description":"Present when `compareWith` is given.","properties":{"comparedWithVersion":{"type":"integer","minimum":1},"addedText":{"type":"array","items":{"type":"object","properties":{"blockKey":{"type":"string"},"language":{"type":"string"},"text":{"type":"string"}}}},"removedText":{"type":"array","items":{"type":"object","properties":{"blockKey":{"type":"string"},"language":{"type":"string"},"text":{"type":"string"}}}},"changedQuestions":{"type":"array","items":{"type":"string"},"description":"Field keys added, removed or changed."},"changedSignatoryRules":{"type":"array","items":{"type":"string"},"description":"Names of the signatory-rule properties that differ."},"changedAssociations":{"type":"array","items":{"type":"string","format":"uuid"},"description":"Associations added, removed or changed between the two versions' publication."}}}}},
 "WaiverOperationsCommandCenterView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.waiver_requirement (new), marketing.form_definition, marketing.form_submission, marketing.waiver_signature, marketing.waiver_verification (new), marketing.waiver_exception (new), orders.order_line, orders.group_booking and catalogue.performance","description":"Waiver readiness for the filters given. Counts are of participant waiver requirements for activities in the window unless the name says otherwise.","required":["waiversRequired","completed","pending","completionRate","byPeriod","breakdown","upcomingActivities"],"properties":{"waiversRequired":{"type":"integer","minimum":0,"description":"Requirements assigned, excluding `superseded`."},"completed":{"type":"integer","minimum":0,"description":"Requirements `completed` or `verified`."},"pending":{"type":"integer","minimum":0,"description":"Requirements `assigned`, `sent` or `opened`, not yet started."},"partiallyCompleted":{"type":"integer","minimum":0,"description":"Requirements `inProgress`, and participants with some but not all waivers complete."},"expiring":{"type":"integer","minimum":0,"description":"Completed requirements whose acceptance (`FormSubmission.expiresAt`) ends before the activity starts."},"invalid":{"type":"integer","minimum":0,"description":"Requirements `expired`, or completed against a superseded version."},"rejected":{"type":"integer","minimum":0},"guardianConsentPending":{"type":"integer","minimum":0,"description":"Minor participants whose guardian has not yet signed."},"upcomingParticipantsMissingWaiver":{"type":"integer","minimum":0,"description":"Participants with at least one mandatory requirement not complete."},"accessBlocked":{"type":"integer","minimum":0,"description":"Participants whose ticket download, activation, check-in or access is currently blocked by a waiver."},"manualExceptions":{"type":"integer","minimum":0,"description":"Approved exceptions (`setWaiverException`) in force."},"completionRate":{"type":"number","minimum":0,"maximum":1,"description":"`completed` / `waiversRequired`."},"byPeriod":{"type":"array","description":"Today, tomorrow and this week, in that order, whatever the window.","items":{"type":"object","required":["period","waiversRequired","completed","missing"],"properties":{"period":{"type":"string","enum":["today","tomorrow","thisWeek"]},"waiversRequired":{"type":"integer","minimum":0},"completed":{"type":"integer","minimum":0},"missing":{"type":"integer","minimum":0}}}},"breakdown":{"type":"array","maxItems":100,"description":"One entry per value of `breakdownBy`, lowest completion first.","items":{"type":"object","required":["key","label","waiversRequired","completed","completionRate"],"properties":{"key":{"type":"string","description":"The id of the venue, event, product, performance, group booking, booking or waiver form."},"label":{"type":"string"},"waiversRequired":{"type":"integer","minimum":0},"completed":{"type":"integer","minimum":0},"missing":{"type":"integer","minimum":0},"completionRate":{"type":"number","minimum":0,"maximum":1}}}},"upcomingActivities":{"type":"array","maxItems":100,"description":"Performances in the window, most at risk first, then by `dateTime`.","items":{"type":"object","required":["performanceId","eventActivity","dateTime","participants","waiversRequired","completed","missing","completion","operationalRisk"],"properties":{"performanceId":{"type":"string","format":"uuid"},"eventId":{"type":"string","format":"uuid"},"eventActivity":{"type":"string","description":"The event or activity name."},"venueId":{"type":"string","format":"uuid"},"venue":{"type":"string","description":"The venue name."},"dateTime":{"type":"string","format":"date-time","description":"When the performance starts."},"participants":{"type":"integer","minimum":0},"waiversRequired":{"type":"integer","minimum":0},"completed":{"type":"integer","minimum":0},"missing":{"type":"integer","minimum":0},"completion":{"type":"number","minimum":0,"maximum":1,"description":"The performance's waiver readiness (the pack's Readiness Score)."},"guardianPending":{"type":"integer","minimum":0},"exceptions":{"type":"integer","minimum":0},"admissionAtRisk":{"type":"boolean","description":"At least one missing requirement is configured to block check-in or access."},"operationalRisk":{"type":"string","enum":["ready","attention","critical"],"description":"`critical` when a missing requirement would block admission; `attention` when anything is missing; otherwise `ready`."}}}},"insights":{"type":"array","maxItems":20,"description":"Advisory predictions, e.g. participants unlikely to complete before arrival without another reminder. Never change a status.","items":{"type":"object","required":["message"],"properties":{"performanceId":{"type":"string","format":"uuid","nullable":true},"predictedIncomplete":{"type":"integer","minimum":0,"nullable":true},"message":{"type":"string","maxLength":500}}}}}},
 "WaiverTemplateLibraryMasterSetupView": {"type":"object","x-ticvai-persistence":"marketing.waiver_master","description":"The master record of one waiver (pack 11.1.2), one per `FormDefinition` of kind `waiver`. The name, wording, fields and versions live on the form; this holds classification, ownership and business scope.","required":["waiverId","waiverType","ownerUserId","businessOwnerUserId","defaultLanguage","templateSource"],"properties":{"waiverId":{"type":"string","format":"uuid","description":"The `FormDefinition.id`; the natural key."},"waiverName":{"type":"string","readOnly":true,"description":"`FormDefinition.name`, shown here, written by `createForm`."},"internalDescription":{"type":"string","maxLength":2000,"nullable":true},"waiverType":{"type":"string","enum":["liabilityWaiver","parentGuardianConsent","participationConsent","medicalDeclaration","safetyAcknowledgement","mediaConsent","rentalAgreement","termsAcceptance","membershipDeclaration","customForm"]},"customTypeLabel":{"type":"string","maxLength":80,"nullable":true,"description":"The tenant's own classification name; required when `waiverType` is `customForm`."},"ownerUserId":{"type":"string","format":"uuid"},"department":{"type":"string","maxLength":100,"nullable":true},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"Null for a corporate waiver every brand may use."},"legalEntityId":{"type":"string","format":"uuid","nullable":true,"description":"The finance legal entity the waiver is given in favour of."},"defaultLanguage":{"type":"string","maxLength":10},"applicableCountries":{"type":"array","items":{"type":"string","pattern":"^[A-Z]{2}$"},"description":"ISO 3166-1 alpha-2. Empty means the waiver is not yet scoped, which blocks publication."},"applicableJurisdiction":{"type":"string","maxLength":100,"nullable":true,"description":"A sub-national jurisdiction where the law differs within a country."},"status":{"type":"string","readOnly":true,"enum":["draft","review","pendingApproval","approved","scheduled","published","suspended","expired","archived"],"description":"The lifecycle status of the latest version (see `listWaiverConsent`)."},"templateSource":{"type":"string","enum":["createNew","duplicateExisting","masterTemplate","corporateTemplate"],"default":"createNew"},"sourceWaiverId":{"type":"string","format":"uuid","nullable":true,"description":"The waiver it was duplicated or created from; required unless `createNew`."},"sourceVersion":{"type":"integer","minimum":1,"nullable":true},"isMasterTemplate":{"type":"boolean","default":false,"description":"Offered in the reusable library. A corporate template is a master template with no `brandId`."},"businessOwnerUserId":{"type":"string","format":"uuid"},"legalReviewerUserId":{"type":"string","format":"uuid","nullable":true},"complianceOwnerUserId":{"type":"string","format":"uuid","nullable":true},"operationalOwnerUserId":{"type":"string","format":"uuid","nullable":true},"legalReviewRequired":{"type":"boolean","default":true,"description":"Whether the approval chain includes the legal/compliance step. On unless the tenant turns it off."},"usage":{"type":"object","readOnly":true,"description":"Where the waiver is used now (pack Usage Indicator, Template Dependency).","properties":{"products":{"type":"integer","minimum":0},"venues":{"type":"integer","minimum":0},"futureBookings":{"type":"integer","minimum":0}}},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"WaiverTriggerEligibilityCompletionRulesView": {"type":"object","x-ticvai-persistence":"marketing.waiver_trigger_rule","description":"One trigger, eligibility and completion rule of a waiver (pack 11.1.7).","required":["formId","name","triggerPoint","completionDeadline","status"],"properties":{"id":{"type":"string","format":"uuid","description":"Absent on create."},"formId":{"type":"string","format":"uuid"},"name":{"type":"string","maxLength":150},"triggerPoint":{"type":"string","enum":["duringCheckout","afterPurchase","beforeTicketIssuance","beforeTicketDownload","beforeEvent","beforeCheckIn","beforeAccess","beforeEquipmentCollection","beforeMembershipActivation","beforeActivityStart"]},"eligibility":{"type":"array","description":"All must hold (AND). Empty means every participant the association reaches.","items":{"type":"object","required":["attribute","operator","values"],"properties":{"attribute":{"type":"string","enum":["age","isMinor","product","event","venue","activity","customerType","membership","country","channel","participantType","bookingType"]},"operator":{"type":"string","enum":["equals","notEquals","in","notIn","lessThan","greaterThan"]},"values":{"type":"array","minItems":1,"items":{"type":"string","maxLength":100}}}}},"completionDeadline":{"type":"object","required":["kind"],"properties":{"kind":{"type":"string","enum":["immediately","beforeTicketRelease","hoursBeforeEvent","daysBeforeVisit","beforeArrival","beforeAccess"]},"offset":{"type":"integer","minimum":1,"nullable":true,"description":"Hours for `hoursBeforeEvent`, days for `daysBeforeVisit`."}}},"enforcement":{"type":"array","items":{"type":"string","enum":["blockTicketDownload","blockTicketActivation","blockCheckIn","blockAccess"]},"description":"What an incomplete waiver blocks. Empty means warn only."},"allowStaffOverride":{"type":"boolean","default":false,"description":"An authorised operator may admit the participant anyway; the override is recorded."},"reminders":{"type":"array","items":{"type":"object","required":["offsetHours","channels"],"properties":{"offsetHours":{"type":"integer","minimum":1,"description":"Hours before the deadline, e.g. 168, 72, 24."},"channels":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/MessageChannel"}}}}},"status":{"type":"string","enum":["active","inactive"],"default":"active"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"WaiverVerificationValidationWorkspaceInput": {"type":"object","x-ticvai-persistence":"marketing.waiver_verification","description":"A reviewer's decision on one waiver submission. The automatic checks are the server's and are not sent; the reviewer records the checks only a person can make.","required":["submissionId","result"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"submissionId":{"type":"string","format":"uuid","description":"The `FormSubmission` reviewed; the natural key."},"result":{"type":"string","enum":["verified","rejected","correctionRequired","escalated"]},"participantMatch":{"type":"boolean","nullable":true,"description":"The reviewer confirmed the signed participant is the booked participant."},"bookingMatch":{"type":"boolean","nullable":true},"guardianRelationshipPresent":{"type":"boolean","nullable":true,"description":"The reviewer confirmed the signatory's guardianship under the configured policy."},"requiredEvidencePresent":{"type":"boolean","nullable":true,"description":"Any supporting document the form requires was seen."},"reasonCode":{"type":"string","nullable":true,"enum":["signatoryNotAuthorised","participantMismatch","wrongVersion","incompleteAnswers","evidenceMissing","suspectedFraud","other"]},"note":{"type":"string","maxLength":2000,"nullable":true,"description":"Required for `rejected`, `correctionRequired`, `escalated`, and for changing an earlier decision."},"escalatedTo":{"type":"string","format":"uuid","nullable":true,"description":"The staff member the review is escalated to; required for `escalated`."},"reviewedBy":{"type":"string","format":"uuid","readOnly":true},"reviewedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"WaiverTriggerEligibilityCompletionRulesView": {"type":"object","x-ticvai-persistence":"marketing.waiver_trigger_rule","description":"One trigger, eligibility and completion rule of a waiver (pack 11.1.7).","required":["formId","name","triggerPoint","completionDeadline","status"],"properties":{"id":{"type":"string","format":"uuid","description":"Absent on create."},"formId":{"type":"string","format":"uuid"},"name":{"type":"string","maxLength":150},"triggerPoint":{"type":"string","enum":["duringCheckout","afterPurchase","beforeTicketIssuance","beforeTicketDownload","beforeEvent","beforeCheckIn","beforeAccess","beforeEquipmentCollection","beforeMembershipActivation","beforeActivityStart"]},"eligibility":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"All must hold (AND). Empty means every participant the association reaches.","items":{"type":"object","required":["attribute","operator","values"],"properties":{"attribute":{"type":"string","enum":["age","isMinor","product","event","venue","activity","customerType","membership","country","channel","participantType","bookingType"]},"operator":{"type":"string","enum":["equals","notEquals","in","notIn","lessThan","greaterThan"]},"values":{"type":"array","minItems":1,"items":{"type":"string","maxLength":100}}}}},"completionDeadline":{"type":"object","required":["kind"],"properties":{"kind":{"type":"string","enum":["immediately","beforeTicketRelease","hoursBeforeEvent","daysBeforeVisit","beforeArrival","beforeAccess"]},"offset":{"type":"integer","minimum":1,"nullable":true,"description":"Hours for `hoursBeforeEvent`, days for `daysBeforeVisit`."}}},"enforcement":{"type":"array","items":{"type":"string","enum":["blockTicketDownload","blockTicketActivation","blockCheckIn","blockAccess"]},"description":"What an incomplete waiver blocks. Empty means warn only."},"allowStaffOverride":{"type":"boolean","default":false,"description":"An authorised operator may admit the participant anyway; the override is recorded."},"reminders":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","required":["offsetHours","channels"],"properties":{"offsetHours":{"type":"integer","minimum":1,"description":"Hours before the deadline, e.g. 168, 72, 24."},"channels":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/MessageChannel"}}}}},"status":{"type":"string","enum":["active","inactive"],"default":"active"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"WaiverVerificationValidationWorkspaceInput": {"type":"object","x-ticvai-persistence":"marketing.waiver_verification","description":"A reviewer's decision on one waiver submission. The automatic checks are the server's and are not sent; the reviewer records the checks only a person can make.","required":["submissionId","result"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"submissionId":{"x-ticvai-references":"marketing.form_submission","type":"string","format":"uuid","description":"The `FormSubmission` reviewed; the natural key."},"result":{"type":"string","enum":["verified","rejected","correctionRequired","escalated"]},"participantMatch":{"type":"boolean","nullable":true,"description":"The reviewer confirmed the signed participant is the booked participant."},"bookingMatch":{"type":"boolean","nullable":true},"guardianRelationshipPresent":{"type":"boolean","nullable":true,"description":"The reviewer confirmed the signatory's guardianship under the configured policy."},"requiredEvidencePresent":{"type":"boolean","nullable":true,"description":"Any supporting document the form requires was seen."},"reasonCode":{"type":"string","nullable":true,"enum":["signatoryNotAuthorised","participantMismatch","wrongVersion","incompleteAnswers","evidenceMissing","suspectedFraud","other"]},"note":{"type":"string","maxLength":2000,"nullable":true,"description":"Required for `rejected`, `correctionRequired`, `escalated`, and for changing an earlier decision."},"escalatedTo":{"type":"string","format":"uuid","nullable":true,"description":"The staff member the review is escalated to; required for `escalated`."},"reviewedBy":{"type":"string","format":"uuid","readOnly":true},"reviewedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "WaiverVerificationValidationWorkspaceView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.form_submission, marketing.waiver_signature, marketing.form_definition, marketing.waiver_verification (new) and marketing.waiver_requirement (new); names from pii.subject","description":"One waiver submission in the verification queue, with its automatic checks, the reviewer's findings and any anomalies flagged.","required":["submissionId","participant","waiver","version","submitted","status","checks"],"properties":{"submissionId":{"type":"string","format":"uuid"},"requirementId":{"type":"string","format":"uuid","nullable":true},"participant":{"type":"object","properties":{"subjectId":{"type":"string","format":"uuid"},"name":{"type":"string"},"age":{"type":"integer","minimum":0,"nullable":true}}},"waiver":{"type":"object","properties":{"formId":{"type":"string","format":"uuid"},"name":{"type":"string"}}},"version":{"type":"integer","minimum":1,"description":"The form version signed."},"booking":{"type":"string","format":"uuid","nullable":true},"signatory":{"type":"object","properties":{"subjectId":{"type":"string","format":"uuid"},"name":{"type":"string"},"signatoryType":{"type":"string","enum":["participant","guardian","organisationRepresentative"]}}},"submitted":{"type":"string","format":"date-time","description":"`FormSubmission.submittedAt`, the device time of signing."},"verificationReason":{"type":"string","enum":["configuredManualReview","automaticCheckFailed","minorSignedAsAdult","guardianDiscrepancy","participantMismatch","evidenceRequired","aiAnomaly","sampleReview"]},"risk":{"type":"string","enum":["low","medium","high"]},"status":{"type":"string","enum":["automaticallyValidated","pendingManualVerification","verified","correctionRequired","rejected","escalated"]},"checks":{"type":"object","description":"Each check the form's configuration applies; null when it does not apply. The first seven are evaluated by the server, the last three recorded by the reviewer.","properties":{"requiredFieldsComplete":{"type":"boolean","nullable":true},"requiredQuestionsAnswered":{"type":"boolean","nullable":true},"requiredAcknowledgementsAccepted":{"type":"boolean","nullable":true},"signaturePresent":{"type":"boolean","nullable":true},"correctWaiverVersion":{"type":"boolean","nullable":true},"effectiveDateValid":{"type":"boolean","nullable":true,"description":"The version signed was in effect at signing and the acceptance covers the visit."},"guardianRelationshipPresent":{"type":"boolean","nullable":true,"description":"Evaluated from `GuestRelationship` where recorded, otherwise the reviewer's."},"participantMatch":{"type":"boolean","nullable":true},"bookingMatch":{"type":"boolean","nullable":true},"requiredEvidencePresent":{"type":"boolean","nullable":true}}},"anomalies":{"type":"array","description":"Advisory flags for the reviewer; never a decision.","items":{"type":"object","required":["code","message"],"properties":{"code":{"type":"string","enum":["minorSignedAsAdult","guardianSurnameDiffers","signatoryIsMinor","signedAfterActivity","duplicateSubmission","other"]},"message":{"type":"string","maxLength":500},"source":{"type":"string","enum":["rule","ai"]}}}},"reviewedBy":{"type":"string","format":"uuid","nullable":true},"reviewedAt":{"type":"string","format":"date-time","nullable":true},"note":{"type":"string","nullable":true}}}
 }
 ```

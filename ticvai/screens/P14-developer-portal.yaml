@@ -65,6 +65,7 @@ screens:
   module: Developer & API
   requiresModule: developerApi
   wave: 1
+  permission: DEVELOPER_VIEW
   implementation:
     app: developer-portal-web
     route: /developer/reference
@@ -231,6 +232,7 @@ screens:
   module: Developer & API
   requiresModule: developerApi
   wave: 1
+  permission: DEVELOPER_VIEW
   implementation:
     app: developer-portal-web
     route: /developer/organisation
@@ -390,6 +392,7 @@ screens:
   module: Developer & API
   requiresModule: developerApi
   wave: 1
+  permission: DEVELOPER_VIEW
   implementation:
     app: developer-portal-web
     route: /developer/clients
@@ -643,6 +646,7 @@ screens:
   module: Developer & API
   requiresModule: developerApi
   wave: 2
+  permission: DEVELOPER_VIEW
   implementation:
     app: developer-portal-web
     route: /developer/sandbox
@@ -862,6 +866,7 @@ screens:
   module: Developer & API
   requiresModule: developerApi
   wave: 2
+  permission: DEVELOPER_VIEW
   implementation:
     app: developer-portal-web
     route: /developer/webhooks
@@ -1081,6 +1086,7 @@ screens:
   module: Developer & API
   requiresModule: developerApi
   wave: 2
+  permission: DEVELOPER_VIEW
   implementation:
     app: developer-portal-web
     route: /developer/usage
@@ -1186,6 +1192,7 @@ screens:
   module: Developer & API
   requiresModule: developerApi
   wave: 3
+  permission: DEVELOPER_VIEW
   implementation:
     app: developer-portal-web
     route: /developer/marketplace
@@ -1332,6 +1339,7 @@ screens:
   module: Developer & API
   requiresModule: developerApi
   wave: 1
+  permission: DEVELOPER_VIEW
   implementation:
     app: developer-portal-web
     route: /developer/admin
@@ -1587,6 +1595,18 @@ screens:
     - name: requestId
       from: navigation
       optional: true
+    - name: anomalyRuleId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApiAnomalyRules`.'
+    - name: licenceId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApiLicences`.'
+    - name: quotaId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listApiQuotas`.'
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
       are for.** The screen opens the requested version read-only, says it is not current, and links to
       the one that is. **An old version is history, not an error.** Arrives with `listingId`, `version`.'

@@ -279,6 +279,8 @@ republish:
 
 **A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `replayDeadLetter`, `republishOutbox`, `cancelOutboxRepublish`.
 
+Screen guard: `PLATFORM_CELL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.

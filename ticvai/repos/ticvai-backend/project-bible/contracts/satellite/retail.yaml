@@ -101,6 +101,29 @@ tags:
   - name: giftCard
   - name: floor
 
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  merchandiseRecords:
+    module: retail
+    table: retail.merchandise
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The retail.merchandise rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Retail stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MerchandiseItem'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Retail answers with its retail.merchandise rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Retail's service route (serviceAuth).
+    served: [service]
 paths:
   # ---------------------------------------------------------------- merchandise
 
@@ -140,8 +163,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/MerchandiseReservation'
+        '409':
+          description: 'The reservation is already `collected`, `expired` or `cancelled`; only a `reserved` one can be collected. Stock does not move.'
+          x-ticvai-problem-types: [merchandise-reservation-not-reserved]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -176,8 +205,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/MerchandiseReservation'
+        '409':
+          description: 'The reservation is already `collected`, `expired` or `cancelled`; only a `reserved` one can be cancelled. Stock does not move.'
+          x-ticvai-problem-types: [merchandise-reservation-not-reserved]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -224,8 +259,14 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/ShopAndDrop'
+        '409':
+          description: 'The item is still within its hold (`awaitingCollection` or `partiallyCollected`; `shop-and-drop-still-held`) or is already `collected` or `disposed` (`shop-and-drop-already-closed`); only an `uncollected` item is disposed of. Nothing changes.'
+          x-ticvai-problem-types: [shop-and-drop-still-held, shop-and-drop-already-closed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
@@ -267,6 +308,8 @@ paths:
         Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that
         is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
         not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+        **Order.** Sorted by `name` ascending, then by `id`.
       tags: [merchandise]
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-guest-callable: true
@@ -447,6 +490,10 @@ paths:
         - "P06 EMP-062 Store Stock & SKU Availability"
         - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
         - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'the caller''s workstation and its outlet (400 outlet-required, 404) (CHG-MOD-003)'
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
       security:
@@ -505,6 +552,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/PriceCheck' }
         '400':
+          x-ticvai-problem-types: [lookup-key-missing, outlet-required]
           description: Neither barcode nor SKU supplied, or a caller with no workstation sent no `outletId` (audit R215)
           content:
             application/problem+json:
@@ -524,6 +572,7 @@ paths:
       operationId: listRetailSales
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List retail sales
@@ -572,6 +621,10 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-005 Payment"
+      x-ticvai-read-via:
+      - query: inventory#kitComponentRecords
+        route: in-process
+        for: 'its read of inventory.kit_component, Inventory''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Sell merchandise
       description: >
@@ -710,6 +763,7 @@ paths:
                         type: array
                         items: { $ref: '#/components/schemas/RetailSale' }
         '400':
+          x-ticvai-problem-types: [lookup-identifier-missing]
           description: None of the three identifiers was sent
           content:
             application/problem+json:
@@ -774,6 +828,7 @@ paths:
   /retail-returns:
     get:
       operationId: listRetailReturns
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List returns
@@ -819,6 +874,10 @@ paths:
       operationId: createRetailReturn
       x-ticvai-consumed-by:
         - "P04 POS-011 Returns, Refunds & Exchanges"
+      x-ticvai-read-via:
+      - query: inventory#kitComponentRecords
+        route: in-process
+        for: 'its read of inventory.kit_component, Inventory''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Accept a return
       description: >
@@ -1022,12 +1081,18 @@ paths:
       operationId: getOutletStock
       x-ticvai-consumed-by:
         - "P06 EMP-062 Store Stock & SKU Availability"
+      x-ticvai-read-via:
+      - query: tenancy#outletRecords
+        route: service
+        for: 'its read of platform.outlet, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Stock across an outlet
       description: >
         Shaped for a handheld on a shop floor — low stock first, with sibling outlet
         availability so a colleague can be sent rather than the sale lost.
+
+        **Order.** Low stock first, by `available` ascending, then by `name`.
       tags: [floor]
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-scope-level: venue
@@ -1132,7 +1197,7 @@ paths:
                   description: >
                     Usually venue close. Uncollected goods after it become an exception, not
                     a permanent shelf occupant.
-                recordedAt: { type: string, format: date-time }
+                recordedAt: { type: string, format: date-time, x-ticvai-stored-as: retail.shop_and_drop.dropped_at }
       responses:
         '201':
           headers:
@@ -1203,6 +1268,7 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/ShopAndDrop' }
         '400':
+          x-ticvai-problem-types: [lookup-identifier-missing]
           description: No identifier supplied
           content:
             application/problem+json:
@@ -1280,6 +1346,13 @@ paths:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P05 KSK-017 Shop"
         - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
+      x-ticvai-read-via:
+      - query: inventory#movementRecords
+        route: in-process
+        for: 'its read of inventory.movement, Inventory''s data (CHG-MOD-001)'
+      - query: inventory#stockEarmarkRecords
+        route: in-process
+        for: 'its read of inventory.stock_earmark, Inventory''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1378,7 +1451,9 @@ paths:
       summary: Rules and controls in force in the store
       description: '**Drafted 4 September as a stub.** BO-142 *Store Rules, Controls & Permissions* had nothing of its own, so wiring `listRoles` onto BO-106 on 4 September made the two screens identical. **The collision was a symptom** - BO-142 needs store rules and there were none to give it. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - retail
       x-ticvai-permission: PRODUCT_VIEW
@@ -1405,6 +1480,7 @@ paths:
                           $ref: '#/components/schemas/StoreRule'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /store-rules/{storeRuleId}:
     put:
       operationId: setStoreRules
       x-ticvai-consumed-by:
@@ -1430,6 +1506,11 @@ paths:
             schema:
               $ref: '#/components/schemas/StoreRule'
       parameters:
+        - name: storeRuleId
+          in: path
+          required: true
+          description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+          schema: { type: string, format: uuid }
         - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
       responses:
         '200':
@@ -1453,6 +1534,8 @@ paths:
         The retail half of the same table F&B keeps. **Separate because the merchandising is
         separate** — a coffee pairs with a pastry and a jacket pairs with a hat, and one list
         serving both would be filtered on every read.
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.
       tags:
       - retail
       x-ticvai-permission: PRODUCT_VIEW
@@ -1574,6 +1657,7 @@ components:
       - id
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         venueId:
@@ -1642,7 +1726,7 @@ components:
             '
         id: { type: string, format: uuid }
         sku: { type: string }
-        barcode: { type: string, nullable: true }
+        barcode: { type: string, nullable: true, x-ticvai-unique: venue }
         name: { type: string }
         outletId: { type: string, format: uuid }
         categoryId: { type: string, format: uuid, nullable: true }
@@ -2128,6 +2212,7 @@ components:
         lastSoldAt: { type: string, format: date-time, nullable: true }
 
     ShopAndDrop:
+      x-ticvai-retired-columns: [collection_point_id]
       type: object
       x-ticvai-persistence: "retail.shop_and_drop + retail.shop_and_drop_line"
       required: [id, dropReference, collectionPointId, status, collectBy]
@@ -2152,7 +2237,7 @@ components:
             The ticket that claims these goods. The point of 4.4.7 — a guest does not have to
             keep a receipt safe for eight hours in a water park.
         subjectId: { type: string, format: uuid, nullable: true }
-        collectionPointId: { type: string, format: uuid }
+        collectionPointId: { type: string, format: uuid, x-ticvai-column: collection_location_id, x-ticvai-references: fnb.delivery_location}
         collectionPointName: { type: string }
         status:
           type: string

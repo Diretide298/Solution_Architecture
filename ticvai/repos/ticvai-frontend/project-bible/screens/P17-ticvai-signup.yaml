@@ -143,6 +143,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: TENANT_CONFIGURE
   source:
     sameAs: ADM-380
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -309,6 +310,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-381
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -339,7 +341,7 @@ screens:
       - kind: multiSelect
         label: Venue type
         bindsTo: null
-        operation: null
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 23 §Visual cards
         notes: The venue types the prospect chooses from (Museum, Attraction, Theme Park, Waterpark, Stadium,
           Theatre, Exhibition / Event Venue, Zoo / Aquarium, Tour Operator, Entertainment Center, Multi-Venue
@@ -420,6 +422,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-382
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -509,6 +512,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-383
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -539,36 +543,47 @@ screens:
       components:
       - kind: selectField
         label: ☐ On-site POS
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: textField
         label: ☐ Own Website / B2C
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Mobile App
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Tour Operators
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Hotels
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Resellers
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Corporate Customers
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Call Center
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Kiosk
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: textField
         label: ☐ Flying / Mobile POS
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: textField
         label: ☐ OTA / Third-Party Channels
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
   states:
     loading: The sales channel assessment configuration as saved.
@@ -618,6 +633,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-384
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -648,48 +664,63 @@ screens:
       components:
       - kind: selectField
         label: General Admission
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Dated Admission
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Timeslot Admission
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Open-Dated Ticket
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Multi-Day Ticket
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Family Ticket
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Group Ticket
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Membership
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Annual Pass
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Season Pass
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Voucher
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Bundle
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Add-On
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Camp / Course
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Special Event
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
   states:
     loading: The ticketing product requirements configuration as saved.
@@ -732,6 +763,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-385
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -821,6 +853,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-386
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -850,6 +883,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listModuleCatalogue
         derived: true
         impliedBy: listModuleCatalogue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -920,6 +954,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-387
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1010,6 +1045,7 @@ screens:
   module: Onboarding & Assessment
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-388
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1100,6 +1136,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-399
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1221,6 +1258,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     sameAs: ADM-400
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1252,6 +1290,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listPlans
         derived: true
         impliedBy: listPlans
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -1317,6 +1356,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-401
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1358,7 +1398,7 @@ screens:
         - Recommended / Required
         - Trial Availability
         bindsTo: null
-        operation: null
+        operation: listModuleCatalogue
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 46 §Each module displays
     - name: contextPanel
       slot: selection
@@ -1366,6 +1406,7 @@ screens:
       - kind: detailPanel
         label: The selected module marketplace
         bindsTo: null
+        operation: listModuleCatalogue
         columns:
         - Module Name
         - Description
@@ -1429,6 +1470,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-402
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1469,7 +1511,7 @@ screens:
         - Confidence
         - Reason
         bindsTo: null
-        operation: null
+        operation: listModuleCatalogue
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 48 §Each recommendation shows
     - name: contextPanel
       slot: selection
@@ -1477,6 +1519,7 @@ screens:
       - kind: detailPanel
         label: The selected module package recommendations
         bindsTo: null
+        operation: listModuleCatalogue
         columns:
         - Additional Monthly Cost
         - Annual Cost
@@ -1538,6 +1581,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-403
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1567,6 +1611,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listModuleCatalogue
         derived: true
         impliedBy: listModuleCatalogue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -1618,6 +1663,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_PLAN_MANAGE
   source:
     sameAs: ADM-404
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1647,6 +1693,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listModuleCatalogue
         derived: true
         impliedBy: listModuleCatalogue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -1709,6 +1756,7 @@ screens:
   module: Package Builder
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_MANAGE
   source:
     sameAs: ADM-405
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1883,6 +1931,7 @@ screens:
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_MANAGE
   source:
     sameAs: ADM-410
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -1983,6 +2032,7 @@ screens:
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: TENANT_CONFIGURE
   source:
     book: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -2127,6 +2177,7 @@ screens:
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: TENANT_CONFIGURE
   source:
     book: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -2229,11 +2280,18 @@ screens:
     - to: SGN-022
       trigger: Order & Commercial Pricing Review
       provenance: structural — the book's own journey, 2.1 "Journey Preview", 11 September 2026
+  entryState:
+    params:
+    - name: providerId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setPaymentProvider` takes it, from the record the user acts on.'
 - id: SGN-022
   name: Order & Commercial Pricing Review
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_VIEW
   source:
     sameAs: ADM-414
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -2271,7 +2329,7 @@ screens:
         - Approved By
         - Expiry
         bindsTo: null
-        operation: null
+        operation: previewSubscriptionChange
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 64 §Show
     - name: contextPanel
       slot: selection
@@ -2279,6 +2337,7 @@ screens:
       - kind: detailPanel
         label: The selected order commercial pricing
         bindsTo: null
+        operation: previewSubscriptionChange
         columns:
         - Discount Type
         - Value
@@ -2345,6 +2404,7 @@ screens:
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: PLATFORM_CELL_MANAGE
   source:
     sameAs: ADM-415
     book: Subscription_Licensing_AI_Self_Service.pdf
@@ -2459,6 +2519,7 @@ screens:
   module: Purchase & Activation
   requiresModule: core
   wave: 3
+  permission: PLATFORM_TENANT_MANAGE
   source:
     sameAs: ADM-417
     book: Subscription_Licensing_AI_Self_Service.pdf

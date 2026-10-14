@@ -5,6 +5,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -417,6 +418,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -577,6 +579,7 @@
       {
        "kind": "livePreview",
        "label": "Preview",
+       "operation": "getPublishedBookingFlow",
        "notes": "**The flow as a guest meets it, step by step, on web and on mobile**, redrawn on every change and drawn from the record in hand. Calls nothing and publishes nothing; guests keep the published flow (`getPublishedBookingFlow`, shown beside it for comparison) until the site is published.",
        "provenance": "authored 29 September, W12"
       },
@@ -883,6 +886,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",

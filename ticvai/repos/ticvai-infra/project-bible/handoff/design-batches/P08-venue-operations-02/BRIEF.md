@@ -160,11 +160,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-129` | Software, Configuration & Version Management | B | 16 | 12 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
-| `BO-130` | Offline Policy & Rules Configuration | A | 14 | 19 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-131` | Connectivity & Auto-Switch Settings | B | 13 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-129` | Software, Configuration & Version Management | B | 14 | 12 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
+| `BO-130` | Offline Policy & Rules Configuration | A | 13 | 19 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-131` | Connectivity & Auto-Switch Settings | B | 12 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-132` | Offline Transaction Monitor & Sync Queue | C | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
-| `BO-133` | Offline Alerts, Limits & Audit | A | 26 | 26 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-133` | Offline Alerts, Limits & Audit | A | 24 | 26 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

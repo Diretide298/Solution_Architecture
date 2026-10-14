@@ -5,6 +5,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "notes": "**Merged into P13 CMS-001 Tenant Workspace and CMS-102 Site Builder** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds the overview of what is set up and what is left; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -15,7 +16,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/digital-experience-center-bo-834",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DigitalExperienceCenter.tsx",
+   "component": "src/routes/engagement-support/DigitalExperienceCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -116,7 +117,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -287,6 +288,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "notes": "**Merged into P13 CMS-002 Brand Kit and CMS-017 Domain & Certificate** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds site, brand and domain set-up; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -297,7 +299,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/site-brand-domain-setup-bo-835",
-   "component": "apps/venue-management-web/src/routes/engagement-support/SiteBrandDomainSetup.tsx",
+   "component": "src/routes/engagement-support/SiteBrandDomainSetup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -412,6 +414,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "notes": "**Merged into P13 CMS-005 Theme Editor, CMS-002 Brand Kit and CMS-006 Component Preview** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds the theme and the component set; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -422,7 +425,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/design-system-components-bo-836",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DesignSystemComponents.tsx",
+   "component": "src/routes/engagement-support/DesignSystemComponents.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -537,6 +540,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "notes": "**Merged into P13 CMS-007 Page Builder** (decided 24 September, M24-03; applied 29 September, the 29 September pass). This screen duplicates the white-label CMS, which builds pages and landing pages from fixed sections; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -547,7 +551,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/page-landing-builder-bo-837",
-   "component": "apps/venue-management-web/src/routes/engagement-support/PageLandingBuilder.tsx",
+   "component": "src/routes/engagement-support/PageLandingBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -604,7 +608,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listContentPages",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listContentPages"
       },
       {
        "kind": "secondaryButton",
@@ -685,7 +690,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/content-media-forms-bo-838",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ContentMediaForms.tsx",
+   "component": "src/routes/engagement-support/ContentMediaForms.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -784,6 +789,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "notes": "**Merged into P13 CMS-008 Content Blocks** (decided 24 September, M24-03; applied 29 September, the 29 September pass). This screen duplicates the white-label CMS, which builds product content blocks; dynamic product pages (matrix 22.10.18) are later, not Block A; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -794,7 +800,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/dynamic-product-pages-bo-839",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DynamicProductPages.tsx",
+   "component": "src/routes/engagement-support/DynamicProductPages.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -904,6 +910,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "notes": "**Merged into P13 CMS-007 Page Builder, CMS-009 Navigation & Menus and CMS-104 App Build & Store Publishing** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds the mobile app: home sections, tabs and the Buy tickets button, and store publishing; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -914,7 +921,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/mobile-app-cms-bo-840",
-   "component": "apps/venue-management-web/src/routes/engagement-support/MobileAppCms.tsx",
+   "component": "src/routes/engagement-support/MobileAppCms.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1034,7 +1041,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/personalization-localization-bo-841",
-   "component": "apps/venue-management-web/src/routes/engagement-support/PersonalizationLocalization.tsx",
+   "component": "src/routes/engagement-support/PersonalizationLocalization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1127,6 +1134,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "notes": "**Merged into P13 CMS-013 SEO & Metadata** (decided 24 September, M24-03; applied 29 September, the 29 September pass). This screen duplicates the white-label CMS, which builds SEO and redirects; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -1137,7 +1145,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/seo-management-bo-842",
-   "component": "apps/venue-management-web/src/routes/engagement-support/SeoManagement.tsx",
+   "component": "src/routes/engagement-support/SeoManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1254,6 +1262,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "notes": "**Merged into P13 CMS-014 Publishing Workflow and CMS-015 Version History** (decided 24 September, M24-03; applied 29 September). This screen duplicates the white-label CMS, which builds publishing, audit and rollback; the minute says to consolidate rather than build both. **One implementation, both ids kept**, as GAP-D3 does: this id stays for traceability and routes to the P13 screen, and nothing on it is built separately. Not `source.sameAs` - that means twin, and these are not copies of each other.",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
@@ -1264,7 +1273,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/publishing-analytics-audit-bo-843",
-   "component": "apps/venue-management-web/src/routes/engagement-support/PublishingAnalyticsAudit.tsx",
+   "component": "src/routes/engagement-support/PublishingAnalyticsAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1323,7 +1332,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Goes live on the tenant’s own domains**, for every guest, at once. The previous version stays restorable.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "publishTenantConfig"
       }
      ]
     }

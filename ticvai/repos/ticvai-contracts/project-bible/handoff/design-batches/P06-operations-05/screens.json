@@ -5,11 +5,12 @@
   "module": "Operations",
   "requiresModule": "maintenance",
   "wave": 1,
+  "permission": "INSPECTION_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/opening-checklist",
-   "component": "apps/venue-staff-app/src/routes/operations/OpeningChecklistDetail.tsx",
+   "component": "src/routes/operations/OpeningChecklistDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -207,11 +208,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/emergency-mode",
-   "component": "apps/venue-staff-app/src/routes/operations/EmergencyModeDetail.tsx",
+   "component": "src/routes/operations/EmergencyModeDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -255,6 +257,7 @@
   "pattern": "listDetail",
   "patternReason": "`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act",
   "purpose": "Evacuate, and stop pretending to be a ticketing app.",
+  "division": "Shares `acknowledgeAnnouncement`, `listAnnouncements` with EMP-039; this screen is Emergency mode: evacuate, and stop pretending to be a ticketing app.",
   "layout": {
    "template": "split",
    "regions": [
@@ -419,11 +422,12 @@
   "module": "Operations",
   "requiresModule": "maintenance",
   "wave": 2,
+  "permission": "INCIDENT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/post-incident-restore",
-   "component": "apps/venue-staff-app/src/routes/operations/PostIncidentRestoreDetail.tsx",
+   "component": "src/routes/operations/PostIncidentRestoreDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -590,6 +594,13 @@
     "invalidates": [
      "listIncidents"
     ]
+   },
+   {
+    "operationId": "uploadIncidentMedia",
+    "contract": "maintenance",
+    "purpose": "The signed upload for a photo or document the incident form attaches, requested when the form is sent; no control of its own",
+    "trigger": "background",
+    "provenance": "Block A audit, 14 October 2026 (CHG-SCP-009)"
    }
   ],
   "entryState": {
@@ -679,7 +690,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/arabic-rtl",
-   "component": "apps/venue-staff-app/src/routes/operations/ArabicRtlDetail.tsx",
+   "component": "src/routes/operations/ArabicRtlDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -776,7 +787,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/sign-out",
-   "component": "apps/venue-staff-app/src/routes/operations/SignOutDetail.tsx",
+   "component": "src/routes/operations/SignOutDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -896,11 +907,12 @@
   "module": "Operations",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/hand-over-the-journal",
-   "component": "apps/venue-staff-app/src/routes/operations/HandOverTheJournalDetail.tsx",
+   "component": "src/routes/operations/HandOverTheJournalDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -1,5 +1,5 @@
 id: LLD-IdentityService
-title: IdentityService — 97 operations, 41 tables
+title: IdentityService — 98 operations, 41 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 deployable: commerce
@@ -10,9 +10,9 @@ why: '**Twelve contracts read it and it reads almost nothing.** The one service 
 scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
 ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
 coverage:
-  operations: 97
+  operations: 98
   inAFlow: 21
-  percent: 22%
+  percent: 21%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -29,7 +29,7 @@ schemas:
   largestTable: pii.subject_biometric
 operationsByContract:
 - contract: identity
-  count: 97
+  count: 98
   operations:
   - operation: changeOwnCredential
     verb: POST
@@ -135,6 +135,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: endGuestDeviceSessions
+    verb: POST
+    path: /internal/guest-sessions/end-for-device
+    scope: subject
+    permission: null
+    offline: false
+    reads: 1
+    writes: 1
   - operation: endOwnSession
     verb: POST
     path: /auth/sessions/mine/{sessionId}/end
@@ -405,7 +413,7 @@ operationsByContract:
     scope: venue
     permission: GUEST_VIEW
     offline: false
-    reads: 3
+    reads: 2
     writes: 0
   - operation: listGuestIdentityVerifications
     verb: GET
@@ -641,7 +649,7 @@ operationsByContract:
     writes: 1
   - operation: setCapabilityTemplate
     verb: PUT
-    path: /capability-templates
+    path: /capability-templates/{capabilityTemplateId}
     scope: tenant
     permission: ROLE_MANAGE
     offline: false
@@ -1018,10 +1026,11 @@ tables:
       bump: null
       affects: null
 - table: identity.access_decision
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - identity
   foreignWriters: null
 - table: identity.access_override
   columns: 10
@@ -1045,7 +1054,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.authorisation_policy
-  columns: 17
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -1062,11 +1071,10 @@ tables:
   columns: 3
   store: postgres
   parent: null
-  writtenBy:
-  - identity
+  writtenBy: []
   foreignWriters: null
 - table: identity.benefit_usage
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1114,7 +1122,9 @@ tables:
   parent: null
   writtenBy:
   - identity
-  foreignWriters: null
+  - marketing-crm
+  foreignWriters:
+  - marketing-crm
 - table: identity.guest_verification_policy
   columns: 14
   store: postgres
@@ -1264,7 +1274,7 @@ tables:
 - table: identity.subject_holding
   columns: 10
   store: postgres
-  parent: null
+  parent: pii.subject
   writtenBy: []
   foreignWriters: null
 - table: pii.consent_identifier
@@ -1311,7 +1321,7 @@ readsFrom:
 - service: TenancyService
   operations: 7
 - service: MarketingService
-  operations: 2
+  operations: 1
 - service: OrderService
   operations: 1
 - service: VenueOpsService

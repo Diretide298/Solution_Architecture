@@ -1,5 +1,6 @@
 {
  "AgentAvailability": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.agent_availability",
   "required": [

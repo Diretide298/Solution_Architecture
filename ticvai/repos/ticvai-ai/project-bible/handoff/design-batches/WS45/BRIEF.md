@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-138` | Promotion Command Center Dashboard | B–D | 0 | 18 | 6 | 1 | 1 | 2 | — | notStarted (generated) |
 | `ADM-139` | Promotion & Campaign Directory | B | 21 | 47 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-140` | Promotion Overview | B–D | 0 | 62 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
-| `ADM-141` | Promotion Lifecycle & Status Manager | B–D | 2 | 0 | 6 | 2 | 0 | 2 | — | notStarted (generated) |
+| `ADM-141` | Promotion Lifecycle & Status Manager | B–D | 2 | 6 | 6 | 2 | 0 | 2 | — | notStarted (generated) |
 | `ADM-142` | Campaign Calendar & Timeline | B | 6 | 14 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `ADM-143` | Promotion Channel & Publication Monitor | B | 0 | 2 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-144` | Promotion Alerts & Exception Center | B | 6 | 0 | 5 | 0 | 0 | 2 | — | notStarted (generated) |

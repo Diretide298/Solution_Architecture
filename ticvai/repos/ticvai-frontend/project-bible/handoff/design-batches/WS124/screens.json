@@ -5,6 +5,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -124,7 +125,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -220,61 +221,73 @@
       {
        "kind": "metricTile",
        "label": "Active AI Capabilities",
+       "operation": "getAiUsage",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "AI Decisions Today",
+       "operation": "getAiUsage",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Governance Compliance Rate",
+       "operation": "getAiUsage",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Policy Violations",
+       "operation": "getAiUsage",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "High-Risk Events",
+       "operation": "getAiUsage",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Critical AI Events",
+       "operation": "getAiUsage",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Open AI Incidents",
+       "operation": "listAiIncidents",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Active Exceptions",
+       "operation": "getAiUsage",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Controls Passing",
+       "operation": "getAiUsage",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Controls Failing",
+       "operation": "getAiUsage",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "AI Capabilities Under Review",
+       "operation": "getAiUsage",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Governance Health Score",
+       "operation": "listAiCapabilityHealth",
        "provenance": "pack AI_Governance_Reference.pdf, page 82 §Header KPIs"
       }
      ]
@@ -416,6 +429,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -570,20 +584,6 @@
   },
   "apis": [
    {
-    "operationId": "listAiRiskRegister",
-    "contract": "ai",
-    "purpose": "The AI risk register",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "setAiRiskRegisterEntry",
-    "contract": "ai",
-    "purpose": "Record or update a risk register entry",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listTenants",
     "contract": "subscription",
     "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
@@ -603,6 +603,20 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "listAiRiskRegister",
+    "contract": "ai",
+    "purpose": "The AI risk register",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "setAiRiskRegisterEntry",
+    "contract": "ai",
+    "purpose": "Record or update a risk register entry",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -679,6 +693,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -770,12 +785,14 @@
       },
       {
        "kind": "dataTable",
+       "operation": "listAiControls",
        "derived": true,
        "impliedBy": "listAiControls",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
        "kind": "primaryButton",
+       "operation": "runAiControlTest",
        "derived": true,
        "impliedBy": "runAiControlTest",
        "notes": "The act the screen exists for."
@@ -910,6 +927,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -956,7 +974,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
@@ -998,36 +1016,43 @@
       {
        "kind": "metricTile",
        "label": "Evaluated Actions",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Compliant",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Blocked by Policy",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Policy Violations",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Attempted Violations",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Exception-Based Actions",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Unknown / Unclassified Actions",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 87 §Compliance KPIs"
       }
      ]
@@ -1092,13 +1117,6 @@
     "contract": "ai",
     "purpose": "Governance alerts",
     "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "decideAiGovernanceAlert",
-    "contract": "ai",
-    "purpose": "Acknowledge, dismiss, resolve, or open an incident",
-    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -1197,6 +1215,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -1243,7 +1262,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
@@ -1285,41 +1304,49 @@
       {
        "kind": "metricTile",
        "label": "AI Data Requests",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Allowed",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Conditionally Allowed",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Blocked",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "External Transfers",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Masked / Redacted",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Data Policy Violations",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Unknown Data Categories",
+       "operation": "listAiGovernanceAlerts",
        "provenance": "pack AI_Governance_Reference.pdf, page 89 §Data Usage KPIs"
       }
      ]
@@ -1404,13 +1431,6 @@
     "contract": "ai",
     "purpose": "Governance alerts",
     "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "decideAiGovernanceAlert",
-    "contract": "ai",
-    "purpose": "Acknowledge, dismiss, resolve, or open an incident",
-    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -1509,6 +1529,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -1872,6 +1893,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -1963,12 +1985,14 @@
       },
       {
        "kind": "dataTable",
+       "operation": "listAiGovernanceAlerts",
        "derived": true,
        "impliedBy": "listAiGovernanceAlerts",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
        "kind": "primaryButton",
+       "operation": "decideAiGovernanceAlert",
        "derived": true,
        "impliedBy": "decideAiGovernanceAlert",
        "notes": "The act the screen exists for."
@@ -2004,13 +2028,6 @@
     "operationId": "decideAiGovernanceAlert",
     "contract": "ai",
     "purpose": "Acknowledge, dismiss, resolve, or open an incident",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "openAiIncident",
-    "contract": "ai",
-    "purpose": "Open an AI incident",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
@@ -2110,6 +2127,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -2523,6 +2541,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -2677,27 +2696,6 @@
   },
   "apis": [
    {
-    "operationId": "exportAiEvidencePackage",
-    "contract": "ai",
-    "purpose": "Export an evidence package",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAiRiskRegister",
-    "contract": "ai",
-    "purpose": "The AI risk register",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAiControls",
-    "contract": "ai",
-    "purpose": "Governance controls",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listTenants",
     "contract": "subscription",
     "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
@@ -2717,6 +2715,20 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "exportAiEvidencePackage",
+    "contract": "ai",
+    "purpose": "Export an evidence package",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listAiRiskRegister",
+    "contract": "ai",
+    "purpose": "The AI risk register",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -2787,6 +2799,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -2907,20 +2920,6 @@
   },
   "apis": [
    {
-    "operationId": "listAiGovernanceAlerts",
-    "contract": "ai",
-    "purpose": "Governance alerts",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAiRiskRegister",
-    "contract": "ai",
-    "purpose": "The AI risk register",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listTenants",
     "contract": "subscription",
     "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
@@ -2940,6 +2939,13 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "listAiRiskRegister",
+    "contract": "ai",
+    "purpose": "The AI risk register",
+    "trigger": "onLoad",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {

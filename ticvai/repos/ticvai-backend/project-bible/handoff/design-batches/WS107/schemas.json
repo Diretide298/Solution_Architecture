@@ -63,6 +63,87 @@
    "clientHosted"
   ]
  },
+ "CommercialMetric": {
+  "type": "object",
+  "description": "One commercial figure. Money-valued codes carry a `Money`; counts, rates and days a number (naming-and-style 5.1: money is never a float).",
+  "required": [
+   "code",
+   "value"
+  ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The band, profile or model this row is for, on a code split by one; null otherwise."
+   },
+   "unit": {
+    "type": "string",
+    "enum": [
+     "count",
+     "currency",
+     "percent",
+     "days"
+    ]
+   },
+   "value": {
+    "oneOf": [
+     {
+      "type": "number"
+     },
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ]
+   },
+   "comparison": {
+    "nullable": true,
+    "oneOf": [
+     {
+      "type": "number"
+     },
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ]
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   }
+  }
+ },
+ "CommercialMetricSet": {
+  "type": "object",
+  "description": "The commercial command centres' figures, one row per metric code (getCommercialMetrics).",
+  "properties": {
+   "tenantId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The customer the figures are for; null for the whole portfolio."
+   },
+   "period": {
+    "type": "string"
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "metrics": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CommercialMetric"
+    }
+   }
+  }
+ },
  "DowngradeConflictProblem": {
   "x-ticvai-persistence": "none — error shape",
   "allOf": [
@@ -386,83 +467,6 @@
    }
   }
  },
- "Subscription": {
-  "x-ticvai-persistence": "subscription.contract",
-  "type": "object",
-  "required": [
-   "tenantId",
-   "planId",
-   "planVersion",
-   "status",
-   "startsAt"
-  ],
-  "properties": {
-   "tenantId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "planId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "planName": {
-    "type": "string"
-   },
-   "planVersion": {
-    "type": "string"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "trial",
-     "active",
-     "pastDue",
-     "cancelled",
-     "expired"
-    ]
-   },
-   "startsAt": {
-    "type": "string",
-    "format": "date"
-   },
-   "renewsAt": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "cancelledAt": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "scheduledChange": {
-    "type": "object",
-    "nullable": true,
-    "readOnly": true,
-    "description": "A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). Null when none is scheduled.",
-    "properties": {
-     "planId": {
-      "type": "string",
-      "format": "uuid"
-     },
-     "planVersion": {
-      "type": "string"
-     },
-     "effectiveFrom": {
-      "type": "string",
-      "format": "date",
-      "description": "Always the `renewsAt` it was scheduled against."
-     }
-    }
-   },
-   "currentPrice": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "billingPeriod": {
-    "type": "string"
-   }
-  }
- },
  "SubscriptionCreditNote": {
   "type": "object",
   "x-ticvai-persistence": "control.credit_note + control.credit_note_line",
@@ -489,10 +493,12 @@
     "description": "**Gapless, per issuing legal entity, in its own sequence** (the R152 rule for invoices, decided 28 September, applied to credit notes): assigned at issue, never reused."
    },
    "invoiceId": {
+    "x-ticvai-references": "control.invoice",
     "type": "string",
     "description": "The invoice credited."
    },
    "tenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },
@@ -598,6 +604,7 @@
     "description": "A tax invoice number, so **gapless, per legal entity** (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity that issues it, assigned when the invoice is issued, never reused. A cancelled invoice keeps its number.\n"
    },
    "tenantId": {
+    "x-ticvai-references": "control.tenant",
     "type": "string",
     "format": "uuid"
    },
@@ -906,6 +913,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

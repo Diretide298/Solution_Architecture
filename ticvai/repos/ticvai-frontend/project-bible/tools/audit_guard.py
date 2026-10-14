@@ -135,6 +135,52 @@ def snake(name: str) -> str:
     return s.lower()
 
 
+def viewed_table(name, known):
+    """The table a DB-READ-VIEWS read view `<table>_for_<reader>` reads, if `known` has it; else None.
+
+    **A read through a view is a read of its table** (14 October 2026, CHG-R6G-007, CHG-GTE-001). DB-READ-VIEWS
+    publishes one view per (reader module, owned table) for bulk reads within one deployable, and the lineage names
+    such a read by the view (`publishBundle` reads `platform.sale_board_for_catalogue`). Every check that resolves a
+    lineage table against the schema asks this one question, so a new reader of the lineage cannot miss it again.
+    Each `_for_` split is tried, so a table whose own name holds `_for_` still resolves. Reads only: a view is never
+    written. tools/check-lineage.py additionally checks the reader is the operation's own module.
+    """
+    name = str(name)
+    i = name.find("_for_")
+    while i > 0:
+        if name[:i] in known:
+            return name[:i]
+        i = name.find("_for_", i + 1)
+    return None
+
+
+def read_views(lin, known):
+    """Every DB-READ-VIEWS view the lineage reads: view -> {table, reader, operations, columns}.
+
+    **The schema reference lists the views the lineage reads** (14 October 2026, CHG-GTE-001, tracker F27). The lineage
+    names a read through a view by the view (`publishBundle` reads `platform.sale_board_for_catalogue`, CHG-R6G-007),
+    and `check-package` failed it because the schema reference had no such name. `build-schema-workbook.py` writes
+    these on its `Read views` sheet, so the name a developer meets in the lineage is one they can look up, with the
+    table beneath it, the module it is for and the columns its readers read (`readColumns`; none: every column).
+    """
+    out: dict = {}
+    for oid, v in (lin or {}).items():
+        rc = v.get("readColumns") or {}
+        for t in v.get("reads") or []:
+            base = viewed_table(t, known) if ":" not in str(t) and t not in known else None
+            if not base:
+                continue
+            x = out.setdefault(t, {"table": base, "reader": str(t)[len(base) + len("_for_"):],
+                                   "operations": set(), "columns": set(), "every": False})
+            x["operations"].add(oid)
+            cs = rc.get(t) or rc.get(base)
+            if cs:
+                x["columns"].update(cs)
+            else:
+                x["every"] = True
+    return out
+
+
 def ref_name(ref: str) -> str:
     return str(ref).rsplit("/", 1)[-1]
 

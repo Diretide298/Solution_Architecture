@@ -8,7 +8,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/fandb--browse-and-order",
-   "component": "apps/guest-web/src/routes/FBBrowseOrder.tsx",
+   "component": "src/routes/FBBrowseOrder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -265,8 +265,8 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add a table deposit to the cart when the venue requires one",
-    "trigger": "onAction"
+    "purpose": "Sent by the screen when a table booking needs a deposit, not a control: adds the deposit to the cart, with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)",
+    "trigger": "background"
    },
    {
     "operationId": "updateTableReservation",
@@ -277,7 +277,7 @@
    {
     "operationId": "listMyTableReservations",
     "contract": "fnb",
-    "purpose": "Show the guest's own reservations, the one being changed among them",
+    "purpose": "Show the guest's own reservations, the one being changed among them. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4)",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }
@@ -423,7 +423,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/menu-item-detail",
-   "component": "apps/guest-web/src/routes/MenuItemDetail.tsx",
+   "component": "src/routes/MenuItemDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -580,7 +580,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/fandb--order-tracking",
-   "component": "apps/guest-web/src/routes/FBOrderTracking.tsx",
+   "component": "src/routes/FBOrderTracking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -738,7 +738,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/venue-map-and-wait-times",
-   "component": "apps/guest-web/src/routes/VenueMapWaitTimes.tsx",
+   "component": "src/routes/VenueMapWaitTimes.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -967,7 +967,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/virtual-queue",
-   "component": "apps/guest-web/src/routes/VirtualQueue.tsx",
+   "component": "src/routes/VirtualQueue.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1026,6 +1026,7 @@
       {
        "kind": "cardList",
        "label": "Virtual Queue",
+       "operation": "listQueues",
        "provenance": "carried from the previous definition"
       },
       {
@@ -1087,6 +1088,13 @@
     "contract": "queue",
     "purpose": "Wait times across a venue",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listQueues",
+    "contract": "queue",
+    "purpose": "Which virtual queues are running",
+    "trigger": "onLoad",
+    "provenance": "Block A audit, 14 October 2026: N-TWIN-OPS, as GST-023 (CHG-SCG-008)"
    }
   ],
   "entryState": {
@@ -1182,7 +1190,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/parking--reserve-and-pay",
-   "component": "apps/guest-web/src/routes/ParkingReservePay.tsx",
+   "component": "src/routes/ParkingReservePay.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1318,7 +1326,7 @@
    {
     "operationId": "getParkingEntitlement",
     "contract": "access",
-    "purpose": "Load the parking entitlement being changed",
+    "purpose": "Load the parking entitlement being changed. Only when signed in: a signed-out guest is offered sign-in and brought back here (GFIX-4)",
     "trigger": "onLoad",
     "provenance": "r1 gate, 3 October 2026 (CHG-R1S-004)"
    }

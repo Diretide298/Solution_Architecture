@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1129` | Benefit Packaging & Digital Wallet Presentation | C | 21 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1130` | Gift Card & Voucher Expiry Management | C | 10 | 11 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1131` | Gift Card Balance, Liability & Breakage Control | C | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1132` | Gift Card & Voucher Simulator, Validation & Publication | C | 0 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-1132` | Gift Card & Voucher Simulator, Validation & Publication | C | 2 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -256,7 +256,7 @@
  },
  "setApprovalMatrix": {
   "method": "PUT",
-  "path": "/approval-matrices",
+  "path": "/approval-matrices/{matrixId}",
   "contract": "approvals",
   "summary": "Configure what requires approval",
   "permission": "APPROVAL_CONFIGURE",
@@ -264,6 +264,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "matrixId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

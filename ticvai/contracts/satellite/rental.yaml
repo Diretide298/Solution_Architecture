@@ -1130,12 +1130,12 @@ paths:
   /rental-deposit-policies:
     put:
       operationId: setRentalDepositPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per rental product or category, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-529 Deposit & Security Hold Policy"
         - "P08 BO-530 Deposit Lifecycle & Settlement Rules"
         - "P08 BO-909 Deposit & Rental Financial Control"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per rental product or category, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: How much is held, how, and what happens to it
       description: 'Boards 4.6 and 4.7. Fixed or percentage, with minimum and maximum, by
@@ -1180,11 +1180,11 @@ paths:
   /rental-fee-policies:
     put:
       operationId: setRentalFeePolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per rental product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-531 Late Fee, Grace Period & Extension Pricing"
         - "P08 BO-909 Deposit & Rental Financial Control"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per rental product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Grace period, late fees and extension pricing
       description: 'Board 4.8. *Expected 14:00, actual 15:12, grace 15 minutes, chargeable 57 minutes.*
@@ -1685,10 +1685,6 @@ paths:
         format: uuid
     post:
       operationId: assignRentalEquipment
-      x-ticvai-read-via:
-      - query: catalogue#productRecords
-        route: service
-        for: 'the product the asset must be of (409 wrong-product) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P06 EMP-074 Equipment Assignment Workspace"
         - "P06 EMP-075 Equipment Scan & Validation"
@@ -1697,6 +1693,10 @@ paths:
         - "P08 BO-548 Equipment Scan & Validation"
         - "P08 BO-552 Group & Multi-Item Checkout"
         - "P08 BO-907 Guest & Resource Assignment"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'the product the asset must be of (409 wrong-product) (CHG-MOD-003)'
       x-ticvai-conflict-policy: serverWins
       summary: Bind specific assets to the booking, by scan where required
       description: 'Boards 6.4 and 6.5. **This is the moment a serialised rental stops being a quantity.**

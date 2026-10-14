@@ -60,28 +60,9 @@
   "requestBody": null,
   "responds": "MediaRendition"
  },
- "replaceMediaAsset": {
-  "method": "POST",
-  "path": "/media/{mediaId}/replace",
-  "contract": "assets",
-  "summary": "Replace the file behind an asset",
-  "permission": "ASSET_LIBRARY_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MediaReplaceResult"
- },
  "setMediaDistributionChannels": {
   "method": "PUT",
-  "path": "/media-distribution/channels",
+  "path": "/media-distribution/channels/{code}",
   "contract": "assets",
   "summary": "CDN, delivery URLs, fallbacks and expiry behaviour",
   "permission": "ASSET_LIBRARY_MANAGE",
@@ -89,6 +70,11 @@
   "conflictPolicy": null,
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "code",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

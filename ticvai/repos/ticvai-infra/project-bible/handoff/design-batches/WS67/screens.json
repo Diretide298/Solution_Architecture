@@ -5,6 +5,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "2",
@@ -168,7 +169,7 @@
         "AI-Generated Dashboard — generated through AI"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listDashboards",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display dashboard cards/table containing"
       }
      ]
@@ -215,7 +216,8 @@
         "AI-Generated Dashboard — generated through AI"
        ],
        "notes": null,
-       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display dashboard cards/table containing"
+       "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display dashboard cards/table containing",
+       "operation": "getDashboard"
       }
      ]
     }
@@ -242,16 +244,6 @@
     "purpose": "Open one",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "createDashboard",
-    "contract": "reporting",
-    "purpose": "Start a new one",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "listDashboards"
-    ]
    },
    {
     "operationId": "recordDashboardView",
@@ -311,6 +303,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_MANAGE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "2",
@@ -364,91 +357,109 @@
       {
        "kind": "selectField",
        "label": "Dashboard Name",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Description",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Category",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Business Domain",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Dashboard Owner",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Tags",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Language",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Default Currency",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
       },
       {
        "kind": "textField",
        "label": "Step 2 — Scope",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Tenant",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
       },
       {
        "kind": "selectField",
        "label": "Organization",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
       },
       {
        "kind": "selectField",
        "label": "Site(s)",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
       },
       {
        "kind": "selectField",
        "label": "Venue(s)",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
       },
       {
        "kind": "selectField",
        "label": "Attraction(s)",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
       },
       {
        "kind": "selectField",
        "label": "Business Unit(s)",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
       },
       {
        "kind": "textField",
        "label": "Step 3 — Data Domains",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select"
       },
       {
        "kind": "selectField",
        "label": "Queue • Accreditation",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select one or multiple domains"
       },
       {
        "kind": "textField",
        "label": "Step 4 — Template",
+       "operation": "createDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select one or multiple domains"
       }
      ]
@@ -862,6 +873,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "2",
@@ -921,7 +933,7 @@
         "Progress Indicator"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getSemanticModel",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components"
       }
      ]
@@ -934,6 +946,7 @@
        "kind": "detailPanel",
        "label": "The selected widget visualization",
        "bindsTo": null,
+       "operation": "getSemanticModel",
        "columns": [
         "KPI Card",
         "Target Card",
@@ -1041,6 +1054,7 @@
   },
   "density": "compact",
   "purposeNote": "Administrators can centrally define reusable KPIs and ensure the same KPI calculation is used across TICVAI dashboards.",
+  "division": "Shares `createKpi`, `listKpis` with ANL-062; this screen is KPI Builder (pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, board 2.2.5, page 18): allow authorized business users to create standardized enterprise KPIs.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configure; Define whether) and no display directory — it is settings, not a population",
   "purpose": "Allow authorized business users to create standardized enterprise KPIs.",
@@ -1220,6 +1234,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "2",
@@ -1286,7 +1301,7 @@
         "Evaluation Frequency"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listKpis",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each KPI"
       }
      ]
@@ -1299,6 +1314,7 @@
        "kind": "detailPanel",
        "label": "The selected targets thresholds kpi",
        "bindsTo": null,
+       "operation": "listKpis",
        "columns": [
         "Target",
         "Minimum",
@@ -1421,6 +1437,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "2",
@@ -1461,7 +1478,7 @@
    "template": "form",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -1472,6 +1489,7 @@
       {
        "kind": "multiSelect",
        "label": "Filter by",
+       "operation": "updateDashboard",
        "columns": [
         "Global",
         "Widget-level",
@@ -1492,81 +1510,97 @@
       {
        "kind": "selectField",
        "label": "Data Domain",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
       },
       {
        "kind": "selectField",
        "label": "Dataset",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
       },
       {
        "kind": "selectField",
        "label": "Measure",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
       },
       {
        "kind": "selectField",
        "label": "Dimension",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
       },
       {
        "kind": "selectField",
        "label": "Aggregation",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
       },
       {
        "kind": "selectField",
        "label": "Date Field",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
       },
       {
        "kind": "selectField",
        "label": "Relationship",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
       },
       {
        "kind": "selectField",
        "label": "Calculation",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select"
       },
       {
        "kind": "selectField",
        "label": "Date Range",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Site",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Venue",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Attraction",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Channel",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Product",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Customer Segment",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Currency",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure"
       }
      ]
@@ -1643,6 +1677,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_MANAGE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "2",
@@ -1696,46 +1731,55 @@
       {
        "kind": "selectField",
        "label": "Click behavior",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
       },
       {
        "kind": "selectField",
        "label": "Cross-filtering",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
       },
       {
        "kind": "selectField",
        "label": "Drill-down",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
       },
       {
        "kind": "selectField",
        "label": "Drill-up",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
       },
       {
        "kind": "selectField",
        "label": "Drill-through",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
       },
       {
        "kind": "selectField",
        "label": "Tooltip",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
       },
       {
        "kind": "selectField",
        "label": "Detail page",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
       },
       {
        "kind": "selectField",
        "label": "Related dashboard",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
       },
       {
        "kind": "selectField",
        "label": "Underlying report",
+       "operation": "updateDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define"
       }
      ]
@@ -1804,6 +1848,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "2",
@@ -1866,7 +1911,7 @@
         "Published Version"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display"
       }
      ]
@@ -1879,6 +1924,7 @@
        "kind": "detailPanel",
        "label": "The selected access publishing versioning",
        "bindsTo": null,
+       "operation": "getDashboard",
        "columns": [
         "Version Number",
         "Changed By",
@@ -1912,6 +1958,13 @@
      "getDashboard",
      "listDashboards"
     ]
+   },
+   {
+    "operationId": "getDashboard",
+    "contract": "reporting",
+    "purpose": "The dashboard as saved: who may see it, what is published and its versions, read before a change is published",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)"
    }
   ],
   "entryState": {
@@ -1965,6 +2018,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "2",
@@ -2030,7 +2084,7 @@
         "Usage Frequency"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getDashboard",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display"
       }
      ]
@@ -2043,6 +2097,7 @@
        "kind": "detailPanel",
        "label": "The selected preview validation health",
        "bindsTo": null,
+       "operation": "getDashboard",
        "columns": [
         "Data Last Refreshed",
         "Refresh Frequency",
@@ -2074,13 +2129,6 @@
     "contract": "reporting",
     "purpose": "Preview",
     "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listAnalyticsPipelines",
-    "contract": "reporting",
-    "purpose": "Whether its data is fresh",
-    "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    },
    {

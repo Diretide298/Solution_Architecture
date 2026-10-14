@@ -5,11 +5,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/product-directory",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ProductDirectoryDetail.tsx",
+   "component": "src/routes/venue-operations/ProductDirectoryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -185,7 +186,7 @@
      ]
     },
     {
-     "name": "contextPanel",
+     "name": "contextPanelSelection",
      "slot": "selection",
      "components": [
       {
@@ -639,11 +640,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/product-detail-variants",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ProductDetailVariantsDetail.tsx",
+   "component": "src/routes/venue-operations/ProductDetailVariantsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -711,7 +713,7 @@
      ]
     },
     {
-     "name": "contextPanel",
+     "name": "contextPanelSelection",
      "slot": "selection",
      "components": [
       {
@@ -1219,11 +1221,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRICE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/pricing-rules",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx",
+   "component": "src/routes/venue-operations/PricingRulesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1624,11 +1627,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRICE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
+   "component": "src/routes/venue-operations/PromotionsCouponsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2491,11 +2495,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/packages-bundles",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
+   "component": "src/routes/venue-operations/PackagesBundlesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2668,7 +2673,7 @@
      ]
     },
     {
-     "name": "contextPanel",
+     "name": "contextPanelSelection",
      "slot": "selection",
      "components": [
       {
@@ -3053,11 +3058,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/membership-products",
-   "component": "apps/venue-management-web/src/routes/venue-operations/MembershipProductsDetail.tsx",
+   "component": "src/routes/venue-operations/MembershipProductsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3579,11 +3585,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/channel-distribution",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ChannelDistributionDetail.tsx",
+   "component": "src/routes/venue-operations/ChannelDistributionDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3888,6 +3895,12 @@
      "from": "deepLink",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listChannelCapacities` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "listingId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listChannelListings`."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `channelCapacityId`.",
@@ -4062,11 +4075,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/catalogue-publishing",
-   "component": "apps/venue-management-web/src/routes/venue-operations/CataloguePublishingDetail.tsx",
+   "component": "src/routes/venue-operations/CataloguePublishingDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -4430,11 +4444,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/session-calendar",
-   "component": "apps/venue-management-web/src/routes/venue-operations/SessionCalendarDetail.tsx",
+   "component": "src/routes/venue-operations/SessionCalendarDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -4920,11 +4935,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PERFORMANCE_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/session-template",
-   "component": "apps/venue-management-web/src/routes/venue-operations/SessionTemplateDetail.tsx",
+   "component": "src/routes/venue-operations/SessionTemplateDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -4957,6 +4973,7 @@
   "pattern": "listDetail",
   "patternReason": "`listPerformanceTemplates` reads the population and the selected row is the detail; `setPerformanceTemplate` saves one — list, select, act",
   "purpose": "Define the pattern the calendar is generated from — slot length, turnaround, concurrent capacity, peak bands and walk-in rules. BO-015 Performance Calendar generates and manages the performances themselves (kept separate, decided 28 September, audit R276).",
+  "division": "Shares `listPerformanceTemplates`, `setPerformanceTemplate` with BO-721, BO-723, BO-724; this screen is Performance Template: define the pattern the calendar is generated from — slot length, turnaround, concurrent capacity, peak bands and walk-in rules. BO-015 Performance Calendar generates and manages the performances themselves (kept separate, decided 28 September, audit R276).",
   "layout": {
    "template": "split",
    "regions": [
@@ -5079,6 +5096,16 @@
     "provenance": "contract catalogue.yaml PUT /performance-templates"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "performanceTemplateId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listPerformanceTemplates`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",

@@ -5,6 +5,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "7",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/ai-setup-command-center-bo-595",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/AiSetupCommandCenter.tsx",
+   "component": "src/routes/setup-go-live/AiSetupCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -178,6 +179,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "7",
@@ -187,7 +189,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/guided-setup-plan-bo-596",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/GuidedSetupPlan.tsx",
+   "component": "src/routes/setup-go-live/GuidedSetupPlan.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -264,7 +266,8 @@
         "Manual configuration available"
        ],
        "notes": null,
-       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 85 §Each Task Shows"
+       "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 85 §Each Task Shows",
+       "operation": "getGoLiveReadiness"
       }
      ]
     }
@@ -331,6 +334,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "7",
@@ -340,7 +344,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/ai-configuration-workspace-bo-597",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/AiConfigurationWorkspace.tsx",
+   "component": "src/routes/setup-go-live/AiConfigurationWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -467,6 +471,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "7",
@@ -476,7 +481,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/ai-draft-review-approval-bo-598",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/AiDraftReviewApproval.tsx",
+   "component": "src/routes/setup-go-live/AiDraftReviewApproval.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -652,7 +657,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/manual-configuration-center-bo-599",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/ManualConfigurationCenter.tsx",
+   "component": "src/routes/setup-go-live/ManualConfigurationCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -762,6 +767,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "7",
@@ -771,7 +777,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/venue-calendar-operational-setup-bo-600",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/VenueCalendarOperationalSetup.tsx",
+   "component": "src/routes/setup-go-live/VenueCalendarOperationalSetup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -895,6 +901,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "7",
@@ -904,7 +911,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/product-pricing-sales-channel-setup-bo-601",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/ProductPricingSalesChannelSetup.tsx",
+   "component": "src/routes/setup-go-live/ProductPricingSalesChannelSetup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1100,6 +1107,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WORKSTATION_CONFIGURE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "7",
@@ -1109,7 +1117,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/pos-payment-access-setup-bo-602",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/PosPaymentAccessSetup.tsx",
+   "component": "src/routes/setup-go-live/PosPaymentAccessSetup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1275,6 +1283,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "7",
@@ -1284,7 +1293,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/configuration-health-ai-review-bo-603",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/ConfigurationHealthAiReview.tsx",
+   "component": "src/routes/setup-go-live/ConfigurationHealthAiReview.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1308,6 +1317,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Configuration Health) and no display directory — it is settings, not a population",
   "purpose": "Allow AI to analyze the complete configuration and identify missing, inconsistent, or potentially incorrect settings before formal go-live validation.",
+  "division": "Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-606, BO-607, BO-608, BO-609, BO-610, BO-611, BO-612; this screen is Configuration Health & AI Review (pack Subscription_Licensing_AI_Self_Service.pdf, board 7.9, page 91): allow AI to analyze the complete configuration and identify missing, inconsistent, or potentially incorrect settings before formal go-live validation.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1324,7 +1334,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "runGoLiveValidation",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "runGoLiveValidation"
       },
       {
        "kind": "secondaryButton",
@@ -1354,6 +1365,13 @@
     "invalidates": [
      "getGoLiveReadiness"
     ]
+   },
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Follows runGoLiveValidation (202) until what it started settles: Everything that must pass before a tenant can sell",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -1391,6 +1409,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "7",
@@ -1400,7 +1419,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/setup-completion-handoff-to-go-live-bo-604",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/SetupCompletionHandoffToGoLive.tsx",
+   "component": "src/routes/setup-go-live/SetupCompletionHandoffToGoLive.tsx",
    "status": "notStarted"
   },
   "navigation": {

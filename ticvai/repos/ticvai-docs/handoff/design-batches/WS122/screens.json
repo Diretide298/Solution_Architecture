@@ -5,6 +5,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "2",
@@ -122,7 +123,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -193,51 +194,61 @@
       {
        "kind": "metricTile",
        "label": "Pending AI Approvals",
+       "operation": "listProposedActions",
        "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "High-Risk Reviews",
+       "operation": "listProposedActions",
        "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Critical Reviews",
+       "operation": "listProposedActions",
        "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Awaiting Additional Approver",
+       "operation": "listProposedActions",
        "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Conditional Approvals",
+       "operation": "listProposedActions",
        "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Requested Changes",
+       "operation": "listProposedActions",
        "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Escalated Cases",
+       "operation": "listProposedActions",
        "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Overdue Reviews",
+       "operation": "listProposedActions",
        "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Active AI Executions Under Oversight",
+       "operation": "listProposedActions",
        "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Human Interventions Today",
+       "operation": "listProposedActions",
        "provenance": "pack AI_Governance_Reference.pdf, page 30 §Header KPIs"
       }
      ]
@@ -253,13 +264,6 @@
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
-   {
-    "operationId": "getActionPlan",
-    "contract": "ai",
-    "purpose": "A plan with its steps",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
    {
     "operationId": "listProposedActions",
     "contract": "ai",
@@ -361,6 +365,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "2",
@@ -537,27 +542,6 @@
   },
   "apis": [
    {
-    "operationId": "createAiGovernancePolicyDraft",
-    "contract": "ai",
-    "purpose": "Draft a governance policy, or a new version of one",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAiGovernancePolicyVersions",
-    "contract": "ai",
-    "purpose": "Governance policies and their versions",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAiTools",
-    "contract": "ai",
-    "purpose": "The tool registry",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listApprovalMatrices",
     "contract": "approvals",
     "purpose": "The matrices AI actions route through",
@@ -655,6 +639,12 @@
      "name": "tenantId",
      "from": "navigation",
      "optional": true
+    },
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listApprovalMatrices`."
     }
    ]
   },
@@ -689,6 +679,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "2",
@@ -770,11 +761,13 @@
       {
        "kind": "textField",
        "label": "Adult Weekend Price AED 140 AED 150",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Governance_Reference.pdf, page 33 §Configuration Current Proposed"
       },
       {
        "kind": "textField",
        "label": "Effective Date Current 1 Oct 2026",
+       "operation": "simulateActionPlan",
        "provenance": "pack AI_Governance_Reference.pdf, page 33 §Configuration Current Proposed"
       }
      ]
@@ -791,23 +784,9 @@
   },
   "apis": [
    {
-    "operationId": "getActionPlan",
-    "contract": "ai",
-    "purpose": "A plan with its steps",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "simulateActionPlan",
     "contract": "ai",
     "purpose": "Validate and simulate a plan without changing anything",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "decideProposedAction",
-    "contract": "ai",
-    "purpose": "Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
@@ -911,6 +890,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "2",
@@ -1009,6 +989,7 @@
       },
       {
        "kind": "primaryButton",
+       "operation": "decideProposedAction",
        "derived": true,
        "impliedBy": "decideProposedAction",
        "notes": "The act the screen exists for."
@@ -1180,6 +1161,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_AUDIT_VIEW",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "2",
@@ -1279,7 +1261,7 @@
         "Ask AI"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getAiDecisionTrace",
        "provenance": "pack AI_Governance_Reference.pdf, page 36 §Show"
       }
      ]
@@ -1292,6 +1274,7 @@
        "kind": "detailPanel",
        "label": "The selected human review challenge",
        "bindsTo": null,
+       "operation": "getAiDecisionTrace",
        "columns": [
         "Proposed Action",
         "Business Context",
@@ -1319,24 +1302,10 @@
   },
   "apis": [
    {
-    "operationId": "overrideAiDecision",
-    "contract": "ai",
-    "purpose": "Override an AI decision",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "getAiDecisionTrace",
     "contract": "ai",
     "purpose": "The full trace of a decision",
     "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "sendAiMessage",
-    "contract": "ai",
-    "purpose": "Ask the assistant",
-    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -1447,6 +1416,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "2",
@@ -1498,7 +1468,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "part0",
      "components": [
       {
        "kind": "selectField",
@@ -1688,6 +1658,12 @@
      "name": "tenantId",
      "from": "navigation",
      "optional": true
+    },
+    {
+     "name": "slaPolicyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalSlaPolicy` takes it, from the record the user acts on."
     }
    ]
   },
@@ -1744,6 +1720,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "2",
@@ -2069,6 +2046,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "2",
@@ -2464,6 +2442,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_AUDIT_VIEW",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "2",
@@ -2499,6 +2478,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide complete operational history of human involvement in AI activity. This is the human-oversight timeline; Board 3 will later provide deeper enterprise AI explainability and audit.",
+  "division": "Shares `getAiDecisionTrace`, `searchAiDecisions` with ADM-498, ADM-540; this screen is Approval & Intervention History / Decision Timeline (pack AI_Governance_Reference.pdf, board 2.9, page 42): provide complete operational history of human involvement in AI activity. This is the human-oversight timeline; Board 3 will later provide deeper enterprise AI explainability and audit.",
   "gaps": [
    {
     "operation": null,
@@ -2694,6 +2674,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "2",
@@ -2782,36 +2763,43 @@
       {
        "kind": "selectField",
        "label": "Risk",
+       "operation": "simulateAiGovernancePolicy",
        "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
       },
       {
        "kind": "selectField",
        "label": "Autonomy",
+       "operation": "simulateAiGovernancePolicy",
        "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
       },
       {
        "kind": "selectField",
        "label": "AI permissions",
+       "operation": "simulateAiGovernancePolicy",
        "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
       },
       {
        "kind": "selectField",
        "label": "Data usage",
+       "operation": "simulateAiGovernancePolicy",
        "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
       },
       {
        "kind": "selectField",
        "label": "Policy",
+       "operation": "simulateAiGovernancePolicy",
        "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
       },
       {
        "kind": "selectField",
        "label": "Governance decision",
+       "operation": "simulateAiGovernancePolicy",
        "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
       },
       {
        "kind": "textField",
        "label": "Important Boundary — Owning Modules",
+       "operation": "simulateAiGovernancePolicy",
        "provenance": "pack AI_Governance_Reference.pdf, page 44 §Board 1 defines"
       }
      ]
@@ -2842,13 +2830,6 @@
     "operationId": "simulateAiGovernancePolicy",
     "contract": "ai",
     "purpose": "Test a draft policy before it is published",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "simulateActionPlan",
-    "contract": "ai",
-    "purpose": "Validate and simulate a plan without changing anything",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },

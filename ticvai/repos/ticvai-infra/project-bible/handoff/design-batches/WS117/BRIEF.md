@@ -1,6 +1,6 @@
 # WS117 — AI Configuration Assistant board 2
 
-**10 screens · 8 operations · 13 schemas · 3 permissions**
+**10 screens · 7 operations · 13 schemas · 3 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -95,15 +95,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-479` | AI Configuration Build Command Center | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-480` | Venue & Organization Configuration | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-481` | Product Configuration Assistant | D | 6 | 6 | 7 | 1 | 2 | 3 | — | notStarted (—) |
-| `ADM-482` | Schedule, Capacity & Availability Configuration | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-479` | AI Configuration Build Command Center | D | 6 | 166 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-480` | Venue & Organization Configuration | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-481` | Product Configuration Assistant | D | 9 | 26 | 7 | 1 | 2 | 3 | — | notStarted (—) |
+| `ADM-482` | Schedule, Capacity & Availability Configuration | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-483` | Pricing & Commercial Configuration | D | 6 | 16 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-484` | Promotion, Bundle & Upsell Configuration | D | 6 | 6 | 7 | 1 | 0 | 2 | — | notStarted (—) |
-| `ADM-485` | Seating, Access & Operational Configuration | D | 6 | 6 | 7 | 1 | 0 | 6 | — | notStarted (—) |
-| `ADM-486` | Channel, Media & Fulfillment Configuration | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-487` | Cross-Module Conflict & Dependency Validation | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-484` | Promotion, Bundle & Upsell Configuration | D | 9 | 26 | 7 | 1 | 0 | 2 | — | notStarted (—) |
+| `ADM-485` | Seating, Access & Operational Configuration | D | 9 | 26 | 7 | 1 | 0 | 6 | — | notStarted (—) |
+| `ADM-486` | Channel, Media & Fulfillment Configuration | D | 9 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-487` | Cross-Module Conflict & Dependency Validation | D | 6 | 126 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-488` | Configuration Preview & Impact Analysis | D | 24 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings

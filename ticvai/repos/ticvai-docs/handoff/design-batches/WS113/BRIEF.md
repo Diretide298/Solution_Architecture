@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-664` | Accreditation Lifecycle Command Center | D | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-664` | Accreditation Lifecycle Command Center | D | 0 | 20 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 | `BO-665` | Accreditation Status Workflow | D | 7 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
 | `BO-666` | Validity Period Configuration | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-667` | Event & Venue Accreditation Assignment | D | 25 | 20 | 6 | 1 | 0 | 6 | — | notStarted (—) |
@@ -105,8 +105,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-669` | Temporary & Seasonal Accreditation | B–D | 15 | 3 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-670` | Suspension & Reactivation Management | D | 9 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-671` | Accreditation Revocation Management | D | 0 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
-| `BO-672` | Expiry Monitor & Expiration Rules | D | 0 | 14 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `BO-673` | Accreditation Renewal Workspace | D | 0 | 0 | 6 | 4 | 1 | 6 | — | notStarted (—) |
+| `BO-672` | Expiry Monitor & Expiration Rules | D | 2 | 34 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `BO-673` | Accreditation Renewal Workspace | D | 2 | 20 | 6 | 4 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

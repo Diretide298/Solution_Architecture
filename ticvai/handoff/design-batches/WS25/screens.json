@@ -5,6 +5,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "1",
@@ -105,6 +106,7 @@
   },
   "density": "compact",
   "purposeNote": "An agent can immediately understand their workload, priorities, SLA exposure and required actions without navigating multiple TICVAI modules.",
+  "division": "Shares `listCustomerService`, `listCustomerServiceProfile` with SUP-010; this screen is Customer Service Command Center (pack Customer Service_Reference.pdf, board 1.10.1.1, page 3): provide every customer-service agent with a personalized operational workspace showing customers, cases, tasks, SLAs, alerts and workload.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide every customer-service agent with a personalized operational workspace showing customers, cases, tasks, SLAs, alerts and workload.",
@@ -163,6 +165,7 @@
        "kind": "detailPanel",
        "label": "The selected customer service",
        "bindsTo": "CustomerServiceCommandCenterView",
+       "operation": "listCustomerService",
        "columns": [
         "CustomerServiceCommandCenterView.myOpenCases",
         "CustomerServiceCommandCenterView.newCases",
@@ -307,6 +310,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "1",
@@ -339,6 +343,7 @@
   },
   "density": "compact",
   "purposeNote": "Agents can understand the customer's complete TICVAI relationship and relevant service context from one screen.",
+  "division": "Shares `listCustomerService`, `listCustomerServiceProfile` with SUP-009; this screen is Customer 360° Service Profile (pack Customer Service_Reference.pdf, board 1.10.1.2, page 5): provide the agent with a complete customer-service view of the customer. This should be one of the most important screens in the entire Customer Service module.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display; Show) and no metric row",
   "purpose": "Provide the agent with a complete customer-service view of the customer. This should be one of the most important screens in the entire Customer Service module.",
@@ -387,6 +392,7 @@
        "kind": "detailPanel",
        "label": "The selected customer 360° service",
        "bindsTo": "Customer360ServiceProfileView",
+       "operation": "listCustomerServiceProfile",
        "columns": [
         "Customer360ServiceProfileView.customerName",
         "Customer360ServiceProfileView.customerId",
@@ -482,6 +488,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "1",
@@ -633,6 +640,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "1",
@@ -883,6 +891,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "1",
@@ -1176,6 +1185,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "1",
@@ -1215,7 +1225,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -1345,6 +1355,14 @@
     "OrderBookingTicketServiceWorkspaceView.channel",
     "OrderBookingTicketServiceWorkspaceView.products",
     "OrderBookingTicketServiceWorkspaceView.tickets"
+   ],
+   "params": [
+    {
+     "name": "serviceActionId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setOrderBookingTicket` takes it, from the record the user acts on."
+    }
    ]
   },
   "wireframe": {
@@ -1383,6 +1401,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "ORDER_REFUND",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "1",
@@ -1545,6 +1564,14 @@
     "RefundCompensationServiceExceptionWorkspaceView.refundableAmount",
     "RefundCompensationServiceExceptionWorkspaceView.previousRefund",
     "RefundCompensationServiceExceptionWorkspaceView.fees"
+   ],
+   "params": [
+    {
+     "name": "compensationRequestId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setRefundCompensationService` takes it, from the record the user acts on."
+    }
    ]
   },
   "wireframe": {
@@ -1583,6 +1610,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "1",
@@ -1726,6 +1754,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "1",
@@ -1974,6 +2003,7 @@
   "module": "Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Customer Service_Reference.pdf",
    "board": "1",
@@ -2059,13 +2089,6 @@
     "contract": "marketing-crm",
     "purpose": "AI Customer Service Copilot & Knowledge Workspace",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "configureAssistantProfile",
-    "contract": "ai",
-    "purpose": "Define an assistant profile",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    },
    {
     "operationId": "listAssistantProfiles",

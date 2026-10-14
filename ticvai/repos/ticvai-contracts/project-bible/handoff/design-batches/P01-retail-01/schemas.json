@@ -124,12 +124,14 @@
     }
    },
    "conflicts": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "$ref": "#/components/schemas/CartConflict"
     }
    },
    "consentQuestions": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n",
@@ -420,17 +422,20 @@
     "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
    },
    "walletAuthorisationId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "nullable": true,
     "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
    },
    "walletHoldId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "format": "uuid",
     "nullable": true,
     "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
    },
    "returnUrl": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "format": "uri",
     "nullable": true,
@@ -443,6 +448,7 @@
     "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
    },
    "deviceId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -549,7 +555,8 @@
    },
    "barcode": {
     "type": "string",
-    "nullable": true
+    "nullable": true,
+    "x-ticvai-unique": "venue"
    },
    "name": {
     "type": "string"
@@ -771,7 +778,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -1172,6 +1180,9 @@
   }
  },
  "ShopAndDrop": {
+  "x-ticvai-retired-columns": [
+   "collection_point_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "retail.shop_and_drop + retail.shop_and_drop_line",
   "required": [
@@ -1212,7 +1223,9 @@
    },
    "collectionPointId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-column": "collection_location_id",
+    "x-ticvai-references": "fnb.delivery_location"
    },
    "collectionPointName": {
     "type": "string"

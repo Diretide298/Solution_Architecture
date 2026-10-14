@@ -39,7 +39,7 @@
  },
  "setPaymentProvider": {
   "method": "PUT",
-  "path": "/payment-providers",
+  "path": "/payment-providers/{providerId}",
   "contract": "orders",
   "summary": "Configure a gateway and its routing",
   "permission": "TENANT_CONFIGURE",
@@ -47,6 +47,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "providerId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

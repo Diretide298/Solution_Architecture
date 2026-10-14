@@ -5,6 +5,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "1",
@@ -170,51 +171,61 @@
       {
        "kind": "metricTile",
        "label": "AI Capabilities Registered",
+       "operation": "listAiCapabilities",
        "provenance": "pack AI_Governance_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Active Governance Policies",
+       "operation": "listAiCapabilities",
        "provenance": "pack AI_Governance_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Governed AI Actions Today",
+       "operation": "listAiCapabilities",
        "provenance": "pack AI_Governance_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Approval-Required Actions",
+       "operation": "listAiCapabilities",
        "provenance": "pack AI_Governance_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Blocked AI Actions",
+       "operation": "listAiCapabilities",
        "provenance": "pack AI_Governance_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Policy Exceptions",
+       "operation": "listAiCapabilities",
        "provenance": "pack AI_Governance_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "High-Risk AI Capabilities",
+       "operation": "listAiCapabilities",
        "provenance": "pack AI_Governance_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Policy Violations",
+       "operation": "listAiCapabilities",
        "provenance": "pack AI_Governance_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "AI Autonomy Coverage",
+       "operation": "listAiCapabilities",
        "provenance": "pack AI_Governance_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Governance Warnings",
+       "operation": "listAiCapabilities",
        "provenance": "pack AI_Governance_Reference.pdf, page 4 §Header KPIs"
       },
       {
@@ -248,27 +259,6 @@
     "operationId": "listAiCapabilities",
     "contract": "ai",
     "purpose": "The capability registry",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "pauseAiCapability",
-    "contract": "ai",
-    "purpose": "Stop a capability now",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "promoteAiRelease",
-    "contract": "ai",
-    "purpose": "Promote a release to its next stage (a person)",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAiGovernanceAlerts",
-    "contract": "ai",
-    "purpose": "Governance alerts",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
@@ -379,6 +369,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "1",
@@ -414,6 +405,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Maintain a controlled registry of every AI capability operating within TICVAI. Nothing should become an operational AI capability without being identifiable and governed.",
+  "division": "Shares `configureAiCapability`, `listAiCapabilities` with ADM-521; this screen is AI Capability Registry & Ownership (pack AI_Governance_Reference.pdf, board 1.2, page 5): maintain a controlled registry of every AI capability operating within TICVAI. Nothing should become an operational AI capability without being identifiable and governed.",
   "gaps": [
    {
     "operation": null,
@@ -667,6 +659,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "1",
@@ -702,6 +695,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Classify AI capabilities and individual AI action types according to their potential business, customer, financial, operational, security and compliance impact. Risk should not be based only on which AI model is being used.",
+  "division": "Shares `configureAiCapability`, `listAiCapabilities` with ADM-520; this screen is AI Risk Classification & Assessment (pack AI_Governance_Reference.pdf, board 1.3, page 7): classify AI capabilities and individual AI action types according to their potential business, customer, financial, operational, security and compliance impact. Risk should not be based only on which AI model is being used.",
   "gaps": [
    {
     "operation": null,
@@ -758,12 +752,14 @@
       },
       {
        "kind": "dataTable",
+       "operation": "listAiCapabilities",
        "derived": true,
        "impliedBy": "listAiCapabilities",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
        "kind": "primaryButton",
+       "operation": "configureAiCapability",
        "derived": true,
        "impliedBy": "configureAiCapability",
        "notes": "The act the screen exists for."
@@ -896,6 +892,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "1",
@@ -977,46 +974,55 @@
       {
        "kind": "selectField",
        "label": "Tenant",
+       "operation": "configureAiCapability",
        "provenance": "pack AI_Governance_Reference.pdf, page 9 §Configure by"
       },
       {
        "kind": "selectField",
        "label": "Venue",
+       "operation": "configureAiCapability",
        "provenance": "pack AI_Governance_Reference.pdf, page 9 §Configure by"
       },
       {
        "kind": "selectField",
        "label": "AI Capability",
+       "operation": "configureAiCapability",
        "provenance": "pack AI_Governance_Reference.pdf, page 9 §Configure by"
       },
       {
        "kind": "selectField",
        "label": "Module",
+       "operation": "configureAiCapability",
        "provenance": "pack AI_Governance_Reference.pdf, page 9 §Configure by"
       },
       {
        "kind": "selectField",
        "label": "Action Type",
+       "operation": "configureAiCapability",
        "provenance": "pack AI_Governance_Reference.pdf, page 9 §Configure by"
       },
       {
        "kind": "selectField",
        "label": "User Role",
+       "operation": "configureAiCapability",
        "provenance": "pack AI_Governance_Reference.pdf, page 9 §Configure by"
       },
       {
        "kind": "selectField",
        "label": "Environment",
+       "operation": "configureAiCapability",
        "provenance": "pack AI_Governance_Reference.pdf, page 9 §Configure by"
       },
       {
        "kind": "selectField",
        "label": "Risk Level",
+       "operation": "configureAiCapability",
        "provenance": "pack AI_Governance_Reference.pdf, page 9 §Configure by"
       },
       {
        "kind": "selectField",
        "label": "Business Unit",
+       "operation": "configureAiCapability",
        "provenance": "pack AI_Governance_Reference.pdf, page 9 §Configure by"
       }
      ]
@@ -1032,13 +1038,6 @@
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
-   {
-    "operationId": "listAiCapabilities",
-    "contract": "ai",
-    "purpose": "The capability registry",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
    {
     "operationId": "configureAiCapability",
     "contract": "ai",
@@ -1147,6 +1146,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "1",
@@ -1492,6 +1492,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "1",
@@ -1586,10 +1587,12 @@
        "derived": true,
        "impliedBy": "createAiGovernancePolicyDraft",
        "label": "Create",
+       "operation": "createAiGovernancePolicyDraft",
        "notes": "The act the screen exists for."
       },
       {
        "kind": "dataTable",
+       "operation": "listAiGovernancePolicyVersions",
        "derived": true,
        "impliedBy": "listAiGovernancePolicyVersions",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -1626,20 +1629,6 @@
     "contract": "ai",
     "purpose": "Governance policies and their versions",
     "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listDataRetentionSettings",
-    "contract": "tenancy",
-    "purpose": "AI data retention (prompts, conversations, decision records, index)",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "setDataRetentionSetting",
-    "contract": "tenancy",
-    "purpose": "Set an AI class's period",
-    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -1738,6 +1727,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "1",
@@ -1874,13 +1864,6 @@
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "createAiGovernancePolicyDraft",
-    "contract": "ai",
-    "purpose": "Draft a governance policy, or a new version of one",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listTenants",
     "contract": "subscription",
     "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
@@ -1970,6 +1953,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "1",
@@ -2124,13 +2108,6 @@
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "listAiGovernancePolicyVersions",
-    "contract": "ai",
-    "purpose": "Governance policies and their versions",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "createAiPolicyException",
     "contract": "ai",
     "purpose": "Grant a temporary exception to a governance policy",
@@ -2279,6 +2256,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "1",
@@ -2526,6 +2504,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "1",

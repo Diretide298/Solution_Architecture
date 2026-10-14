@@ -1,6 +1,6 @@
 # P01-membership-loyalty-value-01 — P01 · Membership, Loyalty & Value
 
-**5 screens · 52 operations · 71 schemas · 14 permissions**
+**5 screens · 37 operations · 55 schemas · 12 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 14 permissions apply here:
-  `AI_USE, GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, LOYALTY_REDEEM, MARKETING_MANAGE, MARKETING_VIEW, ORDER_CREATE, ORDER_VIEW, PAYMENT_VIEW, PRICE_VIEW, PRODUCT_VIEW`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 12 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, GUEST_VIEW_PII, LOYALTY_REDEEM, MARKETING_MANAGE, MARKETING_VIEW, ORDER_CREATE, ORDER_VIEW, PRICE_VIEW, PRODUCT_VIEW, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
@@ -128,9 +128,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-021` | Wallet & Gift Cards | A | 4 | 36 | 6 | 37 | 13 | 6 | guest | review (client-verified) |
 | `WEB-022` | Membership Plans | A | 0 | 17 | 6 | 16 | 4 | 0 | guest | review (client-verified) |
-| `WEB-023` | Membership Management | A | 3 | 28 | 6 | 6 | 5 | 0 | guest | review (client-verified) |
-| `WEB-024` | Devices, Wishlist & Consent | A | 4 | 78 | 6 | 61 | 2 | 4 | guest | review (client-verified) |
-| `WEB-043` | Loyalty & Rewards | A | 9 | 51 | 6 | 54 | 2 | 2 | guest | review (client-verified) |
+| `WEB-023` | Membership Management | A | 3 | 28 | 6 | 5 | 5 | 0 | guest | review (client-verified) |
+| `WEB-024` | Devices, Wishlist & Consent | A | 4 | 78 | 6 | 52 | 2 | 4 | guest | review (client-verified) |
+| `WEB-043` | Loyalty & Rewards | A | 9 | 51 | 6 | 12 | 2 | 2 | guest | review (client-verified) |
 
 ## Thin screens in this batch
 

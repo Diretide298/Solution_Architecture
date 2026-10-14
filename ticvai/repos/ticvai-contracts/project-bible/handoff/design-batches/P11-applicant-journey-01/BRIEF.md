@@ -1,6 +1,6 @@
 # P11-applicant-journey-01 — P11 · Applicant Journey
 
-**5 screens · 10 operations · 5 schemas · 1 permissions**
+**5 screens · 9 operations · 4 schemas · 2 permissions**
 
 Platform P11 Accreditation Web · ships as **ticvai-control** ·
 public audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `ACCREDITATION_APPLY`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `ACCREDITATION_APPLY, ACCREDITATION_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -98,9 +98,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ACC-001` | Landing / Programme Overview | D | 0 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ACC-002` | Registration Form | D | 6 | 0 | 5 | 1 | 6 | 0 | — | notStarted (generated) |
-| `ACC-003` | Application Review & Submit | D | 0 | 0 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
-| `ACC-004` | Application Status Tracking | D | 0 | 0 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
+| `ACC-002` | Registration Form | D | 21 | 20 | 5 | 1 | 6 | 0 | — | notStarted (generated) |
+| `ACC-003` | Application Review & Submit | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ACC-004` | Application Status Tracking | D | 1 | 40 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
 | `ACC-005` | Accreditation Badge | D | 0 | 0 | 5 | 2 | 2 | 6 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings

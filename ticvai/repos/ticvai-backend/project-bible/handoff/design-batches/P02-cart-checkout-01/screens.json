@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/review-and-payment",
-   "component": "apps/guest-app/src/routes/general/ReviewAndPaymentForm.tsx",
+   "component": "src/screens/general/ReviewAndPaymentForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -345,7 +345,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/booking-confirmation",
-   "component": "apps/guest-app/src/routes/general/BookingConfirmationDetail.tsx",
+   "component": "src/screens/general/BookingConfirmationDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -612,7 +612,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/checkout-entry",
-   "component": "apps/guest-app/src/routes/general/CheckoutEntryForm.tsx",
+   "component": "src/screens/general/CheckoutEntryForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -873,6 +873,13 @@
     "purpose": "The published booking flow for this product: which steps it has and in what order (W12)",
     "trigger": "onLoad",
     "provenance": "decided 29 September 2026, W12"
+   },
+   {
+    "operationId": "createCart",
+    "contract": "orders",
+    "purpose": "Started by the runtime the first time a line is added, against the guest or the anonymous cart token (2.1.31); never a button or a form (GFIX-3). With the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)",
+    "trigger": "background",
+    "provenance": "Block A audit, 14 October 2026: N-TWIN-OPS, as WEB-010 (CHG-SCG-008)"
    }
   ],
   "entryState": {
@@ -914,6 +921,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-041",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-041.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",

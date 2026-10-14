@@ -128,11 +128,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-001` | Queue Directory | A | 62 | 46 | 6 | 23 | 1 | 6 | — | notStarted (generated) |
+| `BO-001` | Queue Directory | A | 61 | 46 | 6 | 23 | 1 | 6 | — | notStarted (generated) |
 | `BO-002` | Queue Configuration | D | 59 | 18 | 6 | 21 | 4 | 6 | — | notStarted (generated) |
-| `BO-003` | Queue Integration Setup | D | 12 | 23 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-003` | Queue Integration Setup | D | 11 | 23 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-004` | Manual Wait Time Entry | D | 6 | 32 | 6 | 6 | 2 | 6 | — | notStarted (generated) |
-| `BO-005` | Queue Monitor | A | 55 | 38 | 6 | 34 | 3 | 6 | — | notStarted (generated) |
+| `BO-005` | Queue Monitor | A | 55 | 52 | 6 | 34 | 3 | 6 | — | notStarted (generated) |
 | `BO-006` | Parking Configuration | A | 12 | 6 | 6 | 3 | 2 | 2 | — | notStarted (generated) |
 | `BO-030` | Work Order Verification | A | 7 | 22 | 6 | 10 | 0 | 2 | — | notStarted (generated) |
 | `BO-031` | Asset Register | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |

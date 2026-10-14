@@ -134,11 +134,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-631` | Velocity, Behavioral & Transaction Risk Controls | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-632` | Risk Lists, Signals & Payment Control Center | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-633` | Fraud Alert, Investigation & Case Management | D | 0 | 44 | 6 | 29 | 0 | 0 | — | notStarted (—) |
-| `ADM-634` | Chargeback & Dispute Command Center | C | 0 | 26 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `ADM-634` | Chargeback & Dispute Command Center | C | 0 | 146 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 | `ADM-635` | Chargeback Evidence & Representment Workspace | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-636` | Payment Performance & Conversion Analytics | C | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-637` | AI Fraud, Anomaly & Payment Intelligence Center | D | 0 | 0 | 6 | 29 | 0 | 0 | — | notStarted (—) |
-| `ADM-638` | Payment Executive Intelligence, Risk Simulator & AI Advisor | C | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-637` | AI Fraud, Anomaly & Payment Intelligence Center | D | 0 | 25 | 6 | 29 | 0 | 0 | — | notStarted (—) |
+| `ADM-638` | Payment Executive Intelligence, Risk Simulator & AI Advisor | C | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -230,7 +230,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Chargebacks | text | not in the schema: `Chargebacks` |
 | False positives | text | not in the schema: `False positives` |
 
-**The selected payment risk fraud** (detail panel): The pack groups this record's detail under its own headings: “Breakdown”.
+**The selected payment risk fraud** (detail panel, from `getPaymentPerformance`): The pack groups this record's detail under its own headings: “Breakdown”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -289,6 +289,8 @@ kpis:
 - `getPaymentPerformance` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -419,6 +421,8 @@ rule:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 8 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -545,6 +549,8 @@ rule: 'Same card 4 times in 5 minutes: challenge'
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_CONFIGURE`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -668,6 +674,8 @@ entry:
 - `setPaymentRiskRules` → `PAYMENT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -870,6 +878,8 @@ alert:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_REFUND_APPROVE`
+
 #### Requirements it meets
 
 29 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -972,27 +982,165 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**New Chargebacks** (metric tile)
+**New Chargebacks** (metric tile, from `getChargebackAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period from | 1 Oct 2026 | — |
+| Period to | 1 Oct 2026 | — |
+| Group by | text | — |
+| Totals | grouped details | — |
+| Chargeback count | 1,234 | — |
+| Chargeback amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Card payment count | 1,234 | — |
+| Chargeback rate by count | 1,234.5 | Chargebacks received per card payment captured in the period, as a fraction. |
+| Chargeback rate by value | 1,234.5 | — |
+| Decided count | 1,234 | — |
+| Won count | 1,234 | — |
+| Lost count | 1,234 | — |
+| Accepted count | 1,234 | — |
+| Expired count | 1,234 | Lost to a missed evidence deadline. |
+| Win rate | 12.5% | Won over decided (won, lost, expired); null with none decided. |
+| Recovered amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Fee amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Open count | 1,234 | — |
+| Groups | list or chips (count when long) | — |
+| Chargeback count | 1,234 | — |
 
 **Open Chargebacks** (metric tile)
 
-**Chargeback Value** (metric tile)
+**Chargeback Value** (metric tile, from `getChargebackAnalytics`)
 
-**Chargeback Rate** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period from | 1 Oct 2026 | — |
+| Period to | 1 Oct 2026 | — |
+| Group by | text | — |
+| Totals | grouped details | — |
+| Chargeback count | 1,234 | — |
+| Chargeback amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Card payment count | 1,234 | — |
+| Chargeback rate by count | 1,234.5 | Chargebacks received per card payment captured in the period, as a fraction. |
+| Chargeback rate by value | 1,234.5 | — |
+| Decided count | 1,234 | — |
+| Won count | 1,234 | — |
+| Lost count | 1,234 | — |
+| Accepted count | 1,234 | — |
+| Expired count | 1,234 | Lost to a missed evidence deadline. |
+| Win rate | 12.5% | Won over decided (won, lost, expired); null with none decided. |
+| Recovered amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Fee amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Open count | 1,234 | — |
+| Groups | list or chips (count when long) | — |
+| Chargeback count | 1,234 | — |
+
+**Chargeback Rate** (metric tile, from `getChargebackAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period from | 1 Oct 2026 | — |
+| Period to | 1 Oct 2026 | — |
+| Group by | text | — |
+| Totals | grouped details | — |
+| Chargeback count | 1,234 | — |
+| Chargeback amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Card payment count | 1,234 | — |
+| Chargeback rate by count | 1,234.5 | Chargebacks received per card payment captured in the period, as a fraction. |
+| Chargeback rate by value | 1,234.5 | — |
+| Decided count | 1,234 | — |
+| Won count | 1,234 | — |
+| Lost count | 1,234 | — |
+| Accepted count | 1,234 | — |
+| Expired count | 1,234 | Lost to a missed evidence deadline. |
+| Win rate | 12.5% | Won over decided (won, lost, expired); null with none decided. |
+| Recovered amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Fee amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Open count | 1,234 | — |
+| Groups | list or chips (count when long) | — |
+| Chargeback count | 1,234 | — |
 
 **Response Due** (metric tile)
 
-**Won** (metric tile)
+**Won** (metric tile, from `getChargebackAnalytics`)
 
-**Lost** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period from | 1 Oct 2026 | — |
+| Period to | 1 Oct 2026 | — |
+| Group by | text | — |
+| Totals | grouped details | — |
+| Chargeback count | 1,234 | — |
+| Chargeback amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Card payment count | 1,234 | — |
+| Chargeback rate by count | 1,234.5 | Chargebacks received per card payment captured in the period, as a fraction. |
+| Chargeback rate by value | 1,234.5 | — |
+| Decided count | 1,234 | — |
+| Won count | 1,234 | — |
+| Lost count | 1,234 | — |
+| Accepted count | 1,234 | — |
+| Expired count | 1,234 | Lost to a missed evidence deadline. |
+| Win rate | 12.5% | Won over decided (won, lost, expired); null with none decided. |
+| Recovered amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Fee amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Open count | 1,234 | — |
+| Groups | list or chips (count when long) | — |
+| Chargeback count | 1,234 | — |
 
-**Accepted** (metric tile)
+**Lost** (metric tile, from `getChargebackAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period from | 1 Oct 2026 | — |
+| Period to | 1 Oct 2026 | — |
+| Group by | text | — |
+| Totals | grouped details | — |
+| Chargeback count | 1,234 | — |
+| Chargeback amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Card payment count | 1,234 | — |
+| Chargeback rate by count | 1,234.5 | Chargebacks received per card payment captured in the period, as a fraction. |
+| Chargeback rate by value | 1,234.5 | — |
+| Decided count | 1,234 | — |
+| Won count | 1,234 | — |
+| Lost count | 1,234 | — |
+| Accepted count | 1,234 | — |
+| Expired count | 1,234 | Lost to a missed evidence deadline. |
+| Win rate | 12.5% | Won over decided (won, lost, expired); null with none decided. |
+| Recovered amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Fee amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Open count | 1,234 | — |
+| Groups | list or chips (count when long) | — |
+| Chargeback count | 1,234 | — |
+
+**Accepted** (metric tile, from `getChargebackAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period from | 1 Oct 2026 | — |
+| Period to | 1 Oct 2026 | — |
+| Group by | text | — |
+| Totals | grouped details | — |
+| Chargeback count | 1,234 | — |
+| Chargeback amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Card payment count | 1,234 | — |
+| Chargeback rate by count | 1,234.5 | Chargebacks received per card payment captured in the period, as a fraction. |
+| Chargeback rate by value | 1,234.5 | — |
+| Decided count | 1,234 | — |
+| Won count | 1,234 | — |
+| Lost count | 1,234 | — |
+| Accepted count | 1,234 | — |
+| Expired count | 1,234 | Lost to a missed evidence deadline. |
+| Win rate | 12.5% | Won over decided (won, lost, expired); null with none decided. |
+| Recovered amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Fee amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Open count | 1,234 | — |
+| Groups | list or chips (count when long) | — |
+| Chargeback count | 1,234 | — |
 
 **Represented** (metric tile)
 
 **Recovery Value** (metric tile)
 
-**Every chargeback dispute \t172** (data table)
+**Every chargeback dispute \t172** (data table, from `listChargebacks`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1073,6 +1221,8 @@ case:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_REFUND_APPROVE`
+
 #### Requirements it meets
 
 5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1106,7 +1256,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (146 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-634?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-629`.
@@ -1205,6 +1355,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the chargeback evidence representment are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The chargeback is still `received` and not yet under review (`chargeback-not-under-review`), its evidence was already submitted … |
 
 #### Sample data for the mock-up
 
@@ -1225,6 +1376,8 @@ evidence:
 - `listChargebacks` → `ORDER_REFUND_APPROVE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_REFUND_APPROVE`
 
 #### Requirements it meets
 
@@ -1249,7 +1402,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-635?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Submit chargeback evidence, Cancel.
@@ -1341,6 +1494,8 @@ trend:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1429,9 +1584,40 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getEntityRisk`): One record, read-only.
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Entity type | chip: Customer, Account, Device, Payment token, Credential, Cluster… | — |
+| Entity ref | text | The entity id, or a hashed device id, hashed IP address or provider token reference. |
+| Score | 1,234 | — |
+| Band | chip: Low, Medium, High, Critical | Design 5.6: a risk score and band, never a probability. |
+| Signals | grouped details | Contributing signals with their weights and freshness. Since 29 September (build) they include chargeback count and rate … |
+| Last event at | 1 Oct 2026, 14:30 | — |
+
+**Data table** (data table, from `listRiskAlerts`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Transaction, Velocity, Entity, Network, Staff leakage, Scan abuse… | — |
+| Entity type | chip: Customer, Account, Device, Payment token, Credential, Cluster… | — |
+| Entity ref | text | — |
+| Score | 1,234 | — |
+| Band | chip: Low, Medium, High, Critical | Design 5.6: a risk score and band, never a probability. |
+| Reason codes | list or chips (count when long) | — |
+| Correlation key | text | — |
+| Assessment | the name it points at, never the id | — |
+| Status | chip: Open, Monitoring, Dismissed, False positive, Escalated | — |
+| Case | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Decision note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1489,6 +1675,8 @@ strategy:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 29 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1530,7 +1718,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-637?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `ADM-629`.
@@ -1585,7 +1773,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Payment Success Rate** (metric tile)
 
-**Authorization Rate** (metric tile)
+**Authorization Rate** (metric tile, from `getPaymentPerformance`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Attempts | 1,234 | — |
+| Authorised | 1,234 | — |
+| Declined | 1,234 | — |
+| Errored | 1,234 | — |
+| Abandoned | 1,234 | — |
+| Authorisation rate | 12.5% | — |
+| Conversion rate | 12.5% | — |
+| Average value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Top decline reason | text | — |
 
 **Payment Cost** (metric tile)
 
@@ -1659,6 +1861,8 @@ backtest:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1683,7 +1887,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-638?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-629`.
@@ -1819,16 +2023,16 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiEntityRisk": {"type":"object","x-ticvai-persistence":"ai.entity_risk","description":"**Current risk per entity** (design 5.3, AIP-128): customer, account, device, payment token, credential, cluster or staff member, computed asynchronously from composite signals — no single signal decides (M21).","required":["entityType","entityRef","score","band"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"entityType":{"type":"string","enum":["customer","account","device","paymentToken","credential","cluster","staff","ipAddress"]},"entityRef":{"type":"string","description":"The entity id, or a hashed device id, hashed IP address or provider token reference. Never a card number or a raw IP address."},"score":{"type":"integer","minimum":0,"maximum":100},"band":{"type":"string","enum":["low","medium","high","critical"],"description":"Design 5.6: a risk score and band, never a probability."},"signals":{"type":"object","additionalProperties":true,"description":"Contributing signals with their weights and freshness. Since 29 September (build) they include chargeback count and rate (`order.chargebackRecorded`), password resets (`identity.credentialResetRequested`), IP velocity and country mismatch, and storefront browsing features (`storefront.sessionEvent`)."},"lastEventAt":{"type":"string","format":"date-time","nullable":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiRiskAlert": {"type":"object","x-ticvai-persistence":"ai.risk_alert","description":"**A risk alert** (AIP-109): raised by scoring or re-scoring. **Alert, case and confirmed fraud are kept distinct** (AIP-163): an alert is a signal to look, not a finding.","required":["kind","entityType","entityRef","band","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["transaction","velocity","entity","network","staffLeakage","scanAbuse","accountTakeover","chargeback"]},"entityType":{"type":"string","enum":["customer","account","device","paymentToken","credential","cluster","staff","wallet","ipAddress"]},"entityRef":{"type":"string"},"score":{"type":"integer","minimum":0,"maximum":100},"band":{"type":"string","enum":["low","medium","high","critical"],"description":"Design 5.6: a risk score and band, never a probability."},"reasonCodes":{"type":"array","items":{"type":"string"}},"correlationKey":{"type":"string","nullable":true},"assessmentId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["open","monitoring","dismissed","falsePositive","escalated"],"readOnly":true},"caseId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.risk_case"},"raisedAt":{"type":"string","format":"date-time","readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"decisionNote":{"type":"string","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiRiskBacktest": {"type":"object","x-ticvai-persistence":"none — computed over ai.risk_assessment and labelled outcomes","description":"What a draft strategy would have done over a past window: review rate, recall and precision against analyst-labelled outcomes, and false-positive rate by segment (AIP-143).","required":["evaluated"],"properties":{"evaluated":{"type":"integer"},"reviewRate":{"type":"number"},"recall":{"type":"number","nullable":true},"precision":{"type":"number","nullable":true},"bySegment":{"type":"array","items":{"type":"object","properties":{"segment":{"type":"string","enum":["family","b2b","reseller","member","other"]},"falsePositiveRate":{"type":"number"}}}},"outcomeCounts":{"type":"object","additionalProperties":true}}},
-"AiRiskCase": {"type":"object","x-ticvai-persistence":"ai.risk_case","description":"**An investigation** (AIP-150..160). Its evidence and actions are `ai.case_evidence` and `ai.case_action`. The summary is written by a model from structured evidence only (AIP-153); the outcome is a person's.","required":["reference","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"reference":{"type":"string","readOnly":true},"title":{"type":"string"},"status":{"type":"string","enum":["open","investigating","pendingAction","closed"],"readOnly":true},"priority":{"type":"string","enum":["low","medium","high","critical"]},"entities":{"type":"array","items":{"type":"object","properties":{"entityType":{"type":"string","enum":["customer","account","device","paymentToken","credential","cluster","staff"]},"entityRef":{"type":"string"}}}},"alertIds":{"type":"array","items":{"type":"string","format":"uuid"}},"assigneePrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal"},"summary":{"type":"string","nullable":true,"readOnly":true},"outcome":{"type":"string","enum":["confirmedFraud","notFraud","inconclusive"],"nullable":true,"readOnly":true},"closureNote":{"type":"string","nullable":true,"readOnly":true},"openedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"openedAt":{"type":"string","format":"date-time","readOnly":true},"closedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"closedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiRiskCase": {"type":"object","x-ticvai-persistence":"ai.risk_case","description":"**An investigation** (AIP-150..160). Its evidence and actions are `ai.case_evidence` and `ai.case_action`. The summary is written by a model from structured evidence only (AIP-153); the outcome is a person's.","required":["reference","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"reference":{"type":"string","readOnly":true},"title":{"type":"string"},"status":{"type":"string","enum":["open","investigating","pendingAction","closed"],"readOnly":true},"priority":{"type":"string","enum":["low","medium","high","critical"]},"entities":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"entityType":{"type":"string","enum":["customer","account","device","paymentToken","credential","cluster","staff"]},"entityRef":{"type":"string"}}}},"alertIds":{"type":"array","items":{"type":"string","format":"uuid"}},"assigneePrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal"},"summary":{"type":"string","nullable":true,"readOnly":true},"outcome":{"type":"string","enum":["confirmedFraud","notFraud","inconclusive"],"nullable":true,"readOnly":true},"closureNote":{"type":"string","nullable":true,"readOnly":true},"openedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"openedAt":{"type":"string","format":"date-time","readOnly":true},"closedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"closedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiRiskCaseAction": {"type":"object","x-ticvai-persistence":"ai.case_action","description":"**A restrictive action proposed from a case** (AIP-136). It goes to the owning module through the action pipeline, never straight from review; at the first-release ceiling (L1 advisory, design 3.8) it is a recommendation the owning module's operator applies. **Scoped through its case.**","required":["caseId","action","targetContract"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"caseId":{"type":"string","format":"uuid","x-ticvai-references":"ai.risk_case"},"action":{"type":"string","enum":["blockPaymentToken","suspendAccount","restrictWallet","revokeEntitlement","flagCustomer","requireStepUp","holdRefunds","lockIdentity"]},"targetContract":{"type":"string"},"targetOperation":{"type":"string"},"targetRef":{"type":"string"},"rationale":{"type":"string"},"status":{"type":"string","enum":["recommended","planned","awaitingApproval","applied","rejected","failed"],"readOnly":true},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan"},"proposedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"proposedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "AiRiskCaseDetail": {"type":"object","x-ticvai-persistence":"none — ai.risk_case with its evidence, actions and alerts","description":"A case with everything attached to it.","required":["case"],"properties":{"case":{"$ref":"#/components/schemas/AiRiskCase"},"evidence":{"type":"array","items":{"$ref":"#/components/schemas/AiRiskCaseEvidence"}},"actions":{"type":"array","items":{"$ref":"#/components/schemas/AiRiskCaseAction"}},"alerts":{"type":"array","items":{"$ref":"#/components/schemas/AiRiskAlert"}}}},
 "AiRiskCaseEvidence": {"type":"object","x-ticvai-persistence":"ai.case_evidence","description":"**Case evidence** (AIP-155): `jsonb` plus an immutable Blob copy. **Scoped through its case** (`platform.apply_parent_rls`). Never edited; a correction is new evidence.","required":["caseId","kind","label"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"caseId":{"type":"string","format":"uuid","x-ticvai-references":"ai.risk_case"},"kind":{"type":"string","enum":["assessment","alert","transaction","networkSnapshot","note","document"]},"ref":{"type":"string","nullable":true},"content":{"type":"object","additionalProperties":true,"nullable":true},"blobRef":{"type":"string","nullable":true,"readOnly":true,"description":"The immutable (WORM) copy."},"label":{"type":"string","enum":["source","derived","modelInferred"]},"contentHash":{"type":"string","readOnly":true},"addedByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"addedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "AiRiskEdge": {"type":"object","x-ticvai-persistence":"ai.risk_edge","description":"**A relationship-graph edge** (design 2.4, AIP-111): shared device, token or account, with strength. Queried 1 to 3 hops by `expandRiskNetwork`; no graph database.","required":["fromEntityType","fromEntityRef","toEntityType","toEntityRef","relation"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"fromEntityType":{"type":"string","enum":["customer","account","device","paymentToken","credential","cluster","staff","ipAddress"]},"fromEntityRef":{"type":"string"},"toEntityType":{"type":"string","enum":["customer","account","device","paymentToken","credential","cluster","staff","ipAddress"]},"toEntityRef":{"type":"string"},"relation":{"type":"string","enum":["sharedDevice","sharedToken","sharedAccount","sharedContact","sharedIp","transfer","companion","staffCustomer"]},"strength":{"type":"number","minimum":0,"maximum":1},"firstSeenAt":{"type":"string","format":"date-time"},"lastSeenAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiRiskNetwork": {"type":"object","x-ticvai-persistence":"none — read from ai.risk_edge and ai.entity_risk","description":"A bounded 1..3-hop neighbourhood of an entity (AIP-111).","required":["nodes","edges"],"properties":{"nodes":{"type":"array","items":{"$ref":"#/components/schemas/AiEntityRisk"}},"edges":{"type":"array","items":{"$ref":"#/components/schemas/AiRiskEdge"}},"truncated":{"type":"boolean","description":"The hop or node limit cut the result."}}},
-"AiRiskStrategy": {"type":"object","x-ticvai-persistence":"ai.risk_strategy","description":"**The tenant's risk strategy** (C10, AIP-096..165): weighted rule contributions, thresholds, modes and the map from band to outcome by channel and value (AIP-100). **Fail-open with holds, not declines, by default** (decided 29 September, decision 6): `decline` appears in `outcomeMap` only where the tenant governed it.","required":["version","mode","thresholds"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"version":{"type":"integer","minimum":1,"readOnly":true},"mode":{"type":"string","enum":["monitor","enforce"],"description":"Monitor records outcomes without acting; how a new strategy earns trust."},"weights":{"type":"object","additionalProperties":true,"description":"Contribution of each rule and signal to the composite 0..100 score."},"thresholds":{"type":"object","properties":{"monitor":{"type":"integer","minimum":0,"maximum":100},"stepUp":{"type":"integer","minimum":0,"maximum":100},"holdForReview":{"type":"integer","minimum":0,"maximum":100},"decline":{"type":"integer","minimum":0,"maximum":100,"nullable":true}}},"outcomeMap":{"type":"array","items":{"type":"object","properties":{"band":{"type":"string","enum":["low","medium","high","critical"]},"channel":{"type":"string","nullable":true},"minAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"outcome":{"type":"string","enum":["allow","monitor","stepUp","holdForReview","decline"]}}}},"failMode":{"type":"string","enum":["open","holdForReview"],"default":"open","description":"On timeout or AI down. Never a silent decline (AIP-110)."},"declineGoverned":{"type":"boolean","default":false,"description":"Set only through `configureRiskStrategy` by `AI_APPROVE`; without it no `decline` outcome is accepted."},"modelEnabled":{"type":"boolean","default":false,"readOnly":true,"description":"Adds the promoted model's score where one is promoted for this tenant (design 3.5)."},"status":{"type":"string","enum":["draft","active","superseded"],"readOnly":true},"publishedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiRiskStrategy": {"type":"object","x-ticvai-persistence":"ai.risk_strategy","description":"**The tenant's risk strategy** (C10, AIP-096..165): weighted rule contributions, thresholds, modes and the map from band to outcome by channel and value (AIP-100). **Fail-open with holds, not declines, by default** (decided 29 September, decision 6): `decline` appears in `outcomeMap` only where the tenant governed it.","required":["version","mode","thresholds"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"version":{"type":"integer","minimum":1,"readOnly":true},"mode":{"type":"string","enum":["monitor","enforce"],"description":"Monitor records outcomes without acting; how a new strategy earns trust."},"weights":{"type":"object","additionalProperties":true,"description":"Contribution of each rule and signal to the composite 0..100 score."},"thresholds":{"type":"object","properties":{"monitor":{"type":"integer","minimum":0,"maximum":100},"stepUp":{"type":"integer","minimum":0,"maximum":100},"holdForReview":{"type":"integer","minimum":0,"maximum":100},"decline":{"type":"integer","minimum":0,"maximum":100,"nullable":true}}},"outcomeMap":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"band":{"type":"string","enum":["low","medium","high","critical"]},"channel":{"type":"string","nullable":true},"minAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"outcome":{"type":"string","enum":["allow","monitor","stepUp","holdForReview","decline"]}}}},"failMode":{"type":"string","enum":["open","holdForReview"],"default":"open","description":"On timeout or AI down. Never a silent decline (AIP-110)."},"declineGoverned":{"type":"boolean","default":false,"description":"Set only through `configureRiskStrategy` by `AI_APPROVE`; without it no `decline` outcome is accepted."},"modelEnabled":{"type":"boolean","default":false,"readOnly":true,"description":"Adds the promoted model's score where one is promoted for this tenant (design 3.5)."},"status":{"type":"string","enum":["draft","active","superseded"],"readOnly":true},"publishedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "Chargeback": {"type":"object","x-ticvai-persistence":"orders.chargeback + orders.chargeback_evidence + orders.chargeback_investigation_log","description":"BL-118, CF-144. **A chargeback is not a refund**, and treating it as one is how a venue loses them by default.\nA refund is a decision the venue makes. **A chargeback is a decision a bank makes, on a clock the venue does not control** — evidence is due in days, a deadline missed is a case lost regardless of merit, and there is a fee either way.\nThe money is already gone when this record is created. **Representment is an argument, not a reversal.**\n","required":["id","paymentId","amount","reason","status","evidenceDueBy"],"properties":{"id":{"type":"string","format":"uuid"},"paymentId":{"type":"string","format":"uuid"},"providerId":{"type":"string","format":"uuid"},"providerCaseReference":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"feeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"reason":{"type":"string","enum":["fraudulent","productNotReceived","productUnacceptable","duplicate","subscriptionCancelled","creditNotProcessed","unrecognised","other"],"description":"**The scheme's reason code, mapped.** Which evidence wins depends entirely on it — a *product not received* case is answered by a scan record and a *fraudulent* case is not.\n"},"status":{"type":"string","enum":["received","underReview","evidenceSubmitted","won","lost","accepted","expired"]},"evidenceDueBy":{"type":"string","format":"date-time","description":"**The field the whole record exists for.** A deadline missed is a case lost on merit nobody read, and it is the one date that must reach a person rather than a report.\n"},"evidenceSubmittedAt":{"type":"string","format":"date-time","nullable":true},"evidence":{"type":"array","description":"**What the platform can prove**, assembled rather than typed: the order, the scan that admitted them, the delivery, the terms accepted, the IP and device. A venue answering a chargeback by hand is a venue answering it late.\nHeld as rows of `orders.chargeback_evidence`, one per item (29 September, build: a list of objects needs its own table to be stored at all).\n","items":{"type":"object","properties":{"kind":{"type":"string","enum":["order","scanRecord","deliveryProof","termsAccepted","communication","deviceFingerprint","other"]},"reference":{"type":"string"}}}},"outcomeAt":{"type":"string","format":"date-time","nullable":true},"schemeReasonCode":{"type":"string","nullable":true,"description":"The card scheme's own reason code as notified, beside the mapped `reason` (5.7.92)."},"notifiedAt":{"type":"string","format":"date-time","nullable":true,"description":"When the provider notified the case; the date its debit posts to (`recordChargeback`)."},"assigneePrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who is investigating (`assignChargeback`)."},"investigationLog":{"type":"array","description":"Notes from `assignChargeback` and `recordChargebackOutcome`, oldest first, with who wrote each and when. Append-only. Held as rows of `orders.chargeback_investigation_log` (29 September, build).","items":{"type":"object","properties":{"note":{"type":"string"},"principalId":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"}}}},"debitJournalEntryId":{"type":"string","format":"uuid","nullable":true,"description":"The `chargebackDebit` (and `chargebackFee`) entry posted at intake."},"outcomeJournalEntryId":{"type":"string","format":"uuid","nullable":true,"description":"The `chargebackReversal` entry posted when the case is won, or the additional fee when lost."}}},
-"ChargebackEvidence": {"type":"object","x-ticvai-persistence":"payments.chargeback_evidence","description":"Board 8.7. **The platform holds every document already.**","required":["chargebackId"],"properties":{"chargebackId":{"x-ticvai-references":"orders.chargeback","type":"string","format":"uuid"},"narrative":{"type":"string","nullable":true},"documents":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["authorisationRecord","receipt","termsAccepted","admissionScan","deliveryProof","communicationLog","refundPolicy","other"]},"assetId":{"type":"string","format":"uuid"},"autoAssembled":{"type":"boolean","default":true}}}},"submittedAt":{"type":"string","format":"date-time","nullable":true},"deadlineAt":{"type":"string","format":"date-time","nullable":true},"outcome":{"type":"string","enum":["pending","won","lost","withdrawn"],"nullable":true},"scopePath":{"type":"string"}}},
-"FraudRule": {"type":"object","x-ticvai-persistence":"orders.fraud_rule","description":"BL-118. **Evaluated before the charge, and it holds rather than refuses.**\nA rule that declines outright turns a false positive into a lost sale with an angry guest. **A rule that flags for review turns it into a delay** — and at a gate, review means a supervisor rather than a rejection.\n","required":["id","name","condition","action","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"condition":{"type":"object","description":"Velocity, amount, issuer country, device reuse, mismatched billing.","additionalProperties":true},"appliesTo":{"type":"string","description":"**`refund` rules are evaluated on `createRefund` and `createRefundRequest`** (5.3.33, 29 September build pass), before the money moves: a hold sends the refund to approval rather than refusing it. `charge` rules are evaluated before a charge, as before.","enum":["charge","refund"],"default":"charge"},"signal":{"type":"string","nullable":true,"description":"The measured signal where the rule is one of the named ones; `condition` carries anything else. **`refundCount`, `refundValue` and `refundRatio` detect excessive refunds by one guest** (or one payment card, per `subjectKey`) over `windowDays`: the number of refunds, their total value, or refunds as a share of what that guest bought in the window. **Counted over every sales channel** (5.3.33): tickets, F&B, retail (a retail return raises its refund here, `RetailReturn.refundId`) and every other line, because every refund is an `orders.refund` whichever channel sold it. The access `excessiveRefunds` signal is the gate-side view of ticket refunds only.","enum":["velocityCount","velocityAmount","issuerCountry","deviceReuse","billingMismatch","refundCount","refundValue","refundRatio"]},"subjectKey":{"type":"string","enum":["guest","paymentToken","device"],"default":"guest"},"threshold":{"type":"number","nullable":true},"windowDays":{"type":"integer","minimum":1,"nullable":true},"action":{"type":"string","enum":["allow","flagForReview","requireStepUp","hold","decline"]},"riskWeight":{"type":"integer"},"isActive":{"type":"boolean"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
+"ChargebackEvidence": {"type":"object","x-ticvai-persistence":"payments.chargeback_evidence","description":"Board 8.7. **The platform holds every document already.**","required":["chargebackId"],"properties":{"chargebackId":{"x-ticvai-references":"orders.chargeback","type":"string","format":"uuid"},"narrative":{"type":"string","nullable":true},"documents":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["authorisationRecord","receipt","termsAccepted","admissionScan","deliveryProof","communicationLog","refundPolicy","other"]},"assetId":{"type":"string","format":"uuid"},"autoAssembled":{"type":"boolean","default":true}}}},"submittedAt":{"type":"string","format":"date-time","nullable":true},"deadlineAt":{"type":"string","format":"date-time","nullable":true},"outcome":{"type":"string","enum":["pending","won","lost","withdrawn"],"nullable":true},"scopePath":{"type":"string"}}},
+"FraudRule": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"orders.fraud_rule","description":"BL-118. **Evaluated before the charge, and it holds rather than refuses.**\nA rule that declines outright turns a false positive into a lost sale with an angry guest. **A rule that flags for review turns it into a delay** — and at a gate, review means a supervisor rather than a rejection.\n","required":["id","name","condition","action","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"condition":{"type":"object","description":"Velocity, amount, issuer country, device reuse, mismatched billing.","additionalProperties":true},"appliesTo":{"type":"string","description":"**`refund` rules are evaluated on `createRefund` and `createRefundRequest`** (5.3.33, 29 September build pass), before the money moves: a hold sends the refund to approval rather than refusing it. `charge` rules are evaluated before a charge, as before.","enum":["charge","refund"],"default":"charge"},"signal":{"type":"string","nullable":true,"description":"The measured signal where the rule is one of the named ones; `condition` carries anything else. **`refundCount`, `refundValue` and `refundRatio` detect excessive refunds by one guest** (or one payment card, per `subjectKey`) over `windowDays`: the number of refunds, their total value, or refunds as a share of what that guest bought in the window. **Counted over every sales channel** (5.3.33): tickets, F&B, retail (a retail return raises its refund here, `RetailReturn.refundId`) and every other line, because every refund is an `orders.refund` whichever channel sold it. The access `excessiveRefunds` signal is the gate-side view of ticket refunds only.","enum":["velocityCount","velocityAmount","issuerCountry","deviceReuse","billingMismatch","refundCount","refundValue","refundRatio"]},"subjectKey":{"type":"string","enum":["guest","paymentToken","device"],"default":"guest"},"threshold":{"type":"number","nullable":true},"windowDays":{"type":"integer","minimum":1,"nullable":true},"action":{"type":"string","enum":["allow","flagForReview","requireStepUp","hold","decline"]},"riskWeight":{"type":"integer"},"isActive":{"type":"boolean"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
 "FraudRuleSet": {"type":"object","x-ticvai-persistence":"none — the whole set of orders.fraud_rule rows, in evaluation order","description":"**The whole set in one body**, as `setFraudRules` requires: a rule set edited one rule at a time spends time in states nobody intended. A rule left out of the set is deactivated, never deleted.\n","required":["rules"],"properties":{"rules":{"type":"array","description":"In evaluation order.","items":{"$ref":"#/components/schemas/FraudRule"}}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "OrdChargebackAnalytics": {"x-ticvai-persistence":"none — computed from orders.chargeback and orders.payment on the reporting replica","type":"object","description":"4.2.21. Chargeback measures for a period, in total and per group.","required":["periodFrom","periodTo","groupBy","totals","groups"],"properties":{"periodFrom":{"type":"string","format":"date"},"periodTo":{"type":"string","format":"date"},"groupBy":{"type":"string"},"totals":{"$ref":"#/components/schemas/OrdChargebackMeasures"},"groups":{"type":"array","items":{"allOf":[{"$ref":"#/components/schemas/OrdChargebackMeasures"},{"type":"object","required":["key"],"properties":{"key":{"type":"string","description":"The reason, provider id, outcome, venue id, month (`YYYY-MM`), product id, product category id, or guest `subjectId` (`anonymous` for purchases with no guest) of the group."},"label":{"type":"string","nullable":true,"description":"The display name of the group's key. Null for `customer` unless the caller holds `GUEST_VIEW_PII`."}}}]}}}},
@@ -1836,7 +2040,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PaymentConfigurationSimulation": {"type":"object","description":"Boards 1.10 and 5.10. **Eight boards of configuration that compose, silently.**","properties":{"offeredMethods":{"type":"array","items":{"type":"object","properties":{"methodId":{"type":"string","format":"uuid"},"name":{"type":"string"},"routesTo":{"type":"string","nullable":true},"estimatedCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"surcharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"suppressedMethods":{"type":"array","items":{"type":"object","properties":{"methodId":{"type":"string","format":"uuid"},"reason":{"type":"string"}}}},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning"]},"message":{"type":"string"}}}}}},
 "PaymentPerformanceRow": {"type":"object","description":"Board 8.8. **The last and most expensive place a venue loses a sale.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"attempts":{"type":"integer"},"authorised":{"type":"integer"},"declined":{"type":"integer"},"errored":{"type":"integer"},"abandoned":{"type":"integer"},"authorisationRate":{"type":"number"},"conversionRate":{"type":"number"},"averageValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"topDeclineReason":{"type":"string","nullable":true}}},
-"PaymentRiskRules": {"type":"object","x-ticvai-persistence":"payments.risk_rules","description":"Boards 8.2 to 8.4. **Distinct from `wallet` risk** — this watches card presentation.\n","properties":{"rules":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"signal":{"type":"string","enum":["cardAcrossAccounts","accountAcrossCards","deviceAcrossCards","velocityCount","velocityAmount","issuerCountryMismatch","highRiskBin","listHit","repeatedDecline"]},"threshold":{"type":"number","nullable":true},"windowMinutes":{"type":"integer","nullable":true},"listCode":{"type":"string","nullable":true},"action":{"type":"string","enum":["scoreOnly","challenge","refuse","allowAndFlag","raiseCase"]}}}},"lists":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"kind":{"type":"string","enum":["blockCard","blockBin","blockEmail","blockDevice","blockIp","allowAlways"],"description":"`blockIp` entries are IPv4 or IPv6 addresses or CIDR ranges (no wider than /16 for IPv4 or /32 for IPv6, so one entry cannot block a country's mobile network), matched at the edge (29 September, build pass; 8.3.8)."},"entries":{"type":"integer","readOnly":true}}}},"scopePath":{"type":"string"}}},
+"PaymentRiskRules": {"type":"object","x-ticvai-persistence":"payments.risk_rules","description":"Boards 8.2 to 8.4. **Distinct from `wallet` risk** — this watches card presentation.\n","properties":{"rules":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"signal":{"type":"string","enum":["cardAcrossAccounts","accountAcrossCards","deviceAcrossCards","velocityCount","velocityAmount","issuerCountryMismatch","highRiskBin","listHit","repeatedDecline"]},"threshold":{"type":"number","nullable":true},"windowMinutes":{"type":"integer","nullable":true},"listCode":{"type":"string","nullable":true},"action":{"type":"string","enum":["scoreOnly","challenge","refuse","allowAndFlag","raiseCase"]}}}},"lists":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"kind":{"type":"string","enum":["blockCard","blockBin","blockEmail","blockDevice","blockIp","allowAlways"],"description":"`blockIp` entries are IPv4 or IPv6 addresses or CIDR ranges (no wider than /16 for IPv4 or /32 for IPv6, so one entry cannot block a country's mobile network), matched at the edge (29 September, build pass; 8.3.8)."},"entries":{"type":"integer","readOnly":true}}}},"scopePath":{"type":"string"}}},
 "RoutingContext": {"type":"object","required":["amount"],"properties":{"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"methodId":{"type":"string","format":"uuid","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"channel":{"type":"string","nullable":true},"cardScheme":{"type":"string","nullable":true},"cardIssuerCountry":{"type":"string","nullable":true},"cardPresent":{"type":"boolean","default":false},"customerId":{"type":"string","format":"uuid","nullable":true}}}
 }
 ```

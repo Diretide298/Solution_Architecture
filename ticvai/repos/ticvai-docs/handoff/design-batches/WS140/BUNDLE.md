@@ -1,6 +1,6 @@
 # WS140 — Marketing CRM Configuration Reference v1.0 board 6
 
-**10 screens · 15 operations · 13 schemas · 6 permissions**
+**10 screens · 16 operations · 13 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -126,15 +126,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-784` | Communications Center | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-784` | Communications Center | D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-785` | Template Library | A | 35 | 12 | 6 | 18 | 1 | 0 | — | notStarted (—) |
 | `BO-786` | Newsletter Builder | D | 0 | 0 | 6 | 12 | 0 | 0 | — | notStarted (—) |
 | `BO-787` | Content Blocks & Product Feed | D | 0 | 0 | 6 | 12 | 0 | 6 | — | notStarted (—) |
 | `BO-788` | Subscriptions & Preferences | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-789` | Transactional Notification Rules | D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-790` | Scheduling, Priority & Approval | D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `BO-791` | Delivery, Retry & Failover | D | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
-| `BO-792` | Deliverability & Analytics | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-789` | Transactional Notification Rules | D | 0 | 20 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `BO-790` | Scheduling, Priority & Approval | D | 0 | 20 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `BO-791` | Delivery, Retry & Failover | D | 1 | 20 | 6 | 6 | 1 | 0 | — | notStarted (—) |
+| `BO-792` | Deliverability & Analytics | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-793` | AI Content, Translation & Audit | D | 0 | 0 | 6 | 12 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -182,7 +182,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listCommunicationService`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Window from | 1 Oct 2026, 14:30 | — |
+| Window to | 1 Oct 2026, 14:30 | — |
+| Messages processed | 1,234 | Messages accepted by the service in the window (the pack's "Messages Processed Today"). |
+| Delivered | 1,234 | — |
+| Failed | 1,234 | — |
+| Pending | 1,234 | — |
+| Retrying | 1,234 | — |
+| Average delivery seconds | 1,234.5 | Mean time from acceptance to provider-confirmed delivery, in (fractional) seconds. |
+| Provider availability rate | 12.5% | Share of the window the active providers were reachable, weighted by volume. |
+| By channel | list or chips (count when long) | Sent volume and health per channel, one row per provider on it (the pack's channel tiles and Channel Health table). |
+| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Provider | the name it points at, never the id | — |
+| Provider name | text | — |
+| Sent | 1,234 | — |
+| Success rate | 12.5% | — |
+| Average latency seconds | 1,234.5 | — |
+| Health | chip: Healthy, Warning, Critical | — |
+| By module | list or chips (count when long) | Volume originating from each TICVAI module. |
+| Module | chip: Crm, Ticketing, Membership, Waiver, Group sales, Customer service… | — |
+| Volume | 1,234 | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -240,6 +263,8 @@ alert: WhatsApp provider latency high since 11:20
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -276,7 +301,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-784?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-785`, `BO-786`, `BO-787`, `BO-788`, `BO-789`, `BO-790`, `BO-791`, `BO-792`, `BO-793`.
@@ -414,7 +439,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | New template (primary button) | navigation or local | — | — | — | — |
-| Create template (primary button) | `createMessageTemplate` POST `/message-templates` | MessageTemplate | MessageTemplate | 400 Unknown merge field, or a required language is missing | — |
+| Create template (primary button) | `createMessageTemplate` POST `/message-templates` | MessageTemplate | MessageTemplate | 400 Unknown merge field, or a required language is missing; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September … | — |
 | Save changes (primary button) | `updateMessageTemplate` PATCH `/message-templates/{templateId}` | inline | MessageTemplate | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The template is platform-owned (`template-platform-owned`) and cannot be edited by a tenant. | — |
 | Draft with AI (secondary button) | `proposeMarketingContent` POST `/ai/content-drafts` | inline | AiContentDraftSet | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks … | — |
 | Translate missing languages (secondary button) | `proposeTranslations` POST `/ai/translate` | inline | TranslationProposals | — | — |
@@ -445,7 +470,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | No template on this channel. Names the channel and offers All. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent` … |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and …; 409 The template is platform-owned (`template-platform-owned`) and cannot be edited by a tenant. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and …; 409 The … |
 
 #### Consistency with other screens
 
@@ -484,6 +509,8 @@ mergeFields:
 - `getTranslationProposals` → `TENANT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent` …
+
+Screen guard: `MARKETING_VIEW`
 
 #### Requirements it meets
 
@@ -599,7 +626,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the newsletter are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and … |
 
 #### Sample data for the mock-up
 
@@ -616,6 +643,8 @@ newsletter: Coastal Aqua October news - hero Halloween Splash Nights, 3 event bl
 - `proposeMarketingContent` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `MARKETING_MANAGE`
 
 #### Requirements it meets
 
@@ -722,7 +751,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the content blocks product are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Drafting is not allowed at this scope now: the capability is paused (`capability-paused`) or governance blocks it (`governance-blocked`, naming the policy and … |
 
 #### Sample data for the mock-up
 
@@ -738,6 +767,8 @@ block: Upcoming events feed - next 3 events with seats left, refresh hourly, fal
 - `proposeMarketingContent` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `MARKETING_MANAGE`
 
 #### Requirements it meets
 
@@ -875,6 +906,8 @@ subscriber:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -956,7 +989,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listSystemTransactionalTemplate`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Template | the name it points at, never the id | marketing.message_template id. |
+| Code | text | The human template ID (e.g. TICKET_CONFIRMATION). |
+| Name | text | — |
+| Business event | text | The registered business event this template answers (e.g. TicketIssued). |
+| Source module | chip: Crm, Ticketing, Membership, Waiver, Group sales, Customer service… | — |
+| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Brand | the name it points at, never the id | — |
+| Language | text | BCP 47 tag. |
+| Status | chip: Draft, Published, Archived | — |
+| Ownership | chip: Platform, Crm | platform = transactional template owned here; crm = marketing template owned by CRM. |
+| Subject | text | — |
+| Header | text | — |
+| Body | text | — |
+| Footer | text | — |
+| CTA label | text | — |
+| CTA URL | text | May contain variables, e.g. {{TicketLink}}. |
+| Attachment kinds | list or chips (count when long) | — |
+| Variables | list or chips (count when long) | Dynamic variables the content uses (e.g. CustomerName, OrderNumber, EventDate, AmountDue). |
+| Published at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -1006,6 +1062,8 @@ rules:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1042,7 +1100,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-789?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save message trigger, Cancel.
 - [ ] Every transition is wired: `BO-784`.
@@ -1093,7 +1151,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listRoutingPriorityThrottling`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Country | text | — |
+| Brand | the name it points at, never the id | — |
+| Message class | chip: Transactional, Operational, Service, Marketing | — |
+| Priority class | chip: P1, P2, P3, P4 | — |
+| Recipient type | chip: Customer, Partner, Employee | — |
+| Providers | list or chips (count when long) | Tried in order; a provider below minimum health is skipped. |
+| Provider | the name it points at, never the id | — |
+| Provider name | text | — |
+| Role | chip: Primary, Secondary, Emergency fallback | — |
+| Skip unhealthy providers | yes / no (icon or chip) | Route past providers whose health is degraded or worse. |
+| Cost aware | yes / no (icon or chip) | Among providers meeting the service and compliance rules, prefer the cheapest. |
+| Channel fallback | list or chips (count when long) | Alternate channels, in order, when delivery on this channel fails; used only where consent and preferences permit. |
+| Throttle | grouped details | — |
+| Messages per second | 1,234 | — |
+| Messages per minute | 1,234 | — |
+| Brand messages per minute | 1,234 | Cap across every rule for the same brand. |
+| Event messages per minute | 1,234 | Cap per originating business event. |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -1131,6 +1212,8 @@ rule: Weather closure notice - Critical - all channels - no quiet hours
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1157,7 +1240,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-790?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-784`.
@@ -1204,19 +1287,46 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | From | date and time picker | — | — | `listDeliveryQueueFailure` ?from |
 | To | date and time picker | — | — | `listDeliveryQueueFailure` ?to |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by **** (`retryMessageDispatch`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Channel `channel` | radio group | optional | — | Email · SMS · Whatsapp · Push | — | Absent means the same channel. Present means failover. | `retryMessageDispatch` body |
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listDeliveryQueueFailure`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Communication | text | marketing.message_dispatch id. |
+| Source module | chip: Crm, Ticketing, Membership, Waiver, Group sales, Customer service… | — |
+| Business event | text | The originating event type, e.g. TicketIssued. |
+| Business event | text | The originating event instance, kept so a failed message can be replayed with its context. |
+| Recipient | text | Address or number, masked (e.g. j*@example.com) unless the caller holds GUEST_VIEW_PII. |
+| Subject | the name it points at, never the id | — |
+| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Template | grouped details | — |
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Provider | grouped details | — |
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Priority | chip: P1, P2, P3, P4 | — |
+| Status | chip: Pending, Processing, Sent, Delivered, Failed, Retrying… | — |
+| Attempts | 1,234 | — |
+| Last failure category | chip: Provider unavailable, Invalid address, Invalid mobile, Rate limited, Authentication … | — |
+| Last failure message | text | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `retryMessageDispatch` POST `/message-dispatches/{dispatchId}/retry` | inline | MessageDispatch | 409 The dispatch has not failed (`queued`, `sent`, `delivered`, `opened` or `clicked`; `message-dispatch-not-failed`), or was `suppressed` … | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
@@ -1243,7 +1353,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the delivery retry failover are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The dispatch has not failed (`queued`, `sent`, `delivered`, `opened` or `clicked`; `message-dispatch-not-failed`), or was `suppressed` … |
 
 #### Sample data for the mock-up
 
@@ -1259,6 +1369,8 @@ dispatch: TKT-CONFIRM to +971 50 *** 4567 - WhatsApp failed (number not on Whats
 - `retryMessageDispatch` → `MARKETING_SEND` (operate) · staff, service
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `MARKETING_VIEW`
 
 #### Requirements it meets
 
@@ -1294,8 +1406,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (400, 409).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-791?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-784`.
@@ -1347,7 +1459,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listProviderHealthUsage`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Window from | 1 Oct 2026, 14:30 | — |
+| Window to | 1 Oct 2026, 14:30 | — |
+| Volume | 1,234 | — |
+| Success rate | 12.5% | — |
+| Failure rate | 12.5% | — |
+| Average delivery seconds | 1,234.5 | — |
+| Average API latency seconds | 1,234.5 | — |
+| Availability rate | 12.5% | — |
+| Retries | 1,234 | — |
+| Fallback count | 1,234 | Messages delivered through a fallback provider or channel. |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Cost per message | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Providers | list or chips (count when long) | Provider comparison. |
+| Provider | the name it points at, never the id | — |
+| Provider name | text | — |
+| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Volume | 1,234 | — |
+| Success rate | 12.5% | — |
+| Average delivery seconds | 1,234.5 | — |
+| Cost per thousand | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -1388,6 +1523,8 @@ email:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1412,7 +1549,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-792?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-784`.
@@ -1465,6 +1602,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **review list**: Source and draft side by side (RTL for Arabic), glossary terms highlighted, approve or edit per string. *(source: contracts/satellite/ai.yaml#decideProposedAction / DI-081)*
 
+**Data it reads**: `listProposedActions` (onInterval, Follows decideProposedAction (202) until what it started …)
+
 **Where the user goes next**
 
 - → `BO-784` Communications Center: *Back to Communications Center*
@@ -1497,8 +1636,11 @@ string:
 - `proposeMarketingContent` → `AI_USE` (operate) · staff
 - `decideProposedAction` → `AI_USE` (operate) · staff
 - `proposeTranslations` → `TENANT_CONFIGURE` (configure) · staff
+- `listProposedActions` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1651,6 +1793,7 @@ Method, path, parameters, request and response for every operation these screens
 "listCommunicationService": {"method":"GET","path":"/communication-service","contract":"marketing-crm","summary":"Communication Service Command Center","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"venueId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false}],"requestBody":null,"responds":"CommunicationServiceCommandCenterView"},
 "listDeliveryQueueFailure": {"method":"GET","path":"/delivery-queue-failure","contract":"marketing-crm","summary":"Delivery Queue, Failure & Retry Management","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"sourceModule","in":"query","required":false},{"name":"businessEvent","in":"query","required":false},{"name":"providerId","in":"query","required":false},{"name":"priority","in":"query","required":false},{"name":"failureCategory","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMessageTemplates": {"method":"GET","path":"/message-templates","contract":"marketing-crm","summary":"List message templates","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listProposedActions": {"method":"GET","path":"/proposed-actions","contract":"ai","summary":"What the assistant has proposed and nobody has decided","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ProposedAction"},
 "listProviderHealthUsage": {"method":"GET","path":"/provider-health-usage","contract":"marketing-crm","summary":"Provider Health, Usage & Cost Monitoring","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":"channel","in":"query","required":false},{"name":"providerId","in":"query","required":false},{"name":"brandId","in":"query","required":false},{"name":"venueId","in":"query","required":false},{"name":"module","in":"query","required":false},{"name":"country","in":"query","required":false},{"name":"messageClass","in":"query","required":false},{"name":"groupBy","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false}],"requestBody":null,"responds":"ProviderHealthUsageCostMonitoringView"},
 "listRoutingPriorityThrottling": {"method":"GET","path":"/routing-priority-throttling","contract":"marketing-crm","summary":"Routing, Priority, Throttling & Fallback Rules","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"channel","in":"query","required":false},{"name":"country","in":"query","required":false},{"name":"brandId","in":"query","required":false},{"name":"priorityClass","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listSystemTransactionalTemplate": {"method":"GET","path":"/system-transactional-template","contract":"marketing-crm","summary":"System Transactional Template Registry","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"ownership","in":"query","required":false},{"name":"sourceModule","in":"query","required":false},{"name":"businessEvent","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"brandId","in":"query","required":false},{"name":"language","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1670,15 +1813,15 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "CommunicationServiceCommandCenterView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.communication_provider (new)","description":"Platform KPIs and breakdowns for the communication service over the requested window. Counts are messages (one dispatch = one message on one channel), not recipients.\n","required":["windowFrom","windowTo","messagesProcessed","byChannel","byModule"],"properties":{"windowFrom":{"type":"string","format":"date-time"},"windowTo":{"type":"string","format":"date-time"},"messagesProcessed":{"type":"integer","minimum":0,"description":"Messages accepted by the service in the window (the pack's \"Messages Processed Today\")."},"delivered":{"type":"integer","minimum":0},"failed":{"type":"integer","minimum":0},"pending":{"type":"integer","minimum":0},"retrying":{"type":"integer","minimum":0},"averageDeliverySeconds":{"type":"number","minimum":0,"description":"Mean time from acceptance to provider-confirmed delivery, in (fractional) seconds."},"providerAvailabilityRate":{"type":"number","minimum":0,"maximum":1,"description":"Share of the window the active providers were reachable, weighted by volume."},"byChannel":{"type":"array","description":"Sent volume and health per channel, one row per provider on it (the pack's channel tiles and Channel Health table).","items":{"type":"object","required":["channel","sent"],"properties":{"channel":{"$ref":"#/components/schemas/MessageChannel"},"providerId":{"type":"string","format":"uuid"},"providerName":{"type":"string"},"sent":{"type":"integer","minimum":0},"successRate":{"type":"number","minimum":0,"maximum":1},"averageLatencySeconds":{"type":"number","minimum":0},"health":{"type":"string","enum":["healthy","warning","critical"]}}}},"byModule":{"type":"array","description":"Volume originating from each TICVAI module.","items":{"type":"object","required":["module","volume"],"properties":{"module":{"type":"string","enum":["crm","ticketing","membership","waiver","groupSales","customerService","finance","wallet","resourceManagement","accessControl","other"]},"volume":{"type":"integer","minimum":0},"successRate":{"type":"number","minimum":0,"maximum":1},"averageLatencySeconds":{"type":"number","minimum":0},"health":{"type":"string","enum":["healthy","warning","critical"]}}}},"alerts":{"type":"array","description":"Live operational alerts (failure-rate spikes, queued backlogs, providers near their rate limit).","items":{"type":"object","required":["kind","severity","message","raisedAt"],"properties":{"kind":{"type":"string","enum":["failureRateSpike","queueBacklog","rateLimitApproaching","providerDegraded","other"]},"severity":{"type":"string","enum":["info","warning","critical"]},"message":{"type":"string"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"providerId":{"type":"string","format":"uuid"},"raisedAt":{"type":"string","format":"date-time"}}}},"aiHealthSummary":{"type":"string","description":"AI-written plain-language summary of platform health; absent when AI processing is off for the tenant."}}},
 "DeliveryQueueFailureRetryManagementView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.message_template, marketing.communication_provider (new)","description":"One communication in the delivery queue and where it stands.","required":["communicationId","channel","status","attempts","createdAt"],"properties":{"communicationId":{"type":"string","description":"marketing.message_dispatch id."},"sourceModule":{"type":"string","enum":["crm","ticketing","membership","waiver","groupSales","customerService","finance","wallet","resourceManagement","accessControl","other"]},"businessEvent":{"type":"string","description":"The originating event type, e.g. TicketIssued."},"businessEventId":{"type":"string","description":"The originating event instance, kept so a failed message can be replayed with its context."},"recipient":{"type":"string","description":"Address or number, masked (e.g. j***@example.com) unless the caller holds GUEST_VIEW_PII."},"subjectId":{"type":"string","format":"uuid"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"template":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"}}},"provider":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"}}},"priority":{"type":"string","enum":["P1","P2","P3","P4"]},"status":{"type":"string","enum":["pending","processing","sent","delivered","failed","retrying","deadLettered","cancelled"]},"attempts":{"type":"integer","minimum":0},"lastFailureCategory":{"type":"string","enum":["providerUnavailable","invalidAddress","invalidMobile","rateLimited","authenticationError","templateRejected","timeout","consentBlock","unknownError"]},"lastFailureMessage":{"type":"string"},"nextAttemptAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"sentAt":{"type":"string","format":"date-time"}}},
-"MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
-"MessageDispatch": {"x-ticvai-append-only":"queuedAt","x-ticvai-persistence":"marketing.message_dispatch","type":"object","required":["id","subjectId","channel","status","queuedAt"],"properties":{"id":{"type":"string"},"subjectId":{"type":"string","format":"uuid"},"campaignId":{"type":"string","format":"uuid","nullable":true},"channel":{"$ref":"#/components/schemas/MessageChannel"},"templateId":{"type":"string","format":"uuid"},"messageTriggerId":{"type":"string","format":"uuid","nullable":true,"description":"The `MessageTrigger` that fired it, and through its `event` the `BusinessEvent` and source module; null for a campaign or a direct send. Attempts are in `MessageDispatchAttempt`. (decided 29 September, data model for the agreed operations)"},"campaignVariantId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"marketing.campaign_variant","description":"The A/B variant sent (22.1.17; 29 September, build pass, group G2). Null for a single-content campaign or a triggered message."},"plannedSendAt":{"type":"string","format":"date-time","nullable":true,"description":"The per-recipient hour chosen by `sendTimeMode` `optimised` (22.3.19, 22.9.16); null when sent at the scheduled time."},"status":{"type":"string","enum":["queued","sent","delivered","opened","clicked","bounced","failed","suppressed"]},"failureReason":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true},"queuedAt":{"type":"string","format":"date-time"},"deliveredAt":{"type":"string","format":"date-time","nullable":true},"isTest":{"type":"boolean","default":false,"description":"A `testSendCampaign` message. Excluded from `CampaignPerformance` and `Campaign.sentCount`."},"openedAt":{"type":"string","format":"date-time","nullable":true,"description":"From the provider's engagement events. `CampaignPerformance.opened` counts these."},"clickedAt":{"type":"string","format":"date-time","nullable":true},"complainedAt":{"type":"string","format":"date-time","nullable":true},"unsubscribedAt":{"type":"string","format":"date-time","nullable":true}}},
-"MessageTemplate": {"x-ticvai-persistence":"marketing.message_template","type":"object","required":["id","code","name","channel","bodies"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"channel":{"$ref":"#/components/schemas/MessageChannel"},"subjects":{"type":"object","description":"Per language. Email only.","additionalProperties":{"type":"string"}},"bodies":{"type":"object","description":"Per language, keyed by ISO 639-1 code.","additionalProperties":{"type":"string"}},"mergeFields":{"type":"array","items":{"type":"string"}},"missingLanguages":{"type":"array","readOnly":true,"description":"Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n","items":{"type":"string"}},"providerTemplateId":{"type":"string","nullable":true,"description":"Required for WhatsApp, where templates are pre-approved by the provider."},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand whose identity the template carries; null for the tenant default."},"ownership":{"type":"string","enum":["platform","crm"],"default":"crm","description":"`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"}}},
-"MessageTrigger": {"type":"object","x-ticvai-persistence":"marketing.message_trigger","description":"**What fires a message.** Before, during and after a visit are one mechanism with a different sign on the offset.\n","required":["id","event","templateId","isActive"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"event":{"type":"string","description":"The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n**`entitlement.expiringSoon` is in the catalogue since 29 September** (build pass, group G2; 5.5.30): the pre-expiry reminder for a ticket or pass. Its anchor is the event time; the notice period is the template's `expiryNoticeDays`, so `offsetMinutes` is normally 0.\n"},"templateId":{"type":"string","format":"uuid"},"offsetMinutes":{"type":"integer","default":0,"description":"Negative fires before the anchor, positive after. **A reminder the day before a visit is -1440 against the performance**, not a separate concept.\n"},"anchor":{"type":"string","enum":["eventTime","performanceStart","visitEnd"],"default":"eventTime"},"priority":{"type":"string","enum":["operational","transactional","marketing"],"default":"transactional","description":"**A queue-turn alert and a monthly newsletter are not the same urgency and were the same dispatch.** `operational` bypasses batching and quiet hours; `marketing` never does.\n"},"sendTimeMode":{"type":"string","enum":["fixed","optimised"],"default":"fixed","description":"**Only for `priority` `marketing`** (29 September, build pass, group G2; 22.9.16): `optimised` holds the notification to the recipient's suggested hour from `ai.requestSuggestion` (kind `sendTime`) within the next 24 hours, on the suggested consented channel. `operational` and `transactional` messages are never delayed for it, and a `setMessageTrigger` asking for it on them is refused (400)."},"isActive":{"type":"boolean","default":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"MessageChannel": {"x-ticvai-rls":"grant-holder-read","type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
+"MessageDispatch": {"x-ticvai-rls":"grant-holder-read","x-ticvai-append-only":"queuedAt","x-ticvai-persistence":"marketing.message_dispatch","type":"object","required":["id","subjectId","channel","status","queuedAt"],"properties":{"id":{"type":"string"},"subjectId":{"type":"string","format":"uuid"},"campaignId":{"type":"string","format":"uuid","nullable":true},"channel":{"$ref":"#/components/schemas/MessageChannel"},"templateId":{"type":"string","format":"uuid"},"messageTriggerId":{"type":"string","format":"uuid","nullable":true,"description":"The `MessageTrigger` that fired it, and through its `event` the `BusinessEvent` and source module; null for a campaign or a direct send. Attempts are in `MessageDispatchAttempt`. (decided 29 September, data model for the agreed operations)"},"campaignVariantId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"marketing.campaign_variant","description":"The A/B variant sent (22.1.17; 29 September, build pass, group G2). Null for a single-content campaign or a triggered message."},"plannedSendAt":{"type":"string","format":"date-time","nullable":true,"description":"The per-recipient hour chosen by `sendTimeMode` `optimised` (22.3.19, 22.9.16); null when sent at the scheduled time."},"status":{"type":"string","enum":["queued","sent","delivered","opened","clicked","bounced","failed","suppressed"]},"failureReason":{"type":"string","nullable":true},"providerReference":{"type":"string","nullable":true},"queuedAt":{"type":"string","format":"date-time"},"deliveredAt":{"type":"string","format":"date-time","nullable":true},"isTest":{"type":"boolean","default":false,"description":"A `testSendCampaign` message. Excluded from `CampaignPerformance` and `Campaign.sentCount`."},"openedAt":{"type":"string","format":"date-time","nullable":true,"description":"From the provider's engagement events. `CampaignPerformance.opened` counts these."},"clickedAt":{"type":"string","format":"date-time","nullable":true},"complainedAt":{"type":"string","format":"date-time","nullable":true},"unsubscribedAt":{"type":"string","format":"date-time","nullable":true}}},
+"MessageTemplate": {"x-ticvai-rls":"grant-holder-read","x-ticvai-persistence":"marketing.message_template","type":"object","required":["id","code","name","channel","bodies"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string","maxLength":64},"name":{"type":"string","maxLength":200},"channel":{"$ref":"#/components/schemas/MessageChannel"},"subjects":{"type":"object","description":"Per language. Email only.","additionalProperties":{"type":"string"}},"bodies":{"type":"object","description":"Per language, keyed by ISO 639-1 code.","additionalProperties":{"type":"string"}},"mergeFields":{"type":"array","items":{"type":"string"}},"missingLanguages":{"type":"array","readOnly":true,"description":"Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect.\n","items":{"type":"string"}},"providerTemplateId":{"type":"string","nullable":true,"description":"Required for WhatsApp, where templates are pre-approved by the provider."},"brandId":{"type":"string","format":"uuid","nullable":true,"description":"The brand whose identity the template carries; null for the tenant default."},"ownership":{"type":"string","enum":["platform","crm"],"default":"crm","description":"`platform` = a transactional template owned by the communication service; `crm` = a marketing template owned by CRM (`listSystemTransactionalTemplate`). Content by language and version is in `MessageTemplateVersion`. (decided 29 September, data model for the agreed operations)"}}},
+"MessageTrigger": {"type":"object","x-ticvai-persistence":"marketing.message_trigger","description":"**What fires a message.** Before, during and after a visit are one mechanism with a different sign on the offset.\n","required":["id","event","templateId","isActive"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"event":{"type":"string","description":"The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n**`entitlement.expiringSoon` is in the catalogue since 29 September** (build pass, group G2; 5.5.30): the pre-expiry reminder for a ticket or pass. Its anchor is the event time; the notice period is the template's `expiryNoticeDays`, so `offsetMinutes` is normally 0.\n"},"templateId":{"x-ticvai-references":"marketing.message_template","type":"string","format":"uuid"},"offsetMinutes":{"type":"integer","default":0,"description":"Negative fires before the anchor, positive after. **A reminder the day before a visit is -1440 against the performance**, not a separate concept.\n"},"anchor":{"type":"string","enum":["eventTime","performanceStart","visitEnd"],"default":"eventTime"},"priority":{"type":"string","enum":["operational","transactional","marketing"],"default":"transactional","description":"**A queue-turn alert and a monthly newsletter are not the same urgency and were the same dispatch.** `operational` bypasses batching and quiet hours; `marketing` never does.\n"},"sendTimeMode":{"type":"string","enum":["fixed","optimised"],"default":"fixed","description":"**Only for `priority` `marketing`** (29 September, build pass, group G2; 22.9.16): `optimised` holds the notification to the recipient's suggested hour from `ai.requestSuggestion` (kind `sendTime`) within the next 24 hours, on the suggested consented channel. `operational` and `transactional` messages are never delayed for it, and a `setMessageTrigger` asking for it on them is refused (400)."},"isActive":{"type":"boolean","default":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"ProposedAction": {"type":"object","x-ticvai-persistence":"ai.proposed_action","required":["id","kind","targetContract","targetOperation","payload","status"],"properties":{"id":{"type":"string","format":"uuid"},"interactionId":{"type":"string","format":"uuid"},"translationJobId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."},"kind":{"type":"string","enum":["pricing","promotion","operational","financial","configuration","content","audience"],"description":"`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."},"targetContract":{"type":"string","description":"Which contract would perform it. The assistant never performs it itself."},"targetOperation":{"type":"string"},"payload":{"type":"object","additionalProperties":true,"description":"The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"},"summary":{"type":"string"},"status":{"type":"string","description":"**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n","enum":["proposed","approved","rejected","applied","expired"]},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."},"approvalLevel":{"type":"integer","minimum":1,"maximum":2,"description":"8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"decisionReason":{"type":"string","nullable":true,"description":"Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"},"proposedAt":{"type":"string","format":"date-time"},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan","description":"The plan this action presents for a decision (AI design 2.2 D, 3.8)."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."},"changeSetHash":{"type":"string","nullable":true,"readOnly":true,"description":"Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."}}},
+"ProposedAction": {"x-ticvai-retired-columns":["interaction_id"],"type":"object","x-ticvai-persistence":"ai.proposed_action","required":["id","kind","targetContract","targetOperation","payload","status"],"properties":{"id":{"type":"string","format":"uuid"},"interactionId":{"x-ticvai-references":"ai.activity","x-ticvai-column":"activity_id","type":"string","format":"uuid"},"translationJobId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."},"kind":{"type":"string","enum":["pricing","promotion","operational","financial","configuration","content","audience"],"description":"`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."},"targetContract":{"type":"string","description":"Which contract would perform it. The assistant never performs it itself."},"targetOperation":{"type":"string"},"payload":{"type":"object","additionalProperties":true,"description":"The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"},"summary":{"type":"string"},"status":{"type":"string","description":"**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n","enum":["proposed","approved","rejected","applied","expired"]},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."},"approvalLevel":{"type":"integer","minimum":1,"maximum":2,"description":"8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"decisionReason":{"type":"string","nullable":true,"description":"Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"},"proposedAt":{"type":"string","format":"date-time"},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan","description":"The plan this action presents for a decision (AI design 2.2 D, 3.8)."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."},"changeSetHash":{"type":"string","nullable":true,"readOnly":true,"description":"Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."}}},
 "ProviderHealthUsageCostMonitoringView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.message_dispatch, marketing.message_dispatch_attempt (new), marketing.communication_provider (new)","description":"Provider reliability, usage and cost for the window and filters.","required":["windowFrom","windowTo","volume","providers"],"properties":{"windowFrom":{"type":"string","format":"date-time"},"windowTo":{"type":"string","format":"date-time"},"volume":{"type":"integer","minimum":0},"successRate":{"type":"number","minimum":0,"maximum":1},"failureRate":{"type":"number","minimum":0,"maximum":1},"averageDeliverySeconds":{"type":"number","minimum":0},"averageApiLatencySeconds":{"type":"number","minimum":0},"availabilityRate":{"type":"number","minimum":0,"maximum":1},"retries":{"type":"integer","minimum":0},"fallbackCount":{"type":"integer","minimum":0,"description":"Messages delivered through a fallback provider or channel."},"cost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"costPerMessage":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"providers":{"type":"array","description":"Provider comparison.","items":{"type":"object","required":["providerId","channel","volume"],"properties":{"providerId":{"type":"string","format":"uuid"},"providerName":{"type":"string"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"volume":{"type":"integer","minimum":0},"successRate":{"type":"number","minimum":0,"maximum":1},"averageDeliverySeconds":{"type":"number","minimum":0},"costPerThousand":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"health":{"type":"string","enum":["healthy","warning","critical"]}}}},"breakdown":{"type":"array","description":"Usage and cost per value of the groupBy dimension.","items":{"type":"object","required":["key","volume"],"properties":{"key":{"type":"string","description":"The dimension value's id or code."},"label":{"type":"string"},"volume":{"type":"integer","minimum":0},"cost":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"alerts":{"type":"array","items":{"type":"object","required":["kind","message","raisedAt"],"properties":{"kind":{"type":"string","enum":["budgetThreshold","successRateBelowTarget","latencyAboveTarget","slaBreach"]},"message":{"type":"string"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"providerId":{"type":"string","format":"uuid"},"raisedAt":{"type":"string","format":"date-time"}}}},"slaTargets":{"type":"array","description":"Contractual provider targets, only where configured.","items":{"type":"object","required":["providerId","metric","target"],"properties":{"providerId":{"type":"string","format":"uuid"},"metric":{"type":"string","enum":["successRate","availabilityRate","averageDeliverySeconds"]},"target":{"type":"number"},"observed":{"type":"number"},"met":{"type":"boolean"}}}},"aiRecommendations":{"type":"array","description":"Advisory provider changes on cost/performance trade-offs.","items":{"type":"string"}}}},
-"RoutingPriorityThrottlingFallbackRulesView": {"type":"object","x-ticvai-persistence":"marketing.communication_routing_rule","description":"One routing rule, read by listRoutingPriorityThrottling and written by setCommunicationRoutingRule. Unset selectors match anything; a rule with more selectors set is more specific.\n","required":["id","channel","providers","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"channel":{"$ref":"#/components/schemas/MessageChannel"},"country":{"type":"string","pattern":"^[A-Z]{2}$"},"brandId":{"type":"string","format":"uuid"},"messageClass":{"type":"string","enum":["transactional","operational","service","marketing"]},"priorityClass":{"type":"string","enum":["P1","P2","P3","P4"]},"recipientType":{"type":"string","enum":["customer","partner","employee"]},"providers":{"type":"array","description":"Tried in order; a provider below minimum health is skipped.","items":{"type":"object","required":["providerId","role"],"properties":{"providerId":{"type":"string","format":"uuid"},"providerName":{"type":"string","readOnly":true},"role":{"type":"string","enum":["primary","secondary","emergencyFallback"]}}}},"skipUnhealthyProviders":{"type":"boolean","description":"Route past providers whose health is degraded or worse."},"costAware":{"type":"boolean","description":"Among providers meeting the service and compliance rules, prefer the cheapest."},"channelFallback":{"type":"array","description":"Alternate channels, in order, when delivery on this channel fails; used only where consent and preferences permit.","items":{"$ref":"#/components/schemas/MessageChannel"}},"throttle":{"type":"object","properties":{"messagesPerSecond":{"type":"integer","minimum":1},"messagesPerMinute":{"type":"integer","minimum":1},"brandMessagesPerMinute":{"type":"integer","minimum":1,"description":"Cap across every rule for the same brand."},"eventMessagesPerMinute":{"type":"integer","minimum":1,"description":"Cap per originating business event."}}},"isActive":{"type":"boolean"},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"Suppression": {"x-ticvai-persistence":"marketing.suppression","type":"object","required":["channel","address","reason","suppressedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"address":{"type":"string"},"reason":{"type":"string"},"suppressedAt":{"type":"string","format":"date-time"},"suppressedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
+"RoutingPriorityThrottlingFallbackRulesView": {"type":"object","x-ticvai-persistence":"marketing.communication_routing_rule","description":"One routing rule, read by listRoutingPriorityThrottling and written by setCommunicationRoutingRule. Unset selectors match anything; a rule with more selectors set is more specific.\n","required":["id","channel","providers","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"channel":{"$ref":"#/components/schemas/MessageChannel"},"country":{"type":"string","pattern":"^[A-Z]{2}$"},"brandId":{"type":"string","format":"uuid"},"messageClass":{"type":"string","enum":["transactional","operational","service","marketing"]},"priorityClass":{"type":"string","enum":["P1","P2","P3","P4"]},"recipientType":{"type":"string","enum":["customer","partner","employee"]},"providers":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"Tried in order; a provider below minimum health is skipped.","items":{"type":"object","required":["providerId","role"],"properties":{"providerId":{"type":"string","format":"uuid"},"providerName":{"type":"string","readOnly":true},"role":{"type":"string","enum":["primary","secondary","emergencyFallback"]}}}},"skipUnhealthyProviders":{"type":"boolean","description":"Route past providers whose health is degraded or worse."},"costAware":{"type":"boolean","description":"Among providers meeting the service and compliance rules, prefer the cheapest."},"channelFallback":{"type":"array","description":"Alternate channels, in order, when delivery on this channel fails; used only where consent and preferences permit.","items":{"$ref":"#/components/schemas/MessageChannel"}},"throttle":{"type":"object","properties":{"messagesPerSecond":{"type":"integer","minimum":1},"messagesPerMinute":{"type":"integer","minimum":1},"brandMessagesPerMinute":{"type":"integer","minimum":1,"description":"Cap across every rule for the same brand."},"eventMessagesPerMinute":{"type":"integer","minimum":1,"description":"Cap per originating business event."}}},"isActive":{"type":"boolean"},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"Suppression": {"x-ticvai-rls":"read-beneath","x-ticvai-persistence":"marketing.suppression","type":"object","required":["channel","address","reason","suppressedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"channel":{"$ref":"#/components/schemas/MessageChannel"},"address":{"type":"string"},"reason":{"type":"string"},"suppressedAt":{"type":"string","format":"date-time"},"suppressedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
 "SystemTransactionalTemplateRegistryView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.message_template, marketing.message_template_version (new), marketing.message_trigger","description":"One version of one template on one channel and language, with its content and variables.","required":["templateId","code","name","channel","language","version","status","ownership"],"properties":{"templateId":{"type":"string","format":"uuid","description":"marketing.message_template id."},"code":{"type":"string","description":"The human template ID (e.g. TICKET_CONFIRMATION)."},"name":{"type":"string"},"businessEvent":{"type":"string","description":"The registered business event this template answers (e.g. TicketIssued)."},"sourceModule":{"type":"string","enum":["crm","ticketing","membership","waiver","groupSales","customerService","finance","wallet","resourceManagement","accessControl","other"]},"channel":{"$ref":"#/components/schemas/MessageChannel"},"brandId":{"type":"string","format":"uuid"},"language":{"type":"string","description":"BCP 47 tag."},"version":{"type":"integer","minimum":1},"status":{"type":"string","enum":["draft","published","archived"]},"ownership":{"type":"string","enum":["platform","crm"],"description":"platform = transactional template owned here; crm = marketing template owned by CRM."},"subject":{"type":"string"},"header":{"type":"string"},"body":{"type":"string"},"footer":{"type":"string"},"ctaLabel":{"type":"string"},"ctaUrl":{"type":"string","description":"May contain variables, e.g. {{TicketLink}}."},"attachmentKinds":{"type":"array","items":{"type":"string","enum":["ticketPdf","invoicePdf","walletPass","calendarInvite","waiverPdf"]}},"variables":{"type":"array","description":"Dynamic variables the content uses (e.g. CustomerName, OrderNumber, EventDate, AmountDue).","items":{"type":"string"}},"publishedAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}},
 "TranslationProposals": {"type":"object","x-ticvai-persistence":"none — each draft is an ai.proposed_action row (one per block and language), applied to the block only when an operator saves it through the block's own write (ADR-0020); CHG-FXC-004","description":"What `proposeTranslations` drafted. **Every entry is a draft, never a publish** — a person edits and publishes it through the contract that owns the block.\n","required":["targetLocale","drafts"],"properties":{"targetLocale":{"type":"string"},"translationJobId":{"type":"string","format":"uuid","readOnly":true,"description":"The job to follow with `getTranslationProposals` (contract gap CHG-WIR-017, CMS-011; CHG-CSA-045)."},"status":{"type":"string","readOnly":true,"enum":["running","completed","failed"],"description":"`running` while drafts are still being written; `drafts` then holds those done so far."},"drafts":{"type":"array","items":{"type":"object","required":["targetKind","targetRef","draftText"],"properties":{"targetKind":{"type":"string","enum":["contentBlock","productName","emailTemplate","messageTemplate"]},"targetRef":{"type":"string","description":"The id of the block, product or template the draft sits on."},"draftText":{"type":"string","description":"The first-pass translation, as saved on the draft."}}}}}}
 }

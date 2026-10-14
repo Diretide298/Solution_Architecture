@@ -98,7 +98,7 @@
 | order | [`createFnbOrder`](#createfnborder) | POST | `/fnb-orders` | core | 1 | EMP-058, EMP-059, POS-022 |
 | order | [`getFnbOrder`](#getfnborder) | GET | `/fnb-orders/{orderId}` | core | 1 | BO-020, KIT-004 |
 | order | [`listFnbOrders`](#listfnborders) | GET | `/fnb-orders` | core | 1 | BO-020, BO-021, EMP-051, KIT-001, POS-029 |
-| production | [`setRecipe`](#setrecipe) | PUT | `/recipes` | setup | 1 | BO-111 |
+| production | [`setRecipe`](#setrecipe) | PUT | `/recipes/{recipeId}` | setup | 1 | BO-111 |
 | service | [`acceptFnbOrder`](#acceptfnborder) | POST | `/fnb-orders/{orderId}/accept` | core | 1 | BO-020, POS-029 |
 | service | [`cancelFnbOrder`](#cancelfnborder) | POST | `/fnb-orders/{orderId}/cancel` | core | 1 | BO-020, POS-022 |
 | table | [`clearTable`](#cleartable) | POST | `/tables/{tableId}/clear` | core | 1 | POS-028 |
@@ -126,7 +126,7 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 | Scope level | workstation |
 | Part of slice | core |
 | Wave | 1 |
-| Offline | no |
+| Offline | yes |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line`, `fnb.service_order`, `fnb.service_order_line`, `fnb.table_visit` |
 | Writes | `cache:idempotency`, `fnb.service_order`, `fnb.table_visit` |
@@ -203,6 +203,7 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 | visit.closedAt | string (date-time) |  | (nullable) |
 | visit.serviceStage | string |  | Where the table is in its service (4 October 2026, CHG-FXC-003): the last stage setServiceStage recorded (its stage value), null before the first. (read-only; nullable) |
 | visit.serviceStageRecordedAt | string (date-time) |  | (read-only; nullable) |
+| visit.note | string |  | The server's note on the visit (updateTableVisit). (max length 500; read-only; nullable) |
 | orderIds | array of string | yes |  |
 
 **Responses**
@@ -423,13 +424,14 @@ Board 2E. **Attachment is separate from definition** because that is what makes 
 | sortOrder | integer |  |  |
 | modifierGroupIds | array of string (uuid) |  |  |
 | stationId | string (uuid) |  | (nullable) |
-| menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
+| menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | isStockTracked | boolean |  | True where a recipe exists. |
 | isAvailable | boolean | yes |  |
 | unavailableReason | string |  | (nullable) |
 | restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | preparationMinutes | integer |  | (nullable) |
 | allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| unavailableNote | string |  | The free text with an other unavailable reason (setItemAvailability); reviewed quarterly so the common ones become reasons (audit R222). (max length 500; read-only; nullable) |
 
 **Responses**
 
@@ -471,10 +473,11 @@ Board 2M. **Demand forecast through recipes to quantities per item and per stati
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| id | string (uuid) | yes | (read-only) |
 | outletId | string (uuid) |  |  |
 | forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone; a business date, closing at the venue's businessDayCutoff (tenancy VenueSettings, default 00:00; CHG-R6-032). |
-| status | enum (draft, released, superseded, cancelled) | yes |  |
+| status | enum (draft, released, superseded, cancelled) | yes | (read-only) |
 | basedOnSuggestionId | string (uuid) |  | The forecast it started from. (nullable) |
 | lines | array of object | yes |  |
 | lines[].itemId | string (uuid) | yes |  |
@@ -488,10 +491,11 @@ Board 2M. **Demand forecast through recipes to quantities per item and per stati
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| id | string (uuid) | yes | (read-only) |
 | outletId | string (uuid) |  |  |
 | forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone; a business date, closing at the venue's businessDayCutoff (tenancy VenueSettings, default 00:00; CHG-R6-032). |
-| status | enum (draft, released, superseded, cancelled) | yes |  |
+| status | enum (draft, released, superseded, cancelled) | yes | (read-only) |
 | basedOnSuggestionId | string (uuid) |  | The forecast it started from. (nullable) |
 | lines | array of object | yes |  |
 | lines[].itemId | string (uuid) | yes |  |
@@ -547,6 +551,7 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Chased |
+| 409 |  | The ticket is already served or cancelled; there is nothing left to chase. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createTableReservation
@@ -899,6 +904,7 @@ Board 3 of the client F&B pack. **`KitchenTicket.coursing` carried the policy �
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Fired |
+| 409 |  | The ticket is already served or cancelled; there is no course left to fire. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getCourseRules
@@ -1108,6 +1114,7 @@ Board 3. **The other half of firing, and the one that gets forgotten.** A table 
 |---|---|---|
 | 400 | BadRequest | Validation failed |
 | 200 |  | Held |
+| 409 |  | The ticket is already served or cancelled; there is no course left to hold. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### joinRestaurantWaitlist
@@ -1148,7 +1155,7 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | partySize | integer | yes |  |
 | quotedWaitMinutes | integer |  | (nullable) |
 | seatingPreference | enum (any, indoor, outdoor, bar, booth, highChair) |  | (nullable) |
-| status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes |  |
+| status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes | (read-only) |
 | notifiedAt | string (date-time) |  | (nullable) |
 | recordedAt | string (date-time) | yes | When the party joined, on the device. |
 | syncedAt | string (date-time) |  | (read-only; nullable) |
@@ -1164,7 +1171,7 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | partySize | integer | yes |  |
 | quotedWaitMinutes | integer |  | (nullable) |
 | seatingPreference | enum (any, indoor, outdoor, bar, booth, highChair) |  | (nullable) |
-| status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes |  |
+| status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes | (read-only) |
 | notifiedAt | string (date-time) |  | (nullable) |
 | recordedAt | string (date-time) | yes | When the party joined, on the device. |
 | syncedAt | string (date-time) |  | (read-only; nullable) |
@@ -1222,7 +1229,7 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | partySize | integer | yes |  |
 | quotedWaitMinutes | integer |  | (nullable) |
 | seatingPreference | enum (any, indoor, outdoor, bar, booth, highChair) |  | (nullable) |
-| status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes |  |
+| status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes | (read-only) |
 | notifiedAt | string (date-time) |  | (nullable) |
 | recordedAt | string (date-time) | yes | When the party joined, on the device. |
 | syncedAt | string (date-time) |  | (read-only; nullable) |
@@ -1243,6 +1250,9 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 
 Board 5J. **`setItemAvailability` records the current state and not the history.** An item 86'd at 7pm on a Saturday is a lost-sales figure and a prep-planning signal, and the package kept only the flag.
 **86 is a kitchen word and a real event.** Time off, time back, who called it, and what it cost in refused orders.
+
+
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first).
 
 |  |  |
 |---|---|
@@ -1296,6 +1306,9 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 **`GET /me/table-reservations`**: The guest's own table bookings and waitlist places
 
 **What GST-070 lists under "Your reservations"** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-013). The caller's own table reservations (`createTableReservation`) and restaurant waitlist entries (`joinRestaurantWaitlist`), across the venues of the tenant. **Ordered by** the booking's time, soonest first (a waitlist entry by when it was joined), the row's id as the tiebreak. **Self-scoped**: the subject is the session's, never a parameter, so the list cannot be asked for anybody else; `listTableReservations` stays the host's list under `ORDER_MODIFY`. A signed-out guest has no list (401).
+
+
+**Order.** Soonest first, by `startsAt` ascending (a waitlist entry by `recordedAt`), then by `id`.
 
 |  |  |
 |---|---|
@@ -1354,7 +1367,7 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | items[].waitlistEntry.partySize | integer | yes |  |
 | items[].waitlistEntry.quotedWaitMinutes | integer |  | (nullable) |
 | items[].waitlistEntry.seatingPreference | enum (any, indoor, outdoor, bar, booth, highChair) |  | (nullable) |
-| items[].waitlistEntry.status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes |  |
+| items[].waitlistEntry.status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes | (read-only) |
 | items[].waitlistEntry.notifiedAt | string (date-time) |  | (nullable) |
 | items[].waitlistEntry.recordedAt | string (date-time) | yes | When the party joined, on the device. |
 | items[].waitlistEntry.syncedAt | string (date-time) |  | (read-only; nullable) |
@@ -1424,6 +1437,10 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 **`GET /table-reservations`**: Bookings for a service period
 
 5.1.1. **The bookings for a service period.** A host needs to know what is booked and what is actually free, and those differ all evening — the live table state is `getTableMap` on the same outlet, read alongside this. A reservation carries its tables and, once seated, its `tableVisitId`; it does not carry the table's state.
+
+
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+**Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.
 
 |  |  |
 |---|---|
@@ -1521,6 +1538,7 @@ Board 5G. **A delivery arriving warm is a rejection decision made at the door**,
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | goodsReceiptId | string (uuid) |  | (nullable) |
 | transferId | string (uuid) |  | (nullable) |
@@ -1535,6 +1553,7 @@ Board 5G. **A delivery arriving warm is a rejection decision made at the door**,
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | goodsReceiptId | string (uuid) |  | (nullable) |
 | transferId | string (uuid) |  | (nullable) |
@@ -1593,6 +1612,7 @@ Board 3. **Equipment down, an item run out mid-ticket, a delivery late, a statio
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | outletId | string (uuid) |  |  |
 | stationId | string (uuid) |  | (nullable) |
@@ -1642,6 +1662,7 @@ Board 5J. **HACCP records are a UAE regulatory obligation and nothing in the pac
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | checkPointId | string (uuid) | yes | The unit, station or delivery being read. |
 | checkPointKind | enum (fridge, freezer, holdingCabinet, blastChiller, coreProbe, delivery, displayCounter, ambient) |  |  |
@@ -1659,6 +1680,7 @@ Board 5J. **HACCP records are a UAE regulatory obligation and nothing in the pac
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | log | TemperatureLog |  | Board 5J of the client F&B pack, 20 August. |
+| log.scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | log.id | string (uuid) | yes |  |
 | log.checkPointId | string (uuid) | yes | The unit, station or delivery being read. |
 | log.checkPointKind | enum (fridge, freezer, holdingCabinet, blastChiller, coreProbe, delivery, displayCounter, ambient) |  |  |
@@ -1806,6 +1828,7 @@ Board 3. **`recordOrderHandover` exists for a staff handover; a collection count
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Collected. |
+| 409 |  | The order is not ready yet (ordered, accepted or inPreparation; fnb-order-not-ready), was already handed over (served, collected, delivered or refunded; order-already-fulfilled), or was cancelled (fn… |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### notifyServer
@@ -1822,7 +1845,7 @@ Board 3 and Board 4. **Food ready and nobody collecting it is the commonest reas
 | Scope level | venue |
 | Part of slice | core |
 | Wave | 1 |
-| Offline | no |
+| Offline | yes |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.table_visit`, `identity.principal` |
 | Writes | `cache:idempotency`, `marketing.message_dispatch` |
@@ -1846,6 +1869,7 @@ Board 3 and Board 4. **Food ready and nobody collecting it is the commonest reas
 | Code | Shape | Meaning |
 |---|---|---|
 | 202 |  | Sent |
+| 409 |  | The visit is settled, merged or cancelled; nobody is called to the pass for a closed table. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### printOrderLabel
@@ -1896,6 +1920,7 @@ A label that omits an allergen on a sealed bag is the failure mode this exists t
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Label content |
+| 409 |  | The ticket is cancelled; there is no order to bag. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### publishMenu
@@ -1970,13 +1995,14 @@ Board 2. **`updateMenu` existed, so a menu edited was a menu live** — no draft
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
-| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
+| sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
 | sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
 | sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| sections[].items[].unavailableNote | string |  | The free text with an other unavailable reason (setItemAvailability); reviewed quarterly so the common ones become reasons (audit R222). (max length 500; read-only; nullable) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
 **Responses**
@@ -1984,6 +2010,7 @@ Board 2. **`updateMenu` existed, so a menu edited was a menu live** — no draft
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Published, or scheduled. |
+| 409 |  | The menu has no draft changes since the live version, so there is nothing to publish. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### rebalanceStationLoad
@@ -2189,6 +2216,7 @@ Board 3. **A refire is not a new order and it must not be.** It is the same line
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Refired |
+| 409 |  | The ticket is cancelled; a cancelled order is not made again. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### releaseProductionPlan
@@ -2224,10 +2252,11 @@ The label matters: planned quantities against the forecast are what make a model
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| id | string (uuid) | yes | (read-only) |
 | outletId | string (uuid) |  |  |
 | forDate | string (date) | yes | The trading day this prep list is for, in the Region's time zone; a business date, closing at the venue's businessDayCutoff (tenancy VenueSettings, default 00:00; CHG-R6-032). |
-| status | enum (draft, released, superseded, cancelled) | yes |  |
+| status | enum (draft, released, superseded, cancelled) | yes | (read-only) |
 | basedOnSuggestionId | string (uuid) |  | The forecast it started from. (nullable) |
 | lines | array of object | yes |  |
 | lines[].itemId | string (uuid) | yes |  |
@@ -2242,6 +2271,7 @@ The label matters: planned quantities against the forecast are what make a model
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Released, with the runs it created |
+| 409 |  | The plan is not a draft (already released, superseded or cancelled); only a draft is released. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### requestBill
@@ -2357,12 +2387,14 @@ Reversible. A party that asks for the bill and then orders another round is norm
 | closedAt | string (date-time) |  | (nullable) |
 | serviceStage | string |  | Where the table is in its service (4 October 2026, CHG-FXC-003): the last stage setServiceStage recorded (its stage value), null before the first. (read-only; nullable) |
 | serviceStageRecordedAt | string (date-time) |  | (read-only; nullable) |
+| note | string |  | The server's note on the visit (updateTableVisit). (max length 500; read-only; nullable) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Bill requested |
+| 409 |  | The bill is already requested (table-visit-bill-already-requested), or the visit is settled, merged or cancelled (table-visit-closed). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### rollbackMenu
@@ -2433,13 +2465,14 @@ Board 2. **The reason to version a menu at all.** A price published wrong at 11a
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
-| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
+| sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
 | sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
 | sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| sections[].items[].unavailableNote | string |  | The free text with an other unavailable reason (setItemAvailability); reviewed quarterly so the common ones become reasons (audit R222). (max length 500; read-only; nullable) |
 | scopePath | string |  | The partition key (ADR-0005). (read-only) |
 
 **Responses**
@@ -2447,6 +2480,7 @@ Board 2. **The reason to version a menu at all.** A price published wrong at 11a
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Rolled back as a new version |
+| 409 |  | toVersion is the version already live (menu-version-already-live), or was never published (draft or scheduled; menu-version-not-published). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### scheduleMenuPublish
@@ -3003,6 +3037,7 @@ BL-125. **A shift change mid-service leaves a check with a server who has gone h
 | closedAt | string (date-time) |  | (nullable) |
 | serviceStage | string |  | Where the table is in its service (4 October 2026, CHG-FXC-003): the last stage setServiceStage recorded (its stage value), null before the first. (read-only; nullable) |
 | serviceStageRecordedAt | string (date-time) |  | (read-only; nullable) |
+| note | string |  | The server's note on the visit (updateTableVisit). (max length 500; read-only; nullable) |
 
 **Responses**
 
@@ -3010,6 +3045,7 @@ BL-125. **A shift change mid-service leaves a check with a server who has gone h
 |---|---|---|
 | 200 |  | Transferred. |
 | 400 | BadRequest | Validation failed |
+| 409 |  | The visit is settled, merged or cancelled; only an open or billRequested check changes server. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateTableReservation
@@ -3040,30 +3076,25 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
-**Request body**: `TableReservation`
+**Request body**: `UpdateTableReservationRequest`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| outletId | string (uuid) | yes |  |
+| outletId | string (uuid) |  |  |
 | subjectId | string (uuid) |  | (nullable) |
 | guestName | string |  |  |
 | contactPoint | string |  |  |
-| partySize | integer | yes | (min 1) |
-| startsAt | string (date-time) | yes |  |
+| partySize | integer |  | (min 1) |
+| startsAt | string (date-time) |  |  |
 | durationMinutes | integer |  | How long the cover is held. |
 | tables | array of FnbReservationTable |  | The dining tables assigned to this reservation, one row each. |
 | tables[].reservationId | string (uuid) | yes |  |
 | tables[].tableId | string (uuid) | yes |  |
 | tables[].createdAt | string (date-time) | yes |  |
 | status | TableReservationStatus: enum (awaitingDeposit, booked, confirmed, seated, completed, cancelled, noShow) |  | awaitingDeposit only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts booked. |
-| groupId | string (uuid) |  | 5.1.2. (nullable) |
 | notes | string |  | Allergies, accessibility needs and other requests, as the guest wrote them. |
 | seatingPreference | string |  | The seating area the guest asked for, e.g. (max length 64; nullable) |
 | occasion | enum (birthday, anniversary, business, celebration, other) |  | The occasion the guest named (workbook Q204, DI-337; CHG-CSA-018). (nullable) |
-| takenByPrincipalId | string (uuid) |  | The staff member who took the booking (createTableReservationForGuest); null for a guest's own booking (CHG-CSA-045). (read-only; nullable) |
-| actualPartySize | integer |  | (read-only; nullable) |
-| tableVisitId | string (uuid) |  | (read-only; nullable) |
 | deposit | TableReservationDeposit |  | The deposit this booking holds, snapshotted from orders.DepositPolicy.dining when it was made (decided 29 September, rev 3 REV3-8b). (read-only; nullable) |
 | deposit.amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | deposit.amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -3075,7 +3106,6 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | deposit.variantId | string (uuid) |  | The venue's table-deposit variant, DepositPolicy.dining.depositVariantId, which the client sends to addCartLine with this booking's id. |
 | deposit.cartLineId | string (uuid) |  | The orders.CartLine carrying the deposit, once added. (nullable) |
 | deposit.depositId | string (uuid) |  | The orders.deposit row, once the payment is authorised. (nullable) |
-| createdAt | string (date-time) |  | (read-only) |
 
 **Response**: `TableReservation`
 
@@ -3188,7 +3218,7 @@ location's codes bumps its `codeGeneration`, which retires every code printed be
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Attached, joining an open visit where one exists |
-| 400 |  | Neither a location code nor a seat reference supplied |
+| 400 |  | Neither a location code nor a seatReference supplied |
 | 409 |  | Code expired or unknown, the location is out of service, or no outlet currently delivers to it — a cabana is useless as an address if nothing serves it. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -3663,6 +3693,9 @@ The order's `FnbOrderStatus` — ordered, accepted, inPreparation, ready, then s
 They are one concept because a runner needs one instruction, and a guest needs one way to say where they are.
 **Staff read it too** (contract gap logged in CHG-WIR-011 for BO-065; CHG-CSA-045): the venue configuration screen lists the locations it creates and edits (`createDeliveryLocation`, `updateDeliveryLocation`). A staff token was already accepted; the audience now says so.
 
+
+**Order.** Sorted by `label` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `None` |
@@ -3719,6 +3752,9 @@ They are one concept because a runner needs one instruction, and a guest needs o
 
 The dining list in the guest app. Returns outlets that are **open now**, not every outlet configured — a guest shown a restaurant that closed an hour ago walks there.
 Ordering method is stated per outlet, because it varies within one venue: a table service restaurant, a counter that takes app orders for collection, and a bar that does neither are all normal.
+
+
+**Order.** Sorted by `name` ascending, then by `outletId`.
 
 |  |  |
 |---|---|
@@ -3777,6 +3813,9 @@ Ordering method is stated per outlet, because it varies within one venue: a tabl
 **`GET /outlets/{outletId}/fulfilment-slots`**: Collection times or delivery windows still open
 
 Computed from the outlet's `FnbDeliveryPolicy` and its current load: ASAP plus fixed slots. A slot closes when the kitchen cannot make it, so the guest never picks a time that will be missed.
+
+
+**Order.** Soonest first, by `start` ascending.
 
 |  |  |
 |---|---|
@@ -4092,6 +4131,8 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 
 **`GET /kitchen/stations`**: List preparation stations and their routing
 
+**Order.** Sorted by `name` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -4118,6 +4159,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | items | array of KitchenStation | yes |  |
+| items[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | items[].id | string (uuid) | yes |  |
 | items[].code | string | yes |  |
 | items[].name | string | yes |  |
@@ -4157,7 +4199,7 @@ The rail. Read by P15 Kitchen Display — TICVAI's own kitchen display on commod
 | Read routing | replica |
 | Reads | `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line` |
 | Writes | - |
-| Called by | BO-020, BO-046, KIT-001, KIT-002, KIT-003, KIT-004, KIT-005, KIT-006, KIT-007, KIT-008, POS-022 |
+| Called by | BO-020, BO-046, KIT-001, KIT-002, KIT-003, KIT-004, KIT-005, KIT-006, KIT-007, KIT-008, KIT-009, POS-022 |
 
 **Parameters**
 
@@ -4225,7 +4267,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 | Scope level | venue |
 | Part of slice | core |
 | Wave | 1 |
-| Offline | no |
+| Offline | yes |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line` |
 | Writes | `cache:idempotency`, `fnb.kitchen_ticket` |
@@ -4284,6 +4326,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Prioritised |
+| 409 |  | The ticket is already ready (kitchen-ticket-already-ready), or served or cancelled (kitchen-ticket-closed); only a ticket still being made can move up the queue. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setKitchenTicketStatus
@@ -4434,13 +4477,14 @@ Called by P15 Kitchen Display, or the back-office and till views of the rail. St
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
-| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
+| sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
 | sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
 | sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| sections[].items[].unavailableNote | string |  | The free text with an other unavailable reason (setItemAvailability); reviewed quarterly so the common ones become reasons (audit R222). (max length 500; read-only; nullable) |
 | isActive | boolean | yes |  |
 | publishedVersion | integer |  | The MenuVersion.version live now. (read-only; nullable) |
 | publishedAt | string (date-time) |  | (read-only; nullable) |
@@ -4451,6 +4495,7 @@ Called by P15 Kitchen Display, or the back-office and till views of the rail. St
 |---|---|---|
 | 201 |  | Created. |
 | 400 | BadRequest | Validation failed |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setItemAvailability
@@ -4507,13 +4552,14 @@ The most-used endpoint in a live kitchen. A sold-out item must disappear from ev
 | sortOrder | integer |  |  |
 | modifierGroupIds | array of string (uuid) |  |  |
 | stationId | string (uuid) |  | (nullable) |
-| menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
+| menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | isStockTracked | boolean |  | True where a recipe exists. |
 | isAvailable | boolean | yes |  |
 | unavailableReason | string |  | (nullable) |
 | restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | preparationMinutes | integer |  | (nullable) |
 | allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| unavailableNote | string |  | The free text with an other unavailable reason (setItemAvailability); reviewed quarterly so the common ones become reasons (audit R222). (max length 500; read-only; nullable) |
 
 **Responses**
 
@@ -4571,13 +4617,14 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
-| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
+| sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
 | sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
 | sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| sections[].items[].unavailableNote | string |  | The free text with an other unavailable reason (setItemAvailability); reviewed quarterly so the common ones become reasons (audit R222). (max length 500; read-only; nullable) |
 
 **Response**: `Menu`
 
@@ -4609,13 +4656,14 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
-| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
+| sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
 | sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
 | sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| sections[].items[].unavailableNote | string |  | The free text with an other unavailable reason (setItemAvailability); reviewed quarterly so the common ones become reasons (audit R222). (max length 500; read-only; nullable) |
 | isActive | boolean | yes |  |
 | publishedVersion | integer |  | The MenuVersion.version live now. (read-only; nullable) |
 | publishedAt | string (date-time) |  | (read-only; nullable) |
@@ -4696,13 +4744,14 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | sections[].items[].sortOrder | integer |  |  |
 | sections[].items[].modifierGroupIds | array of string (uuid) |  |  |
 | sections[].items[].stationId | string (uuid) |  | (nullable) |
-| sections[].items[].menuSectionId | string (uuid) |  | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only; nullable) |
+| sections[].items[].menuSectionId | string (uuid) | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). (read-only) |
 | sections[].items[].isStockTracked | boolean |  | True where a recipe exists. |
 | sections[].items[].isAvailable | boolean | yes |  |
 | sections[].items[].unavailableReason | string |  | (nullable) |
 | sections[].items[].restoreAt | string (date-time) |  | When an unavailable item comes back on its own (setItemAvailability). (nullable) |
 | sections[].items[].preparationMinutes | integer |  | (nullable) |
 | sections[].items[].allergens | array of AllergenCode: enum (gluten, crustaceans, eggs, fish, peanuts, soybeans, milk, nuts, …) |  |  |
+| sections[].items[].unavailableNote | string |  | The free text with an other unavailable reason (setItemAvailability); reviewed quarterly so the common ones become reasons (audit R222). (max length 500; read-only; nullable) |
 | isActive | boolean | yes |  |
 | publishedVersion | integer |  | The MenuVersion.version live now. (read-only; nullable) |
 | publishedAt | string (date-time) |  | (read-only; nullable) |
@@ -4746,7 +4795,7 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes |  |
 | name | string | yes |  |
 | minSelections | integer | yes | Greater than zero makes the group required. (min 0) |
@@ -4767,7 +4816,7 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes |  |
 | name | string | yes |  |
 | minSelections | integer | yes | Greater than zero makes the group required. (min 0) |
@@ -4790,6 +4839,7 @@ Groups carry selection constraints — minimum, maximum, required. A burger that
 |---|---|---|
 | 201 |  | Created |
 | 400 |  | Constraints are unsatisfiable — minimum exceeds available options. |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -5038,6 +5088,8 @@ Offline behaviour depends on the items: an order containing only untracked items
 
 **`GET /fnb-orders`**: List F&B orders
 
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -5134,7 +5186,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 
 ### setRecipe
 
-**`PUT /recipes`**: Define a recipe for a menu item
+**`PUT /recipes/{recipeId}`**: Define a recipe for a menu item
 
 **Saving re-runs `verifyAllergens`** for the menu item (decided 28 September, audit R241), and **recomputes `costPerPortion`** from the ingredients (audit R125 (9)). A cost sent in the body is ignored.
 
@@ -5154,6 +5206,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| recipeId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | If-Match | header |  | string | Optimistic concurrency for serverWins (system-design review SD-013, 29 September; ADR-0031). |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
@@ -5480,7 +5533,8 @@ Before acceptance this is a refusal and needs no approval. **After acceptance th
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| id | string (uuid) | yes | (read-only) |
 | label | string | yes | The table code, unique per venue (decided 28 September, audit R108). (max length 32) |
 | capacity | integer | yes | (min 1) |
 | zone | string |  | (nullable) |
@@ -5505,6 +5559,7 @@ Before acceptance this is a refusal and needs no approval. **After acceptance th
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Cleared |
+| 409 |  | The table has an open bill (ordered or billRequested; table-has-open-bill) or is reserved (table-reserved); it is cleared only from seated, needsClearing, free or outOfService. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getTableMap
@@ -5539,7 +5594,8 @@ The floor as the server sees it — free, seated, ordered, bill requested, needs
 | outletId | string (uuid) | yes |  |
 | zones | array of string |  |  |
 | tables | array of TableState | yes |  |
-| tables[].id | string (uuid) | yes |  |
+| tables[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| tables[].id | string (uuid) | yes | (read-only) |
 | tables[].label | string | yes | The table code, unique per venue (decided 28 September, audit R108). (max length 32) |
 | tables[].capacity | integer | yes | (min 1) |
 | tables[].zone | string |  | (nullable) |
@@ -5670,6 +5726,7 @@ The floor as the server sees it — free, seated, ordered, bill requested, needs
 | closedAt | string (date-time) |  | (nullable) |
 | serviceStage | string |  | Where the table is in its service (4 October 2026, CHG-FXC-003): the last stage setServiceStage recorded (its stage value), null before the first. (read-only; nullable) |
 | serviceStageRecordedAt | string (date-time) |  | (read-only; nullable) |
+| note | string |  | The server's note on the visit (updateTableVisit). (max length 500; read-only; nullable) |
 
 **Responses**
 
@@ -5796,6 +5853,7 @@ Covers is captured at seating because it drives split-by-covers at close.
 | closedAt | string (date-time) |  | (nullable) |
 | serviceStage | string |  | Where the table is in its service (4 October 2026, CHG-FXC-003): the last stage setServiceStage recorded (its stage value), null before the first. (read-only; nullable) |
 | serviceStageRecordedAt | string (date-time) |  | (read-only; nullable) |
+| note | string |  | The server's note on the visit (updateTableVisit). (max length 500; read-only; nullable) |
 
 **Responses**
 
@@ -5842,7 +5900,8 @@ covers, is refused with 409 `tableHasOpenVisit` (an `FnbProblem` reason), read f
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | tables | array of TableDefinition | yes |  |
-| tables[].id | string (uuid) | yes |  |
+| tables[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| tables[].id | string (uuid) | yes | (read-only) |
 | tables[].label | string | yes | The table code, unique per venue (decided 28 September, audit R108). (max length 32) |
 | tables[].capacity | integer | yes | (min 1) |
 | tables[].zone | string |  | (nullable) |
@@ -5860,7 +5919,8 @@ covers, is refused with 409 `tableHasOpenVisit` (an `FnbProblem` reason), read f
 | outletId | string (uuid) | yes |  |
 | zones | array of string |  |  |
 | tables | array of TableState | yes |  |
-| tables[].id | string (uuid) | yes |  |
+| tables[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
+| tables[].id | string (uuid) | yes | (read-only) |
 | tables[].label | string | yes | The table code, unique per venue (decided 28 September, audit R108). (max length 32) |
 | tables[].capacity | integer | yes | (min 1) |
 | tables[].zone | string |  | (nullable) |
@@ -6004,6 +6064,7 @@ Moving a party to another table is routine and must not lose the visit. The visi
 | closedAt | string (date-time) |  | (nullable) |
 | serviceStage | string |  | Where the table is in its service (4 October 2026, CHG-FXC-003): the last stage setServiceStage recorded (its stage value), null before the first. (read-only; nullable) |
 | serviceStageRecordedAt | string (date-time) |  | (read-only; nullable) |
+| note | string |  | The server's note on the visit (updateTableVisit). (max length 500; read-only; nullable) |
 
 **Responses**
 
@@ -6043,6 +6104,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | goods_receipt_id | uuid | no |  |
 | transfer_id | uuid | no |  |
@@ -6126,13 +6188,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | free_delivery_above | numeric(18,4) | no |  |
 | radius_km | numeric | no |  |
 | emirates_served | text[] | no |  |
-| cutlery_opt_in | boolean | no | Cutlery only when asked for, as in the design. |
+| is_cutlery_opted_in | boolean | no | Cutlery only when asked for, as in the design. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
 ### `fnb.dining_table`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | label | text | yes | The table code, unique per venue (decided 28 September, audit R108). |
 | capacity | integer | yes |  |
@@ -6147,6 +6210,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | outlet_id | uuid | no |  |
 | station_id | uuid | no |  |
@@ -6169,6 +6233,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | code | text | yes |  |
 | name | text | yes |  |
@@ -6230,7 +6295,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | label | text | yes |  |
 | outlet_id | uuid | no | The outlet serving this location. |
 | visit_id | uuid | no | The table visit this session orders onto, where the location is a table. |
-| joined_existing_visit | boolean | no |  |
+| has_joined_existing_visit | boolean | no |  |
 | subject_id | uuid | no |  |
 | expires_at | timestamptz | yes | Sessions expire so a guest who leaves cannot order to a lounger now occupied by someone else. |
 | venue_id | uuid | no | Points at platform.org_unit. |
@@ -6262,13 +6327,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 | sort_order | integer | no |  |
 | modifier_group_ids | text[] | no |  |
 | station_id | uuid | no |  |
-| menu_section_id | uuid | no | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). |
+| menu_section_id | uuid | yes | The section the item sits in, set by setMenuSections and applyMenuActions (moveSection). |
 | is_stock_tracked | boolean | no | True where a recipe exists. |
 | is_available | boolean | yes |  |
 | unavailable_reason | text | no |  |
 | restore_at | timestamptz | no | When an unavailable item comes back on its own (setItemAvailability). |
 | preparation_minutes | integer | no |  |
 | allergens | text[] | no |  |
+| unavailable_note | text | no | The free text with an other unavailable reason (setItemAvailability); reviewed quarterly so the common ones become reasons (audit R222). |
 
 ### `fnb.menu_item_modifier`
 
@@ -6363,6 +6429,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | outlet_id | uuid | no |  |
 | for_date | date | yes | The trading day this prep list is for, in the Region's time zone; a business date, closing at the venue's businessDayCutoff (tenancy VenueSettings, default 00:00; CHG-R6-032). |
@@ -6562,7 +6629,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | table_id | uuid | yes |  |
 | table_label | text | yes |  |
 | visit_id | uuid | yes | The table visit this session orders onto. |
-| joined_existing_visit | boolean | no |  |
+| has_joined_existing_visit | boolean | no |  |
 | subject_id | uuid | no |  |
 | expires_at | timestamptz | yes | Sessions expire so a guest who leaves cannot order to a table now occupied by someone else. |
 
@@ -6586,11 +6653,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 | closed_at | timestamptz | no |  |
 | service_stage | text | no | Where the table is in its service (4 October 2026, CHG-FXC-003): the last stage setServiceStage recorded (its stage value), null before the first. |
 | service_stage_recorded_at | timestamptz | no |  |
+| note | text | no | The server's note on the visit (updateTableVisit). |
 
 ### `fnb.temperature_log`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | check_point_id | uuid | yes | The unit, station or delivery being read. |
 | check_point_kind | text | no |  |

@@ -245,6 +245,7 @@
     "format": "uuid"
    },
    "moduleId": {
+    "x-ticvai-references": "identity.module",
     "type": "string",
     "format": "uuid"
    },
@@ -715,6 +716,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -769,6 +771,7 @@
     "format": "uuid"
    },
    "username": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "displayName": {
@@ -1052,6 +1055,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

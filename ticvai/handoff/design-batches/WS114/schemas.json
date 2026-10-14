@@ -186,6 +186,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -272,6 +273,20 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "statusEffectiveFrom": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the status `setAccreditationStatus` set takes effect."
+   },
+   "statusReviewAt": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When the status is due for review (`setAccreditationStatus`)."
    }
   }
  },
@@ -330,6 +345,8 @@
     "format": "uuid"
    },
    "rules": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

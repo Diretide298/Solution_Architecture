@@ -5,11 +5,12 @@
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/stock-levels",
-   "component": "apps/venue-management-web/src/routes/venue-operations/StockLevelsDetail.tsx",
+   "component": "src/routes/venue-operations/StockLevelsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -333,11 +334,12 @@
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/stock-count",
-   "component": "apps/venue-management-web/src/routes/venue-operations/StockCountDetail.tsx",
+   "component": "src/routes/venue-operations/StockCountDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -451,11 +453,12 @@
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PROCUREMENT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/purchase-orders",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PurchaseOrdersDetail.tsx",
+   "component": "src/routes/venue-operations/PurchaseOrdersDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -770,11 +773,12 @@
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PROCUREMENT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/goods-receipt",
-   "component": "apps/venue-management-web/src/routes/venue-operations/GoodsReceiptDetail.tsx",
+   "component": "src/routes/venue-operations/GoodsReceiptDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1105,11 +1109,12 @@
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 1,
+  "permission": "PROCUREMENT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/inventory/requisitions",
-   "component": "apps/venue-management-web/src/routes/inventory/Requisitions.tsx",
+   "component": "src/routes/inventory/Requisitions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1499,11 +1504,12 @@
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/inventory/stock-count",
-   "component": "apps/venue-management-web/src/routes/inventory/StockCount.tsx",
+   "component": "src/routes/inventory/StockCount.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1970,11 +1976,12 @@
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/inventory/stock-transfers",
-   "component": "apps/venue-management-web/src/routes/inventory/StockTransfers.tsx",
+   "component": "src/routes/inventory/StockTransfers.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2271,11 +2278,12 @@
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/inventory/inventory-items",
-   "component": "apps/venue-management-web/src/routes/inventory/InventoryItems.tsx",
+   "component": "src/routes/inventory/InventoryItems.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2645,11 +2653,12 @@
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/inventory/stock-movements",
-   "component": "apps/venue-management-web/src/routes/inventory/StockMovements.tsx",
+   "component": "src/routes/inventory/StockMovements.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2925,11 +2934,12 @@
   "module": "Stock & Supply",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PROCUREMENT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/inventory/suppliers",
-   "component": "apps/venue-management-web/src/routes/inventory/Suppliers.tsx",
+   "component": "src/routes/inventory/Suppliers.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3089,7 +3099,7 @@
    {
     "operationId": "getSupplierPerformance",
     "contract": "reporting",
-    "purpose": "getSupplierPerformance",
+    "purpose": "On-time, in-full, and what was rejected",
     "trigger": "onAction"
    },
    {

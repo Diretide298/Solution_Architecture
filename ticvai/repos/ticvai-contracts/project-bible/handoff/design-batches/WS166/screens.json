@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/import-command-center-bo-963",
-   "component": "apps/venue-management-web/src/routes/access-venue/ImportCommandCenter.tsx",
+   "component": "src/routes/access-venue/ImportCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -148,7 +149,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatMapImport",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatMapImport"
       }
      ]
     }
@@ -226,6 +228,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "2",
@@ -235,7 +238,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/pdf-image-import-bo-964",
-   "component": "apps/venue-management-web/src/routes/access-venue/PdfImageImport.tsx",
+   "component": "src/routes/access-venue/PdfImageImport.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -291,7 +294,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getImportJob",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getImportJob"
       },
       {
        "kind": "secondaryButton",
@@ -375,6 +379,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "2",
@@ -384,7 +389,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/svg-cad-import-bo-965",
-   "component": "apps/venue-management-web/src/routes/access-venue/SvgCadImport.tsx",
+   "component": "src/routes/access-venue/SvgCadImport.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -440,7 +445,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getImportJob",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getImportJob"
       },
       {
        "kind": "secondaryButton",
@@ -524,6 +530,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "2",
@@ -533,7 +540,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/csv-excel-import-bo-966",
-   "component": "apps/venue-management-web/src/routes/access-venue/CsvExcelImport.tsx",
+   "component": "src/routes/access-venue/CsvExcelImport.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -589,7 +596,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getImportJob",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getImportJob"
       },
       {
        "kind": "secondaryButton",
@@ -673,6 +681,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "2",
@@ -682,7 +691,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/ai-section-recognition-bo-967",
-   "component": "apps/venue-management-web/src/routes/access-venue/AiSectionRecognition.tsx",
+   "component": "src/routes/access-venue/AiSectionRecognition.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -709,6 +718,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Recognize venue levels, sections and standing zones from source geometry. Display detected boundaries, labels, hierarchy, capacity estimate and per-object confidence on the source preview. Allow accept, reject, merge, split, rename and redraw with AI correction suggestions and reason capture. Flag ambiguous, overlapping, disconnected or unlabelled areas and prevent silent assignment to the wrong level. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatMapImport`, `validateSeatMap` with BO-971; this screen is AI Section Recognition (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 2.05, page 11): recognize venue levels, sections and standing zones from source geometry. Display detected boundaries, labels, hierarchy, capacity estimate and per-object confidence on the source preview. Allow accept, reject, merge, split, rename and redraw with AI correction suggestions and reason capture. Flag ambiguous, overlapping, disconnected or unlabelled areas and prevent silent assignment to the wrong level. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -731,13 +741,15 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatMapImport",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatMapImport"
       },
       {
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "validateSeatMap",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "validateSeatMap"
       },
       {
        "kind": "secondaryButton",
@@ -820,6 +832,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "2",
@@ -829,7 +842,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/ai-row-seat-recognition-bo-968",
-   "component": "apps/venue-management-web/src/routes/access-venue/AiRowSeatRecognition.tsx",
+   "component": "src/routes/access-venue/AiRowSeatRecognition.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -878,7 +891,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatMapImport",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatMapImport"
       },
       {
        "kind": "primaryButton",
@@ -968,6 +982,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "2",
@@ -977,7 +992,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/ai-aisle-vip-accessibility-bo-969",
-   "component": "apps/venue-management-web/src/routes/access-venue/AiAisleVipAccessibility.tsx",
+   "component": "src/routes/access-venue/AiAisleVipAccessibility.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1026,7 +1041,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatMapImport",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatMapImport"
       },
       {
        "kind": "primaryButton",
@@ -1116,6 +1132,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "2",
@@ -1125,7 +1142,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/ai-numbering-labeling-bo-970",
-   "component": "apps/venue-management-web/src/routes/access-venue/AiNumberingLabeling.tsx",
+   "component": "src/routes/access-venue/AiNumberingLabeling.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1185,7 +1202,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getActionPlan",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getActionPlan"
       },
       {
        "kind": "secondaryButton",
@@ -1283,6 +1301,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "2",
@@ -1292,7 +1311,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/validation-correction-bo-971",
-   "component": "apps/venue-management-web/src/routes/access-venue/ValidationCorrection.tsx",
+   "component": "src/routes/access-venue/ValidationCorrection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1319,6 +1338,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide one controlled workspace for resolving AI and import exceptions. Compare the source and generated map side by side with issue list, filters, severity and confidence. Offer manual draw, move, split, merge, add, delete, renumber, relabel and property-edit tools on a correction layer. Re-run selected recognizers, validate affected objects and preserve every AI suggestion, human edit and reviewer decision. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatMapImport`, `validateSeatMap` with BO-967; this screen is Validation & Correction (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 2.09, page 12): provide one controlled workspace for resolving AI and import exceptions. Compare the source and generated map side by side with issue list, filters, severity and confidence. Offer manual draw, move, split, merge, add, delete, renumber, relabel and property-edit tools on a correction layer. Re-run selected recognizers, validate affected objects and preserve every AI suggestion, human edit and reviewer decision. Retain source files, model/version, confidence, reviewer corrections and publication evidence; never allow AI output to bypass validation or approval. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -1341,13 +1361,15 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "validateSeatMap",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "validateSeatMap"
       },
       {
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatMapImport",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatMapImport"
       },
       {
        "kind": "secondaryButton",
@@ -1428,6 +1450,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "2",
@@ -1437,7 +1460,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/ai-venue-designer-publish-bo-972",
-   "component": "apps/venue-management-web/src/routes/access-venue/AiVenueDesignerPublish.tsx",
+   "component": "src/routes/access-venue/AiVenueDesignerPublish.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1491,7 +1514,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "commitImportJob",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "commitImportJob"
       },
       {
        "kind": "secondaryButton",
@@ -1504,7 +1528,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Replaces the map every channel sells from.** Seats already sold keep their labels; seats that no longer exist in the new map are listed before this proceeds.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "publishSeatMap"
       },
       {
        "kind": "detailPanel",

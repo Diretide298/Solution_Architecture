@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-669` | Journey & Context Command Center | C | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
+| `ADM-669` | Journey & Context Command Center | C | 0 | 10 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `ADM-670` | Customer Journey Map & Touchpoint Designer | C | 30 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-671` | Real-Time Context Rule Engine | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-672` | Pre-Purchase & Booking Journey Recommendation Manager | C | 6 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |

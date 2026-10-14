@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/booking-and-selection/ticket-type-selection",
-   "component": "apps/guest-web/src/routes/booking-and-selection/TicketTypeSelectionForm.tsx",
+   "component": "src/routes/booking-and-selection/TicketTypeSelectionForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -349,7 +349,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/booking-and-selection/date-and-session-selection",
-   "component": "apps/guest-web/src/routes/booking-and-selection/DateAndSessionSelectionForm.tsx",
+   "component": "src/routes/booking-and-selection/DateAndSessionSelectionForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -571,8 +571,8 @@
    {
     "operationId": "getCart",
     "contract": "orders",
-    "purpose": "The cart's `consentQuestions` after the time is added",
-    "trigger": "onAction"
+    "purpose": "Read by the screen right after addCartLine, not a control: the cart's consentQuestions, which open the consent questions pop-up; with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)",
+    "trigger": "background"
    },
    {
     "operationId": "recordConsentAnswers",
@@ -724,7 +724,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/booking-and-selection/seat-map-selection",
-   "component": "apps/guest-web/src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx",
+   "component": "src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -901,8 +901,8 @@
    {
     "operationId": "relinquishSeatHold",
     "contract": "seating",
-    "purpose": "Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold",
-    "trigger": "onAction"
+    "purpose": "Sent by the time bar when the guest switches time, not a control: releases the seats held for the old performance (decided 29 September), with the guest session the device already holds: signed in, or the anonymous cart session a visitor gets with the first line (ADR-0045)",
+    "trigger": "background"
    },
    {
     "operationId": "getPublishedBookingFlow",
@@ -1038,7 +1038,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/booking-and-selection/add-ons-and-upsell",
-   "component": "apps/guest-web/src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx",
+   "component": "src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1098,7 +1098,7 @@
   "density": "compact",
   "pattern": "statusTracker",
   "patternReason": "`getUpsellSuggestions` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "See add-ons & upsell for this venue.",
+  "purpose": "Suggested add-ons and the offered bundle for this booking, each added to the cart, before checkout.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -1177,7 +1177,7 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add something",
+    "purpose": "Add a suggested add-on or the offered bundle to the cart",
     "trigger": "onAction"
    },
    {
@@ -1196,8 +1196,8 @@
    {
     "operationId": "recordRecommendationEvents",
     "contract": "ai",
-    "purpose": "Report what happened to recommended items",
-    "trigger": "onAction",
+    "purpose": "Sent by the Suggested for you list, not a control: impressions, clicks, add-to-cart and declines of the recommended items, batched",
+    "trigger": "background",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -1310,7 +1310,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/booking-and-selection/wishlist",
-   "component": "apps/guest-web/src/routes/booking-and-selection/WishlistDetail.tsx",
+   "component": "src/routes/booking-and-selection/WishlistDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1503,7 +1503,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/booking-and-selection/map-booking",
-   "component": "apps/guest-web/src/routes/booking-and-selection/MapBookingCanvas.tsx",
+   "component": "src/routes/booking-and-selection/MapBookingCanvas.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1826,7 +1826,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/booking-and-selection/space-by-the-hour",
-   "component": "apps/guest-web/src/routes/booking-and-selection/SpaceByTheHourWizard.tsx",
+   "component": "src/routes/booking-and-selection/SpaceByTheHourWizard.tsx",
    "status": "notStarted"
   },
   "navigation": {

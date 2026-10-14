@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-299` | Resale Eligibility & Ticket Selection | C | 0 | 16 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-300` | Create Listing & Resale Price Selection | C | 0 | 0 | 6 | 0 | 2 | 5 | — | notStarted (generated) |
 | `ADM-301` | Fees, Seller Proceeds & Listing Confirmation | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-302` | My Resale Listings & Seller Dashboard | C | 0 | 22 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
+| `ADM-302` | My Resale Listings & Seller Dashboard | C | 0 | 40 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-303` | Official Resale Marketplace & Buyer Discovery | C | 0 | 0 | 6 | 0 | 2 | 5 | — | notStarted (generated) |
 | `ADM-304` | Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience | C | 0 | 24 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `ADM-305` | Buyer Checkout, Inventory Hold & Secure Payment | C | 1 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
@@ -212,6 +212,8 @@ tickets:
 - `listTicketResaleMarketplace` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -368,6 +370,8 @@ result: 'Not eligible: the event starts in 1 hour'
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -483,6 +487,8 @@ price:
 - `listCreateListingResale` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -602,6 +608,8 @@ breakdown:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -686,7 +694,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Paid Settlements** (metric tile)
 
-**SOLD ✓** (metric tile)
+**SOLD ✓** (metric tile, from `listResaleListingSeller`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Active listings | 1,234 | Active Listings |
+| Pending approval | 1,234 | Pending Approval |
+| Sold | text | Sold |
+| Expiring soon | text | Expiring Soon |
+| Seller proceeds | 1,234 | Seller Proceeds |
+| Pending settlement | 1,234 | Pending Settlement |
+| Paid settlements | 1,234 | Paid Settlements |
+| Event | text | Event |
+| Date | 1 Oct 2026, 14:30 | Date |
+| Seat | text | Seat |
+| Listing price | AED 1,234.50 | Listing Price |
+| Original price | AED 1,234.50 | Original Price |
+| Marketplace status | text | Marketplace Status |
+| Listing date | 1 Oct 2026, 14:30 | Listing Date |
+| Expiry | 1 Oct 2026, 14:30 | Expiry |
+| Settlement status | text | Settlement Status |
+| Settlement scheduled after event | 1 Oct 2026, 14:30 | Settlement: Scheduled after event |
+| Views | text | Views where applicable |
 
 **Selling Price: AED 220** (metric tile)
 
@@ -764,6 +793,8 @@ listing:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -794,7 +825,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-302?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-298`.
@@ -888,6 +919,8 @@ listing:
 - `listOfficialResaleMarketplace` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1036,6 +1069,8 @@ detail:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1153,6 +1188,8 @@ checkout:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1268,6 +1305,8 @@ confirmation:
 - `listResaleConfirmationOwnership` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
@@ -1409,6 +1448,8 @@ deployment:
 - `listWhiteLabelMarketplace` → `ORDER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 

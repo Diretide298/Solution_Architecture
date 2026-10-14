@@ -175,6 +175,13 @@ CHECKS = [
     # 14 October (ADAM CR-004 on DB-READ-VIEWS, CHG-LIN-001): a read of personal data by another module names its
     # columns, so its view is narrow; every read's column list is the derived one (tools/derive-read-columns.py).
     "check-read-columns",
+    # 14 October (the Block A audit, batch GRD; lead: "With the pattern of errors we need to get them updated"): the
+    # gate holds what the audit's pull found. Every Block A feature and task links something ADAM pulls, every link
+    # ADAM loads resolves at HEAD, and the release runbook gates the tag on the rehearsal pull (CHG-GRD-001,
+    # CHG-GRD-003); no visible change to a client-approved screen without a recorded client approval
+    # (handoff/approved-ui.json, docs/active/approved-ui-changes.yaml; CHG-GRD-002). Both strict: never baselined.
+    "check-ticket-links",
+    "check-approved-ui",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

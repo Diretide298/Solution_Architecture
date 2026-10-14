@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-256` | Graphical Access Map & Live Gate Performance | C | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-257` | Attendance & Admission Analytics | C | 2 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-258` | Entry, Exit, Re-entry & Crossover Analytics | C | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-259` | Throughput, Queue & Validation Performance Analytics | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-259` | Throughput, Queue & Validation Performance Analytics | C | 0 | 13 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-260` | Validation Outcome & Rejection Analytics | C | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-261` | Guest Dwell Time, Length of Stay & Attraction Flow | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-262` | Access Reports, Scheduled Reporting & Data Export | D | 2 | 0 | 6 | 9 | 0 | 0 | — | notStarted (generated) |

@@ -10,10 +10,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
@@ -128,7 +130,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    },
    "createdAt": {
     "type": "string",
@@ -277,6 +280,13 @@
     "type": "string",
     "format": "uuid",
     "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The latest note on the alert (`updateSecurityAlert`)."
    }
   }
  },
@@ -329,7 +339,7 @@
  "EdgeNodeLocalProcessingConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.edge_node` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Edge Node & Local Processing Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "nodeType": {

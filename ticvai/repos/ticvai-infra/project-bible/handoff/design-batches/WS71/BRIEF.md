@@ -127,15 +127,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-061` | BI & Analytics Administration Command Center | D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-061` | BI & Analytics Administration Command Center | D | 0 | 98 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-062` | Enterprise KPI Library | D | 0 | 28 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-063` | KPI Targets, Thresholds & Scorecards | D | 8 | 0 | 5 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-064` | Benchmark & Comparative Analytics Configuration | D | 12 | 6 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-064` | Benchmark & Comparative Analytics Configuration | D | 12 | 48 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-065` | Data Source & Integration Registry | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-066` | Semantic Model & Business Data Catalogue | A | 14 | 19 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | D | 0 | 98 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-068` | Embedded BI, Workspace & Tenant Administration | D | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-069` | Analytics Performance, Usage & Cost Monitor | D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-069` | Analytics Performance, Usage & Cost Monitor | D | 0 | 124 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-070` | Analytics Governance, Security & Audit Center | D | 20 | 91 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

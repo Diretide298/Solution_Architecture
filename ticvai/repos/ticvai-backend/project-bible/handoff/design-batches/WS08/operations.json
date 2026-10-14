@@ -250,7 +250,7 @@
  },
  "setFastPassProfile": {
   "method": "PUT",
-  "path": "/fast-pass-profiles",
+  "path": "/fast-pass-profiles/{fastPassProfileId}",
   "contract": "access",
   "summary": "Create or replace a Fast Pass profile",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -258,6 +258,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "fastPassProfileId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -288,7 +293,7 @@
  },
  "setGuestCompanionEligibility": {
   "method": "PUT",
-  "path": "/guest-companion-eligibility",
+  "path": "/guest-companion-eligibility/{ruleId}",
   "contract": "access",
   "summary": "Save a companion eligibility rule",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -296,6 +301,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "ruleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -307,7 +317,7 @@
  },
  "setJourneyProfile": {
   "method": "PUT",
-  "path": "/journey-profiles",
+  "path": "/journey-profiles/{journeyProfileId}",
   "contract": "access",
   "summary": "Create or replace a guest journey profile",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -315,6 +325,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "journeyProfileId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -326,7 +341,7 @@
  },
  "setOperatingCalendarEntry": {
   "method": "PUT",
-  "path": "/operating-calendar-entries",
+  "path": "/operating-calendar-entries/{entryId}",
   "contract": "access",
   "summary": "Create or replace an operating calendar entry",
   "permission": "ACCESS_POINT_CONFIGURE",

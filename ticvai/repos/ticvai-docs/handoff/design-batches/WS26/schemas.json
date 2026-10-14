@@ -1646,6 +1646,7 @@
     "type": "boolean"
    },
    "createdAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    },
@@ -1657,6 +1658,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -1700,10 +1702,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "agentPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid"
    },
@@ -1751,6 +1755,8 @@
     ]
    },
    "criteria": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 30,
     "items": {
@@ -1805,6 +1811,8 @@
     "description": "Criteria score as a percentage; 0 when any critical failure is recorded."
    },
    "aiFindings": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "readOnly": true,
     "items": {
@@ -1843,6 +1851,8 @@
     "nullable": true
    },
    "coachingActions": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

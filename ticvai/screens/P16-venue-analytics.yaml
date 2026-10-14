@@ -69,6 +69,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 1
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/executive-command-center
@@ -476,6 +477,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/sales-revenue-channel
@@ -617,6 +619,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/operational-performance
@@ -866,6 +869,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/product-performance
@@ -1079,6 +1083,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/cost-margin-profitability
@@ -1249,6 +1254,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/inventory-waste-intelligence
@@ -1471,6 +1477,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/guest-conversion-intelligence
@@ -1711,6 +1718,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/demand-forecasting
@@ -1852,6 +1860,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/ai-assistant-action-center
@@ -2114,6 +2123,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: alertRuleId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setAlertRule` takes it, from the record the user acts on.'
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not. A proposed action opened from the queue or an alert.'
@@ -2234,6 +2247,7 @@ screens:
   module: Analytics
   requiresModule: ai
   wave: 3
+  permission: AI_USE
   implementation:
     app: venue-management-web
     route: /analytics/suggestions
@@ -2410,6 +2424,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -2542,6 +2557,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -2758,6 +2774,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -2894,6 +2911,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -3002,6 +3020,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -3125,6 +3144,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -3284,6 +3304,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: PRICE_VIEW
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -3631,6 +3652,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -3840,6 +3862,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -3970,7 +3993,7 @@ screens:
         - Custom Dashboard — customer-created
         - AI-Generated Dashboard — generated through AI
         bindsTo: null
-        operation: null
+        operation: listDashboards
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display
           dashboard cards/table containing
     - name: contextPanel
@@ -4014,6 +4037,7 @@ screens:
         notes: null
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display
           dashboard cards/table containing
+        operation: getDashboard
   states:
     loading: The record list.
     error: Could not load. Names which read failed and leaves the record untouched.
@@ -4062,6 +4086,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4487,6 +4512,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4614,6 +4640,8 @@ screens:
   density: compact
   purposeNote: Administrators can centrally define reusable KPIs and ensure the same KPI calculation is
     used across TICVAI dashboards.
+  division: 'Shares `createKpi`, `listKpis` with ANL-062; this screen is KPI Builder (pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf,
+    board 2.2.5, page 18): allow authorized business users to create standardized enterprise KPIs.'
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Define whether) and
     no display directory — it is settings, not a population
@@ -4740,6 +4768,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4886,6 +4915,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -5046,6 +5076,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -5155,6 +5186,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -5244,10 +5276,10 @@ screens:
     - listDashboards
   - operationId: getDashboard
     contract: reporting
-    purpose: 'The dashboard as saved: who may see it, what is published and its versions, read before a
-      change is published'
+    purpose: 'The dashboard as saved: who may see it, what is published and its versions, read before
+      a change is published'
     trigger: onLoad
-    provenance: 'audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)'
+    provenance: audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)
   entryState:
     preloaded:
     - Version Number
@@ -5272,6 +5304,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -5391,6 +5424,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5554,6 +5588,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5660,6 +5695,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5767,6 +5803,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5863,6 +5900,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5970,6 +6008,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -6086,6 +6125,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -6189,6 +6229,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -6306,6 +6347,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -6429,6 +6471,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -6579,6 +6622,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -6678,7 +6722,7 @@ screens:
         - Permission changes
         - Scheduled-report changes
         bindsTo: null
-        operation: null
+        operation: listReportDeliveries
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 40 §Display
     - name: contextPanel
       slot: selection
@@ -6743,6 +6787,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -6909,6 +6954,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7009,6 +7055,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_SCHEDULE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7150,6 +7197,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_EXPORT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7275,6 +7323,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7595,6 +7644,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7740,6 +7790,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7866,6 +7917,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: TENANT_VIEW
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -8009,6 +8061,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8174,6 +8227,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8268,6 +8322,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8355,6 +8410,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8460,6 +8516,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: AI_USE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8585,6 +8642,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8683,6 +8741,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: AI_USE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8835,6 +8894,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8913,6 +8973,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -9006,6 +9067,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: AI_USE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -9148,6 +9210,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9329,6 +9392,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9355,6 +9419,10 @@ screens:
     row
   purpose: Maintain the authoritative catalogue of approved TICVAI business KPIs. This is essential because
     every dashboard must use the same definition of a metric.
+  division: 'Shares `createKpi`, `listKpis` with ANL-025; this screen is Enterprise KPI Library (pack
+    Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, board 10.10.2, page 124): maintain the
+    authoritative catalogue of approved TICVAI business KPIs. This is essential because every dashboard
+    must use the same definition of a metric.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -9455,6 +9523,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9566,6 +9635,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9731,6 +9801,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9981,6 +10052,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -10117,6 +10189,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -10196,6 +10269,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -10370,6 +10444,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -10635,6 +10710,7 @@ screens:
   module: Analytics
   requiresModule: ai
   wave: 3
+  permission: AI_USE
   implementation:
     app: venue-management-web
     route: /analytics/ai-maturity

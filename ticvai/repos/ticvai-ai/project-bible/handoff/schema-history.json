@@ -1511,7 +1511,10 @@
   "marketing.waiver_signatory_rule (guardian threshold and flag on marketing.form_definition)": "2026-09-30",
   "marketing.waiver_version_control (checklist, simulation and aiFindings computed at read time)": "2026-09-30",
   "orders.deposit_policy (dining_* columns)": "2026-09-30",
-  "ai.chunk_ref": "2026-09-30"
+  "ai.chunk_ref": "2026-09-30",
+  "marketing.message_delivery": "2026-10-14",
+  "orders.payment_tip": "2026-10-14",
+  "platform.device_heartbeat": "2026-10-14"
  },
  "baseline": "2026-09-19",
  "generated": "2026-10-14"

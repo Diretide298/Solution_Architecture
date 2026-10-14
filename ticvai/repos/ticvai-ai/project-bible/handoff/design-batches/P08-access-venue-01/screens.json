@@ -5,11 +5,12 @@
   "module": "Access & Venue",
   "requiresModule": "queue",
   "wave": 1,
+  "permission": "QUEUE_VIEW",
   "capability": "C05",
   "implementation": {
    "app": "venue-management-web",
    "route": "/queue-management/queue-directory",
-   "component": "apps/venue-management-web/src/routes/queue-management/QueueDirectoryList.tsx",
+   "component": "src/routes/queue-management/QueueDirectoryList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -599,11 +600,12 @@
   "module": "Access & Venue",
   "requiresModule": "queue",
   "wave": 1,
+  "permission": "QUEUE_VIEW",
   "capability": "C05",
   "implementation": {
    "app": "venue-management-web",
    "route": "/queue-management/queue-configuration",
-   "component": "apps/venue-management-web/src/routes/queue-management/QueueConfigurationForm.tsx",
+   "component": "src/routes/queue-management/QueueConfigurationForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1046,11 +1048,12 @@
   "module": "Access & Venue",
   "requiresModule": "queue",
   "wave": 1,
+  "permission": "QUEUE_MANAGE",
   "capability": "C05",
   "implementation": {
    "app": "venue-management-web",
    "route": "/queue-management/queue-integration-setup",
-   "component": "apps/venue-management-web/src/routes/queue-management/QueueIntegrationSetupForm.tsx",
+   "component": "src/routes/queue-management/QueueIntegrationSetupForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1356,11 +1359,12 @@
   "module": "Access & Venue",
   "requiresModule": "queue",
   "wave": 1,
+  "permission": "QUEUE_VIEW",
   "capability": "C05",
   "implementation": {
    "app": "venue-management-web",
    "route": "/queue-management/manual-wait-time-entry",
-   "component": "apps/venue-management-web/src/routes/queue-management/ManualWaitTimeEntryForm.tsx",
+   "component": "src/routes/queue-management/ManualWaitTimeEntryForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1721,11 +1725,12 @@
   "module": "Access & Venue",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "capability": "C05",
   "implementation": {
    "app": "venue-management-web",
    "route": "/queue-management/queue-monitor",
-   "component": "apps/venue-management-web/src/routes/queue-management/QueueMonitorDashboard.tsx",
+   "component": "src/routes/queue-management/QueueMonitorDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1829,7 +1834,8 @@
       {
        "kind": "metricTile",
        "notes": "Waiting, called, expired, average wait",
-       "provenance": "carried from the previous definition"
+       "provenance": "carried from the previous definition",
+       "operation": "getKpiValues"
       },
       {
        "kind": "metricTile",
@@ -2266,11 +2272,12 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "PARKING_CONFIGURE",
   "capability": "C39",
   "implementation": {
    "app": "venue-management-web",
    "route": "/parking/parking-configuration",
-   "component": "apps/venue-management-web/src/routes/parking/ParkingConfigurationForm.tsx",
+   "component": "src/routes/parking/ParkingConfigurationForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2364,6 +2371,14 @@
     "AccessPoint.name",
     "AccessPoint.venueId",
     "AccessPoint.scopePath"
+   ],
+   "params": [
+    {
+     "name": "parkingFacilityId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listParkingFacilities`."
+    }
    ]
   },
   "wireframe": {
@@ -2446,11 +2461,12 @@
   "module": "Access & Venue",
   "requiresModule": "maintenance",
   "wave": 1,
+  "permission": "WORK_ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/work-order-verification",
-   "component": "apps/venue-management-web/src/routes/venue-operations/WorkOrderVerificationDetail.tsx",
+   "component": "src/routes/venue-operations/WorkOrderVerificationDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2753,7 +2769,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/asset-register-bo-031",
-   "component": "apps/venue-management-web/src/routes/venue-operations/AssetRegisterBO031Detail.tsx",
+   "component": "src/routes/venue-operations/AssetRegisterBO031Detail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2850,11 +2866,12 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/admission-rules",
-   "component": "apps/venue-management-web/src/routes/venue-operations/AdmissionProfilesDetail.tsx",
+   "component": "src/routes/venue-operations/AdmissionProfilesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -3124,11 +3141,12 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/blacklist-management",
-   "component": "apps/venue-management-web/src/routes/venue-operations/BlacklistManagementDetail.tsx",
+   "component": "src/routes/venue-operations/BlacklistManagementDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

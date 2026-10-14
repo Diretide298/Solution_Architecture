@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1149` | Administrative Balance Adjustment Studio | C | 9 | 35 | 6 | 77 | 1 | 0 | — | notStarted (—) |
 | `BO-1150` | Wallet Block, Freeze & Restriction Management | C | 6 | 15 | 6 | 28 | 0 | 6 | — | notStarted (—) |
 | `BO-1151` | Wallet Disputes & Operational Exception Queue | C | 24 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
-| `BO-1152` | Operations Simulator, Approval & Audit Trail | C | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `BO-1152` | Operations Simulator, Approval & Audit Trail | C | 0 | 14 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

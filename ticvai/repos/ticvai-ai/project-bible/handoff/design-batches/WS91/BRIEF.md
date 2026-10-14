@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-524` | Rental Pricing Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-524` | Rental Pricing Command Center | D | 36 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-525` | Pricing Profile Builder | D | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-526` | Duration & Tiered Pricing Configuration | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-527` | Calendar, Peak & Seasonal Pricing | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

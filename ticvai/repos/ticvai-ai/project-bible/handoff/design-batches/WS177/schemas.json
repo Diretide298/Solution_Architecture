@@ -19,7 +19,8 @@
    },
    "developerId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.developer_account"
    },
    "name": {
     "type": "string"
@@ -104,6 +105,13 @@
     "nullable": true,
     "readOnly": true,
     "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   },
+   "statusReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the client was suspended (`setApiClientStatus`)."
    }
   }
  },
@@ -331,6 +339,7 @@
     "type": "integer"
    },
    "pendingApprovers": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -696,7 +705,8 @@
    "developerId": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-references": "control.developer_account"
    },
    "sandboxClientId": {
     "type": "string",
@@ -791,7 +801,8 @@
    },
    "subscriptionId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.webhook_subscription"
    },
    "eventId": {
     "type": "string",
@@ -978,7 +989,8 @@
    },
    "clientId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.api_client"
    },
    "endpointUrl": {
     "type": "string"
@@ -997,6 +1009,7 @@
     "additionalProperties": true
    },
    "signingSecret": {
+    "x-ticvai-secret": "vault-reference",
     "type": "string",
     "format": "password",
     "writeOnly": true,

@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/shared-wallet-command-center-bo-1113",
-   "component": "apps/venue-management-web/src/routes/orders-money/SharedWalletCommandCenter.tsx",
+   "component": "src/routes/orders-money/SharedWalletCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -145,7 +146,7 @@
         "Pending invitations/associations"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listSharedWallets",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 38 §Display"
       }
      ]
@@ -313,6 +314,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "4",
@@ -322,7 +324,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/shared-wallet-model-configuration-bo-1114",
-   "component": "apps/venue-management-web/src/routes/orders-money/SharedWalletModelConfiguration.tsx",
+   "component": "src/routes/orders-money/SharedWalletModelConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -349,6 +351,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define reusable shared-wallet structures. Administrators can create models such as: Family Wallet Parent–Child Wallet Corporate Wallet Employee Wallet School Wallet Student Wallet Tour Group Wallet Event Group Wallet Hospitality Group Wallet Balance Models Model A — Fully Shared Balance Parent:",
   "purposeNote": "customer or venue.",
+  "division": "Shares `createSharedWallet`, `listSharedWallets` with BO-1119; this screen is Shared Wallet Model Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 4.02, page 39): define reusable shared-wallet structures. Administrators can create models such as: Family Wallet Parent–Child Wallet Corporate Wallet Employee Wallet School Wallet Student Wallet Tour Group Wallet Event Group Wallet Hospitality Group Wallet Balance Models Model A — Fully Shared Balance Parent:.",
   "layout": {
    "template": "form",
    "regions": [
@@ -491,6 +494,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "4",
@@ -500,7 +504,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/family-household-structure-configuration-bo-1115",
-   "component": "apps/venue-management-web/src/routes/orders-money/FamilyHouseholdStructureConfiguration.tsx",
+   "component": "src/routes/orders-money/FamilyHouseholdStructureConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -527,6 +531,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure family relationships and wallet participation. The source requires customers to register individually or as a family/group, with a designated owner able to allocate budgets to linked accounts and monitor/cancel spending authorization. Supported Roles Family Owner Co-Owner Parent Guardian Adult Member Child Dependant Viewer",
   "purposeNote": "Authorized users can create and maintain family structures while preserving individual identities and wallet permissions.",
+  "division": "Shares `listSharedWallets`, `setSharedWalletMembers` with BO-1117, BO-1118; this screen is Family & Household Structure Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 4.03, page 40): configure family relationships and wallet participation. The source requires customers to register individually or as a family/group, with a designated owner able to allocate budgets to linked accounts and monitor/cancel spending authorization. Supported Roles Family Owner Co-Owner Parent Guardian Adult Member Child Dependant Viewer.",
   "layout": {
    "template": "form",
    "regions": [
@@ -669,6 +674,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "4",
@@ -678,7 +684,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/parent-child-stored-value-distribution-bo-1116",
-   "component": "apps/venue-management-web/src/routes/orders-money/ParentChildStoredValueDistribution.tsx",
+   "component": "src/routes/orders-money/ParentChildStoredValueDistribution.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -891,6 +897,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "4",
@@ -900,7 +907,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/allowance-budget-allocation-engine-bo-1117",
-   "component": "apps/venue-management-web/src/routes/orders-money/AllowanceBudgetAllocationEngine.tsx",
+   "component": "src/routes/orders-money/AllowanceBudgetAllocationEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -927,6 +934,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure how wallet owners distribute value to linked members. Allocation Types One-time allowance Daily allowance Weekly allowance Monthly allowance Event allowance Attraction allowance Meal allowance Ride allowance Shopping allowance Custom allocation",
   "purposeNote": "Wallet owners or authorized administrators can distribute stored value according to configurable allocation rules while preserving central financial control.",
+  "division": "Shares `listSharedWallets`, `setSharedWalletMembers` with BO-1115, BO-1118; this screen is Allowance & Budget Allocation Engine (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 4.05, page 42): configure how wallet owners distribute value to linked members. Allocation Types One-time allowance Daily allowance Weekly allowance Monthly allowance Event allowance Attraction allowance Meal allowance Ride allowance Shopping allowance Custom allocation.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1074,6 +1082,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "4",
@@ -1083,7 +1092,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/member-spending-controls-permissions-bo-1118",
-   "component": "apps/venue-management-web/src/routes/orders-money/MemberSpendingControlsPermissions.tsx",
+   "component": "src/routes/orders-money/MemberSpendingControlsPermissions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1110,6 +1119,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§For each member configure; Configure) and no display directory — it is settings, not a population",
   "purpose": "Give wallet owners granular control over what each linked member can do. The source explicitly requires family owners to cap expenses and cancel spending authorization at any time. Permission Controls",
   "purposeNote": "Every member transaction is evaluated against that member's current permissions and spending policy before wallet value is authorized.",
+  "division": "Shares `listSharedWallets`, `setSharedWalletMembers` with BO-1115, BO-1117; this screen is Member Spending Controls & Permissions (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 4.06, page 43): give wallet owners granular control over what each linked member can do. The source explicitly requires family owners to cap expenses and cancel spending authorization at any time. Permission Controls.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1312,6 +1322,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "4",
@@ -1321,7 +1332,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/corporate-wallet-organizational-hierarchy-bo-1119",
-   "component": "apps/venue-management-web/src/routes/orders-money/CorporateWalletOrganizationalHierarchy.tsx",
+   "component": "src/routes/orders-money/CorporateWalletOrganizationalHierarchy.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1348,6 +1359,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure wallets for companies, schools, partners and other organizations. Requirement 4.3.27 calls specifically for corporate wallets with spending limits, user-level permissions, departmental allocation and reporting. Organizational Structure",
   "purposeNote": "configured organizational level.",
+  "division": "Shares `createSharedWallet`, `listSharedWallets` with BO-1114; this screen is Corporate Wallet & Organizational Hierarchy (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 4.07, page 44): configure wallets for companies, schools, partners and other organizations. Requirement 4.3.27 calls specifically for corporate wallets with spending limits, user-level permissions, departmental allocation and reporting. Organizational Structure.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1475,6 +1487,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "4",
@@ -1484,7 +1497,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/corporate-budget-policy-approval-rules-bo-1120",
-   "component": "apps/venue-management-web/src/routes/orders-money/CorporateBudgetPolicyApprovalRules.tsx",
+   "component": "src/routes/orders-money/CorporateBudgetPolicyApprovalRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1658,6 +1671,12 @@
     {
      "name": "sharedWalletId",
      "from": "navigation"
+    },
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listApprovalMatrices`."
     }
    ]
   },
@@ -1690,6 +1709,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "4",
@@ -1699,7 +1719,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/shared-wallet-transfers-balance-reallocation-bo-1121",
-   "component": "apps/venue-management-web/src/routes/orders-money/SharedWalletTransfersBalanceReallocation.tsx",
+   "component": "src/routes/orders-money/SharedWalletTransfersBalanceReallocation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1866,6 +1886,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "4",
@@ -1875,7 +1896,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/shared-wallet-simulator-monitoring-audit-bo-1122",
-   "component": "apps/venue-management-web/src/routes/orders-money/SharedWalletSimulatorMonitoringAudit.tsx",
+   "component": "src/routes/orders-money/SharedWalletSimulatorMonitoringAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1930,7 +1951,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSharedWallets",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSharedWallets"
       },
       {
        "kind": "secondaryButton",

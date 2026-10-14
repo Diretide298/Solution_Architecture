@@ -73,7 +73,7 @@
    }
   ],
   "requestBody": null,
-  "responds": null
+  "responds": "ShopAndDrop"
  },
  "getReturnPolicy": {
   "method": "GET",
@@ -387,7 +387,7 @@
  },
  "setConfigurationProfile": {
   "method": "PUT",
-  "path": "/configuration-profiles",
+  "path": "/configuration-profiles/{profileId}",
   "contract": "tenancy",
   "summary": "What a class of workstation is configured to be",
   "permission": "TENANT_CONFIGURE",
@@ -425,7 +425,7 @@
  },
  "setStoreRules": {
   "method": "PUT",
-  "path": "/store-rules",
+  "path": "/store-rules/{storeRuleId}",
   "contract": "retail",
   "summary": "Change a store rule",
   "permission": "PRODUCT_CONFIGURE",
@@ -433,6 +433,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "storeRuleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

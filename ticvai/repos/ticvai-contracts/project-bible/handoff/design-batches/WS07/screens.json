@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "7",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/offline-edge-operations-command-center-bo-204",
-   "component": "apps/venue-management-web/src/routes/access-venue/OfflineEdgeOperationsCommandCenter.tsx",
+   "component": "src/routes/access-venue/OfflineEdgeOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -106,7 +107,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -269,6 +270,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "7",
@@ -278,7 +280,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/edge-node-local-processing-configuration-bo-205",
-   "component": "apps/venue-management-web/src/routes/access-venue/EdgeNodeLocalProcessingConfiguration.tsx",
+   "component": "src/routes/access-venue/EdgeNodeLocalProcessingConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -433,6 +435,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "7",
@@ -442,7 +445,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/offline-validation-policy-builder-bo-206",
-   "component": "apps/venue-management-web/src/routes/access-venue/OfflineValidationPolicyBuilder.tsx",
+   "component": "src/routes/access-venue/OfflineValidationPolicyBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -581,6 +584,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "7",
@@ -590,7 +594,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/edge-package-data-distribution-bo-207",
-   "component": "apps/venue-management-web/src/routes/access-venue/EdgePackageDataDistribution.tsx",
+   "component": "src/routes/access-venue/EdgePackageDataDistribution.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -744,6 +748,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "7",
@@ -753,7 +758,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/offline-credential-revocation-cache-bo-208",
-   "component": "apps/venue-management-web/src/routes/access-venue/OfflineCredentialRevocationCache.tsx",
+   "component": "src/routes/access-venue/OfflineCredentialRevocationCache.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -898,6 +903,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "7",
@@ -907,7 +913,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/offline-entitlement-usage-ledger-bo-209",
-   "component": "apps/venue-management-web/src/routes/access-venue/OfflineEntitlementUsageLedger.tsx",
+   "component": "src/routes/access-venue/OfflineEntitlementUsageLedger.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1018,6 +1024,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "7",
@@ -1027,7 +1034,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/connectivity-failure-degraded-mode-policy-bo-210",
-   "component": "apps/venue-management-web/src/routes/access-venue/ConnectivityFailureDegradedModePolicy.tsx",
+   "component": "src/routes/access-venue/ConnectivityFailureDegradedModePolicy.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1168,6 +1175,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "7",
@@ -1177,7 +1185,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/reconnection-synchronization-conflict-resolution-bo-211",
-   "component": "apps/venue-management-web/src/routes/access-venue/ReconnectionSynchronizationConflictResolution.tsx",
+   "component": "src/routes/access-venue/ReconnectionSynchronizationConflictResolution.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1288,6 +1296,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "7",
@@ -1297,7 +1306,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/offline-simulation-resilience-testing-bo-212",
-   "component": "apps/venue-management-web/src/routes/access-venue/OfflineSimulationResilienceTesting.tsx",
+   "component": "src/routes/access-venue/OfflineSimulationResilienceTesting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1413,6 +1422,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "7",
@@ -1422,7 +1432,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/edge-security-audit-deployment-bo-213",
-   "component": "apps/venue-management-web/src/routes/access-venue/EdgeSecurityAuditDeployment.tsx",
+   "component": "src/routes/access-venue/EdgeSecurityAuditDeployment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1444,7 +1454,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {

@@ -2,7 +2,7 @@
  "ABPricingExperimentStudioInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_envelope at 5%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.pricing_experiment` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What A/B Pricing Experiment Studio submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "experimentName": {
@@ -1128,7 +1128,7 @@
  "LiveDynamicPriceExecutionDeploymentMonitorInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.price` (with `catalogue.audit_entry`, `catalogue.price_execution`, `catalogue.pricing_recommendation_decision`, `platform.outbox`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Live Dynamic Price Execution & Deployment Monitor submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "product": {
@@ -1356,6 +1356,7 @@
     "readOnly": true
    },
    "recommendationId": {
+    "x-ticvai-references": "catalogue.pricing_recommendation",
     "type": "string",
     "format": "uuid",
     "description": "A `catalogue.pricing_recommendation` (29 September, data model DM3)."
@@ -1417,6 +1418,7 @@
     "description": "The `createLiveDynamicPrice` execution that carried it out, once it has."
    },
    "decidedByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true
@@ -1485,7 +1487,7 @@
  "PricingSimulationStudioInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.pricing_recommendation` (with `catalogue.pricing_simulation`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Pricing Simulation Studio submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "venue": {
@@ -2160,6 +2162,7 @@
   }
  },
  "SignalRegistryEntry": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "catalogue.signal_registry",
   "description": "**The registry of AI signals and models, with their trust and quality** (29 September, data model DM3). ADM-106 and ADM-118. A signal or model not `approved` for a use in `aiUsePermissions` is not used for it.",

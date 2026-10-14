@@ -1,6 +1,6 @@
 # P02-account-self-service-01 — P02 · Account & Self-Service (1 of 2)
 
-**10 screens · 46 operations · 53 schemas · 6 permissions**
+**10 screens · 42 operations · 45 schemas · 6 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -215,7 +215,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `GST-042` | Simple Registration & OTP | A | 35 | 5 | 6 | 13 | 8 | 0 | guest | notStarted (designed) |
 | `GST-045` | Ticket Delivery & Sharing | A | 7 | 7 | 5 | 7 | 3 | 0 | guest | notStarted (client-verified) |
 | `GST-055` | Dynamic QR Ticket | A | 5 | 20 | 5 | 2 | 10 | 0 | guest | notStarted (client-verified) |
-| `GST-066` | Privacy & My Data | A | 3 | 12 | 6 | 23 | 2 | 4 | guest | notStarted (designed) |
+| `GST-066` | Privacy & My Data | A | 3 | 12 | 6 | 15 | 2 | 4 | guest | notStarted (designed) |
 
 ## Design inputs from the client meetings
 

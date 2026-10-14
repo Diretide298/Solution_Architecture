@@ -514,10 +514,12 @@
     "readOnly": true
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "maxLength": 64,
     "nullable": true
@@ -576,6 +578,7 @@
   ],
   "properties": {
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -719,6 +722,7 @@
     "readOnly": true
    },
    "bundleComponentId": {
+    "x-ticvai-references": "promotions.bundle_component",
     "type": "string",
     "format": "uuid"
    },
@@ -727,6 +731,7 @@
     "format": "uuid"
    },
    "externalProductId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "maxLength": 128
    },

@@ -1,23 +1,4 @@
 {
- "buildConfigurationPlan": {
-  "method": "POST",
-  "path": "/configuration-sessions/{sessionId}/plan",
-  "contract": "ai",
-  "summary": "Compile the blueprint into a plan",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiActionPlanDetail"
- },
  "decideBlueprintRecommendation": {
   "method": "POST",
   "path": "/configuration-sessions/{sessionId}/decisions/{decisionKey}",

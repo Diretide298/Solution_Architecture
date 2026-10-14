@@ -490,7 +490,7 @@
  },
  "setWaiverVerificationValidation": {
   "method": "PUT",
-  "path": "/waiver-verification-validation",
+  "path": "/waiver-verification-validation/{verificationId}",
   "contract": "marketing-crm",
   "summary": "Record a reviewer's verification decision on a waiver submission",
   "permission": "GUEST_MANAGE",
@@ -498,6 +498,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "verificationId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

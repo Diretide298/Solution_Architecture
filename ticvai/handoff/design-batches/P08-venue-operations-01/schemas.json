@@ -18,6 +18,7 @@
     "description": "The accreditation credential's id (`credentialId` on the events)."
    },
    "holderId": {
+    "x-ticvai-references": "accreditation.holder",
     "type": "string",
     "format": "uuid"
    },
@@ -266,6 +267,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -388,6 +390,20 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "directionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a direction change set by `setAccessPointDirection` takes effect; held `pending` until then."
+   },
+   "directionChangeReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the gate was last turned round (`setAccessPointDirection`)."
    }
   }
  },
@@ -455,6 +471,7 @@
     "format": "uuid"
    },
    "ruleId": {
+    "x-ticvai-references": "reporting.alert_rule",
     "type": "string",
     "format": "uuid"
    },
@@ -577,7 +594,8 @@
    },
    "developerId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.developer_account"
    },
    "name": {
     "type": "string"
@@ -662,6 +680,13 @@
     "nullable": true,
     "readOnly": true,
     "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   },
+   "statusReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the client was suspended (`setApiClientStatus`)."
    }
   }
  },
@@ -1517,6 +1542,7 @@
     "$ref": "#/components/schemas/DeliveryLocationKind"
    },
    "label": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "description": "What a runner is told. \"Cabana 12\", \"Row H Seat 4\", \"Lawn — north gate\"."
    },
@@ -1923,6 +1949,7 @@
     "readOnly": true
    },
    "outletId": {
+    "x-ticvai-references": "platform.outlet",
     "type": "string",
     "format": "uuid"
    },
@@ -2277,7 +2304,7 @@
  },
  "MetricSource": {
   "type": "string",
-  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
+  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.entry.estimated_call_at` against `called_at` | | `throughput` | `queue.entry` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
   "enum": [
    "occupancy",
    "capacityUtilisation",
@@ -3021,15 +3048,22 @@
   }
  },
  "RegisteredDevice": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "platform.device",
   "type": "object",
   "description": "**The only device register** (ADR-0067, accepted 1 October; the register of record since 29 September). Identity (kind, hardware type, model, serial), every version (firmware, configuration, rule package, credential package), health, heartbeat and one lifecycle (`enrolmentState`: registered, enrolled, provisioned, active, deactivated, retired) for every device in the estate live on this row. The access-control device row, which repeated serial, versions, health and lifecycle, is now `access.device_placement` and holds only where an access-control device is placed. Tenancy owns and migrates this table; Access reads it only through this contract.\n",
   "required": [
    "id",
    "kind",
-   "driver"
+   "driver",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -3068,6 +3102,7 @@
     "description": "The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the library; this names a model in it.\n"
    },
    "serialNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "nullable": true,
     "maxLength": 100,
@@ -3120,6 +3155,7 @@
     "description": "Reported connectivity."
    },
    "pushToken": {
+    "x-ticvai-secret": "field-encrypted",
     "type": "string",
     "format": "password",
     "nullable": true,
@@ -4006,6 +4042,9 @@
   }
  },
  "ScanEvent": {
+  "x-ticvai-retired-columns": [
+   "ticket_id"
+  ],
   "x-ticvai-append-only": "recordedAt",
   "x-ticvai-persistence": "access.scan_event",
   "type": "object",
@@ -4035,6 +4074,8 @@
     "type": "string"
    },
    "ticketId": {
+    "x-ticvai-references": "access.entitlement",
+    "x-ticvai-column": "entitlement_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -4468,7 +4509,8 @@
       },
       "principalId": {
        "type": "string",
-       "format": "uuid"
+       "format": "uuid",
+       "x-ticvai-references": "identity.principal"
       },
       "at": {
        "type": "string",
@@ -4495,16 +4537,24 @@
   ]
  },
  "TableDefinition": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "fnb.dining_table",
   "type": "object",
   "description": "A restaurant (dining) table, reserved with `createTableReservation`. Not a map-bookable `resources` table, which is a non-dining spot sold like a cabana (decided 29 September, rev 3 GAP-C2).",
   "required": [
    "id",
    "label",
-   "capacity"
+   "capacity",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -4880,11 +4930,13 @@
    },
    "workOrderId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.work_order"
    },
    "supplierId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "inventory.supplier"
    },
    "scope": {
     "type": "string",
@@ -4950,6 +5002,9 @@
   ]
  },
  "VenueSettings": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
@@ -5615,7 +5670,8 @@
    },
    "subscriptionId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.webhook_subscription"
    },
    "eventId": {
     "type": "string",
@@ -5742,7 +5798,8 @@
    },
    "clientId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.api_client"
    },
    "endpointUrl": {
     "type": "string"
@@ -5761,6 +5818,7 @@
     "additionalProperties": true
    },
    "signingSecret": {
+    "x-ticvai-secret": "vault-reference",
     "type": "string",
     "format": "password",
     "writeOnly": true,
@@ -6055,6 +6113,8 @@
       }
      },
      "timeEntries": {
+      "x-ticvai-persistence-column": "jsonb",
+      "x-ticvai-persistence-kind": "valueObject",
       "type": "array",
       "items": {
        "type": "object",
@@ -6078,6 +6138,8 @@
       }
      },
      "parts": {
+      "x-ticvai-persistence-column": "jsonb",
+      "x-ticvai-persistence-kind": "valueObject",
       "type": "array",
       "items": {
        "type": "object",
@@ -6268,6 +6330,9 @@
   ]
  },
  "Workstation": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "x-ticvai-persistence": "platform.workstation",
   "type": "object",
   "required": [

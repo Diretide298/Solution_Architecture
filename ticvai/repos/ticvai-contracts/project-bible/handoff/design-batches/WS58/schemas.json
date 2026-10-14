@@ -275,6 +275,9 @@
   ]
  },
  "ChannelAllocation": {
+  "x-ticvai-retired-columns": [
+   "envelope_id"
+  ],
   "x-ticvai-persistence": "catalogue.channel_envelope",
   "type": "object",
   "required": [
@@ -313,6 +316,13 @@
     "format": "date-time",
     "nullable": true,
     "description": "Unsold units return to the general pool at this time. How distribution holds are freed close to a performance without someone remembering to do it.\n"
+   },
+   "channelCapacityId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "catalogue.channel_capacity",
+    "description": "The capacity envelope this allocation draws from (`catalogue.channel_capacity`), from the path of `setChannelAllocations`."
    },
    "salesChannelId": {
     "type": "string",
@@ -632,6 +642,7 @@
     "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
    },
    "salesChannelId": {
+    "x-ticvai-references": "catalogue.sales_channel",
     "type": "string",
     "format": "uuid"
    },
@@ -1219,6 +1230,7 @@
     "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
    },
    "salesChannelId": {
+    "x-ticvai-references": "catalogue.sales_channel",
     "type": "string",
     "format": "uuid"
    },
@@ -1344,6 +1356,13 @@
     "type": "string",
     "format": "date-time",
     "readOnly": true
+   },
+   "resolutionNote": {
+    "type": "string",
+    "maxLength": 1000,
+    "nullable": true,
+    "readOnly": true,
+    "description": "How the incident was resolved (`updateChannelIncident`)."
    }
   }
  },
@@ -1664,6 +1683,7 @@
     "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
    },
    "salesChannelId": {
+    "x-ticvai-references": "catalogue.sales_channel",
     "type": "string",
     "format": "uuid"
    },

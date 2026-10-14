@@ -5,6 +5,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/campaign-command-center-bo-764",
-   "component": "apps/venue-management-web/src/routes/engagement-support/CampaignCommandCenter.tsx",
+   "component": "src/routes/engagement-support/CampaignCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -134,7 +135,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listCampaigns",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listCampaigns"
       }
      ]
     }
@@ -197,6 +199,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -206,7 +209,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/campaign-library-calendar-bo-765",
-   "component": "apps/venue-management-web/src/routes/engagement-support/CampaignLibraryCalendar.tsx",
+   "component": "src/routes/engagement-support/CampaignLibraryCalendar.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -314,6 +317,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -323,7 +327,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/campaign-builder-bo-766",
-   "component": "apps/venue-management-web/src/routes/engagement-support/CampaignBuilder.tsx",
+   "component": "src/routes/engagement-support/CampaignBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -590,6 +594,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -599,7 +604,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/audience-offer-selection-bo-767",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AudienceOfferSelection.tsx",
+   "component": "src/routes/engagement-support/AudienceOfferSelection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -724,6 +729,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -733,7 +739,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/multichannel-composer-bo-768",
-   "component": "apps/venue-management-web/src/routes/engagement-support/MultichannelComposer.tsx",
+   "component": "src/routes/engagement-support/MultichannelComposer.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -756,6 +762,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create personalized content for every selected communication channel. Provide channel-specific email, SMS, WhatsApp, push, in-app and website-banner editors and previews. Insert approved personalization tokens, products, events, tickets, QR codes, vouchers, payment links and media assets. Support brand and language variants, accessibility checks, link validation and character/channel constraints. Maintain common campaign intent while allowing controlled channel variations and version history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "division": "Shares `listMessageTemplates`, `updateCampaign` with BO-769; this screen is Multichannel Composer (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 4.05, page 22): create personalized content for every selected communication channel. Provide channel-specific email, SMS, WhatsApp, push, in-app and website-banner editors and previews. Insert approved personalization tokens, products, events, tickets, QR codes, vouchers, payment links and media assets. Support brand and language variants, accessibility checks, link validation and character/channel constraints. Maintain common campaign intent while allowing controlled channel variations and version history. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
   "gaps": [
    {
     "operation": null,
@@ -875,6 +882,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -884,7 +892,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/schedule-trigger-rules-bo-769",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ScheduleTriggerRules.tsx",
+   "component": "src/routes/engagement-support/ScheduleTriggerRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -907,6 +915,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure when and under what conditions a campaign executes. Support immediate, scheduled, recurring, event-triggered and API/webhook execution. Configure timezone, send windows, blackout dates, frequency caps, re-entry, expiry and audience refresh timing. Map events such as purchase, expiry, birthday, milestone, top-up, first visit and abandoned cart. Provide schedule summary, conflict detection and pre-flight audience/inventory revalidation. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 22",
+  "division": "Shares `listMessageTemplates`, `updateCampaign` with BO-768; this screen is Schedule & Trigger Rules (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 4.06, page 22): configure when and under what conditions a campaign executes. Support immediate, scheduled, recurring, event-triggered and API/webhook execution. Configure timezone, send windows, blackout dates, frequency caps, re-entry, expiry and audience refresh timing. Map events such as purchase, expiry, birthday, milestone, top-up, first visit and abandoned cart. Provide schedule summary, conflict detection and pre-flight audience/inventory revalidation. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 22.",
   "gaps": [
    {
     "operation": null,
@@ -929,7 +938,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listMessageTemplates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listMessageTemplates"
       },
       {
        "kind": "primaryButton",
@@ -1015,6 +1025,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_CONFIGURE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -1024,7 +1035,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/campaign-approval-workflow-bo-770",
-   "component": "apps/venue-management-web/src/routes/engagement-support/CampaignApprovalWorkflow.tsx",
+   "component": "src/routes/engagement-support/CampaignApprovalWorkflow.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1138,6 +1149,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -1147,7 +1159,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/budget-goals-forecast-bo-771",
-   "component": "apps/venue-management-web/src/routes/engagement-support/BudgetGoalsForecast.tsx",
+   "component": "src/routes/engagement-support/BudgetGoalsForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1199,7 +1211,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getCampaign",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getCampaign"
       },
       {
        "kind": "secondaryButton",
@@ -1278,6 +1291,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -1287,7 +1301,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/a-b-ai-optimization-bo-772",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ABAiOptimization.tsx",
+   "component": "src/routes/engagement-support/ABAiOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1616,6 +1630,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -1625,7 +1640,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/attribution-audit-bo-773",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AttributionAudit.tsx",
+   "component": "src/routes/engagement-support/AttributionAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1681,7 +1696,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getCampaignPerformance",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getCampaignPerformance"
       }
      ]
     }

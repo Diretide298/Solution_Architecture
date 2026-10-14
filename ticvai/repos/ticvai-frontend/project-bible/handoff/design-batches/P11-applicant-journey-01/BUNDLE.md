@@ -1,6 +1,6 @@
 # P11-applicant-journey-01 — P11 · Applicant Journey
 
-**5 screens · 10 operations · 5 schemas · 1 permissions**
+**5 screens · 9 operations · 4 schemas · 2 permissions**
 
 Platform P11 Accreditation Web · ships as **ticvai-control** ·
 public audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 1 permissions apply here:
-  `ACCREDITATION_APPLY`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 2 permissions apply here:
+  `ACCREDITATION_APPLY, ACCREDITATION_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -98,9 +98,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ACC-001` | Landing / Programme Overview | D | 0 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ACC-002` | Registration Form | D | 6 | 0 | 5 | 1 | 6 | 0 | — | notStarted (generated) |
-| `ACC-003` | Application Review & Submit | D | 0 | 0 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
-| `ACC-004` | Application Status Tracking | D | 0 | 0 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
+| `ACC-002` | Registration Form | D | 21 | 20 | 5 | 1 | 6 | 0 | — | notStarted (generated) |
+| `ACC-003` | Application Review & Submit | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ACC-004` | Application Status Tracking | D | 1 | 40 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
 | `ACC-005` | Accreditation Badge | D | 0 | 0 | 5 | 2 | 2 | 6 | — | notStarted (generated) |
 
 ---
@@ -276,7 +276,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P11 Accreditation Web (web) |
 | Module | Applicant Journey · wave 3 · needs the `accreditation` module |
 | Block | Block D · task APP-ACCRED-ACC-002 |
-| Who uses it | public staff holding `ACCREDITATION_APPLY` (1 operate); in the flows as contractor |
+| Who uses it | public staff holding `ACCREDITATION_APPLY`, `ACCREDITATION_VIEW` (1 operate, 1 read); in the flows as contractor |
 | Device and orientation | This is a public web form flow, 1440 desktop and 390 phone widths; reviewer screens as a desktop back office. · LTR and RTL · light theme |
 | Pattern | multiStepForm (compact density):  |
 | Offline | online only |
@@ -317,6 +317,26 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Supporting documents | file upload | — | — | — | — | Commission letter and badge photo. Accepted formats stated before the picker opens. | — |
 | Consent | consent block | — | — | — | — | **Stated once, unticked, and collected before documents rather than after.** The 2 September session recorded consent language as a live question for face data; the same principle applies to a press … | — |
 
+**Sent by *Save and finish later*** (`updateAccreditationApplication`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `updateAccreditationApplication` body |
+| Reference `reference` | text field | optional | — | — | — | — | `updateAccreditationApplication` body |
+| Programme `programmeId` | picker: choose a programme | required | — | — | shows names, sends the id | — | `updateAccreditationApplication` body |
+| Category code `categoryCode` | text field | optional | — | — | — | — | `updateAccreditationApplication` body |
+| Applicant type `applicantType` | text field | optional | — | — | — | — | `updateAccreditationApplication` body |
+| Submitted by principal `submittedByPrincipalId` | picker: choose a submitted by principal | optional | — | — | shows names, sends the id | — | `updateAccreditationApplication` body |
+| Organisation `organisationId` | picker: choose an organisation | optional | — | — | shows names, sends the id | — | `updateAccreditationApplication` body |
+| Subject `subject` | key and value settings | optional | — | — | — | Name, date of birth, nationality, contact — shaped by the requirements matrix. | `updateAccreditationApplication` body |
+| Status `status` | select | optional | — | Draft · Submitted · Under review · Information requested · Approved · Rejected · Withdrawn · Expired | — | — | `updateAccreditationApplication` body |
+| Decision reason `decisionReason` | text field | optional | — | — | — | — | `updateAccreditationApplication` body |
+| Approval request `approvalRequestId` | picker: choose an approval request | optional | — | — | shows names, sends the id | — | `updateAccreditationApplication` body |
+| Holder `holderId` | picker: choose a holder | optional | — | — | shows names, sends the id | — | `updateAccreditationApplication` body |
+| Submitted at `submittedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateAccreditationApplication` body |
+| Decided at `decidedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateAccreditationApplication` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `updateAccreditationApplication` body |
+
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Category and applicant type (first step)**: Category as cards from the programme's categories (closed set, never free text), then applicant type from the programme's applicantTypes. Changing category after documents are uploaded warns "Your document list will change" and keeps uploads that still match a requirement. *(source: contracts/satellite/accreditation.yaml#/components/schemas/AccreditationProgramme / DI-656)*
@@ -333,14 +353,37 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Shown**
 
-**Step 1 of 4 — Organisation** (progress indicator): Organisation · Coverage · Documents · Check and submit.
+**Step 1 of 4 — Organisation** (progress indicator, from `getAccreditationApplication`): Organisation · Coverage · Documents · Check and submit.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Reference | text | — |
+| Programme | the name it points at, never the id | — |
+| Category code | text | — |
+| Applicant type | text | — |
+| Submitted by principal | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Subject | grouped details | Name, date of birth, nationality, contact — shaped by the requirements matrix. |
+| Requirement status | list or chips (count when long) | — |
+| Requirement code | text | — |
+| Satisfied | yes / no (icon or chip) | — |
+| Document | the name it points at, never the id | — |
+| Status | chip: Draft, Submitted, Under review, Information requested, Approved, Rejected… | — |
+| Decision reason | text | — |
+| Missing requirements | list or chips (count when long) | The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting |
+| Decision due at | 1 Oct 2026, 14:30 | When a decision is due — the approvals request's SLA. |
+| Approval request | the name it points at, never the id | — |
+| Holder | the name it points at, never the id | — |
+| Renews holder | the name it points at, never the id | 12.1.37. |
+| Resubmission of application | the name it points at, never the id | 12.1.33. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Continue (primary button) | navigation or local | — | — | — | — |
-| Save and finish later (secondary button) | navigation or local | — | — | — | — |
+| Save and finish later (secondary button) | `updateAccreditationApplication` PUT `/accreditation-applications/{applicationId}` | AccreditationApplication | AccreditationApplication | 403 A guest amending an application somebody else submitted; 409 The application is not draft or informationRequested; 422 A subject field fails its requirement row's fieldType or validation | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -352,6 +395,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 - **Continue**: First press creates the application with status draft; later presses update it (whole application, per VO-R04) and move on. Errors stay against their fields and never clear entered values. A 409 means the application is no longer a draft (opened in another tab and submitted) and says so. *(source: contracts/satellite/accreditation.yaml#createAccreditationApplication / contracts/satellite/accreditation.yaml#updateAccreditationApplication)*
 - **Save and finish later**: Saves, then a dialog "Your draft is saved. Return with reference ACR-2026-004417; we have emailed you a link." *(source: screens/P11-accreditation-portal.yaml#ACC-002)*
 - **Upload a document**: Sends the file against its requirementCode (with expiresAt where asked); the slot shows Uploaded with the file name and a Replace link. A file over the size limit or in another format is refused before upload with the limit named. *(source: contracts/satellite/accreditation.yaml#submitAccreditationDocument / DI-657)*
+
+**Data it reads**: `getAccreditationApplication` (onLoad, The draft being resumed from the acknowledgement link …)
 
 **Where the user goes next**
 
@@ -417,10 +462,12 @@ reference: ACR-2026-004417
 #### Permissions
 
 - `createAccreditationApplication` → `ACCREDITATION_APPLY` (operate) · staff, guest
-- `submitAccreditationDocument` → `ACCREDITATION_APPLY` (operate) · staff, guest
 - `updateAccreditationApplication` → `ACCREDITATION_APPLY` (operate) · staff, guest
+- `getAccreditationApplication` → `ACCREDITATION_VIEW` (read) · staff
 
 **A refused user sees:** The programme is closed. Says when it reopens.
+
+Screen guard: `ACCREDITATION_VIEW`
 
 #### Requirements it meets
 
@@ -455,12 +502,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (403, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state (403, 404, 409, 422).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ACC-002?state=<state>`: loading, emptyFirstRun, error, denied, offline.
 - [ ] Every action is wired with its success and its failure: Continue, Save and finish later.
 - [ ] Every transition is wired: `ACC-003`, `ACC-007`.
-- [ ] Every gated control is gated: `ACCREDITATION_APPLY`.
+- [ ] Every gated control is gated: `ACCREDITATION_APPLY`, `ACCREDITATION_VIEW`.
 - [ ] The 6 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 5 edge case(s) from the process notes are drawn.
 - [ ] The 5 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -527,7 +574,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Submit application (primary button) | navigation or local | — | — | — | — |
+| Submit application (primary button) | `submitAccreditationApplication` POST `/accreditation-applications/{applicationId}/submit` | — | AccreditationApplication | 409 Not a draft, or the programme's application window is closed; 422 A requirement that blocks submission is not satisfied | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -559,7 +606,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | No draft to review. Sends the applicant to `ACC-002` rather than showing an empty summary. |
 | Empty, first run (`?state=emptyFirstRun`) | No draft to review. Sends the applicant to ACC-002 rather than showing an empty summary. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Not a draft, or the programme's application window is closed; 409 The application is not draft or informationRequested; 422 A requirement that blocks submission is not satisfied; 422 A subject field fails its requirement row's fieldType or validation |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 Not a draft, or the programme's application window is closed; 422 A requirement that blocks submission is not satisfied |
 
 #### Edge cases to draw
 
@@ -587,17 +634,14 @@ unmetBlockingApproval:
 #### Permissions
 
 - `submitAccreditationApplication` → `ACCREDITATION_APPLY` (operate) · staff, guest
-- `updateAccreditationApplication` → `ACCREDITATION_APPLY` (operate) · staff, guest
 
 **A refused user sees:** The programme closed while the application was open. Says so plainly.
 
+Screen guard: `ACCREDITATION_APPLY`
+
 #### Requirements it meets
 
-1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 12.1.2 | Accreditation Registration System shall support accreditation applications through configurable forms. | Accreditation & Credential Management | CONTRACTED | `updateAccreditationApplication` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -618,7 +662,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 409, 422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ACC-003?state=<state>`: loading, error, denied, emptyNoResults, emptyFirstRun, offline.
 - [ ] Every action is wired with its success and its failure: Submit application.
@@ -673,7 +717,11 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|---|---|
 | Status | text field | — | — | `listMyAccreditationApplications` ?status |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by *Withdraw this application*** (`withdrawAccreditationApplication`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Reason `reason` | text area | optional | — | max length 500 | — | — | `withdrawAccreditationApplication` body |
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -686,16 +734,62 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **With a reviewer** (banner): Where it is now, and **the date a decision is due** — `ApprovalRequest.slaDueAt`. *"Fourth in the queue"* was considered and rejected on the frame: a position moves backwards and a date does not.
 
-**Where it has been** (timeline): Received, documents checked, decision — each with its date.
+**Where it has been** (timeline, from `listMyAccreditationApplications`): Received, documents checked, decision — each with its date.
 
-**Application** (detail panel): The reference, the performances, and what was requested.
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Reference | text | — |
+| Programme | the name it points at, never the id | — |
+| Category code | text | — |
+| Applicant type | text | — |
+| Submitted by principal | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Subject | grouped details | Name, date of birth, nationality, contact — shaped by the requirements matrix. |
+| Requirement status | list or chips (count when long) | — |
+| Requirement code | text | — |
+| Satisfied | yes / no (icon or chip) | — |
+| Document | the name it points at, never the id | — |
+| Status | chip: Draft, Submitted, Under review, Information requested, Approved, Rejected… | — |
+| Decision reason | text | — |
+| Missing requirements | list or chips (count when long) | The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting |
+| Decision due at | 1 Oct 2026, 14:30 | When a decision is due — the approvals request's SLA. |
+| Approval request | the name it points at, never the id | — |
+| Holder | the name it points at, never the id | — |
+| Renews holder | the name it points at, never the id | 12.1.37. |
+
+**Application** (detail panel, from `listMyAccreditationApplications`): The reference, the performances, and what was requested.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Reference | text | — |
+| Programme | the name it points at, never the id | — |
+| Category code | text | — |
+| Applicant type | text | — |
+| Submitted by principal | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Subject | grouped details | Name, date of birth, nationality, contact — shaped by the requirements matrix. |
+| Requirement status | list or chips (count when long) | — |
+| Requirement code | text | — |
+| Satisfied | yes / no (icon or chip) | — |
+| Document | the name it points at, never the id | — |
+| Status | chip: Draft, Submitted, Under review, Information requested, Approved, Rejected… | — |
+| Decision reason | text | — |
+| Missing requirements | list or chips (count when long) | The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting |
+| Decision due at | 1 Oct 2026, 14:30 | When a decision is due — the approvals request's SLA. |
+| Approval request | the name it points at, never the id | — |
+| Holder | the name it points at, never the id | — |
+| Renews holder | the name it points at, never the id | 12.1.37. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Add a document (secondary button) | navigation or local | — | — | — | — |
-| Withdraw this application (destructive button) | navigation or local | — | — | — | — |
+| Withdraw this application (destructive button) | `withdrawAccreditationApplication` POST `/accreditation-applications/{applicationId}/withdraw` | inline | AccreditationApplication | 403 A guest withdrawing an application somebody else submitted; 409 The application is already decided, withdrawn or expired | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -731,7 +825,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Denied (`?state=denied`) | The reference has expired. Applications are readable for a stated period after the season. |
 | Empty, first run (`?state=emptyFirstRun`) | No application behind this reference yet — a reference issued but not submitted. Points back at the draft. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Not informationRequested or rejected, or the programme's window is closed; 409 The application is already decided, withdrawn or expired; 409 The application is not draft or informationRequested; 422 A requirement that blocks submission is still not satisfied |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The application is already decided, withdrawn or expired |
 
 #### Edge cases to draw
 
@@ -773,20 +867,17 @@ applications:
 
 - `listMyAccreditationApplications` → `ACCREDITATION_APPLY` (operate) · guest
 - `withdrawAccreditationApplication` → `ACCREDITATION_APPLY` (operate) · staff, guest
-- `submitAccreditationDocument` → `ACCREDITATION_APPLY` (operate) · staff, guest
-- `updateAccreditationApplication` → `ACCREDITATION_APPLY` (operate) · staff, guest
-- `resubmitAccreditationApplication` → `ACCREDITATION_APPLY` (operate) · staff, guest
 
 **A refused user sees:** The reference has expired. Applications are readable for a stated period after the season.
 
+Screen guard: `ACCREDITATION_APPLY`
+
 #### Requirements it meets
 
-9 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 12.1.2 | Accreditation Registration System shall support accreditation applications through configurable forms. | Accreditation & Credential Management | CONTRACTED | `updateAccreditationApplication` |
-| 12.1.33 | Accreditation Rejection Management - System shall support rejection and resubmission workflows. | Accreditation & Credential Management | CONTRACTED | `resubmitAccreditationApplication` |
 | 11.1.10 | Out-of-Office Routing - System shall automatically reroute approvals when approvers are unavailable. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
 | 11.1.28 | Mobile Approvals - System shall support approval actions through mobile applications. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
 | 11.1.29 | Email-Based Approvals - System shall support approval actions through email links. | Approval Workflows & Governance | CONTRACTED | data `ApprovalRequest` |
@@ -814,8 +905,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (403, 409).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ACC-004?state=<state>`: loading, emptyNoResults, error, denied, emptyFirstRun, offline.
 - [ ] Every action is wired with its success and its failure: Add a document, Withdraw this application.
 - [ ] Every transition is wired: `ACC-005`.
@@ -964,6 +1055,8 @@ zones:
 - `issueMyAccreditationWalletPass` → `ACCREDITATION_APPLY` (operate) · guest
 - `renewAccreditation` → `ACCREDITATION_APPLY` (operate) · staff, guest
 
+Screen guard: `ACCREDITATION_APPLY`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1095,13 +1188,12 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "createAccreditationApplication": {"method":"POST","path":"/accreditation-applications","contract":"accreditation","summary":"Apply, or apply on behalf of somebody","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccreditationApplication","responds":"AccreditationApplication"},
+"getAccreditationApplication": {"method":"GET","path":"/accreditation-applications/{applicationId}","contract":"accreditation","summary":"One application, with where each requirement stands","permission":"ACCREDITATION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AccreditationApplication"},
 "issueMyAccreditationWalletPass": {"method":"POST","path":"/my/accreditation-credentials/{credentialId}/wallet-pass","contract":"accreditation","summary":"Put my accreditation credential in Apple or Google Wallet","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccreditationCredentialDelivery"},
 "listMyAccreditationApplications": {"method":"GET","path":"/my/accreditation-applications","contract":"accreditation","summary":"The applications this person made, or that were made for them","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listMyAccreditationCredentials": {"method":"GET","path":"/my/accreditation-credentials","contract":"accreditation","summary":"The credentials this person holds, with where each is valid","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "renewAccreditation": {"method":"POST","path":"/accreditation-holders/{holderId}/renew","contract":"accreditation","summary":"Renew a holder's accreditation for another period","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccreditationApplication"},
-"resubmitAccreditationApplication": {"method":"POST","path":"/accreditation-applications/{applicationId}/resubmit","contract":"accreditation","summary":"Send an application back after a return for information or a rejection","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccreditationApplication"},
 "submitAccreditationApplication": {"method":"POST","path":"/accreditation-applications/{applicationId}/submit","contract":"accreditation","summary":"Send a draft for review","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccreditationApplication"},
-"submitAccreditationDocument": {"method":"POST","path":"/accreditation-documents","contract":"accreditation","summary":"Supply a document against a requirement","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccreditationDocument","responds":"AccreditationDocument"},
 "updateAccreditationApplication": {"method":"PUT","path":"/accreditation-applications/{applicationId}","contract":"accreditation","summary":"Save a draft, or amend an application returned for information","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccreditationApplication","responds":"AccreditationApplication"},
 "withdrawAccreditationApplication": {"method":"POST","path":"/accreditation-applications/{applicationId}/withdraw","contract":"accreditation","summary":"Withdraw an application before it is decided","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccreditationApplication"}
 }
@@ -1113,10 +1205,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AccreditationApplication": {"type":"object","x-ticvai-persistence":"accreditation.application","description":"Board 1.3. **Usually submitted by an organisation on behalf of its people.**","required":["programmeId"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"applicantType":{"type":"string"},"submittedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"subject":{"type":"object","additionalProperties":true,"description":"Name, date of birth, nationality, contact — shaped by the requirements matrix."},"requirementStatus":{"type":"array","readOnly":true,"items":{"type":"object","properties":{"requirementCode":{"type":"string"},"satisfied":{"type":"boolean"},"documentId":{"type":"string","format":"uuid","nullable":true}}}},"status":{"type":"string","enum":["draft","submitted","underReview","informationRequested","approved","rejected","withdrawn","expired"]},"decisionReason":{"type":"string","nullable":true},"missingRequirements":{"type":"array","readOnly":true,"description":"The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting","items":{"type":"string"}},"decisionDueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a decision is due — the approvals request's SLA. **A date, not a queue position**"},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"holderId":{"type":"string","format":"uuid","nullable":true},"renewsHolderId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"},"resubmissionOfApplicationId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.33. The rejected application this one resubmits, so the rejection stays in the record"},"resubmissionNote":{"type":"string","maxLength":1000,"nullable":true,"readOnly":true,"description":"What the applicant changed, from `resubmitAccreditationApplication`"},"submittedAt":{"type":"string","format":"date-time","nullable":true},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
-"AccreditationCredential": {"type":"object","x-ticvai-persistence":"accreditation.credential","description":"Board 4. **Not the accreditation** — reissuing one re-vets nobody.","required":["holderId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["printedBadge","mobileCredential","qr","nfcCard","rfidCard","wristband"]},"symbology":{"type":"string","nullable":true,"description":"12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n","enum":["qr","dataMatrix","pdf417","aztec","code128","nfcNdef","rfidEpc","none"]},"serialNumber":{"type":"string","nullable":true},"encodedIdentifier":{"type":"string","nullable":true},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"issuedBy":{"type":"string","format":"uuid"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["pendingPrint","issued","active","lost","replaced","revoked","expired"]},"replacesCredentialId":{"type":"string","format":"uuid","nullable":true},"replacementCount":{"type":"integer","default":0},"scopePath":{"type":"string"}}},
-"AccreditationCredentialDelivery": {"type":"object","x-ticvai-persistence":"accreditation.mobile_credential_delivery","description":"12.1.21. **Issuing a mobile credential and getting it onto a phone are two acts**, and the second is recorded so *\"I never got it\"* has an answer. Written by `deliverAccreditationCredential` (the accreditation team sends it) and `issueMyAccreditationWalletPass` (the holder adds it to a wallet).\n","required":["credentialId","channel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"credentialId":{"type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","readOnly":true},"channel":{"type":"string","enum":["email","sms","holderApp","appleWallet","googleWallet"]},"destinationMasked":{"type":"string","nullable":true,"readOnly":true,"description":"The address or number used, masked (`j***@agency.com`). Always the holder's own"},"walletPassSerial":{"type":"string","nullable":true,"readOnly":true},"walletPassUrl":{"type":"string","nullable":true,"readOnly":true,"description":"Signed and expiring; adds the pass to the wallet"},"status":{"type":"string","readOnly":true,"enum":["queued","sent","delivered","opened","failed","superseded"]},"failureReason":{"type":"string","nullable":true,"readOnly":true},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time","readOnly":true},"deliveredAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}},
-"AccreditationDocument": {"type":"object","x-ticvai-persistence":"accreditation.document","description":"Board 2.5. **Submitted against a named requirement, not into a folder.**","required":["requirementCode","assetId"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","nullable":true},"applicationId":{"type":"string","format":"uuid","nullable":true},"requirementCode":{"type":"string"},"assetId":{"type":"string","format":"uuid"},"submittedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["submitted","verified","rejected","expired"]},"verifiedBy":{"type":"string","format":"uuid","nullable":true},"verifiedAt":{"type":"string","format":"date-time","nullable":true},"rejectionReason":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date","nullable":true,"description":"**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"},"scopePath":{"type":"string"}}},
+"AccreditationApplication": {"type":"object","x-ticvai-persistence":"accreditation.application","description":"Board 1.3. **Usually submitted by an organisation on behalf of its people.**","required":["programmeId"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"programmeId":{"x-ticvai-references":"accreditation.programme","type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"applicantType":{"type":"string"},"submittedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"subject":{"type":"object","additionalProperties":true,"description":"Name, date of birth, nationality, contact — shaped by the requirements matrix."},"requirementStatus":{"x-ticvai-persisted":false,"type":"array","readOnly":true,"items":{"type":"object","properties":{"requirementCode":{"type":"string"},"satisfied":{"type":"boolean"},"documentId":{"type":"string","format":"uuid","nullable":true}}}},"status":{"type":"string","enum":["draft","submitted","underReview","informationRequested","approved","rejected","withdrawn","expired"]},"decisionReason":{"type":"string","nullable":true},"missingRequirements":{"type":"array","readOnly":true,"description":"The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting","items":{"type":"string"}},"decisionDueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a decision is due — the approvals request's SLA. **A date, not a queue position**"},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"holderId":{"type":"string","format":"uuid","nullable":true},"renewsHolderId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"},"resubmissionOfApplicationId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.33. The rejected application this one resubmits, so the rejection stays in the record"},"resubmissionNote":{"type":"string","maxLength":1000,"nullable":true,"readOnly":true,"description":"What the applicant changed, from `resubmitAccreditationApplication`"},"submittedAt":{"type":"string","format":"date-time","nullable":true},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
+"AccreditationCredential": {"type":"object","x-ticvai-persistence":"accreditation.credential","description":"Board 4. **Not the accreditation** — reissuing one re-vets nobody.","required":["holderId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"x-ticvai-references":"accreditation.holder","type":"string","format":"uuid"},"kind":{"type":"string","enum":["printedBadge","mobileCredential","qr","nfcCard","rfidCard","wristband"]},"symbology":{"type":"string","nullable":true,"description":"12.1.22. **How `encodedIdentifier` is carried**, so a reader and a badge renderer agree: `qr` for a QR credential and the default for a `mobileCredential`, a barcode where a printed badge carries one, `nfcNdef` or `rfidEpc` for an encoded card, `none` where nothing is encoded.\n","enum":["qr","dataMatrix","pdf417","aztec","code128","nfcNdef","rfidEpc","none"]},"serialNumber":{"type":"string","nullable":true},"encodedIdentifier":{"type":"string","nullable":true},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true},"issuedAt":{"type":"string","format":"date-time"},"issuedBy":{"type":"string","format":"uuid"},"activatedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["pendingPrint","issued","active","lost","replaced","revoked","expired"]},"replacesCredentialId":{"type":"string","format":"uuid","nullable":true},"replacementCount":{"type":"integer","default":0},"scopePath":{"type":"string"}}},
+"AccreditationCredentialDelivery": {"type":"object","x-ticvai-persistence":"accreditation.mobile_credential_delivery","description":"12.1.21. **Issuing a mobile credential and getting it onto a phone are two acts**, and the second is recorded so *\"I never got it\"* has an answer. Written by `deliverAccreditationCredential` (the accreditation team sends it) and `issueMyAccreditationWalletPass` (the holder adds it to a wallet).\n","required":["credentialId","channel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"credentialId":{"x-ticvai-references":"accreditation.credential","type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","readOnly":true},"channel":{"type":"string","enum":["email","sms","holderApp","appleWallet","googleWallet"]},"destinationMasked":{"type":"string","nullable":true,"readOnly":true,"description":"The address or number used, masked (`j***@agency.com`). Always the holder's own"},"walletPassSerial":{"type":"string","nullable":true,"readOnly":true},"walletPassUrl":{"type":"string","nullable":true,"readOnly":true,"description":"Signed and expiring; adds the pass to the wallet"},"status":{"type":"string","readOnly":true,"enum":["queued","sent","delivered","opened","failed","superseded"]},"failureReason":{"type":"string","nullable":true,"readOnly":true},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time","readOnly":true},"deliveredAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
 }
 ```

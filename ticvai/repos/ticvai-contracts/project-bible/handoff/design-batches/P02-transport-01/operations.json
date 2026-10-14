@@ -3,7 +3,7 @@
   "method": "POST",
   "path": "/carts/{cartId}/lines",
   "contract": "orders",
-  "summary": "Add something",
+  "summary": "Add a line to the cart",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -107,19 +107,6 @@
   ],
   "requestBody": null,
   "responds": "FareTable"
- },
- "getTransportRoute": {
-  "method": "GET",
-  "path": "/transport/routes/{routeId}",
-  "contract": "transport",
-  "summary": "A route with its stops",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "TransportRoute"
  },
  "getTransportRouteMap": {
   "method": "GET",

@@ -16,6 +16,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -138,6 +139,20 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "directionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a direction change set by `setAccessPointDirection` takes effect; held `pending` until then."
+   },
+   "directionChangeReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the gate was last turned round (`setAccessPointDirection`)."
    }
   }
  },
@@ -413,11 +428,13 @@
     "format": "uuid"
    },
    "performanceId": {
+    "x-ticvai-references": "catalogue.performance",
     "type": "string",
     "format": "uuid",
     "description": "The `catalogue.performance` this participant is on (audit R165)."
    },
    "subjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -530,6 +547,7 @@
     "type": "string"
    },
    "productId": {
+    "x-ticvai-references": "rental.product",
     "type": "string",
     "format": "uuid"
    },
@@ -595,6 +613,7 @@
     "nullable": true
    },
    "depositAuthorisationId": {
+    "x-ticvai-references": "orders.stored_value_authorisation",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -604,6 +623,7 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "readiness": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "**Computed, not stored** — agreement, requirements, deposit, equipment.",
@@ -631,14 +651,29 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "changeReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the booking was last changed (`updateRentalBooking`)."
    }
   }
  },
  "RentalParticipant": {
+  "required": [
+   "scopePath"
+  ],
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "rental.participant",
   "description": "Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n",
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -787,6 +822,7 @@
     "description": "Ties the occurrences of a recurring booking. **Cancelling one week does not cancel the series**, and cancelling the series is a separate act with a separate confirmation.\n"
    },
    "depositAuthorisationId": {
+    "x-ticvai-references": "orders.stored_value_authorisation",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -821,6 +857,12 @@
     "nullable": true,
     "readOnly": true,
     "description": "When the latest offline check-out or check-in write reached the server. **The device times are `checkedOutAt` and `returnedAt`**, taken from each write's `recordedAt`; this is the server's half of the pair naming-and-style 5.2 requires. Null while pending.\n"
+   },
+   "changeReason": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the booking was last changed (`updateResourceBooking`)."
    }
   }
  },
@@ -894,6 +936,9 @@
   }
  },
  "ScanEvent": {
+  "x-ticvai-retired-columns": [
+   "ticket_id"
+  ],
   "x-ticvai-append-only": "recordedAt",
   "x-ticvai-persistence": "access.scan_event",
   "type": "object",
@@ -923,6 +968,8 @@
     "type": "string"
    },
    "ticketId": {
+    "x-ticvai-references": "access.entitlement",
+    "x-ticvai-column": "entitlement_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,

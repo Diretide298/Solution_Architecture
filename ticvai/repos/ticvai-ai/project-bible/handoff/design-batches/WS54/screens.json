@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "10",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/promotion-performance-command-center-adm-228",
-   "component": "apps/venue-management-web/src/routes/commercial/PromotionPerformanceCommandCenter.tsx",
+   "component": "src/routes/commercial/PromotionPerformanceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -106,7 +107,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -295,6 +296,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "10",
@@ -304,7 +306,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/campaign-promotion-performance-explorer-adm-229",
-   "component": "apps/venue-management-web/src/routes/commercial/CampaignPromotionPerformanceExplorer.tsx",
+   "component": "src/routes/commercial/CampaignPromotionPerformanceExplorer.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -472,6 +474,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "10",
@@ -481,7 +484,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/redemption-conversion-funnel-analytics-adm-230",
-   "component": "apps/venue-management-web/src/routes/commercial/RedemptionConversionFunnelAnalytics.tsx",
+   "component": "src/routes/commercial/RedemptionConversionFunnelAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -511,7 +514,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -656,6 +659,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "10",
@@ -665,7 +669,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/discount-margin-profitability-analytics-adm-231",
-   "component": "apps/venue-management-web/src/routes/commercial/DiscountMarginProfitabilityAnalytics.tsx",
+   "component": "src/routes/commercial/DiscountMarginProfitabilityAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -831,6 +835,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "10",
@@ -840,7 +845,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/bundle-bogo-advanced-offer-analytics-adm-232",
-   "component": "apps/venue-management-web/src/routes/commercial/BundleBogoAdvancedOfferAnalytics.tsx",
+   "component": "src/routes/commercial/BundleBogoAdvancedOfferAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1034,6 +1039,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "10",
@@ -1043,7 +1049,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upsell-cross-sell-attach-rate-analytics-adm-233",
-   "component": "apps/venue-management-web/src/routes/commercial/UpsellCrossSellAttachRateAnalytics.tsx",
+   "component": "src/routes/commercial/UpsellCrossSellAttachRateAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1073,7 +1079,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1240,6 +1246,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "10",
@@ -1249,7 +1256,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/customer-segment-channel-partner-analytics-adm-234",
-   "component": "apps/venue-management-web/src/routes/commercial/CustomerSegmentChannelPartnerAnalytics.tsx",
+   "component": "src/routes/commercial/CustomerSegmentChannelPartnerAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1278,7 +1285,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1462,6 +1469,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "10",
@@ -1471,7 +1479,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/incrementality-attribution-cannibalization-analysis-adm-235",
-   "component": "apps/venue-management-web/src/routes/commercial/IncrementalityAttributionCannibalizationAnalysis.tsx",
+   "component": "src/routes/commercial/IncrementalityAttributionCannibalizationAnalysis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1596,6 +1604,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "10",
@@ -1605,7 +1614,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ai-optimization-next-best-action-center-adm-236",
-   "component": "apps/venue-management-web/src/routes/commercial/AiOptimizationNextBestActionCenter.tsx",
+   "component": "src/routes/commercial/AiOptimizationNextBestActionCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1727,6 +1736,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "10",
@@ -1736,7 +1746,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/executive-promotion-intelligence-reporting-studio-adm-237",
-   "component": "apps/venue-management-web/src/routes/commercial/ExecutivePromotionIntelligenceReportingStudio.tsx",
+   "component": "src/routes/commercial/ExecutivePromotionIntelligenceReportingStudio.tsx",
    "status": "notStarted"
   },
   "navigation": {

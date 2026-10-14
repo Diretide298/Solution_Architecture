@@ -31,6 +31,7 @@
   ],
   "properties": {
    "menuItemId": {
+    "x-ticvai-references": "fnb.menu_item",
     "type": "string",
     "format": "uuid"
    },
@@ -276,6 +277,7 @@
     "type": "integer"
    },
    "pendingApprovers": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -613,6 +615,7 @@
     "format": "uuid"
    },
    "menuItemId": {
+    "x-ticvai-references": "fnb.menu_item",
     "type": "string",
     "format": "uuid"
    },
@@ -912,6 +915,7 @@
     }
    },
    "defaultStationId": {
+    "x-ticvai-references": "fnb.kitchen_station",
     "type": "string",
     "format": "uuid",
     "description": "Where a line that matches no item rule and no category rule goes (workbook Q190). Never refused for want of a station."
@@ -938,6 +942,7 @@
   "description": "**How long a ticket may sit, per service mode, and what pushes it up the rail** (`setKitchenSla`). The priority weights are the ones `listKitchenTickets` orders the rail by.\n\n**Stored per outlet in `fnb.kitchen_sla`** (3 October 2026, CHG-R1S-005: the HLD/LLD cross-check found `setKitchenSla` wrote no table). One row per outlet; the targets and weights are held whole.\n",
   "properties": {
    "outletId": {
+    "x-ticvai-references": "platform.outlet",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -996,14 +1001,21 @@
   }
  },
  "KitchenStation": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "fnb.kitchen_station",
   "type": "object",
   "required": [
    "id",
    "code",
-   "name"
+   "name",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -1077,6 +1089,7 @@
     "format": "uuid"
    },
    "orderId": {
+    "x-ticvai-references": "fnb.service_order",
     "type": "string",
     "format": "uuid",
     "description": "The F&B order the ticket was created from on acceptance (`FnbOrder.id`)."
@@ -1328,6 +1341,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "maxLength": 64
    },
@@ -1517,7 +1531,8 @@
    "productVariantId",
    "name",
    "price",
-   "isAvailable"
+   "isAvailable",
+   "menuSectionId"
   ],
   "properties": {
    "id": {
@@ -1570,9 +1585,9 @@
     "nullable": true
    },
    "menuSectionId": {
+    "x-ticvai-references": "fnb.menu_section",
     "type": "string",
     "format": "uuid",
-    "nullable": true,
     "readOnly": true,
     "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
    },
@@ -1602,6 +1617,13 @@
     "items": {
      "$ref": "#/components/schemas/AllergenCode"
     }
+   },
+   "unavailableNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The free text with an `other` unavailable reason (`setItemAvailability`); reviewed quarterly so the common ones become reasons (audit R222)."
    }
   }
  },
@@ -1622,6 +1644,7 @@
     "readOnly": true
    },
    "menuId": {
+    "x-ticvai-references": "fnb.menu",
     "type": "string",
     "format": "uuid"
    },
@@ -1715,6 +1738,7 @@
     "readOnly": true
    },
    "menuId": {
+    "x-ticvai-references": "fnb.menu",
     "type": "string",
     "format": "uuid"
    },
@@ -1804,10 +1828,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -2360,6 +2386,9 @@
   }
  },
  "VenueSettings": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",

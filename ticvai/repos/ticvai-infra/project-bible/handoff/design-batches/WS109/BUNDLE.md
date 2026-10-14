@@ -98,14 +98,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-625` | Accreditation Holder Directory | D | 0 | 50 | 6 | 3 | 1 | 6 | — | notStarted (—) |
-| `BO-626` | Accreditation Holder Profile | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-627` | Identity Details & Verification | D | 0 | 18 | 6 | 2 | 2 | 0 | — | notStarted (—) |
-| `BO-628` | Photo Management | D | 0 | 18 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-626` | Accreditation Holder Profile | D | 0 | 20 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-627` | Identity Details & Verification | D | 0 | 20 | 6 | 2 | 2 | 0 | — | notStarted (—) |
+| `BO-628` | Photo Management | D | 0 | 20 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-629` | Document Repository | D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `BO-630` | Document Verification Queue | D | 0 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
-| `BO-631` | Duplicate & Identity Conflict Detection | D | 3 | 0 | 6 | 0 | 2 | 2 | — | notStarted (—) |
+| `BO-631` | Duplicate & Identity Conflict Detection | D | 3 | 11 | 6 | 0 | 2 | 2 | — | notStarted (—) |
 | `BO-632` | Organization & Affiliation Management | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-633` | Profile Completeness & Compliance Monitor | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-633` | Profile Completeness & Compliance Monitor | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-634` | Profile History & Audit Timeline | D | 7 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -173,7 +173,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every accreditation holder** (data table)
+**Every accreditation holder** (data table, from `listAccreditationHolders`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -327,6 +327,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -433,7 +435,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getAccreditationHolder`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Accreditation number | text | — |
+| Full name | text | — |
+| Photo image | the image or video | — |
+| Date of birth | 1 Oct 2026 | — |
+| Nationality | text | — |
+| Email | email, tap to write | 12.1.16. |
+| Phone | +971 50 123 4567 | 12.1.16. |
+| Identity document verified | yes / no (icon or chip) | — |
+| Organisation | the name it points at, never the id | — |
+| Affiliation role | text | — |
+| Programme | the name it points at, never the id | — |
+| Category code | text | — |
+| Status | chip: Active, Suspended, Revoked, Expired, Archived | — |
+| Valid from | 1 Oct 2026 | — |
+| Valid to | 1 Oct 2026 | — |
+| Completeness percent | 1,234 | — |
+| Status effective from | 1 Oct 2026, 14:30 | When the status `setAccreditationStatus` set takes effect. |
+| Status review at | 1 Oct 2026 | When the status is due for review (`setAccreditationStatus`). |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -495,6 +520,8 @@ holder:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -526,7 +553,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-626?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-625`.
@@ -611,6 +638,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Valid from | 1 Oct 2026 | — |
 | Valid to | 1 Oct 2026 | — |
 | Completeness percent | 1,234 | — |
+| Status effective from | 1 Oct 2026, 14:30 | When the status `setAccreditationStatus` set takes effect. |
+| Status review at | 1 Oct 2026 | When the status is due for review (`setAccreditationStatus`). |
 
 **Actions and what each produces**
 
@@ -682,6 +711,8 @@ verification:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -714,7 +745,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-627?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save accreditation holder, Cancel.
 - [ ] Every transition is wired: `BO-625`.
@@ -797,6 +828,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Valid from | 1 Oct 2026 | — |
 | Valid to | 1 Oct 2026 | — |
 | Completeness percent | 1,234 | — |
+| Status effective from | 1 Oct 2026, 14:30 | When the status `setAccreditationStatus` set takes effect. |
+| Status review at | 1 Oct 2026 | When the status is due for review (`setAccreditationStatus`). |
 
 **Actions and what each produces**
 
@@ -865,6 +898,8 @@ history:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -894,7 +929,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-628?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save accreditation holder, Cancel.
 - [ ] Every transition is wired: `BO-625`.
@@ -1040,6 +1075,8 @@ Draw the default until it is answered.
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1173,6 +1210,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the document verification queue are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The document is not `submitted` (already `verified` or `rejected`, or `expired`); only a submitted document is decided. |
 
 #### Edge cases to draw
 
@@ -1217,6 +1255,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1250,7 +1290,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-630?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Verify, Cancel.
@@ -1325,7 +1365,21 @@ Errors to draw in the form: 409 The conflict is already merged or rejected; 422 
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAccreditationIdentityConflicts`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Holders | list or chips (count when long) | — |
+| Score | 1,234.5 | — |
+| Matched on | list or chips (count when long) | — |
+| Differing access | yes / no (icon or chip) | — |
+| Status | chip: Pending, Merged, Rejected | — |
+| Detected at | 1 Oct 2026, 14:30 | — |
+| Surviving holder | the name it points at, never the id | The holder kept when the conflict was merged |
+| Resolution reason | text | — |
+| Resolved by principal | the name it points at, never the id | — |
+| Resolved at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -1400,6 +1454,8 @@ conflicts:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1428,7 +1484,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-631?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Resolve identity conflict.
 - [ ] Every transition is wired: `BO-625`.
@@ -1559,6 +1615,8 @@ organisations:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1638,7 +1696,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getAccreditationHolder`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Accreditation number | text | — |
+| Full name | text | — |
+| Photo image | the image or video | — |
+| Date of birth | 1 Oct 2026 | — |
+| Nationality | text | — |
+| Email | email, tap to write | 12.1.16. |
+| Phone | +971 50 123 4567 | 12.1.16. |
+| Identity document verified | yes / no (icon or chip) | — |
+| Organisation | the name it points at, never the id | — |
+| Affiliation role | text | — |
+| Programme | the name it points at, never the id | — |
+| Category code | text | — |
+| Status | chip: Active, Suspended, Revoked, Expired, Archived | — |
+| Valid from | 1 Oct 2026 | — |
+| Valid to | 1 Oct 2026 | — |
+| Completeness percent | 1,234 | — |
+| Status effective from | 1 Oct 2026, 14:30 | When the status `setAccreditationStatus` set takes effect. |
+| Status review at | 1 Oct 2026 | When the status is due for review (`setAccreditationStatus`). |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1696,6 +1777,8 @@ items:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1720,7 +1803,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-633?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-625`.
@@ -1856,6 +1939,8 @@ entries:
 - `listAccreditationAudit` → `ACCREDITATION_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ACCREDITATION_VIEW`
 
 #### Requirements it meets
 
@@ -2014,8 +2099,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "AccreditationAuditRecord": {"type":"object","x-ticvai-persistence":"accreditation.audit","description":"Board 8.7. **Who gave this person access to that place, when, and on whose authority.**\n","properties":{"id":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"holderId":{"type":"string","format":"uuid","nullable":true},"action":{"type":"string"},"actorPrincipalId":{"type":"string","format":"uuid","nullable":true},"previousValue":{"nullable":true},"newValue":{"nullable":true},"reason":{"type":"string","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"previousRecordHash":{"type":"string","nullable":true},"recordHash":{"type":"string"},"integrity":{"type":"string","readOnly":true,"enum":["intact","broken","unverifiable"]},"scopePath":{"type":"string"}}},
-"AccreditationDocument": {"type":"object","x-ticvai-persistence":"accreditation.document","description":"Board 2.5. **Submitted against a named requirement, not into a folder.**","required":["requirementCode","assetId"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","nullable":true},"applicationId":{"type":"string","format":"uuid","nullable":true},"requirementCode":{"type":"string"},"assetId":{"type":"string","format":"uuid"},"submittedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["submitted","verified","rejected","expired"]},"verifiedBy":{"type":"string","format":"uuid","nullable":true},"verifiedAt":{"type":"string","format":"date-time","nullable":true},"rejectionReason":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date","nullable":true,"description":"**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"},"scopePath":{"type":"string"}}},
-"AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
+"AccreditationDocument": {"type":"object","x-ticvai-persistence":"accreditation.document","description":"Board 2.5. **Submitted against a named requirement, not into a folder.**","required":["requirementCode","assetId"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","nullable":true},"applicationId":{"type":"string","format":"uuid","nullable":true},"requirementCode":{"type":"string"},"assetId":{"x-ticvai-references":"assets.media_asset","type":"string","format":"uuid"},"submittedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["submitted","verified","rejected","expired"]},"verifiedBy":{"type":"string","format":"uuid","nullable":true},"verifiedAt":{"type":"string","format":"date-time","nullable":true},"rejectionReason":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date","nullable":true,"description":"**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"},"scopePath":{"type":"string"}}},
+"AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"},"statusEffectiveFrom":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the status `setAccreditationStatus` set takes effect."},"statusReviewAt":{"type":"string","format":"date","nullable":true,"readOnly":true,"description":"When the status is due for review (`setAccreditationStatus`)."}}},
 "AccreditationIdentityConflict": {"type":"object","x-ticvai-persistence":"accreditation.identity_conflict","description":"Board 2.7. **One badge revoked and the other still opening doors.**\n\n**`matchedOn` names `face` only where the programme's `faceMatching` is enabled** and both applicants consented (workbook Q461; CHG-CSA-031).\n\n**Stored, not recomputed on each read** (data model for the agreed operations, 29 September): a suspected pair is raised by `createAccreditationApplication` and `importAccreditationHolders` using `marketing-crm`'s identity resolution, and keeps its id and status while somebody decides it, so a pair rejected as two different people is not raised again on the next import. Resolved by `resolveIdentityConflict` (`pending` to `merged` or `rejected`, decided 29 September, writers pass); lifecycle in `states/accreditation-identity-conflict.yaml`.","required":["id","holderIds","status"],"properties":{"id":{"type":"string","format":"uuid"},"holderIds":{"type":"array","items":{"type":"string","format":"uuid"}},"score":{"type":"number"},"matchedOn":{"type":"array","items":{"type":"string"}},"differingAccess":{"type":"boolean"},"status":{"type":"string","enum":["pending","merged","rejected"]},"detectedAt":{"type":"string","format":"date-time","readOnly":true},"survivingHolderId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The holder kept when the conflict was merged"},"resolutionReason":{"type":"string","maxLength":500,"nullable":true,"readOnly":true},"resolvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
 }

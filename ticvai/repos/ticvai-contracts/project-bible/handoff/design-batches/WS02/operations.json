@@ -303,7 +303,7 @@
  },
  "setEntitlementConsumption": {
   "method": "PUT",
-  "path": "/entitlement-consumption",
+  "path": "/entitlement-consumption/{ruleId}",
   "contract": "access",
   "summary": "Save an entitlement consumption rule",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -311,6 +311,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "ruleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -322,7 +327,7 @@
  },
  "setJourneySequenceRule": {
   "method": "PUT",
-  "path": "/journey-sequence-rules",
+  "path": "/journey-sequence-rules/{ruleId}",
   "contract": "access",
   "summary": "Create or replace an anti-passback / journey sequence rule",
   "permission": "ACCESS_POINT_CONFIGURE",

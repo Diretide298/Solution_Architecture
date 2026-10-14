@@ -5,6 +5,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "3",
@@ -101,51 +102,61 @@
       {
        "kind": "metricTile",
        "label": "Active Commercial Models",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Active Tiers",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Active VSI Model",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Customers by Commercial Model",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Average VSI",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Customers Near Threshold",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Customers Above Allowance",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Per-Ticket Contracts",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Minimum Guarantee Contracts",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
       },
       {
        "kind": "metricTile",
        "label": "Pending Rule Changes",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 31 §KPI Cards"
       }
      ]
@@ -160,6 +171,13 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getCommercialMetrics",
+    "contract": "subscription",
+    "purpose": "The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)"
+   },
    {
     "operationId": "listLicensingModels",
     "contract": "subscription",
@@ -204,6 +222,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "3",
@@ -253,51 +272,61 @@
       {
        "kind": "selectField",
        "label": "Factor Name",
+       "operation": "setVsiModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Weight",
+       "operation": "setVsiModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Data Source",
+       "operation": "setVsiModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Minimum Value",
+       "operation": "setVsiModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Maximum Value",
+       "operation": "setVsiModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Scoring Method",
+       "operation": "setVsiModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Mandatory/Optional",
+       "operation": "setVsiModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Venue Type Applicability",
+       "operation": "setVsiModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Market Applicability",
+       "operation": "setVsiModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Effective Date",
+       "operation": "setVsiModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields"
       }
      ]
@@ -366,6 +395,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "3",
@@ -489,6 +519,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "3",
@@ -548,6 +579,7 @@
       },
       {
        "kind": "dataTable",
+       "operation": "listPlans",
        "derived": true,
        "impliedBy": "listPlans",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -622,6 +654,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "3",
@@ -664,46 +697,55 @@
       {
        "kind": "selectField",
        "label": "Metric",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
       },
       {
        "kind": "selectField",
        "label": "Quantity",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
       },
       {
        "kind": "selectField",
        "label": "Measurement Period",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
       },
       {
        "kind": "selectField",
        "label": "Reset Period",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
       },
       {
        "kind": "selectField",
        "label": "Warning Threshold",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
       },
       {
        "kind": "selectField",
        "label": "Enforcement Type",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
       },
       {
        "kind": "selectField",
        "label": "Overage Allowed",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
       },
       {
        "kind": "selectField",
        "label": "Overage Rate",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
       },
       {
        "kind": "selectField",
        "label": "Additional Pack Allowed",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance"
       }
      ]
@@ -735,6 +777,16 @@
    "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-393"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 35. 0 of 0 labels bound to a contract property; 9 of 13 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "licensingModelId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setLicensingModel` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -765,6 +817,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "3",
@@ -807,116 +860,139 @@
       {
        "kind": "selectField",
        "label": "Commercial Model",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Charging Unit",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Rate",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Currency",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Billing Period",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Included Volume",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Minimum Guarantee",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Guarantee Period",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Percentage Rate",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Fixed Base Fee",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Module Charging",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Effective Date",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Expiry",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "Contract Applicability",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration Fields"
       },
       {
        "kind": "selectField",
        "label": "POS Limit",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
       },
       {
        "kind": "selectField",
        "label": "Access Device Limit",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
       },
       {
        "kind": "selectField",
        "label": "User Limit",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
       },
       {
        "kind": "selectField",
        "label": "Venue Limit",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
       },
       {
        "kind": "selectField",
        "label": "API Limit",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
       },
       {
        "kind": "selectField",
        "label": "Storage Limit",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
       },
       {
        "kind": "selectField",
        "label": "Module Entitlements",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
       },
       {
        "kind": "selectField",
        "label": "Technical Capacity Profile",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
       },
       {
        "kind": "selectField",
        "label": "Hard/Soft/Approval Enforcement",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure"
       }
      ]
@@ -948,6 +1024,16 @@
    "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-394"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 36. 0 of 0 labels bound to a contract property; 23 of 44 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "licensingModelId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setLicensingModel` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -978,6 +1064,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "3",
@@ -1020,86 +1107,103 @@
       {
        "kind": "selectField",
        "label": "Ticket Sold",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
       },
       {
        "kind": "selectField",
        "label": "Ticket Issued",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
       },
       {
        "kind": "selectField",
        "label": "Paid Ticket",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
       },
       {
        "kind": "selectField",
        "label": "Transaction",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
       },
       {
        "kind": "selectField",
        "label": "Admission/Redemption",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
       },
       {
        "kind": "selectField",
        "label": "Gross Transaction Value",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
       },
       {
        "kind": "selectField",
        "label": "Net Transaction Value",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
       },
       {
        "kind": "selectField",
        "label": "Custom Billable Event",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support"
       },
       {
        "kind": "selectField",
        "label": "50 billable tickets",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Commercial rule can specify"
       },
       {
        "kind": "selectField",
        "label": "1 billable transaction",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Commercial rule can specify"
       },
       {
        "kind": "selectField",
        "label": "Guarantee Amount",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
       },
       {
        "kind": "textField",
        "label": "Monthly / Quarterly / Annual",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Carry Forward Allowed",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Carry Forward Period",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Reconciliation Method",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Currency",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Effective Dates",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure"
       }
      ]
@@ -1131,6 +1235,16 @@
    "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-395"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 38. 0 of 0 labels bound to a contract property; 17 of 30 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "licensingModelId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setLicensingModel` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1161,6 +1275,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "3",
@@ -1203,56 +1318,67 @@
       {
        "kind": "selectField",
        "label": "Pack Name",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       },
       {
        "kind": "selectField",
        "label": "Resource",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       },
       {
        "kind": "selectField",
        "label": "Quantity",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       },
       {
        "kind": "selectField",
        "label": "Price",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       },
       {
        "kind": "selectField",
        "label": "Recurring/One-Time",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       },
       {
        "kind": "selectField",
        "label": "Validity",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       },
       {
        "kind": "selectField",
        "label": "Applicable Tier",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       },
       {
        "kind": "selectField",
        "label": "Applicable Commercial Model",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       },
       {
        "kind": "selectField",
        "label": "Auto-Renew",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       },
       {
        "kind": "selectField",
        "label": "Proration",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       },
       {
        "kind": "selectField",
        "label": "Effective Dates",
+       "operation": "setLicensingModel",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration"
       }
      ]
@@ -1295,6 +1421,16 @@
    "workshopBoard": "wireframes/WS155 Subscription Licensing AI Self Service Board 3.dc.html#adm-396"
   },
   "apisNote": "Regenerated 9 September 2026 from Subscription_Licensing_AI_Self_Service.pdf page 39. 0 of 0 labels bound to a contract property; 11 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "licensingModelId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setLicensingModel` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",
@@ -1325,6 +1461,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "3",
@@ -1477,6 +1614,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "3",

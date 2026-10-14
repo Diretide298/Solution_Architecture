@@ -5,6 +5,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "9",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/voice-of-customer-center-bo-814",
-   "component": "apps/venue-management-web/src/routes/engagement-support/VoiceOfCustomerCenter.tsx",
+   "component": "src/routes/engagement-support/VoiceOfCustomerCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -113,7 +114,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listCustomerSatisfactionFeedback",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listCustomerSatisfactionFeedback"
       }
      ]
     }
@@ -170,6 +172,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "9",
@@ -179,7 +182,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/survey-builder-bo-815",
-   "component": "apps/venue-management-web/src/routes/engagement-support/SurveyBuilder.tsx",
+   "component": "src/routes/engagement-support/SurveyBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -294,6 +297,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "9",
@@ -303,7 +307,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/survey-triggers-distribution-bo-816",
-   "component": "apps/venue-management-web/src/routes/engagement-support/SurveyTriggersDistribution.tsx",
+   "component": "src/routes/engagement-support/SurveyTriggersDistribution.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -422,7 +426,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/nps-csat-ces-configuration-bo-817",
-   "component": "apps/venue-management-web/src/routes/engagement-support/NpsCsatCesConfiguration.tsx",
+   "component": "src/routes/engagement-support/NpsCsatCesConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -520,6 +524,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "9",
@@ -529,7 +534,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/survey-responses-insights-bo-818",
-   "component": "apps/venue-management-web/src/routes/engagement-support/SurveyResponsesInsights.tsx",
+   "component": "src/routes/engagement-support/SurveyResponsesInsights.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -574,7 +579,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listCustomerSatisfactionFeedback",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listCustomerSatisfactionFeedback"
       }
      ]
     }
@@ -631,6 +637,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "9",
@@ -640,7 +647,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/review-collection-rating-rules-bo-819",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ReviewCollectionRatingRules.tsx",
+   "component": "src/routes/engagement-support/ReviewCollectionRatingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -685,7 +692,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listReviews",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listReviews"
       }
      ]
     }
@@ -742,6 +750,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "9",
@@ -751,7 +760,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/moderation-publishing-bo-820",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ModerationPublishing.tsx",
+   "component": "src/routes/engagement-support/ModerationPublishing.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -870,6 +879,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "9",
@@ -879,7 +889,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/ai-sentiment-topic-analysis-bo-821",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AiSentimentTopicAnalysis.tsx",
+   "component": "src/routes/engagement-support/AiSentimentTopicAnalysis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -924,7 +934,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listCustomerSatisfactionFeedback",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listCustomerSatisfactionFeedback"
       }
      ]
     }
@@ -990,7 +1001,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/service-recovery-automation-bo-822",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ServiceRecoveryAutomation.tsx",
+   "component": "src/routes/engagement-support/ServiceRecoveryAutomation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1088,6 +1099,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "9",
@@ -1097,7 +1109,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/voc-analytics-audit-bo-823",
-   "component": "apps/venue-management-web/src/routes/engagement-support/VocAnalyticsAudit.tsx",
+   "component": "src/routes/engagement-support/VocAnalyticsAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1142,7 +1154,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listServiceRootCause",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listServiceRootCause"
       }
      ]
     }

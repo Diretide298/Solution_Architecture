@@ -373,7 +373,7 @@ the zip's **33,695**. Ours looks truncated and the zip has the full copy — **v
       with a workforce system rather than becoming one
 - [ ] **Per-domain product catalogues** — they duplicate `product`/`price`/`category` into `fnb` and
       `retail`. This is a fifth architectural divergence and belongs in the response document
-- [ ] **`marketing.data_subject_request` vs our `platform.dsar_request`** — one has to go
+- [ ] **`marketing.data_subject_request` vs our `sync.dsar_request`** — one has to go
 ### Phase 1, reverted — how to bring it back
 
 **It was written, it worked, and it was rolled back for sequencing.** All fourteen schemas were

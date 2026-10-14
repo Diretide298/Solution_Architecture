@@ -113,69 +113,6 @@
   "requestBody": null,
   "responds": null
  },
- "getCookieConsentRuntime": {
-  "method": "GET",
-  "path": "/storefront/cookie-consent",
-  "contract": "marketing-crm",
-  "summary": "What the page must show and what it may load",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "channel",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "brandId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "language",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": "X-Consent-Key",
-    "in": "header",
-    "required": false
-   }
-  ],
-  "requestBody": null,
-  "responds": "CookieConsentRuntime"
- },
- "getDeviceConsentHistory": {
-  "method": "GET",
-  "path": "/consent/device/history",
-  "contract": "marketing-crm",
-  "summary": "A visitor's own cookie decisions, oldest first",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "X-Consent-Key",
-    "in": "header",
-    "required": true
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "getEntitlement": {
   "method": "GET",
   "path": "/entitlements/{entitlementId}",
@@ -668,40 +605,6 @@
   "requestBody": null,
   "responds": "Page"
  },
- "listPublishedTrackingTechnologies": {
-  "method": "GET",
-  "path": "/storefront/cookie-consent/technologies",
-  "contract": "marketing-crm",
-  "summary": "The approved cookie registry, as the preference centre shows it",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "channel",
-    "in": "query",
-    "required": true
-   },
-   {
-    "name": "category",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listTaxInvoices": {
   "method": "GET",
   "path": "/tax-invoices",
@@ -808,25 +711,6 @@
   ],
   "requestBody": "RecordConsentRequest",
   "responds": "ConsentState"
- },
- "recordDeviceConsent": {
-  "method": "POST",
-  "path": "/consent/device",
-  "contract": "marketing-crm",
-  "summary": "Record a visitor's cookie decision, before anyone is known",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "append",
-  "scopeLevel": "subject",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "RecordDeviceConsentRequest",
-  "responds": "DeviceConsent"
  },
  "refreshToken": {
   "method": "POST",

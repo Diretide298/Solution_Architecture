@@ -289,7 +289,7 @@
  },
  "setMembershipBenefit": {
   "method": "PUT",
-  "path": "/membership-benefits",
+  "path": "/membership-benefits/{benefitId}",
   "contract": "catalogue",
   "summary": "Define a benefit",
   "permission": "PRODUCT_CONFIGURE",
@@ -297,6 +297,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "benefitId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -384,7 +389,7 @@
  },
  "setMembershipProgramme": {
   "method": "PUT",
-  "path": "/membership-programmes",
+  "path": "/membership-programmes/{programId}",
   "contract": "catalogue",
   "summary": "Define a membership programme",
   "permission": "PRODUCT_CONFIGURE",
@@ -392,6 +397,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "programId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

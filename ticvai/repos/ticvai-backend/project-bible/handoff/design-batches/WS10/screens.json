@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "10",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/dynamic-access-policy-command-center-bo-234",
-   "component": "apps/venue-management-web/src/routes/access-venue/DynamicAccessPolicyCommandCenter.tsx",
+   "component": "src/routes/access-venue/DynamicAccessPolicyCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -109,7 +110,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -287,6 +288,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "10",
@@ -296,7 +298,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-attribute-catalog-bo-235",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessAttributeCatalog.tsx",
+   "component": "src/routes/access-venue/AccessAttributeCatalog.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -384,7 +386,15 @@
    }
   ],
   "entryState": {
-   "preloaded": []
+   "preloaded": [],
+   "params": [
+    {
+     "name": "attributeKey",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listAccessAttributeCatalog`."
+    }
+   ]
   },
   "wireframe": {
    "status": "notStarted",
@@ -422,6 +432,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "10",
@@ -431,7 +442,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/visual-dynamic-policy-builder-bo-236",
-   "component": "apps/venue-management-web/src/routes/access-venue/VisualDynamicPolicyBuilder.tsx",
+   "component": "src/routes/access-venue/VisualDynamicPolicyBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -562,6 +573,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "10",
@@ -571,7 +583,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/context-time-event-capacity-policy-builder-bo-237",
-   "component": "apps/venue-management-web/src/routes/access-venue/ContextTimeEventCapacityPolicyBuilder.tsx",
+   "component": "src/routes/access-venue/ContextTimeEventCapacityPolicyBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -687,6 +699,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "10",
@@ -696,7 +709,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/identity-membership-accreditation-policies-bo-238",
-   "component": "apps/venue-management-web/src/routes/access-venue/IdentityMembershipAccreditationPolicies.tsx",
+   "component": "src/routes/access-venue/IdentityMembershipAccreditationPolicies.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -794,6 +807,14 @@
   "entryState": {
    "preloaded": [
     "IdentityMembershipAccreditationPoliciesView.identityType"
+   ],
+   "params": [
+    {
+     "name": "accessProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setAccessProfile` takes it, from the record the user acts on."
+    }
    ]
   },
   "wireframe": {
@@ -832,6 +853,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "10",
@@ -841,7 +863,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/policy-scope-hierarchy-inheritance-bo-239",
-   "component": "apps/venue-management-web/src/routes/access-venue/PolicyScopeHierarchyInheritance.tsx",
+   "component": "src/routes/access-venue/PolicyScopeHierarchyInheritance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -937,6 +959,16 @@
    "workshopBoard": "wireframes/WS27 Access Control Board 10.dc.html#bo-239"
   },
   "apisNote": "Regenerated 9 September 2026 from Access Control Module_Reference.pdf page 140. 0 of 0 labels bound to a contract property; 4 of 25 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "policyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listPolicyScopeHierarchy`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -966,6 +998,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "10",
@@ -975,7 +1008,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/authorization-governance-temporary-access-bo-240",
-   "component": "apps/venue-management-web/src/routes/access-venue/AuthorizationGovernanceTemporaryAccess.tsx",
+   "component": "src/routes/access-venue/AuthorizationGovernanceTemporaryAccess.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1097,6 +1130,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "10",
@@ -1106,7 +1140,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/policy-evaluation-architecture-offline-distribution-bo-241",
-   "component": "apps/venue-management-web/src/routes/access-venue/PolicyEvaluationArchitectureOfflineDistribution.tsx",
+   "component": "src/routes/access-venue/PolicyEvaluationArchitectureOfflineDistribution.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1275,6 +1309,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "10",
@@ -1284,7 +1319,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/policy-simulation-conflict-impact-analysis-bo-242",
-   "component": "apps/venue-management-web/src/routes/access-venue/PolicySimulationConflictImpactAnalysis.tsx",
+   "component": "src/routes/access-venue/PolicySimulationConflictImpactAnalysis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1429,6 +1464,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "10",
@@ -1438,7 +1474,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/policy-approval-audit-analytics-ai-optimization-bo-243",
-   "component": "apps/venue-management-web/src/routes/access-venue/PolicyApprovalAuditAnalyticsAiOptimization.tsx",
+   "component": "src/routes/access-venue/PolicyApprovalAuditAnalyticsAiOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1526,7 +1562,10 @@
     "component": "confirmDialog",
     "trigger": "ROLLBACK TO V3.4",
     "body": "**ROLLBACK TO V3.4 on a policy approval audit is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Access Control Module_Reference.pdf, page 146 §Allow"
+    "provenance": "pack Access Control Module_Reference.pdf, page 146 §Allow",
+    "confirm": {
+     "operation": "rollbackAccessPolicy"
+    }
    }
   ],
   "states": {

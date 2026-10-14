@@ -1,0 +1,56 @@
+{
+ "updateAdmissionRules": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "updateAuthorisationPolicy": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "updatePaymentMethod": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "updateRecommendationStrategy": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "updateRentalPricingProfile": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "updateRentalProduct": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "updateResource": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "updateResourcePackage": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "updateCreditType": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ }
+}

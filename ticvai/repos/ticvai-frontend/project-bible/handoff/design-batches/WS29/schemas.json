@@ -10,6 +10,7 @@
   "description": "**The status of a catalogue configuration record** (29 September, data model DM3): price lists, rates, fees and fee rules, tax profiles and rules, calculation and rounding profiles, package pricing and templates. `draft` is being prepared and is never used by a calculation; `active` is in use from its effective date; `inactive` is switched off and may be switched back; `retired` is kept for history only. A record already used by a live price becomes `active` through a published change request, not by an edit."
  },
  "CatalogueMembershipBenefit": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "catalogue.membership_benefit",
   "description": "**Taken from the backend workbook, 20 September.** Defines a benefit that can be included in one or more membership plans.",
@@ -18,9 +19,15 @@
    "name",
    "type",
    "isActive",
-   "createdAt"
+   "createdAt",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -60,12 +67,14 @@
     "type": "boolean"
    },
    "createdAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    }
   }
  },
  "CatalogueMembershipProgramme": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "catalogue.membership_programme",
   "description": "**Taken from the backend workbook, 20 September.** Defines the overall membership programme available to customers.",
@@ -74,9 +83,15 @@
    "programCode",
    "programName",
    "isActive",
-   "createdAt"
+   "createdAt",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "programId": {
     "type": "string",
     "format": "uuid"
@@ -98,6 +113,7 @@
     "type": "boolean"
    },
    "createdAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    },
@@ -121,10 +137,12 @@
   ],
   "properties": {
    "entitlementTemplateId": {
+    "x-ticvai-references": "catalogue.entitlement_template",
     "type": "string",
     "format": "uuid"
    },
    "membershipBenefitId": {
+    "x-ticvai-references": "catalogue.membership_benefit",
     "type": "string",
     "format": "uuid"
    },
@@ -164,7 +182,7 @@
  "ChannelPublicationAvailabilityInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.product` (with `catalogue.audit_entry`, `catalogue.product_channel_assignment`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Channel Publication & Availability submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "channels": {
@@ -348,6 +366,7 @@
     "description": "Assigned by the server on create; `createEntitlementTemplate` does not take it."
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -426,6 +445,8 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "validTimeWindows": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "nullable": true,
     "description": "BL-036, 1.1.81 and 1.1.83. **A time-window entitlement needed a performance to express** — valid 09:00 to 13:00 on any day was a thing you built by creating performances.\n**A window is a property of the entitlement and a performance is an occurrence**, and conflating them means a morning pass generates 365 performances a year.\n",
@@ -2632,6 +2653,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

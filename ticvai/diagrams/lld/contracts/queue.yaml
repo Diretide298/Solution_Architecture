@@ -23,7 +23,7 @@ operations:
   - queue.queue
 - operation: configureQueueFeed
   verb: PUT
-  path: /queue-feeds
+  path: /queue-feeds/{feedId}
   scope: venue
   permission: QUEUE_MANAGE
   audience:

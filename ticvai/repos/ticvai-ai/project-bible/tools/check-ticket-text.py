@@ -46,7 +46,8 @@ RULES = {
 }
 
 SCREEN_ID = re.compile(r"\b(?:[A-Z]{2,5})-\d{3,4}\b")
-GENERIC_DONE = re.compile(r"(pnpm|dotnet|PR is reviewed|reviewed$)", re.I)
+# "scripts pass": a screen's build gate written from its repository's profile (frontend_repos.gate_line, CHG-RPO-003).
+GENERIC_DONE = re.compile(r"(pnpm|dotnet|scripts pass|PR is reviewed|reviewed$)", re.I)
 
 
 def main() -> int:

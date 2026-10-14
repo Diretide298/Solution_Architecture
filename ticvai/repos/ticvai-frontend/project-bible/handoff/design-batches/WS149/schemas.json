@@ -249,6 +249,7 @@
     "type": "string"
    },
    "version": {
+    "readOnly": true,
     "type": "string"
    },
    "vendor": {
@@ -1279,6 +1280,7 @@
   }
  },
  "PayTerminalCertification": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "payments.terminal_certification + payments.terminal_certification_level3",
   "description": "4.3.1. Also the `recordPaymentTerminalCertification` body. **One per terminal model**; a terminal names its model in `PaymentTerminal.terminalModelCode`.",
@@ -1528,15 +1530,22 @@
   }
  },
  "RegisteredDevice": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "platform.device",
   "type": "object",
   "description": "**The only device register** (ADR-0067, accepted 1 October; the register of record since 29 September). Identity (kind, hardware type, model, serial), every version (firmware, configuration, rule package, credential package), health, heartbeat and one lifecycle (`enrolmentState`: registered, enrolled, provisioned, active, deactivated, retired) for every device in the estate live on this row. The access-control device row, which repeated serial, versions, health and lifecycle, is now `access.device_placement` and holds only where an access-control device is placed. Tenancy owns and migrates this table; Access reads it only through this contract.\n",
   "required": [
    "id",
    "kind",
-   "driver"
+   "driver",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -1575,6 +1584,7 @@
     "description": "The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the library; this names a model in it.\n"
    },
    "serialNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "nullable": true,
     "maxLength": 100,
@@ -1627,6 +1637,7 @@
     "description": "Reported connectivity."
    },
    "pushToken": {
+    "x-ticvai-secret": "field-encrypted",
     "type": "string",
     "format": "password",
     "nullable": true,

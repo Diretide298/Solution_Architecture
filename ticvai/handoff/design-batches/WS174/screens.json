@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "10",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/revenue-command-center-bo-1043",
-   "component": "apps/venue-management-web/src/routes/access-venue/RevenueCommandCenter.tsx",
+   "component": "src/routes/access-venue/RevenueCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -101,7 +102,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listRevenue",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listRevenue"
       }
      ]
     }
@@ -157,6 +159,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "10",
@@ -166,7 +169,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/dynamic-seat-pricing-bo-1044",
-   "component": "apps/venue-management-web/src/routes/access-venue/DynamicSeatPricing.tsx",
+   "component": "src/routes/access-venue/DynamicSeatPricing.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -216,7 +219,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listDynamicPricingStrategy",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listDynamicPricingStrategy"
       }
      ]
     }
@@ -273,6 +277,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "10",
@@ -282,7 +287,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/price-bands-categories-bo-1045",
-   "component": "apps/venue-management-web/src/routes/access-venue/PriceBandsCategories.tsx",
+   "component": "src/routes/access-venue/PriceBandsCategories.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -542,6 +547,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "10",
@@ -551,7 +557,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/inventory-forecasting-bo-1046",
-   "component": "apps/venue-management-web/src/routes/access-venue/InventoryForecasting.tsx",
+   "component": "src/routes/access-venue/InventoryForecasting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -596,7 +602,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listDemandBookingCurve",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listDemandBookingCurve"
       }
      ]
     }
@@ -653,6 +660,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "10",
@@ -662,7 +670,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/section-revenue-forecast-bo-1047",
-   "component": "apps/venue-management-web/src/routes/access-venue/SectionRevenueForecast.tsx",
+   "component": "src/routes/access-venue/SectionRevenueForecast.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -707,7 +715,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listDemandBookingCurve",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listDemandBookingCurve"
       }
      ]
     }
@@ -764,6 +773,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "10",
@@ -773,7 +783,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/seat-upsell-recommendations-bo-1048",
-   "component": "apps/venue-management-web/src/routes/access-venue/SeatUpsellRecommendations.tsx",
+   "component": "src/routes/access-venue/SeatUpsellRecommendations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -887,6 +897,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "10",
@@ -896,7 +907,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/scenario-what-if-planning-bo-1049",
-   "component": "apps/venue-management-web/src/routes/access-venue/ScenarioWhatIfPlanning.tsx",
+   "component": "src/routes/access-venue/ScenarioWhatIfPlanning.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1010,6 +1021,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "10",
@@ -1019,7 +1031,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/revenue-analytics-audit-bo-1050",
-   "component": "apps/venue-management-web/src/routes/access-venue/RevenueAnalyticsAudit.tsx",
+   "component": "src/routes/access-venue/RevenueAnalyticsAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1064,7 +1076,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listRevenue",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listRevenue"
       }
      ]
     }

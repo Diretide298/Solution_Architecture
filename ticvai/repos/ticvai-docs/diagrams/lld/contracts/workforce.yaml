@@ -186,6 +186,7 @@ operations:
   offline: false
   reads:
   - workforce.employee
+  - workforce.work_assignment
   writes: []
 - operation: listIntegrationSources
   verb: GET
@@ -503,7 +504,7 @@ operations:
   - workforce.field_ownership
 - operation: setIntegrationSource
   verb: PUT
-  path: /integration-sources
+  path: /integration-sources/{sourceId}
   scope: tenant
   permission: WORKFORCE_MANAGE
   audience:
@@ -515,7 +516,7 @@ operations:
   - workforce.integration_source
 - operation: setJobTitle
   verb: PUT
-  path: /job-titles
+  path: /job-titles/{jobTitleId}
   scope: venue
   permission: WORKFORCE_MANAGE
   audience:
@@ -527,7 +528,7 @@ operations:
   - workforce.job_title
 - operation: setLabourBudget
   verb: PUT
-  path: /labour-budgets
+  path: /labour-budgets/{labourBudgetId}
   scope: venue
   permission: WORKFORCE_MANAGE
   audience:
@@ -541,7 +542,7 @@ operations:
   - workforce.labour_budget
 - operation: setLeaveType
   verb: PUT
-  path: /leave-types
+  path: /leave-types/{leaveTypeId}
   scope: venue
   permission: WORKFORCE_MANAGE
   audience:
@@ -553,7 +554,7 @@ operations:
   - workforce.leave_type
 - operation: setShiftPattern
   verb: PUT
-  path: /shift-patterns
+  path: /shift-patterns/{shiftPatternId}
   scope: venue
   permission: WORKFORCE_MANAGE
   audience:
@@ -565,7 +566,7 @@ operations:
   - workforce.shift
 - operation: setShiftTemplate
   verb: PUT
-  path: /shift-templates
+  path: /shift-templates/{shiftTemplateId}
   scope: venue
   permission: WORKFORCE_MANAGE
   audience:
@@ -592,7 +593,7 @@ operations:
   - workforce.staffing_rules
 - operation: setWorkAssignment
   verb: PUT
-  path: /work-assignments
+  path: /work-assignments/{workAssignmentId}
   scope: venue
   permission: WORKFORCE_MANAGE
   audience:
@@ -613,6 +614,7 @@ operations:
   reads:
   - workforce.sync_run
   writes:
+  - workforce.employee
   - workforce.sync_run
 - operation: updateRotaAssignment
   verb: PATCH

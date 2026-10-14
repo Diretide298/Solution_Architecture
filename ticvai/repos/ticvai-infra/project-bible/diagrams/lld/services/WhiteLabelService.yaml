@@ -120,7 +120,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: deleteBookingFlow
     verb: DELETE
     path: /booking-flows/{bookingFlowId}
@@ -136,7 +136,7 @@ operationsByContract:
     permission: TENANT_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: deleteGuidedChoice
     verb: DELETE
     path: /guided-choices/{guidedChoiceId}
@@ -635,7 +635,7 @@ operationsByContract:
     writes: 4
   - operation: setAnalyticsProvider
     verb: PUT
-    path: /tenant-config/analytics-providers
+    path: /tenant-config/analytics-providers/{analyticsProviderId}
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
@@ -1195,14 +1195,14 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.booking_flow_step
-  columns: 7
+  columns: 8
   store: postgres
   parent: whitelabel.booking_flow
   writtenBy:
   - white-label
   foreignWriters: null
 - table: whitelabel.config_version
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:

@@ -17,6 +17,7 @@ operations:
   - platform.device
   writes:
   - platform.device
+  - tenancy.device_audit
 - operation: configureWorkstation
   verb: PUT
   path: /workstations/{workstationId}
@@ -293,7 +294,6 @@ operations:
   offline: false
   reads:
   - platform.device
-  - platform.device_heartbeat
   - platform.workstation
   writes: []
 - operation: issueDeviceCredential
@@ -559,7 +559,7 @@ operations:
   - tenancy.device_rollout
 - operation: setConfigurationProfile
   verb: PUT
-  path: /configuration-profiles
+  path: /configuration-profiles/{profileId}
   scope: tenant
   permission: TENANT_CONFIGURE
   audience:

@@ -56,6 +56,7 @@
     "type": "string"
    },
    "programmeId": {
+    "x-ticvai-references": "accreditation.programme",
     "type": "string",
     "format": "uuid"
    },
@@ -82,6 +83,7 @@
     "description": "Name, date of birth, nationality, contact — shaped by the requirements matrix."
    },
    "requirementStatus": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "items": {
@@ -193,6 +195,7 @@
     "format": "uuid"
    },
    "holderId": {
+    "x-ticvai-references": "accreditation.holder",
     "type": "string",
     "format": "uuid"
    },
@@ -274,90 +277,118 @@
    }
   }
  },
- "AccreditationDocument": {
+ "AccreditationDataExport": {
   "type": "object",
-  "x-ticvai-persistence": "accreditation.document",
-  "description": "Board 2.5. **Submitted against a named requirement, not into a folder.**",
+  "x-ticvai-persistence": "accreditation.data_export",
+  "description": "12.1.55. **A spreadsheet of accredited people leaving the platform is an event someone should own.** Requested by `exportAccreditationData`, listed for BO-682, and fetched once `ready`.\n",
   "required": [
-   "requirementCode",
-   "assetId"
+   "dataset",
+   "format"
   ],
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
-   },
-   "holderId": {
-    "type": "string",
     "format": "uuid",
-    "nullable": true
+    "readOnly": true
    },
-   "applicationId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "requirementCode": {
-    "type": "string"
-   },
-   "assetId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "submittedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "status": {
+   "dataset": {
     "type": "string",
     "enum": [
-     "submitted",
-     "verified",
-     "rejected",
-     "expired"
+     "holders",
+     "applications",
+     "credentials",
+     "accessAssignments",
+     "documents"
     ]
    },
-   "verifiedBy": {
+   "format": {
+    "type": "string",
+    "enum": [
+     "csv",
+     "xlsx"
+    ]
+   },
+   "programmeId": {
     "type": "string",
     "format": "uuid",
     "nullable": true
    },
-   "verifiedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   },
-   "rejectionReason": {
+   "statusFilter": {
     "type": "string",
     "nullable": true
    },
-   "expiresAt": {
+   "organisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "categoryCode": {
+    "type": "string",
+    "nullable": true
+   },
+   "validOn": {
     "type": "string",
     "format": "date",
     "nullable": true,
-    "description": "**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"
+    "description": "Only accreditations valid on this date — the register for one performance"
+   },
+   "fields": {
+    "type": "array",
+    "description": "The columns wanted. Omitted means the dataset's standard set",
+    "items": {
+     "type": "string"
+    }
+   },
+   "includePersonalData": {
+    "type": "boolean",
+    "default": false,
+    "description": "Contact details, date of birth, nationality and document references. Requires REPORT_EXPORT_PII and a purpose; recorded in the accreditation audit trail"
+   },
+   "purpose": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true
+   },
+   "requestedByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "requestedAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   },
+   "recordCount": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "status": {
+    "type": "string",
+    "readOnly": true,
+    "enum": [
+     "queued",
+     "running",
+     "ready",
+     "failed",
+     "expired"
+    ]
+   },
+   "downloadUrl": {
+    "type": "string",
+    "nullable": true,
+    "readOnly": true,
+    "description": "Signed and expiring"
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true
    },
    "scopePath": {
     "type": "string"
-   }
-  }
- },
- "Page": {
-  "type": "object",
-  "required": [
-   "items",
-   "hasMore"
-  ],
-  "properties": {
-   "items": {
-    "type": "array",
-    "items": {}
-   },
-   "nextCursor": {
-    "type": "string"
-   },
-   "hasMore": {
-    "type": "boolean"
    }
   }
  }

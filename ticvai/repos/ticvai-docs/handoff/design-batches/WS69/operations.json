@@ -56,25 +56,6 @@
   "requestBody": "ReportSubscription",
   "responds": "ReportSubscription"
  },
- "exportReportResult": {
-  "method": "POST",
-  "path": "/report-executions/{executionId}/export",
-  "contract": "reporting",
-  "summary": "Export a completed result",
-  "permission": "REPORT_EXPORT",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "getAnalyticsGovernancePolicy": {
   "method": "GET",
   "path": "/analytics-governance-policy",

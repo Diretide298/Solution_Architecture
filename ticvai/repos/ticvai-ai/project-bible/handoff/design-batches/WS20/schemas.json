@@ -73,6 +73,8 @@
     "description": "A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy."
    },
    "signals": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

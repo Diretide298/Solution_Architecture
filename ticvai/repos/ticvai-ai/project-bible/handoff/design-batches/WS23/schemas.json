@@ -315,6 +315,7 @@
     "readOnly": true
    },
    "partnerId": {
+    "x-ticvai-references": "control.partner",
     "type": "string",
     "format": "uuid",
     "description": "The partner (control.partner)."
@@ -470,6 +471,7 @@
     "readOnly": true
    },
    "partnerId": {
+    "x-ticvai-references": "control.partner",
     "type": "string",
     "format": "uuid",
     "description": "The partner (control.partner)."
@@ -832,185 +834,6 @@
     "type": "string",
     "description": "Advisory AI case summary",
     "nullable": true
-   }
-  }
- },
- "PartnerManagementCommandCenterSummary": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection; the headline tiles over the list, computed at read time for the filters in force",
-  "description": "**The headline figures on Partner Management Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.",
-  "properties": {
-   "totalPartners": {
-    "type": "integer",
-    "description": "Total Partners"
-   },
-   "activePartners": {
-    "type": "integer",
-    "description": "Active Partners"
-   },
-   "pendingOnboarding": {
-    "type": "integer",
-    "description": "Pending Onboarding"
-   },
-   "pendingApproval": {
-    "type": "integer",
-    "description": "Pending Approval"
-   },
-   "suspendedPartners": {
-    "type": "integer",
-    "description": "Suspended Partners"
-   },
-   "expiringAgreements": {
-    "type": "integer",
-    "description": "Expiring Agreements: partners whose active agreement ends within its expiryAlertDays (default 30) (decided 29 September, readiness close-out)"
-   },
-   "documentationIssues": {
-    "type": "integer",
-    "description": "Documentation Issues: partners with a mandatory document missing, rejected, expiring or expired"
-   },
-   "partnersWithCreditHolds": {
-    "type": "integer",
-    "description": "Partners With Credit Holds: partners whose credit status is onHold or blocked"
-   },
-   "connectedOtaApiPartners": {
-    "type": "integer",
-    "description": "Connected OTA/API Partners"
-   },
-   "partnerSalesYtd": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Partner Sales YTD: gross value of partner orders this calendar year (decided 29 September, readiness close-out)"
-   },
-   "partnerRevenueYtd": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money",
-    "description": "Partner Revenue YTD: partner sales net of commission this calendar year (decided 29 September, readiness close-out)"
-   },
-   "highRiskPartners": {
-    "type": "integer",
-    "description": "High-Risk Partners"
-   }
-  }
- },
- "PartnerManagementCommandCenterView": {
-  "type": "object",
-  "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — projection over control.partner (Partner), control.partner_credit_profile, control.partner_application, control.partner_scope_assignment and control.partner_distribution_right and the existing subscription state, assembled at read time (data model DM4)",
-  "description": "**What Partner Management Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.",
-  "properties": {
-   "partnerId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Partner ID"
-   },
-   "tradingName": {
-    "type": "string",
-    "description": "Trading Name"
-   },
-   "legalEntity": {
-    "type": "string",
-    "description": "Legal Entity"
-   },
-   "partnerType": {
-    "type": "string",
-    "description": "Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 list: b2bReseller, travelAgent, tourOperator, ota, corporateCustomer, hotelConcierge, destinationManagementCompany, affiliate, wholesaler, distributor, governmentPartner, schoolInstitution, apiPartner, internalGroupCompany"
-   },
-   "country": {
-    "type": "string",
-    "description": "Country, ISO 3166-1 alpha-2"
-   },
-   "territory": {
-    "type": "string",
-    "description": "Territory: summary of the authorised markets (listTerritoryMarketDistribution)"
-   },
-   "assignedBrands": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue)"
-   },
-   "assignedVenues": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue)"
-   },
-   "commercialOwner": {
-    "type": "string",
-    "description": "Commercial Owner: staff display name of the account manager"
-   },
-   "distributionChannel": {
-    "type": "array",
-    "items": {
-     "type": "string",
-     "enum": [
-      "b2bPortal",
-      "api",
-      "otaConnection",
-      "agentPortal",
-      "affiliateLink",
-      "voucherDistribution",
-      "bulkTicketExport",
-      "other"
-     ]
-    },
-    "description": "Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI integrates into the OTA, either direction per MoM 31 Aug 4.3), agentPortal, affiliateLink, voucherDistribution, bulkTicketExport (pre-generated QR tickets as CSV, MoM 5 Aug option 3), other"
-   },
-   "accountStatus": {
-    "type": "string",
-    "description": "Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and p.18 merged with MoM 31 Aug 4.3 lead -> submitted -> active -> suspended; \"submitted\" is applicant)"
-   },
-   "onboardingStatus": {
-    "type": "string",
-    "description": "Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview, technicalReview, approval, configuration, activation) or complete"
-   },
-   "agreementStatus": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/PartnerAgreementStatus"
-     }
-    ],
-    "nullable": true,
-    "description": "Agreement Status of the partner's current agreement; empty when none"
-   },
-   "creditStatus": {
-    "type": "string",
-    "description": "Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness close-out)"
-   },
-   "integrationStatus": {
-    "type": "string",
-    "enum": [
-     "none",
-     "testing",
-     "connected",
-     "degraded",
-     "disconnected"
-    ],
-    "x-ticvai-persisted": false,
-    "description": "Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). **Derived at read time, not a column** (decided 29 September, writers pass; DM4), from the partner's OTA/API channel listings (control.channel_listing) and the health of its API clients (control.api_client, with webhook deliveries in control.webhook_delivery), first match wins: `none` when the partner has no channel listing and no API client; `disconnected` when every listing is `paused` or `delisted` or every production API client is `suspended` or `revoked`; `degraded` when a `live` listing's `lastPushedAt` is older than twice its `pushIntervalMinutes`, or webhook deliveries to the partner failed in the last hour; `connected` when a `live` listing or an `active` production client exists and none of the above holds; otherwise `testing` (only `draft` listings or only sandbox clients). The thresholds are proposed, the venue may correct them."
-   },
-   "lastActivity": {
-    "type": "string",
-    "format": "date-time",
-    "description": "Last Activity"
-   },
-   "riskRating": {
-    "type": "string",
-    "enum": [
-     "low",
-     "medium",
-     "high",
-     "critical"
-    ],
-    "description": "Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI"
-   },
-   "aiInsights": {
-    "type": "array",
-    "items": {
-     "type": "string"
-    },
-    "description": "Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6)"
    }
   }
  },

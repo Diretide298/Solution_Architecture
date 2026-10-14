@@ -245,6 +245,7 @@
   ]
  },
  "ConsentPurposeConfig": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.consent_purpose + marketing.consent_purpose_channel",
   "type": "object",
   "required": [
@@ -440,6 +441,7 @@
     "description": "A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
+    "x-ticvai-references": "catalogue.entitlement_template",
     "type": "string",
     "format": "uuid",
     "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
@@ -815,7 +817,7 @@
  "FooterConfig": {
   "type": "object",
   "x-ticvai-persistence": "whitelabel.footer_config + whitelabel.footer_config_column + whitelabel.footer_config_social_link",
-  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` and its two child tables.\n",
+  "description": "BL-002. **`setHeader` and `HeaderConfig` exist and the footer does not**, which looked like symmetry until you notice it is not: **a header is chrome and a footer is a link surface.**\nA footer carries the legal links — terms, privacy, accessibility statement, cookie preferences — and **those are the ones a regulator checks.** Treating it as a mirror of the header would have given it a logo and no way to reach a privacy notice.\n**Where it is stored.** `legalLinks` and `copyrightText` are columns of `whitelabel.footer_config`; each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks` a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In the tenant's own database, not the control plane (decided 28 September, audit R163)**: it moved from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.\n",
   "required": [
    "id",
    "scopePath"
@@ -900,6 +902,7 @@
   }
  },
  "GiftCard": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.gift_card",
   "type": "object",
   "required": [
@@ -1400,6 +1403,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -1808,7 +1812,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -2129,6 +2134,7 @@
   }
  },
  "PaymentToken": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "payments.token",
   "description": "BL-116. **A stored credential, held by the provider and referenced here.** The platform never sees a card number, which is what keeps PCI scope where it belongs.\n**A token is provider-scoped.** A card tokenised with one gateway does not work with another, so a routing change does not silently move a guest's saved card — it means asking them again, and the model should make that visible rather than surprising.\n",
@@ -2154,6 +2160,7 @@
     "format": "uuid"
    },
    "token": {
+    "x-ticvai-secret": "field-encrypted",
     "type": "string",
     "format": "password",
     "writeOnly": true,
@@ -2401,6 +2408,7 @@
     "format": "uuid"
    },
    "sellerSubjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -2505,71 +2513,6 @@
    }
   }
  },
- "Session": {
-  "type": "object",
-  "required": [
-   "sessionId",
-   "principalId",
-   "roleId",
-   "scope",
-   "effectivePermissions"
-  ],
-  "properties": {
-   "sessionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "roleId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "displayName": {
-    "type": "string"
-   },
-   "scope": {
-    "type": "array",
-    "description": "Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n",
-    "items": {
-     "$ref": "../shared/common.yaml#/components/schemas/ScopeRef"
-    }
-   },
-   "effectivePermissions": {
-    "allOf": [
-     {
-      "$ref": "../shared/permissions.yaml#/components/schemas/PermissionSet"
-     }
-    ],
-    "description": "Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"
-   },
-   "permissionsByScope": {
-    "type": "array",
-    "description": "Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n",
-    "items": {
-     "$ref": "../shared/permissions.yaml#/components/schemas/ScopedPermissions"
-    }
-   },
-   "saleBoardId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"
-   },
-   "workstation": {
-    "$ref": "#/components/schemas/WorkstationContext"
-   },
-   "openedAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "Theme": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
@@ -2645,6 +2588,7 @@
     "pattern": "^#[0-9A-Fa-f]{6}$"
    },
    "darkMode": {
+    "x-ticvai-persisted": false,
     "type": "object",
     "deprecated": true,
     "description": "**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). White label has no dark or light mode: the venue's chosen theme is applied, on every device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has no Light/Dark switch.",
@@ -2784,6 +2728,7 @@
   }
  },
  "Wallet": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [
@@ -2962,101 +2907,5 @@
    "expiry",
    "transfer"
   ]
- },
- "WorkstationContext": {
-  "type": "object",
-  "required": [
-   "id",
-   "code",
-   "venueId",
-   "regionId"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "code": {
-    "type": "string"
-   },
-   "venueId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "regionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "accessPointId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Inherited from the workstation, never selected by the operator."
-   },
-   "devices": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "required": [
-      "kind",
-      "driver"
-     ],
-     "properties": {
-      "kind": {
-       "type": "string",
-       "enum": [
-        "receiptPrinter",
-        "ticketPrinter",
-        "cashDrawer",
-        "barcodeScanner",
-        "rfidReader",
-        "paymentTerminal",
-        "customerDisplay"
-       ]
-      },
-      "driver": {
-       "type": "string"
-      },
-      "identifier": {
-       "type": "string"
-      }
-     }
-    }
-   },
-   "currency": {
-    "type": "string",
-    "pattern": "^[A-Z]{3}$"
-   },
-   "currencyScale": {
-    "type": "integer",
-    "minimum": 0,
-    "maximum": 4
-   },
-   "timezone": {
-    "type": "string"
-   },
-   "cellName": {
-    "type": "string",
-    "description": "The cell serving this workstation's region. One cell per tenant per region (ADR-0014). A client uses this only for diagnostics and telemetry tagging — never for routing, which the Control Plane resolves.\n"
-   },
-   "deploymentProfile": {
-    "type": "string",
-    "enum": [
-     "terminalLocal",
-     "venueEdge",
-     "thin"
-    ],
-    "description": "Whether this surface reads catalogue locally (ADR-0013). Determines which flows the client enables offline.\n"
-   },
-   "pinLength": {
-    "type": "integer",
-    "enum": [
-     4,
-     6,
-     8
-    ],
-    "readOnly": true,
-    "description": "**The tenant's `PasswordPolicy.pinLength`, carried to the device** (14 October 2026, CHG-CRD-002, ADAM CR-078). A device door draws its PIN keypad, and its supervisor step-up prompt, at this many digits; the device keeps it with the workstation context of the last session on it, so the door needs nothing fetched before sign-in. A device that has never had a session accepts 4 to 8 digits and the server decides. Read from `identity.password_policy`, not stored on the workstation."
-   }
-  }
  }
 }

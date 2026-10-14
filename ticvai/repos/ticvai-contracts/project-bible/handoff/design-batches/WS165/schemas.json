@@ -488,6 +488,7 @@
   }
  },
  "Seat": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "seating.seat",
   "x-ticvai-unique-together": [
    [
@@ -503,9 +504,15 @@
    "sectionCode",
    "rowLabel",
    "seatNumber",
-   "attribute"
+   "attribute",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -734,6 +741,8 @@
     "type": "integer"
    },
    "boundary": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "$ref": "#/components/schemas/Point"

@@ -1,6 +1,6 @@
 # WS69 — Unified BI Reporting and AI Analytics Platform board 4
 
-**10 screens · 13 operations · 15 schemas · 8 permissions**
+**10 screens · 12 operations · 15 schemas · 8 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -128,9 +128,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ANL-041` | Reporting Governance Command Center | D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-042` | Report Scheduler | D | 23 | 0 | 5 | 4 | 1 | 0 | — | notStarted (—) |
-| `ANL-043` | Subscription Manager | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-043` | Subscription Manager | D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-044` | Distribution & Delivery Configuration | D | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-045` | Export & Download Center | D | 0 | 22 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `ANL-045` | Export & Download Center | D | 0 | 22 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-046` | Report API & Data Delivery Manager | D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-047` | Report Access & Sharing Control | B | 39 | 18 | 6 | 7 | 0 | 0 | — | notStarted (—) |
 | `ANL-048` | Delivery Monitoring & Failure Management | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -156,7 +156,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
 | Block | Block D · task APP-ANALYTICS-ANL-041 |
-| Who uses it | venue staff holding `REPORT_VIEW_TENANT`, `REPORT_VIEW_VENUE` (2 operate); in the flows as venue manager |
+| Who uses it | venue staff holding `REPORT_VIEW_TENANT` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
 | Offline | online only |
@@ -186,7 +186,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every reporting governance** (data table)
+**Every reporting governance** (data table, from `listReportDeliveries`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -238,7 +238,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - **headline counters (pending)**: Active reports and published dashboards (no count operation; lists only), pending approvals (no report or dashboard approval), exports today and large exports (no export list), API report requests (no source), governance exceptions (undefined). Draw greyed with "Not yet available". *(source: contracts/satellite/reporting.yaml#listReports / contracts/satellite/reporting.yaml#getReportExport)*
 - **recent lists**: Failed deliveries (newest first, with reason), recently changed schedules, permission changes from the platform audit trail. *(source: contracts/satellite/reporting.yaml#listReportDeliveries / contracts/spine/tenancy.yaml#listAuditRecords)*
 
-**Data it reads**: `listReportSchedules` (onLoad, What runs when); `listReportDeliveries` (onLoad, What arrived and what did not)
+**Data it reads**: `listReportDeliveries` (onLoad, What arrived and what did not)
 
 **Where the user goes next**
 
@@ -300,10 +300,11 @@ failed:
 
 #### Permissions
 
-- `listReportSchedules` → `REPORT_VIEW_VENUE` (operate) · staff
 - `listReportDeliveries` → `REPORT_VIEW_TENANT` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_TENANT`
 
 #### Requirements it meets
 
@@ -343,7 +344,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#ANL-041?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-001`, `ANL-050`, `ANL-042`, `ANL-043`, `ANL-044`, `ANL-045`, `ANL-046`, `ANL-047`, `ANL-048`, `ANL-049`.
-- [ ] Every gated control is gated: `REPORT_VIEW_TENANT`, `REPORT_VIEW_VENUE`.
+- [ ] Every gated control is gated: `REPORT_VIEW_TENANT`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -499,6 +500,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -595,7 +598,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listReportSubscriptions`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Report | the name it points at, never the id | — |
+| Schedule | the name it points at, never the id | — |
+| Recipients | list or chips (count when long) | — |
+| Principal | the name it points at, never the id | — |
+| Email | text | — |
+| External | yes / no (icon or chip) | — |
+| Channel | chip: Email, Sftp, Webhook, In platform | — |
+| Format | chip: Pdf, Xlsx, Csv, Json | — |
+| Includes personal data | yes / no (icon or chip) | Gates on `REPORT_EXPORT_PII` and is audited. A report that leaves the tenant with personal data in it is a fact somebody will ask about. |
+| Runs as principal | the name it points at, never the id | The report runs under the owner's permissions, not the recipient's. |
+| Active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -669,6 +687,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -695,7 +715,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-043?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create report subscription, Cancel.
 - [ ] Every transition is wired: `ANL-041`.
@@ -820,6 +840,8 @@ subjectAr: الإغلاق اليومي - أكوافنتشر - 30 سبتمبر 20
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_SCHEDULE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -897,7 +919,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every export download** (data table)
+**Every export download** (data table, from `getReportExport`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -913,7 +935,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Status | text | not in the schema: `Status` |
 | Expiration | text | not in the schema: `Expiration` |
 
-**The selected export download** (detail panel): The pack groups this record's detail under its own headings: “At minimum”, “Export Status”, “Large Exports”.
+**The selected export download** (detail panel, from `getReportExport`): The pack groups this record's detail under its own headings: “At minimum”, “Export Status”, “Large Exports”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -988,22 +1010,15 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 #### Permissions
 
-- `exportReportResult` → `REPORT_EXPORT` (read) · staff
 - `getReportExport` → `REPORT_EXPORT` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_EXPORT`
+
 #### Requirements it meets
 
-5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 6.1.20 | The system should be able to all reporting functions should have export option to multiple file formats; minimum of PDF, Excel, delimited text, and XML. | Retail POS | CONTRACTED | `exportReportResult` |
-| 6.1.26 | The system should be able to view/export (as CSV) user data. | Retail POS | CONTRACTED | `exportReportResult` |
-| 8.7.18 | System shall support report exports to Excel. | Unified Operations Dashboard | CONTRACTED | `exportReportResult` |
-| 8.7.19 | System shall support report exports to PDF. | Unified Operations Dashboard | CONTRACTED | `exportReportResult` |
-| 8.7.20 | System shall support report exports through APIs. | Unified Operations Dashboard | CONTRACTED | `exportReportResult` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -1026,7 +1041,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
 - [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-045?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1136,6 +1151,8 @@ pushes:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1235,6 +1252,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Effective to `effectiveTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `createAuthorisationPolicy` body |
 | Delegated admin roles `delegatedAdminRoleIds` | multi-picker: choose delegated admin roles | optional | — | — | — | 3.3.35. Who may edit this policy without being a platform administrator. | `createAuthorisationPolicy` body |
 
+Errors to draw in the form: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …
+
 **Form: Save access policy** (drawer, opened by *Save access policy*; *Save access policy* calls `updateAuthorisationPolicy`, *Cancel* sends nothing)
 
 **The selected policy, editable.** The same fields as creating one; saving writes a new version and the panel shows it. Dismissing sends nothing.
@@ -1260,6 +1279,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Effective from `effectiveFrom` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateAuthorisationPolicy` body |
 | Effective to `effectiveTo` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `updateAuthorisationPolicy` body |
 | Delegated admin roles `delegatedAdminRoleIds` | multi-picker: choose delegated admin roles | optional | — | — | — | 3.3.35. Who may edit this policy without being a platform administrator. | `updateAuthorisationPolicy` body |
+
+Errors to draw in the form: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …
 
 #### Outputs: what the screen shows and produces
 
@@ -1302,8 +1323,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| New access policy (primary button) | `createAuthorisationPolicy` POST `/authorisation-policies` | AuthorisationPolicy | AuthorisationPolicy | — | opens drawer first |
-| Save access policy (secondary button) | `updateAuthorisationPolicy` PUT `/authorisation-policies/{policyId}` | AuthorisationPolicy | AuthorisationPolicy | — | opens drawer first |
+| New access policy (primary button) | `createAuthorisationPolicy` POST `/authorisation-policies` | AuthorisationPolicy | AuthorisationPolicy | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | opens drawer first |
+| Save access policy (secondary button) | `updateAuthorisationPolicy` PUT `/authorisation-policies/{policyId}` | AuthorisationPolicy | AuthorisationPolicy | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | opens drawer first |
 
 **Data it reads**: `listAuthorisationPolicies` (onLoad, Who may see which report: the policies that speak to …); `getAnalyticsGovernancePolicy` (onLoad, The sharing and export rules that apply to every report)
 
@@ -1321,6 +1342,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the status filter, and the access policies are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_TENANT` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for … |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Edge cases to draw
 
@@ -1391,7 +1413,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (39), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (39), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-047?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: New access policy, Save access policy.
@@ -1453,7 +1475,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every delivery monitoring failure** (data table)
+**Every delivery monitoring failure** (data table, from `listReportDeliveries`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1468,7 +1490,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Error | text | not in the schema: `Error` |
 | Retry count | text | not in the schema: `Retry Count` |
 
-**The selected delivery monitoring failure** (detail panel)
+**The selected delivery monitoring failure** (detail panel, from `listReportDeliveries`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1560,6 +1582,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `listReportDeliveries` → `REPORT_VIEW_TENANT` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_TENANT`
 
 #### Requirements it meets
 
@@ -1717,6 +1741,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_TENANT`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1849,6 +1875,8 @@ policy:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `TENANT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1974,7 +2002,6 @@ Method, path, parameters, request and response for every operation these screens
 "createAuthorisationPolicy": {"method":"POST","path":"/authorisation-policies","contract":"identity","summary":"Write a policy without writing code","permission":"PERMISSION_MANAGE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AuthorisationPolicy","responds":"AuthorisationPolicy"},
 "createReportSchedule": {"method":"POST","path":"/report-schedules","contract":"reporting","summary":"Schedule a report","permission":"REPORT_SCHEDULE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateReportScheduleRequest","responds":"ReportSchedule"},
 "createReportSubscription": {"method":"POST","path":"/report-subscriptions","contract":"reporting","summary":"Send a report to somebody, on terms","permission":"REPORT_SCHEDULE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ReportSubscription","responds":"ReportSubscription"},
-"exportReportResult": {"method":"POST","path":"/report-executions/{executionId}/export","contract":"reporting","summary":"Export a completed result","permission":"REPORT_EXPORT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "getAnalyticsGovernancePolicy": {"method":"GET","path":"/analytics-governance-policy","contract":"reporting","summary":"The tenant's analytics governance policy","permission":"REPORT_VIEW_TENANT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"AnalyticsGovernancePolicy"},
 "getReportExport": {"method":"GET","path":"/report-exports/{exportId}","contract":"reporting","summary":"Export status and download link","permission":"REPORT_EXPORT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ReportExport"},
 "listAuthorisationPolicies": {"method":"GET","path":"/authorisation-policies","contract":"identity","summary":"Attribute-based authorisation policies","permission":"PERMISSION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"scopePath","in":"query","required":null}],"requestBody":null,"responds":"AuthorisationPolicy"},
@@ -1995,7 +2022,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AccessCondition": {"type":"object","description":"**One attribute, one operator, one value** — and the attribute names are an enum rather than free text, because a policy that reads `venu.type` silently never matches.\nThe enum is the matrix, row by row: user (3.3.7), employee (3.3.8), membership (3.3.9), accreditation (3.3.10), customer segment (3.3.11), resource classification (3.3.12), venue (3.3.13), attraction (3.3.14), device (3.3.15), day of week (3.3.16), season (3.3.17), event (3.3.18), capacity (3.3.19), occupancy (3.3.20), risk score (3.3.21), location (3.3.2) and time (3.3.3).\n","required":["attribute","operator"],"properties":{"attribute":{"type":"string","enum":["user.attribute","employee.attribute","employee.onShift","membership.tier","membership.status","accreditation.type","accreditation.status","customer.segment","resource.classification","venue.attribute","venue.id","attraction.attribute","device.kind","device.id","device.trusted","time.ofDay","time.dayOfWeek","time.season","time.withinOperatingHours","event.id","event.status","capacity.utilisationPercent","occupancy.level","risk.score","ticket.status","location.scopePath"]},"key":{"type":"string","nullable":true,"description":"For the `*.attribute` forms — which attribute, by code."},"operator":{"type":"string","enum":["equals","notEquals","in","notIn","greaterThan","lessThan","between","contains","startsWith","exists"]},"value":{"nullable":true,"description":"The single comparand for `equals`, `notEquals`, `greaterThan`, `lessThan`, `contains` and `startsWith` — a string, number or boolean, by the attribute. Null for `exists`; `in`, `notIn` and `between` use `values`.\n"},"values":{"type":"array","items":{"type":"string"}}}},
 "AnalyticsGovernancePolicy": {"type":"object","x-ticvai-persistence":"reporting.analytics_governance_policy","description":"**What analytics may show and where it may go** (Chinmay, 2 October, workbook Q225; CHG-CSA-021). One row per tenant.","properties":{"masking":{"type":"object","description":"Masked fields, as `schema.table.column`, and who may see them unmasked.","properties":{"maskedFields":{"type":"array","items":{"type":"string"}},"unmaskedForPermissions":{"type":"array","items":{"type":"string"}}}},"export":{"type":"object","properties":{"allowedFormats":{"type":"array","items":{"type":"string"}},"personalDataNeedsPermission":{"type":"boolean","default":true,"description":"An export carrying personal data needs `REPORT_EXPORT_PII`."},"maxRows":{"type":"integer","nullable":true}}},"retention":{"type":"object","properties":{"resultDays":{"type":"integer","minimum":1,"nullable":true,"description":"How long report results and exports are kept."}}},"sharing":{"type":"object","properties":{"externalLinks":{"type":"boolean","default":false},"allowedDomains":{"type":"array","items":{"type":"string"}}}},"aiAndApiAccess":{"type":"object","properties":{"aiAssistant":{"type":"boolean","default":true,"description":"The AI assistant may answer analytics questions through the semantic layer (ADR-0054)."},"publicApi":{"type":"boolean","default":false}}},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005). Written at `tenant` scope."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"AuthorisationPolicy": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy","description":"3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n","required":["code","name","effect"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."},"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"isTemplate":{"type":"boolean","default":false},"permissions":{"type":"array","items":{"type":"string"},"description":"**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"},"conditions":{"type":"array","x-ticvai-persistence-column":"jsonb","items":{"$ref":"#/components/schemas/AccessCondition"}},"combining":{"type":"string","enum":["allMustMatch","anyMayMatch"],"default":"allMustMatch"},"effect":{"type":"string","enum":["permit","deny"],"description":"**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"},"priority":{"type":"integer","default":0},"scopePath":{"type":"string","description":"3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"},"appliesToRoleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"status":{"type":"string","readOnly":true,"description":"**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n","enum":["draft","pendingApproval","active","suspended","retired"]},"version":{"type":"integer","default":1,"readOnly":true,"description":"Set by the server; every `updateAuthorisationPolicy` writes a new version."},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"delegatedAdminRoleIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"}}},
+"AuthorisationPolicy": {"type":"object","x-ticvai-persistence":"identity.authorisation_policy","description":"3.3. **Conditions and an effect, evaluated by one engine.** A role says who you are; a policy says under what circumstances that is enough.\n\n**Which of the two policy engines this is** (stated 29 September, build pass). The package has two: this one, and the access contract's `AccessDynamicPolicy` (`access.dynamic_policy`). **This one governs who may do what in the software**: a principal's permissions on operations and screens (`permissions` names them), narrowed or extended by who, where, when and on what device, and decided by `evaluateAccess`. **`AccessDynamicPolicy` governs who may pass which gate**: a guest's, holder's or employee's admission at an access point, decided in the gate's validation with results such as `requireId` or `requireSupervisor` that mean nothing to a permission check. A staff member's badge opening a staff door is a gate decision (access); the same staff member approving a refund is a permission decision (here).\n**Settled by ADR-0068 (accepted 1 October): guest admission lives in Access only.** This engine keeps staff authorisation and was renamed to say so: `identity.access_policy` became `identity.authorisation_policy`, its versions `identity.authorisation_policy_version`, and its operations `*AuthorisationPolicy*`. \"Access policy\" now means `AccessDynamicPolicy` and nothing else.\n","required":["code","name","effect"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"Assigned by the server on `createAuthorisationPolicy`; the path names the policy on update."},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"isTemplate":{"type":"boolean","default":false},"permissions":{"type":"array","items":{"type":"string"},"description":"**Which permissions this policy speaks to.** A policy with an empty list speaks to all of them, which is powerful enough that it is worth being explicit about.\n"},"conditions":{"type":"array","x-ticvai-persistence-column":"jsonb","items":{"$ref":"#/components/schemas/AccessCondition"}},"combining":{"type":"string","enum":["allMustMatch","anyMayMatch"],"default":"allMustMatch"},"effect":{"type":"string","enum":["permit","deny"],"description":"**Deny wins over permit when two policies disagree.** 3.3.32 asks for least-privilege, and a permit that can override a deny is not least-privilege by any reading — it is the union of every mistake anybody has made.\n"},"priority":{"type":"integer","default":0},"scopePath":{"type":"string","description":"3.3.40 to 3.3.43. **Tenant, venue and cross-venue policies are one mechanism**, because `scope_path` is prefix-comparable — `uae.dubai` contains `uae.dubai.marina` — and inheritance is the prefix walk rather than a second table.\n"},"appliesToRoleIds":{"type":"array","items":{"type":"string","format":"uuid"}},"status":{"type":"string","readOnly":true,"description":"**Moved only by `setAuthorisationPolicyState`.** A policy is created as a `draft`, and a status sent in a create or update body is ignored — otherwise a write could skip the approval 3.3.26 requires.\n","enum":["draft","pendingApproval","active","suspended","retired"]},"version":{"type":"integer","default":1,"readOnly":true,"description":"Set by the server; every `updateAuthorisationPolicy` writes a new version."},"effectiveFrom":{"type":"string","format":"date-time","nullable":true},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"delegatedAdminRoleIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"3.3.35. **Who may edit this policy without being a platform administrator.** A venue manager tuning their own opening-hours rule should not need someone who can edit every tenant's.\n"},"statusReason":{"type":"string","nullable":true,"readOnly":true,"description":"Why the policy's state last changed (`setAuthorisationPolicyState`)."}}},
 "Cadence": {"x-ticvai-persistence":"none — embedded in schedule","type":"object","description":"**What each frequency needs (decided 28 September, audit R158).** `daily`: `timeOfDay`. `weekly`: `dayOfWeek` and `timeOfDay`. `monthly`: `dayOfMonth` and `timeOfDay`, a day past the month's end running on its last day. `quarterly`: `dayOfMonth` and `timeOfDay`, in the first month of each quarter. `onShiftClose` and `onPeriodClose`: nothing else, they run on the event. A field a frequency needs and does not have, or one it does not take, is the 400 on `createReportSchedule`. **Times are in the venue's time zone.**\n","required":["frequency"],"properties":{"frequency":{"type":"string","enum":["daily","weekly","monthly","quarterly","onShiftClose","onPeriodClose"]},"dayOfWeek":{"type":"integer","minimum":0,"maximum":6},"dayOfMonth":{"type":"integer","minimum":1,"maximum":31},"timeOfDay":{"type":"string","pattern":"^([01]\\d|2[0-3]):[0-5]\\d$"},"timeZone":{"type":"string","readOnly":true,"description":"Always the venue's time zone (decided 28 September, audit R158), returned so a reader knows which. Not taken on a write."}}},
 "CreateReportScheduleRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["reportId","cadence","recipients","format"],"properties":{"reportId":{"type":"string","format":"uuid"},"name":{"type":"string","maxLength":200},"cadence":{"$ref":"#/components/schemas/Cadence"},"parameters":{"type":"object","additionalProperties":true,"description":"As `RunReportRequest.parameters` — keyed by the report's `ReportParameter.key`, applied to every run."},"recipients":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/Recipient"}},"format":{"$ref":"#/components/schemas/ExportFormat"},"includePersonalData":{"type":"boolean","default":false},"skipIfEmpty":{"type":"boolean","default":true,"description":"An empty report every morning trains people to ignore the report."}}},
 "ExecutionStatus": {"type":"string","enum":["queued","running","completed","failed","cancelled","expired"]},
@@ -2005,7 +2032,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ReportDelivery": {"type":"object","x-ticvai-persistence":"reporting.delivery","description":"BI boards 4.8 and 4.9. **A report that silently stopped arriving is worse than one that never existed.**\n","properties":{"id":{"type":"string","format":"uuid"},"subscriptionId":{"type":"string","format":"uuid"},"reportId":{"type":"string","format":"uuid"},"attemptedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["delivered","failed","retrying","suppressed"]},"recipientCount":{"type":"integer"},"failureReason":{"type":"string","nullable":true},"retryCount":{"type":"integer","default":0},"containedPersonalData":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
 "ReportExport": {"x-ticvai-persistence":"reporting.export","type":"object","required":["id","executionId","format","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"executionId":{"type":"string"},"format":{"$ref":"#/components/schemas/ExportFormat"},"status":{"type":"string","enum":["queued","generating","ready","failed","expired"]},"includesPersonalData":{"type":"boolean"},"purpose":{"type":"string","nullable":true},"downloadUrl":{"type":"string","nullable":true,"description":"Signed and expiring. Present only while status is `ready`."},"sizeBytes":{"type":"integer","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"requestedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},
 "ReportSchedule": {"x-ticvai-persistence":"reporting.schedule + reporting.schedule_recipient","allOf":[{"$ref":"#/components/schemas/CreateReportScheduleRequest"},{"type":"object","required":["id","ownerPrincipalId","isPaused","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"ownerPrincipalId":{"type":"string","format":"uuid","description":"The schedule runs under this principal's permissions, not the recipients'. A standing grant of whatever the owner can see.\n"},"isPaused":{"type":"boolean"},"lastRunAt":{"type":"string","format":"date-time","nullable":true},"lastRunStatus":{"$ref":"#/components/schemas/ExecutionStatus"},"nextRunAt":{"type":"string","format":"date-time","nullable":true},"consecutiveFailures":{"type":"integer"},"createdAt":{"type":"string","format":"date-time"}}}]},
-"ReportSubscription": {"type":"object","x-ticvai-persistence":"reporting.subscription","description":"BI boards 4.3 and 4.4. **Not a schedule** — one schedule serves several of these.","required":["reportId"],"properties":{"id":{"type":"string","format":"uuid"},"reportId":{"type":"string","format":"uuid"},"scheduleId":{"type":"string","format":"uuid","nullable":true},"recipients":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid","nullable":true},"email":{"type":"string","nullable":true},"external":{"type":"boolean","default":false}}}},"channel":{"type":"string","enum":["email","sftp","webhook","inPlatform"]},"format":{"type":"string","enum":["pdf","xlsx","csv","json"]},"includesPersonalData":{"type":"boolean","default":false,"description":"**Gates on `REPORT_EXPORT_PII` and is audited.** A report that leaves the tenant with personal data in it is a fact somebody will ask about.\n"},"runsAsPrincipalId":{"type":"string","format":"uuid","description":"**The report runs under the owner's permissions, not the recipient's.**"},"active":{"type":"boolean","default":true},"scopePath":{"type":"string"}}},
+"ReportSubscription": {"type":"object","x-ticvai-persistence":"reporting.subscription","description":"BI boards 4.3 and 4.4. **Not a schedule** — one schedule serves several of these.","required":["reportId"],"properties":{"id":{"type":"string","format":"uuid"},"reportId":{"type":"string","format":"uuid"},"scheduleId":{"type":"string","format":"uuid","nullable":true},"recipients":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid","nullable":true},"email":{"type":"string","nullable":true},"external":{"type":"boolean","default":false}}}},"channel":{"type":"string","enum":["email","sftp","webhook","inPlatform"]},"format":{"type":"string","enum":["pdf","xlsx","csv","json"]},"includesPersonalData":{"type":"boolean","default":false,"description":"**Gates on `REPORT_EXPORT_PII` and is audited.** A report that leaves the tenant with personal data in it is a fact somebody will ask about.\n"},"runsAsPrincipalId":{"type":"string","format":"uuid","description":"**The report runs under the owner's permissions, not the recipient's.**"},"active":{"type":"boolean","default":true},"scopePath":{"type":"string"}}},
 "TenantDataRetentionClass": {"type":"string","description":"**The data classes a tenant sets a retention period for** (decided 29 September, Chinmay: all data retention is tenant configuration, one setting per class). Defaults are ADR-0047's and the AI system design's (section 8, decision 5); a legal limit is the only thing the platform enforces.\n| Class | Default | Counted from | Legal limit (refused) | |---|---|---|---| | `guestProfile` | 5 years | last activity | none | | `paymentRecord` | 10 years | created | at least 10 years (4.3.4) | | `financialRecord` | 7 years | created | at least 7 years (6.1.78) | | `auditRecord` | 2 years (authorisation and device audit) | created | none | | `approvalRecord` | 7 years (approvals board 6.7) | decided | none | | `complianceInspection` | 7 years | created | none | | `faceTagBiometric` | 7 days | ticket expiry | make-or-break | | `facePassBiometric` | follows `guestProfile` | last activity | make-or-break | | `aiPrompts` | 90 days (prompts and responses) | created | none | | `aiConversations` | 90 days | last activity | none | | `aiDecisionRecords` | follows `auditRecord` (decision records and the approvals of AI actions) | decided | none | | `aiMetadataIndex` | always follows `aiDecisionRecords` (summaries, entities, embeddings) | created | none |\n**ADR-0047's floors and ceilings that are not law are defaults now, not refusals** (the audit floor of one year, the proposed seven-year guest-profile ceiling, the Face Tag thirty-day ceiling). Platform-owned copies — the burst environment copy, a decommissioned cell — are not tenant data classes and are not here.\n","enum":["guestProfile","paymentRecord","financialRecord","auditRecord","approvalRecord","complianceInspection","faceTagBiometric","facePassBiometric","aiPrompts","aiConversations","aiDecisionRecords","aiMetadataIndex"]},
 "TenantDataRetentionSetting": {"type":"object","x-ticvai-persistence":"tenancy.data_retention_setting","description":"**One tenant's retention period for one data class** (decided 29 September, Chinmay). One row per tenant and class, written by `setDataRetentionSetting`; a class with no row takes the platform default. The limit and default fields are the platform's catalogue, computed for the response and not stored on the row.\n","required":["dataClass"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"dataClass":{"allOf":[{"$ref":"#/components/schemas/TenantDataRetentionClass"}],"x-ticvai-unique":"tenant","description":"One row per class per tenant. On a write it comes from the path; a body value is ignored."},"retainAmount":{"type":"integer","nullable":true,"minimum":0,"description":"The tenant's period. Null with no `followsDataClass` means the platform default applies. Zero means the data is not kept past the transaction that produced it.\n"},"retainUnit":{"type":"string","nullable":true,"enum":["days","months","years"],"description":"Required with `retainAmount`."},"followsDataClass":{"allOf":[{"$ref":"#/components/schemas/TenantDataRetentionClass"}],"nullable":true,"description":"Keep this class for as long as another class is kept. Set by default for `aiDecisionRecords` (follows `auditRecord`), `facePassBiometric` (follows `guestProfile`) and `aiMetadataIndex` (follows `aiDecisionRecords`, and cannot be changed).\n"},"onExpiry":{"type":"string","enum":["archive","anonymise","delete"],"default":"archive","description":"ADR-0047's stages. `archive` moves the data to the archive instance, from where it is erased on the class's own schedule; derived stores (the AI index, search) purge at archive, not later.\n"},"anchor":{"type":"string","readOnly":true,"x-ticvai-persisted":false,"enum":["createdAt","lastActivity","decidedAt","ticketExpiry"],"description":"What the period is counted from. Fixed per class by the platform."},"effectiveAmount":{"type":"integer","readOnly":true,"x-ticvai-persisted":false,"description":"The period actually applied, after follows and defaults are resolved."},"effectiveUnit":{"type":"string","readOnly":true,"x-ticvai-persisted":false,"enum":["days","months","years"]},"isDefault":{"type":"boolean","readOnly":true,"x-ticvai-persisted":false,"description":"True when the tenant has not set this class and the platform default applies."},"defaultAmount":{"type":"integer","nullable":true,"readOnly":true,"x-ticvai-persisted":false},"defaultUnit":{"type":"string","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"enum":["days","months","years"]},"legalMinimumAmount":{"type":"integer","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"description":"A floor the law sets. A shorter period is refused (`422`)."},"legalMaximumAmount":{"type":"integer","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"description":"A maximum the law sets. A longer period is refused (`422`). Null for every class until the biometric make-or-break is answered."},"legalLimitUnit":{"type":"string","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"enum":["days","months","years"]},"legalBasis":{"type":"string","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"description":"The law or requirement the limit comes from, e.g. `4.3.4`."},"updatedAt":{"type":"string","format":"date-time","readOnly":true},"updatedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The tenant. Retention is set at tenant scope only."}}}
 }

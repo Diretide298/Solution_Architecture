@@ -567,6 +567,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -595,6 +596,7 @@
     "format": "uuid"
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "enum": [
      "submitted",
@@ -756,6 +758,7 @@
     }
    },
    "credentialRef": {
+    "x-ticvai-secret": "vault-reference",
     "type": "string",
     "writeOnly": true,
     "description": "A vault reference. **Never the credential**, never returned, and rotated without a contract change.\n"

@@ -106,25 +106,6 @@
   "requestBody": null,
   "responds": "MarketingSubscription"
  },
- "getPublishedTenantConfig": {
-  "method": "GET",
-  "path": "/storefront/tenant-config",
-  "contract": "white-label",
-  "summary": "The published guest-facing configuration, before anyone signs in",
-  "permission": null,
-  "offlineCapable": true,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": false
-   }
-  ],
-  "requestBody": null,
-  "responds": "PublishedTenantConfig"
- },
  "getTenantAppStatus": {
   "method": "GET",
   "path": "/tenant-config/status",
@@ -487,7 +468,7 @@
   "contract": "marketing-crm",
   "summary": "Sign a waiver, answer a survey, capture details",
   "permission": "GUEST_VIEW",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

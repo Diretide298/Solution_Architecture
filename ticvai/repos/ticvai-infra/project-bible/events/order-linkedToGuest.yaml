@@ -7,9 +7,11 @@ publisher: orders
 description: A guest-checkout order was attached to a guest's account, so it now belongs to that subject.
 aggregate: order
 emittedWhen: linkGuestCheckout attaches the named order and every other guest-checkout order with the same verified
-  contact detail (one event per order attached)
+  contact detail (one event per order attached); setCustomerGuestAccount attaches a guest account to an order (one event
+  per order whose subject it sets; CHG-MOD-006)
 emittedBy:
 - identity.linkGuestCheckout
+- orders.setCustomerGuestAccount
 payload:
 - field: orderId
   type: uuid

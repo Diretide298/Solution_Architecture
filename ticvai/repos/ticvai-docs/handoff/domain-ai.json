@@ -1062,7 +1062,7 @@
    "scopeLevel": "venue"
   },
   "setAiProvider": {
-   "path": "/providers",
+   "path": "/providers/{providerId}",
    "verb": "PUT",
    "summary": "Configure a provider",
    "permission": "PLATFORM_TENANT_MANAGE",
@@ -1110,7 +1110,7 @@
    "scopeLevel": "venue"
   },
   "setIndexSource": {
-   "path": "/index-sources",
+   "path": "/index-sources/{sourceId}",
    "verb": "PUT",
    "summary": "Declare a source indexed",
    "permission": "AI_CONFIGURE",
@@ -2508,30 +2508,8 @@
  },
  "screens": [
   {
-   "id": "WEB-001",
-   "name": "Home / Landing",
-   "platform": "P01",
-   "platformName": "Guest Web",
-   "wave": 1,
-   "operations": [
-    "decideRecommendations",
-    "recordRecommendationEvents"
-   ]
-  },
-  {
    "id": "WEB-008",
    "name": "Add-ons & Upsell",
-   "platform": "P01",
-   "platformName": "Guest Web",
-   "wave": 1,
-   "operations": [
-    "decideRecommendations",
-    "recordRecommendationEvents"
-   ]
-  },
-  {
-   "id": "WEB-043",
-   "name": "Loyalty & Rewards",
    "platform": "P01",
    "platformName": "Guest Web",
    "wave": 1,
@@ -2555,17 +2533,6 @@
    ]
   },
   {
-   "id": "GST-001",
-   "name": "Home",
-   "platform": "P02",
-   "platformName": "Guest App",
-   "wave": 1,
-   "operations": [
-    "decideRecommendations",
-    "recordRecommendationEvents"
-   ]
-  },
-  {
    "id": "GST-031",
    "name": "AI Concierge \u2013 Home",
    "platform": "P02",
@@ -2586,7 +2553,6 @@
    "platformName": "Guest App",
    "wave": 1,
    "operations": [
-    "recordAnswerFeedback",
     "sendAiMessage"
    ]
   },
@@ -2601,17 +2567,6 @@
     "listAiConversations",
     "recordAnswerFeedback",
     "sendAiMessage"
-   ]
-  },
-  {
-   "id": "GST-036",
-   "name": "Loyalty & Rewards",
-   "platform": "P02",
-   "platformName": "Guest App",
-   "wave": 1,
-   "operations": [
-    "decideRecommendations",
-    "recordRecommendationEvents"
    ]
   },
   {
@@ -2665,7 +2620,6 @@
    "wave": 1,
    "operations": [
     "createAiConversation",
-    "recordAnswerFeedback",
     "sendAiMessage"
    ]
   },
@@ -2943,6 +2897,7 @@
    "wave": 3,
    "operations": [
     "decideProposedAction",
+    "listProposedActions",
     "proposeLookalikeSegment"
    ]
   },
@@ -3041,6 +2996,7 @@
    "wave": 3,
    "operations": [
     "decideProposedAction",
+    "listProposedActions",
     "proposeMarketingContent",
     "proposeTranslations"
    ]
@@ -3362,7 +3318,6 @@
    "platformName": "TICVAI Web",
    "wave": 2,
    "operations": [
-    "getAiDecisionTrace",
     "listAiInteractions"
    ]
   },
@@ -3404,7 +3359,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "answerConfigurationQuestion",
     "attachConfigurationSource",
     "listConfigurationSources",
     "startConfigurationSession"
@@ -3418,7 +3372,6 @@
    "wave": 3,
    "operations": [
     "answerConfigurationQuestion",
-    "getConfigurationBlueprint",
     "setAiVenueSettings"
    ]
   },
@@ -3473,8 +3426,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "decideBlueprintRecommendation",
-    "getConfigurationBlueprint"
+    "decideBlueprintRecommendation"
    ]
   },
   {
@@ -3484,9 +3436,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "answerConfigurationQuestion",
     "attachConfigurationSource",
-    "decideBlueprintRecommendation",
     "getConfigurationBlueprint",
     "listConfigurationSources"
    ]
@@ -3509,7 +3459,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "buildConfigurationPlan",
     "getActionPlan",
     "getConfigurationBlueprint"
    ]
@@ -3522,8 +3471,7 @@
    "wave": 3,
    "operations": [
     "decideBlueprintRecommendation",
-    "getActionPlan",
-    "getConfigurationBlueprint"
+    "getActionPlan"
    ]
   },
   {
@@ -3534,8 +3482,7 @@
    "wave": 3,
    "operations": [
     "decideBlueprintRecommendation",
-    "getActionPlan",
-    "getConfigurationBlueprint"
+    "getActionPlan"
    ]
   },
   {
@@ -3546,8 +3493,7 @@
    "wave": 3,
    "operations": [
     "decideBlueprintRecommendation",
-    "getActionPlan",
-    "getConfigurationBlueprint"
+    "getActionPlan"
    ]
   },
   {
@@ -3558,8 +3504,7 @@
    "wave": 3,
    "operations": [
     "decideBlueprintRecommendation",
-    "getActionPlan",
-    "getConfigurationBlueprint"
+    "getActionPlan"
    ]
   },
   {
@@ -3570,8 +3515,7 @@
    "wave": 3,
    "operations": [
     "decideBlueprintRecommendation",
-    "getActionPlan",
-    "getConfigurationBlueprint"
+    "getActionPlan"
    ]
   },
   {
@@ -3582,8 +3526,7 @@
    "wave": 3,
    "operations": [
     "decideBlueprintRecommendation",
-    "getActionPlan",
-    "getConfigurationBlueprint"
+    "getActionPlan"
    ]
   },
   {
@@ -3594,8 +3537,7 @@
    "wave": 3,
    "operations": [
     "decideBlueprintRecommendation",
-    "getActionPlan",
-    "getConfigurationBlueprint"
+    "getActionPlan"
    ]
   },
   {
@@ -3605,8 +3547,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getActionPlan",
-    "simulateActionPlan"
+    "getActionPlan"
    ]
   },
   {
@@ -3616,7 +3557,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getActionPlan",
     "simulateActionPlan"
    ]
   },
@@ -3629,7 +3569,6 @@
    "operations": [
     "getActionPlan",
     "getAiVenueSettings",
-    "getEffectiveAiPolicy",
     "setAiVenueSettings"
    ]
   },
@@ -3651,20 +3590,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "decideBlueprintRecommendation",
     "getConfigurationBlueprint"
-   ]
-  },
-  {
-   "id": "ADM-492",
-   "name": "Configuration Approval Workflow",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "decideProposedAction",
-    "getActionPlan",
-    "listProposedActions"
    ]
   },
   {
@@ -3687,8 +3613,6 @@
    "wave": 3,
    "operations": [
     "getActionPlan",
-    "pauseActionPlan",
-    "resumeActionPlan",
     "retryActionStep"
    ]
   },
@@ -3699,20 +3623,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getActionPlan",
-    "rollbackActionPlan"
-   ]
-  },
-  {
-   "id": "ADM-496",
-   "name": "Configuration Change & Modification Assistant",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "answerConfigurationQuestion",
-    "buildConfigurationPlan",
-    "startConfigurationSession"
+    "getActionPlan"
    ]
   },
   {
@@ -3782,8 +3693,7 @@
    "wave": 3,
    "operations": [
     "configureAnomalyDetector",
-    "getForecast",
-    "listAiInsights"
+    "getForecast"
    ]
   },
   {
@@ -3842,8 +3752,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "compareForecastScenarios",
-    "createForecastScenario",
     "getForecast"
    ]
   },
@@ -3868,8 +3776,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getForecast",
-    "listOperationalRequirements"
+    "getForecast"
    ]
   },
   {
@@ -3881,7 +3788,6 @@
    "operations": [
     "configureAnomalyDetector",
     "getForecast",
-    "listAiInsights",
     "listOperationalRequirements"
    ]
   },
@@ -3893,7 +3799,6 @@
    "wave": 3,
    "operations": [
     "getForecast",
-    "listOperationalRequirements",
     "requestSuggestion"
    ]
   },
@@ -3904,30 +3809,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getForecast",
-    "listOperationalRequirements"
-   ]
-  },
-  {
-   "id": "ADM-513",
-   "name": "Workforce Demand & Staffing Forecast",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "getForecast",
-    "listOperationalRequirements"
-   ]
-  },
-  {
-   "id": "ADM-514",
-   "name": "POS, Kiosk & Frontline Service Forecast",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "getForecast",
-    "listOperationalRequirements"
+    "getForecast"
    ]
   },
   {
@@ -3937,8 +3819,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getForecast",
-    "listOperationalRequirements"
+    "getForecast"
    ]
   },
   {
@@ -3948,8 +3829,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getForecast",
-    "listOperationalRequirements"
+    "getForecast"
    ]
   },
   {
@@ -3959,20 +3839,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "compareForecastScenarios",
-    "createForecastScenario",
-    "listOperationalRequirements"
-   ]
-  },
-  {
-   "id": "ADM-518",
-   "name": "Operational Forecast Review, Recommendations & Handover",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "decideOperationalRequirement",
-    "listOperationalRequirements"
+    "compareForecastScenarios"
    ]
   },
   {
@@ -3983,10 +3850,7 @@
    "wave": 3,
    "operations": [
     "listAiCapabilities",
-    "listAiCapabilityMaturity",
-    "listAiGovernanceAlerts",
-    "pauseAiCapability",
-    "promoteAiRelease"
+    "listAiCapabilityMaturity"
    ]
   },
   {
@@ -4019,8 +3883,7 @@
    "wave": 3,
    "operations": [
     "configureAiCapability",
-    "getEffectiveAiPolicy",
-    "listAiCapabilities"
+    "getEffectiveAiPolicy"
    ]
   },
   {
@@ -4053,7 +3916,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "createAiGovernancePolicyDraft",
     "getEffectiveAiPolicy"
    ]
   },
@@ -4066,7 +3928,6 @@
    "operations": [
     "createAiPolicyException",
     "getEffectiveAiPolicy",
-    "listAiGovernancePolicyVersions",
     "revokeAiPolicyException"
    ]
   },
@@ -4100,20 +3961,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getActionPlan",
     "listProposedActions"
-   ]
-  },
-  {
-   "id": "ADM-530",
-   "name": "AI Approval Requirement & Routing Configuration",
-   "platform": "P09",
-   "platformName": "TICVAI Web",
-   "wave": 3,
-   "operations": [
-    "createAiGovernancePolicyDraft",
-    "listAiGovernancePolicyVersions",
-    "listAiTools"
    ]
   },
   {
@@ -4123,8 +3971,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "decideProposedAction",
-    "getActionPlan",
     "simulateActionPlan"
    ]
   },
@@ -4146,9 +3992,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getAiDecisionTrace",
-    "overrideAiDecision",
-    "sendAiMessage"
+    "getAiDecisionTrace"
    ]
   },
   {
@@ -4210,7 +4054,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "simulateActionPlan",
     "simulateAiGovernancePolicy"
    ]
   },
@@ -4262,7 +4105,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "explainRecommendationDecision",
     "getAiDecisionTrace"
    ]
   },
@@ -4294,8 +4136,7 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "getActionPlan",
-    "getAiDecisionTrace"
+    "getActionPlan"
    ]
   },
   {
@@ -4362,7 +4203,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "decideAiGovernanceAlert",
     "listAiGovernanceAlerts"
    ]
   },
@@ -4373,7 +4213,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "decideAiGovernanceAlert",
     "listAiGovernanceAlerts"
    ]
   },
@@ -4400,8 +4239,7 @@
    "wave": 3,
    "operations": [
     "decideAiGovernanceAlert",
-    "listAiGovernanceAlerts",
-    "openAiIncident"
+    "listAiGovernanceAlerts"
    ]
   },
   {
@@ -4427,7 +4265,6 @@
    "wave": 3,
    "operations": [
     "exportAiEvidencePackage",
-    "listAiControls",
     "listAiRiskRegister"
    ]
   },
@@ -4438,7 +4275,6 @@
    "platformName": "TICVAI Web",
    "wave": 3,
    "operations": [
-    "listAiGovernanceAlerts",
     "listAiRiskRegister"
    ]
   },
@@ -4482,7 +4318,6 @@
    "platformName": "Venue Support",
    "wave": 3,
    "operations": [
-    "configureAssistantProfile",
     "listAssistantProfiles"
    ]
   },
@@ -4494,6 +4329,7 @@
    "wave": 1,
    "operations": [
     "decideProposedAction",
+    "listProposedActions",
     "proposeMarketingContent"
    ]
   },
@@ -4505,6 +4341,7 @@
    "wave": 1,
    "operations": [
     "decideProposedAction",
+    "listProposedActions",
     "proposeMarketingContent"
    ]
   },
@@ -4658,8 +4495,6 @@
    "platformName": "Venue Analytics",
    "wave": 3,
    "operations": [
-    "configureAnomalyDetector",
-    "listAiInsights",
     "listAnomalyDetectors"
    ]
   },
@@ -4682,19 +4517,7 @@
    "wave": 3,
    "operations": [
     "createForecastScenario",
-    "exportForecastVersion",
-    "getForecast",
-    "listForecastDefinitions"
-   ]
-  },
-  {
-   "id": "ANL-058",
-   "name": "AI Recommendation & Next-Best-Action Center",
-   "platform": "P16",
-   "platformName": "Venue Analytics",
-   "wave": 3,
-   "operations": [
-    "listAiInsights"
+    "getForecast"
    ]
   },
   {
@@ -4704,8 +4527,6 @@
    "platformName": "Venue Analytics",
    "wave": 3,
    "operations": [
-    "decideAiInsight",
-    "listAiInsights",
     "listAiInteractions",
     "searchAiDecisions"
    ]
@@ -4717,13 +4538,7 @@
    "platformName": "Venue Analytics",
    "wave": 3,
    "operations": [
-    "configureAiCapability",
-    "getEffectiveAiPolicy",
-    "listAiCapabilities",
-    "listAiEvaluations",
-    "listAiModels",
-    "listPromptTemplates",
-    "runAiEvaluation"
+    "listAiModels"
    ]
   },
   {
@@ -5451,7 +5266,7 @@
   "states": 42,
   "events": 48,
   "tables": 138,
-  "screens": 194,
+  "screens": 183,
   "flows": 11,
   "documents": 68,
   "openConflicts": 1

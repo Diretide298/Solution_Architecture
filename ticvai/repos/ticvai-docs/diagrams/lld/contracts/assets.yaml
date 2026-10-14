@@ -271,6 +271,7 @@ operations:
   offline: false
   reads:
   - assets.media_asset
+  - assets.media_collection_member
   writes: []
 - operation: setMediaAssetApproval
   verb: POST
@@ -309,10 +310,11 @@ operations:
   reads:
   - assets.tag
   writes:
+  - assets.media_asset
   - assets.tag
 - operation: setMediaDistributionChannels
   verb: PUT
-  path: /media-distribution/channels
+  path: /media-distribution/channels/{code}
   scope: tenant
   permission: ASSET_LIBRARY_MANAGE
   audience:

@@ -263,7 +263,7 @@
   "contract": "maintenance",
   "summary": "Investigate, escalate, close or reopen an incident",
   "permission": "INCIDENT_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "append",
   "scopeLevel": "venue",
   "parameters": [
@@ -275,5 +275,24 @@
   ],
   "requestBody": null,
   "responds": "Incident"
+ },
+ "uploadIncidentMedia": {
+  "method": "POST",
+  "path": "/incidents/{incidentId}/media",
+  "contract": "maintenance",
+  "summary": "Add a photo, video or document to an incident",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UploadIncidentMediaRequest",
+  "responds": "IncidentMedia"
  }
 }

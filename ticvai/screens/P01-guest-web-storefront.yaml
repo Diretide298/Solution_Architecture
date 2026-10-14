@@ -460,8 +460,8 @@ screens:
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)
   - operation: decideRecommendations
     removed: true
-    why: The client-approved Home has no recommendation slot, so nothing shows a decision;
-      recommendations show in the cart slot (WEB-008, GST-048).
+    why: The client-approved Home has no recommendation slot, so nothing shows a decision; recommendations
+      show in the cart slot (WEB-008, GST-048).
     source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
   - operation: recordRecommendationEvents
@@ -2108,8 +2108,7 @@ screens:
   pattern: statusTracker
   patternReason: '`getUpsellSuggestions` reads one record and nothing reads a population — the screen
     is about that one thing'
-  purpose: Suggested add-ons and the offered bundle for this booking, each added to the cart, before
-    checkout.
+  purpose: Suggested add-ons and the offered bundle for this booking, each added to the cart, before checkout.
   layout:
     template: detail
     regions:
@@ -3826,8 +3825,6 @@ screens:
       provenance: flow F56 step 3→4
       crossesDevice: true
       back: false
-      carries:
-      - subjectId
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles
     to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession`
@@ -4128,8 +4125,8 @@ screens:
     trigger: onAction
   - operationId: createMfaChallenge
     contract: identity
-    purpose: 'Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step
-      verification on (action signIn), not a control: the code is then typed in Verification code'
+    purpose: 'Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step verification
+      on (action signIn), not a control: the code is then typed in Verification code'
     trigger: background
   - operationId: verifyMfaChallenge
     contract: identity
@@ -4753,8 +4750,8 @@ screens:
   pattern: listDetail
   patternReason: '`listMyOrders` reads the population and `getOrder` reads one of them — list, select,
     act'
-  purpose: 'The guest''s orders: open one, ask for a refund, and get or download its tax invoice and
-    credit notes.'
+  purpose: 'The guest''s orders: open one, ask for a refund, and get or download its tax invoice and credit
+    notes.'
   layout:
     template: split
     regions:
@@ -5256,8 +5253,7 @@ screens:
   pattern: listDetail
   patternReason: '`listWalletTransactions` reads the population and `getWallet` reads one of them — list,
     select, act'
-  purpose: The guest's wallet and its activity, saved cards, and the balance on a gift card or game
-    card.
+  purpose: The guest's wallet and its activity, saved cards, and the balance on a gift card or game card.
   layout:
     template: split
     regions:
@@ -5689,8 +5685,7 @@ screens:
   pattern: listDetail
   patternReason: '`listGuestMemberships` reads the population and `getMyMemberships` reads one of them
     — list, select, act'
-  purpose: 'The guest''s membership: billing statements, payments that need them, and the membership
-    itself.'
+  purpose: 'The guest''s membership: billing statements, payments that need them, and the membership itself.'
   layout:
     template: split
     regions:
@@ -6316,14 +6311,14 @@ screens:
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
   - operation: enrolMfaMethod
     removed: true
-    why: The client-approved web account screen has no control to set up two-step verification (the
-      app's GST-073 has one).
+    why: The client-approved web account screen has no control to set up two-step verification (the app's
+      GST-073 has one).
     source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
   - operation: verifyMfaEnrolment
     removed: true
-    why: The client-approved web account screen has no control to set up two-step verification (the
-      app's GST-073 has one).
+    why: The client-approved web account screen has no control to set up two-step verification (the app's
+      GST-073 has one).
     source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: WEB-025
@@ -6606,8 +6601,7 @@ screens:
   - operationId: getForm
     contract: marketing-crm
     purpose: 'A triggered survey opened from its link. Read once the guest is signed in (getForm needs
-      the guest session): a signed-out guest opening the link is offered sign-in and brought back
-      (GFIX-4)'
+      the guest session): a signed-out guest opening the link is offered sign-in and brought back (GFIX-4)'
     trigger: onLoad
   - operationId: submitForm
     contract: marketing-crm
@@ -6619,8 +6613,8 @@ screens:
     trigger: onAction
   - operationId: listMyOrders
     contract: orders
-    purpose: 'The recent visits a review can be about. Only when signed in: a signed-out guest is
-      offered sign-in and brought back here (GFIX-4)'
+    purpose: 'The recent visits a review can be about. Only when signed in: a signed-out guest is offered
+      sign-in and brought back here (GFIX-4)'
     trigger: onLoad
   wireframe:
     status: review
@@ -6880,8 +6874,8 @@ screens:
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
-    purpose: 'How to reach the venue: phone, email, WhatsApp, address, opening hours, without signing in
-      (decided 28 September, audit R073 (f))'
+    purpose: 'How to reach the venue: phone, email, WhatsApp, address, opening hours, without signing
+      in (decided 28 September, audit R073 (f))'
     trigger: onLoad
     provenance: 'Block A audit, 14 October 2026: N-TWIN-OPS, as GST-029 (CHG-SCG-008)'
   wireframe:
@@ -8436,8 +8430,8 @@ screens:
   - operationId: addCartLine
     contract: orders
     purpose: 'Sent by the screen when a table booking needs a deposit, not a control: adds the deposit
-      to the cart, with the guest session the device already holds: signed in, or the anonymous cart
-      session a visitor gets with the first line (ADR-0045)'
+      to the cart, with the guest session the device already holds: signed in, or the anonymous cart session
+      a visitor gets with the first line (ADR-0045)'
     trigger: background
   - operationId: updateTableReservation
     contract: fnb
@@ -9239,8 +9233,8 @@ screens:
     - listParkingFacilities
   - operationId: getParkingEntitlement
     contract: access
-    purpose: 'Load the parking entitlement being changed. Only when signed in: a signed-out guest is
-      offered sign-in and brought back here (GFIX-4)'
+    purpose: 'Load the parking entitlement being changed. Only when signed in: a signed-out guest is offered
+      sign-in and brought back here (GFIX-4)'
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
@@ -9845,8 +9839,7 @@ screens:
   - operationId: createAiConversation
     contract: ai
     purpose: 'Opened silently on the first message; the scope comes from the session, never a module the
-      guest picks. Only when signed in: the conversation is the guest''s own (x-ticvai-self-scoped
-      subject)'
+      guest picks. Only when signed in: the conversation is the guest''s own (x-ticvai-self-scoped subject)'
     trigger: background
   - operationId: sendAiMessage
     contract: ai
@@ -9858,12 +9851,11 @@ screens:
     trigger: onAction
   - operationId: requestSuggestion
     contract: ai
-    purpose: 'From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen''s
-      production plan; an itinerary is asked on the Plan tab); never a kind picker. Later
-      (CHG-RONEP-010): the wait-time and upsell suggestions of the day-one suggestions
-      (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay, 3 October); until then the control shows
-      ''Later''. Only when signed in: the conversation is the guest''s own (x-ticvai-self-scoped
-      subject)'
+    purpose: 'From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen''s production
+      plan; an itinerary is asked on the Plan tab); never a kind picker. Later (CHG-RONEP-010): the wait-time
+      and upsell suggestions of the day-one suggestions (AI-ENGINE-SUGGESTIONS) ships in Block A2 (Chinmay,
+      3 October); until then the control shows ''Later''. Only when signed in: the conversation is the
+      guest''s own (x-ticvai-self-scoped subject)'
     trigger: background
   - operationId: getGuestMenu
     contract: fnb
@@ -9883,8 +9875,8 @@ screens:
     contract: marketing-crm
     purpose: 'The agent''s replies, the queue position and the wait after a handover, polled every 5 s
       while the chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay,
-      3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the
-      guest''s own (x-ticvai-self-scoped subject)'
+      3 October 2026, r1 additions; CHG-RONEC-003). Only when signed in: the conversation is the guest''s
+      own (x-ticvai-self-scoped subject)'
     trigger: onInterval
     pollSeconds: 5
     pollSecondsHidden: 30
@@ -10892,8 +10884,7 @@ screens:
   gaps:
   - operation: getTransportRoute
     removed: true
-    why: 'Nothing on the client-approved screen shows it: the stops and the map come from
-      getTransportRouteMap.'
+    why: 'Nothing on the client-approved screen shows it: the stops and the map come from getTransportRouteMap.'
     source: 'Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling ''wire onLoad
       reads to the load; otherwise remove it from the screen'' (CHG-SCG-004)'
 - id: WEB-050

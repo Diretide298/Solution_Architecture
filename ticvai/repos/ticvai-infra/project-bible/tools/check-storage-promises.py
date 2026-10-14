@@ -77,21 +77,7 @@ CODEISH = re.compile(r"(code|sku|number|name|slug|label|key|reference|handle|ema
 # `x-ticvai-persistence-column`, or `x-ticvai-persisted: false`). Each of these is a storage decision for its
 # module's owner, listed for the lead with CHG-DDL-007; remove a line when it is decided. Only shrinks.
 SLICE_DEBT = frozenset(k + "@slice" for k in """
-ai.AiForecastScenario.changes ai.AiGuidedChoiceSuggestion.questions ai.AiHistoryImport.findings
-ai.AiIncident.containment ai.AiModel.taskFitness ai.AiProvider.fitnessWarnings ai.AiVenueSettings.openingHours
-approvals.ApprovalRequest.escalations approvals.ApprovalRequest.pendingApprovers assets.MediaAssetDetail.collections
-assets.MediaAssetDetail.derivatives assets.MediaAssetDetail.previousVersions catalogue.CatalogueImportJob.findings
-catalogue.EntitlementTemplate.validTimeWindows catalogue.Product.displayTags identity.Principal.roles
-marketing-crm.CookieBannerPreferenceCenterDesignerView.buttons
-marketing-crm.CookieBannerPreferenceCenterDesignerView.categories
-marketing-crm.CookieBannerPreferenceCenterDesignerView.links orders.Cart.conflicts orders.Cart.consentQuestions
-public-api.ApiVersion.changes reporting.SemanticModel.domains reporting.SemanticModel.relationships
-resources.ResourceSchedule.exceptions resources.ResourceSchedule.windows seating.AccessibleSeating.spaces
-seating.SeatRecommendationRules.profiles transport.TransportNetworkImport.findings venue-map.PlacedResource.boundary
-venue-map.VenueMapImportJob.findings venue-map.VenuePoint.media venue-map.VisitPlan.days venue-map.VisitPlan.excluded
-wallet.WalletConfigurationVersion.findings wallet.WalletFundingRules.bonusRules wallet.WalletFundingRules.presetAmounts
-white-label.ConfigVersion.pendingBuildTimeChanges
-""".split())
+""".split())   # emptied by CHG-STO-010: every member's storage is decided
 
 
 # **The tables a delivery-slice operation writes below tenant that an undeclared key left at the tenant root, on
@@ -100,14 +86,7 @@ white-label.ConfigVersion.pendingBuildTimeChanges
 # (`x-ticvai-references`, as CR-090 did for `marketing.consent_question_version`) or decide the owner in
 # derive-ddl.py ROW_OWNER, then remove its line. Only shrinks.
 FALLBACK_DEBT = frozenset(k + "@slice" for k in """
-assets.media_collection_member.asset_id assets.media_collection_member.collection_id fnb.allergen_verdict.menu_item_id
-fnb.kitchen_sla.outlet_id fnb.menu_item_modifier.group_id fnb.menu_item_modifier.item_id
-fnb.production_plan_line.item_id fnb.reservation_table.reservation_id fnb.substitution_rule.from_ingredient_id
-fnb.substitution_rule.recipe_id fnb.substitution_rule.to_ingredient_id marketing.campaign_target.campaign_id
-marketing.loyalty_rule.campaign_id promotions.coupon_code_batch.campaign_id transport.departure.performance_id
-transport.departure.route_id transport.fare_matrix_cell.from_station_id transport.fare_matrix_cell.to_station_id
-transport.fare_table.route_id transport.timetable.route_id wallet.balance.wallet_id
-""".split())
+""".split())   # emptied by CHG-STO-001: every member's key is declared
 DEBT = {"SP-ARRAY-NOWHERE": SLICE_DEBT, "SP-KEY-TENANT-FALLBACK": FALLBACK_DEBT}
 
 
@@ -320,8 +299,15 @@ def main() -> int:
         desc = " ".join(str(r409.get("description") or "").split())
         if not DUPLICATE.search(desc):
             continue
-        named = [p for p in props if CODEISH.search(p) and re.search(r"\b" + re.escape(p) + r"\b|"
-                 + re.escape(" ".join(g.snake(p).split("_"))), desc, re.I)]
+        # **The problem types say what the 409 is** (CHG-STO-018): `verifyProspectSignupCode` answers `codeExpired`
+        # for a code "already used" once, which is a spent challenge, not a uniqueness promise. A 409 that names its
+        # problem types and none of them is a duplicate makes no promise this rule reads.
+        ptypes = [str(x) for x in (r409.get("x-ticvai-problem-types") or [])]
+        if ptypes and not any(re.search(r"taken|duplicate|in-?use|exists|conflict-code", x, re.I) for x in ptypes):
+            continue
+        # a field named in the text as a word, not inside another (`name` is not in "names each one", CHG-STO-018)
+        named = [p for p in props if CODEISH.search(p) and re.search(r"\b" + re.escape(p) + r"\b|\b"
+                 + re.escape(" ".join(g.snake(p).split("_"))) + r"\b", desc, re.I)]
         if not named:
             named = [p for p in props if re.fullmatch(r"(code|sku|\w+Code|\w+Number)", p)
                      and re.search(g.snake(p).split("_")[-1], desc, re.I)]

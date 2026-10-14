@@ -203,11 +203,11 @@ paths:
   /releases:
     get:
       operationId: listReleases
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P09 ADM-022 Release & Version Management"
         - "P09 ADM-023 Staging Promotion & Approval"
         - "P09 ADM-024 Release Notification Composer"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1575,6 +1575,8 @@ paths:
   /dead-letters:
     get:
       operationId: listDeadLetters
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
       x-ticvai-read-via:
       - query: tenancy#deadLetterRecords
         route: service
@@ -1582,8 +1584,6 @@ paths:
       - query: tenancy#outboxRecords
         route: service
         for: 'its read of platform.outbox, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P09 ADM-318 Dead Letters"
       summary: Undeliverable events
       description: ADR-0033. **A dead-letter table nobody reads is worse than no table** — it converts
         a visible outage into an invisible backlog. This is the query behind the screen that stops that.
@@ -1619,13 +1619,13 @@ paths:
   /dead-letters/{deadLetterId}/replay:
     post:
       operationId: replayDeadLetter
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
       x-ticvai-read-via:
       - query: tenancy#deadLetterRecords
         route: service
         for: 'its read of platform.dead_letter, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-names-for-context: [platform.outbox]
-      x-ticvai-consumed-by:
-        - "P09 ADM-318 Dead Letters"
       x-ticvai-write-via:
       - table: platform.dead_letter
         operation: requeueDeadLetter
@@ -1670,12 +1670,12 @@ paths:
   /outbox-republishes:
     post:
       operationId: republishOutbox
+      x-ticvai-consumed-by:
+        - "P09 ADM-318 Dead Letters"
       x-ticvai-read-via:
       - query: tenancy#outboxRecords
         route: service
         for: 'its read of platform.outbox, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P09 ADM-318 Dead Letters"
       summary: Republish one tenant database's outbox rows for a time range
       description: '**ADR-0058, amended 1 October (section 3).** When the broker is lost or rebuilt, or a
         DR failover starts an empty broker in the other region (ADR-0060), every message it held and no
@@ -2078,10 +2078,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setScalingPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per cell and service, the one the body''s `cellId` names, within the caller''s region: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-030 Infrastructure Sizing & Scaling Policy"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per cell and service, the one the body''s `cellId` names, within the caller''s region: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Change the scaling policy

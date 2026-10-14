@@ -395,7 +395,7 @@ operations:
   - control.api_client
 - operation: setApiAnomalyRule
   verb: PUT
-  path: /api-anomaly-rules
+  path: /api-anomaly-rules/{anomalyRuleId}
   scope: tenant
   permission: DEVELOPER_ADMIN
   audience:
@@ -422,7 +422,7 @@ operations:
   - control.api_client
 - operation: setApiLicensing
   verb: PUT
-  path: /api-licensing
+  path: /api-licensing/{licenceId}
   scope: tenant
   permission: DEVELOPER_ADMIN
   audience:
@@ -437,7 +437,7 @@ operations:
   - control.api_licence
 - operation: setApiQuota
   verb: PUT
-  path: /api-quotas
+  path: /api-quotas/{quotaId}
   scope: tenant
   permission: DEVELOPER_ADMIN
   audience:

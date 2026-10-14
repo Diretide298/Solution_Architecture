@@ -31,6 +31,7 @@
     "maxLength": 200
    },
    "version": {
+    "readOnly": true,
     "type": "integer",
     "minimum": 1
    },
@@ -411,7 +412,7 @@
  "FeeApplicabilityChargingRuleBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is catalogue.channel_envelope at 5%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.fee_rule` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Fee Applicability & Charging Rule Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "product": {
@@ -1076,6 +1077,7 @@
     "type": "string"
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -1166,6 +1168,7 @@
     "readOnly": true
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -1247,6 +1250,7 @@
     "readOnly": true
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -1345,6 +1349,7 @@
   }
  },
  "LegalEntity": {
+  "x-ticvai-rls": "read-beneath",
   "x-ticvai-persistence": "ledger.legal_entity",
   "type": "object",
   "description": "Also the `createLegalEntity` body. **`id` and `scopePath` are server-owned** (`readOnly`) and ignored if sent.\n",
@@ -1364,6 +1369,7 @@
     "readOnly": true
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -1882,6 +1888,7 @@
   }
  },
  "RoundingProfile": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "catalogue.rounding_profile",
   "description": "**Precision and rounding for one currency** (29 September, data model DM3). ADM-075. One per currency the tenant sells in; the engine keeps line totals + tax + fees equal to the transaction total. Distinct from `payments.currency_rule` (settlement currency and payment limits). The currency here is the subject of the rule, not the denomination of an amount.",
@@ -1990,7 +1997,7 @@
  "TaxProfileJurisdictionConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.tax_profile` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Tax Profile & Jurisdiction Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "taxProfileName": {
@@ -2242,7 +2249,7 @@
  "TaxRuleTreatmentBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.tax_rule` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Tax Rule & Treatment Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "product": {

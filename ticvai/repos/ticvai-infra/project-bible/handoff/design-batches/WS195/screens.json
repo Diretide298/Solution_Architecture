@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "10",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-integration-command-center-bo-1173",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletIntegrationCommandCenter.tsx",
+   "component": "src/routes/orders-money/WalletIntegrationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -119,7 +120,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -147,12 +148,13 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "publishWalletConfiguration"
       }
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -238,7 +240,7 @@
         "Maintenance"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listWebhookSubscriptions",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 115 §Each integration displays"
       }
      ]
@@ -319,7 +321,7 @@
     "operationId": "publishWalletConfiguration",
     "contract": "wallet",
     "purpose": "Configuration state",
-    "trigger": "onLoad",
+    "trigger": "onAction",
     "provenance": "board reading, 19 September 2026",
     "invalidates": [
      "listWalletTypes",
@@ -402,7 +404,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-api-catalogue-endpoint-configuration-bo-1174",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletApiCatalogueEndpointConfiguration.tsx",
+   "component": "src/routes/orders-money/WalletApiCatalogueEndpointConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -643,6 +645,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "10",
@@ -652,7 +655,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/integration-profile-system-mapping-bo-1175",
-   "component": "apps/venue-management-web/src/routes/orders-money/IntegrationProfileSystemMapping.tsx",
+   "component": "src/routes/orders-money/IntegrationProfileSystemMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -866,6 +869,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "10",
@@ -875,7 +879,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-events-webhooks-notification-orchestration-bo-1176",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletEventsWebhooksNotificationOrchestration.tsx",
+   "component": "src/routes/orders-money/WalletEventsWebhooksNotificationOrchestration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1087,6 +1091,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "10",
@@ -1096,7 +1101,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/api-security-access-integration-permissions-bo-1177",
-   "component": "apps/venue-management-web/src/routes/orders-money/ApiSecurityAccessIntegrationPermissions.tsx",
+   "component": "src/routes/orders-money/ApiSecurityAccessIntegrationPermissions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1297,6 +1302,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "10",
@@ -1306,7 +1312,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/synchronization-retry-resilience-configuration-bo-1178",
-   "component": "apps/venue-management-web/src/routes/orders-money/SynchronizationRetryResilienceConfiguration.tsx",
+   "component": "src/routes/orders-money/SynchronizationRetryResilienceConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1459,6 +1465,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "10",
@@ -1468,7 +1475,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/integration-monitoring-exception-workbench-bo-1179",
-   "component": "apps/venue-management-web/src/routes/orders-money/IntegrationMonitoringExceptionWorkbench.tsx",
+   "component": "src/routes/orders-money/IntegrationMonitoringExceptionWorkbench.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1623,7 +1630,10 @@
     "component": "confirmDialog",
     "trigger": "Suspend integration",
     "body": "**Suspend integration on a integration monitoring exception is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions"
+    "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 122 §Actions",
+    "confirm": {
+     "operation": "setApiClientStatus"
+    }
    }
   ],
   "states": {
@@ -1746,6 +1756,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "10",
@@ -1755,7 +1766,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-configuration-governance-version-control-bo-1180",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletConfigurationGovernanceVersionControl.tsx",
+   "component": "src/routes/orders-money/WalletConfigurationGovernanceVersionControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1779,6 +1790,7 @@
   "patternReason": "the pack gives this screen a display directory (§Show) and no metric row",
   "purpose": "Provide centralized governance for configuration changes across all ten Wallet boards. This screen becomes the master configuration governance layer for the entire Wallet module.",
   "purposeNote": "Every material Wallet configuration change is version-controlled and historical configurations remain available for audit and investigation.",
+  "division": "Shares `listWalletConfigurationVersions`, `publishWalletConfiguration` with BO-1092, BO-1132; this screen is Wallet Configuration Governance & Version Control (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 10.08, page 123): provide centralized governance for configuration changes across all ten Wallet boards. This screen becomes the master configuration governance layer for the entire Wallet module.",
   "gaps": [
    {
     "operation": null,
@@ -1810,7 +1822,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "publishWalletConfiguration"
       },
       {
        "kind": "dataTable",
@@ -1911,6 +1924,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "10",
@@ -1920,7 +1934,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/approval-publication-change-management-bo-1181",
-   "component": "apps/venue-management-web/src/routes/orders-money/ApprovalPublicationChangeManagement.tsx",
+   "component": "src/routes/orders-money/ApprovalPublicationChangeManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1990,7 +2004,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "publishWalletConfiguration"
       },
       {
        "kind": "dataTable",
@@ -2085,6 +2100,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "10",
@@ -2094,7 +2110,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-platform-health-audit-administration-center-bo-1182",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletPlatformHealthAuditAdministrationCenter.tsx",
+   "component": "src/routes/orders-money/WalletPlatformHealthAuditAdministrationCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2129,7 +2145,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -2207,7 +2223,8 @@
         "Wallet Engine"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Healthy”, “Search across”, “Every record should contain”, “Authorized super administrators can”.",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Display"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 125 §Display",
+       "operation": "getWalletLiability"
       }
      ]
     }

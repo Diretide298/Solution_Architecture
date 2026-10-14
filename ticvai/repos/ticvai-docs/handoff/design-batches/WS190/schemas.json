@@ -43,6 +43,7 @@
     "format": "uuid"
    },
    "creditTypeId": {
+    "x-ticvai-references": "wallet.credit_type",
     "type": "string",
     "format": "uuid"
    },
@@ -99,6 +100,7 @@
   }
  },
  "GiftCard": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.gift_card",
   "type": "object",
   "required": [
@@ -170,6 +172,7 @@
     "type": "string"
    },
    "denominations": {
+    "x-ticvai-persistence-column": "numeric(18,4)[]",
     "type": "array",
     "items": {
      "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -317,6 +320,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -391,6 +395,8 @@
     "nullable": true
    },
    "findings": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

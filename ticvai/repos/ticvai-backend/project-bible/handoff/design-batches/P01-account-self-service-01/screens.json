@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/account-and-self-service/login-register",
-   "component": "apps/guest-web/src/routes/account-and-self-service/LoginRegisterList.tsx",
+   "component": "src/routes/account-and-self-service/LoginRegisterList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -74,10 +74,7 @@
      "trigger": "They set a profile",
      "provenance": "flow F56 step 3→4",
      "crossesDevice": true,
-     "back": false,
-     "carries": [
-      "subjectId"
-     ]
+     "back": false
     }
    ]
   },
@@ -400,8 +397,8 @@
    {
     "operationId": "createMfaChallenge",
     "contract": "identity",
-    "purpose": "Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at a venue with guest two-step verification on",
-    "trigger": "onAction"
+    "purpose": "Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step verification on (action signIn), not a control: the code is then typed in Verification code",
+    "trigger": "background"
    },
    {
     "operationId": "verifyMfaChallenge",
@@ -415,8 +412,8 @@
    {
     "operationId": "claimDeviceConsent",
     "contract": "marketing-crm",
-    "purpose": "Attach this browser's cookie decision to the guest after sign-in or registration",
-    "trigger": "onAction",
+    "purpose": "Sent by the screen after sign-in or registration, not a control: attaches this device's tracking decision to the guest",
+    "trigger": "background",
     "provenance": "build, 29 September 2026"
    }
   ],
@@ -492,7 +489,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/account-and-self-service/my-account-dashboard",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyAccountDashboard.tsx",
+   "component": "src/routes/account-and-self-service/MyAccountDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -795,7 +792,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/account-and-self-service/my-tickets",
-   "component": "apps/guest-web/src/routes/account-and-self-service/MyTicketsDetail.tsx",
+   "component": "src/routes/account-and-self-service/MyTicketsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -837,7 +834,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
+  "purpose": "The guest's tickets and passes, current and past: each with its code and history, sent to another guest, shared, or added to a phone wallet.",
   "gaps": [
    {
     "operation": "getEntitlementCredential",
@@ -1029,6 +1026,13 @@
     "contract": "orders",
     "purpose": "Send a ticket to somebody",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listTicketTransfers",
+    "contract": "orders",
+    "purpose": "Re-read by the screen after transferOrderTickets answers 202, not a control: the guest's transfers, so the ticket shows as offered, then claimed or returned when the offer lapses",
+    "trigger": "background",
+    "provenance": "Block A audit, 14 October 2026: S-ASYNC-POLL (CHG-SCG-005)"
    }
   ],
   "entryState": {
@@ -1167,7 +1171,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/account-and-self-service/order-history",
-   "component": "apps/guest-web/src/routes/account-and-self-service/OrderHistoryList.tsx",
+   "component": "src/routes/account-and-self-service/OrderHistoryList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1209,7 +1213,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMyOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find order history for this venue.",
+  "purpose": "The guest's orders: open one, ask for a refund, and get or download its tax invoice and credit notes.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1512,7 +1516,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/account-and-self-service/profile-and-preferences",
-   "component": "apps/guest-web/src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
+   "component": "src/routes/account-and-self-service/ProfileAndPreferencesDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1679,20 +1683,6 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "getMyIdentityVerification",
-    "contract": "identity",
-    "purpose": "Show the guest's ID verification status",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "submitGuestIdentityDocument",
-    "contract": "identity",
-    "purpose": "Upload an ID document for verification",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "getMyProfile",
     "contract": "marketing-crm",
     "purpose": "The guest's own details, read by session",
@@ -1798,6 +1788,20 @@
      ]
     },
     "provenance": "client-verified"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "getMyIdentityVerification",
+    "removed": true,
+    "why": "The client-approved profile screen has no identity verification status or upload.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "submitGuestIdentityDocument",
+    "removed": true,
+    "why": "The client-approved profile screen has no identity verification status or upload.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "_platform": {

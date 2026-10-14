@@ -149,7 +149,7 @@
  },
  "setOutletTemplate": {
   "method": "PUT",
-  "path": "/outlet-templates",
+  "path": "/outlet-templates/{code}",
   "contract": "fnb",
   "summary": "Create or replace an outlet template",
   "permission": "PRODUCT_CONFIGURE",
@@ -157,6 +157,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "code",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

@@ -8,7 +8,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/central-kitchen-commissary-management",
-   "component": "apps/venue-management-web/src/routes/sell/CentralKitchenCommissaryManagementList.tsx",
+   "component": "src/routes/sell/CentralKitchenCommissaryManagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -32,7 +32,7 @@
   "density": "compact",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`planProductionRun`, `completeProductionRun`) and no read of a population — it is settings, not a list",
-  "purpose": "Central Kitchen & Commissary Management — from the client design board, 20 August (merged into BO-112 Production Planning & Production Sheets).",
+  "purpose": "Central Kitchen & Commissary Management: merged into BO-112; this id routes there and nothing on it is built separately.",
   "layout": {
    "template": "form",
    "regions": [
@@ -109,10 +109,11 @@
   "module": "Sell",
   "requiresModule": "inventory",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/variants-attributes-barcode-rfid-management",
-   "component": "apps/venue-management-web/src/routes/sell/VariantsAttributesBarcodeRfidManagemenList.tsx",
+   "component": "src/routes/sell/VariantsAttributesBarcodeRfidManagemenList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -139,7 +140,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listSerialisedItems` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Variants, Attributes, Barcode & RFID Management — from the client design board, 20 August.",
+  "purpose": "Variants, Attributes, Barcode & RFID Management: shows where each individual item is (`listSerialisedItems`); price and stock check by barcode (`lookupMerchandise`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -225,7 +226,7 @@
    {
     "operationId": "listSerialisedItems",
     "contract": "inventory",
-    "purpose": "listSerialisedItems",
+    "purpose": "Where each individual item is",
     "trigger": "onLoad"
    },
    {
@@ -289,10 +290,11 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/category-brand-merchandise-hierarchy",
-   "component": "apps/venue-management-web/src/routes/sell/CategoryBrandMerchandiseHierarchyList.tsx",
+   "component": "src/routes/sell/CategoryBrandMerchandiseHierarchyList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -325,7 +327,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listProductCategories` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Category, Brand & Merchandise Hierarchy — from the client design board, 20 August.",
+  "purpose": "Category, Brand & Merchandise Hierarchy: shows the merchandise hierarchy — categories, brands, collections (`listProductCategories`); a venue's booking flows, in the working draft (`listBookingFlows`), and acts with define the hierarchy, in the order a guest sees it (`setProductCategories`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -355,7 +357,7 @@
      ]
     },
     {
-     "name": "contextPanel",
+     "name": "contextPanelSelection",
      "slot": "selection",
      "components": [
       {
@@ -425,13 +427,13 @@
    {
     "operationId": "listProductCategories",
     "contract": "catalogue",
-    "purpose": "listProductCategories",
+    "purpose": "The merchandise hierarchy — categories, brands, collections",
     "trigger": "onLoad"
    },
    {
     "operationId": "setProductCategories",
     "contract": "catalogue",
-    "purpose": "setProductCategories",
+    "purpose": "Define the hierarchy, in the order a guest sees it",
     "trigger": "onAction",
     "invalidates": [
      "listProductCategories"
@@ -531,10 +533,11 @@
   "module": "Sell",
   "requiresModule": "retail",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/merchandising-product-presentation",
-   "component": "apps/venue-management-web/src/routes/sell/MerchandisingProductPresentationList.tsx",
+   "component": "src/routes/sell/MerchandisingProductPresentationList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -839,10 +842,11 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/product-import-governance-ai-configuration-assistant",
-   "component": "apps/venue-management-web/src/routes/sell/ProductImportGovernanceAiConfigurationList.tsx",
+   "component": "src/routes/sell/ProductImportGovernanceAiConfigurationList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -876,7 +880,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Product Import, Governance & AI Configuration Assistant — from the client design board, 20 August.",
+  "purpose": "Product Import, Governance & AI Configuration Assistant: shows progress and findings of a catalogue import (`getCatalogueImportJob`), and acts with parse a catalogue file into a preview (`importProductCatalogue`); draft a configuration from a description (`generateConfiguration`); apply a parsed catalogue import (`commitCatalogueImport`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -1088,10 +1092,11 @@
   "module": "Sell",
   "requiresModule": "marketing",
   "wave": 2,
+  "permission": "MARKETING_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/campaign-audience-management",
-   "component": "apps/venue-management-web/src/routes/sell/CampaignAudienceManagementList.tsx",
+   "component": "src/routes/sell/CampaignAudienceManagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1126,7 +1131,7 @@
   ],
   "pattern": "commandCentre",
   "patternReason": "3 independent reads and no read of one record — the screen watches a population rather than working one",
-  "purpose": "Campaign & Audience Management — from the client design board, 20 August.",
+  "purpose": "Campaign & Audience Management: shows list campaigns (`listCampaigns`); list segments (`listSegments`), and acts with create a campaign (`createCampaign`); run a report (`runReport`).",
   "layout": {
    "template": "dashboard",
    "regions": [
@@ -1233,6 +1238,13 @@
     "invalidates": [
      "listCampaigns"
     ]
+   },
+   {
+    "operationId": "getReportExecution",
+    "contract": "reporting",
+    "purpose": "Follows runReport (202) until what it started settles: Execution status, and where its result is",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "entryState": {
@@ -1246,6 +1258,12 @@
      "from": "deepLink",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+    },
+    {
+     "name": "executionId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, `runReport` answers 202 with it and `getReportExecution` follows it."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
@@ -1353,10 +1371,11 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/cross-sell-upsell-recommendation-rules",
-   "component": "apps/venue-management-web/src/routes/sell/CrossSellUpsellRecommendationRulesList.tsx",
+   "component": "src/routes/sell/CrossSellUpsellRecommendationRulesList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1389,7 +1408,7 @@
   ],
   "pattern": "statusTracker",
   "patternReason": "`getRecommendations` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Cross-Sell, Upsell & Recommendation Rules — from the client design board, 20 August.",
+  "purpose": "Cross-Sell, Upsell & Recommendation Rules: shows list upsell and cross-sell rules (`listUpsellRules`), and acts with create an upsell rule (`createUpsellRule`); remove an upsell rule (`deleteUpsellRule`); fill a recommendation slot (`decideRecommendations`).",
   "gaps": [
    {
     "operation": "getRecommendations",
@@ -1537,10 +1556,11 @@
   "module": "Sell",
   "requiresModule": "marketing",
   "wave": 2,
+  "permission": "MARKETING_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/omnichannel-commerce-journey-configuration",
-   "component": "apps/venue-management-web/src/routes/sell/OmnichannelCommerceJourneyConfiguratioList.tsx",
+   "component": "src/routes/sell/OmnichannelCommerceJourneyConfiguratioList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1567,7 +1587,8 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listJourneys` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Omnichannel Commerce & Journey Configuration — from the client design board, 20 August.",
+  "purpose": "Omnichannel Commerce & Journey Configuration: shows automated journeys (`listJourneys`), and acts with define an automated journey (`createJourney`).",
+  "division": "Shares `createJourney`, `listJourneys` with BO-777; this screen is Omnichannel Commerce & Journey Configuration: omnichannel Commerce & Journey Configuration: shows automated journeys (`listJourneys`), and acts with define an automated journey (`createJourney`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -1737,10 +1758,11 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/donation-campaigns",
-   "component": "apps/venue-management-web/src/routes/sell/DonationCampaigns.tsx",
+   "component": "src/routes/sell/DonationCampaigns.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1960,7 +1982,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/entitlement-templates",
-   "component": "apps/venue-management-web/src/routes/sell/EntitlementTemplates.tsx",
+   "component": "src/routes/sell/EntitlementTemplates.tsx",
    "status": "notStarted"
   },
   "navigation": {

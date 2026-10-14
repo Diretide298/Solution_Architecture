@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-access-command-center-bo-654",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationAccessCommandCenter.tsx",
+   "component": "src/routes/access-venue/AccreditationAccessCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -243,6 +244,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "5",
@@ -252,7 +254,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-profile-management-bo-655",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessProfileManagement.tsx",
+   "component": "src/routes/access-venue/AccessProfileManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -275,6 +277,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Each profile shall define) and no display directory — it is settings, not a population",
   "purpose": "Create reusable accreditation access profiles.",
+  "division": "Shares `listAccessProfiles`, `setAccessProfile` with BO-656, BO-657, BO-658, BO-668; this screen is Access Profile Management (pack ACCREDITATION.pdf, board 5.2, page 38): create reusable accreditation access profiles.",
   "layout": {
    "template": "form",
    "regions": [
@@ -363,6 +366,16 @@
    "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-655"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 38. 0 of 0 labels bound to a contract property; 9 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "accessProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listAccessProfiles`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -392,6 +405,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "5",
@@ -401,7 +415,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/venue-zone-access-matrix-bo-656",
-   "component": "apps/venue-management-web/src/routes/access-venue/VenueZoneAccessMatrix.tsx",
+   "component": "src/routes/access-venue/VenueZoneAccessMatrix.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -424,6 +438,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Visually configure which accreditation profiles can access each venue zone.",
+  "division": "Shares `listAccessProfiles`, `setAccessProfile` with BO-655, BO-657, BO-658, BO-668; this screen is Venue & Zone Access Matrix (pack ACCREDITATION.pdf, board 5.3, page 39): visually configure which accreditation profiles can access each venue zone.",
   "gaps": [
    {
     "operation": null,
@@ -499,7 +514,16 @@
    "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-656"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 39. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "accessProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listAccessProfiles`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -529,6 +553,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "5",
@@ -538,7 +563,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/operational-area-permission-management-bo-657",
-   "component": "apps/venue-management-web/src/routes/access-venue/OperationalAreaPermissionManagement.tsx",
+   "component": "src/routes/access-venue/OperationalAreaPermissionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -561,6 +586,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure access to operational areas below the broader zone level.",
+  "division": "Shares `listAccessProfiles`, `setAccessProfile` with BO-655, BO-656, BO-658, BO-668; this screen is Operational Area Permission Management (pack ACCREDITATION.pdf, board 5.4, page 40): configure access to operational areas below the broader zone level.",
   "gaps": [
    {
     "operation": null,
@@ -636,7 +662,16 @@
    "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-657"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "accessProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listAccessProfiles`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -666,6 +701,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "5",
@@ -675,7 +711,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/date-time-access-rules-bo-658",
-   "component": "apps/venue-management-web/src/routes/access-venue/DateTimeAccessRules.tsx",
+   "component": "src/routes/access-venue/DateTimeAccessRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -698,6 +734,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control when accreditation access is valid.",
+  "division": "Shares `listAccessProfiles`, `setAccessProfile` with BO-655, BO-656, BO-657, BO-668; this screen is Date & Time Access Rules (pack ACCREDITATION.pdf, board 5.5, page 40): control when accreditation access is valid.",
   "gaps": [
    {
     "operation": null,
@@ -773,7 +810,16 @@
    "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-658"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 40. 0 of 0 labels bound to a contract property; 0 of 20 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "accessProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listAccessProfiles`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -803,6 +849,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_CONFIGURE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "5",
@@ -812,7 +859,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-schedule-management-bo-659",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessScheduleManagement.tsx",
+   "component": "src/routes/access-venue/AccessScheduleManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -896,6 +943,16 @@
    "workshopBoard": "wireframes/WS05 ACCREDITATION Board 5.dc.html#bo-659"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 41. 0 of 0 labels bound to a contract property; 0 of 6 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "accessProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setAccessProfile` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -925,6 +982,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "5",
@@ -934,7 +992,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/holder-access-assignment-bo-660",
-   "component": "apps/venue-management-web/src/routes/access-venue/HolderAccessAssignment.tsx",
+   "component": "src/routes/access-venue/HolderAccessAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1120,6 +1178,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_MANAGE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "5",
@@ -1129,7 +1188,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/temporary-access-exception-management-bo-661",
-   "component": "apps/venue-management-web/src/routes/access-venue/TemporaryAccessExceptionManagement.tsx",
+   "component": "src/routes/access-venue/TemporaryAccessExceptionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1252,6 +1311,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_MANAGE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "5",
@@ -1261,7 +1321,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-revocation-suspension-bo-662",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessRevocationSuspension.tsx",
+   "component": "src/routes/access-venue/AccessRevocationSuspension.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1385,6 +1445,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_CONFIGURE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "5",
@@ -1394,7 +1455,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-rights-preview-impact-synchronization-bo-663",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessRightsPreviewImpactSynchronization.tsx",
+   "component": "src/routes/access-venue/AccessRightsPreviewImpactSynchronization.tsx",
    "status": "notStarted"
   },
   "navigation": {

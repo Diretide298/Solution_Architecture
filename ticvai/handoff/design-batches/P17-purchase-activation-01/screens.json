@@ -121,6 +121,7 @@
   "module": "Purchase & Activation",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "sameAs": "ADM-410",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
@@ -266,6 +267,7 @@
   "module": "Purchase & Activation",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "source": {
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -457,6 +459,7 @@
   "module": "Purchase & Activation",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "source": {
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "5",
@@ -567,6 +570,16 @@
     }
    ]
   },
+  "entryState": {
+   "params": [
+    {
+     "name": "providerId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setPaymentProvider` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P17",
    "audience": "public",
@@ -597,6 +610,7 @@
   "module": "Purchase & Activation",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "sameAs": "ADM-414",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
@@ -637,7 +651,7 @@
         "Expiry"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "previewSubscriptionChange",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 64 §Show"
       }
      ]
@@ -650,6 +664,7 @@
        "kind": "detailPanel",
        "label": "The selected order commercial pricing",
        "bindsTo": null,
+       "operation": "previewSubscriptionChange",
        "columns": [
         "Discount Type",
         "Value",
@@ -756,6 +771,7 @@
   "module": "Purchase & Activation",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_CELL_MANAGE",
   "source": {
    "sameAs": "ADM-415",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
@@ -915,6 +931,7 @@
   "module": "Purchase & Activation",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "sameAs": "ADM-417",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",

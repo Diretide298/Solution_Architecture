@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-369` | Commercial Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-369` | Commercial Command Center | B | 0 | 108 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-370` | Customer Subscription & Commercial Portfolio | B | 2 | 34 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-371` | Customer Commercial 360° | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | B | 0 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
-| `ADM-373` | Revenue & Commercial Model Analytics | B | 0 | 10 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ADM-374` | Trial & Conversion Monitor | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ADM-375` | Renewal & Retention Center | B | 0 | 22 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-376` | Commercial Optimization & Expansion Opportunities | B | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-371` | Customer Commercial 360° | B | 0 | 13 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | B | 0 | 72 | 6 | 2 | 2 | 0 | — | notStarted (—) |
+| `ADM-373` | Revenue & Commercial Model Analytics | B | 0 | 91 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ADM-374` | Trial & Conversion Monitor | B | 0 | 72 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ADM-375` | Renewal & Retention Center | B | 0 | 103 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-376` | Commercial Optimization & Expansion Opportunities | B | 0 | 66 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-377` | Subscription Exceptions & Commercial Alerts | B | 0 | 12 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-378` | Executive AI Commercial Intelligence | B | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-378` | Executive AI Commercial Intelligence | B | 0 | 306 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29289 (APP-CONSOLE-ADM-369) |
-| Who uses it | ticvai staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as platform admin |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Primary KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
@@ -143,8 +143,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
-| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Codes | text field | — | — | `getCommercialMetrics` ?codes |
+| Period | text field | — | — | `getCommercialMetrics` ?period |
+| Compare to | segmented control | — | Previous period · Same period last year | `getCommercialMetrics` ?compareTo |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -152,35 +153,179 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Total Active Customers** (metric tile)
+**Total Active Customers** (metric tile, from `getCommercialMetrics`)
 
-**Active Subscriptions** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Active Trials** (metric tile)
+**Active Subscriptions** (metric tile, from `getCommercialMetrics`)
 
-**MRR / Monthly Equivalent Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**ARR / Annualized Contract Value** (metric tile)
+**Active Trials** (metric tile, from `getCommercialMetrics`)
 
-**New Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Expansion Revenue** (metric tile)
+**MRR / Monthly Equivalent Revenue** (metric tile, from `getCommercialMetrics`)
 
-**Contraction Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Churned Revenue** (metric tile)
+**ARR / Annualized Contract Value** (metric tile, from `getCommercialMetrics`)
 
-**Renewal Rate** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Trial-to-Paid Conversion** (metric tile)
+**New Revenue** (metric tile, from `getCommercialMetrics`)
 
-**Average Revenue per Customer** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Expansion Revenue** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Contraction Revenue** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Churned Revenue** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Renewal Rate** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Trial-to-Paid Conversion** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Average Revenue per Customer** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
 **Rules for what is shown** (from the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process; these refine the tables above and win where they differ)
 
 - **Revenue tiles**: In TICVAI's reporting currency with the conversion date stated; per-currency breakdown on hover. *(source: ADR-0008)*
 
-**Data it reads**: `listTenants` (onLoad, The commercial portfolio)
+**Data it reads**: `getCommercialMetrics` (onLoad, The commercial figures the tiles show, one value per metric …)
 
 **Where the user goes next**
 
@@ -205,6 +350,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commercial are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown metric code or a malformed period |
 
 #### Sample data for the mock-up
 
@@ -226,10 +372,11 @@ metric tiles:
 
 #### Permissions
 
-- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
-- `getSubscription` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `getCommercialMetrics` → `PLATFORM_BILLING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -266,12 +413,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (108 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-369?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-002`, `ADM-370`, `ADM-371`, `ADM-372`, `ADM-373`, `ADM-374`, `ADM-375`, `ADM-376`, `ADM-377`, `ADM-378`.
-- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -323,7 +470,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Shown**
 
-**Every customer subscription commercial** (data table)
+**Every customer subscription commercial** (data table, from `listTenants`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -345,7 +492,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Subscription status | text | not in the schema: `Subscription Status` |
 | Commercial health | text | not in the schema: `Commercial Health` |
 
-**The selected customer subscription commercial** (detail panel): The pack groups this record's detail under its own headings: “Enterprise Operational Profile”, “AED 20K/month minimum”, “Commercial Health Indicators”.
+**The selected customer subscription commercial** (detail panel, from `listTenants`): The pack groups this record's detail under its own headings: “Enterprise Operational Profile”, “AED 20K/month minimum”, “Commercial Health Indicators”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -426,6 +573,8 @@ Every customer subscription commercial:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -490,9 +639,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSubscription`): One record, read-only.
 
-**Data it reads**: `getSubscription` (onLoad, Commercial 360); `getEntitlementUsage` (onLoad, What they consume)
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | the name it points at, never the id | — |
+| Plan name | text | — |
+| Plan version | text | — |
+| Status | chip: Trial, Active, Past due, Cancelled, Expired | — |
+| Starts at | 1 Oct 2026 | — |
+| Renews at | 1 Oct 2026 | — |
+| Cancelled at | 1 Oct 2026 | — |
+| Scheduled change | grouped details | A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). |
+| Plan | the name it points at, never the id | — |
+| Plan version | text | — |
+| Effective from | 1 Oct 2026 | Always the `renewsAt` it was scheduled against. |
+| Current price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Billing period | text | — |
+
+**Data it reads**: `getSubscription` (onLoad, Commercial 360)
 
 **Where the user goes next**
 
@@ -532,9 +697,10 @@ getSubscription (Subscription):
 #### Permissions
 
 - `getSubscription` → `PLATFORM_TENANT_VIEW` (read) · staff
-- `getEntitlementUsage` → `PLATFORM_TENANT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -562,7 +728,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-371?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-369`.
@@ -581,7 +747,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29287 (APP-CONSOLE-ADM-372) |
-| Who uses it | ticvai staff holding `PLATFORM_PLAN_MANAGE` (1 configure); in the flows as platform admin |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW`, `PLATFORM_PLAN_MANAGE` (1 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
@@ -594,27 +760,133 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Codes | text field | — | — | `getCommercialMetrics` ?codes |
+| Period | text field | — | — | `getCommercialMetrics` ?period |
+| Compare to | segmented control | — | Previous period · Same period last year | `getCommercialMetrics` ?compareTo |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Customers by VSI** (metric tile)
+**Customers by VSI** (metric tile, from `getCommercialMetrics`)
 
-**Customers by Operational Profile** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Customers by Commercial Model** (metric tile)
+**Customers by Operational Profile** (metric tile, from `getCommercialMetrics`)
 
-**Average VSI** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Profile Misalignment** (metric tile)
+**Customers by Commercial Model** (metric tile, from `getCommercialMetrics`)
 
-**Commercial Model Optimization Candidates** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Upgrade Candidates** (metric tile)
+**Average VSI** (metric tile, from `getCommercialMetrics`)
 
-**Downgrade Candidates** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Profile Misalignment** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Commercial Model Optimization Candidates** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Upgrade Candidates** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Downgrade Candidates** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Data it reads**: `getCommercialMetrics` (onLoad, The commercial figures the tiles show, one value per metric …)
 
 **Where the user goes next**
 
@@ -630,6 +902,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the operational profile vsi are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown metric code or a malformed period |
 
 #### Sample data for the mock-up
 
@@ -649,9 +922,12 @@ metric tiles:
 
 #### Permissions
 
+- `getCommercialMetrics` → `PLATFORM_BILLING_VIEW` (read) · staff
 - `scoreVsiAssessment` → `PLATFORM_PLAN_MANAGE` (configure) · staff, guest, prospect
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -684,12 +960,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (72 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-372?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-369`.
-- [ ] Every gated control is gated: `PLATFORM_PLAN_MANAGE`.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_VIEW`, `PLATFORM_PLAN_MANAGE`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -728,6 +1004,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Period | text field | — | — | `getBillingReconciliation` ?period |
+| Codes | text field | — | — | `getCommercialMetrics` ?codes |
+| Period | text field | — | — | `getCommercialMetrics` ?period |
+| Compare to | segmented control | — | Previous period · Same period last year | `getCommercialMetrics` ?compareTo |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -735,25 +1014,133 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**MRR / Monthly Equivalent** (metric tile)
+**MRR / Monthly Equivalent** (metric tile, from `getCommercialMetrics`)
 
-**ARR / ACV** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**New Revenue** (metric tile)
+**ARR / ACV** (metric tile, from `getCommercialMetrics`)
 
-**Expansion Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Contraction Revenue** (metric tile)
+**New Revenue** (metric tile, from `getCommercialMetrics`)
 
-**Churned Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**NRR** (metric tile)
+**Expansion Revenue** (metric tile, from `getCommercialMetrics`)
 
-**ARPC** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Growth %** (metric tile)
+**Contraction Revenue** (metric tile, from `getCommercialMetrics`)
 
-**Every revenue commercial model** (data table)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Churned Revenue** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**NRR** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**ARPC** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Growth %** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Every revenue commercial model** (data table, from `getBillingReconciliation`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -763,7 +1150,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Contracts above guarantee | text | not in the schema: `Contracts Above Guarantee` |
 | Contracts at guarantee | text | not in the schema: `Contracts at Guarantee` |
 
-**The selected revenue commercial model** (detail panel): The pack groups this record's detail under its own headings: “Break down”, “Revenue by”.
+**The selected revenue commercial model** (detail panel, from `getBillingReconciliation`): The pack groups this record's detail under its own headings: “Break down”, “Revenue by”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -777,7 +1164,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Money columns (Actual Variable Revenue, Guaranteed Revenue)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
 
-**Data it reads**: `getBillingReconciliation` (onLoad, Revenue against metering)
+**Data it reads**: `getBillingReconciliation` (onLoad, Revenue against metering); `getCommercialMetrics` (onLoad, The commercial figures the tiles show, one value per metric …)
 
 **Where the user goes next**
 
@@ -793,6 +1180,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the revenue commercial model are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown metric code or a malformed period |
 
 #### Sample data for the mock-up
 
@@ -830,8 +1218,11 @@ Every revenue commercial model:
 #### Permissions
 
 - `getBillingReconciliation` → `PLATFORM_BILLING_VIEW` (read) · staff
+- `getCommercialMetrics` → `PLATFORM_BILLING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -859,8 +1250,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (91 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-373?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-369`.
@@ -879,7 +1270,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29294 (APP-CONSOLE-ADM-374) |
-| Who uses it | ticvai staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as platform admin |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
 | Offline | online only |
@@ -898,8 +1289,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
-| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Codes | text field | — | — | `getCommercialMetrics` ?codes |
+| Period | text field | — | — | `getCommercialMetrics` ?period |
+| Compare to | segmented control | — | Previous period · Same period last year | `getCommercialMetrics` ?compareTo |
 
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
@@ -911,23 +1303,119 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Active Trials** (metric tile)
+**Active Trials** (metric tile, from `getCommercialMetrics`)
 
-**New Trials** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Expiring Trials** (metric tile)
+**New Trials** (metric tile, from `getCommercialMetrics`)
 
-**Trial-to-Paid %** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Average Trial Duration** (metric tile)
+**Expiring Trials** (metric tile, from `getCommercialMetrics`)
 
-**Setup Completion** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Go-Live Readiness** (metric tile)
+**Trial-to-Paid %** (metric tile, from `getCommercialMetrics`)
 
-**Estimated Conversion Value** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Data it reads**: `listTenants` (onLoad, Trials running)
+**Average Trial Duration** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Setup Completion** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Go-Live Readiness** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Estimated Conversion Value** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Data it reads**: `getCommercialMetrics` (onLoad, The commercial figures the tiles show, one value per metric …)
 
 **Where the user goes next**
 
@@ -943,6 +1431,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the trial conversion are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown metric code or a malformed period |
 
 #### Edge cases to draw
 
@@ -966,9 +1455,11 @@ metric tiles:
 
 #### Permissions
 
-- `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
+- `getCommercialMetrics` → `PLATFORM_BILLING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -996,12 +1487,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (72 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-374?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-369`.
-- [ ] Every gated control is gated: `PLATFORM_TENANT_VIEW`.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1017,7 +1508,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29198 (APP-CONSOLE-ADM-375) |
-| Who uses it | ticvai; in the flows as platform admin |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPIs) and a per-row directory (§Columns) — counts over a population, then the population |
 | Offline | online only |
@@ -1036,29 +1527,145 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Codes | text field | — | — | `getCommercialMetrics` ?codes |
+| Period | text field | — | — | `getCommercialMetrics` ?period |
+| Compare to | segmented control | — | Previous period · Same period last year | `getCommercialMetrics` ?compareTo |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Renewals Next 30 Days** (metric tile)
+**Renewals Next 30 Days** (metric tile, from `getCommercialMetrics`)
 
-**Next 60 Days** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Next 90 Days** (metric tile)
+**Next 60 Days** (metric tile, from `getCommercialMetrics`)
 
-**Renewal Value** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Renewal Rate** (metric tile)
+**Next 90 Days** (metric tile, from `getCommercialMetrics`)
 
-**At-Risk Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Auto-Renew Value** (metric tile)
+**Renewal Value** (metric tile, from `getCommercialMetrics`)
 
-**Expansion Opportunity** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Optimization Opportunity** (metric tile)
+**Renewal Rate** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**At-Risk Revenue** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Auto-Renew Value** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Expansion Opportunity** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Optimization Opportunity** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
 **Every renewal retention** (data table)
 
@@ -1096,6 +1703,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Money columns (Contract Value)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
 
+**Data it reads**: `getCommercialMetrics` (onLoad, The commercial figures the tiles show, one value per metric …)
+
 **Where the user goes next**
 
 - → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
@@ -1110,6 +1719,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the renewal retention are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown metric code or a malformed period |
 
 #### Sample data for the mock-up
 
@@ -1155,7 +1765,11 @@ Every renewal retention:
 
 #### Permissions
 
+- `getCommercialMetrics` → `PLATFORM_BILLING_VIEW` (read) · staff
+
 **A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -1182,12 +1796,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (103 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-375?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-369`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1202,7 +1816,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29199 (APP-CONSOLE-ADM-376) |
-| Who uses it | ticvai; in the flows as platform admin |
+| Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Opportunity KPIs) and a per-row directory (§Show) — counts over a population, then the population |
 | Offline | online only |
@@ -1221,23 +1835,103 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Codes | text field | — | — | `getCommercialMetrics` ?codes |
+| Period | text field | — | — | `getCommercialMetrics` ?period |
+| Compare to | segmented control | — | Previous period · Same period last year | `getCommercialMetrics` ?compareTo |
+
 Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Total Opportunities** (metric tile)
+**Total Opportunities** (metric tile, from `getCommercialMetrics`)
 
-**Potential Expansion Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Potential Retention Value** (metric tile)
+**Potential Expansion Revenue** (metric tile, from `getCommercialMetrics`)
 
-**Model Optimization Opportunities** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Module Opportunities** (metric tile)
+**Potential Retention Value** (metric tile, from `getCommercialMetrics`)
 
-**Cost Optimization Opportunities** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Model Optimization Opportunities** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Module Opportunities** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Cost Optimization Opportunities** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
 **Every commercial optimization expansion** (data table)
 
@@ -1265,6 +1959,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Money columns (Current Customer Cost, Proposed Customer Cost)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
 
+**Data it reads**: `getCommercialMetrics` (onLoad, The commercial figures the tiles show, one value per metric …)
+
 **Where the user goes next**
 
 - → `ADM-369` Commercial Command Center: *Back to Commercial Command Center*
@@ -1279,6 +1975,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the commercial optimization expansion are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown metric code or a malformed period |
 
 #### Sample data for the mock-up
 
@@ -1315,7 +2012,11 @@ Every commercial optimization expansion:
 
 #### Permissions
 
+- `getCommercialMetrics` → `PLATFORM_BILLING_VIEW` (read) · staff
+
 **A refused user sees:** Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -1342,12 +2043,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400).
+- [ ] Every output is drawn (66 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-376?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-369`.
-- [ ] Sign-in is asked only where the spec asks for it.
+- [ ] Every gated control is gated: `PLATFORM_BILLING_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1448,6 +2149,8 @@ exceptions:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_BILLING_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1514,6 +2217,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
+| Codes | text field | — | — | `getCommercialMetrics` ?codes |
+| Period | text field | — | — | `getCommercialMetrics` ?period |
+| Compare to | segmented control | — | Previous period · Same period last year | `getCommercialMetrics` ?compareTo |
 | Horizon months | stepper or slider | 3 | min 1; max 12 | `getPlanRecommendations` ?horizonMonths |
 | Kind | select | — | Upgrade · Downgrade · Add module · Remove module · Remove add on · Capacity pack | `getPlanRecommendations` ?kind |
 
@@ -1523,73 +2229,481 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Active Customers** (metric tile)
+**Active Customers** (metric tile, from `getCommercialMetrics`)
 
-**New Customers** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Churned Customers** (metric tile)
+**New Customers** (metric tile, from `getCommercialMetrics`)
 
-**Trials** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Conversion** (metric tile)
+**Churned Customers** (metric tile, from `getCommercialMetrics`)
 
-**MRR / Monthly Equivalent Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**ARR / ACV** (metric tile)
+**Trials** (metric tile, from `getCommercialMetrics`)
 
-**New Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Expansion** (metric tile)
+**Conversion** (metric tile, from `getCommercialMetrics`)
 
-**Contraction** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Churn** (metric tile)
+**MRR / Monthly Equivalent Revenue** (metric tile, from `getCommercialMetrics`)
 
-**NRR** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**ARPC** (metric tile)
+**ARR / ACV** (metric tile, from `getCommercialMetrics`)
 
-**Billable Tickets** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Billable Transactions** (metric tile)
+**New Revenue** (metric tile, from `getCommercialMetrics`)
 
-**Eligible Transaction Value** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Variable Revenue** (metric tile)
+**Expansion** (metric tile, from `getCommercialMetrics`)
 
-**Minimum Guaranteed Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Guarantee Utilization** (metric tile)
+**Contraction** (metric tile, from `getCommercialMetrics`)
 
-**Revenue Above Guarantee** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**VSI** (metric tile)
+**Churn** (metric tile, from `getCommercialMetrics`)
 
-**Operational Profile** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**POS Utilization** (metric tile)
+**NRR** (metric tile, from `getCommercialMetrics`)
 
-**Access Utilization** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**User Utilization** (metric tile)
+**ARPC** (metric tile, from `getCommercialMetrics`)
 
-**API** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Storage** (metric tile)
+**Billable Tickets** (metric tile, from `getCommercialMetrics`)
 
-**Admissions** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Renewal Risk** (metric tile)
+**Billable Transactions** (metric tile, from `getCommercialMetrics`)
 
-**Expansion Probability** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Model Optimization Opportunity** (metric tile)
+**Eligible Transaction Value** (metric tile, from `getCommercialMetrics`)
 
-**Cost Optimization** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
-**Upgrade/Downgrade Probability** (metric tile)
+**Variable Revenue** (metric tile, from `getCommercialMetrics`)
 
-**Commercial Health** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Minimum Guaranteed Revenue** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Guarantee Utilization** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Revenue Above Guarantee** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**VSI** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Operational Profile** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**POS Utilization** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Access Utilization** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**User Utilization** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**API** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Storage** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Admissions** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Renewal Risk** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Expansion Probability** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Model Optimization Opportunity** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Cost Optimization** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Upgrade/Downgrade Probability** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+
+**Commercial Health** (metric tile, from `getCommercialMetrics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period | text | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Metrics | list or chips (count when long) | — |
+| Code | text | — |
+| Group key | text | The band, profile or model this row is for, on a code split by one; null otherwise. |
+| Unit | chip: Count, Currency, Percent, Days | — |
+| Value | 1,234.5 | — |
+| Comparison | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
 
 **Actions and what each produces**
 
@@ -1601,7 +2715,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Enforcement**: Approaching, at and over a limit are three states; hard stop is off by default and every enforcement action is alerted. *(source: contracts/satellite/subscription.yaml#getLicenceEnforcement)*
 
-**Data it reads**: `getLicenceEnforcement` (onLoad, Exceptions and overage); `getPlanRecommendations` (onLoad, Commercial recommendations beside the enforcement position)
+**Data it reads**: `getCommercialMetrics` (onLoad, The commercial figures the tiles show, one value per metric …); `getPlanRecommendations` (onLoad, Commercial recommendations beside the enforcement position)
 
 **Where the user goes next**
 
@@ -1617,6 +2731,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the executive commercial intelligence are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 An unknown metric code or a malformed period |
 
 #### Sample data for the mock-up
 
@@ -1638,18 +2753,19 @@ metric tiles:
 
 #### Permissions
 
-- `getLicenceEnforcement` → `PLATFORM_BILLING_VIEW` (read) · staff
+- `getCommercialMetrics` → `PLATFORM_BILLING_VIEW` (read) · staff
 - `getPlanRecommendations` → `PLATFORM_BILLING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_BILLING_VIEW`
+
 #### Requirements it meets
 
-3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 20.8.3 | AI Usage Forecasting - System shall forecast future platform consumption. | Subscription & Licensing Management | CONTRACTED | `getLicenceEnforcement` |
 | 20.8.4 | AI Upgrade Recommendations - System shall recommend subscription upgrades. | Subscription & Licensing Management | CONTRACTED | `getPlanRecommendations` |
 | 20.8.5 | AI Cost Optimization - System shall recommend cost optimization opportunities. | Subscription & Licensing Management | CONTRACTED | `getPlanRecommendations` |
 
@@ -1672,8 +2788,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (306 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-378?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Board 1 — Standardized Commercial ….
 - [ ] Every transition is wired: `ADM-369`.
@@ -1757,7 +2873,7 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "getBillingReconciliation": {"method":"GET","path":"/billing-reconciliation","contract":"subscription","summary":"Metered consumption against what was invoiced","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"tenantId","in":"query","required":true},{"name":"period","in":"query","required":true}],"requestBody":null,"responds":"BillingReconciliation"},
-"getEntitlementUsage": {"method":"GET","path":"/tenants/{tenantId}/entitlement-usage","contract":"subscription","summary":"Usage against licensed limits","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"EntitlementUsage"},
+"getCommercialMetrics": {"method":"GET","path":"/commercial-metrics","contract":"subscription","summary":"The commercial figures across the customer portfolio, by code","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"codes","in":"query","required":null},{"name":"tenantId","in":"query","required":null},{"name":"period","in":"query","required":null},{"name":"compareTo","in":"query","required":null}],"requestBody":null,"responds":"CommercialMetricSet"},
 "getLicenceEnforcement": {"method":"GET","path":"/licence-enforcement","contract":"subscription","summary":"Where a tenant stands against its entitlements, and what happens next","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"tenantId","in":"query","required":true}],"requestBody":null,"responds":"LicenceEnforcement"},
 "getPlanRecommendations": {"method":"GET","path":"/plan-recommendations","contract":"subscription","summary":"Which plan, module or pack would fit this tenant better, and what it would cost or save","permission":"PLATFORM_BILLING_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"platform","parameters":[{"name":"tenantId","in":"query","required":true},{"name":"horizonMonths","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "getSubscription": {"method":"GET","path":"/tenants/{tenantId}/subscription","contract":"subscription","summary":"Read the current subscription","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"Subscription"},
@@ -1774,7 +2890,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "BillingReconciliation": {"type":"object","description":"Boards 10.2 and 10.3. **The first invoice sets the tone for the relationship.**","properties":{"tenantId":{"type":"string","format":"uuid"},"period":{"type":"string"},"lines":{"type":"array","items":{"type":"object","properties":{"unit":{"type":"string"},"meteredQuantity":{"type":"integer"},"billedQuantity":{"type":"integer"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variance":{"type":"integer"}}}},"meteredNotBilled":{"type":"integer"},"billedNotMetered":{"type":"integer"},"invoiceId":{"type":"string","format":"uuid","nullable":true},"approvedBy":{"type":"string","format":"uuid","nullable":true}}},
-"EntitlementUsage": {"x-ticvai-persistence":"none — aggregated from usage_record","type":"object","required":["tenantId","metrics"],"properties":{"tenantId":{"type":"string","format":"uuid"},"metrics":{"type":"array","items":{"type":"object","required":["metric","current","isNearLimit"],"properties":{"metric":{"$ref":"#/components/schemas/UsageMetric"},"current":{"type":"integer"},"limit":{"type":"integer","nullable":true},"percentUsed":{"type":"number","nullable":true},"isNearLimit":{"type":"boolean","description":"Approaching a limit is an account conversation. Hitting one silently at a gate is an incident.\n"},"isExceeded":{"type":"boolean"}}}},"asAt":{"type":"string","format":"date-time"}}},
+"CommercialMetric": {"type":"object","description":"One commercial figure. Money-valued codes carry a `Money`; counts, rates and days a number (naming-and-style 5.1: money is never a float).","required":["code","value"],"properties":{"code":{"type":"string"},"groupKey":{"type":"string","nullable":true,"description":"The band, profile or model this row is for, on a code split by one; null otherwise."},"unit":{"type":"string","enum":["count","currency","percent","days"]},"value":{"oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},"comparison":{"nullable":true,"oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},"direction":{"type":"string","enum":["up","down","flat"]}}},
+"CommercialMetricSet": {"type":"object","description":"The commercial command centres' figures, one row per metric code (getCommercialMetrics).","properties":{"tenantId":{"type":"string","format":"uuid","nullable":true,"description":"The customer the figures are for; null for the whole portfolio."},"period":{"type":"string"},"asOf":{"type":"string","format":"date-time"},"metrics":{"type":"array","items":{"$ref":"#/components/schemas/CommercialMetric"}}}},
 "LicenceEnforcement": {"type":"object","description":"Board 9.5. **Three states, three responses.**","properties":{"tenantId":{"type":"string","format":"uuid"},"period":{"type":"string"},"units":{"type":"array","items":{"type":"object","properties":{"unit":{"type":"string"},"allowance":{"type":"integer"},"consumed":{"type":"integer"},"percentUsed":{"type":"number"},"projectedAtPeriodEnd":{"type":"integer","nullable":true},"state":{"type":"string","enum":["withinAllowance","approaching","atLimit","overage"]},"nextAction":{"type":"string","nullable":true},"overageCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"minimumGuaranteeMet":{"type":"boolean"},"alertsRaised":{"type":"integer"}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "PackageSimulation": {"type":"object","description":"Boards 3.9 and 4.8. **Refused at quote time rather than at go-live.**","properties":{"lines":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["baseTier","module","addOn","capacityPack","overage","professionalServices","discount"]},"label":{"type":"string"},"quantity":{"type":"number","nullable":true},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"recurringTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"oneOffTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"contractTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"minimumGuarantee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning","advisory"]},"code":{"type":"string"},"message":{"type":"string"}}}},"provisionable":{"type":"boolean"}}},
@@ -1783,9 +2900,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Subscription": {"x-ticvai-persistence":"subscription.contract","type":"object","required":["tenantId","planId","planVersion","status","startsAt"],"properties":{"tenantId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid"},"planName":{"type":"string"},"planVersion":{"type":"string"},"status":{"type":"string","enum":["trial","active","pastDue","cancelled","expired"]},"startsAt":{"type":"string","format":"date"},"renewsAt":{"type":"string","format":"date","nullable":true},"cancelledAt":{"type":"string","format":"date","nullable":true},"scheduledChange":{"type":"object","nullable":true,"readOnly":true,"description":"A downgrade waiting for the next renewal (decided 28 September, audit R214 (1)). Null when none is scheduled.","properties":{"planId":{"type":"string","format":"uuid"},"planVersion":{"type":"string"},"effectiveFrom":{"type":"string","format":"date","description":"Always the `renewsAt` it was scheduled against."}}},"currentPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"billingPeriod":{"type":"string"}}},
 "SubscriptionPlanRecommendation": {"type":"object","x-ticvai-persistence":"none — computed from control.usage_record, the plan, tier and add-on limits and capacity packs, priced as simulateCommercialPackage prices","description":"One plan-fit move for a tenant, priced against staying as it is (20.8.4, 20.8.5; decided 29 September, build pass, group G2).","required":["kind","reason","projectedMonthlyCost"],"properties":{"kind":{"type":"string","enum":["upgrade","downgrade","addModule","removeModule","removeAddOn","capacityPack"]},"targetPlanId":{"type":"string","format":"uuid","nullable":true,"description":"The tier to move to, for `upgrade` and `downgrade`."},"moduleCode":{"type":"string","nullable":true,"description":"For `addModule` and `removeModule`."},"addOnCode":{"type":"string","nullable":true,"description":"For `removeAddOn`."},"billableUnit":{"type":"string","nullable":true,"description":"The unit that drives it (for `upgrade`, `downgrade` and `capacityPack`), as `getLicenceEnforcement` names it."},"capacityPackSize":{"type":"integer","nullable":true,"description":"For `capacityPack`, the pack size that covers the projected overage."},"projectedMonthlyCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"projectedSaving":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Against staying as it is over the horizon, monthly. Set where the move saves money."},"projectedAddedCost":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Where the move costs more than today but less than the alternative named in `comparedWith`."},"comparedWith":{"type":"string","enum":["currentPackage","projectedOverage","nextTier","capacityPack"],"description":"What the move is cheaper than. An `upgrade` is compared with paying the projected overage; a `capacityPack` with the next tier."},"reason":{"type":"string","maxLength":500,"description":"One sentence a person can repeat to the customer."},"basis":{"type":"object","description":"The numbers it rests on.","properties":{"usageWindowDays":{"type":"integer"},"usedAverage":{"type":"number","nullable":true},"usedPeak":{"type":"number","nullable":true},"projectedPeak":{"type":"number","nullable":true},"currentLimit":{"type":"number","nullable":true},"targetLimit":{"type":"number","nullable":true},"lastUsedAt":{"type":"string","format":"date-time","nullable":true,"description":"For `removeModule` and `removeAddOn`, the last metered use; null for never."}}},"applyWith":{"type":"string","enum":["setSubscription","addCapacityPack"],"description":"The operation a person uses to carry it out (after `previewSubscriptionChange` for `setSubscription`)."}}},
 "SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
-"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "TenantStatus": {"type":"string","enum":["onboarding","active","suspended","terminating","terminated"]},
-"UsageMetric": {"type":"string","enum":["venues","workstations","activeUsers","devices","brandedApps","aiTokens","apiCalls","storageGb","transactions","guestProfiles"]},
 "VsiAssessment": {"type":"object","x-ticvai-persistence":"subscription.vsi_assessment","description":"Board 2 — the ten-screen questionnaire, as data.","properties":{"id":{"type":"string","format":"uuid"},"organisationName":{"type":"string","nullable":true},"contactEmail":{"type":"string","nullable":true},"venueType":{"type":"string","nullable":true},"answers":{"type":"object","additionalProperties":true},"requestedModules":{"type":"array","items":{"type":"string"}},"submittedAt":{"type":"string","format":"date-time","nullable":true}}},
 "VsiResult": {"type":"object","description":"Board 2.10. **A prospect told only their price has been told nothing they can argue with.**\n","properties":{"assessmentId":{"type":"string","format":"uuid"},"score":{"type":"number"},"tierCode":{"type":"string"},"tierName":{"type":"string"},"factors":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"answer":{"type":"string"},"points":{"type":"number"}}}},"recommendedModules":{"type":"array","items":{"type":"string"}},"recommendedPlanId":{"type":"string","format":"uuid","nullable":true},"indicativePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}
 }

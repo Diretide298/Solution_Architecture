@@ -331,7 +331,7 @@
  },
  "setCaseCategoryDefinition": {
   "method": "PUT",
-  "path": "/case-categories",
+  "path": "/case-categories/{caseCategoryId}",
   "contract": "marketing-crm",
   "summary": "Create or change a case category or subcategory",
   "permission": "CASE_MANAGE",
@@ -339,6 +339,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "caseCategoryId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -350,7 +355,7 @@
  },
  "setSlaPolicy": {
   "method": "PUT",
-  "path": "/sla-policies",
+  "path": "/sla-policies/{slaPolicyId}",
   "contract": "marketing-crm",
   "summary": "Define an SLA policy",
   "permission": "CASE_MANAGE",
@@ -358,6 +363,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "slaPolicyId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -373,7 +383,7 @@
   "contract": "marketing-crm",
   "summary": "Assign, reprioritise or resolve a case",
   "permission": "CASE_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

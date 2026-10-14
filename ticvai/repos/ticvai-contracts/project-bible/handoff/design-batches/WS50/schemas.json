@@ -153,6 +153,7 @@
     "readOnly": true
    },
    "bundleId": {
+    "x-ticvai-references": "promotions.bundle",
     "type": "string",
     "format": "uuid"
    },

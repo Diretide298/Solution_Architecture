@@ -177,6 +177,7 @@
     "type": "object",
     "properties": {
      "derivatives": {
+      "x-ticvai-persisted": false,
       "type": "array",
       "description": "Generated from the original, never uploaded separately. A new breakpoint is a re-render rather than a re-upload of everything.\n",
       "items": {
@@ -208,6 +209,7 @@
       }
      },
      "collections": {
+      "x-ticvai-persisted": false,
       "type": "array",
       "items": {
        "type": "object",
@@ -223,6 +225,7 @@
       }
      },
      "previousVersions": {
+      "x-ticvai-persisted": false,
       "type": "array",
       "items": {
        "type": "object",
@@ -283,6 +286,7 @@
     "type": "boolean"
    },
    "usageImpact": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "items": {
@@ -515,11 +519,14 @@
   }
  },
  "MediaTaxonomy": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "assets.taxonomy",
   "description": "Boards 1.5 and 1.6. **Metadata fields are per asset type**, because an image has dimensions and a contract has an expiry.\n",
   "properties": {
    "categories": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -549,6 +556,8 @@
     }
    },
    "fields": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -581,6 +590,8 @@
     }
    },
    "keywordVocabularies": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

@@ -251,7 +251,7 @@
  },
  "publishActivationScheduler": {
   "method": "PUT",
-  "path": "/activation-scheduler",
+  "path": "/activation-scheduler/{lifecycleActionId}",
   "contract": "catalogue",
   "summary": "Publication & Activation Scheduler",
   "permission": "PRODUCT_CONFIGURE",
@@ -259,6 +259,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "lifecycleActionId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -308,7 +313,7 @@
  },
  "setConfigurationTemplate": {
   "method": "PUT",
-  "path": "/configuration-templates",
+  "path": "/configuration-templates/{configurationTemplateId}",
   "contract": "catalogue",
   "summary": "Create or update a product or price-list template",
   "permission": "PRODUCT_CONFIGURE",
@@ -316,6 +321,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "configurationTemplateId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

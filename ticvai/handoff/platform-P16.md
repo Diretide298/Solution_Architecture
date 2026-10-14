@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 71 |
-| Operations | 94 |
+| Operations | 84 |
 | Contracts | 10 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 115 |
+| Operations with no screen | 114 |
 | Waves | wave1 4 · wave3 67 |
 
 ## Gaps
 
-### 115 operations with no screen here
+### 114 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
 | `listCustomerMemberships` | identity | GET | Memberships a customer holds |
 | `listModuleCapabilities` | identity | GET | What a person can be allowed to do, per module |
-| … | | | 75 more |
+| … | | | 74 more |
 
 ### 1 modules split across waves
 
@@ -88,7 +88,7 @@
 | `ANL-008` | Demand Forecasting | Analytics | 3 | 4 | yes |
 | `ANL-009` | AI Assistant & Action Center | Analytics | 3 | 9 | yes |
 | `ANL-010` | Suggestions & Advice | Analytics | 3 | 2 | yes |
-| `ANL-012` | Live Operations Dashboard | Analytics | 3 | 2 | yes |
+| `ANL-012` | Live Operations Dashboard | Analytics | 3 | 1 | yes |
 | `ANL-013` | Revenue Pulse | Analytics | 3 | 1 | yes |
 | `ANL-014` | Attendance & Footfall Intelligence | Analytics | 3 | 1 | yes |
 | `ANL-015` | Capacity & Utilization Monitor | Analytics | 3 | 1 | yes |
@@ -97,7 +97,7 @@
 | `ANL-018` | Alerts & Exception Center | Analytics | 3 | 1 | yes |
 | `ANL-019` | AI Management Insights | Analytics | 3 | 4 | yes |
 | `ANL-020` | Multi-Site & Performance Comparison | Analytics | 3 | 2 | yes |
-| `ANL-021` | Dashboard Library | Analytics | 3 | 4 | yes |
+| `ANL-021` | Dashboard Library | Analytics | 3 | 3 | yes |
 | `ANL-022` | Dashboard Creation Wizard | Analytics | 3 | 1 | yes |
 | `ANL-023` | Drag-and-Drop Dashboard Canvas | Analytics | 1 | 7 | yes |
 | `ANL-024` | Widget & Visualization Library | Analytics | 3 | 1 | yes |
@@ -105,8 +105,8 @@
 | `ANL-026` | Targets, Thresholds & KPI Status Rules | Analytics | 3 | 2 | yes |
 | `ANL-027` | Data & Filter Configuration | Analytics | 3 | 2 | yes |
 | `ANL-028` | Drill-Down & Interaction Designer | Analytics | 3 | 1 | yes |
-| `ANL-029` | Dashboard Access, Publishing & Versioning | Analytics | 3 | 1 | yes |
-| `ANL-030` | Dashboard Preview, Validation & Health | Analytics | 3 | 3 | yes |
+| `ANL-029` | Dashboard Access, Publishing & Versioning | Analytics | 3 | 2 | yes |
+| `ANL-030` | Dashboard Preview, Validation & Health | Analytics | 3 | 2 | yes |
 | `ANL-031` | Report Catalogue & Library | Analytics | 3 | 2 | yes |
 | `ANL-032` | Report Creation Wizard | Analytics | 3 | 1 | yes |
 | `ANL-033` | Data Domain & Dataset Selector | Analytics | 3 | 1 | yes |
@@ -115,13 +115,13 @@
 | `ANL-036` | Grouping, Aggregation & Calculation Builder | Analytics | 3 | 1 | yes |
 | `ANL-037` | Cross-Domain Report Composer | Analytics | 3 | 2 | yes |
 | `ANL-038` | Report Layout & Formatting Designer | Analytics | 3 | 1 | yes |
-| `ANL-039` | Report Preview, Test & Validation | Analytics | 3 | 3 | yes |
-| `ANL-040` | Save, Run & Report Results Viewer | Analytics | 3 | 2 | yes |
-| `ANL-041` | Reporting Governance Command Center | Analytics | 3 | 2 | yes |
+| `ANL-039` | Report Preview, Test & Validation | Analytics | 3 | 2 | yes |
+| `ANL-040` | Save, Run & Report Results Viewer | Analytics | 3 | 1 | yes |
+| `ANL-041` | Reporting Governance Command Center | Analytics | 3 | 1 | yes |
 | `ANL-042` | Report Scheduler | Analytics | 3 | 2 | yes |
 | `ANL-043` | Subscription Manager | Analytics | 3 | 2 | yes |
 | `ANL-044` | Distribution & Delivery Configuration | Analytics | 3 | 1 | yes |
-| `ANL-045` | Export & Download Center | Analytics | 3 | 2 | yes |
+| `ANL-045` | Export & Download Center | Analytics | 3 | 1 | yes |
 | `ANL-046` | Report API & Data Delivery Manager | Analytics | 3 | 1 | yes |
 | `ANL-047` | Report Access & Sharing Control | Analytics | 3 | 4 | yes |
 | `ANL-048` | Delivery Monitoring & Failure Management | Analytics | 3 | 1 | yes |
@@ -131,12 +131,12 @@
 | `ANL-052` | Ask TICVAI — Natural Language Analytics | Analytics | 3 | 2 | yes |
 | `ANL-053` | AI-Generated Dashboard Studio | Analytics | 3 | 1 | yes |
 | `ANL-054` | AI Report Generator | Analytics | 3 | 1 | yes |
-| `ANL-055` | Anomaly Detection Center | Analytics | 3 | 3 | yes |
+| `ANL-055` | Anomaly Detection Center | Analytics | 3 | 1 | yes |
 | `ANL-056` | Root-Cause Analysis Explorer | Analytics | 3 | 3 | yes |
-| `ANL-057` | Forecasting & Predictive Analytics Studio | Analytics | 3 | 5 | yes |
-| `ANL-058` | AI Recommendation & Next-Best-Action Center | Analytics | 3 | 2 | yes |
-| `ANL-059` | AI Insight History, Evidence & Explainability | Analytics | 3 | 5 | yes |
-| `ANL-060` | AI Analytics Governance & Model Control | Analytics | 3 | 7 | yes |
+| `ANL-057` | Forecasting & Predictive Analytics Studio | Analytics | 3 | 2 | yes |
+| `ANL-058` | AI Recommendation & Next-Best-Action Center | Analytics | 3 | 1 | yes |
+| `ANL-059` | AI Insight History, Evidence & Explainability | Analytics | 3 | 2 | yes |
+| `ANL-060` | AI Analytics Governance & Model Control | Analytics | 3 | 1 | yes |
 | `ANL-061` | BI & Analytics Administration Command Center | Analytics | 3 | 2 | yes |
 | `ANL-062` | Enterprise KPI Library | Analytics | 3 | 2 | yes |
 | `ANL-063` | KPI Targets, Thresholds & Scorecards | Analytics | 3 | 2 | yes |

@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-384` | Delegation & Escalation Command Center | B | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-385` | Delegation Management | B | 13 | 0 | 5 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-386` | Temporary Delegation & Availability Calendar | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-386` | Temporary Delegation & Availability Calendar | B | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-387` | Out-of-Office & Substitute Routing | B | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-388` | Approval SLA Policy Configuration | B | 8 | 0 | 5 | 0 | 1 | 3 | — | notStarted (—) |
 | `BO-389` | Reminder & Breach Notification Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

@@ -220,7 +220,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; lookupTicket · overrideAccess · validateAccess · validateGroupAccess +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · admitted</span></div>
-          <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, rightId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; mediaCode&larr;deepLink, rightId&larr;deepLink, workstationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-007">SCN-007</a>  &mdash; <i>A school party of forty arrives on one booki</i><br><a href="#scn-008">SCN-008</a> <br><a href="#scn-009">SCN-009</a> <br><a href="#scn-011">SCN-011</a>  &mdash; <i>Delegated right</i> <span class="car">rightId</span><br><a href="#scn-014">SCN-014</a>  &mdash; <i>Syncs the journal when signal returns</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div><div class="ov"><b>modal</b> formConsumeCrossRegionEntitlement &middot; <i>Consume cross region entitlement</i> &middot; <b>Consume cross region entitlement</b> &middot; Cancel <span class="dis">discards id · entries · scanId · recordedAt</span></div></div>
@@ -250,7 +250,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; validateGroupAccess · getOfflinePackage · lookupTicket</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-014">SCN-014</a>  &mdash; <i>The session ends and the device syncs</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
@@ -280,7 +280,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; lookupTicket · getOfflinePackage · validateAccess</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-009">SCN-009</a>  &mdash; <i>The ticket is found and its history read</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div></div>
@@ -310,7 +310,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; lookupTicket · getOfflinePackage · listScans</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>It is valid</i> <span class="car">mediaCode · rightId</span></div>
           
           
@@ -340,7 +340,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getCrossRegionEntitlement · consumeCrossRegionEntitlement</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; rightId&larr;deepLink</div>
+          <div><b>ARRIVES WITH</b> &middot; rightId&larr;deepLink, workstationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">rightId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formConsumeCrossRegionEntitlement &middot; <i>Consume cross region entitlement</i> &middot; <b>Consume cross region entitlement</b> &middot; Cancel <span class="dis">discards entries · scanId · recordedAt</span></div></div>
@@ -370,7 +370,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getOfflinePackage · lookupTicket · overrideAccess · syncScans +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-014">SCN-014</a>  &mdash; <i>The network returns and the journal posts</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
@@ -400,7 +400,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; syncScans · listSyncRejections · getOfflinePackage · listScans +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Ready to scan</i> <span class="car">mediaCode · rightId</span></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> confirmOverrideAccess &middot; <i>Override access</i></div><div class="ov"><b>modal</b> formSyncScans &middot; <i>Sync scans</i> &middot; <b>Sync scans</b> &middot; Cancel <span class="dis">discards deviceId · scans</span></div><div class="ov"><b>modal</b> formValidateAccess &middot; <i>Validate access</i> &middot; <b>Validate access</b> &middot; Cancel <span class="dis">discards id · mediaCode · mediaKind · direction · recordedAt · groupSize · proximityToken</span></div><div class="ov"><b>modal</b> formValidateGroupAccess &middot; <i>Validate group access</i> &middot; <b>Validate group access</b> &middot; Cancel <span class="dis">discards id · mediaCode · admitCount · recordedAt · direction</span></div></div>
@@ -430,7 +430,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; getOfflinePackage · lookupTicket</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#scn-001">SCN-001</a>  &mdash; <i>Sign in</i><br><a href="#scn-002">SCN-002</a>  &mdash; <i>Access point &amp; direction</i> <span class="car">accessPointId</span><br><a href="#scn-003">SCN-003</a>  &mdash; <i>Waits at the ready screen</i> <span class="car">mediaCode · rightId</span><br><a href="#scn-013">SCN-013</a>  &mdash; <i>Scans journal locally while the network is g</i></div>
           
           

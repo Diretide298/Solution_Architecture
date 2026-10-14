@@ -435,7 +435,7 @@
  },
  "setPartnerContact": {
   "method": "PUT",
-  "path": "/partner-contacts",
+  "path": "/partner-contacts/{contactId}",
   "contract": "subscription",
   "summary": "Create, edit, disable, enable or revoke a partner contact",
   "permission": "PARTNER_MANAGE",
@@ -443,6 +443,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "contactId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

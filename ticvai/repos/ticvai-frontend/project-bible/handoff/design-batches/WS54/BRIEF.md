@@ -106,8 +106,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-228` | Promotion Performance Command Center | C | 2 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
-| `ADM-229` | Campaign & Promotion Performance Explorer | C | 4 | 5 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-228` | Promotion Performance Command Center | B | 2 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-229` | Campaign & Promotion Performance Explorer | B | 4 | 5 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-230` | Redemption, Conversion & Funnel Analytics | C | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-231` | Discount, Margin & Profitability Analytics | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-232` | Bundle, BOGO & Advanced Offer Analytics | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

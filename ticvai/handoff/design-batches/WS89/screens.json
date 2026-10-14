@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-inventory-command-center-bo-504",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalInventoryCommandCenter.tsx",
+   "component": "src/routes/rentals/RentalInventoryCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -101,7 +102,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -281,6 +282,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "2",
@@ -290,7 +292,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/serialized-equipment-registry-bo-505",
-   "component": "apps/venue-management-web/src/routes/rentals/SerializedEquipmentRegistry.tsx",
+   "component": "src/routes/rentals/SerializedEquipmentRegistry.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -433,6 +435,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "2",
@@ -442,7 +445,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/equipment-asset-profile-bo-506",
-   "component": "apps/venue-management-web/src/routes/rentals/EquipmentAssetProfile.tsx",
+   "component": "src/routes/rentals/EquipmentAssetProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -487,7 +490,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getAsset",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getAsset"
       },
       {
        "kind": "primaryButton",
@@ -577,6 +581,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "2",
@@ -586,7 +591,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/pooled-inventory-management-bo-507",
-   "component": "apps/venue-management-web/src/routes/rentals/PooledInventoryManagement.tsx",
+   "component": "src/routes/rentals/PooledInventoryManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -733,6 +738,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "2",
@@ -742,7 +748,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/equipment-status-condition-management-bo-508",
-   "component": "apps/venue-management-web/src/routes/rentals/EquipmentStatusConditionManagement.tsx",
+   "component": "src/routes/rentals/EquipmentStatusConditionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -794,7 +800,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getAsset",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getAsset"
       },
       {
        "kind": "secondaryButton",
@@ -877,6 +884,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "2",
@@ -886,7 +894,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/qr-barcode-equipment-identification-bo-509",
-   "component": "apps/venue-management-web/src/routes/rentals/QrBarcodeEquipmentIdentification.tsx",
+   "component": "src/routes/rentals/QrBarcodeEquipmentIdentification.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -937,7 +945,8 @@
        "derived": true,
        "impliedBy": "lookupAsset",
        "label": "Search",
-       "notes": "A search that returns nothing must say so differently from a search not yet run."
+       "notes": "A search that returns nothing must say so differently from a search not yet run.",
+       "operation": "lookupAsset"
       }
      ]
     }
@@ -994,6 +1003,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "2",
@@ -1003,7 +1013,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/inventory-location-allocation-bo-510",
-   "component": "apps/venue-management-web/src/routes/rentals/InventoryLocationAllocation.tsx",
+   "component": "src/routes/rentals/InventoryLocationAllocation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1059,7 +1069,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listStockLocations",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listStockLocations"
       }
      ]
     }
@@ -1116,6 +1127,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "2",
@@ -1125,7 +1137,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/inventory-transfer-management-bo-511",
-   "component": "apps/venue-management-web/src/routes/rentals/InventoryTransferManagement.tsx",
+   "component": "src/routes/rentals/InventoryTransferManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1302,6 +1314,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "2",
@@ -1311,7 +1324,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/inventory-adjustment-exception-management-bo-512",
-   "component": "apps/venue-management-web/src/routes/rentals/InventoryAdjustmentExceptionManagement.tsx",
+   "component": "src/routes/rentals/InventoryAdjustmentExceptionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1363,7 +1376,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listStockMovements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listStockMovements"
       },
       {
        "kind": "secondaryButton",
@@ -1438,6 +1452,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "2",
@@ -1447,7 +1462,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/inventory-intelligence-rebalancing-bo-513",
-   "component": "apps/venue-management-web/src/routes/rentals/InventoryIntelligenceRebalancing.tsx",
+   "component": "src/routes/rentals/InventoryIntelligenceRebalancing.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1528,7 +1543,8 @@
         "Inventory turnover"
        ],
        "notes": "The pack groups this record's detail under its own headings: “North Station”, “Marina Station”, “The board should visually demonstrate”, “Serialized Asset”, “Pooled Inventory”, “Integration Boundaries”.",
-       "provenance": "pack Rental_Management.pdf, page 24 §Display"
+       "provenance": "pack Rental_Management.pdf, page 24 §Display",
+       "operation": "getStockPositions"
       }
      ]
     },

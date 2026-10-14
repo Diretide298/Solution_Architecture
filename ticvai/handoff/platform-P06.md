@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 96 |
-| Operations | 223 |
-| Contracts | 20 |
+| Operations | 221 |
+| Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 136 |
+| Operations with no screen | 135 |
 | Waves | wave1 30 · wave2 35 · wave3 31 |
 
 ## Gaps
 
-### 136 operations with no screen here
+### 135 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
 | `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
 | `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
-| … | | | 96 more |
+| … | | | 95 more |
 
 ### 3 modules split across waves
 
@@ -85,14 +85,14 @@
 |---|---|---|---|---|---|
 | `EMP-001` | Sign in | Operations | 1 | 9 | yes |
 | `EMP-002` | Select venue & role | Operations | 1 | 2 | yes |
-| `EMP-003` | Home — on duty | Operations | 1 | 7 | yes |
+| `EMP-003` | Home — on duty | Operations | 1 | 8 | yes |
 | `EMP-004` | Task list | Operations | 1 | 4 | yes |
 | `EMP-005` | Task detail | Operations | 1 | 14 | yes |
 | `EMP-006` | Raise a task | Operations | 1 | 16 | yes |
 | `EMP-007` | Handover notes | Operations | 2 | 1 | yes |
 | `EMP-008` | Shift summary | Operations | 2 | 5 | yes |
 | `EMP-009` | End shift | Operations | 1 | 8 | yes |
-| `EMP-010` | Scan — ready | Operations | 1 | 5 | yes |
+| `EMP-010` | Scan — ready | Operations | 1 | 4 | yes |
 | `EMP-014` | Ticket lookup | Operations | 1 | 5 | yes |
 | `EMP-015` | Group scan | Operations | 2 | 7 | yes |
 | `EMP-017` | Sync & reconciliation | Operations | 1 | 8 | yes |
@@ -105,7 +105,7 @@
 | `EMP-024` | Clock in / out | Operations | 1 | 2 | yes |
 | `EMP-025` | Break management | Operations | 2 | 2 | yes |
 | `EMP-026` | Incident report | Operations | 1 | 6 | yes |
-| `EMP-027` | Incident detail | Operations | 2 | 4 | yes |
+| `EMP-027` | Incident detail | Operations | 2 | 5 | yes |
 | `EMP-028` | Lost & found | Operations | 2 | 7 | yes |
 | `EMP-029` | Guest assistance | Operations | 2 | 12 | yes |
 | `EMP-030` | Venue map | Operations | 2 | 2 | yes |
@@ -128,7 +128,7 @@
 | `EMP-047` | Emergency mode | Operations | 1 | 2 | yes |
 | `EMP-048` | Opening checklist | Operations | 1 | 3 | yes |
 | `EMP-049` | Hand over the journal | Operations | 1 | 2 | yes |
-| `EMP-050` | Post-incident restore | Operations | 2 | 3 | yes |
+| `EMP-050` | Post-incident restore | Operations | 2 | 4 | yes |
 | `EMP-051` | Restaurant Service Command Center | Floor Service | 2 | 3 | yes |
 | `EMP-052` | Floor Plan & Table Map | Floor Service | 2 | 1 | yes |
 | `EMP-053` | Table & Seating Configuration | Floor Service | 2 | 3 | yes |
@@ -139,7 +139,7 @@
 | `EMP-058` | Live Table & Service Management | Floor Service | 1 | 12 | yes |
 | `EMP-059` | Table Order, Bill & Payment Management | Floor Service | 1 | 8 | yes |
 | `EMP-060` | Reservation & Table Performance | Floor Service | 2 | 3 | yes |
-| `EMP-061` | Retail Inventory Command Center | Stock on the Floor | 2 | 6 | yes |
+| `EMP-061` | Retail Inventory Command Center | Stock on the Floor | 2 | 2 | yes |
 | `EMP-062` | Store Stock & SKU Availability | Stock on the Floor | 2 | 3 | yes |
 | `EMP-063` | Requisition & Smart Store Replenishment | Stock on the Floor | 2 | 4 | yes |
 | `EMP-064` | Store-to-Store & Warehouse Transfers | Stock on the Floor | 2 | 5 | yes |

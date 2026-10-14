@@ -106,14 +106,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-569` | Payment Orchestration Command Center | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-569` | Payment Orchestration Command Center | C | 0 | 21 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-570` | Gateway, PSP & Acquirer Directory | A | 25 | 44 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-571` | Provider Connection & Adapter Configuration | C | 0 | 41 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-572` | Gateway Capability & Payment Method Mapping | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-572` | Gateway Capability & Payment Method Mapping | C | 0 | 19 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-573` | Payment Routing Rule Builder | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-574` | Routing Strategy, Priority & Load Distribution | C | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-575` | Failover, Retry & Resilience Manager | C | 8 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-576` | Provider Health, SLA & Performance Monitor | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-576` | Provider Health, SLA & Performance Monitor | C | 0 | 32 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-577` | Provider Cost, Commercial & Routing Economics | C | 5 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-578` | Payment Routing Simulator, Decision Trace & AI Advisor | C | 0 | 24 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
@@ -172,7 +172,21 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Successful Authorizations** (metric tile)
 
-**Authorization Rate** (metric tile)
+**Authorization Rate** (metric tile, from `getPaymentProviderHealth`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Connection | the name it points at, never the id | — |
+| Provider name | text | — |
+| Transactions | 1,234 | — |
+| Authorisation rate | 12.5% | — |
+| Baseline authorisation rate | 12.5% | — |
+| Decline rate | 12.5% | — |
+| Error rate | 12.5% | — |
+| P50 latency ms | 1,234 | — |
+| P95 latency ms | 1,234 | — |
+| Circuit state | chip: Closed, Open, Half open | — |
+| Status | chip: Healthy, Degraded, Failing, Disabled | — |
 
 **Successful Captures** (metric tile)
 
@@ -192,7 +206,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Average Processing Time** (metric tile)
 
-**Every payment orchestration \t27** (data table)
+**Every payment orchestration \t27** (data table, from `listPaymentProviderConnections`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -202,7 +216,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Failed value | text | not in the schema: `Failed Value` |
 | Rerouted value | text | not in the schema: `Rerouted Value` |
 
-**The selected payment orchestration \t27** (detail panel): The pack groups this record's detail under its own headings: “Provider Value Success Status”, “Provider AED”, “Provider AED Warnin”.
+**The selected payment orchestration \t27** (detail panel, from `getPaymentProviderHealth`): The pack groups this record's detail under its own headings: “Provider Value Success Status”, “Provider AED”, “Provider AED Warnin”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -260,6 +274,8 @@ provider:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -294,7 +310,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-569?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `ADM-570`, `ADM-571`, `ADM-572`, `ADM-573`, `ADM-574`, `ADM-575`, `ADM-576`, `ADM-577`, `ADM-578`.
@@ -443,7 +459,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Connect a provider (primary button) | navigation or local | — | — | — | — |
-| Connect (primary button) | `createPaymentProviderConnection` POST `/payment-providers` | PaymentProviderConnection | PaymentProviderConnection | — | — |
+| Connect (primary button) | `createPaymentProviderConnection` POST `/payment-providers` | PaymentProviderConnection | PaymentProviderConnection | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -466,6 +482,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the gateway psp acquirer are still there. The pack's own statuses are Draft — the state names which is selected. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PAYMENT_VIEW`, which `listPaymentProviderConnections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PAYMENT_PROVIDER_MANAGE` for `createPaymentProviderConnection`. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -493,6 +510,8 @@ providers:
 
 **A refused user sees:** Shown when the caller lacks `PAYMENT_VIEW`, which `listPaymentProviderConnections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PAYMENT_PROVIDER_MANAGE` for `createPaymentProviderConnection`.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -517,7 +536,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (25), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (25), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-570?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Connect a provider, Connect, Cancel.
@@ -650,6 +669,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the provider connection adapter are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Consistency with other screens
 
@@ -674,6 +694,8 @@ connection:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -697,7 +719,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-571?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: API endpoint reference, Webhook configuration, Callback configuration, Retry configuration.
@@ -744,7 +766,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listPaymentProviderConnections`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Provider kind | chip: Gateway, Psp, Acquirer, Wallet provider, Bnpl provider | — |
+| Environment | chip: Sandbox, Production | — |
+| Credential fingerprint | text | Written, never read back. Enough to confirm which key is in use without the key being retrievable from a screen. |
+| Capabilities | grouped details | — |
+| Methods | list or chips (count when long) | — |
+| Currencies | list or chips (count when long) | — |
+| Partial capture | yes / no (icon or chip) | — |
+| Multiple capture | yes / no (icon or chip) | — |
+| Refund window days | 1,234 | — |
+| Tokenisation | yes / no (icon or chip) | — |
+| Three d secure | yes / no (icon or chip) | — |
+| Card present | yes / no (icon or chip) | — |
+| Merchant account | the name it points at, never the id | — |
+| Status | chip: Draft, Testing, Active, Degraded, Disabled | — |
+| Last tested at | 1 Oct 2026, 14:30 | — |
+| Credential ref | text | Where the provider credential is kept (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as … |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -785,6 +829,8 @@ row:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -809,7 +855,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-572?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-569`.
@@ -903,6 +949,8 @@ rule: 'AED cards at Dune Park: Network International; foreign cards: Stripe'
 - `listPaymentRoutingRules` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -1041,6 +1089,8 @@ shares:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1162,6 +1212,8 @@ policy:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1240,11 +1292,39 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Availability** (metric tile)
 
-**Authorization rate** (metric tile)
+**Authorization rate** (metric tile, from `getPaymentProviderHealth`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Connection | the name it points at, never the id | — |
+| Provider name | text | — |
+| Transactions | 1,234 | — |
+| Authorisation rate | 12.5% | — |
+| Baseline authorisation rate | 12.5% | — |
+| Decline rate | 12.5% | — |
+| Error rate | 12.5% | — |
+| P50 latency ms | 1,234 | — |
+| P95 latency ms | 1,234 | — |
+| Circuit state | chip: Closed, Open, Half open | — |
+| Status | chip: Healthy, Degraded, Failing, Disabled | — |
 
 **Capture rate** (metric tile)
 
-**Decline rate** (metric tile)
+**Decline rate** (metric tile, from `getPaymentProviderHealth`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Connection | the name it points at, never the id | — |
+| Provider name | text | — |
+| Transactions | 1,234 | — |
+| Authorisation rate | 12.5% | — |
+| Baseline authorisation rate | 12.5% | — |
+| Decline rate | 12.5% | — |
+| Error rate | 12.5% | — |
+| P50 latency ms | 1,234 | — |
+| P95 latency ms | 1,234 | — |
+| Circuit state | chip: Closed, Open, Half open | — |
+| Status | chip: Healthy, Degraded, Failing, Disabled | — |
 
 **Technical error rate** (metric tile)
 
@@ -1268,7 +1348,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | 30 days | text | not in the schema: `30 Days` |
 | Historical baseline | text | not in the schema: `Historical baseline` |
 
-**The selected provider health sla** (detail panel): The pack groups this record's detail under its own headings: “Health State”, “Authorization Rate”, “Normal Baseline”, “Change”.
+**The selected provider health sla** (detail panel, from `getPaymentProviderHealth`): The pack groups this record's detail under its own headings: “Health State”, “Authorization Rate”, “Normal Baseline”, “Change”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1315,6 +1395,8 @@ sla:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1339,7 +1421,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-576?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-569`.
@@ -1432,6 +1514,8 @@ cost:
 - `getPaymentProviderEconomics` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -1581,6 +1665,8 @@ trace:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1725,8 +1811,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "PaymentFailoverPolicy": {"type":"object","x-ticvai-persistence":"payments.failover_policy","description":"Board 2.7. **A decline is final; a timeout is not. Retrying the first is how a guest gets charged twice.**\n","properties":{"retryableOutcomes":{"type":"array","items":{"type":"string","enum":["timeout","connectionRefused","providerError5xx","rateLimited","issuerUnavailable"]},"description":"**Explicit, rather than \"anything that was not a success\".**"},"maxAttempts":{"type":"integer","default":2},"backoffMs":{"type":"integer","default":500},"failoverToNextProvider":{"type":"boolean","default":true},"circuitBreaker":{"type":"object","description":"**A hundred tills each discovering an outage independently is a hundred queues.**\n","properties":{"failureThresholdPercent":{"type":"number","default":25},"windowSeconds":{"type":"integer","default":60},"minimumSample":{"type":"integer","default":20},"openForSeconds":{"type":"integer","default":300},"alertOnOpen":{"type":"boolean","default":true}}},"scopePath":{"type":"string"}}},
-"PaymentProviderConnection": {"type":"object","x-ticvai-persistence":"payments.provider_connection","description":"Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped.**","required":["code","providerKind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"providerKind":{"type":"string","enum":["gateway","psp","acquirer","walletProvider","bnplProvider"]},"environment":{"type":"string","enum":["sandbox","production"]},"credentialFingerprint":{"type":"string","readOnly":true,"description":"**Written, never read back.** Enough to confirm which key is in use without the key being retrievable from a screen.\n"},"capabilities":{"type":"object","properties":{"methods":{"type":"array","items":{"type":"string"}},"currencies":{"type":"array","items":{"type":"string"}},"partialCapture":{"type":"boolean","default":false},"multipleCapture":{"type":"boolean","default":false},"refundWindowDays":{"type":"integer","nullable":true},"tokenisation":{"type":"boolean","default":false},"threeDSecure":{"type":"boolean","default":false},"cardPresent":{"type":"boolean","default":false}}},"merchantAccountId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["draft","testing","active","degraded","disabled"]},"lastTestedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"},"credentialRef":{"type":"string","writeOnly":true,"description":"**Where the provider credential is kept** (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as `SetPaymentProviderRequest.credentialRef`. Sent on create, never returned; `credentialFingerprint` is what reads show."}}},
-"PaymentRoutingRule": {"type":"object","x-ticvai-persistence":"payments.routing_rule","description":"Boards 2.5 and 2.6. **Priority and distribution are both needed.**","required":["code"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"priority":{"type":"integer","default":0},"conditions":{"type":"object","properties":{"methodIds":{"type":"array","items":{"type":"string","format":"uuid"}},"currencies":{"type":"array","items":{"type":"string"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"channels":{"type":"array","items":{"type":"string"}},"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"cardSchemes":{"type":"array","items":{"type":"string"}},"cardIssuerCountries":{"type":"array","items":{"type":"string"}}}},"targets":{"type":"array","items":{"type":"object","properties":{"connectionId":{"type":"string","format":"uuid"},"sharePercent":{"type":"integer","nullable":true},"rank":{"type":"integer"}}}},"strategy":{"type":"string","enum":["priorityOrder","loadShare","lowestCost","highestAuthRate"],"default":"priorityOrder"},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"PaymentProviderConnection": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"payments.provider_connection","description":"Boards 2.2 and 2.4. **Capability mapping is the part that gets skipped.**","required":["code","providerKind"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"providerKind":{"type":"string","enum":["gateway","psp","acquirer","walletProvider","bnplProvider"]},"environment":{"type":"string","enum":["sandbox","production"]},"credentialFingerprint":{"type":"string","readOnly":true,"description":"**Written, never read back.** Enough to confirm which key is in use without the key being retrievable from a screen.\n"},"capabilities":{"type":"object","properties":{"methods":{"type":"array","items":{"type":"string"}},"currencies":{"type":"array","items":{"type":"string"}},"partialCapture":{"type":"boolean","default":false},"multipleCapture":{"type":"boolean","default":false},"refundWindowDays":{"type":"integer","nullable":true},"tokenisation":{"type":"boolean","default":false},"threeDSecure":{"type":"boolean","default":false},"cardPresent":{"type":"boolean","default":false}}},"merchantAccountId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["draft","testing","active","degraded","disabled"]},"lastTestedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"},"credentialRef":{"x-ticvai-secret":"vault-reference","type":"string","writeOnly":true,"description":"**Where the provider credential is kept** (4 October 2026, CHG-FXC-010; ADM-570): the vault reference the credential was stored under, as `SetPaymentProviderRequest.credentialRef`. Sent on create, never returned; `credentialFingerprint` is what reads show."}}},
+"PaymentRoutingRule": {"type":"object","x-ticvai-persistence":"payments.routing_rule","description":"Boards 2.5 and 2.6. **Priority and distribution are both needed.**","required":["code"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"priority":{"type":"integer","default":0},"conditions":{"type":"object","properties":{"methodIds":{"type":"array","items":{"type":"string","format":"uuid"}},"currencies":{"type":"array","items":{"type":"string"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"channels":{"type":"array","items":{"type":"string"}},"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"cardSchemes":{"type":"array","items":{"type":"string"}},"cardIssuerCountries":{"type":"array","items":{"type":"string"}}}},"targets":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"connectionId":{"type":"string","format":"uuid"},"sharePercent":{"type":"integer","nullable":true},"rank":{"type":"integer"}}}},"strategy":{"type":"string","enum":["priorityOrder","loadShare","lowestCost","highestAuthRate"],"default":"priorityOrder"},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "ProviderEconomics": {"type":"object","description":"Board 2.9. **Cost per transaction is a routing input.**","properties":{"connectionId":{"type":"string","format":"uuid"},"providerName":{"type":"string"},"transactions":{"type":"integer"},"grossVolume":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"schemeFees":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"interchange":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"acquirerMargin":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"fxSpread":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargebackCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"effectiveRatePercent":{"type":"number"}}},
 "ProviderHealth": {"type":"object","description":"Board 2.8. **Authorisation rate is the number, and it is not uptime.**","properties":{"connectionId":{"type":"string","format":"uuid"},"providerName":{"type":"string"},"transactions":{"type":"integer"},"authorisationRate":{"type":"number"},"baselineAuthorisationRate":{"type":"number","nullable":true},"declineRate":{"type":"number"},"errorRate":{"type":"number"},"p50LatencyMs":{"type":"integer"},"p95LatencyMs":{"type":"integer"},"circuitState":{"type":"string","enum":["closed","open","halfOpen"]},"status":{"type":"string","enum":["healthy","degraded","failing","disabled"]}}},
 "ProviderTestResult": {"type":"object","description":"Board 3.10. **A provider configured and never tested fails on the first real transaction.**\n","properties":{"connectionId":{"type":"string","format":"uuid"},"testedAt":{"type":"string","format":"date-time"},"checks":{"type":"array","items":{"type":"object","properties":{"check":{"type":"string","enum":["credentials","authorise","capture","refund","void","tokenise","webhook"]},"passed":{"type":"boolean"},"latencyMs":{"type":"integer","nullable":true},"detail":{"type":"string","nullable":true}}}},"overall":{"type":"string","enum":["pass","partial","fail"]}}},

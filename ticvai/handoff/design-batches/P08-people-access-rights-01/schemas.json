@@ -159,6 +159,8 @@
     "description": "A suggestion for an SLA problem, carried out if at all by a person or the tenant's SLA policy."
    },
    "signals": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -631,6 +633,7 @@
     "type": "integer"
    },
    "pendingApprovers": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -1059,7 +1062,8 @@
    },
    "amendedByPrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "identity.principal"
    },
    "amendedAt": {
     "type": "string",
@@ -1315,6 +1319,7 @@
     "maxLength": 200
    },
    "scopePath": {
+    "readOnly": true,
     "type": "string",
     "description": "**The partition key** (ADR-0005), and what is reviewed: every grant at or below it. Inside the caller's own scope. Operations write it at `venue` scope."
    },
@@ -2003,6 +2008,7 @@
     "format": "uuid"
    },
    "username": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "displayName": {
@@ -2643,7 +2649,8 @@
       },
       "principalId": {
        "type": "string",
-       "format": "uuid"
+       "format": "uuid",
+       "x-ticvai-references": "identity.principal"
       },
       "at": {
        "type": "string",
@@ -2702,6 +2709,7 @@
   }
  },
  "TrainingRecord": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "workforce.training_record",
   "description": "**Drafted 4 September.** One person, one course, one outcome. **The field that matters is the expiry** - a lapsed food-safety or first-aid certificate is a person who may not work a station, and a list without it is a list nobody can roster from.",
@@ -2746,6 +2754,75 @@
    }
   }
  },
+ "UpdateRotaAssignmentRequest": {
+  "type": "object",
+  "x-ticvai-persistence": "none — request only; a partial update of workforce.rota_assignment",
+  "description": "**A partial update of RotaAssignment** (the CR-089 pattern; CHG-SHP-008): `updateRotaAssignment` sends only what changes, and a field left out keeps its stored value. Nothing is required and nothing has a default, so a generated client never resends a value it did not mean to change. The server's own fields (breachesWorkingHourLimit, displayName, id, overtimeMinutes) are not sendable.",
+  "minProperties": 1,
+  "properties": {
+   "restPeriodBefore": {
+    "type": "integer",
+    "nullable": true,
+    "description": "Minutes since the previous shift ended. **The check that stops a closing shift followed by an opening one**, which is legal in most places and unsafe in all of them.\n"
+   },
+   "labourCost": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "**Cost at the point of scheduling.** A manager building a rota without seeing its cost is a manager who finds out from finance.\n"
+   },
+   "principalId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "departmentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "position": {
+    "type": "string",
+    "description": "What they are rostered to do — gate steward, cashier, lifeguard, technician. **Most positions never touch a till**, which is why a rota assignment is not a shift.\n**A position code, not a label.** It is the same value as `StaffingRules.minimumCover[].positionCode`, `OpenShift.positionCode` and `StaffingCoverage.positionCode`: coverage counts rostered people per position, so an assignment spelled differently from the rule it fills is counted against nothing and the gap stays open. Tenant-defined, which is why it is not an enum here.\n"
+   },
+   "requiredRoleId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Checked on assignment. A rota naming someone unqualified is a rota that gets overridden."
+   },
+   "workstationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Where the position needs a till. **The link between a rota and a cash session**, without merging the two.\n"
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "endsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "$ref": "#/components/schemas/RotaStatus"
+   },
+   "breakMinutes": {
+    "type": "integer",
+    "nullable": true
+   },
+   "note": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
  "WorkforceJobTitle": {
   "type": "object",
   "x-ticvai-persistence": "workforce.job_title",
@@ -2763,6 +2840,8 @@
     "format": "uuid"
    },
    "tenantId": {
+    "readOnly": true,
+    "x-ticvai-references": "none",
     "type": "string",
     "format": "uuid"
    },
@@ -2783,6 +2862,7 @@
     "type": "boolean"
    },
    "createdAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    },
@@ -2811,10 +2891,12 @@
     "format": "uuid"
    },
    "employeeId": {
+    "x-ticvai-references": "workforce.employee",
     "type": "string",
     "format": "uuid"
    },
    "jobTitleId": {
+    "x-ticvai-references": "workforce.job_title",
     "type": "string",
     "format": "uuid"
    },
@@ -2850,10 +2932,12 @@
     "type": "boolean"
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "maxLength": 30
    },
    "createdAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    }

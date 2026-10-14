@@ -19,7 +19,8 @@
    },
    "developerId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "control.developer_account"
    },
    "name": {
     "type": "string"
@@ -104,6 +105,13 @@
     "nullable": true,
     "readOnly": true,
     "description": "**A credential unused for a year is a credential nobody will notice being stolen.**\n"
+   },
+   "statusReason": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the client was suspended (`setApiClientStatus`)."
    }
   }
  },
@@ -476,6 +484,7 @@
   ]
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -487,6 +496,7 @@
   ]
  },
  "MessageDispatch": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-append-only": "queuedAt",
   "x-ticvai-persistence": "marketing.message_dispatch",
   "type": "object",
@@ -725,6 +735,7 @@
     "format": "uuid"
    },
    "username": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "displayName": {
@@ -798,7 +809,8 @@
    "developerId": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-references": "control.developer_account"
    },
    "sandboxClientId": {
     "type": "string",

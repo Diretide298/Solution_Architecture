@@ -134,10 +134,6 @@ paths:
   /rota-assignments:
     get:
       operationId: listRotaAssignments
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: in-process
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-009 Staff Roster"
         - "P06 EMP-021 Roster"
@@ -148,6 +144,10 @@ paths:
         - "P08 BO-714 Event Shift & Roster Configuration"
         - "P08 BO-883 Workforce Roster Command Center"
         - "P08 BO-884 Attraction & Operational Staffing Roster"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: The rota
       description: >
@@ -199,6 +199,12 @@ paths:
 
     post:
       operationId: createRotaAssignment
+      x-ticvai-consumed-by:
+        - "P08 BO-055 Rota & Scheduling"
+        - "P08 BO-712 Staff & Role Assignment Configuration"
+        - "P08 BO-714 Event Shift & Roster Configuration"
+        - "P08 BO-884 Attraction & Operational Staffing Roster"
+        - "P08 BO-917 Event Staff & Personnel Allocation"
       x-ticvai-read-via:
       - query: identity#delegatedAccessRecords
         route: in-process
@@ -206,12 +212,6 @@ paths:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-055 Rota & Scheduling"
-        - "P08 BO-712 Staff & Role Assignment Configuration"
-        - "P08 BO-714 Event Shift & Roster Configuration"
-        - "P08 BO-884 Attraction & Operational Staffing Roster"
-        - "P08 BO-917 Event Staff & Personnel Allocation"
       x-ticvai-audience: [staff]
       summary: Put someone on the rota
       description: >
@@ -389,16 +389,16 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: requestShiftSwap
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: in-process
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-021 Roster"
         - "P06 EMP-022 My rota"
         - "P06 EMP-023 Swap request"
         - "P08 BO-055 Rota & Scheduling"
         - "P08 BO-939 Shift Change, Swap, Pickup & Release"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Ask someone to take your shift
       description: |-
@@ -499,10 +499,6 @@ paths:
   /attendance/clock:
     post:
       operationId: recordAttendance
-      x-ticvai-read-via:
-      - query: access#accessPointRecords
-        route: service
-        for: 'its read of access.access_point, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-009 Staff Roster"
         - "P06 EMP-024 Clock in / out"
@@ -510,6 +506,10 @@ paths:
         - "P08 BO-889 Staff Check-In, Check-Out & Attendance Exceptions"
         - "P08 BO-935 Assignment Detail & Operational Brief"
         - "P08 BO-936 Mobile Staff Check-In & Check-Out"
+      x-ticvai-read-via:
+      - query: access#accessPointRecords
+        route: service
+        for: 'its read of access.access_point, Access''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Clock in, clock out, or take a break
       description: >
@@ -675,13 +675,13 @@ paths:
 
     post:
       operationId: publishAnnouncement
+      x-ticvai-consumed-by:
+        - "P06 EMP-038 Broadcast to team"
+        - "P08 BO-066 Notification Settings"
       x-ticvai-read-via:
       - query: identity#roleRecords
         route: in-process
         for: 'its read of identity.role, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P06 EMP-038 Broadcast to team"
-        - "P08 BO-066 Notification Settings"
       x-ticvai-audience: [staff]
       summary: Tell staff something
       description: >
@@ -781,14 +781,14 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getAnnouncementReach
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: in-process
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-037 Notifications"
         - "P06 EMP-038 Broadcast to team"
         - "P08 BO-066 Notification Settings"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Who has acknowledged, and who has not
       description: >
@@ -942,11 +942,11 @@ paths:
   /staffing-rules:
     put:
       operationId: setStaffingRules
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-881 Overtime & Working-Hour Rules"
         - "P08 BO-885 Minimum Staffing & Coverage Rule Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Minimum cover, working-hour limits and overtime
       description: 'Resource boards 4.3 and 3.9. **Minimum staffing is a safety rule before it is a
         cost rule.** A ride that requires two operators cannot run with one, and a rota that allows it
@@ -1197,13 +1197,13 @@ paths:
   /workforce-compliance:
     get:
       operationId: validateWorkforceCompliance
+      x-ticvai-consumed-by:
+        - "P08 BO-876 Certification & Expiry Management"
+        - "P08 BO-890 Workforce Compliance Validation Center"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-876 Certification & Expiry Management"
-        - "P08 BO-890 Workforce Compliance Validation Center"
       summary: Where the rota breaks a rule
       description: 'Resource board 4.8. **Expired qualifications, exceeded hours, missed breaks,
         under-age rostering and minimum-rest breaches** — checked against the rota before it is

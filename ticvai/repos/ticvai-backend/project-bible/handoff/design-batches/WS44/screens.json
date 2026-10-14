@@ -5,6 +5,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/product-governance-command-center-adm-128",
-   "component": "apps/venue-management-web/src/routes/catalogue/ProductGovernanceCommandCenter.tsx",
+   "component": "src/routes/catalogue/ProductGovernanceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -119,7 +120,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -148,7 +149,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -396,6 +397,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "2",
@@ -405,7 +407,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/approval-workflow-designer-adm-129",
-   "component": "apps/venue-management-web/src/routes/catalogue/ApprovalWorkflowDesigner.tsx",
+   "component": "src/routes/catalogue/ApprovalWorkflowDesigner.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -609,6 +611,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "2",
@@ -618,7 +621,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/approval-review-decision-workspace-adm-130",
-   "component": "apps/venue-management-web/src/routes/catalogue/ApprovalReviewDecisionWorkspace.tsx",
+   "component": "src/routes/catalogue/ApprovalReviewDecisionWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -750,6 +753,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "2",
@@ -759,7 +763,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/product-detail-variants/product-version-management-adm-131",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ProductDetailVariantsDetail.tsx",
+   "component": "src/routes/venue-operations/ProductDetailVariantsDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-008"
   },
@@ -919,6 +923,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "2",
@@ -928,7 +933,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/rollback-recovery-management-adm-132",
-   "component": "apps/venue-management-web/src/routes/catalogue/RollbackRecoveryManagement.tsx",
+   "component": "src/routes/catalogue/RollbackRecoveryManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1077,6 +1082,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "2",
@@ -1086,7 +1092,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/change-impact-analysis-adm-133",
-   "component": "apps/venue-management-web/src/routes/catalogue/ChangeImpactAnalysis.tsx",
+   "component": "src/routes/catalogue/ChangeImpactAnalysis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1227,6 +1233,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "2",
@@ -1236,7 +1243,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/change-propagation-dependency-control-adm-134",
-   "component": "apps/venue-management-web/src/routes/catalogue/ChangePropagationDependencyControl.tsx",
+   "component": "src/routes/catalogue/ChangePropagationDependencyControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1377,6 +1384,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "2",
@@ -1386,7 +1394,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/product-retirement-suspension-archive-adm-135",
-   "component": "apps/venue-management-web/src/routes/catalogue/ProductRetirementSuspensionArchive.tsx",
+   "component": "src/routes/catalogue/ProductRetirementSuspensionArchive.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1580,6 +1588,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "2",
@@ -1589,7 +1598,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/product-audit-trail-change-history-adm-136",
-   "component": "apps/venue-management-web/src/routes/catalogue/ProductAuditTrailChangeHistory.tsx",
+   "component": "src/routes/catalogue/ProductAuditTrailChangeHistory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1620,7 +1629,7 @@
    "template": "form",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -1777,6 +1786,7 @@
   "module": "Catalogue",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Product_Lifecycle___Catalogue_Governance_Reference.pdf",
    "board": "2",
@@ -1786,7 +1796,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/catalogue/governance-risk-ai-monitoring-control-center-adm-137",
-   "component": "apps/venue-management-web/src/routes/catalogue/GovernanceRiskAiMonitoringControlCenter.tsx",
+   "component": "src/routes/catalogue/GovernanceRiskAiMonitoringControlCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {

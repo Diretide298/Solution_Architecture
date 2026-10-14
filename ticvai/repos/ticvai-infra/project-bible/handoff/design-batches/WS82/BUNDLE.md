@@ -136,9 +136,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-436` | Group Pricing Configuration | D | 12 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-437` | Peak / Non-Peak Dynamic Pricing | D | 10 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-438` | Pricing Calendar & Exception Dates | D | 8 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-439` | Normal & VIP Pricing Configuration | D | 1 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-439` | Normal & VIP Pricing Configuration | D | 21 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-440` | Retry Price Configuration | D | 0 | 2 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-441` | Price Priority & Conflict Rules | B | 20 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-441` | Price Priority & Conflict Rules | A | 20 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-442` | Effective Pricing & Reader Price Preview | D | 6 | 10 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-443` | Pricing Audit, Approval & Publication | B | 16 | 0 | 6 | 11 | 0 | 3 | — | notStarted (—) |
 
@@ -316,6 +316,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -483,6 +485,8 @@ price:
 - `setGamePricing` → `PRICE_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_CONFIGURE`
 
 #### Requirements it meets
 
@@ -658,6 +662,8 @@ members:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_CONFIGURE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -825,6 +831,8 @@ effective: 01 Oct 2026 - 31 Mar 2027
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_CONFIGURE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -987,6 +995,8 @@ conflict: Existing Peak pricing rule overlaps this period.
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_CONFIGURE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1068,6 +1078,31 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|---|---|---|---|---|
 | Attraction: VR Racing | select field | — | — | — | — | — | — |
 
+**Sent by *Save game pricing*** (`setGamePricing`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Game `gameId` | picker: choose a game | optional | — | — | shows names, sends the id | — | `setGamePricing` body |
+| Standard price `standardPrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setGamePricing` body |
+| Vip price `vipPrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setGamePricing` body |
+| Group pricing `groupPricing` | repeatable rows | optional | — | — | — | — | `setGamePricing` body |
+| Minimum players `groupPricing[].minimumPlayers` | number field | optional | — | — | — | — | `setGamePricing` body |
+| Price per player `groupPricing[].pricePerPlayer` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setGamePricing` body |
+| Peak pricing `peakPricing` | repeatable rows | optional | — | — | — | — | `setGamePricing` body |
+| Days of week `peakPricing[].daysOfWeek` | list of values (chips) | optional | — | — | — | — | `setGamePricing` body |
+| From `peakPricing[].from` | text field | optional | — | — | — | — | `setGamePricing` body |
+| To `peakPricing[].to` | text field | optional | — | — | — | — | `setGamePricing` body |
+| Price `peakPricing[].price` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setGamePricing` body |
+| Calendar exceptions `calendarExceptions` | repeatable rows | optional | — | — | — | — | `setGamePricing` body |
+| Date `calendarExceptions[].date` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `setGamePricing` body |
+| Price `calendarExceptions[].price` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setGamePricing` body |
+| Closed `calendarExceptions[].closed` | toggle | optional | off | — | — | — | `setGamePricing` body |
+| Retry price `retryPrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `setGamePricing` body |
+| Retry window seconds `retryWindowSeconds` | number field (seconds) | optional | — | — | — | How long after the game ends the retry offer stays open. | `setGamePricing` body |
+| Retry offer lead seconds `retryOfferLeadSeconds` | number field (seconds) | optional | — | min 0 | — | When the retry offer appears (Chinmay, 2 October, workbook Q410, default accepted; DI-877; CHG-CSA-028): this many seconds before the game ends, and it stays open … | `setGamePricing` body |
+| Priority `priority` | multi-select chips | optional | — | Calendar exception · Peak · Group · Vip · Retry · Standard | — | — | `setGamePricing` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `setGamePricing` body |
+
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **attraction and prices**: Attraction picker (not a label "Attraction VR Racing"); a two-row table Customer type / Price - Normal (the standard price, read-only, link to BO-435) and VIP (money, lower than or equal to Normal unless confirmed). *(source: screens/P08-venue-back-office.yaml#BO-440 / contracts/satellite/games.yaml#/components/schemas/GamePricing)*
@@ -1081,7 +1116,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save game pricing (primary button) | navigation or local | — | — | — | — |
+| Save game pricing (primary button) | `setGamePricing` PUT `/game-pricing` | GamePricing | GamePricing | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
@@ -1148,6 +1183,8 @@ reader:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_CONFIGURE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1177,7 +1214,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (1), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (21), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-439?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Save game pricing, Cancel.
@@ -1314,6 +1351,8 @@ reader: CONTINUE? RETRY AED 10
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_CONFIGURE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1365,7 +1404,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 3 · needs the `core` module |
-| Block | Block B · ticket #29882 (VM-BO-441) |
+| Block | Block A · ticket #29882 (VM-BO-441) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1426,7 +1465,30 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listRulePriorityConflict`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Product | text | Test input: product |
+| Event | text | Test input: event |
+| Performance | text | Test input: performance |
+| Date | 1 Oct 2026 | Test input: visit/event date |
+| Timeslot | text | Test input: timeslot |
+| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Test input: channel |
+| Customer segment | text | Test input: customer segment |
+| Base price | AED 1,234.50 | Test input: base price |
+| Occupancy | 1,234.5 | Test input: occupancy percent |
+| Inventory | 1,234 | Test input: remaining inventory |
+| Booking velocity | 1,234.5 | Test input: booking velocity, percent against expected pace |
+| Time to event | 1,234 | Test input: days to event (0 = same day) |
+| Calculation path | list or chips (count when long) | Explainability: the complete calculation path, one step per line |
+| Test case | text | Test case ID |
+| Case name | text | Test case name |
+| Case type | chip: Low demand, High demand, Near sell out, Early bird, Last minute, Weekend peak… | Test case type (pack p.91) |
+| Rules matched | list or chips (count when long) | Rules matched |
+| Rule | text | Rule |
+| Rule name | text | Rule name |
 
 **Actions and what each produces**
 
@@ -1489,6 +1551,8 @@ test:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1514,7 +1578,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (20), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-441?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Reorder / Validate / Test / Save.
 - [ ] Every transition is wired: `BO-434`.
@@ -1696,6 +1760,8 @@ reader:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1845,6 +1911,8 @@ publication:
 - `listDynamicPriceRules` → `PRICE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRICE_VIEW`
 
 #### Requirements it meets
 
@@ -2013,12 +2081,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "DynamicPriceRuleDetail": {"type":"object","x-ticvai-persistence":"none — composed from a rule, its conditions and its actions","description":"**A rule is unreadable without both halves.** The conditions say when it fires, the actions say what it does to the price, and `minPrice`/`maxPrice` on the action are the guard rails a reviewer looks for first.\n","required":["rule"],"properties":{"rule":{"$ref":"#/components/schemas/PricingDynamicPriceRule"},"conditions":{"type":"array","items":{"$ref":"#/components/schemas/PricingDynamicPriceCondition"}},"actions":{"type":"array","items":{"$ref":"#/components/schemas/PricingDynamicPriceAction"}}}},
 "GamePriceResolution": {"type":"object","description":"Board 5.9. **What will this actually charge.**","properties":{"gameId":{"type":"string","format":"uuid"},"effectivePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"appliedRule":{"type":"string"},"trace":{"type":"array","items":{"type":"object","properties":{"rule":{"type":"string"},"applied":{"type":"boolean"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"skippedBecause":{"type":"string","nullable":true}}}}}},
-"GamePricing": {"type":"object","x-ticvai-persistence":"games.pricing","description":"Board 5. **Priority is explicit**, because evaluation order is not a decision anybody made.\n`groupPricing`, `peakPricing` and `calendarExceptions` are stored one row per entry in `games.pricing_exception` (`GamePricingException`); the rest of this shape is `games.pricing`.\n","properties":{"gameId":{"type":"string","format":"uuid"},"standardPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"vipPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"groupPricing":{"type":"array","items":{"type":"object","properties":{"minimumPlayers":{"type":"integer"},"pricePerPlayer":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"peakPricing":{"type":"array","items":{"type":"object","properties":{"daysOfWeek":{"type":"array","items":{"type":"string"}},"from":{"type":"string"},"to":{"type":"string"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"calendarExceptions":{"type":"array","items":{"type":"object","properties":{"date":{"type":"string","format":"date"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"closed":{"type":"boolean","default":false}}}},"retryPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"retryWindowSeconds":{"type":"integer","nullable":true,"description":"How long after the game ends the retry offer stays open."},"retryOfferLeadSeconds":{"type":"integer","minimum":0,"nullable":true,"description":"**When the retry offer appears** (Chinmay, 2 October, workbook Q410, default accepted; DI-877; CHG-CSA-028): this many seconds before the game ends, and it stays open `retryWindowSeconds` after. A retry is charged in money at `retryPrice`, never from an entitlement; a retry after a machine fault is the reader's `retryPricing`, not this."},"priority":{"type":"array","items":{"type":"string","enum":["calendarException","peak","group","vip","retry","standard"]}},"scopePath":{"type":"string"}}},
+"GamePricing": {"type":"object","x-ticvai-persistence":"games.pricing","description":"Board 5. **Priority is explicit**, because evaluation order is not a decision anybody made.\n`groupPricing`, `peakPricing` and `calendarExceptions` are stored one row per entry in `games.pricing_exception` (`GamePricingException`); the rest of this shape is `games.pricing`.\n","properties":{"gameId":{"type":"string","format":"uuid"},"standardPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"vipPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"groupPricing":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"minimumPlayers":{"type":"integer"},"pricePerPlayer":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"peakPricing":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"daysOfWeek":{"type":"array","items":{"type":"string"}},"from":{"type":"string"},"to":{"type":"string"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"calendarExceptions":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"date":{"type":"string","format":"date"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"closed":{"type":"boolean","default":false}}}},"retryPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"retryWindowSeconds":{"type":"integer","nullable":true,"description":"How long after the game ends the retry offer stays open."},"retryOfferLeadSeconds":{"type":"integer","minimum":0,"nullable":true,"description":"**When the retry offer appears** (Chinmay, 2 October, workbook Q410, default accepted; DI-877; CHG-CSA-028): this many seconds before the game ends, and it stays open `retryWindowSeconds` after. A retry is charged in money at `retryPrice`, never from an entitlement; a retry after a machine fault is the reader's `retryPricing`, not this."},"priority":{"type":"array","items":{"type":"string","enum":["calendarException","peak","group","vip","retry","standard"]}},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"PricingDynamicPriceAction": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_action","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price action.","required":["dynamicPriceRuleId","type","value"],"properties":{"id":{"type":"string","format":"uuid"},"dynamicPriceRuleId":{"type":"string","format":"uuid"},"type":{"type":"string","maxLength":30},"value":{"type":"number"},"minPrice":{"type":"number","nullable":true},"maxPrice":{"type":"number","nullable":true}}},
-"PricingDynamicPriceCondition": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_condition","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule condition.","required":["actionId","dynamicPriceRuleId","type","ruleOperator","valueJson","sequenceNo"],"properties":{"actionId":{"type":"string","format":"uuid"},"dynamicPriceRuleId":{"type":"string","format":"uuid"},"type":{"type":"string","maxLength":50},"ruleOperator":{"type":"string","maxLength":20},"valueJson":{"type":"string"},"sequenceNo":{"type":"integer"}}},
+"PricingDynamicPriceAction": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_action","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price action.","required":["dynamicPriceRuleId","type","value"],"properties":{"id":{"type":"string","format":"uuid"},"dynamicPriceRuleId":{"x-ticvai-references":"pricing.dynamic_price_rule","type":"string","format":"uuid"},"type":{"type":"string","maxLength":30},"value":{"type":"number"},"minPrice":{"type":"number","nullable":true},"maxPrice":{"type":"number","nullable":true}}},
+"PricingDynamicPriceCondition": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_condition","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule condition.","required":["actionId","dynamicPriceRuleId","type","ruleOperator","valueJson","sequenceNo"],"properties":{"actionId":{"type":"string","format":"uuid"},"dynamicPriceRuleId":{"x-ticvai-references":"pricing.dynamic_price_rule","type":"string","format":"uuid"},"type":{"type":"string","maxLength":50},"ruleOperator":{"type":"string","maxLength":20},"valueJson":{"type":"string"},"sequenceNo":{"type":"integer"}}},
 "PricingDynamicPriceRule": {"type":"object","x-ticvai-persistence":"pricing.dynamic_price_rule","description":"**Taken from the backend workbook, 20 September.** Configurable dynamic pricing component for dynamic price rule.","required":["pricingRuleCode","name","priority","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"pricingRuleCode":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"productId":{"type":"string","format":"uuid","nullable":true},"priceListId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string","nullable":true},"channelId":{"type":"string","format":"uuid","nullable":true},"priority":{"type":"integer"},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean"},"dynamicPricingStrategyId":{"type":"string","format":"uuid","nullable":true,"description":"The `catalogue.dynamic_pricing_strategy` a dynamic rule belongs to (29 September, data model DM3). Null for a static pricing rule."},"ruleType":{"type":"string","maxLength":40,"nullable":true,"description":"Static rules: `PricingRuleCommandCenterView.ruleType`; dynamic rules: the builder's `ruleKind`."},"inputMetric":{"type":"string","maxLength":40,"nullable":true},"conditionLogic":{"type":"string","enum":["all","any"],"default":"all"},"cooldownMinutes":{"type":"integer","nullable":true,"minimum":0},"minimumDurationMinutes":{"type":"integer","nullable":true,"minimum":0},"exitThresholdOffset":{"type":"number","nullable":true},"rangeMinPercent":{"type":"number","nullable":true},"rangeMaxPercent":{"type":"number","nullable":true},"isProtected":{"type":"boolean","default":false,"description":"A protected segment or channel: dynamic adjustments never apply."}}},
-"PricingPublicationEffectiveDateSchedulerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures","description":"**What Pricing Publication & Effective-Date Scheduler submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"version":{"type":"string","description":"Approved pricing version to publish"},"publicationDate":{"type":"string","format":"date-time","description":"Publish configuration at (empty for immediate)","nullable":true},"effectiveDate":{"type":"string","format":"date-time","description":"Sales effective from; must not be in the past (never retroactive)"},"expiryDate":{"type":"string","format":"date-time","description":"Expiry; empty for open-ended","nullable":true},"venue":{"type":"string","description":"Scope: venue; empty for all venues in the version","nullable":true},"market":{"type":"string","description":"Scope: market; empty for all","nullable":true},"channel":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}],"nullable":true,"description":"Scope: channel; empty for all"},"changeRequestId":{"type":"string","description":"Change request being published"},"publicationMode":{"type":"string","enum":["immediate","scheduled","futureEffectiveDate","staged"],"description":"Publication Mode (pack p.66)"},"visitEffectiveFrom":{"type":"string","format":"date","description":"Visit dates from which the new prices apply, when different from the sales effective date","nullable":true},"stages":{"type":"array","items":{"type":"object","properties":{"dimension":{"type":"string","enum":["market","venue","channel"],"description":"Staged by"},"target":{"type":"string","description":"Market, venue or channel ID"},"publicationDate":{"type":"string","format":"date-time","description":"Publish at"},"effectiveDate":{"type":"string","format":"date-time","description":"Effective from"}},"description":"One stage"},"description":"Stages for staged publication (market-by-market, venue-by-venue, channel-by-channel)"},"cancel":{"type":"boolean","description":"True cancels this scheduled publication; allowed only before activation"}}},
+"PricingPublicationEffectiveDateSchedulerInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; applied to `catalogue.change_request` (with `catalogue.audit_entry`, `catalogue.price_list_version`, `catalogue.pricing_publication`, `catalogue.pricing_publication_target`, `platform.outbox`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept","description":"**What Pricing Publication & Effective-Date Scheduler submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"version":{"type":"string","description":"Approved pricing version to publish"},"publicationDate":{"type":"string","format":"date-time","description":"Publish configuration at (empty for immediate)","nullable":true},"effectiveDate":{"type":"string","format":"date-time","description":"Sales effective from; must not be in the past (never retroactive)"},"expiryDate":{"type":"string","format":"date-time","description":"Expiry; empty for open-ended","nullable":true},"venue":{"type":"string","description":"Scope: venue; empty for all venues in the version","nullable":true},"market":{"type":"string","description":"Scope: market; empty for all","nullable":true},"channel":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}],"nullable":true,"description":"Scope: channel; empty for all"},"changeRequestId":{"type":"string","description":"Change request being published"},"publicationMode":{"type":"string","enum":["immediate","scheduled","futureEffectiveDate","staged"],"description":"Publication Mode (pack p.66)"},"visitEffectiveFrom":{"type":"string","format":"date","description":"Visit dates from which the new prices apply, when different from the sales effective date","nullable":true},"stages":{"type":"array","items":{"type":"object","properties":{"dimension":{"type":"string","enum":["market","venue","channel"],"description":"Staged by"},"target":{"type":"string","description":"Market, venue or channel ID"},"publicationDate":{"type":"string","format":"date-time","description":"Publish at"},"effectiveDate":{"type":"string","format":"date-time","description":"Effective from"}},"description":"One stage"},"description":"Stages for staged publication (market-by-market, venue-by-venue, channel-by-channel)"},"cancel":{"type":"boolean","description":"True cancels this scheduled publication; allowed only before activation"}}},
 "PricingPublicationEffectiveDateSchedulerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Pricing Publication & Effective-Date Scheduler displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"publicationDate":{"type":"string","format":"date-time","description":"Publish configuration at (empty for immediate)","nullable":true},"effectiveDate":{"type":"string","format":"date-time","description":"Sales effective from; must not be in the past (never retroactive)"},"expiryDate":{"type":"string","format":"date-time","description":"Expiry; empty for open-ended","nullable":true},"venue":{"type":"string","description":"Scope: venue; empty for all venues in the version","nullable":true},"market":{"type":"string","description":"Scope: market; empty for all","nullable":true},"channel":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}],"nullable":true,"description":"Scope: channel; empty for all"},"version":{"type":"string","description":"Approved pricing version to publish"},"changeRequestId":{"type":"string","description":"Change request being published"},"publicationMode":{"type":"string","enum":["immediate","scheduled","futureEffectiveDate","staged"],"description":"Publication Mode (pack p.66)"},"visitEffectiveFrom":{"type":"string","format":"date","description":"Visit dates from which the new prices apply, when different from the sales effective date","nullable":true},"stages":{"type":"array","items":{"type":"object","properties":{"dimension":{"type":"string","enum":["market","venue","channel"],"description":"Staged by"},"target":{"type":"string","description":"Market, venue or channel ID"},"publicationDate":{"type":"string","format":"date-time","description":"Publish at"},"effectiveDate":{"type":"string","format":"date-time","description":"Effective from"}},"description":"One stage"},"description":"Stages for staged publication (market-by-market, venue-by-venue, channel-by-channel)"},"cancel":{"type":"boolean","description":"True cancels this scheduled publication; allowed only before activation"},"prePublicationChecks":{"type":"array","items":{"type":"object","properties":{"check":{"type":"string","enum":["approvalComplete","validationPassed","noCriticalConflicts","dependenciesAvailable","channelsReady","effectiveDatesValid"],"description":"Pre-Publication Check (pack p.67)"},"passed":{"type":"boolean","description":"Passed"},"message":{"type":"string","description":"Detail, e.g. the colliding version","nullable":true}},"description":"One check"},"description":"Pre-publication check results"},"collisions":{"type":"array","items":{"type":"string"},"description":"Other versions scheduled to become effective for the same object and date"},"status":{"type":"string","description":"Status: scheduled, blocked, published, cancelled or failed"}}},
 "RulePriorityConflictInput": {"type":"object","x-ticvai-persistence":"none — request only; the saved hierarchy and test cases are the rows listRulePriorityConflict reads","description":"What `setRulePriorityConflict` takes (decided 29 September, readiness close-out; VM close-out for BO-441 Reorder, Validate, Test, Save).","required":["mode"],"properties":{"orderedRuleIds":{"type":"array","description":"The rules in priority order, highest first. Reorder is this list.","items":{"type":"string"}},"resolutionMethod":{"type":"string","enum":["highestPriorityWins","mostSpecificRuleWins","cumulativeAdjustment","maximumAdjustmentWins","minimumAdjustmentWins","weightedCombination","stopProcessing","customGovernedResolution"],"default":"highestPriorityWins","description":"How two applicable rules are resolved; the same vocabulary as `RulePriorityConflictResolutionDynamicPricingTestConsSummary.resolutionMethod`. Never lowest-price-wins by default (decided 29 September, readiness close-out)."},"priorityHierarchy":{"type":"array","description":"The priority matrix, highest first; defaults to the pack's order.","items":{"type":"string","enum":["commercialProtection","contractMemberProtection","eventSpecificStrategy","inventoryOccupancy","bookingVelocity","timeToEvent","seasonDayTimeslot","basePrice"]}},"mode":{"type":"string","enum":["save","validate","test"],"description":"`validate` checks the order and returns conflicts without saving; `test` runs `testScenario` against the order and saves it as a test case; `save` stores the order and method, refused with `409` while a critical conflict is open."},"testScenario":{"$ref":"#/components/schemas/RulePriorityTestScenario"}}},
 "RulePriorityConflictResolutionDynamicPricingTestConsSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Rule Priority, Conflict Resolution & Dynamic Pricing Test Console.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"contradictoryRules":{"type":"integer","description":"Open contradictoryRules conflicts detected across active and draft rules"},"samePriority":{"type":"integer","description":"Open samePriority conflicts detected across active and draft rules"},"impossibleCondition":{"type":"integer","description":"Open impossibleCondition conflicts detected across active and draft rules"},"overlappingStrategy":{"type":"integer","description":"Open overlappingStrategy conflicts detected across active and draft rules"},"circularDependency":{"type":"integer","description":"Open circularDependency conflicts detected across active and draft rules"},"missingFallback":{"type":"integer","description":"Open missingFallback conflicts detected across active and draft rules"},"guardrailConflict":{"type":"integer","description":"Open guardrailConflict conflicts detected across active and draft rules"},"resolutionMethod":{"type":"string","enum":["highestPriorityWins","mostSpecificRuleWins","cumulativeAdjustment","maximumAdjustmentWins","minimumAdjustmentWins","weightedCombination","stopProcessing","customGovernedResolution"],"description":"Resolution Method in force (pack p.89); defaults to highestPriorityWins (decided 29 September, readiness close-out)"},"priorityHierarchy":{"type":"array","items":{"type":"string","enum":["commercialProtection","contractMemberProtection","eventSpecificStrategy","inventoryOccupancy","bookingVelocity","timeToEvent","seasonDayTimeslot","basePrice"]},"description":"Priority Matrix, highest first; defaults to the pack's order (decided 29 September, readiness close-out)"}}},

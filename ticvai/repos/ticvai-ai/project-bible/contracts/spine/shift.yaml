@@ -192,6 +192,27 @@ x-ticvai-queries:
         pendingVariance: a count beyond the venue's threshold is cash nobody has explained; only a supervisor accepting
           it (acceptShiftVariance) or a recount within the threshold (submitShiftCount) may end it, and a timer that
           closed it would close the books over an unexplained difference
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October). Rule questions keep queries of their own, above.
+  posShiftRecords:
+    module: shift
+    table: orders.pos_shift
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The orders.pos_shift rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Orders stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ShiftVarianceReasonRequest'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Orders answers with its orders.pos_shift rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within commerce, through the C# query interface Orders implements.
+    served: [in-process]
 
 paths:
   /shifts:
@@ -210,6 +231,7 @@ paths:
         - "P08 BO-043 Daily Reconciliation"
         - "P08 BO-053 Staff Directory"
         - "P08 BO-100 Venue Home"
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # open-shift state gates workstation actions
       summary: List shifts
@@ -260,6 +282,16 @@ paths:
       operationId: openShift
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'its read of platform.venue_settings, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Open a shift
       description: >
@@ -304,6 +336,7 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
+          x-ticvai-problem-types: [shift-already-open, required-device-absent]
           description: >
             A shift is already open or suspended on this workstation (problem type
             `shift-already-open`), or a required device is absent (`required-device-absent`). A
@@ -402,6 +435,13 @@ paths:
         - "P04 POS-001 Begin Shift"
         - "P04 POS-007 Close Shift"
         - "P08 BO-1065 Currency, Timezone & Channels"
+      x-ticvai-read-via:
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'its read of platform.denomination, Tenancy''s data (CHG-MOD-001)'
+      - query: tenancy#regionSettingsRecords
+        route: in-process
+        for: 'its read of platform.region_settings, Tenancy''s data (CHG-MOD-001)'
       summary: The notes and coins a till counts
       description: >
         Raised by Tanmay in the 20 August review, and **the table was built and nothing read it** —
@@ -439,6 +479,12 @@ paths:
       operationId: setDenominations
       x-ticvai-consumed-by:
         - "P08 BO-1065 Currency, Timezone & Channels"
+      x-ticvai-read-via:
+      - query: tenancy#denominationRecords
+        route: in-process
+        for: 'its read of platform.denomination, Tenancy''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per currency, the one the body''s `currencyCode` names, within the caller''s region: a PUT replaces it whole. There is no key in the path.'
       summary: Set the notes and coins a region's tills count
       description: >
         **`listDenominations` read a table nothing wrote**, so every till's count screen was empty
@@ -494,6 +540,7 @@ paths:
         '403':
           $ref: '../shared/common.yaml#/components/responses/Forbidden'
         '422':
+          x-ticvai-problem-types: [denomination-invalid, denomination-currency-out-of-scope]
           description: >
             A zero or negative value, or two entries with the same value and kind (problem type
             `denomination-invalid`). The zero-valued coin in the original seed is exactly this. Or
@@ -512,6 +559,10 @@ paths:
         - "P04 POS-015 Cash Operations Dashboard"
         - "P04 POS-018 Safe Drop & Cash Transfer Management"
         - "P08 BO-042 Banking & Safe"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Cash boxes and who holds them
       description: >
@@ -521,6 +572,10 @@ paths:
 
         That separation is what makes a variance attributable to a person rather than to a
         counter.
+
+        **Order.** Sorted by `id` descending (a UUIDv7, so newest first).
+
+        **Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
       tags: [shift]
       x-ticvai-permission: SHIFT_OPEN
       x-ticvai-scope-level: venue
@@ -553,6 +608,13 @@ paths:
       operationId: allocateDepositBox
       x-ticvai-consumed-by:
         - "P04 POS-016 Till Configuration"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Give a cashier a box and a float
       description: >
@@ -764,6 +826,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
+          x-ticvai-problem-types: [deposit-box-not-open]
           description: >
             The box is being counted or has been counted — `closing`, `closed` or `reconciled`
             (problem type `deposit-box-not-open`). A box being counted takes nothing in or out
@@ -779,6 +842,10 @@ paths:
       operationId: closeDepositBoxes
       x-ticvai-consumed-by:
         - "P08 BO-024 Payment Exceptions"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: Close one box or all of them
       description: >
@@ -839,6 +906,7 @@ paths:
                 type: array
                 items: { $ref: '#/components/schemas/DepositBox' }
         '422':
+          x-ticvai-problem-types: [deposit-box-count-missing]
           description: >
             A box being closed has no entry in `counts`, or its entry has neither a total nor a
             denomination count (problem type `deposit-box-count-missing`, audit R123 (4)).
@@ -857,6 +925,10 @@ paths:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the session''s workstation (404 no-current-shift) (CHG-MOD-003)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # cash position drives close-out
       summary: The open or suspended shift on the session's workstation
@@ -872,6 +944,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '404':
+          x-ticvai-problem-types: [no-current-shift]
           description: >
             No shift open or suspended on this workstation, or the session has no workstation
             (problem type `no-current-shift`)
@@ -887,6 +960,10 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-025 Till Home"
         - "P06 EMP-003 Home — on duty"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the session''s workstation (404 no-current-shift) (CHG-MOD-003)'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary   # the till home shows the live shift, not a replica's
       summary: Read the open or suspended shift on the session's workstation, without the right to open one
@@ -1001,6 +1078,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '409':
+          x-ticvai-problem-types: [shift-not-awaiting-approval]
           description: Shift is not `pendingApproval` (problem type `shift-not-awaiting-approval`)
           content:
             application/problem+json:
@@ -1085,6 +1163,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
+          x-ticvai-problem-types: [shift-not-closed, fiscal-period-closed]
           description: >
             Shift is not closed (problem type `shift-not-closed`), or the fiscal period has closed
             over it (`fiscal-period-closed`)
@@ -1143,6 +1222,7 @@ paths:
               schema: { $ref: '#/components/schemas/Shift' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
+          x-ticvai-problem-types: [shift-not-open]
           description: Shift is not `open` (problem type `shift-not-open`)
           content:
             application/problem+json:
@@ -1160,6 +1240,10 @@ paths:
       operationId: resumeShift
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: in-process
+        for: 'the shift''s workstation (409 shift-already-open) (CHG-MOD-003)'
       x-ticvai-audience: [staff]
       summary: Resume a suspended shift
       description: >
@@ -1192,6 +1276,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Shift' }
         '403':
+          x-ticvai-problem-types: [not-shift-holder]
           description: >
             Not the principal who suspended it, and the caller does not hold
             SHIFT_CLOSE_OTHER (problem type `not-shift-holder`).
@@ -1199,6 +1284,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
+          x-ticvai-problem-types: [shift-already-open, shift-not-suspended]
           description: >
             Another shift is now open on this workstation (problem type `shift-already-open`), or
             this shift is not `suspended` (`shift-not-suspended`)
@@ -1286,6 +1372,12 @@ paths:
       - query: identity#verifySupervisorStepUp
         route: in-process
         for: 'the PIN step-up in `supervisorStepUp` is checked by Identity, never by reading identity.* here (CHG-CRD-004, ADAM CR-078); same deployable (commerce): the C# query interface Identity implements, in the caller''s transaction (ADR-0055 rule 2)'
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'its read of platform.venue_settings, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-step-up-reason: A supervisor closes a cashier's shift and sees the expected cash and the variance (CHG-FIN-003); their own PIN on the device in use proves who did it (pre-apply round, 2 October; CHG-CSP-012).
       x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue   # was workstation; the supervisor closes from any till or the back office (CHG-CSP-012)
@@ -1332,6 +1424,7 @@ paths:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '409':
+          x-ticvai-problem-types: [shift-not-open, open-orders-remain]
           description: >
             Shift is not `open` or `suspended` — already closing or closed (problem type
             `shift-not-open`) — or open orders remain (`open-orders-remain`)
@@ -1339,6 +1432,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '422':
+          x-ticvai-problem-types: [unknown-denomination, duplicate-denomination, count-total-mismatch]
           description: >
             A counted line names an unknown or inactive denomination (`unknown-denomination`), repeats
             one (`duplicate-denomination`), or sends a `total` that disagrees with count times face
@@ -1441,6 +1535,7 @@ paths:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
+          x-ticvai-problem-types: [shift-not-pending-variance]
           description: >
             Shift is not `pendingVariance` (problem type `shift-not-pending-variance`) — within
             tolerance, still open, or already accepted.
@@ -1623,6 +1718,13 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P06 EMP-009 End shift"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: in-process
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#venueSettingsRecords
+        route: in-process
+        for: 'its read of platform.venue_settings, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience: [staff]
       summary: The cashier's blind count, closing their own shift
       description: >
@@ -1912,6 +2014,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/NoSaleEvent' }
         '409':
+          x-ticvai-problem-types: [shift-not-open]
           description: Shift is not open (problem type `shift-not-open`)
           content:
             application/problem+json:
@@ -1936,6 +2039,7 @@ paths:
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
         - "P08 BO-041 Cash Movements"
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: primary
       summary: Lifts, adds and the opening float
@@ -2017,6 +2121,7 @@ paths:
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '409':
+          x-ticvai-problem-types: [shift-not-open, lift-exceeds-float]
           description: >
             Shift is not open (problem type `shift-not-open`), or the lift exceeds the float
             counted at the last count less lifts since (`lift-exceeds-float`, audit R123 (2))
@@ -2048,7 +2153,7 @@ components:
       required: [venueId]
       properties:
         id: { type: string, format: uuid, readOnly: true }
-        venueId: { type: string, format: uuid }
+        venueId: { type: string, format: uuid, x-ticvai-references: platform.scope }
         scopePath: { type: string, readOnly: true }
         requireOpenApproval:
           type: boolean
@@ -2139,6 +2244,7 @@ components:
             required: [denominationId, count]
             properties:
               denominationId:
+                x-ticvai-references: platform.denomination
                 type: string
                 format: uuid
                 description: >
@@ -2218,8 +2324,15 @@ components:
             When the device recorded the allocation. `allocateDepositBox` is offline-capable, so
             for a box allocated offline this differs from the server's receipt time.
         closedAt: { type: string, format: date-time, nullable: true }
+        recordedAt:
+          type: string
+          format: date-time
+          description: '**When the device made the write** (R113; CHG-OFL-003): for an allocation, the same moment as
+            `allocatedAt`, kept in `recorded_at`, the column every offline-written table carries for the sync to
+            order replays by. Omitted online, the server sets it to the time it received the call.'
 
     Denomination:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by listDenominations, setDenominations
       x-ticvai-persistence: "platform.denomination"
       description: >
         **Raised in review by Tanmay: denominations belong in a table, not in JSON.** He is right,
@@ -2236,8 +2349,12 @@ components:
         the order they sit in the drawer, and `sortOrder` is what makes the count screen match the
         physical tray."
       type: object
-      required: [currencyCode, kind, value]
+      required: [currencyCode, kind, value, scopePath]
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id: { type: string, format: uuid }
         currencyCode: { type: string }
         displayName:
@@ -2366,6 +2483,7 @@ components:
             The movement this line counts, where `countKind` is `movement`. How
             `listCashMovements` rebuilds each movement's `denominations`.
         denominationId:
+          x-ticvai-references: platform.denomination
           type: string
           format: uuid
           description: "References `platform.denomination` — face value, kind and sort order live there."
@@ -2776,7 +2894,7 @@ components:
                 description: >
                   `open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from
                   `acceptShiftVariance`.
-              principalId: { type: string, format: uuid }
+              principalId: { type: string, format: uuid, x-ticvai-references: identity.principal }
               at: { type: string, format: date-time }
               reason: { type: string }
 

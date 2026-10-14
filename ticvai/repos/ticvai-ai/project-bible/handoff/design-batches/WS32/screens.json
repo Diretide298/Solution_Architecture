@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/amendment-after-sales-command-center-bo-314",
-   "component": "apps/venue-management-web/src/routes/orders-money/AmendmentAfterSalesCommandCenter.tsx",
+   "component": "src/routes/orders-money/AmendmentAfterSalesCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -104,6 +105,7 @@
   },
   "density": "compact",
   "purposeNote": "Authorized users can monitor and manage all after-sales order activities from one centralized operational workspace.",
+  "division": "Shares `listAmendmentAfterSale`, `listAmendmentAfterSale2` with BO-323; this screen is Amendment & After-Sales Command Center (pack Order___Reservation_Management_Reference.pdf, board 2.12.2.1, page 20): provide one operational workspace for all post-sale activities affecting confirmed orders and reservations.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide one operational workspace for all post-sale activities affecting confirmed orders and reservations.",
@@ -111,7 +113,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -332,6 +334,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "2",
@@ -341,7 +344,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/order-amendment-workspace-bo-315",
-   "component": "apps/venue-management-web/src/routes/orders-money/OrderAmendmentWorkspace.tsx",
+   "component": "src/routes/orders-money/OrderAmendmentWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -614,6 +617,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "2",
@@ -623,7 +627,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/amendment-eligibility-policy-rule-builder-bo-316",
-   "component": "apps/venue-management-web/src/routes/orders-money/AmendmentEligibilityPolicyRuleBuilder.tsx",
+   "component": "src/routes/orders-money/AmendmentEligibilityPolicyRuleBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -838,6 +842,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "2",
@@ -847,7 +852,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/cancellation-partial-cancellation-policy-configuration-bo-317",
-   "component": "apps/venue-management-web/src/routes/orders-money/CancellationPartialCancellationPolicyConfigurati.tsx",
+   "component": "src/routes/orders-money/CancellationPartialCancellationPolicyConfigurati.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -990,6 +995,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "2",
@@ -999,7 +1005,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/refund-policy-refund-calculation-configuration-bo-318",
-   "component": "apps/venue-management-web/src/routes/orders-money/RefundPolicyRefundCalculationConfiguration.tsx",
+   "component": "src/routes/orders-money/RefundPolicyRefundCalculationConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1208,6 +1214,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "2",
@@ -1217,7 +1224,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/void-reversal-same-day-correction-management-bo-319",
-   "component": "apps/venue-management-web/src/routes/orders-money/VoidReversalSameDayCorrectionManagement.tsx",
+   "component": "src/routes/orders-money/VoidReversalSameDayCorrectionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1425,6 +1432,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "2",
@@ -1434,7 +1442,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/after-sales-financial-settlement-adjustment-workspace-bo-321",
-   "component": "apps/venue-management-web/src/routes/orders-money/AfterSalesFinancialSettlementAdjustmentWorkspace.tsx",
+   "component": "src/routes/orders-money/AfterSalesFinancialSettlementAdjustmentWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1600,6 +1608,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "2",
@@ -1609,7 +1618,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/approval-exception-service-recovery-management-bo-322",
-   "component": "apps/venue-management-web/src/routes/orders-money/ApprovalExceptionServiceRecoveryManagement.tsx",
+   "component": "src/routes/orders-money/ApprovalExceptionServiceRecoveryManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1779,6 +1788,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "2",
@@ -1788,7 +1798,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/amendment-history-audit-after-sales-analytics-bo-323",
-   "component": "apps/venue-management-web/src/routes/orders-money/AmendmentHistoryAuditAfterSalesAnalytics.tsx",
+   "component": "src/routes/orders-money/AmendmentHistoryAuditAfterSalesAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1803,6 +1813,7 @@
   },
   "density": "compact",
   "purposeNote": "through the final commercial, financial and credential state. Board 2 — Final Screen Register # Backend Screen Core Responsibility 12.2. Central after-sales",
+  "division": "Shares `listAmendmentAfterSale`, `listAmendmentAfterSale2` with BO-314; this screen is Amendment History, Audit & After-Sales Analytics (pack Order___Reservation_Management_Reference.pdf, board 2.12.2.10, page 35): provide complete traceability and analytical visibility across all changes made after original order creation.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population",
   "purpose": "Provide complete traceability and analytical visibility across all changes made after original order creation.",
@@ -1810,7 +1821,7 @@
    "template": "form",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {

@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORK_ORDER_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "9",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/maintenance-command-center-bo-574",
-   "component": "apps/venue-management-web/src/routes/rentals/MaintenanceCommandCenter.tsx",
+   "component": "src/routes/rentals/MaintenanceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -116,7 +117,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -276,6 +277,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "9",
@@ -285,7 +287,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/maintenance-rule-service-plan-configuration-bo-575",
-   "component": "apps/venue-management-web/src/routes/rentals/MaintenanceRuleServicePlanConfiguration.tsx",
+   "component": "src/routes/rentals/MaintenanceRuleServicePlanConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -432,6 +434,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "9",
@@ -441,7 +444,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/maintenance-calendar-scheduling-bo-576",
-   "component": "apps/venue-management-web/src/routes/rentals/MaintenanceCalendarScheduling.tsx",
+   "component": "src/routes/rentals/MaintenanceCalendarScheduling.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -593,6 +596,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "WORK_ORDER_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "9",
@@ -602,7 +606,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/maintenance-work-order-bo-577",
-   "component": "apps/venue-management-web/src/routes/rentals/MaintenanceWorkOrder.tsx",
+   "component": "src/routes/rentals/MaintenanceWorkOrder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -647,7 +651,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listWorkOrders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listWorkOrders"
       },
       {
        "kind": "detailPanel",
@@ -672,7 +677,7 @@
      ]
     },
     {
-     "name": "contextPanel",
+     "name": "contextPanelSelection",
      "slot": "selection",
      "components": [
       {
@@ -921,6 +926,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "MAINTENANCE_EXECUTE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "9",
@@ -930,7 +936,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/technician-repair-workspace-bo-578",
-   "component": "apps/venue-management-web/src/routes/rentals/TechnicianRepairWorkspace.tsx",
+   "component": "src/routes/rentals/TechnicianRepairWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -975,7 +981,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "startWorkOrder",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "startWorkOrder"
       },
       {
        "kind": "secondaryButton",
@@ -1143,6 +1150,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "9",
@@ -1152,7 +1160,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/parts-cost-maintenance-expense-tracking-bo-579",
-   "component": "apps/venue-management-web/src/routes/rentals/PartsCostMaintenanceExpenseTracking.tsx",
+   "component": "src/routes/rentals/PartsCostMaintenanceExpenseTracking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1337,6 +1345,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "9",
@@ -1346,7 +1355,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/asset-maintenance-history-lifecycle-bo-580",
-   "component": "apps/venue-management-web/src/routes/rentals/AssetMaintenanceHistoryLifecycle.tsx",
+   "component": "src/routes/rentals/AssetMaintenanceHistoryLifecycle.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1391,7 +1400,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getAssetHistory",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getAssetHistory"
       }
      ]
     }
@@ -1456,6 +1466,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "INSPECTION_SUBMIT",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "9",
@@ -1465,7 +1476,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/return-to-service-inspection-approval-bo-581",
-   "component": "apps/venue-management-web/src/routes/rentals/ReturnToServiceInspectionApproval.tsx",
+   "component": "src/routes/rentals/ReturnToServiceInspectionApproval.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1634,6 +1645,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "9",
@@ -1643,7 +1655,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/asset-retirement-write-off-replacement-recommendation-bo-582",
-   "component": "apps/venue-management-web/src/routes/rentals/AssetRetirementWriteOffReplacementRecommendation.tsx",
+   "component": "src/routes/rentals/AssetRetirementWriteOffReplacementRecommendation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1695,7 +1707,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getAssetHistory",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getAssetHistory"
       },
       {
        "kind": "secondaryButton",
@@ -1778,6 +1791,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "9",
@@ -1787,7 +1801,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/maintenance-intelligence-predictive-ai-bo-583",
-   "component": "apps/venue-management-web/src/routes/rentals/MaintenanceIntelligencePredictiveAi.tsx",
+   "component": "src/routes/rentals/MaintenanceIntelligencePredictiveAi.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1864,7 +1878,8 @@
         "Mean Time to Repair"
        ],
        "notes": "The pack groups this record's detail under its own headings: “BIKE-018”, “Instead of simply saying”, “Every 30 Days”, “Every 50 Rentals”, “Every 100 Rental Hours”, “Whichever Happens First”.",
-       "provenance": "pack Rental_Management.pdf, page 118 §Display"
+       "provenance": "pack Rental_Management.pdf, page 118 §Display",
+       "operation": "getDueMaintenance"
       }
      ]
     }

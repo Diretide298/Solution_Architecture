@@ -81,7 +81,7 @@
   "contract": "marketing-crm",
   "summary": "Escalate a case",
   "permission": "CASE_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -214,7 +214,7 @@
   "contract": "marketing-crm",
   "summary": "Reopen a resolved case",
   "permission": "CASE_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -271,7 +271,7 @@
   "contract": "marketing-crm",
   "summary": "Assign, reprioritise or resolve a case",
   "permission": "CASE_MANAGE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

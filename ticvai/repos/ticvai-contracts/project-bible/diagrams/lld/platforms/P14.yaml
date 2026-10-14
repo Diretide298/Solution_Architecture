@@ -32,7 +32,7 @@ modulesUsed:
   screens: 8
 servicesCalled:
 - service: PlatformService
-  operationCalls: 37
+  operationCalls: 36
 coverage:
   screens: 8
   inAFlow: 8
@@ -160,7 +160,6 @@ screens:
   operations:
   - createWebhookSubscription
   - listWebhookDeliveries
-  - listWebhookEventTypes
   - listWebhookSubscriptions
   - replayEvents
   states:

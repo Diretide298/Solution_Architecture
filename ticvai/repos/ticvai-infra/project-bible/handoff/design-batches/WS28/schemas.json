@@ -15,6 +15,7 @@
     "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
+    "x-ticvai-references": "catalogue.variant",
     "type": "string",
     "format": "uuid"
    },
@@ -391,6 +392,7 @@
     "format": "uuid"
    },
    "leaderSubjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -1084,6 +1086,7 @@
   ],
   "properties": {
    "groupBookingId": {
+    "x-ticvai-references": "orders.group_booking",
     "type": "string",
     "format": "uuid",
     "readOnly": true
@@ -1430,6 +1433,7 @@
   ],
   "properties": {
    "groupBookingId": {
+    "x-ticvai-references": "orders.group_booking",
     "type": "string",
     "format": "uuid",
     "readOnly": true
@@ -1466,6 +1470,7 @@
        "readOnly": true
       },
       "productId": {
+       "x-ticvai-references": "catalogue.product",
        "type": "string",
        "format": "uuid"
       },
@@ -1630,6 +1635,7 @@
   ],
   "properties": {
    "groupBookingId": {
+    "x-ticvai-references": "orders.group_booking",
     "type": "string",
     "format": "uuid",
     "readOnly": true
@@ -2126,7 +2132,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",

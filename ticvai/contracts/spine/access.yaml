@@ -183,10 +183,6 @@ paths:
   /access/validate:
     post:
       operationId: validateAccess
-      x-ticvai-read-via:
-      - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
@@ -196,6 +192,10 @@ paths:
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-latency-budget-ms: 300
       x-ticvai-audience:
       - staff
@@ -279,13 +279,13 @@ paths:
   /my/entitlements/all:
     get:
       operationId: listEntitlements
+      x-ticvai-consumed-by:
+        - "P01 WEB-018 My Tickets"
+        - "P02 GST-012 My Tickets"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-018 My Tickets"
-        - "P02 GST-012 My Tickets"
       security:
       - guestAuth: []
       x-ticvai-self-scoped: subject
@@ -343,16 +343,6 @@ paths:
   /guests/me/entitlements:
     get:
       operationId: listMyEntitlements
-      x-ticvai-read-via:
-      - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
-      - query: catalogue#productRecords
-        route: service
-        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      - query: identity#delegatedAccessRecords
-        route: service
-        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-017 My Account Dashboard"
@@ -366,6 +356,16 @@ paths:
         - "P02 GST-062 Shop & Drop Collection"
         - "P02 GST-069 Face Pass"
         - "P04 POS-002 Sell — Ticket Catalogue"
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#delegatedAccessRecords
+        route: service
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -446,6 +446,12 @@ paths:
         format: uuid
     get:
       operationId: getEntitlement
+      x-ticvai-consumed-by:
+        - "P01 WEB-018 My Tickets"
+        - "P02 GST-012 My Tickets"
+        - "P02 GST-013 Ticket Details"
+        - "P02 GST-055 Dynamic QR Ticket"
+        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
@@ -453,12 +459,6 @@ paths:
       - query: identity#delegatedAccessRecords
         route: service
         for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-018 My Tickets"
-        - "P02 GST-012 My Tickets"
-        - "P02 GST-013 Ticket Details"
-        - "P02 GST-055 Dynamic QR Ticket"
-        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -711,12 +711,12 @@ paths:
   /face-tag/enrolments:
     post:
       operationId: enrolFaceTag
+      x-ticvai-consumed-by:
+        - "P04 POS-005 Payment"
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P04 POS-005 Payment"
       x-ticvai-write-via:
       - table: pii.subject_biometric
         event: biometric.enrolmentChanged
@@ -995,6 +995,8 @@ paths:
   /face-pass/enrolments:
     post:
       operationId: enrolFacePass
+      x-ticvai-consumed-by:
+        - "P02 GST-069 Face Pass"
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
@@ -1005,8 +1007,6 @@ paths:
       - query: marketing-crm#consentRecords
         route: service
         for: 'its read of marketing.consent_record, Marketing''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P02 GST-069 Face Pass"
       x-ticvai-write-via:
       - table: marketing.consent_record
         event: biometric.enrolmentChanged
@@ -1233,13 +1233,13 @@ paths:
         format: uuid
     get:
       operationId: getFacePassEnrolment
+      x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-069 Face Pass"
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-069 Face Pass"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -1286,13 +1286,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: revokeFacePass
+      x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
+        - "P02 GST-069 Face Pass"
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P01 WEB-024 Devices, Wishlist & Consent"
-        - "P02 GST-069 Face Pass"
       x-ticvai-write-via:
       - table: pii.subject_biometric
         event: biometric.enrolmentChanged
@@ -1776,10 +1776,6 @@ paths:
   /access/override:
     post:
       operationId: overrideAccess
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: service
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
@@ -1789,6 +1785,10 @@ paths:
         - "P07 SCN-014 Sync & reconciliation"
         - "P08 BO-060 Attendance & Footfall"
         - "P08 BO-228 Manual Override & Supervisor Approval"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Admit against a failed validation
@@ -1860,16 +1860,6 @@ paths:
   /access/lookup:
     get:
       operationId: lookupTicket
-      x-ticvai-read-via:
-      - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
-      - query: identity#subjectRecords
-        route: service
-        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      - query: orders#salesOrderRecords
-        route: service
-        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
@@ -1885,6 +1875,16 @@ paths:
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
         - "P08 BO-358 Media Binding, Activation & Assignment Operations"
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#subjectRecords
+        route: service
+        for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2010,7 +2010,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     get:
       operationId: listScans
-      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P06 EMP-015 Group scan"
         - "P06 EMP-017 Sync & reconciliation"
@@ -2021,6 +2020,7 @@ paths:
         - "P08 BO-035 Override Audit"
         - "P08 BO-060 Attendance & Footfall"
         - "P08 BO-103 Access & Venue"
+      description: '**Order.** Newest first, by `recordedAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2179,10 +2179,10 @@ paths:
         format: uuid
     put:
       operationId: setTurnstileMode
-      x-ticvai-names-for-context: [access.configuration_change]
       x-ticvai-consumed-by:
         - "P07 SCN-016 Gate mode"
         - "P08 BO-230 Live Gate Mode & Lane Control"
+      x-ticvai-names-for-context: [access.configuration_change]
       x-ticvai-audience:
       - staff
       summary: Set the operating mode of an access point
@@ -2277,7 +2277,6 @@ paths:
   /access-points:
     get:
       operationId: listAccessPoints
-      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P07 SCN-002 Access point & direction"
         - "P07 SCN-016 Gate mode"
@@ -2286,6 +2285,7 @@ paths:
         - "P08 BO-148 Access Point Directory"
         - "P08 BO-194 Device & Gate Command Center"
         - "P08 BO-230 Live Gate Mode & Lane Control"
+      description: '**Order.** Sorted by `name` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2740,9 +2740,9 @@ paths:
   /blacklist:
     get:
       operationId: listBlacklist
-      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `addedByPrincipalId`.'
       x-ticvai-consumed-by:
         - "P08 BO-033 Blacklist Management"
+      description: '**Order.** Soonest first, by `expiresAt` ascending, then by `addedByPrincipalId`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: primary
@@ -2897,10 +2897,6 @@ paths:
   /access/group-validate:
     post:
       operationId: validateGroupAccess
-      x-ticvai-read-via:
-      - query: catalogue#entitlementTemplateRecords
-        route: service
-        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P06 EMP-010 Scan — ready"
         - "P06 EMP-015 Group scan"
@@ -2910,6 +2906,10 @@ paths:
         - "P07 SCN-013 Offline journal"
         - "P07 SCN-014 Sync & reconciliation"
         - "P08 BO-060 Attendance & Footfall"
+      x-ticvai-read-via:
+      - query: catalogue#entitlementTemplateRecords
+        route: service
+        for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Admit a group on one read
@@ -3054,6 +3054,8 @@ paths:
   /virtual-ticket:
     get:
       operationId: listVirtualTicket
+      x-ticvai-consumed-by:
+        - "P08 BO-334 Virtual Ticket Command Center"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
@@ -3067,8 +3069,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-334 Virtual Ticket Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.4-5 (15.1.1); MoM 2
@@ -3238,10 +3238,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setVirtualTicketIdentity
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-335 Virtual Ticket Identity & Master Record Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.6-7 (15.1.2); MoM 2
@@ -3676,12 +3676,12 @@ paths:
   /media-replacement-revocation/{replacementReason}:
     put:
       operationId: setMediaReplacementRevocation
+      x-ticvai-consumed-by:
+        - "P08 BO-342 Media Replacement, Revocation & Rebinding Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'the product replacementFeeReference names (422 unknown-product) (CHG-MOD-003)'
-      x-ticvai-consumed-by:
-        - "P08 BO-342 Media Replacement, Revocation & Rebinding Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: VM close-out; pack ''Ticket Media & Credential Management'' p.16 (BO-342)'
@@ -3740,12 +3740,12 @@ paths:
   /virtual-ticket-architecture:
     get:
       operationId: listVirtualTicketArchitecture
+      x-ticvai-consumed-by:
+        - "P08 BO-343 Virtual Ticket Architecture Testing, Governance & Audit"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-343 Virtual Ticket Architecture Testing, Governance & Audit"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.17-22 (15.1.10); MoM
@@ -3896,10 +3896,10 @@ paths:
   /digital-barcode-ticket:
     put:
       operationId: setDigitalBarcodeTicket
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-345 Digital QR & Barcode Ticket Designer"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.24-25 (15.2.2); MoM
@@ -3959,9 +3959,9 @@ paths:
   /pdf-printable-pos:
     get:
       operationId: getPdfPrintablePos
-      x-ticvai-names-for-context: [access.configuration_change]
       x-ticvai-consumed-by:
         - "P08 BO-346 PDF, Printable & POS Ticket Designer"
+      x-ticvai-names-for-context: [access.configuration_change]
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: The printable ticket design as saved
@@ -4001,10 +4001,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPdfPrintablePos
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-346 PDF, Printable & POS Ticket Designer"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.26 (15.2.3); MoM 15
@@ -4058,10 +4058,10 @@ paths:
   /apple-wallet-pass:
     put:
       operationId: setAppleWalletPass
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-347 Apple Wallet Pass Designer"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.27-28 (15.2.4); MoM
@@ -4122,10 +4122,10 @@ paths:
   /google-wallet-pass:
     put:
       operationId: setGoogleWalletPass
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-348 Google Wallet Pass Designer"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.29 (15.2.5); MoM 2 Sep
@@ -4184,10 +4184,10 @@ paths:
   /rfid-nfc-card:
     put:
       operationId: setRfidNfcCard
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.30 (15.2.6); MoM 2 Sep
@@ -4243,10 +4243,10 @@ paths:
   /digital-card-membership:
     put:
       operationId: setDigitalCardMembership
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-350 Digital Card, Membership & Wearable Designer"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.31 (15.2.7); MoM 2 Sep
@@ -4301,10 +4301,10 @@ paths:
   /dynamic-field-data:
     put:
       operationId: setDynamicFieldData
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per dynamic field, the one the body''s `fieldKey` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-351 Dynamic Fields, Data Mapping & Content Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per dynamic field, the one the body''s `fieldKey` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.32-33 (15.2.8); our
@@ -4409,10 +4409,10 @@ paths:
       x-ticvai-bounded: branding profiles per inheritance level, defined by hand
     put:
       operationId: setBrandingLocalizationTemplate
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per scope node, the one the body''s `scopeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-352 Branding, Localization & Template Inheritance"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per scope node, the one the body''s `scopeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -4467,10 +4467,10 @@ paths:
   /multi-media-preview:
     put:
       operationId: approveMultiMediaPreview
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-353 Multi-Media Preview, Testing, Approval & Publication"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket media template, the one the body''s `templateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.36-40 (15.2.10); MoM
@@ -4531,6 +4531,8 @@ paths:
   /credential:
     get:
       operationId: listCredential
+      x-ticvai-consumed-by:
+        - "P08 BO-354 Credential Operations Command Center"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
@@ -4538,8 +4540,6 @@ paths:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-354 Credential Operations Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.41-42 (15.3.1); MoM
@@ -4743,6 +4743,8 @@ paths:
   /credential-generation-issuance:
     get:
       operationId: listCredentialGenerationIssuance
+      x-ticvai-consumed-by:
+        - "P08 BO-356 Credential Generation & Issuance Monitor"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
@@ -4750,8 +4752,6 @@ paths:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-356 Credential Generation & Issuance Monitor"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.45-46 (15.3.3); our
@@ -4834,12 +4834,12 @@ paths:
   /credential-delivery-distribution:
     get:
       operationId: listCredentialDeliveryDistribution
+      x-ticvai-consumed-by:
+        - "P08 BO-357 Credential Delivery & Distribution Operations"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-357 Credential Delivery & Distribution Operations"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.47 (15.3.4); our build
@@ -4910,15 +4910,15 @@ paths:
   /media-binding-activation:
     put:
       operationId: setMediaBindingActivation
+      x-ticvai-consumed-by:
+        - "P06 EMP-036 Issue media"
+        - "P08 BO-358 Media Binding, Activation & Assignment Operations"
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per virtual ticket, the one the body''s `virtualTicketId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P06 EMP-036 Issue media"
-        - "P08 BO-358 Media Binding, Activation & Assignment Operations"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.48-49 (15.3.5); MoM
@@ -5025,12 +5025,12 @@ paths:
   /failed-generation-delivery:
     get:
       operationId: listFailedGenerationDelivery
+      x-ticvai-consumed-by:
+        - "P08 BO-360 Failed Generation, Delivery & Credential Exception Management"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-360 Failed Generation, Delivery & Credential Exception Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.51-52 (15.3.7); our
@@ -5174,13 +5174,13 @@ paths:
   /credential-security-operational:
     get:
       operationId: listCredentialSecurityOperational
+      x-ticvai-consumed-by:
+        - "P08 BO-173 Credential Security Simulation, Audit & Publication"
+        - "P08 BO-362 Credential Security, Audit & Operational Evidence"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-173 Credential Security Simulation, Audit & Publication"
-        - "P08 BO-362 Credential Security, Audit & Operational Evidence"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.54-55 (15.3.9); MoM
@@ -5256,12 +5256,12 @@ paths:
   /ticket-media:
     get:
       operationId: listTicketMedia
+      x-ticvai-consumed-by:
+        - "P08 BO-363 Ticket Media Analytics & AI Operations Intelligence"
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-363 Ticket Media Analytics & AI Operations Intelligence"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Ticket Media & Credential Management'' p.56-58 (15.3.10); MoM
@@ -5370,12 +5370,12 @@ paths:
   /access:
     get:
       operationId: listAccess
+      x-ticvai-consumed-by:
+        - "P08 BO-144 Access Control Command Center"
       x-ticvai-read-via:
       - query: cross-region#rejectionRecords
         route: service
         for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-144 Access Control Command Center"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -5567,10 +5567,10 @@ paths:
   /access-area-zone:
     put:
       operationId: setAccessAreaZone
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access zone, the one the body''s `zoneId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-146 Access Area & Zone Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access zone, the one the body''s `zoneId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.8 [Create], [Each zone receives]; our
@@ -5624,10 +5624,10 @@ paths:
   /attraction-access:
     put:
       operationId: setAttractionAccess
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per attraction, the one the body''s `attractionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-147 Attraction Access Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per attraction, the one the body''s `attractionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.9 [For each attraction], [Eligibility]
@@ -5681,10 +5681,10 @@ paths:
   /gate-lane:
     put:
       operationId: setGateLane
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per gate, the one the body''s `gateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-149 Gate & Lane Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per gate, the one the body''s `gateId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.11 [Direction], [Gate type], [Operational
@@ -5742,14 +5742,14 @@ paths:
   /access-graphical-map:
     put:
       operationId: setAccessGraphicalMap
+      x-ticvai-consumed-by:
+        - "P08 BO-150 Access Control Graphical Map Designer"
       x-ticvai-read-via:
       - query: venue-map#mapRecords
         route: service
         for: 'its read of venuemap.map, VenueOps''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue access map, the one the body''s `mapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-150 Access Control Graphical Map Designer"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.12 [Administrator uploads], [AI can
@@ -5900,10 +5900,10 @@ paths:
   /topology-validation:
     put:
       operationId: publishTopologyValidation
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access configuration version, the one the body''s `configurationVersionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-153 Topology Validation & Publication"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access configuration version, the one the body''s `configurationVersionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.14 [Configuration lifecycle], [Publication
@@ -6086,10 +6086,10 @@ paths:
   /visual-access-rule:
     put:
       operationId: setVisualAccessRule
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-155 Visual Access Rule Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.18 [WHEN]/[IF]/[THEN]/[AND perform
@@ -6245,12 +6245,12 @@ paths:
   /access-validity-time:
     get:
       operationId: listAccessValidityTime
+      x-ticvai-consumed-by:
+        - "P08 BO-158 Access Validity & Time Rules"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-158 Access Validity & Time Rules"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -6615,14 +6615,14 @@ paths:
   /rule-conflict-check:
     put:
       operationId: publishRuleConflictCheck
+      x-ticvai-consumed-by:
+        - "P08 BO-163 Rule Simulation, Conflict Check & Publication"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per access rule version, the one the body''s `ruleVersionId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-163 Rule Simulation, Conflict Check & Publication"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.26 [Decision Trace], [For denial],
@@ -6741,10 +6741,10 @@ paths:
   /dynamic-security-profile:
     put:
       operationId: setDynamicSecurityProfile
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per dynamic QR security profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-165 Dynamic QR Security Profile Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per dynamic QR security profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.30 [QR Mode], [Options], [Configuration
@@ -6915,12 +6915,12 @@ paths:
   /device-binding-session:
     get:
       operationId: listDeviceBindingSession
+      x-ticvai-consumed-by:
+        - "P08 BO-167 Device Binding & Session Security"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-167 Device Binding & Session Security"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.33 [Device Change], [Show], [Response];
@@ -7007,10 +7007,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBleBeaconGeofence
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per beacon, the one the body''s `beaconId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-168 BLE Beacon & Geofence Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per beacon, the one the body''s `beaconId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.34 [Configure], [Support], [Example]
@@ -7070,12 +7070,12 @@ paths:
   /credential-transfer-rebinding:
     get:
       operationId: listCredentialTransferRebinding
+      x-ticvai-consumed-by:
+        - "P08 BO-169 Credential Transfer & Rebinding"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-169 Credential Transfer & Rebinding"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -7221,10 +7221,10 @@ paths:
   /embedded-entitlement-payload:
     put:
       operationId: setEmbeddedEntitlementPayload
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per payload profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-172 Embedded Entitlement Payload Designer"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per payload profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.38 [Identity]/[Access]/[Validity]/[Entitlements],
@@ -7556,13 +7556,13 @@ paths:
   /virtual-credential-media:
     get:
       operationId: listVirtualCredentialMedia
+      x-ticvai-consumed-by:
+        - "P08 BO-174 Media & Credential Command Center"
+        - "P08 BO-176 Virtual Credential & Media Association"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-174 Media & Credential Command Center"
-        - "P08 BO-176 Virtual Credential & Media Association"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.46 (4.3); MoM 2 Sep 2026 key decision
@@ -7845,10 +7845,10 @@ paths:
   /rfid-nfc:
     put:
       operationId: setRfidNfc
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per RFID/NFC profile, the one the body''s `rfidNfcProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-180 RFID & NFC Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per RFID/NFC profile, the one the body''s `rfidNfcProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.50 (4.7); pack ''Access Control Module''
@@ -8070,10 +8070,10 @@ paths:
   /media-compatibility-testing:
     put:
       operationId: publishMediaCompatibilityTesting
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per media profile, the one the body''s `mediaProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-183 Media Compatibility, Testing & Publication"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per media profile, the one the body''s `mediaProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.54 (4.10); MoM 2 Sep 2026 (media compatibility
@@ -8132,12 +8132,12 @@ paths:
   /biometric-access:
     get:
       operationId: listBiometricAccess
+      x-ticvai-consumed-by:
+        - "P08 BO-184 Biometric Access Command Center"
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-184 Biometric Access Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.56 (5.1); MoM 2 Sep 2026 (Face Pass
@@ -8218,10 +8218,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBiometricVerificationProfile
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per biometric verification profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-185 Biometric Verification Profile Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per biometric verification profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.58 (5.2); MoM 2 Sep 2026 (Face Pass,
@@ -8304,10 +8304,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFacePassEnrollment
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-186 Face Pass Enrollment Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.59 (5.3); MoM 2 Sep 2026 (enrolment
@@ -8712,12 +8712,12 @@ paths:
   /face-change-enrollment:
     get:
       operationId: listFaceChangeEnrollment
+      x-ticvai-consumed-by:
+        - "P08 BO-190 Face Change, Re-enrollment & Identity Protection"
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-190 Face Change, Re-enrollment & Identity Protection"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.63 (5.7); MoM 2 Sep 2026 (re-enrolment;
@@ -8823,12 +8823,12 @@ paths:
   /biometric-lifecycle-retention:
     get:
       operationId: listBiometricLifecycleRetention
+      x-ticvai-consumed-by:
+        - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-read-via:
       - query: tenancy#dataRetentionSettingRecords
         route: service
         for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-audience:
       - staff
       x-ticvai-provisional: true
@@ -8879,12 +8879,12 @@ paths:
   /biometric-lifecycle-retention/{retentionSettingId}:
     put:
       operationId: setBiometricLifecycleRetention
+      x-ticvai-consumed-by:
+        - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-read-via:
       - query: tenancy#dataRetentionSettingRecords
         route: service
         for: 'its read of tenancy.data_retention_setting, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-write-via:
       - table: tenancy.data_retention_setting
         operation: setDataRetentionSetting
@@ -9248,10 +9248,10 @@ paths:
   /turnstile-lane-behavior:
     put:
       operationId: setTurnstileLaneBehavior
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access point, the one the body''s `accessPointId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-197 Turnstile & Lane Behavior Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access point, the one the body''s `accessPointId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.74 (6.4); MoM 2 Sep 2026 (turnstile
@@ -9310,10 +9310,10 @@ paths:
   /validation-outcome-guest:
     put:
       operationId: setValidationOutcomeGuest
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per outcome profile, the one the body''s `outcomeProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-198 Validation Outcome & Guest Feedback Designer"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per outcome profile, the one the body''s `outcomeProfileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.76 (6.5); MoM 2 Sep 2026 (light and
@@ -9370,10 +9370,10 @@ paths:
   /reader-scanner-peripheral:
     put:
       operationId: setReaderScannerPeripheral
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access point, the one the body''s `accessPointId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-199 Reader, Scanner & Peripheral Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access point, the one the body''s `accessPointId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.77 (6.6); MoM 2 Sep 2026 (handheld
@@ -9427,10 +9427,10 @@ paths:
   /handheld-mobile-access:
     put:
       operationId: setHandheldMobileAccess
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per handheld device profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-200 Handheld & Mobile Access Device Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per handheld device profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.78 (6.7); MoM 15 Sep 2026 (devices
@@ -9539,10 +9539,10 @@ paths:
   /device-software-content:
     put:
       operationId: setDeviceSoftwareContent
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per device group, the one the body''s `deviceGroupId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-202 Device Software, Content & Remote Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per device group, the one the body''s `deviceGroupId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.81 (6.9); MoM 15 Sep 2026 (remote configuration
@@ -9662,6 +9662,8 @@ paths:
   /offline-edge:
     get:
       operationId: listOfflineEdge
+      x-ticvai-consumed-by:
+        - "P08 BO-204 Offline & Edge Operations Command Center"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
@@ -9669,8 +9671,6 @@ paths:
       - query: cross-region#rejectionRecords
         route: service
         for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-204 Offline & Edge Operations Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 7.1 p.86; MoM 2 Sep 2026 (offline: devices
@@ -9725,10 +9725,10 @@ paths:
   /edge-node-local:
     put:
       operationId: setEdgeNodeLocal
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per edge node, the one the body''s `edgeNodeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-205 Edge Node & Local Processing Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per edge node, the one the body''s `edgeNodeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 7.2 p.87; MoM 2 Sep 2026 (offline local
@@ -9982,12 +9982,12 @@ paths:
   /reconnection-synchronization-conflict:
     get:
       operationId: listReconnectionSynchronizationConflict
+      x-ticvai-consumed-by:
+        - "P08 BO-211 Reconnection, Synchronization & Conflict Resolution"
       x-ticvai-read-via:
       - query: cross-region#rejectionRecords
         route: service
         for: 'its read of sync.rejection, CrossRegion''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-211 Reconnection, Synchronization & Conflict Resolution"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 7.8 p.94; MoM 2 Sep 2026 (sync on reconnect;
@@ -10041,14 +10041,14 @@ paths:
   /offline-resilience-testing:
     put:
       operationId: simulateOfflineResilienceTesting
+      x-ticvai-consumed-by:
+        - "P08 BO-212 Offline Simulation & Resilience Testing"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-212 Offline Simulation & Resilience Testing"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 7.9 p.95; MoM 2 Sep 2026 (rule simulation
@@ -10214,10 +10214,10 @@ paths:
   /group-admission-profile:
     put:
       operationId: setGroupAdmissionProfile
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per group admission profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-215 Group & B2B Admission Profile Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per group admission profile, the one the body''s `profileId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 8.2 p.102; MoM 2 Sep 2026 (group admission:
@@ -10271,6 +10271,8 @@ paths:
   /group-leader-fast:
     get:
       operationId: listGroupLeaderFast
+      x-ticvai-consumed-by:
+        - "P08 BO-216 Group Leader & Fast B2B Validation"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
@@ -10278,8 +10280,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-216 Group Leader & Fast B2B Validation"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 8.3 p.103; MoM 2 Sep 2026 (one QR scanned
@@ -10336,6 +10336,8 @@ paths:
   /group-attendance-partial:
     get:
       operationId: listGroupAttendancePartial
+      x-ticvai-consumed-by:
+        - "P08 BO-217 Group Attendance & Partial Entry Manager"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
@@ -10343,8 +10345,6 @@ paths:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-217 Group Attendance & Partial Entry Manager"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 8.4 p.104; MoM 2 Sep 2026 (group headcount
@@ -10401,12 +10401,12 @@ paths:
   /family-child-pod:
     get:
       operationId: listFamilyChildPod
+      x-ticvai-consumed-by:
+        - "P08 BO-218 Family, Child, POD & Companion Journey"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-218 Family, Child, POD & Companion Journey"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10556,12 +10556,12 @@ paths:
   /fast-pass-attraction:
     get:
       operationId: listFastPassAttraction
+      x-ticvai-consumed-by:
+        - "P08 BO-221 Fast Pass & Attraction Access Journey"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-221 Fast Pass & Attraction Access Journey"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10716,12 +10716,12 @@ paths:
   /podium-console:
     get:
       operationId: listPodiumConsole
+      x-ticvai-consumed-by:
+        - "P08 BO-225 Podium Operations Console"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-225 Podium Operations Console"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -10773,6 +10773,8 @@ paths:
   /ticket-credential-investigation:
     get:
       operationId: listTicketCredentialInvestigation
+      x-ticvai-consumed-by:
+        - "P08 BO-226 Ticket & Credential Investigation Console"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
@@ -10786,8 +10788,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-226 Ticket & Credential Investigation Console"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 9.3 p.118; MoM 2 Sep 2026 (ticket lookup
@@ -11221,10 +11221,10 @@ paths:
   /operational-incident-exception:
     put:
       operationId: setOperationalIncidentException
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per incident, the one the body''s `incidentId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-232 Operational Incident & Exception Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per incident, the one the body''s `incidentId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 9.9 p.127; MoM 2 Sep 2026 (fraud assessment
@@ -11284,12 +11284,12 @@ paths:
   /shift-handover-summary:
     get:
       operationId: listShiftHandoverSummary
+      x-ticvai-consumed-by:
+        - "P08 BO-233 Operations Audit, Shift Handover & Control Summary"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-233 Operations Audit, Shift Handover & Control Summary"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' 9.10 p.128; MoM 2 Sep 2026 (every override
@@ -11519,11 +11519,11 @@ paths:
   /visual-dynamic-policy:
     put:
       operationId: setVisualDynamicPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per dynamic policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-236 Visual Dynamic Policy Builder"
         - "P08 BO-238 Identity, Membership & Accreditation Policies"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per dynamic policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.136 (10.3 IF/AND/OR/NOT/IN builder,
@@ -11582,10 +11582,10 @@ paths:
   /context-time-event:
     put:
       operationId: setContextTimeEvent
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per access policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-237 Context, Time, Event & Capacity Policy Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per access policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.137 (10.4 Support list, occupancy bands
@@ -11790,6 +11790,8 @@ paths:
   /authorization-governance-temporary:
     get:
       operationId: listAuthorizationGovernanceTemporary
+      x-ticvai-consumed-by:
+        - "P08 BO-240 Authorization Governance & Temporary Access"
       x-ticvai-read-via:
       - query: identity#delegatedAccessRecords
         route: service
@@ -11797,8 +11799,6 @@ paths:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-240 Authorization Governance & Temporary Access"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.142 (10.7 Emergency Access Grant with
@@ -11904,14 +11904,14 @@ paths:
   /policy-conflict-impact:
     put:
       operationId: simulatePolicyConflictImpact
+      x-ticvai-consumed-by:
+        - "P08 BO-242 Policy Simulation, Conflict & Impact Analysis"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per access policy, the one the body''s `policyId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-242 Policy Simulation, Conflict & Impact Analysis"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.144 (10.9 scenario results, Show list,
@@ -12215,12 +12215,12 @@ paths:
   /unified-identity-credential:
     get:
       operationId: listUnifiedIdentityCredential
+      x-ticvai-consumed-by:
+        - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-read-via:
       - query: identity#subjectRecords
         route: service
         for: 'its read of pii.subject, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.155 (11.4 Select, Lock Duration, propagation
@@ -12277,12 +12277,12 @@ paths:
   /biometric-identity-integrity:
     get:
       operationId: listBiometricIdentityIntegrity
+      x-ticvai-consumed-by:
+        - "P08 BO-248 Biometric & Identity Integrity Monitoring"
       x-ticvai-read-via:
       - query: identity#subjectBiometricRecords
         route: service
         for: 'its read of pii.subject_biometric, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-248 Biometric & Identity Integrity Monitoring"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.156 (11.5 Monitor list, Record list,
@@ -12427,10 +12427,10 @@ paths:
   /real-time-security:
     put:
       operationId: setRealTimeSecurity
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per security playbook, the one the body''s `playbookId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-251 Real-Time Security Response & Playbook Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per security playbook, the one the body''s `playbookId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.161 (11.8 trigger Risk Score > 75,
@@ -12485,11 +12485,11 @@ paths:
   /security-investigation-evidence:
     put:
       operationId: setSecurityInvestigationEvidence
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per investigation, the one the body''s `investigationId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-248 Biometric & Identity Integrity Monitoring"
         - "P08 BO-252 Security Investigation & Evidence Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per investigation, the one the body''s `investigationId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.162 (11.9 Automatically correlate,
@@ -12662,12 +12662,12 @@ paths:
   /access-monitoring:
     get:
       operationId: listAccessMonitoring
+      x-ticvai-consumed-by:
+        - "P08 BO-254 Access Monitoring & Analytics Command Center"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-254 Access Monitoring & Analytics Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.168 (12.1 Show tiles, Venue Comparison
@@ -12769,6 +12769,8 @@ paths:
   /graphical-access-map:
     get:
       operationId: listGraphicalAccessMap
+      x-ticvai-consumed-by:
+        - "P08 BO-256 Graphical Access Map & Live Gate Performance"
       x-ticvai-read-via:
       - query: venue-map#mapRecords
         route: service
@@ -12776,8 +12778,6 @@ paths:
       - query: venue-map#pointRecords
         route: service
         for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-256 Graphical Access Map & Live Gate Performance"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.171 (12.3 Display point kinds, Status,
@@ -12841,6 +12841,8 @@ paths:
   /attendance-admission:
     get:
       operationId: listAttendanceAdmission
+      x-ticvai-consumed-by:
+        - "P08 BO-257 Attendance & Admission Analytics"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
@@ -12851,8 +12853,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-257 Attendance & Admission Analytics"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.172 (12.4 Show, Analyze by); MoM 7
@@ -12968,12 +12968,12 @@ paths:
   /entry-exit-crossover:
     get:
       operationId: listEntryExitCrossover
+      x-ticvai-consumed-by:
+        - "P08 BO-258 Entry, Exit, Re-entry & Crossover Analytics"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-258 Entry, Exit, Re-entry & Crossover Analytics"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -13061,6 +13061,8 @@ paths:
   /validation-outcome-rejection:
     get:
       operationId: listValidationOutcomeRejection
+      x-ticvai-consumed-by:
+        - "P08 BO-260 Validation Outcome & Rejection Analytics"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
@@ -13068,8 +13070,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-260 Validation Outcome & Rejection Analytics"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Access Control Module'' p.176 (12.7 Outcome Distribution, reason
@@ -13171,6 +13171,8 @@ paths:
   /guest-dwell-time:
     get:
       operationId: listGuestDwellTime
+      x-ticvai-consumed-by:
+        - "P08 BO-261 Guest Dwell Time, Length of Stay & Attraction Flow"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
@@ -13178,8 +13180,6 @@ paths:
       - query: venue-map#pointRecords
         route: service
         for: 'its read of venuemap.point, VenueOps''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-261 Guest Dwell Time, Length of Stay & Attraction Flow"
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       x-ticvai-audience:
@@ -13705,12 +13705,12 @@ paths:
   /guest-journey/simulate:
     post:
       operationId: simulateGuestJourney
+      x-ticvai-consumed-by:
+        - "P08 BO-223 Journey Simulation, Audit & Publication"
       x-ticvai-read-via:
       - query: catalogue#entitlementTemplateRecords
         route: service
         for: 'its read of catalogue.entitlement_template, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-223 Journey Simulation, Audit & Publication"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: VM close-out; pack ''Access Control Module'' p.111 (BO-223); label ''Free
@@ -13779,10 +13779,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setCredentialIssuanceRetryPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-356 Credential Generation & Issuance Monitor"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: venue
@@ -14254,15 +14254,15 @@ paths:
   /offline-policies:
     put:
       operationId: setGateOfflinePolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-names-for-context: [access.edge_package]
       x-ticvai-consumed-by:
         - "P08 BO-171 Offline Cryptographic Validation Profile"
         - "P08 BO-206 Offline Validation Policy Builder"
         - "P08 BO-208 Offline Credential & Revocation Cache"
         - "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
         - "P08 BO-471 Offline, Synchronization & Recovery Monitor"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
+      x-ticvai-names-for-context: [access.edge_package]
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listOfflineCryptographicValidation, listOfflineCredentialRevocation
@@ -14653,9 +14653,9 @@ paths:
   /device-placements:
     post:
       operationId: placeAccessDevice
-      x-ticvai-names-for-context: [platform.device]
       x-ticvai-consumed-by:
         - "P08 BO-196 Physical Device Registration & Provisioning"
+      x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listPhysicalDeviceRegistration reads (pack ''Access
@@ -14740,9 +14740,9 @@ paths:
         format: uuid
     put:
       operationId: updateAccessDevicePlacement
-      x-ticvai-names-for-context: [platform.device]
       x-ticvai-consumed-by:
         - "P08 BO-196 Physical Device Registration & Provisioning"
+      x-ticvai-names-for-context: [platform.device]
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listPhysicalDeviceRegistration reads (pack ''Access
@@ -15350,11 +15350,11 @@ paths:
   /credential-event-propagation-rules:
     put:
       operationId: setCredentialEventPropagationRule
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per ticket lifecycle event, the one the body''s `triggerEvent` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-170 Credential Revocation & Lifecycle Events"
         - "P08 BO-340 Entitlement & Cross-Media Synchronization Rules"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per ticket lifecycle event, the one the body''s `triggerEvent` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listEntitlementCrossMedia and listCredentialRevocationLifecycle
@@ -15552,10 +15552,10 @@ paths:
   /ticket-status-transitions:
     put:
       operationId: setTicketStatusTransition
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per status transition (fromStatus, toStatus), the one the body''s `fromStatus` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-336 Virtual Ticket Status & Lifecycle Model"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per status transition (fromStatus, toStatus), the one the body''s `fromStatus` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listVirtualTicketStatus reads (pack ''Ticket
@@ -15629,14 +15629,14 @@ paths:
   /verification-method-policies:
     put:
       operationId: setVerificationMethodPolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-177 Verification Method Selection & Locking"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per product, the one the body''s `productId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-177 Verification Method Selection & Locking"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listVerificationMethodSelection reads (pack ''Access
@@ -15710,10 +15710,10 @@ paths:
   /device-binding-policy:
     put:
       operationId: setDeviceBindingPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-167 Device Binding & Session Security"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listDeviceBindingSession reads (pack ''Access
@@ -16186,10 +16186,10 @@ paths:
   /policy-evaluation-settings:
     put:
       operationId: setPolicyEvaluationSetting
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per policy category, the one the body''s `policyCategory` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-241 Policy Evaluation Architecture & Offline Distribution"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per policy category, the one the body''s `policyCategory` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listPolicyEvaluationArchitecture reads (pack
@@ -16264,10 +16264,10 @@ paths:
   /risk-scoring-config:
     put:
       operationId: setRiskScoringConfig
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-250 Access Risk Scoring & Decision Engine"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listAccessRiskScoring reads (pack ''Access Control
@@ -16328,10 +16328,10 @@ paths:
   /relationship-fraud-rules:
     put:
       operationId: setRelationshipFraudRule
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per relationship fraud rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-249 Relationship & Companion Fraud Monitoring"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per relationship fraud rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; writes the table listRelationshipCompanionFraud reads (pack ''Access

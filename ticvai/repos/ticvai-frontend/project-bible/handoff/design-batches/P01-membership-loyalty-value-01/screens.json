@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/membership-loyalty-and-value/wallet-and-gift-cards",
-   "component": "apps/guest-web/src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx",
+   "component": "src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -48,7 +48,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act",
-  "purpose": "See wallet & gift cards for this venue.",
+  "purpose": "The guest's wallet and its activity, saved cards, and the balance on a gift card or game card.",
   "layout": {
    "template": "split",
    "regions": [
@@ -217,34 +217,6 @@
     "contract": "wallet",
     "purpose": "Move value between wallets",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "getWalletAutoReloadSetting",
-    "contract": "wallet",
-    "purpose": "Show auto top-up",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "setWalletAutoReloadSetting",
-    "contract": "wallet",
-    "purpose": "Set auto top-up",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getWalletExitBalance",
-    "contract": "wallet",
-    "purpose": "Balance due / refundable at exit",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "settleWalletAtExit",
-    "contract": "wallet",
-    "purpose": "Settle the wallet at exit",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -326,6 +298,32 @@
     "provenance": "client-verified"
    }
   ],
+  "gaps": [
+   {
+    "operation": "getWalletExitBalance",
+    "removed": true,
+    "why": "The client-approved wallet screen shows no balance due or refundable at exit.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "settleWalletAtExit",
+    "removed": true,
+    "why": "The client-approved wallet screen has no control to settle the wallet at exit.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "getWalletAutoReloadSetting",
+    "removed": true,
+    "why": "The client-approved web wallet has no auto top-up controls (the app's GST-011 has them).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "setWalletAutoReloadSetting",
+    "removed": true,
+    "why": "The client-approved web wallet has no auto top-up controls (the app's GST-011 has them).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   }
+  ],
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -367,7 +365,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/membership-loyalty-and-value/membership-plans",
-   "component": "apps/guest-web/src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx",
+   "component": "src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -573,7 +571,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/membership-loyalty-and-value/membership-management",
-   "component": "apps/guest-web/src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx",
+   "component": "src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -612,7 +610,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listGuestMemberships` reads the population and `getMyMemberships` reads one of them — list, select, act",
-  "purpose": "Work with membership management for this venue.",
+  "purpose": "The guest's membership: billing statements, payments that need them, and the membership itself.",
   "layout": {
    "template": "split",
    "regions": [
@@ -760,20 +758,6 @@
     "contract": "catalogue",
     "purpose": "A guest's own memberships, benefits and history",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "listInstalmentPlans",
-    "contract": "payments",
-    "purpose": "Instalment plans and schedule",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "createInstalmentPlan",
-    "contract": "payments",
-    "purpose": "Pay in instalments",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -854,6 +838,18 @@
     "removed": true,
     "why": "No use on Membership Management; moving a membership to a family member is a different operation.",
     "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   },
+   {
+    "operation": "listInstalmentPlans",
+    "removed": true,
+    "why": "The client-approved membership screen shows no instalment plans.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "createInstalmentPlan",
+    "removed": true,
+    "why": "The client-approved membership screen has no control to pay in instalments.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "_platform": {
@@ -897,7 +893,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/membership-loyalty-and-value/devices-wishlist-consent",
-   "component": "apps/guest-web/src/routes/membership-loyalty-and-value/DevicesWishlistConsentDetail.tsx",
+   "component": "src/routes/membership-loyalty-and-value/DevicesWishlistConsentDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1265,61 +1261,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "enrolMfaMethod",
-    "contract": "identity",
-    "purpose": "Enrol an authenticator (email code as fallback)",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "verifyMfaEnrolment",
-    "contract": "identity",
-    "purpose": "Confirm the enrolment with a first code",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "removeMfaMethod",
-    "contract": "identity",
-    "purpose": "Remove a method",
-    "trigger": "onAction",
-    "invalidates": [
-     "listMfaMethods"
-    ]
-   },
-   {
-    "operationId": "getCookieConsentRuntime",
-    "contract": "marketing-crm",
-    "purpose": "Preference centre: categories and the current decision",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listPublishedTrackingTechnologies",
-    "contract": "marketing-crm",
-    "purpose": "Each cookie's name, provider, purpose, expiry and party",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getDeviceConsentHistory",
-    "contract": "marketing-crm",
-    "purpose": "My cookie decisions so far",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "recordDeviceConsent",
-    "contract": "marketing-crm",
-    "purpose": "Change or withdraw cookie preferences",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listConsentPurposes",
     "contract": "marketing-crm",
     "purpose": "The purposes the consent rows show",
@@ -1392,6 +1333,48 @@
     "operation": "getWaiverStatus",
     "why": "**`getWaiverStatus` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
     "source": "contract marketing-crm.yaml GET /guests/{subjectId}/waiver-status"
+   },
+   {
+    "operation": "getCookieConsentRuntime",
+    "removed": true,
+    "why": "The client-approved privacy screen has no tracking preference centre (categories, the trackers, past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client approves.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "listPublishedTrackingTechnologies",
+    "removed": true,
+    "why": "The client-approved privacy screen has no tracking preference centre (categories, the trackers, past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client approves.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "getDeviceConsentHistory",
+    "removed": true,
+    "why": "The client-approved privacy screen has no tracking preference centre (categories, the trackers, past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client approves.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "recordDeviceConsent",
+    "removed": true,
+    "why": "The client-approved privacy screen has no tracking preference centre (categories, the trackers, past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client approves.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "removeMfaMethod",
+    "removed": true,
+    "why": "The client-approved screen has no control to remove a two-step method.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "enrolMfaMethod",
+    "removed": true,
+    "why": "The client-approved web account screen has no control to set up two-step verification (the app's GST-073 has one).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "verifyMfaEnrolment",
+    "removed": true,
+    "why": "The client-approved web account screen has no control to set up two-step verification (the app's GST-073 has one).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "_platform": {
@@ -1434,7 +1417,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/loyalty-and-rewards",
-   "component": "apps/guest-web/src/routes/LoyaltyRewards.tsx",
+   "component": "src/routes/LoyaltyRewards.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1455,6 +1438,18 @@
     "operation": "getLoyaltyPosition",
     "why": "**`getLoyaltyPosition` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
     "source": "contract marketing-crm.yaml GET /loyalty/position"
+   },
+   {
+    "operation": "decideRecommendations",
+    "removed": true,
+    "why": "The client-approved Loyalty & Rewards has no recommendation slot, so nothing shows a decision; recommendations show in the cart slot (WEB-008, GST-048).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "recordRecommendationEvents",
+    "removed": true,
+    "why": "Goes with decideRecommendations: no recommended item is shown here to report on.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "layout": {
@@ -1602,20 +1597,6 @@
     "contract": "marketing-crm",
     "purpose": "Spend points",
     "trigger": "onAction"
-   },
-   {
-    "operationId": "decideRecommendations",
-    "contract": "ai",
-    "purpose": "Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "recordRecommendationEvents",
-    "contract": "ai",
-    "purpose": "Report impressions, clicks and declines of recommended items",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    },
    {
     "operationId": "listRewards",

@@ -591,6 +591,8 @@
     "description": "The privacy request (`setPrivacyRequest`); the natural key."
    },
    "identifiers": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Extra identifiers to search by; the request's subject is always included.",
     "items": {
@@ -714,6 +716,8 @@
     }
    },
    "corrections": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Correction requests to route to the system of record.",
     "items": {
@@ -752,6 +756,7 @@
   ],
   "properties": {
    "requestId": {
+    "x-ticvai-references": "marketing.privacy_request",
     "type": "string",
     "format": "uuid"
    },
@@ -761,6 +766,8 @@
     "readOnly": true
    },
    "results": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Record counts per source; the records themselves go only into the export package.",
     "items": {
@@ -847,6 +854,8 @@
     }
    },
    "corrections": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "readOnly": true,
     "items": {
@@ -1095,6 +1104,7 @@
     "readOnly": true
    },
    "subjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid",
     "description": "The person the request is about."
@@ -1309,6 +1319,7 @@
     "readOnly": true
    },
    "subjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -1336,6 +1347,7 @@
     "readOnly": true
    },
    "impact": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "Affected areas and what will happen to each, shown before execution.",
@@ -1382,6 +1394,7 @@
     }
    },
    "checks": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "items": {
@@ -1414,6 +1427,7 @@
     }
    },
    "approvals": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "items": {
@@ -1497,6 +1511,8 @@
     ]
    },
    "systemResults": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "readOnly": true,
     "description": "The execution monitor, per system.",
@@ -1701,6 +1717,7 @@
   "description": "What the visitor pressed. `doNotSellOrShare` is the CCPA/CPRA opt-out link, shown where the design's `regulatoryRegimes` include `ccpaCpra`."
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -1927,6 +1944,7 @@
   }
  },
  "PrivacyAuditEvidenceComplianceReportingView": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.privacy_audit_event",
   "description": "One privacy audit event (pack 17.2.9 Audit Fields). Append-only; written by the operation that performed the event, never through an API.",
@@ -2210,6 +2228,7 @@
       "description": "From the SLA policy for the severity (`setSlaPolicy`)."
      },
      "timeline": {
+      "x-ticvai-persisted": false,
       "type": "array",
       "readOnly": true,
       "items": {

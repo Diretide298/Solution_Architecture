@@ -239,7 +239,7 @@
  },
  "setCredentialActivationDisplay": {
   "method": "PUT",
-  "path": "/credential-activation-display",
+  "path": "/credential-activation-display/{credentialPolicyId}",
   "contract": "access",
   "summary": "Save a credential activation and display rule",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -247,6 +247,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "credentialPolicyId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

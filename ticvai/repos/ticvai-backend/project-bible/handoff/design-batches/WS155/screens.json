@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-management-command-center-bo-854",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceManagementCommandCenter.tsx",
+   "component": "src/routes/rentals/ResourceManagementCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -335,6 +336,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "1",
@@ -344,7 +346,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-type-configuration-bo-855",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceTypeConfiguration.tsx",
+   "component": "src/routes/rentals/ResourceTypeConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -523,6 +525,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "1",
@@ -532,7 +535,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-category-management-bo-856",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceCategoryManagement.tsx",
+   "component": "src/routes/rentals/ResourceCategoryManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -723,6 +726,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 1,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "1",
@@ -732,7 +736,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-creation-profile-bo-857",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceCreationProfile.tsx",
+   "component": "src/routes/rentals/ResourceCreationProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -761,7 +765,7 @@
    "template": "form",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFields",
      "slot": "fields",
      "components": [
       {
@@ -1058,6 +1062,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "1",
@@ -1067,7 +1072,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/configurable-attribute-builder-bo-858",
-   "component": "apps/venue-management-web/src/routes/rentals/ConfigurableAttributeBuilder.tsx",
+   "component": "src/routes/rentals/ConfigurableAttributeBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1245,6 +1250,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "1",
@@ -1254,7 +1260,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-hierarchy-parent-child-relationships-bo-859",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceHierarchyParentChildRelationships.tsx",
+   "component": "src/routes/rentals/ResourceHierarchyParentChildRelationships.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1300,7 +1306,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getResourceHierarchy",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getResourceHierarchy"
       },
       {
        "kind": "primaryButton",
@@ -1389,6 +1396,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "1",
@@ -1398,7 +1406,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-dependency-rules-bo-860",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceDependencyRules.tsx",
+   "component": "src/routes/rentals/ResourceDependencyRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1466,7 +1474,8 @@
         "Unavailable dependent resources"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Private Ski Lesson”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 13 §The system shall display"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 13 §The system shall display",
+       "operation": "getResourceDependencies"
       }
      ]
     }
@@ -1547,6 +1556,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 1,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "1",
@@ -1556,7 +1566,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-package-bundle-configuration-bo-861",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourcePackageBundleConfiguration.tsx",
+   "component": "src/routes/rentals/ResourcePackageBundleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1581,6 +1591,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Administrators shall configure) and no display directory — it is settings, not a population",
   "purpose": "Allow commonly used combinations of resources to be predefined and assigned as a single operational package.",
   "purposeNote": "Administrators can create reusable resource packages containing fixed or dynamically selected resources and use those packages later during experience, event, reservation, and operational allocation.",
+  "division": "Shares `createResourcePackage`, `listResourcePackages`, `updateResourcePackage` with BO-895, BO-918; this screen is Resource Package & Bundle Configuration (pack Resource_Management_Configuration_Reference.pdf, board 1.08, page 14): allow commonly used combinations of resources to be predefined and assigned as a single operational package.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1848,6 +1859,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "1",
@@ -1857,7 +1869,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/multi-venue-resource-assignment-bo-862",
-   "component": "apps/venue-management-web/src/routes/rentals/MultiVenueResourceAssignment.tsx",
+   "component": "src/routes/rentals/MultiVenueResourceAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1915,7 +1927,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getResource",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getResource"
       },
       {
        "kind": "secondaryButton",
@@ -1997,6 +2010,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "1",
@@ -2006,7 +2020,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-lifecycle-governance-audit-bo-863",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceLifecycleGovernanceAudit.tsx",
+   "component": "src/routes/rentals/ResourceLifecycleGovernanceAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2185,6 +2199,18 @@
     {
      "name": "resourceId",
      "from": "navigation"
+    },
+    {
+     "name": "controlPolicyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalControlPolicy` takes it, from the record the user acts on."
+    },
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalMatrix` takes it, from the record the user acts on."
     }
    ]
   },

@@ -547,7 +547,7 @@
  },
  "setPricingChangeRequest": {
   "method": "PUT",
-  "path": "/pricing-change-request",
+  "path": "/pricing-change-request/{changeId}",
   "contract": "catalogue",
   "summary": "Pricing Change Request & Workspace",
   "permission": "PRODUCT_CONFIGURE",
@@ -555,6 +555,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "changeId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

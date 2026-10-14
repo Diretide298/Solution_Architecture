@@ -96,15 +96,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-449` | Usage & License Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-450` | Entitlement & License Inventory | B | 0 | 0 | 6 | 8 | 1 | 4 | — | notStarted (—) |
-| `ADM-451` | Commercial Consumption & Billable Event Metering | B | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `ADM-452` | Operational Usage & Threshold Monitor | B | 0 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `ADM-449` | Usage & License Command Center | B | 0 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-450` | Entitlement & License Inventory | B | 0 | 12 | 6 | 8 | 1 | 4 | — | notStarted (—) |
+| `ADM-451` | Commercial Consumption & Billable Event Metering | B | 0 | 13 | 6 | 7 | 1 | 0 | — | notStarted (—) |
+| `ADM-452` | Operational Usage & Threshold Monitor | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-453` | License Enforcement & Decision Engine | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-454` | Minimum Guarantee & Variable Consumption Monitor | B | 0 | 4 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-455` | Overage, Capacity & Temporary Exception Management | B | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-456` | Usage Alerts, Reconciliation & Exception Center | B | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-457` | AI Usage Forecast & Commercial Optimization | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-457` | AI Usage Forecast & Commercial Optimization | B | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-458` | License, Metering & Commercial Synchronization Audit | B | 0 | 18 | 6 | 7 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -147,7 +147,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getEntitlementUsage`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Metrics | list or chips (count when long) | — |
+| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
+| Current | 1,234 | — |
+| Limit | 1,234 | — |
+| Percent used | 12.5% | — |
+| Is near limit | yes / no (icon or chip) | Approaching a limit is an account conversation. Hitting one silently at a gate is an incident. |
+| Is exceeded | yes / no (icon or chip) | — |
+| As at | 1 Oct 2026, 14:30 | — |
 
 **Data it reads**: `getEntitlementUsage` (onLoad, Usage against licence)
 
@@ -192,6 +203,8 @@ aiTokens: 120%
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -228,7 +241,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-449?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-002`, `ADM-450`, `ADM-451`, `ADM-452`, `ADM-453`, `ADM-454`, `ADM-455`, `ADM-456`, `ADM-457`, `ADM-458`.
@@ -268,7 +281,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getTenantLicences`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Powered by removable | yes / no (icon or chip) | Whether the tenant's licence lets it switch "Powered by TICVAI" off (Chinmay, 2 October, workbook Q160 and the pre-apply round … |
+| Plan | the name it points at, never the id | — |
+| Licensed modules | list or chips (count when long) | Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it. |
+| Module key | text | — |
+| Display name | text | — |
+| Source | chip: Plan, Add on | — |
+| Valid to | 1 Oct 2026 | — |
+| Limits | list or chips (count when long) | — |
+| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
+| Limit | 1,234 | Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure … |
+| Overage allowed | yes / no (icon or chip) | — |
+| Overage unit price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Data it reads**: `getTenantLicences` (onLoad, Entitlement inventory)
 
@@ -304,6 +332,8 @@ entitlements:
 - `getTenantLicences` → `PLATFORM_TENANT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -345,7 +375,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-450?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-449`.
@@ -393,7 +423,23 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getUsageMetering`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Period start | 1 Oct 2026 | — |
+| Period end | 1 Oct 2026 | — |
+| Metrics | list or chips (count when long) | — |
+| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
+| Total | 1,234.5 | — |
+| Included | 1,234.5 | — |
+| Overage | 1,234.5 | — |
+| By venue | list or chips (count when long) | — |
+| Venue | the name it points at, never the id | — |
+| Quantity | 1,234.5 | — |
+| By capability | list or chips (count when long) | AI tokens only. |
+| Capability | text | — |
+| Quantity | 1,234.5 | — |
 
 **Data it reads**: `getUsageMetering` (onLoad, Billable event metering)
 
@@ -429,6 +475,8 @@ billableEvents:
 - `getUsageMetering` → `PLATFORM_TENANT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -466,7 +514,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-451?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-449`.
@@ -508,8 +556,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Thresholds**: Three states with three responses (warn, require an overage pack, refuse); hard stop off by default. *(source: contracts/satellite/subscription.yaml#getLicenceEnforcement)*
 
-**Data it reads**: `getLicenceEnforcement` (onLoad, Thresholds and position)
-
 **Where the user goes next**
 
 - → `ADM-449` Usage & License Command Center: *Back to Usage & License Command Center*
@@ -538,18 +584,18 @@ state: approaching (96%)
 
 #### Permissions
 
-- `getLicenceEnforcement` → `PLATFORM_BILLING_VIEW` (read) · staff
 - `getPlanRecommendations` → `PLATFORM_BILLING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_BILLING_VIEW`
+
 #### Requirements it meets
 
-3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 20.8.3 | AI Usage Forecasting - System shall forecast future platform consumption. | Subscription & Licensing Management | CONTRACTED | `getLicenceEnforcement` |
 | 20.8.4 | AI Upgrade Recommendations - System shall recommend subscription upgrades. | Subscription & Licensing Management | CONTRACTED | `getPlanRecommendations` |
 | 20.8.5 | AI Cost Optimization - System shall recommend cost optimization opportunities. | Subscription & Licensing Management | CONTRACTED | `getPlanRecommendations` |
 
@@ -701,6 +747,8 @@ Every license enforcement decision:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -769,14 +817,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every minimum guarantee variable** (data table)
+**Every minimum guarantee variable** (data table, from `getLicenceEnforcement`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Projected month end billable tickets | text | not in the schema: `Projected month-end billable tickets` |
 | Projected variable billing basis: AED 32,850 | text | not in the schema: `Projected variable billing basis: AED 32,850` |
 
-**The selected minimum guarantee variable** (detail panel): The pack groups this record's detail under its own headings: “Rate”, “Billable Tickets”, “Current Position”, “Automatically calculate”, “Progress Visualization”, “Where applicable show”.
+**The selected minimum guarantee variable** (detail panel, from `getLicenceEnforcement`): The pack groups this record's detail under its own headings: “Rate”, “Billable Tickets”, “Current Position”, “Automatically calculate”, “Progress Visualization”, “Where applicable show”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -819,6 +867,8 @@ Every minimum guarantee variable:
 - `getLicenceEnforcement` → `PLATFORM_BILLING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_BILLING_VIEW`
 
 #### Requirements it meets
 
@@ -934,6 +984,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_BILLING_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1046,6 +1098,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_BILLING_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1112,7 +1166,18 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getEntitlementUsage`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Metrics | list or chips (count when long) | — |
+| Metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | — |
+| Current | 1,234 | — |
+| Limit | 1,234 | — |
+| Percent used | 12.5% | — |
+| Is near limit | yes / no (icon or chip) | Approaching a limit is an account conversation. Hitting one silently at a gate is an incident. |
+| Is exceeded | yes / no (icon or chip) | — |
+| As at | 1 Oct 2026, 14:30 | — |
 
 **Data it reads**: `getEntitlementUsage` (onLoad, Consumption trend)
 
@@ -1146,6 +1211,8 @@ recommendation: Offer capacity pack of 100,000 tickets
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1170,7 +1237,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-457?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-449`.
@@ -1222,7 +1289,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every license metering commercial** (data table)
+**Every license metering commercial** (data table, from `getUsageMetering`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1236,7 +1303,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Timestamp | text | not in the schema: `Timestamp` |
 | Effective date | text | not in the schema: `Effective Date` |
 
-**The selected license metering commercial** (detail panel): The pack groups this record's detail under its own headings: “Approved Commercial Package”, “Contract”, “All Tickets Issued”, “Critical Board 9 Data Separation”, “Suppose during September”, “Contract says”.
+**The selected license metering commercial** (detail panel, from `getUsageMetering`): The pack groups this record's detail under its own headings: “Approved Commercial Package”, “Contract”, “All Tickets Issued”, “Critical Board 9 Data Separation”, “Suppose during September”, “Contract says”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1308,6 +1375,8 @@ Every license metering commercial:
 - `getUsageMetering` → `PLATFORM_TENANT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -1444,11 +1513,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "BillingReconciliation": {"type":"object","description":"Boards 10.2 and 10.3. **The first invoice sets the tone for the relationship.**","properties":{"tenantId":{"type":"string","format":"uuid"},"period":{"type":"string"},"lines":{"type":"array","items":{"type":"object","properties":{"unit":{"type":"string"},"meteredQuantity":{"type":"integer"},"billedQuantity":{"type":"integer"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variance":{"type":"integer"}}}},"meteredNotBilled":{"type":"integer"},"billedNotMetered":{"type":"integer"},"invoiceId":{"type":"string","format":"uuid","nullable":true},"approvedBy":{"type":"string","format":"uuid","nullable":true}}},
-"CapacityPack": {"type":"object","x-ticvai-persistence":"subscription.capacity_pack","description":"Board 3.8. **A good season should not require renegotiating a contract in August.**\n","required":["tenantId","unit","quantity"],"properties":{"id":{"type":"string","format":"uuid"},"tenantId":{"type":"string","format":"uuid"},"unit":{"type":"string"},"quantity":{"type":"integer"},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date","nullable":true},"temporary":{"type":"boolean","default":true},"approvedBy":{"type":"string","format":"uuid","nullable":true},"invoiceId":{"type":"string","format":"uuid","nullable":true}}},
+"CapacityPack": {"type":"object","x-ticvai-persistence":"subscription.capacity_pack","description":"Board 3.8. **A good season should not require renegotiating a contract in August.**\n","required":["tenantId","unit","quantity"],"properties":{"id":{"type":"string","format":"uuid"},"tenantId":{"x-ticvai-references":"none","type":"string","format":"uuid"},"unit":{"type":"string"},"quantity":{"type":"integer"},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"validFrom":{"type":"string","format":"date"},"validTo":{"type":"string","format":"date","nullable":true},"temporary":{"type":"boolean","default":true},"approvedBy":{"type":"string","format":"uuid","nullable":true},"invoiceId":{"type":"string","format":"uuid","nullable":true}}},
 "EntitlementLimit": {"type":"object","required":["metric","limit"],"properties":{"metric":{"$ref":"#/components/schemas/UsageMetric"},"limit":{"type":"integer","nullable":true,"x-ticvai-column":"limit_value","description":"Null means unlimited. Stored as `limit_value` — `limit` is a reserved word, and `subscription.tier_allowance` already names the same figure `limit_value`."},"overageAllowed":{"type":"boolean","default":false},"overageUnitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},
 "EntitlementUsage": {"x-ticvai-persistence":"none — aggregated from usage_record","type":"object","required":["tenantId","metrics"],"properties":{"tenantId":{"type":"string","format":"uuid"},"metrics":{"type":"array","items":{"type":"object","required":["metric","current","isNearLimit"],"properties":{"metric":{"$ref":"#/components/schemas/UsageMetric"},"current":{"type":"integer"},"limit":{"type":"integer","nullable":true},"percentUsed":{"type":"number","nullable":true},"isNearLimit":{"type":"boolean","description":"Approaching a limit is an account conversation. Hitting one silently at a gate is an incident.\n"},"isExceeded":{"type":"boolean"}}}},"asAt":{"type":"string","format":"date-time"}}},
 "LicenceEnforcement": {"type":"object","description":"Board 9.5. **Three states, three responses.**","properties":{"tenantId":{"type":"string","format":"uuid"},"period":{"type":"string"},"units":{"type":"array","items":{"type":"object","properties":{"unit":{"type":"string"},"allowance":{"type":"integer"},"consumed":{"type":"integer"},"percentUsed":{"type":"number"},"projectedAtPeriodEnd":{"type":"integer","nullable":true},"state":{"type":"string","enum":["withinAllowance","approaching","atLimit","overage"]},"nextAction":{"type":"string","nullable":true},"overageCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"minimumGuaranteeMet":{"type":"boolean"},"alertsRaised":{"type":"integer"}}},
-"LicenceEnforcementPolicy": {"type":"object","x-ticvai-persistence":"subscription.enforcement_policy","description":"Board 9.5. **Refusing service to a paying customer mid-season is a commercial decision.**\n","properties":{"id":{"type":"string","format":"uuid"},"thresholds":{"type":"array","items":{"type":"object","properties":{"atPercentOfAllowance":{"type":"integer"},"action":{"type":"string","enum":["notify","notifyAccountManager","requireCapacityPack","autoAddCapacityPack","restrictNewConfiguration","hardStop"]},"notifyRoles":{"type":"array","items":{"type":"string"}}}}},"hardStopAllowed":{"type":"boolean","default":false,"description":"**Off by default, and every enforcement action is alerted.**"},"graceDays":{"type":"integer","default":7}}},
+"LicenceEnforcementPolicy": {"type":"object","x-ticvai-persistence":"subscription.enforcement_policy","description":"Board 9.5. **Refusing service to a paying customer mid-season is a commercial decision.**\n","properties":{"id":{"type":"string","format":"uuid"},"thresholds":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"atPercentOfAllowance":{"type":"integer"},"action":{"type":"string","enum":["notify","notifyAccountManager","requireCapacityPack","autoAddCapacityPack","restrictNewConfiguration","hardStop"]},"notifyRoles":{"type":"array","items":{"type":"string"}}}}},"hardStopAllowed":{"type":"boolean","default":false,"description":"**Off by default, and every enforcement action is alerted.**"},"graceDays":{"type":"integer","default":7}}},
 "LicencePosition": {"x-ticvai-persistence":"none — union of the tenant's plan (control.tenant.plan_id -> subscription.plan_module, subscription.plan_limit) and its add-ons (control.licence_add_on, control.licence_add_on_limit by tenant_id)","type":"object","required":["tenantId","licensedModules","limits"],"properties":{"poweredByRemovable":{"type":"boolean","readOnly":true,"default":false,"description":"**Whether the tenant's licence lets it switch \"Powered by TICVAI\" off** (Chinmay, 2 October, workbook Q160 and the pre-apply round; CHG-CSA-036). False by default; true where TICVAI sold the tenant the add-on keyed `poweredByRemoval` (`addLicenceAddOn`). White label's `setBrandIdentity` refuses `showPoweredBy` false while this is false."},"tenantId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid","nullable":true},"licensedModules":{"type":"array","description":"Union of plan modules and add-ons. The White Label Builder reads this and cannot enable anything absent from it.\n\n**`moduleKey` values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424), the vocabulary of\n`white-label.ModuleEnablement.moduleKey`.","items":{"type":"object","required":["moduleKey","source"],"properties":{"moduleKey":{"type":"string"},"displayName":{"type":"string"},"source":{"type":"string","enum":["plan","addOn"]},"validTo":{"type":"string","format":"date","nullable":true}}}},"limits":{"type":"array","items":{"$ref":"#/components/schemas/EntitlementLimit"}}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},

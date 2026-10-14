@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/newsletter-preferences",
-   "component": "apps/guest-app/src/routes/NewsletterPreferences.tsx",
+   "component": "src/screens/NewsletterPreferences.tsx",
    "status": "notStarted"
   },
   "navigation": {

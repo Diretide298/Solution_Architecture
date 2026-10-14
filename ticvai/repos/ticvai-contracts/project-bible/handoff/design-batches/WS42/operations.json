@@ -599,7 +599,7 @@
  },
  "setLegalHold": {
   "method": "PUT",
-  "path": "/data-retention-expiry",
+  "path": "/data-retention-expiry/{holdId}",
   "contract": "marketing-crm",
   "summary": "Place, approve or release a legal or operational hold",
   "permission": "GUEST_MANAGE",
@@ -607,6 +607,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "holdId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -618,7 +623,7 @@
  },
  "setPrivacyComplianceException": {
   "method": "PUT",
-  "path": "/privacy-compliance-exception",
+  "path": "/privacy-compliance-exception/{exceptionId}",
   "contract": "marketing-crm",
   "summary": "Raise, investigate or close a privacy exception",
   "permission": "GUEST_MANAGE",
@@ -626,6 +631,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "exceptionId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

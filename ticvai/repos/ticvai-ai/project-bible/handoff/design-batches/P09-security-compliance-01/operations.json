@@ -177,7 +177,7 @@
  },
  "setWafPolicy": {
   "method": "PUT",
-  "path": "/waf-policies",
+  "path": "/waf-policies/{wafRuleId}",
   "contract": "platform-ops",
   "summary": "Change the firewall policy",
   "permission": "PLATFORM_CELL_MANAGE",
@@ -185,6 +185,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "region",
   "parameters": [
+   {
+    "name": "wafRuleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

@@ -129,14 +129,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-1043` | Revenue Command Center | B | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-1044` | Dynamic Seat Pricing | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1043` | Revenue Command Center | B | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-1044` | Dynamic Seat Pricing | B | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1045` | Price Bands & Categories | A | 36 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1046` | Inventory Forecasting | B | 0 | 0 | 6 | 3 | 0 | 4 | — | notStarted (—) |
-| `BO-1047` | Section Revenue Forecast | B | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-1046` | Inventory Forecasting | B | 0 | 20 | 6 | 3 | 0 | 4 | — | notStarted (—) |
+| `BO-1047` | Section Revenue Forecast | B | 0 | 20 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-1048` | Seat Upsell Recommendations | D | 0 | 0 | 6 | 40 | 0 | 6 | — | notStarted (—) |
 | `BO-1049` | Scenario & What-If Planning | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1050` | Revenue Analytics & Audit | B | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-1050` | Revenue Analytics & Audit | B | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -185,7 +185,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listRevenue`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -233,6 +256,8 @@ kpis:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -269,7 +294,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1043?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-1044`, `BO-1045`, `BO-1046`, `BO-1047`, `BO-1048`, `BO-1049`, `BO-1050`.
@@ -321,7 +346,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listDynamicPricingStrategy`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Strategy | text | Strategy ID |
+| Strategy name | text | Strategy Name |
+| Strategy type | chip: Demand based, Occupancy based, Availability based, Inventory based, Booking … | Strategy Type (pack pp.75-76) |
+| Product event | text | Product or event the strategy controls |
+| Venue | text | Venue |
+| Base price source | text | Base price source: the Board 1 price list and rate the strategy moves from, e.g. |
+| Current price | AED 1,234.50 | Current resolved dynamic price (for a single-price scope) |
+| Adjustment range | grouped details | Adjustment range allowed by the strategy |
+| Min percent | 1,234.5 | Lowest adjustment from base, percent |
+| Max percent | 1,234.5 | Highest adjustment from base, percent |
+| Rule count | 1,234 | Rule Count |
+| Effective period | grouped details | Effective period |
+| From | 1 Oct 2026, 14:30 | Effective from |
+| To | 1 Oct 2026, 14:30 | Effective to; empty for open-ended |
+| Automation mode | chip: Monitor, Recommend, Prepare change, Auto execute within guardrails | Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default |
+| Status | text | Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired |
+| Owner | text | Owner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -362,6 +410,8 @@ strategy:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -391,7 +441,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1044?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1043`.
@@ -519,7 +569,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|---|---|---|---|
 | New seat category (primary button) | navigation or local | — | — | — | — |
 | Add band (secondary button) | navigation or local | — | — | — | — |
-| Create seat category (primary button) | `createSeatCategory` POST `/seat-categories` | inline | SeatCategory | — | — |
+| Create seat category (primary button) | `createSeatCategory` POST `/seat-categories` | inline | SeatCategory | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | — |
 | Save changes (primary button) | `updateSeatCategory` PATCH `/seat-categories/{seatCategoryId}` | inline | SeatCategory | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 422 Two bands with the same `code`, or a band whose `effectiveTo` is not after its `effectiveFrom` (audit R275 (d)). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
@@ -539,7 +589,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the price bands categories are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatCategories` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `createSeatCategory`, `updateSeatCategory`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 422 Two bands with the same `code`, or a band whose `effectiveTo` is not after its `effectiveFrom` (audit R275 (d)). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 422 Two bands with the same `code`, or a band whose `effectiveTo` is not after its `effectiveFrom` (audit R275 (d)). |
 
 #### Edge cases to draw
 
@@ -577,6 +627,8 @@ categories:
 
 **A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatCategories` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `createSeatCategory`, `updateSeatCategory`.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -600,7 +652,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (36), with its required mark, default, format and its error state (404, 422).
+- [ ] Every input above is drawn (36), with its required mark, default, format and its error state (404, 409, 422).
 - [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1045?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: New seat category, Add band, Create seat category, Save changes, Cancel.
@@ -655,7 +707,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listDemandBookingCurve`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue id |
+| Product | text | Product id |
+| Event | text | Event id |
+| Performance | text | Performance id |
+| Date | 1 Oct 2026 | Date |
+| Timeslot | text | Timeslot |
+| Price category | text | Price category |
+| Section code | text | Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build … |
+| Channel | chip: POS, Kiosk, Web, Mobile, B2B, Ota… | Channel |
+| Confidence | 1,234.5 | Forecast Confidence, percent |
+| Forecast final occupancy | 1,234.5 | Forecast Final Occupancy, percent |
+| Demand | 1,234 | Forecast demand |
+| Attendance | 1,234 | Forecast attendance |
+| Occupancy | 1,234.5 | Forecast occupancy, percent |
+| Sell through | 1,234.5 | Forecast sell-through, percent |
+| Expected sell out time | 1 Oct 2026, 14:30 | Expected Sell-Out Time; empty if no sell-out forecast |
+| Revenue | AED 1,234.50 | Forecast revenue |
+| Conversion | 1,234.5 | Forecast conversion, percent |
+| Remaining inventory | 1,234 | Forecast remaining inventory at event |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -696,6 +771,8 @@ forecast:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -729,7 +806,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1046?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1043`.
@@ -782,7 +859,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listDemandBookingCurve`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue id |
+| Product | text | Product id |
+| Event | text | Event id |
+| Performance | text | Performance id |
+| Date | 1 Oct 2026 | Date |
+| Timeslot | text | Timeslot |
+| Price category | text | Price category |
+| Section code | text | Seat-map section (`seating.Section.code`) the row forecasts; null for a row at price-category or performance level (29 September, build … |
+| Channel | chip: POS, Kiosk, Web, Mobile, B2B, Ota… | Channel |
+| Confidence | 1,234.5 | Forecast Confidence, percent |
+| Forecast final occupancy | 1,234.5 | Forecast Final Occupancy, percent |
+| Demand | 1,234 | Forecast demand |
+| Attendance | 1,234 | Forecast attendance |
+| Occupancy | 1,234.5 | Forecast occupancy, percent |
+| Sell through | 1,234.5 | Forecast sell-through, percent |
+| Expected sell out time | 1 Oct 2026, 14:30 | Expected Sell-Out Time; empty if no sell-out forecast |
+| Revenue | AED 1,234.50 | Forecast revenue |
+| Conversion | 1,234.5 | Forecast conversion, percent |
+| Remaining inventory | 1,234 | Forecast remaining inventory at event |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -822,6 +922,8 @@ sections:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -852,7 +954,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1047?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1043`.
@@ -936,6 +1038,8 @@ offer:
 - `decideRecommendations` → `AI_USE` (operate) · staff, guest, anonymous
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1074,6 +1178,8 @@ scenario:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1145,7 +1251,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listRevenue`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Venue | text | Venue |
+| Event product | text | Event/Product |
+| Performance | text | Performance |
+| Current price | AED 1,234.50 | Current Price |
+| Recommended price | AED 1,234.50 | Recommended Price |
+| Forecast revenue | AED 1,234.50 | Forecast Revenue |
+| Expected uplift | 1,234.5 | Expected Uplift, percent |
+| Confidence | 1,234.5 | Confidence, percent |
+| Automation mode | chip: Advisory, Human in the loop, Conditional autonomous, Autonomous | Automation Mode in force for this scope |
+| Approval status | text | Approval Status: notRequired, pending, approved or rejected |
+| Execution status | text | Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack |
+| Revenue risk | AED 1,234.50 | Revenue Risk if no action is taken |
+| Event proximity | 1,234 | Event Proximity: days until the event |
+| Inventory position | 1,234.5 | Inventory Position: remaining inventory, percent |
+| Demand variance | 1,234.5 | Demand Variance against forecast, percent |
+| Urgency | chip: Low, Medium, High, Critical | Urgency |
+| Optimization | text | Optimisation id |
+| Recommendation | text | Recommendation id |
+| Revenue opportunity | AED 1,234.50 | Revenue Opportunity |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1187,6 +1316,8 @@ variance:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1215,7 +1346,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1050?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1043`.
@@ -1348,6 +1479,6 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "RevenueOptimizationCommandCenterSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Revenue Optimization Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"revenueOpportunity":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue Opportunity"},"incrementalRevenueGenerated":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Incremental Revenue Generated"},"activeOptimizations":{"type":"integer","description":"Active Optimizations"},"recommendationsAwaitingAction":{"type":"integer","description":"Recommendations Awaiting Action"},"pendingSimulations":{"type":"integer","description":"Pending Simulations"},"autoExecutedChanges":{"type":"integer","description":"Auto-Executed Changes"},"approvalRequired":{"type":"integer","description":"Approval Required: changes waiting for an approver"},"activeABTests":{"type":"integer","description":"Active A/B Tests"},"pricingExceptions":{"type":"integer","description":"Pricing Exceptions"},"revenueAtRisk":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue at Risk"},"forecastAccuracy":{"type":"number","description":"Forecast Accuracy over the last 30 days (decided 29 September, readiness close-out), percent"},"optimizationSuccessRate":{"type":"number","description":"Optimization Success Rate: executed changes with a positive measured outcome, percent"},"aiRevenueBrief":{"type":"array","items":{"type":"string"},"description":"AI Revenue Brief, e.g. AED 284,000 of opportunity in the next seven days. Advisory only: generated narrative never changes a price (decided 29 September, readiness close-out)"}}},
 "RevenueOptimizationCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over catalogue state, assembled at read time from tables that already exist","description":"**What Revenue Optimization Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"venue":{"type":"string","description":"Venue"},"eventProduct":{"type":"string","description":"Event/Product"},"performance":{"type":"string","description":"Performance","nullable":true},"currentPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Current Price"},"recommendedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Recommended Price"},"forecastRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Forecast Revenue"},"expectedUplift":{"type":"number","description":"Expected Uplift, percent"},"confidence":{"type":"number","description":"Confidence, percent"},"automationMode":{"type":"string","description":"Automation Mode in force for this scope","enum":["advisory","humanInTheLoop","conditionalAutonomous","autonomous"]},"approvalStatus":{"type":"string","description":"Approval Status: notRequired, pending, approved or rejected"},"executionStatus":{"type":"string","description":"Execution Status: notStarted, queued, processing, live, partial, failed or rolledBack"},"revenueRisk":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue Risk if no action is taken"},"eventProximity":{"type":"integer","description":"Event Proximity: days until the event"},"inventoryPosition":{"type":"number","description":"Inventory Position: remaining inventory, percent"},"demandVariance":{"type":"number","description":"Demand Variance against forecast, percent"},"urgency":{"type":"string","description":"Urgency","enum":["low","medium","high","critical"]},"optimizationId":{"type":"string","description":"Optimisation id"},"recommendationId":{"type":"string","description":"Recommendation id","nullable":true},"revenueOpportunity":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Revenue Opportunity"},"priorityRank":{"type":"integer","description":"Priority rank (1 = act first)"},"nextAction":{"type":"string","description":"Suggested next action (the pack's Action column)","enum":["review","simulate","approve"]}}},
 "SeatCategory": {"x-ticvai-persistence":"seating.seat_category","type":"object","required":["id","code","name","venueId","rank"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","x-ticvai-unique":"venue"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"displayColour":{"type":"string","nullable":true},"rank":{"type":"integer","description":"Ordering for best-seat assignment. Lower is better."},"seatCount":{"type":"integer"},"priceBands":{"type":"array","description":"What a seat in this category costs, by band (decided 28 September, audit R275 (d), from the BO-1045 pack). Written by `createSeatCategory` and `updateSeatCategory`. A band may be narrowed to a sales channel or a customer segment and to a window; where several match a sale, the narrowest wins.\n","items":{"$ref":"#/components/schemas/SeatPriceBand"}}}},
-"SeatPriceBand": {"x-ticvai-persistence":"seating.seat_price_band","x-ticvai-unique-together":[["seatCategoryId","code"]],"type":"object","description":"One price band on a seat category (decided 28 September, audit R275 (d)). The currency is `amount.currency`, resolved from the region like every `Money` (ADR-0018), so the band carries no currency of its own.\n","required":["code","displayLabel","amount","effectiveFrom"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"seatCategoryId":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":64,"description":"Unique within the category."},"displayLabel":{"type":"string","maxLength":200},"displayColour":{"type":"string","nullable":true,"pattern":"^#[0-9A-Fa-f]{6}$"},"amount":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"channel":{"nullable":true,"description":"Null means every channel.","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}]},"customerSegmentId":{"type":"string","format":"uuid","nullable":true,"description":"A `marketing-crm` customer segment; null means everyone."},"effectiveFrom":{"type":"string","format":"date-time"},"effectiveTo":{"type":"string","format":"date-time","nullable":true,"description":"Null means open-ended."}}}
+"SeatPriceBand": {"x-ticvai-rls":"grant-holder-read","x-ticvai-persistence":"seating.seat_price_band","x-ticvai-unique-together":[["seatCategoryId","code"]],"type":"object","description":"One price band on a seat category (decided 28 September, audit R275 (d)). The currency is `amount.currency`, resolved from the region like every `Money` (ADR-0018), so the band carries no currency of its own.\n","required":["code","displayLabel","amount","effectiveFrom","scopePath"],"properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid","readOnly":true},"seatCategoryId":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":64,"description":"Unique within the category."},"displayLabel":{"type":"string","maxLength":200},"displayColour":{"type":"string","nullable":true,"pattern":"^#[0-9A-Fa-f]{6}$"},"amount":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"channel":{"nullable":true,"description":"Null means every channel.","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"}]},"customerSegmentId":{"type":"string","format":"uuid","nullable":true,"description":"A `marketing-crm` customer segment; null means everyone."},"effectiveFrom":{"type":"string","format":"date-time"},"effectiveTo":{"type":"string","format":"date-time","nullable":true,"description":"Null means open-ended."}}}
 }
 ```

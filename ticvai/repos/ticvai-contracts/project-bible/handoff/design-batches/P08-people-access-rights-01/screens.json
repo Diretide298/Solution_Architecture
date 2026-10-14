@@ -5,11 +5,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "USER_MANAGE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/staff-directory",
-   "component": "apps/venue-management-web/src/routes/venue-operations/StaffDirectoryDetail.tsx",
+   "component": "src/routes/venue-operations/StaffDirectoryDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -330,6 +331,18 @@
      "name": "principalId",
      "from": "navigation",
      "optional": true
+    },
+    {
+     "name": "jobTitleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listJobTitles`."
+    },
+    {
+     "name": "workAssignmentId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listWorkAssignments`."
     }
    ],
    "coldEntry": "Opened from the Venue Management menu; lists everyone in scope. The selected person comes from the row, not the session.",
@@ -454,11 +467,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "ROLE_MANAGE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/role-assignment",
-   "component": "apps/venue-management-web/src/routes/venue-operations/RoleAssignmentDetail.tsx",
+   "component": "src/routes/venue-operations/RoleAssignmentDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -690,6 +704,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRoles` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "capabilityTemplateId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listCapabilityTemplates`."
     }
    ]
   },
@@ -793,11 +813,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/rota-scheduling",
-   "component": "apps/venue-management-web/src/routes/venue-operations/RotaSchedulingDetail.tsx",
+   "component": "src/routes/venue-operations/RotaSchedulingDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1124,11 +1145,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/time-attendance",
-   "component": "apps/venue-management-web/src/routes/venue-operations/TimeAttendanceDetail.tsx",
+   "component": "src/routes/venue-operations/TimeAttendanceDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1336,11 +1358,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "USER_MANAGE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/training-certification",
-   "component": "apps/venue-management-web/src/routes/venue-operations/TrainingCertificationDetail.tsx",
+   "component": "src/routes/venue-operations/TrainingCertificationDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1487,11 +1510,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/notification-settings",
-   "component": "apps/venue-management-web/src/routes/venue-operations/NotificationSettingsDetail.tsx",
+   "component": "src/routes/venue-operations/NotificationSettingsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1720,11 +1744,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "APPROVAL_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/approvals/approval-inbox",
-   "component": "apps/venue-management-web/src/routes/approvals/ApprovalInbox.tsx",
+   "component": "src/routes/approvals/ApprovalInbox.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2015,11 +2040,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "APPROVAL_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/approvals/approval-request",
-   "component": "apps/venue-management-web/src/routes/approvals/ApprovalRequest.tsx",
+   "component": "src/routes/approvals/ApprovalRequest.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2288,11 +2314,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "APPROVAL_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/approvals/approval-matrix",
-   "component": "apps/venue-management-web/src/routes/approvals/ApprovalMatrix.tsx",
+   "component": "src/routes/approvals/ApprovalMatrix.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2436,6 +2463,14 @@
     "ApprovalMatrix.scopeLevel",
     "ApprovalMatrix.scopePath",
     "ApprovalMatrix.rules"
+   ],
+   "params": [
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listApprovalMatrices`."
+    }
    ]
   },
   "wireframe": {
@@ -2496,11 +2531,12 @@
   "module": "People & Access Rights",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "APPROVAL_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/approvals/approval-delegations",
-   "component": "apps/venue-management-web/src/routes/approvals/ApprovalDelegations.tsx",
+   "component": "src/routes/approvals/ApprovalDelegations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2746,6 +2782,12 @@
      "from": "deepLink",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovalDelegations` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listApprovalMatrices`."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `delegationId`.",

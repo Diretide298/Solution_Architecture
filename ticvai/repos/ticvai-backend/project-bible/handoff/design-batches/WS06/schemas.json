@@ -13,9 +13,11 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
@@ -124,7 +126,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    },
    "createdAt": {
     "type": "string",
@@ -150,10 +153,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
@@ -197,7 +202,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    },
    "createdAt": {
     "type": "string",
@@ -212,6 +218,7 @@
   }
  },
  "AccessHardwareModel": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "access.hardware_model",
   "description": "One hardware model in the reusable library, independent of deployed devices: manufacturer, model, category and type, supported technologies, connectivity, capability flags and firmware information (declared 29 September, data-model close-out DM1)",
@@ -225,6 +232,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -290,7 +298,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    },
    "createdAt": {
     "type": "string",
@@ -321,6 +330,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -443,6 +453,20 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "directionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a direction change set by `setAccessPointDirection` takes effect; held `pending` until then."
+   },
+   "directionChangeReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the gate was last turned round (`setAccessPointDirection`)."
    }
   }
  },
@@ -733,7 +757,7 @@
  "DeviceSoftwareContentRemoteConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.device_configuration` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Device Software, Content & Remote Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "deviceGroupId": {
@@ -1138,7 +1162,7 @@
  "HandheldMobileAccessDeviceConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.device_configuration` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Handheld & Mobile Access Device Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "name": {
@@ -1587,7 +1611,7 @@
  "ReaderScannerPeripheralConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.access_point_configuration` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Reader, Scanner & Peripheral Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "accessPointId": {
@@ -1681,15 +1705,22 @@
   ]
  },
  "RegisteredDevice": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "platform.device",
   "type": "object",
   "description": "**The only device register** (ADR-0067, accepted 1 October; the register of record since 29 September). Identity (kind, hardware type, model, serial), every version (firmware, configuration, rule package, credential package), health, heartbeat and one lifecycle (`enrolmentState`: registered, enrolled, provisioned, active, deactivated, retired) for every device in the estate live on this row. The access-control device row, which repeated serial, versions, health and lifecycle, is now `access.device_placement` and holds only where an access-control device is placed. Tenancy owns and migrates this table; Access reads it only through this contract.\n",
   "required": [
    "id",
    "kind",
-   "driver"
+   "driver",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -1728,6 +1759,7 @@
     "description": "The model in the hardware library (access `setHardwareModel`; ADR-0067). Access owns the library; this names a model in it.\n"
    },
    "serialNumber": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "nullable": true,
     "maxLength": 100,
@@ -1780,6 +1812,7 @@
     "description": "Reported connectivity."
    },
    "pushToken": {
+    "x-ticvai-secret": "field-encrypted",
     "type": "string",
     "format": "password",
     "nullable": true,
@@ -1990,7 +2023,7 @@
  "TurnstileLaneBehaviorConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.access_point_configuration` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Turnstile & Lane Behavior Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "accessPointId": {
@@ -2086,7 +2119,7 @@
  "ValidationOutcomeGuestFeedbackDesignerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.gate_outcome_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Validation Outcome & Guest Feedback Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "appliesTo": {

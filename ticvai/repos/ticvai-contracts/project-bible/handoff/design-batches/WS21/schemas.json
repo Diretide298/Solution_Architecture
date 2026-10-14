@@ -907,6 +907,7 @@
     "readOnly": true
    },
    "partnerId": {
+    "x-ticvai-references": "control.partner",
     "type": "string",
     "format": "uuid",
     "description": "The partner (control.partner)."
@@ -2075,6 +2076,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },

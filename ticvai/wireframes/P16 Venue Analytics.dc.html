@@ -458,7 +458,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getKpiValues · listAlerts</div>
+          <div><b>OPERATIONS</b> &middot; getKpiValues</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Executive Command Center</i><br><a href="#anl-020">ANL-020</a>  &mdash; <i>Back to Multi-Site &amp; Performance Comparison</i></div>
@@ -728,7 +728,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listDashboards · getDashboard · createDashboard · recordDashboardView</div>
+          <div><b>OPERATIONS</b> &middot; listDashboards · getDashboard · recordDashboardView</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; dashboardId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Back to Executive Command Center</i> <span class="car">dashboardId · reportId</span><br><a href="#anl-022">ANL-022</a>  &mdash; <i>Dashboard Creation Wizard</i><br><a href="#anl-023">ANL-023</a>  &mdash; <i>Drag-and-Drop Dashboard Canvas</i> <span class="car">dashboardId</span><br><a href="#anl-024">ANL-024</a>  &mdash; <i>Widget &amp; Visualization Library</i><br><a href="#anl-025">ANL-025</a>  &mdash; <i>KPI Builder</i><br><a href="#anl-026">ANL-026</a>  &mdash; <i>Targets, Thresholds &amp; KPI Status Rules</i><br><a href="#anl-027">ANL-027</a>  &mdash; <i>Data &amp; Filter Configuration</i> <span class="car">dashboardId</span><br><a href="#anl-028">ANL-028</a>  &mdash; <i>Drill-Down &amp; Interaction Designer</i> <span class="car">dashboardId</span><br><a href="#anl-029">ANL-029</a>  &mdash; <i>Dashboard Access, Publishing &amp; Versioning</i> <span class="car">dashboardId</span><br><a href="#anl-030">ANL-030</a>  &mdash; <i>Dashboard Preview, Validation &amp; Health</i> <span class="car">dashboardId</span><br><a href="#anl-072">ANL-072</a>  &mdash; <i>Finance Dashboard</i></div>
@@ -968,7 +968,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; updateDashboard</div>
+          <div><b>OPERATIONS</b> &middot; updateDashboard · getDashboard</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; dashboardId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-021">ANL-021</a>  &mdash; <i>Back to Dashboard Library</i> <span class="car">dashboardId</span></div>
@@ -998,7 +998,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getDashboard · listAnalyticsPipelines · recordDashboardView</div>
+          <div><b>OPERATIONS</b> &middot; getDashboard · recordDashboardView</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; dashboardId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-021">ANL-021</a>  &mdash; <i>Back to Dashboard Library</i> <span class="car">dashboardId</span></div>
@@ -1268,7 +1268,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; runReport · getReportExecution · cancelReportExecution</div>
+          <div><b>OPERATIONS</b> &middot; getReportExecution · cancelReportExecution</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; executionId&larr;navigation, reportId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-031">ANL-031</a>  &mdash; <i>Back to Report Catalogue &amp; Library</i></div>
@@ -1298,7 +1298,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; runReport · getReportResult</div>
+          <div><b>OPERATIONS</b> &middot; getReportResult</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; executionId&larr;navigation, reportId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-031">ANL-031</a>  &mdash; <i>Back to Report Catalogue &amp; Library</i></div>
@@ -1328,7 +1328,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listReportSchedules · listReportDeliveries</div>
+          <div><b>OPERATIONS</b> &middot; listReportDeliveries</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#anl-001">ANL-001</a>  &mdash; <i>Back to Executive Command Center</i> <span class="car">reportId</span><br><a href="#anl-042">ANL-042</a>  &mdash; <i>Report Scheduler</i><br><a href="#anl-043">ANL-043</a>  &mdash; <i>Subscription Manager</i><br><a href="#anl-044">ANL-044</a>  &mdash; <i>Distribution &amp; Delivery Configuration</i><br><a href="#anl-045">ANL-045</a>  &mdash; <i>Export &amp; Download Center</i><br><a href="#anl-046">ANL-046</a>  &mdash; <i>Report API &amp; Data Delivery Manager</i><br><a href="#anl-047">ANL-047</a>  &mdash; <i>Report Access &amp; Sharing Control</i><br><a href="#anl-048">ANL-048</a>  &mdash; <i>Delivery Monitoring &amp; Failure Management</i><br><a href="#anl-049">ANL-049</a>  &mdash; <i>Report Audit Trail &amp; Compliance</i><br><a href="#anl-050">ANL-050</a>  &mdash; <i>Retention, Archive &amp; Governance Policy</i></div>
@@ -1448,7 +1448,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; exportReportResult · getReportExport</div>
+          <div><b>OPERATIONS</b> &middot; getReportExport</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; executionId&larr;navigation, exportId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-041">ANL-041</a>  &mdash; <i>Back to Reporting Governance Command Center</i></div>
@@ -1748,7 +1748,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiInsights · configureAnomalyDetector · listAnomalyDetectors</div>
+          <div><b>OPERATIONS</b> &middot; listAnomalyDetectors</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; detectorKey&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-051">ANL-051</a>  &mdash; <i>Back to AI Analytics Command Center</i></div>
@@ -1808,7 +1808,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; getKpiValues · listForecastDefinitions · getForecast · createForecastScenario +1</div>
+          <div><b>OPERATIONS</b> &middot; getForecast · createForecastScenario</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; versionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-051">ANL-051</a>  &mdash; <i>Back to AI Analytics Command Center</i></div>
@@ -1838,7 +1838,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAnalyticsAnomalies · listAiInsights</div>
+          <div><b>OPERATIONS</b> &middot; listAnalyticsAnomalies</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           
           <div><b>GOES TO</b> &middot; <a href="#anl-051">ANL-051</a>  &mdash; <i>Back to AI Analytics Command Center</i></div>
@@ -1868,7 +1868,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAnalyticsAnomalies · listAiInsights · decideAiInsight · searchAiDecisions +1</div>
+          <div><b>OPERATIONS</b> &middot; searchAiDecisions · listAiInteractions</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; insightId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-051">ANL-051</a>  &mdash; <i>Back to AI Analytics Command Center</i></div>
@@ -1898,7 +1898,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listAiCapabilities · configureAiCapability · getEffectiveAiPolicy · listAiModels +3</div>
+          <div><b>OPERATIONS</b> &middot; listAiModels</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; capabilityKey&larr;navigation, templateKey&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#anl-051">ANL-051</a>  &mdash; <i>Back to AI Analytics Command Center</i></div>

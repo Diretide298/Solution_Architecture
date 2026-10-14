@@ -5,11 +5,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/capacity-management",
-   "component": "apps/venue-management-web/src/routes/venue-operations/CapacityManagementDetail.tsx",
+   "component": "src/routes/venue-operations/CapacityManagementDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -351,11 +352,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/allocation-holds",
-   "component": "apps/venue-management-web/src/routes/venue-operations/AllocationHoldsDetail.tsx",
+   "component": "src/routes/venue-operations/AllocationHoldsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -580,11 +582,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/closures-blackouts",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ClosuresBlackoutsDetail.tsx",
+   "component": "src/routes/venue-operations/ClosuresBlackoutsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1096,11 +1099,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/offline-package-status",
-   "component": "apps/venue-management-web/src/routes/venue-operations/OfflinePackageStatusDetail.tsx",
+   "component": "src/routes/venue-operations/OfflinePackageStatusDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1337,7 +1341,7 @@
    {
     "operationId": "setOfflinePolicy",
     "contract": "tenancy",
-    "purpose": "setOfflinePolicy",
+    "purpose": "What a workstation may do with no network, and for how long",
     "trigger": "onAction",
     "invalidates": [
      "listCatalogueBundles"
@@ -1502,11 +1506,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "TENANT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/opening-hours-calendar",
-   "component": "apps/venue-management-web/src/routes/venue-operations/OpeningHoursCalendarDetail.tsx",
+   "component": "src/routes/venue-operations/OpeningHoursCalendarDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1763,10 +1768,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell",
-   "component": "apps/venue-management-web/src/routes/home/SellList.tsx",
+   "component": "src/routes/home/SellList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1940,7 +1946,7 @@
     {
      "to": "BO-118",
      "trigger": "Campaign & Audience Management",
-     "provenance": "derived — BO-118 declares entryState.params reportId and BO-102 holds none of them. The edge carries nothing: reportId only pre-selects (deep link or optional), and BO-118 opens on its own"
+     "provenance": "derived — BO-118 declares entryState.params executionId, reportId and BO-102 holds none of them. The edge carries nothing: reportId, executionId only pre-select (deep link or optional), and BO-118 opens on its own"
     },
     {
      "to": "BO-119",
@@ -2214,10 +2220,11 @@
   "module": "Sell",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/menu-builder-pos-layout-designer",
-   "component": "apps/venue-management-web/src/routes/sell/MenuBuilderPosLayoutDesignerList.tsx",
+   "component": "src/routes/sell/MenuBuilderPosLayoutDesignerList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2486,7 +2493,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/recipe-bom-management",
-   "component": "apps/venue-management-web/src/routes/sell/RecipeBomManagementList.tsx",
+   "component": "src/routes/sell/RecipeBomManagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2510,7 +2517,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listRecipes` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Recipe & BOM Management — from the client design board, 20 August (merged into BO-111 Ingredient Substitution, Allergen & Nutrition).",
+  "purpose": "Recipe & BOM Management: merged into BO-111; this id routes there and nothing on it is built separately.",
   "layout": {
    "template": "split",
    "regions": [
@@ -2589,10 +2596,11 @@
   "module": "Sell",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/ingredient-substitution-allergen-nutrition",
-   "component": "apps/venue-management-web/src/routes/sell/IngredientSubstitutionAllergenNutritioList.tsx",
+   "component": "src/routes/sell/IngredientSubstitutionAllergenNutritioList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2630,7 +2638,7 @@
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`setRecipe`, `updateMenu`, `setSubstitutionRules`) and no read of a population — it is settings, not a list",
-  "purpose": "Ingredient Substitution, Allergen & Nutrition — from the client design board, 20 August.",
+  "purpose": "Ingredient Substitution, Allergen & Nutrition: shows the last allergen verdict recorded for a dish (`getAllergenVerification`); list recipes (`listRecipes`), and acts with define a recipe for a menu item (`setRecipe`); what may replace what (`setSubstitutionRules`); does this dish still match its claim? (`verifyAllergens`).",
   "layout": {
    "template": "form",
    "regions": [
@@ -2939,10 +2947,11 @@
   "module": "Sell",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/production-planning-production-sheets",
-   "component": "apps/venue-management-web/src/routes/sell/ProductionPlanningProductionSheetsList.tsx",
+   "component": "src/routes/sell/ProductionPlanningProductionSheetsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2979,7 +2988,7 @@
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`planProductionRun`) and no read of a population — it is settings, not a list",
-  "purpose": "Production Planning & Production Sheets — from the client design board, 20 August.",
+  "purpose": "Production Planning & Production Sheets: shows what is being made, and what was (`listProductionRuns`); the production plans (`listProductionPlans`), and acts with plan a batch, for one outlet or several (`planProductionRun`); turn a forecast into a prep list (`buildProductionPlan`); make the plan real (`releaseProductionPlan`).",
   "layout": {
    "template": "form",
    "regions": [

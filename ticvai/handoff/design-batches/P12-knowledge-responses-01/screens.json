@@ -5,6 +5,7 @@
   "module": "Knowledge & Responses",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C105",
   "implementation": {
    "app": "venue-support-web",
@@ -173,6 +174,7 @@
   "module": "Knowledge & Responses",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "capability": "C60",
   "implementation": {
    "app": "venue-support-web",
@@ -201,7 +203,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listMessageTemplates` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Find canned response management for this venue.",
+  "purpose": "Support keeps the canned responses agents reuse: every message template by channel, and a new one when a reply recurs.",
   "layout": {
    "template": "split",
    "regions": [

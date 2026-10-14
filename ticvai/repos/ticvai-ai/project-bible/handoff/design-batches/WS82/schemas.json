@@ -77,6 +77,8 @@
     "$ref": "../shared/common.yaml#/components/schemas/Money"
    },
    "groupPricing": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -91,6 +93,8 @@
     }
    },
    "peakPricing": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -114,6 +118,8 @@
     }
    },
    "calendarExceptions": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -199,6 +205,7 @@
     "format": "uuid"
    },
    "dynamicPriceRuleId": {
+    "x-ticvai-references": "pricing.dynamic_price_rule",
     "type": "string",
     "format": "uuid"
    },
@@ -237,6 +244,7 @@
     "format": "uuid"
    },
    "dynamicPriceRuleId": {
+    "x-ticvai-references": "pricing.dynamic_price_rule",
     "type": "string",
     "format": "uuid"
    },
@@ -371,7 +379,7 @@
  "PricingPublicationEffectiveDateSchedulerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.change_request` (with `catalogue.audit_entry`, `catalogue.price_list_version`, `catalogue.pricing_publication`, `catalogue.pricing_publication_target`, `platform.outbox`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Pricing Publication & Effective-Date Scheduler submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "version": {

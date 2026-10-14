@@ -18,6 +18,7 @@
     "description": "The accreditation credential's id (`credentialId` on the events)."
    },
    "holderId": {
+    "x-ticvai-references": "accreditation.holder",
     "type": "string",
     "format": "uuid"
    },
@@ -494,7 +495,8 @@
    },
    "amendedByPrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "identity.principal"
    },
    "amendedAt": {
     "type": "string",
@@ -1310,7 +1312,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -1787,6 +1790,9 @@
   }
  },
  "ProposedAction": {
+  "x-ticvai-retired-columns": [
+   "interaction_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "ai.proposed_action",
   "required": [
@@ -1803,6 +1809,8 @@
     "format": "uuid"
    },
    "interactionId": {
+    "x-ticvai-references": "ai.activity",
+    "x-ticvai-column": "activity_id",
     "type": "string",
     "format": "uuid"
    },
@@ -2315,6 +2323,9 @@
   ]
  },
  "ScanEvent": {
+  "x-ticvai-retired-columns": [
+   "ticket_id"
+  ],
   "x-ticvai-append-only": "recordedAt",
   "x-ticvai-persistence": "access.scan_event",
   "type": "object",
@@ -2344,6 +2355,8 @@
     "type": "string"
    },
    "ticketId": {
+    "x-ticvai-references": "access.entitlement",
+    "x-ticvai-column": "entitlement_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -2529,11 +2542,13 @@
    },
    "fromPrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "identity.principal"
    },
    "toPrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "identity.principal"
    },
    "status": {
     "type": "string",

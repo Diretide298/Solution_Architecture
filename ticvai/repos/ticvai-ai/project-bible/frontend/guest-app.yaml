@@ -71,7 +71,7 @@ screens:
   platform: P02
   route: /general/home-default
   repo: ticvai-guest-app
-  path: src/routes/general/HomeDefaultDashboard.tsx
+  path: src/screens/general/HomeDefaultDashboard.tsx
   wave: 1
   status: notStarted
 - id: GST-002
@@ -79,7 +79,7 @@ screens:
   platform: P02
   route: /general/explore-categories
   repo: ticvai-guest-app
-  path: src/routes/general/ExploreCategoriesList.tsx
+  path: src/screens/general/ExploreCategoriesList.tsx
   wave: 1
   status: notStarted
 - id: GST-003
@@ -87,7 +87,7 @@ screens:
   platform: P02
   route: /general/buy-tickets
   repo: ticvai-guest-app
-  path: src/routes/general/BuyTicketsList.tsx
+  path: src/screens/general/BuyTicketsList.tsx
   wave: 1
   status: notStarted
 - id: GST-004
@@ -95,7 +95,7 @@ screens:
   platform: P02
   route: /general/item-detail
   repo: ticvai-guest-app
-  path: src/routes/general/ItemDetail.tsx
+  path: src/screens/general/ItemDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-005
@@ -103,7 +103,7 @@ screens:
   platform: P02
   route: /general/whats-on
   repo: ticvai-guest-app
-  path: src/routes/general/WhatsOnList.tsx
+  path: src/screens/general/WhatsOnList.tsx
   wave: 1
   status: notStarted
 - id: GST-006
@@ -111,7 +111,7 @@ screens:
   platform: P02
   route: /general/event-exhibition-details
   repo: ticvai-guest-app
-  path: src/routes/general/EventExhibitionDetailsDetail.tsx
+  path: src/screens/general/EventExhibitionDetailsDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-007
@@ -119,7 +119,7 @@ screens:
   platform: P02
   route: /general/select-date-and-time
   repo: ticvai-guest-app
-  path: src/routes/general/SelectDateAndTimeDetail.tsx
+  path: src/screens/general/SelectDateAndTimeDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-008
@@ -127,7 +127,7 @@ screens:
   platform: P02
   route: /general/tickets-and-add-ons
   repo: ticvai-guest-app
-  path: src/routes/general/TicketsAndAddOnsList.tsx
+  path: src/screens/general/TicketsAndAddOnsList.tsx
   wave: 1
   status: notStarted
 - id: GST-009
@@ -135,7 +135,7 @@ screens:
   platform: P02
   route: /general/review-and-payment
   repo: ticvai-guest-app
-  path: src/routes/general/ReviewAndPaymentForm.tsx
+  path: src/screens/general/ReviewAndPaymentForm.tsx
   wave: 1
   status: notStarted
 - id: GST-010
@@ -143,7 +143,7 @@ screens:
   platform: P02
   route: /general/booking-confirmation
   repo: ticvai-guest-app
-  path: src/routes/general/BookingConfirmationDetail.tsx
+  path: src/screens/general/BookingConfirmationDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-011
@@ -151,7 +151,7 @@ screens:
   platform: P02
   route: /general/wallet-overview
   repo: ticvai-guest-app
-  path: src/routes/general/WalletOverviewDashboard.tsx
+  path: src/screens/general/WalletOverviewDashboard.tsx
   wave: 1
   status: notStarted
 - id: GST-012
@@ -159,7 +159,7 @@ screens:
   platform: P02
   route: /general/my-tickets
   repo: ticvai-guest-app
-  path: src/routes/general/MyTicketsList.tsx
+  path: src/screens/general/MyTicketsList.tsx
   wave: 1
   status: notStarted
 - id: GST-013
@@ -167,7 +167,7 @@ screens:
   platform: P02
   route: /general/ticket-details
   repo: ticvai-guest-app
-  path: src/routes/general/TicketDetailsDetail.tsx
+  path: src/screens/general/TicketDetailsDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-014
@@ -175,7 +175,7 @@ screens:
   platform: P02
   route: /general/ticket-transfer
   repo: ticvai-guest-app
-  path: src/routes/general/TicketTransferDetail.tsx
+  path: src/screens/general/TicketTransferDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-015
@@ -183,7 +183,7 @@ screens:
   platform: P02
   route: /general/memberships
   repo: ticvai-guest-app
-  path: src/routes/general/MembershipsDetail.tsx
+  path: src/screens/general/MembershipsDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-016
@@ -191,7 +191,7 @@ screens:
   platform: P02
   route: /general/my-reservations
   repo: ticvai-guest-app
-  path: src/routes/general/MyReservationsDetail.tsx
+  path: src/screens/general/MyReservationsDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-017
@@ -199,7 +199,7 @@ screens:
   platform: P02
   route: /general/reservation-details
   repo: ticvai-guest-app
-  path: src/routes/general/ReservationDetailsDetail.tsx
+  path: src/screens/general/ReservationDetailsDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-018
@@ -207,7 +207,7 @@ screens:
   platform: P02
   route: /general/add-to-calendar-reminders
   repo: ticvai-guest-app
-  path: src/routes/general/AddToCalendarRemindersDetail.tsx
+  path: src/screens/general/AddToCalendarRemindersDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-019
@@ -215,7 +215,7 @@ screens:
   platform: P02
   route: /general/order-history-wallet
   repo: ticvai-guest-app
-  path: src/routes/general/OrderHistoryWalletDashboard.tsx
+  path: src/screens/general/OrderHistoryWalletDashboard.tsx
   wave: 1
   status: notStarted
 - id: GST-020
@@ -223,7 +223,7 @@ screens:
   platform: P02
   route: /general/saved-items-wishlist
   repo: ticvai-guest-app
-  path: src/routes/general/SavedItemsWishlistList.tsx
+  path: src/screens/general/SavedItemsWishlistList.tsx
   wave: 1
   status: notStarted
 - id: GST-021
@@ -231,7 +231,7 @@ screens:
   platform: P02
   route: /general/interactive-map
   repo: ticvai-guest-app
-  path: src/routes/general/InteractiveMapCanvas.tsx
+  path: src/screens/general/InteractiveMapCanvas.tsx
   wave: 1
   status: notStarted
 - id: GST-022
@@ -239,7 +239,7 @@ screens:
   platform: P02
   route: /general/attraction-wait-times
   repo: ticvai-guest-app
-  path: src/routes/general/AttractionWaitTimesDetail.tsx
+  path: src/screens/general/AttractionWaitTimesDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-023
@@ -247,7 +247,7 @@ screens:
   platform: P02
   route: /general/virtual-queue-join-queue
   repo: ticvai-guest-app
-  path: src/routes/general/VirtualQueueJoinQueueDetail.tsx
+  path: src/screens/general/VirtualQueueJoinQueueDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-024
@@ -255,7 +255,7 @@ screens:
   platform: P02
   route: /general/fandb-browse-and-order
   repo: ticvai-guest-app
-  path: src/routes/general/FandbBrowseAndOrderList.tsx
+  path: src/screens/general/FandbBrowseAndOrderList.tsx
   wave: 1
   status: notStarted
 - id: GST-025
@@ -263,7 +263,7 @@ screens:
   platform: P02
   route: /general/fandb-order-tracking
   repo: ticvai-guest-app
-  path: src/routes/general/FandbOrderTrackingDetail.tsx
+  path: src/screens/general/FandbOrderTrackingDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-026
@@ -271,7 +271,7 @@ screens:
   platform: P02
   route: /general/retail-merchandise
   repo: ticvai-guest-app
-  path: src/routes/general/RetailMerchandiseDetail.tsx
+  path: src/screens/general/RetailMerchandiseDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-027
@@ -279,7 +279,7 @@ screens:
   platform: P02
   route: /general/parking-reserve-and-pay
   repo: ticvai-guest-app
-  path: src/routes/general/ParkingReserveAndPayDetail.tsx
+  path: src/screens/general/ParkingReserveAndPayDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-028
@@ -287,7 +287,7 @@ screens:
   platform: P02
   route: /general/parking-reservation-confirmed
   repo: ticvai-guest-app
-  path: src/routes/general/ParkingReservationConfirmedDetail.tsx
+  path: src/screens/general/ParkingReservationConfirmedDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-029
@@ -295,7 +295,7 @@ screens:
   platform: P02
   route: /general/venue-info-and-services
   repo: ticvai-guest-app
-  path: src/routes/general/VenueInfoAndServicesDetail.tsx
+  path: src/screens/general/VenueInfoAndServicesDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-030
@@ -303,7 +303,7 @@ screens:
   platform: P02
   route: /general/in-venue-notifications
   repo: ticvai-guest-app
-  path: src/routes/general/InVenueNotificationsDetail.tsx
+  path: src/screens/general/InVenueNotificationsDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-031
@@ -311,7 +311,7 @@ screens:
   platform: P02
   route: /general/ai-concierge-home
   repo: ticvai-guest-app
-  path: src/routes/general/AiConciergeHomeDashboard.tsx
+  path: src/screens/general/AiConciergeHomeDashboard.tsx
   wave: 1
   status: notStarted
 - id: GST-032
@@ -319,7 +319,7 @@ screens:
   platform: P02
   route: /general/ai-concierge-chat
   repo: ticvai-guest-app
-  path: src/routes/general/AiConciergeChatDetail.tsx
+  path: src/screens/general/AiConciergeChatDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-033
@@ -327,7 +327,7 @@ screens:
   platform: P02
   route: /general/ai-concierge-contextual-help
   repo: ticvai-guest-app
-  path: src/routes/general/AiConciergeContextualHelpDetail.tsx
+  path: src/screens/general/AiConciergeContextualHelpDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-034
@@ -335,7 +335,7 @@ screens:
   platform: P02
   route: /general/lost-and-found
   repo: ticvai-guest-app
-  path: src/routes/general/LostAndFoundDetail.tsx
+  path: src/screens/general/LostAndFoundDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-035
@@ -343,7 +343,7 @@ screens:
   platform: P02
   route: /general/feedback-and-ratings
   repo: ticvai-guest-app
-  path: src/routes/general/FeedbackAndRatingsList.tsx
+  path: src/screens/general/FeedbackAndRatingsList.tsx
   wave: 1
   status: notStarted
 - id: GST-036
@@ -351,7 +351,7 @@ screens:
   platform: P02
   route: /loyalty-rewards
   repo: ticvai-guest-app
-  path: src/routes/LoyaltyRewards.tsx
+  path: src/screens/LoyaltyRewards.tsx
   wave: 1
   status: notStarted
 - id: GST-037
@@ -359,7 +359,7 @@ screens:
   platform: P02
   route: /general/offers-and-promotions
   repo: ticvai-guest-app
-  path: src/routes/general/OffersAndPromotionsDetail.tsx
+  path: src/screens/general/OffersAndPromotionsDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-038
@@ -367,7 +367,7 @@ screens:
   platform: P02
   route: /general/at-the-venue
   repo: ticvai-guest-app
-  path: src/routes/general/AtTheVenueDetail.tsx
+  path: src/screens/general/AtTheVenueDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-039
@@ -375,7 +375,7 @@ screens:
   platform: P02
   route: /general/profile
   repo: ticvai-guest-app
-  path: src/routes/general/ProfileDashboard.tsx
+  path: src/screens/general/ProfileDashboard.tsx
   wave: 1
   status: notStarted
 - id: GST-040
@@ -383,7 +383,7 @@ screens:
   platform: P02
   route: /general/help-and-support
   repo: ticvai-guest-app
-  path: src/routes/general/HelpAndSupportDetail.tsx
+  path: src/screens/general/HelpAndSupportDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-041
@@ -391,7 +391,7 @@ screens:
   platform: P02
   route: /general/checkout-entry
   repo: ticvai-guest-app
-  path: src/routes/general/CheckoutEntryForm.tsx
+  path: src/screens/general/CheckoutEntryForm.tsx
   wave: 1
   status: notStarted
 - id: GST-042
@@ -399,7 +399,7 @@ screens:
   platform: P02
   route: /general/simple-registration-and-otp
   repo: ticvai-guest-app
-  path: src/routes/general/SimpleRegistrationAndOtpDetail.tsx
+  path: src/screens/general/SimpleRegistrationAndOtpDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-043
@@ -407,7 +407,7 @@ screens:
   platform: P02
   route: /general/arabic-rtl-experience
   repo: ticvai-guest-app
-  path: src/routes/general/ArabicRtlExperienceDetail.tsx
+  path: src/screens/general/ArabicRtlExperienceDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-044
@@ -415,7 +415,7 @@ screens:
   platform: P02
   route: /general/multi-currency-and-pricing
   repo: ticvai-guest-app
-  path: src/routes/general/MultiCurrencyAndPricingDetail.tsx
+  path: src/screens/general/MultiCurrencyAndPricingDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-045
@@ -423,7 +423,7 @@ screens:
   platform: P02
   route: /general/ticket-delivery-and-sharing
   repo: ticvai-guest-app
-  path: src/routes/general/TicketDeliveryAndSharingDetail.tsx
+  path: src/screens/general/TicketDeliveryAndSharingDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-046
@@ -431,7 +431,7 @@ screens:
   platform: P02
   route: /general/branded-queue-waiting-room
   repo: ticvai-guest-app
-  path: src/routes/general/BrandedQueueWaitingRoomDetail.tsx
+  path: src/screens/general/BrandedQueueWaitingRoomDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-047
@@ -439,7 +439,7 @@ screens:
   platform: P02
   route: /general/maintenance-page
   repo: ticvai-guest-app
-  path: src/routes/general/MaintenancePageDetail.tsx
+  path: src/screens/general/MaintenancePageDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-048
@@ -447,7 +447,7 @@ screens:
   platform: P02
   route: /general/upsell-cross-sell
   repo: ticvai-guest-app
-  path: src/routes/general/UpsellCrossSellDetail.tsx
+  path: src/screens/general/UpsellCrossSellDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-049
@@ -455,7 +455,7 @@ screens:
   platform: P02
   route: /general/interactive-seat-selection
   repo: ticvai-guest-app
-  path: src/routes/general/InteractiveSeatSelectionCanvas.tsx
+  path: src/screens/general/InteractiveSeatSelectionCanvas.tsx
   wave: 1
   status: notStarted
 - id: GST-050
@@ -463,7 +463,7 @@ screens:
   platform: P02
   route: /general/resource-booking-cabana
   repo: ticvai-guest-app
-  path: src/routes/general/ResourceBookingCabanaDetail.tsx
+  path: src/screens/general/ResourceBookingCabanaDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-051
@@ -471,7 +471,7 @@ screens:
   platform: P02
   route: /general/plan-your-adventure-start
   repo: ticvai-guest-app
-  path: src/routes/general/PlanYourAdventureStartDetail.tsx
+  path: src/screens/general/PlanYourAdventureStartDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-052
@@ -479,7 +479,7 @@ screens:
   platform: P02
   route: /general/suggested-itineraries
   repo: ticvai-guest-app
-  path: src/routes/general/SuggestedItinerariesDetail.tsx
+  path: src/screens/general/SuggestedItinerariesDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-053
@@ -487,7 +487,7 @@ screens:
   platform: P02
   route: /general/your-plan
   repo: ticvai-guest-app
-  path: src/routes/general/YourPlanDetail.tsx
+  path: src/screens/general/YourPlanDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-054
@@ -495,7 +495,7 @@ screens:
   platform: P02
   route: /general/ai-planner
   repo: ticvai-guest-app
-  path: src/routes/general/AIPlannerDetail.tsx
+  path: src/screens/general/AIPlannerDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-055
@@ -503,7 +503,7 @@ screens:
   platform: P02
   route: /general/dynamic-qr-ticket
   repo: ticvai-guest-app
-  path: src/routes/general/DynamicQrTicketCanvas.tsx
+  path: src/screens/general/DynamicQrTicketCanvas.tsx
   wave: 1
   status: notStarted
 - id: GST-056
@@ -511,7 +511,7 @@ screens:
   platform: P02
   route: /general/bundle-package
   repo: ticvai-guest-app
-  path: src/routes/general/BundlePackageDetail.tsx
+  path: src/screens/general/BundlePackageDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-057
@@ -519,7 +519,7 @@ screens:
   platform: P02
   route: /general/accessibility-information
   repo: ticvai-guest-app
-  path: src/routes/general/AccessibilityInformationForm.tsx
+  path: src/screens/general/AccessibilityInformationForm.tsx
   wave: 1
   status: notStarted
 - id: GST-058
@@ -527,7 +527,7 @@ screens:
   platform: P02
   route: /general/resource-availability-cabana
   repo: ticvai-guest-app
-  path: src/routes/general/ResourceAvailabilityCabanaDetail.tsx
+  path: src/screens/general/ResourceAvailabilityCabanaDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-059
@@ -535,7 +535,7 @@ screens:
   platform: P02
   route: /general/plan-my-day-in-progress
   repo: ticvai-guest-app
-  path: src/routes/general/PlanMyDayInProgressDetail.tsx
+  path: src/screens/general/PlanMyDayInProgressDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-061
@@ -543,7 +543,7 @@ screens:
   platform: P02
   route: /in-venue-experience/menu-item-detail
   repo: ticvai-guest-app
-  path: src/routes/in-venue-experience/MenuItemDetail.tsx
+  path: src/screens/in-venue-experience/MenuItemDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-062
@@ -551,7 +551,7 @@ screens:
   platform: P02
   route: /in-venue-experience/shop-and-drop-collection
   repo: ticvai-guest-app
-  path: src/routes/in-venue-experience/ShopAndDropCollectionList.tsx
+  path: src/screens/in-venue-experience/ShopAndDropCollectionList.tsx
   wave: 1
   status: notStarted
 - id: GST-063
@@ -559,7 +559,7 @@ screens:
   platform: P02
   route: /search
   repo: ticvai-guest-app
-  path: src/routes/Search.tsx
+  path: src/screens/Search.tsx
   wave: 1
   status: notStarted
 - id: GST-065
@@ -567,7 +567,7 @@ screens:
   platform: P02
   route: /newsletter-preferences
   repo: ticvai-guest-app
-  path: src/routes/NewsletterPreferences.tsx
+  path: src/screens/NewsletterPreferences.tsx
   wave: 1
   status: notStarted
 - id: GST-066
@@ -575,7 +575,7 @@ screens:
   platform: P02
   route: /account/privacy-my-data
   repo: ticvai-guest-app
-  path: src/routes/account/PrivacyMyData.tsx
+  path: src/screens/account/PrivacyMyData.tsx
   wave: 1
   status: notStarted
 - id: GST-067
@@ -583,7 +583,7 @@ screens:
   platform: P02
   route: /account/refunds-resale
   repo: ticvai-guest-app
-  path: src/routes/account/RefundsResale.tsx
+  path: src/screens/account/RefundsResale.tsx
   wave: 1
   status: notStarted
 - id: GST-068
@@ -591,7 +591,7 @@ screens:
   platform: P02
   route: /account/help-my-cases
   repo: ticvai-guest-app
-  path: src/routes/account/HelpMyCases.tsx
+  path: src/screens/account/HelpMyCases.tsx
   wave: 1
   status: notStarted
 - id: GST-069
@@ -599,7 +599,7 @@ screens:
   platform: P02
   route: /account/face-pass
   repo: ticvai-guest-app
-  path: src/routes/account/FacePass.tsx
+  path: src/screens/account/FacePass.tsx
   wave: 1
   status: notStarted
 - id: GST-070
@@ -607,7 +607,7 @@ screens:
   platform: P02
   route: /reserve-table
   repo: ticvai-guest-app
-  path: src/routes/ReserveTable.tsx
+  path: src/screens/ReserveTable.tsx
   wave: 1
   status: notStarted
 - id: GST-071
@@ -615,7 +615,7 @@ screens:
   platform: P02
   route: /account/payment-methods
   repo: ticvai-guest-app
-  path: src/routes/account/PaymentMethods.tsx
+  path: src/screens/account/PaymentMethods.tsx
   wave: 1
   status: notStarted
 - id: GST-072
@@ -623,7 +623,7 @@ screens:
   platform: P02
   route: /account/share-group-booking
   repo: ticvai-guest-app
-  path: src/routes/account/ShareGroupBooking.tsx
+  path: src/screens/account/ShareGroupBooking.tsx
   wave: 1
   status: notStarted
 - id: GST-073
@@ -631,7 +631,7 @@ screens:
   platform: P02
   route: /account/security-sign-in
   repo: ticvai-guest-app
-  path: src/routes/account/SecuritySignIn.tsx
+  path: src/screens/account/SecuritySignIn.tsx
   wave: 1
   status: notStarted
 - id: GST-074
@@ -639,7 +639,7 @@ screens:
   platform: P02
   route: /general/map-booking
   repo: ticvai-guest-app
-  path: src/routes/general/MapBookingCanvas.tsx
+  path: src/screens/general/MapBookingCanvas.tsx
   wave: 1
   status: notStarted
 - id: GST-075
@@ -647,7 +647,7 @@ screens:
   platform: P02
   route: /general/space-by-the-hour
   repo: ticvai-guest-app
-  path: src/routes/general/SpaceByTheHourWizard.tsx
+  path: src/screens/general/SpaceByTheHourWizard.tsx
   wave: 1
   status: notStarted
 - id: GST-076
@@ -655,7 +655,7 @@ screens:
   platform: P02
   route: /transport/route-and-schedule
   repo: ticvai-guest-app
-  path: src/routes/transport/RouteAndScheduleList.tsx
+  path: src/screens/transport/RouteAndScheduleList.tsx
   wave: 1
   status: notStarted
 - id: GST-077
@@ -663,7 +663,7 @@ screens:
   platform: P02
   route: /transport/route-and-passengers
   repo: ticvai-guest-app
-  path: src/routes/transport/RouteAndPassengersDetail.tsx
+  path: src/screens/transport/RouteAndPassengersDetail.tsx
   wave: 1
   status: notStarted
 - id: GST-078
@@ -671,7 +671,7 @@ screens:
   platform: P02
   route: /transport/multi-trip-passes
   repo: ticvai-guest-app
-  path: src/routes/transport/MultiTripPassesList.tsx
+  path: src/screens/transport/MultiTripPassesList.tsx
   wave: 1
   status: notStarted
 - id: GST-079
@@ -679,7 +679,7 @@ screens:
   platform: P02
   route: /transport/favourite-routes
   repo: ticvai-guest-app
-  path: src/routes/transport/FavouriteRoutesList.tsx
+  path: src/screens/transport/FavouriteRoutesList.tsx
   wave: 1
   status: notStarted
 - id: KSK-001

@@ -5,6 +5,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "3",
@@ -125,7 +126,7 @@
         "Usage Count"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listReports",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each report shall display"
       }
      ]
@@ -138,6 +139,7 @@
        "kind": "detailPanel",
        "label": "The selected report catalogue",
        "bindsTo": null,
+       "operation": "listReports",
        "columns": [
         "Report Name",
         "Report ID",
@@ -228,6 +230,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_MANAGE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "3",
@@ -278,46 +281,55 @@
       {
        "kind": "selectField",
        "label": "Report Name",
+       "operation": "createReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Description",
+       "operation": "createReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Category",
+       "operation": "createReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Owner",
+       "operation": "createReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Tags",
+       "operation": "createReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Language",
+       "operation": "createReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure"
       },
       {
        "kind": "textField",
        "label": "Step 2 — Business Domain",
+       "operation": "createReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure"
       },
       {
        "kind": "textField",
        "label": "Inventory • Resources • Marketing",
+       "operation": "createReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Select one or multiple domains"
       },
       {
        "kind": "textField",
        "label": "Step 3 — Report Type",
+       "operation": "createReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Select one or multiple domains"
       }
      ]
@@ -377,6 +389,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "3",
@@ -438,7 +451,7 @@
         "Security Classification"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getSemanticModel",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 29 §Show"
       }
      ]
@@ -451,6 +464,7 @@
        "kind": "detailPanel",
        "label": "The selected data domain dataset",
        "bindsTo": null,
+       "operation": "getSemanticModel",
        "columns": [
         "Dataset Name",
         "Description",
@@ -529,6 +543,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "3",
@@ -665,6 +680,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_MANAGE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "3",
@@ -725,6 +741,7 @@
       {
        "kind": "multiSelect",
        "label": "Filter by",
+       "operation": "updateReport",
        "columns": [
         "Date Range",
         "Site",
@@ -813,6 +830,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_MANAGE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "3",
@@ -878,6 +896,7 @@
       {
        "kind": "multiSelect",
        "label": "Filter by",
+       "operation": "updateReport",
        "columns": [
         "Site",
         "Attraction",
@@ -974,6 +993,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "3",
@@ -1120,6 +1140,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_MANAGE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "3",
@@ -1175,36 +1196,43 @@
       {
        "kind": "selectField",
        "label": "Column labels",
+       "operation": "updateReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Number format",
+       "operation": "updateReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Currency",
+       "operation": "updateReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Percentage",
+       "operation": "updateReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Date format",
+       "operation": "updateReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Decimal precision",
+       "operation": "updateReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Conditional formatting",
+       "operation": "updateReport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure"
       }
      ]
@@ -1291,6 +1319,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "3",
@@ -1352,7 +1381,7 @@
         "Data Refresh Time"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getReportExecution",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 36 §Display"
       }
      ]
@@ -1365,6 +1394,7 @@
        "kind": "detailPanel",
        "label": "The selected report preview test",
        "bindsTo": null,
+       "operation": "getReportExecution",
        "columns": [
         "Sample Results",
         "Total Records",
@@ -1390,13 +1420,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "runReport",
-    "contract": "reporting",
-    "purpose": "Run it against a sample",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "getReportExecution",
     "contract": "reporting",
@@ -1474,6 +1497,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "3",
@@ -1518,47 +1542,55 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "Report Name",
+       "operation": "getReportResult",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Description",
+       "operation": "getReportResult",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Owner",
+       "operation": "getReportResult",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Last Run",
+       "operation": "getReportResult",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Data Refresh",
+       "operation": "getReportResult",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Applied Parameters",
+       "operation": "getReportResult",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Reporting Period",
+       "operation": "getReportResult",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Visual management dashboards Detailed reporting",
+       "operation": "getReportResult",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Dashboard Designer Report Builder"
       }
      ]
@@ -1619,13 +1651,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "runReport",
-    "contract": "reporting",
-    "purpose": "Run it",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "getReportResult",
     "contract": "reporting",

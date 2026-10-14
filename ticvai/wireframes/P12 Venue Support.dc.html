@@ -200,7 +200,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div>
           <div class="hdr"><span class="code">SUP-002</span>
             <span class="ttl">Agent Dashboard</span><span class="pill named" title="Board archived to _dump/; the link is history and no drawn frame for this screen is in wireframes/">archived: Dashboards Board.dc.html#sup-002</span></div>
-          <div class="pur">The screen this app sits on. Everything else is entered from here and returns to it.</div>
+          <div class="pur">The support agent&#x27;s home: the cases and conversations waiting, filtered by status, assignee, priority and breached SLA, the agents&#x27; availabi</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>Overview</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Overview</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -350,7 +350,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div>
           <div class="hdr"><span class="code">SUP-007</span>
             <span class="ttl">Canned Response Management</span></div>
-          <div class="pur">Find canned response management for this venue.</div>
+          <div class="pur">Support keeps the canned responses agents reuse: every message template by channel, and a new one when a reply recurs.</div>
         </div>
         <div class="frame">
           <aside class="rail"><div class="brand"><b>TICVAI</b><span>Knowledge &amp; Responses</span></div><nav class="nav"><i class="">Dashboard</i><i class="on">Knowledge &amp;amp; Responses</i><i class="">Settings</i><i class="">Reports</i><i class="">People</i></nav></aside>
@@ -550,7 +550,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setOrderBookingTicket · listOrders</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; serviceActionId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#sup-009">SUP-009</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -580,7 +580,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setRefundCompensationService</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; compensationRequestId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#sup-009">SUP-009</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -668,7 +668,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; setCustomerServiceCopilot · configureAssistantProfile · listAssistantProfiles</div>
+          <div><b>OPERATIONS</b> &middot; setCustomerServiceCopilot · listAssistantProfiles</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
           <div><b>ARRIVES WITH</b> &middot; profileKey&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#sup-009">SUP-009</a> </div>
@@ -730,7 +730,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listServiceQueues · setServiceQueueDefinition</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; queueId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#sup-019">SUP-019</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetServiceQueueDefinition &middot; <i>Save service queue definition</i> &middot; <b>Save service queue definition</b> &middot; Cancel <span class="dis">discards code · name · isActive · overflowWaitSeconds</span></div></div>
@@ -760,7 +760,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; setIntelligentRoutingSkill · listCaseCategories · listServiceQueues</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; routingRuleId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#sup-019">SUP-019</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           
@@ -790,7 +790,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
         <div class="foot">
           <div><b>OPERATIONS</b> &middot; listSlaPolicyService · setSlaPolicy</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyFirstRun · emptyNoAccess</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; slaPolicyId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#sup-019">SUP-019</a>  &mdash; <i>Returns to the board&#x27;s landing screen</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetSlaPolicy &middot; <i>Save SLA policy</i> &middot; <b>Save SLA policy</b> &middot; Cancel</div></div>

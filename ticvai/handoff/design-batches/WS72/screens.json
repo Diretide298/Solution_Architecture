@@ -5,6 +5,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "1",
@@ -113,7 +114,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -141,7 +142,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
@@ -369,6 +370,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "1",
@@ -584,6 +586,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_MANAGE",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "1",
@@ -763,6 +766,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "1",
@@ -977,6 +981,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "1",
@@ -1029,61 +1034,73 @@
       {
        "kind": "selectField",
        "label": "Signature Required",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Initials Required",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Typed Acceptance",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Checkbox Acceptance",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Digital Signature",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Date/Time",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Signatory Name",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Relationship",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure"
       },
       {
        "kind": "textField",
        "label": "Identity Verification where required",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure"
       },
       {
        "kind": "textField",
        "label": "Each participant signs individually",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §For group bookings, configure whether"
       },
       {
        "kind": "textField",
        "label": "Guardian signs for each minor",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §For group bookings, configure whether"
       },
       {
        "kind": "textField",
        "label": "Group leader signs where legally/operationally permitted",
+       "operation": "getSignatorySignatureGuardian",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §For group bookings, configure whether"
       }
      ]
@@ -1128,6 +1145,13 @@
     "contract": "marketing-crm",
     "purpose": "Signatory, Signature & Guardian Rule Configuration",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "getSignatorySignatureGuardian",
+    "contract": "marketing-crm",
+    "purpose": "The signatory and guardian rules as configured, which fill the form before a change is saved",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)"
    }
   ],
   "wireframe": {
@@ -1166,6 +1190,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "1",
@@ -1334,6 +1359,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "1",
@@ -1512,6 +1538,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "1",
@@ -1666,6 +1693,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "1",
@@ -1839,6 +1867,7 @@
   "module": "Policy",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "GUEST_MANAGE",
   "source": {
    "pack": "Waiver, Consent & Digital Form Management_Reference.pdf",
    "board": "1",
@@ -1883,21 +1912,25 @@
       {
        "kind": "selectField",
        "label": "Required fields configured",
+       "operation": "approveWaiverTesting",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Fields"
       },
       {
        "kind": "selectField",
        "label": "11.1.1",
+       "operation": "approveWaiverTesting",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Configuration experience"
       },
       {
        "kind": "selectField",
        "label": "0",
+       "operation": "approveWaiverTesting",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Configuration experience"
       },
       {
        "kind": "textField",
        "label": "→ Approve & Publish",
+       "operation": "approveWaiverTesting",
        "provenance": "pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Board 1 Configuration Flow"
       }
      ]

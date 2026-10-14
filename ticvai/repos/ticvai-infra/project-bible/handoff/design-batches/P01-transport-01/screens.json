@@ -8,7 +8,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/transport/route-and-schedule",
-   "component": "apps/guest-web/src/routes/transport/RouteAndScheduleSplit.tsx",
+   "component": "src/routes/transport/RouteAndScheduleSplit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -270,12 +270,6 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "getTransportRoute",
-    "contract": "transport",
-    "purpose": "The route and its stops",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "getTransportRouteMap",
     "contract": "transport",
     "purpose": "Stop list, line and bounds for the map",
@@ -372,6 +366,14 @@
      "discards": []
     },
     "provenance": "client-verified"
+   }
+  ],
+  "gaps": [
+   {
+    "operation": "getTransportRoute",
+    "removed": true,
+    "why": "Nothing on the client-approved screen shows it: the stops and the map come from getTransportRouteMap.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "_platform": {

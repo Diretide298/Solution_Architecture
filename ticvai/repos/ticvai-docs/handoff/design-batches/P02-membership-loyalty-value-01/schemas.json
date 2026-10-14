@@ -1,153 +1,4 @@
 {
- "AiRecommendationItem": {
-  "type": "object",
-  "x-ticvai-persistence": "none — held in jsonb on ai.rec_decision.items, through AiRecommendationItemList",
-  "description": "One recommended item. **Carries a Pricing price reference, never a computed price** (AIR-029).",
-  "required": [
-   "trackingId",
-   "rank"
-  ],
-  "properties": {
-   "trackingId": {
-    "type": "string",
-    "format": "uuid",
-    "description": "Echoed on every `recordRecommendationEvents` event and as `orders.addCartLine.recommendationId`, so attribution never guesses."
-   },
-   "productId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "The product recommended. **Exactly one of `productId`, `promotionId` or `couponRef`, `rewardId` or `challengeId` is set, by `kind`** (29 September, build): `offer` carries a promotion or coupon, `reward` a loyalty reward, `challenge` a challenge, every other kind a product."
-   },
-   "promotionId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For `offer`, a published promotion the guest is eligible for. Promotions computes the discount at the basket, never the engine."
-   },
-   "couponRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "For `offer`, a coupon campaign; a code is assigned only when the guest takes it (`promotions.assignCoupon`)."
-   },
-   "rewardId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For `reward`, a marketing-crm loyalty reward the guest can redeem."
-   },
-   "challengeId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true,
-    "description": "For `challenge`, a marketing-crm challenge the guest can join."
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "upsell",
-     "crossSell",
-     "upgrade",
-     "bundle",
-     "addOn",
-     "membership",
-     "nextBestOffer",
-     "offer",
-     "reward",
-     "challenge"
-    ]
-   },
-   "rank": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "priceRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "The Pricing reference the channel resolves to a price. AI never computes a price."
-   },
-   "reasonTemplateKey": {
-    "type": "string",
-    "nullable": true,
-    "description": "The template reason (decided 29 September, decision 9): no model writes guest-visible reasons."
-   },
-   "reasonText": {
-    "type": "string",
-    "nullable": true,
-    "description": "The rendered template in the session locale, where the channel shows reasons."
-   },
-   "confidenceBand": {
-    "type": "string",
-    "enum": [
-     "high",
-     "medium",
-     "low"
-    ],
-    "description": "Design 5.6: a band, never a bare percentage."
-   },
-   "score": {
-    "type": "number",
-    "nullable": true,
-    "description": "Normalised score. **Returned to staff callers only**; a guest response omits it."
-   }
-  }
- },
- "AiRecommendationResult": {
-  "type": "object",
-  "x-ticvai-persistence": "none — written as ai.rec_decision after the response",
-  "description": "The recommendation slot's content (design 2.2 A). Empty `items` is a valid answer: the slot stays empty.",
-  "required": [
-   "decisionId",
-   "mode",
-   "items",
-   "expiresAt"
-  ],
-  "properties": {
-   "decisionId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "placement": {
-    "type": "string",
-    "enum": [
-     "productPage",
-     "cart",
-     "checkout",
-     "postPurchase",
-     "preVisit",
-     "inVenue",
-     "posBasket",
-     "kioskBasket",
-     "fnbMenu",
-     "retailBasket",
-     "seatUpgrade",
-     "membership",
-     "email",
-     "homepage",
-     "loyalty"
-    ]
-   },
-   "mode": {
-    "type": "string",
-    "enum": [
-     "personalised",
-     "contextual",
-     "rulesOnly",
-     "fallback"
-    ]
-   },
-   "items": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AiRecommendationItem"
-    }
-   },
-   "expiresAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
  "BillingStatement": {
   "x-ticvai-persistence": "none — computed from orders.payment and payments.dunning_case",
   "type": "object",
@@ -1111,6 +962,7 @@
     "format": "uuid"
    },
    "badgeId": {
+    "x-ticvai-references": "marketing.badge",
     "type": "string",
     "format": "uuid"
    },
@@ -1139,6 +991,7 @@
     "nullable": true
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "maxLength": 20
    }
@@ -1211,6 +1064,7 @@
   }
  },
  "MarketingReward": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.reward",
   "description": "**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.",
@@ -1219,9 +1073,15 @@
    "code",
    "name",
    "type",
-   "isActive"
+   "isActive",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -1283,134 +1143,8 @@
    }
   }
  },
- "PayInstalment": {
-  "type": "object",
-  "description": "One scheduled charge in an instalment plan.",
-  "required": [
-   "sequence",
-   "dueDate",
-   "amount",
-   "status"
-  ],
-  "properties": {
-   "sequence": {
-    "type": "integer",
-    "minimum": 1
-   },
-   "dueDate": {
-    "type": "string",
-    "format": "date"
-   },
-   "amount": {
-    "x-ticvai-column": "due_amount",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "scheduled",
-     "paid",
-     "failed",
-     "waived",
-     "cancelled"
-    ]
-   },
-   "paymentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "dunningCaseId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "attemptedAt": {
-    "type": "string",
-    "format": "date-time",
-    "nullable": true
-   }
-  }
- },
- "PayInstalmentPlan": {
-  "type": "object",
-  "x-ticvai-persistence": "payments.instalment_plan + payments.instalment",
-  "description": "4.2.17. A schedule of charges for one order, independent of the product's term.",
-  "required": [
-   "id",
-   "orderId",
-   "frequency",
-   "status",
-   "total",
-   "instalments"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "orderId": {
-    "x-ticvai-references": "orders.sales_order",
-    "type": "string",
-    "format": "uuid"
-   },
-   "subjectId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "frequency": {
-    "type": "string",
-    "enum": [
-     "monthly",
-     "quarterly",
-     "custom"
-    ]
-   },
-   "paymentTokenId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "status": {
-    "type": "string",
-    "enum": [
-     "active",
-     "completed",
-     "inArrears",
-     "cancelled"
-    ]
-   },
-   "total": {
-    "x-ticvai-column": "gross_amount",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "paidToDate": {
-    "x-ticvai-column": "paid_amount",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "nextDueDate": {
-    "type": "string",
-    "format": "date",
-    "nullable": true
-   },
-   "instalments": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/PayInstalment"
-    }
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Written at the scope of the venue the order was sold at."
-   }
-  }
- },
  "PaymentToken": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "payments.token",
   "description": "BL-116. **A stored credential, held by the provider and referenced here.** The platform never sees a card number, which is what keeps PCI scope where it belongs.\n**A token is provider-scoped.** A card tokenised with one gateway does not work with another, so a routing change does not silently move a guest's saved card — it means asking them again, and the model should make that visible rather than surprising.\n",
@@ -1436,6 +1170,7 @@
     "format": "uuid"
    },
    "token": {
+    "x-ticvai-secret": "field-encrypted",
     "type": "string",
     "format": "password",
     "writeOnly": true,
@@ -1533,13 +1268,15 @@
     "type": "string",
     "format": "uuid",
     "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164).",
     "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
    },
    "approvedByPrincipalId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164)."
    },
    "responsibleDepartmentId": {
     "type": "string",
@@ -1645,6 +1382,8 @@
     "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 6,
     "items": {
@@ -2071,6 +1810,7 @@
     "format": "uuid"
    },
    "referrerSubjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -2081,6 +1821,7 @@
     "nullable": true
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "readOnly": true,
     "type": "string"
    },
@@ -2133,6 +1874,7 @@
   "description": "Request only.",
   "properties": {
    "paymentTokenId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "format": "uuid",
     "nullable": true,
@@ -2151,6 +1893,7 @@
   ]
  },
  "Wallet": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [
@@ -2312,122 +2055,6 @@
     "type": "string",
     "readOnly": true,
     "description": "**The partition key** (ADR-0005). Written at the wallet's venue scope."
-   }
-  }
- },
- "WalletExitBalance": {
-  "type": "object",
-  "x-ticvai-persistence": "none — computed from wallet.wallet, wallet.credit_lot and held offline transactions",
-  "required": [
-   "walletId",
-   "balance",
-   "amountDue",
-   "refundable"
-  ],
-  "properties": {
-   "walletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "balance": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "pendingOfflineAmount": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "amountDue": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "refundable": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "nonRefundableCredit": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "waiveAllowedUpTo": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "asAt": {
-    "type": "string",
-    "format": "date-time"
-   }
-  }
- },
- "WalletExitSettlement": {
-  "type": "object",
-  "x-ticvai-persistence": "wallet.exit_settlement",
-  "description": "4.3.4. One settlement of a wallet at exit.",
-  "required": [
-   "id",
-   "walletId",
-   "action",
-   "amount",
-   "settledAt"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "walletId": {
-    "type": "string",
-    "format": "uuid"
-   },
-   "action": {
-    "type": "string",
-    "enum": [
-     "collect",
-     "refund",
-     "waive"
-    ]
-   },
-   "method": {
-    "type": "string",
-    "nullable": true,
-    "enum": [
-     "card",
-     "cash",
-     "storedCard",
-     "originalPayment"
-    ]
-   },
-   "amount": {
-    "x-ticvai-column": "settled_amount",
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "balanceBefore": {
-    "$ref": "../shared/common.yaml#/components/schemas/Money"
-   },
-   "paymentId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "refundId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "walletTransactionId": {
-    "type": "string",
-    "nullable": true
-   },
-   "reason": {
-    "type": "string",
-    "nullable": true
-   },
-   "settledByPrincipalId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "settledAt": {
-    "type": "string",
-    "format": "date-time"
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true
    }
   }
  },

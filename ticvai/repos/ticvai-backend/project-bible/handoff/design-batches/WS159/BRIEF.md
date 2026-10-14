@@ -1,6 +1,6 @@
 # WS159 — Resource Management Configuration board 5
 
-**10 screens · 12 operations · 10 schemas · 3 permissions**
+**10 screens · 12 operations · 11 schemas · 3 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -101,9 +101,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-894` | Staff-to-Experience Qualification Mapping | D | 19 | 11 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-895` | Resource Combination Builder | D | 28 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-896` | Ticket Demand & Resource Capacity Mapping | D | 3 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-897` | Customer Resource Selection Configuration | D | 1 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-897` | Customer Resource Selection Configuration | D | 5 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-898` | Skill-Based & Smart Resource Selection | D | 4 | 22 | 6 | 22 | 1 | 0 | — | notStarted (—) |
-| `BO-899` | Customer / Cashier Resource Assignment Experience | D | 1 | 0 | 6 | 4 | 2 | 6 | — | notStarted (—) |
+| `BO-899` | Customer / Cashier Resource Assignment Experience | D | 18 | 0 | 6 | 4 | 2 | 6 | — | notStarted (—) |
 | `BO-900` | Dynamic Resource Allocation Engine | D | 10 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-901` | Priority, Scoring & Allocation Policy | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-902` | Automatic Replacement & Assignment Recovery | D | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

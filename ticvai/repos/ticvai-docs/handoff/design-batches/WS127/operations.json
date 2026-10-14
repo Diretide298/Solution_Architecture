@@ -14,7 +14,7 @@
  },
  "setSpace": {
   "method": "PUT",
-  "path": "/spaces",
+  "path": "/spaces/{spaceId}",
   "contract": "catalogue",
   "summary": "Define a space, its capacity and its access rules",
   "permission": "EVENT_CONFIGURE",
@@ -22,6 +22,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "spaceId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

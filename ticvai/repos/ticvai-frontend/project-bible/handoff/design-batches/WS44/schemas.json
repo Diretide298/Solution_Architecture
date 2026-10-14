@@ -221,6 +221,7 @@
     "type": "integer"
    },
    "pendingApprovers": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -423,7 +424,7 @@
  "ApprovalReviewDecisionWorkspaceInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.change_request` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Approval Review & Decision Workspace submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "decision": {
@@ -796,7 +797,7 @@
  "ApprovalWorkflowDesignerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `catalogue.approval_policy` (with `catalogue.audit_entry`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Approval Workflow Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "workflowName": {
@@ -1344,6 +1345,7 @@
     "description": "The change request whose publication is being rolled back."
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "enum": [
      "requested",
@@ -1356,6 +1358,7 @@
     "default": "requested"
    },
    "requestedByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true
@@ -1975,6 +1978,7 @@
     "description": "**The partition key** (ADR-0005). Operations write it at `venue` scope."
    },
    "sourceProductId": {
+    "x-ticvai-references": "catalogue.product",
     "type": "string",
     "format": "uuid"
    },
@@ -2178,6 +2182,7 @@
     "format": "date-time"
    },
    "publishedByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid"
    },

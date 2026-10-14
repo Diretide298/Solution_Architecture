@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/device-gate-command-center-bo-194",
-   "component": "apps/venue-management-web/src/routes/access-venue/DeviceGateCommandCenter.tsx",
+   "component": "src/routes/access-venue/DeviceGateCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -112,7 +113,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -369,6 +370,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",
@@ -378,7 +380,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/device-type-hardware-library-bo-195",
-   "component": "apps/venue-management-web/src/routes/access-venue/DeviceTypeHardwareLibrary.tsx",
+   "component": "src/routes/access-venue/DeviceTypeHardwareLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -401,6 +403,7 @@
   },
   "density": "compact",
   "purposeNote": "manufacturer-specific logic into admission policies.",
+  "division": "Shares `listDeviceTypeHardware`, `setHardwareModel` with BO-475; this screen is Device Type & Hardware Library (pack Access Control Module_Reference.pdf, board 6.6.2, page 72): create reusable hardware definitions independently from physical deployed devices.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create reusable hardware definitions independently from physical deployed devices.",
@@ -473,6 +476,14 @@
   "entryState": {
    "preloaded": [
     "DeviceTypeHardwareLibraryView.hardwareType"
+   ],
+   "params": [
+    {
+     "name": "modelId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setHardwareModel` takes it, from the record the user acts on."
+    }
    ]
   },
   "wireframe": {
@@ -545,6 +556,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",
@@ -554,7 +566,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/physical-device-registration-provisioning-bo-196",
-   "component": "apps/venue-management-web/src/routes/access-venue/PhysicalDeviceRegistrationProvisioning.tsx",
+   "component": "src/routes/access-venue/PhysicalDeviceRegistrationProvisioning.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -898,6 +910,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",
@@ -907,7 +920,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/turnstile-lane-behavior-configuration-bo-197",
-   "component": "apps/venue-management-web/src/routes/access-venue/TurnstileLaneBehaviorConfiguration.tsx",
+   "component": "src/routes/access-venue/TurnstileLaneBehaviorConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1085,6 +1098,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",
@@ -1094,7 +1108,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/validation-outcome-guest-feedback-designer-bo-198",
-   "component": "apps/venue-management-web/src/routes/access-venue/ValidationOutcomeGuestFeedbackDesigner.tsx",
+   "component": "src/routes/access-venue/ValidationOutcomeGuestFeedbackDesigner.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1254,6 +1268,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",
@@ -1263,7 +1278,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/reader-scanner-peripheral-configuration-bo-199",
-   "component": "apps/venue-management-web/src/routes/access-venue/ReaderScannerPeripheralConfiguration.tsx",
+   "component": "src/routes/access-venue/ReaderScannerPeripheralConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1389,6 +1404,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",
@@ -1398,7 +1414,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/handheld-mobile-access-device-configuration-bo-200",
-   "component": "apps/venue-management-web/src/routes/access-venue/HandheldMobileAccessDeviceConfiguration.tsx",
+   "component": "src/routes/access-venue/HandheldMobileAccessDeviceConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1577,6 +1593,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",
@@ -1586,7 +1603,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/gate-modes-free-spin-emergency-controls-bo-201",
-   "component": "apps/venue-management-web/src/routes/access-venue/GateModesFreeSpinEmergencyControls.tsx",
+   "component": "src/routes/access-venue/GateModesFreeSpinEmergencyControls.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1749,6 +1766,16 @@
    }
   ],
   "notes": "**Mode (the upsert key) and createsIncident added to the form 4 October 2026** (CHG-FXS-002)",
+  "entryState": {
+   "params": [
+    {
+     "name": "gateModePolicyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setGateModePolicy` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1778,6 +1805,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "DEVICE_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",
@@ -1787,7 +1815,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/device-software-content-remote-configuration-bo-202",
-   "component": "apps/venue-management-web/src/routes/access-venue/DeviceSoftwareContentRemoteConfiguration.tsx",
+   "component": "src/routes/access-venue/DeviceSoftwareContentRemoteConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1922,6 +1950,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "DEVICE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",
@@ -1931,7 +1960,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/hardware-compatibility-health-testing-deployment-bo-203",
-   "component": "apps/venue-management-web/src/routes/access-venue/HardwareCompatibilityHealthTestingDeployment.tsx",
+   "component": "src/routes/access-venue/HardwareCompatibilityHealthTestingDeployment.tsx",
    "status": "notStarted"
   },
   "navigation": {

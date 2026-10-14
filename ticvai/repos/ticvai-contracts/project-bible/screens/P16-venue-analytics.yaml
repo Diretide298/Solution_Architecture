@@ -69,6 +69,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 1
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/executive-command-center
@@ -301,6 +302,7 @@ screens:
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
+        operation: listAiInsights
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
@@ -373,7 +375,7 @@ screens:
     trigger: onLoad
   - operationId: requestSuggestion
     contract: ai
-    purpose: requestSuggestion
+    purpose: Ask the assistant for an answer about the figures on the command centre
     trigger: onAction
     invalidates:
     - listAlerts
@@ -475,6 +477,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/sales-revenue-channel
@@ -616,6 +619,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/operational-performance
@@ -865,6 +869,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/product-performance
@@ -1078,6 +1083,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/cost-margin-profitability
@@ -1248,6 +1254,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/inventory-waste-intelligence
@@ -1324,6 +1331,7 @@ screens:
         provenance: contract inventory.yaml GET /stock-batches/expiring
       - kind: multiSelect
         label: Domain
+        operation: requestSuggestion
         notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
           analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
@@ -1469,6 +1477,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/guest-conversion-intelligence
@@ -1709,6 +1718,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/demand-forecasting
@@ -1767,6 +1777,7 @@ screens:
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
+        operation: getForecast
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
@@ -1849,6 +1860,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-management-web
     route: /analytics/ai-assistant-action-center
@@ -1978,6 +1990,7 @@ screens:
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
+        operation: getActionPlan
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
@@ -2110,6 +2123,10 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: alertRuleId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setAlertRule` takes it, from the record the user acts on.'
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not. A proposed action opened from the queue or an alert.'
@@ -2230,6 +2247,7 @@ screens:
   module: Analytics
   requiresModule: ai
   wave: 3
+  permission: AI_USE
   implementation:
     app: venue-management-web
     route: /analytics/suggestions
@@ -2406,6 +2424,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -2448,45 +2467,59 @@ screens:
       components:
       - kind: metricTile
         label: Visitors currently on-site
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Entries today
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Exits today
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Current occupancy
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Capacity remaining
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Occupancy %
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Active gates
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Gate status
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Active POS terminals
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Active sessions/timeslots
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Current queues
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Resource utilization
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: Operational incidents
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
       - kind: metricTile
         label: System/device exceptions
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 4 §Display
   states:
     loading: The live operations list; the counts above it resolve separately.
@@ -2501,11 +2534,6 @@ screens:
   - operationId: getKpiValues
     contract: reporting
     purpose: Live operational KPIs
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: listAlerts
-    contract: reporting
-    purpose: What needs attention
     trigger: onLoad
     provenance: board reading, 19 September 2026
   entryState:
@@ -2529,6 +2557,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -2745,6 +2774,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -2787,48 +2817,63 @@ screens:
       components:
       - kind: metricTile
         label: Total Visitors
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Current Visitors On-Site
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Entry Count
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Exit Count
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Hourly Footfall
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Peak Entry Time
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Average Visit Duration
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Attendance by Site
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Attendance by Attraction
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Attendance by Ticket Type
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Attendance by Product
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Attendance by Timeslot
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Repeat Visits
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: No-Show %
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
       - kind: metricTile
         label: Ticketed vs Actual Attendance
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 6 §Display
   states:
     loading: The attendance footfall intelligence list; the counts above it resolve separately.
@@ -2866,6 +2911,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -2908,27 +2954,35 @@ screens:
       components:
       - kind: metricTile
         label: Available Capacity
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Booked Capacity
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Used Capacity
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Remaining Capacity
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Utilization %
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: No-Show %
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Peak Utilization
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Forecast Utilization
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
   states:
     loading: The capacity utilization list; the counts above it resolve separately.
@@ -2966,6 +3020,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -3007,39 +3062,51 @@ screens:
       components:
       - kind: metricTile
         label: Gross Sales
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Net Sales
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Transactions
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Tickets Sold
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Average Order Value
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Conversion Rate
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Discount Value
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Refunds
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Cancellations
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Commission
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Upsell Revenue
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
       - kind: metricTile
         label: Cross-Sell Revenue
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 7 §KPIs
   states:
     loading: The sales channel performance list; the counts above it resolve separately.
@@ -3077,6 +3144,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -3121,7 +3189,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -3165,7 +3233,7 @@ screens:
         - Outstanding Loyalty Liability
         - Customer Satisfaction Score
         bindsTo: null
-        operation: null
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 8 §Display
     - name: contextPanel
       slot: selection
@@ -3173,6 +3241,7 @@ screens:
       - kind: detailPanel
         label: The selected customer membership loyalty
         bindsTo: null
+        operation: getKpiValues
         columns:
         - Unique Customers
         - New Customers
@@ -3235,6 +3304,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: PRICE_VIEW
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -3296,7 +3366,7 @@ screens:
         - Status
         - Recommended action
         bindsTo: null
-        operation: null
+        operation: listPromotionAlertException
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 9 §Each Alert
           Shall Display
     - name: contextPanel
@@ -3305,6 +3375,7 @@ screens:
       - kind: detailPanel
         label: The selected alerts exception
         bindsTo: null
+        operation: listPromotionAlertException
         columns:
         - Severity
         - KPI
@@ -3581,6 +3652,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '1'
@@ -3649,59 +3721,73 @@ screens:
       components:
       - kind: metricTile
         label: Net revenue
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
         notes: '(CHG-FIN-002: never a bare "Revenue")'
       - kind: metricTile
         label: Revenue Growth
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Attendance
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Capacity Utilization
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Revenue per Visitor
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Average Transaction Value
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Conversion
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Refund %
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Membership Conversion
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Repeat Visitor %
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Customer Satisfaction
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: F&B Spend
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Retail Spend
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: metricTile
         label: Operational Exceptions
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 11 §Comparison
           KPIs
       - kind: textField
@@ -3776,6 +3862,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -3906,7 +3993,7 @@ screens:
         - Custom Dashboard — customer-created
         - AI-Generated Dashboard — generated through AI
         bindsTo: null
-        operation: null
+        operation: listDashboards
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display
           dashboard cards/table containing
     - name: contextPanel
@@ -3950,6 +4037,7 @@ screens:
         notes: null
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 14 §Display
           dashboard cards/table containing
+        operation: getDashboard
   states:
     loading: The record list.
     error: Could not load. Names which read failed and leaves the record untouched.
@@ -3969,13 +4057,6 @@ screens:
     purpose: Open one
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: createDashboard
-    contract: reporting
-    purpose: Start a new one
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - listDashboards
   - operationId: recordDashboardView
     contract: reporting
     purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
@@ -4005,6 +4086,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4047,58 +4129,76 @@ screens:
       components:
       - kind: selectField
         label: Dashboard Name
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Description
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Category
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Business Domain
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Dashboard Owner
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Tags
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Language
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Default Currency
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: textField
         label: Step 2 — Scope
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Tenant
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Organization
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Site(s)
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Venue(s)
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Attraction(s)
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Business Unit(s)
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: textField
         label: Step 3 — Data Domains
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Queue • Accreditation
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
           one or multiple domains
       - kind: textField
         label: Step 4 — Template
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
           one or multiple domains
   states:
@@ -4412,6 +4512,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4460,7 +4561,7 @@ screens:
         - Gauge
         - Progress Indicator
         bindsTo: null
-        operation: null
+        operation: getSemanticModel
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components
     - name: contextPanel
       slot: selection
@@ -4468,6 +4569,7 @@ screens:
       - kind: detailPanel
         label: The selected widget visualization
         bindsTo: null
+        operation: getSemanticModel
         columns:
         - KPI Card
         - Target Card
@@ -4538,6 +4640,8 @@ screens:
   density: compact
   purposeNote: Administrators can centrally define reusable KPIs and ensure the same KPI calculation is
     used across TICVAI dashboards.
+  division: 'Shares `createKpi`, `listKpis` with ANL-062; this screen is KPI Builder (pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf,
+    board 2.2.5, page 18): allow authorized business users to create standardized enterprise KPIs.'
   pattern: configEditor
   patternReason: the pack gives this screen a configuration directory (§Configure; Define whether) and
     no display directory — it is settings, not a population
@@ -4664,6 +4768,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4720,7 +4825,7 @@ screens:
         - Tolerance
         - Evaluation Frequency
         bindsTo: null
-        operation: null
+        operation: listKpis
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each
           KPI
     - name: contextPanel
@@ -4729,6 +4834,7 @@ screens:
       - kind: detailPanel
         label: The selected targets thresholds kpi
         bindsTo: null
+        operation: listKpis
         columns:
         - Target
         - Minimum
@@ -4809,6 +4915,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4841,7 +4948,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -4850,6 +4957,7 @@ screens:
           may be
       - kind: multiSelect
         label: Filter by
+        operation: updateDashboard
         columns:
         - Global
         - Widget-level
@@ -4866,51 +4974,67 @@ screens:
       components:
       - kind: selectField
         label: Data Domain
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Dataset
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Measure
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Dimension
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Aggregation
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Date Field
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Relationship
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Calculation
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Date Range
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Site
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Venue
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Attraction
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Channel
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Product
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Customer Segment
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Currency
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
   states:
     loading: The data filter configuration as saved.
@@ -4952,6 +5076,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4994,30 +5119,39 @@ screens:
       components:
       - kind: selectField
         label: Click behavior
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Cross-filtering
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Drill-down
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Drill-up
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Drill-through
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Tooltip
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Detail page
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Related dashboard
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Underlying report
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
   states:
     loading: The drill-down interaction designer configuration as saved.
@@ -5052,6 +5186,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -5102,7 +5237,7 @@ screens:
         - Approval Status
         - Published Version
         bindsTo: null
-        operation: null
+        operation: getDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display
     - name: contextPanel
       slot: selection
@@ -5110,6 +5245,7 @@ screens:
       - kind: detailPanel
         label: The selected access publishing versioning
         bindsTo: null
+        operation: getDashboard
         columns:
         - Version Number
         - Changed By
@@ -5138,6 +5274,12 @@ screens:
     invalidates:
     - getDashboard
     - listDashboards
+  - operationId: getDashboard
+    contract: reporting
+    purpose: 'The dashboard as saved: who may see it, what is published and its versions, read before
+      a change is published'
+    trigger: onLoad
+    provenance: audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)
   entryState:
     preloaded:
     - Version Number
@@ -5162,6 +5304,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -5215,7 +5358,7 @@ screens:
         - User Count
         - Usage Frequency
         bindsTo: null
-        operation: null
+        operation: getDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display
     - name: contextPanel
       slot: selection
@@ -5223,6 +5366,7 @@ screens:
       - kind: detailPanel
         label: The selected preview validation health
         bindsTo: null
+        operation: getDashboard
         columns:
         - Data Last Refreshed
         - Refresh Frequency
@@ -5250,11 +5394,6 @@ screens:
     contract: reporting
     purpose: Preview
     trigger: onAction
-    provenance: board reading, 19 September 2026
-  - operationId: listAnalyticsPipelines
-    contract: reporting
-    purpose: Whether its data is fresh
-    trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: recordDashboardView
     contract: reporting
@@ -5285,6 +5424,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5379,7 +5519,7 @@ screens:
         - Status
         - Usage Count
         bindsTo: null
-        operation: null
+        operation: listReports
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each report
           shall display
     - name: contextPanel
@@ -5388,6 +5528,7 @@ screens:
       - kind: detailPanel
         label: The selected report catalogue
         bindsTo: null
+        operation: listReports
         columns:
         - Report Name
         - Report ID
@@ -5447,6 +5588,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5489,31 +5631,40 @@ screens:
       components:
       - kind: selectField
         label: Report Name
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: selectField
         label: Description
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: selectField
         label: Category
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: selectField
         label: Owner
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: selectField
         label: Tags
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: selectField
         label: Language
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: textField
         label: Step 2 — Business Domain
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: textField
         label: Inventory • Resources • Marketing
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Select
           one or multiple domains
       - kind: textField
         label: Step 3 — Report Type
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Select
           one or multiple domains
   states:
@@ -5544,6 +5695,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5594,7 +5746,7 @@ screens:
         - Data Owner
         - Security Classification
         bindsTo: null
-        operation: null
+        operation: getSemanticModel
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 29 §Show
     - name: contextPanel
       slot: selection
@@ -5602,6 +5754,7 @@ screens:
       - kind: detailPanel
         label: The selected data domain dataset
         bindsTo: null
+        operation: getSemanticModel
         columns:
         - Dataset Name
         - Description
@@ -5650,6 +5803,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5746,6 +5900,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5795,6 +5950,7 @@ screens:
           Filters
       - kind: multiSelect
         label: Filter by
+        operation: updateReport
         columns:
         - Date Range
         - Site
@@ -5852,6 +6008,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -5907,6 +6064,7 @@ screens:
           can group by
       - kind: multiSelect
         label: Filter by
+        operation: updateReport
         columns:
         - Site
         - Attraction
@@ -5967,6 +6125,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -6070,6 +6229,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -6116,24 +6276,31 @@ screens:
       components:
       - kind: selectField
         label: Column labels
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Number format
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Currency
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Percentage
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Date format
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Decimal precision
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Conditional formatting
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
     - name: actionBar
       slot: publish
@@ -6180,6 +6347,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -6229,7 +6397,7 @@ screens:
         - Execution Time
         - Data Refresh Time
         bindsTo: null
-        operation: null
+        operation: getReportExecution
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 36 §Display
     - name: contextPanel
       slot: selection
@@ -6237,6 +6405,7 @@ screens:
       - kind: detailPanel
         label: The selected report preview test
         bindsTo: null
+        operation: getReportExecution
         columns:
         - Sample Results
         - Total Records
@@ -6258,11 +6427,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: runReport
-    contract: reporting
-    purpose: Run it against a sample
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getReportExecution
     contract: reporting
     purpose: How the run went
@@ -6307,6 +6471,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '3'
@@ -6346,32 +6511,40 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
         label: Report Name
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Description
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Owner
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Last Run
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Data Refresh
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Applied Parameters
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Reporting Period
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Display
       - kind: metricTile
         label: Visual management dashboards Detailed reporting
+        operation: getReportResult
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 37 §Dashboard
           Designer Report Builder
     - name: contentBody
@@ -6419,11 +6592,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: runReport
-    contract: reporting
-    purpose: Run it
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getReportResult
     contract: reporting
     purpose: The results
@@ -6454,6 +6622,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -6553,7 +6722,7 @@ screens:
         - Permission changes
         - Scheduled-report changes
         bindsTo: null
-        operation: null
+        operation: listReportDeliveries
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 40 §Display
     - name: contextPanel
       slot: selection
@@ -6592,11 +6761,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listReportSchedules
-    contract: reporting
-    purpose: What runs when
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: listReportDeliveries
     contract: reporting
     purpose: What arrived and what did not
@@ -6623,6 +6787,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -6658,79 +6823,102 @@ screens:
       components:
       - kind: selectField
         label: Schedule Name
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Report
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Report Version
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Owner
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Start Date
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: End Date
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Time
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Time Zone
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Frequency
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Run immediately
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Retry on failure
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Maximum retries
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Timeout
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: textField
         label: Skip if source data is stale
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: textField
         label: Wait for source refresh
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Once
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Hourly
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Daily
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Weekly
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Monthly
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Quarterly
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Yearly
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Custom
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
   states:
@@ -6766,6 +6954,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -6816,6 +7005,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listReportSubscriptions
         derived: true
         impliedBy: listReportSubscriptions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -6865,6 +7055,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_SCHEDULE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -6906,45 +7097,59 @@ screens:
       components:
       - kind: selectField
         label: Destination
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Recipient
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Format
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Language
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Time Zone
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: File Naming
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Password/Security Policy
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Expiration
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Delivery Priority
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Email Subject
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
       - kind: selectField
         label: Email Body Template
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
       - kind: selectField
         label: Attachment
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
       - kind: selectField
         label: Secure Link
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
       - kind: selectField
         label: Branding
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
     - name: actionBar
       slot: publish
@@ -6992,6 +7197,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_EXPORT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7046,7 +7252,7 @@ screens:
         - Status
         - Expiration
         bindsTo: null
-        operation: null
+        operation: getReportExport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 45 §Display
     - name: contextPanel
       slot: selection
@@ -7054,6 +7260,7 @@ screens:
       - kind: detailPanel
         label: The selected export download
         bindsTo: null
+        operation: getReportExport
         columns:
         - Export ID
         - Report
@@ -7079,11 +7286,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: exportReportResult
-    contract: reporting
-    purpose: Export
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getReportExport
     contract: reporting
     purpose: Collect the file
@@ -7121,6 +7323,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7441,6 +7644,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7499,7 +7703,7 @@ screens:
         - Error
         - Retry Count
         bindsTo: null
-        operation: null
+        operation: listReportDeliveries
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 48 §Display
     - name: contextPanel
       slot: selection
@@ -7507,6 +7711,7 @@ screens:
       - kind: detailPanel
         label: The selected delivery monitoring failure
         bindsTo: null
+        operation: listReportDeliveries
         columns:
         - Job ID
         - Report
@@ -7585,6 +7790,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7616,7 +7822,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -7711,6 +7917,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: TENANT_VIEW
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '4'
@@ -7747,53 +7954,67 @@ screens:
       components:
       - kind: selectField
         label: Report Definitions
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Dashboard Versions
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Generated Reports
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Export Files
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Audit Logs
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Schedule History
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: API Logs
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Historical Analytics
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Retention Period
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
       - kind: selectField
         label: Archive After
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
       - kind: selectField
         label: Delete After
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
       - kind: selectField
         label: Legal/Compliance Hold
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
       - kind: selectField
         label: Storage Location
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
       - kind: selectField
         label: Retrieval Rules
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
   states:
     loading: The retention archive governance configuration as saved.
@@ -7840,6 +8061,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -7938,7 +8160,7 @@ screens:
         - Recommendations Pending Review
         - AI Queries Today
         bindsTo: null
-        operation: null
+        operation: listAnalyticsAnomalies
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 109 §Display
     - name: contextPanel
       slot: selection
@@ -7946,6 +8168,7 @@ screens:
       - kind: detailPanel
         label: The selected analytics
         bindsTo: null
+        operation: listAnalyticsAnomalies
         columns:
         - Executive Insights
         - Revenue Insights
@@ -8004,6 +8227,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8098,6 +8322,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8185,6 +8410,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_MANAGE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8290,6 +8516,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: AI_USE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8348,7 +8575,7 @@ screens:
         - Affected Domain
         - Confidence
         bindsTo: null
-        operation: null
+        operation: listAnomalyDetectors
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 113 §Each
           Anomaly Displays
     - name: contextPanel
@@ -8357,6 +8584,7 @@ screens:
       - kind: detailPanel
         label: The selected anomaly detection
         bindsTo: null
+        operation: listAnomalyDetectors
         columns:
         - KPI
         - Expected Range
@@ -8382,16 +8610,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAiInsights
-    contract: ai
-    purpose: Insights and anomalies
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: configureAnomalyDetector
-    contract: ai
-    purpose: Set up anomaly detection on a KPI
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listAnomalyDetectors
     contract: ai
     purpose: Anomaly detectors
@@ -8424,6 +8642,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8470,6 +8689,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listAnalyticsAnomalies
         derived: true
         impliedBy: listAnalyticsAnomalies
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -8521,6 +8741,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: AI_USE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8568,24 +8789,31 @@ screens:
       components:
       - kind: selectField
         label: Next Hour
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Today
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Tomorrow
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Next 7 Days
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Month End
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Quarter
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Custom
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
     - name: actionBar
       slot: publish
@@ -8631,16 +8859,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: getKpiValues
-    contract: reporting
-    purpose: The series being forecast
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: listForecastDefinitions
-    contract: ai
-    purpose: What is forecast
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: getForecast
     contract: ai
     purpose: Forecast values
@@ -8649,11 +8867,6 @@ screens:
   - operationId: createForecastScenario
     contract: ai
     purpose: Run a what-if
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: exportForecastVersion
-    contract: ai
-    purpose: Export the forecast version as CSV, Excel or JSON
     trigger: onAction
     provenance: build, 29 September 2026
   wireframe:
@@ -8681,6 +8894,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8726,6 +8940,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listAnalyticsAnomalies
         derived: true
         impliedBy: listNextBestAction
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -8745,11 +8960,6 @@ screens:
     purpose: What to act on
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: listAiInsights
-    contract: ai
-    purpose: Insights and anomalies
-    trigger: onLoad
-    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-058
@@ -8763,6 +8973,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: AI_AUDIT_VIEW
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8826,21 +9037,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAnalyticsAnomalies
-    contract: reporting
-    purpose: Past insights and their evidence
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: listAiInsights
-    contract: ai
-    purpose: Insights and anomalies
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: decideAiInsight
-    contract: ai
-    purpose: Review, accept, reject or mark an insight actioned
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: searchAiDecisions
     contract: ai
     purpose: The decision records behind each insight
@@ -8871,6 +9067,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: AI_USE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '9'
@@ -8931,7 +9128,7 @@ screens:
         - Tenant
         - Module
         bindsTo: null
-        operation: null
+        operation: listAiModels
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 119 §Display
     - name: contextPanel
       slot: selection
@@ -8939,6 +9136,7 @@ screens:
       - kind: detailPanel
         label: The selected analytics governance model
         bindsTo: null
+        operation: listAiModels
         columns:
         - AI Service
         - Model
@@ -8975,39 +9173,9 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAiCapabilities
-    contract: ai
-    purpose: The capability registry
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: configureAiCapability
-    contract: ai
-    purpose: Register a capability, or change its owner, risk class or autonomy
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: getEffectiveAiPolicy
-    contract: ai
-    purpose: The policy in force for a capability at a scope
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: listAiModels
     contract: ai
     purpose: The model catalogue
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listPromptTemplates
-    contract: ai
-    purpose: The prompt registry
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: runAiEvaluation
-    contract: ai
-    purpose: Evaluate a candidate
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listAiEvaluations
-    contract: ai
-    purpose: Evaluation runs
     trigger: onLoad
     provenance: build, 29 September 2026
   entryState:
@@ -9042,6 +9210,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9116,44 +9285,56 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
         label: Active Dashboards
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Active Reports
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Published KPIs
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Connected Data Sources
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Active Datasets
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Data Refresh Success %
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Data Quality Score
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Failed Refreshes
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: BI Service Health
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: AI Analytics Health
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Active Alerts
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
       - kind: metricTile
         label: Analytics Users
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Display
     - name: contentBody
       slot: moduleTiles
@@ -9163,7 +9344,7 @@ screens:
         columns:
         - Healthy / Warning / Critical / Offline
         bindsTo: null
-        operation: null
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Each
           component shall show
     - name: contextPanel
@@ -9172,6 +9353,7 @@ screens:
       - kind: detailPanel
         label: The selected analytics administration
         bindsTo: null
+        operation: listAnalyticsPipelines
         columns:
         - Healthy / Warning / Critical / Offline
         notes: null
@@ -9210,6 +9392,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9236,6 +9419,10 @@ screens:
     row
   purpose: Maintain the authoritative catalogue of approved TICVAI business KPIs. This is essential because
     every dashboard must use the same definition of a metric.
+  division: 'Shares `createKpi`, `listKpis` with ANL-025; this screen is Enterprise KPI Library (pack
+    Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, board 10.10.2, page 124): maintain the
+    authoritative catalogue of approved TICVAI business KPIs. This is essential because every dashboard
+    must use the same definition of a metric.'
   gaps:
   - operation: null
     why: '**This screen''s operations return no schema with described properties**, so not one of its
@@ -9266,7 +9453,7 @@ screens:
         - Inventory
         - Resources
         bindsTo: null
-        operation: null
+        operation: listKpis
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories
     - name: contextPanel
       slot: selection
@@ -9274,6 +9461,7 @@ screens:
       - kind: detailPanel
         label: The selected enterprise kpi
         bindsTo: null
+        operation: listKpis
         columns:
         - Executive
         - Sales
@@ -9335,6 +9523,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9368,34 +9557,42 @@ screens:
       components:
       - kind: selectField
         label: Organization
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Site
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Venue
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Attraction
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Business Unit
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Product
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Channel
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Period
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
   states:
@@ -9438,6 +9635,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9472,30 +9670,37 @@ screens:
       components:
       - kind: metricTile
         label: Revenue per Visitor
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Transactions per 1,000 Visitors
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Entries per Gate per Hour
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Incidents per 10,000 Visitors
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Revenue per m² where applicable
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Revenue per Operating Hour
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: metricTile
         label: Utilization %
+        operation: getAnalyticsBenchmark
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 127 §Support
           metrics such as
       - kind: textField
@@ -9596,6 +9801,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9648,7 +9854,7 @@ screens:
         - Status
         - Data Classification
         bindsTo: null
-        operation: null
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 128 §Display
     - name: contextPanel
       slot: selection
@@ -9656,6 +9862,7 @@ screens:
       - kind: detailPanel
         label: The selected data source integration
         bindsTo: null
+        operation: listAnalyticsPipelines
         columns:
         - Source Name
         - Source Type
@@ -9845,6 +10052,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9881,29 +10089,36 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
         label: Pipelines Running
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Successful Refreshes
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Failed Refreshes
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Average Refresh Duration
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Data Latency
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Stale Datasets
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
       - kind: metricTile
         label: Records Processed
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 130 §KPI Cards
     - name: contentBody
       slot: moduleTiles
@@ -9974,6 +10189,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_VENUE
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -10053,6 +10269,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -10087,63 +10304,77 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
         label: Active Analytics Users
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: Dashboard Views
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: Report Runs
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: AI Queries
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: Exports
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: API Requests
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: Peak Concurrent Users
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Usage
           KPIs
       - kind: metricTile
         label: Average Dashboard Load Time
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Query Duration
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Slowest Reports
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Failed Queries
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Dataset Size
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Refresh Duration
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
       - kind: metricTile
         label: Embedded BI Availability
+        operation: getAnalyticsUsage
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 132 §Performance
           KPIs
     - name: contentBody
@@ -10213,6 +10444,7 @@ screens:
   module: Analytics
   requiresModule: analytics
   wave: 3
+  permission: REPORT_VIEW_TENANT
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -10478,6 +10710,7 @@ screens:
   module: Analytics
   requiresModule: ai
   wave: 3
+  permission: AI_USE
   implementation:
     app: venue-management-web
     route: /analytics/ai-maturity

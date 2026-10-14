@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "7",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-operations-command-center-bo-1143",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletOperationsCommandCenter.tsx",
+   "component": "src/routes/orders-money/WalletOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -122,7 +123,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -304,6 +305,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "7",
@@ -313,7 +315,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/peer-to-peer-transfer-configuration-bo-1144",
-   "component": "apps/venue-management-web/src/routes/orders-money/PeerToPeerTransferConfiguration.tsx",
+   "component": "src/routes/orders-money/PeerToPeerTransferConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -542,6 +544,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "7",
@@ -551,7 +554,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/transfer-eligibility-limits-approval-rules-bo-1145",
-   "component": "apps/venue-management-web/src/routes/orders-money/TransferEligibilityLimitsApprovalRules.tsx",
+   "component": "src/routes/orders-money/TransferEligibilityLimitsApprovalRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -739,6 +742,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "7",
@@ -748,7 +752,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/refund-to-wallet-policy-configuration-bo-1146",
-   "component": "apps/venue-management-web/src/routes/orders-money/RefundToWalletPolicyConfiguration.tsx",
+   "component": "src/routes/orders-money/RefundToWalletPolicyConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -989,6 +993,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "7",
@@ -998,7 +1003,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/refund-routing-credit-restoration-engine-bo-1147",
-   "component": "apps/venue-management-web/src/routes/orders-money/RefundRoutingCreditRestorationEngine.tsx",
+   "component": "src/routes/orders-money/RefundRoutingCreditRestorationEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1156,6 +1161,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "7",
@@ -1165,7 +1171,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/reversal-transaction-correction-management-bo-1148",
-   "component": "apps/venue-management-web/src/routes/orders-money/ReversalTransactionCorrectionManagement.tsx",
+   "component": "src/routes/orders-money/ReversalTransactionCorrectionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1341,6 +1347,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "7",
@@ -1350,7 +1357,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/administrative-balance-adjustment-studio-bo-1149",
-   "component": "apps/venue-management-web/src/routes/orders-money/AdministrativeBalanceAdjustmentStudio.tsx",
+   "component": "src/routes/orders-money/AdministrativeBalanceAdjustmentStudio.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1518,6 +1525,12 @@
     {
      "name": "subjectId",
      "from": "navigation"
+    },
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listApprovalMatrices`."
     }
    ]
   },
@@ -1550,6 +1563,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "7",
@@ -1559,7 +1573,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-block-freeze-restriction-management-bo-1150",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletBlockFreezeRestrictionManagement.tsx",
+   "component": "src/routes/orders-money/WalletBlockFreezeRestrictionManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1791,6 +1805,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "7",
@@ -1800,7 +1815,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-disputes-operational-exception-queue-bo-1151",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletDisputesOperationalExceptionQueue.tsx",
+   "component": "src/routes/orders-money/WalletDisputesOperationalExceptionQueue.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2049,6 +2064,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "7",
@@ -2058,7 +2074,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/operations-simulator-approval-audit-trail-bo-1152",
-   "component": "apps/venue-management-web/src/routes/orders-money/OperationsSimulatorApprovalAuditTrail.tsx",
+   "component": "src/routes/orders-money/OperationsSimulatorApprovalAuditTrail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2104,7 +2120,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listWalletDisputes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listWalletDisputes"
       }
      ]
     }

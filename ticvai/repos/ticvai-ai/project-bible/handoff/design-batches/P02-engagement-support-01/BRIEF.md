@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 3 permissions apply here:
   `AI_USE, GUEST_VIEW, PRODUCT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **11 of these operations work offline**: getTenantAppStatus, getVisitPlan, getWaitTimes, listCatalogueBundles, listMyNotifications, listProducts, listPublishedContentPages, listPublishedFaqs
+- **10 of these operations work offline**: getTenantAppStatus, getVisitPlan, getWaitTimes, listCatalogueBundles, listMyNotifications, listProducts, listPublishedContentPages, listPublishedFaqs
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -209,9 +209,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `GST-033` | AI Concierge – Contextual Help | A | 7 | 24 | 5 | 20 | 0 | 0 | guest | notStarted (designed) |
 | `GST-035` | Feedback & Ratings | A | 28 | 20 | 4 | 82 | 2 | 0 | guest | notStarted (client-verified) |
 | `GST-040` | Help & Support | A | 8 | 31 | 6 | 0 | 3 | 0 | guest | notStarted (client-verified) |
-| `GST-051` | Plan | A | 26 | 0 | 7 | 7 | 8 | 1 | guest | notStarted (client-verified) |
+| `GST-051` | Plan | A | 26 | 0 | 7 | 3 | 8 | 1 | guest | notStarted (client-verified) |
 | `GST-052` | Suggested Itineraries | A | 17 | 28 | 6 | 3 | 2 | 1 | guest | notStarted (designed) |
-| `GST-053` | Your Plan | A | 16 | 91 | 7 | 9 | 8 | 1 | guest | notStarted (client-verified) |
+| `GST-053` | Your Plan | A | 16 | 91 | 7 | 4 | 8 | 1 | guest | notStarted (client-verified) |
 | `GST-054` | AI Planner | A | 10 | 71 | 7 | 29 | 4 | 1 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch

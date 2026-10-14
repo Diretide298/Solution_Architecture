@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-calendar-command-center-bo-864",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceCalendarCommandCenter.tsx",
+   "component": "src/routes/rentals/ResourceCalendarCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -220,6 +221,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -229,7 +231,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/calendar-filters-search-smart-discovery-bo-865",
-   "component": "apps/venue-management-web/src/routes/rentals/CalendarFiltersSearchSmartDiscovery.tsx",
+   "component": "src/routes/rentals/CalendarFiltersSearchSmartDiscovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -355,6 +357,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 1,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -364,7 +367,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-availability-schedule-configuration-bo-866",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceAvailabilityScheduleConfiguration.tsx",
+   "component": "src/routes/rentals/ResourceAvailabilityScheduleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -393,7 +396,7 @@
    "template": "form",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFields",
      "slot": "fields",
      "components": [
       {
@@ -615,6 +618,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -624,7 +628,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-time-slot-configuration-bo-867",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceTimeSlotConfiguration.tsx",
+   "component": "src/routes/rentals/ResourceTimeSlotConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -794,6 +798,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -803,7 +808,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/advance-reservation-management-bo-868",
-   "component": "apps/venue-management-web/src/routes/rentals/AdvanceReservationManagement.tsx",
+   "component": "src/routes/rentals/AdvanceReservationManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1050,6 +1055,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_BOOK",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -1059,7 +1065,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/recurring-reservation-configuration-bo-869",
-   "component": "apps/venue-management-web/src/routes/rentals/RecurringReservationConfiguration.tsx",
+   "component": "src/routes/rentals/RecurringReservationConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1235,6 +1241,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 1,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -1244,7 +1251,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/operational-time-resource-blocking-bo-870",
-   "component": "apps/venue-management-web/src/routes/rentals/OperationalTimeResourceBlocking.tsx",
+   "component": "src/routes/rentals/OperationalTimeResourceBlocking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1433,6 +1440,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -1442,7 +1450,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/multi-event-resource-planning-bo-871",
-   "component": "apps/venue-management-web/src/routes/rentals/MultiEventResourcePlanning.tsx",
+   "component": "src/routes/rentals/MultiEventResourcePlanning.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1520,7 +1528,8 @@
         "Resource gaps"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Event A”, “Event B”, “Events may be assigned”, “Resource allocation can consider”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 29 §The screen shall display"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 29 §The screen shall display",
+       "operation": "getResourceCalendar"
       }
      ]
     }
@@ -1598,6 +1607,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -1607,7 +1617,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/smart-assignment-drag-and-drop-reallocation-bo-872",
-   "component": "apps/venue-management-web/src/routes/rentals/SmartAssignmentDragAndDropReallocation.tsx",
+   "component": "src/routes/rentals/SmartAssignmentDragAndDropReallocation.tsx",
    "status": "notStarted"
   },
   "navigation": {

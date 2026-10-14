@@ -358,7 +358,7 @@
  },
  "setFraudDetectionRule": {
   "method": "PUT",
-  "path": "/fraud-detection-rule",
+  "path": "/fraud-detection-rule/{ruleId}",
   "contract": "access",
   "summary": "Save an access fraud detection rule",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -366,6 +366,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "ruleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

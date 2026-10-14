@@ -3,7 +3,7 @@
   "method": "POST",
   "path": "/carts/{cartId}/lines",
   "contract": "orders",
-  "summary": "Add something",
+  "summary": "Add a line to the cart",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -709,7 +709,7 @@
   "contract": "marketing-crm",
   "summary": "Sign a waiver, answer a survey, capture details",
   "permission": "GUEST_VIEW",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

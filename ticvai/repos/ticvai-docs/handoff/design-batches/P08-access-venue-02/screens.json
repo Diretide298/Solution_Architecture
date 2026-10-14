@@ -5,11 +5,12 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/scan-activity",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ScanActivityDetail.tsx",
+   "component": "src/routes/venue-operations/ScanActivityDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -225,11 +226,12 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/override-audit",
-   "component": "apps/venue-management-web/src/routes/venue-operations/OverrideAuditDetail.tsx",
+   "component": "src/routes/venue-operations/OverrideAuditDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -467,11 +469,12 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/reconciliation-queue",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ReconciliationQueueDetail.tsx",
+   "component": "src/routes/venue-operations/ReconciliationQueueDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -669,11 +672,12 @@
   "module": "Access & Venue",
   "requiresModule": "maintenance",
   "wave": 1,
+  "permission": "ASSET_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/asset-register",
-   "component": "apps/venue-management-web/src/routes/venue-operations/AssetRegisterDetail.tsx",
+   "component": "src/routes/venue-operations/AssetRegisterDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -757,7 +761,7 @@
      ]
     },
     {
-     "name": "contextPanel",
+     "name": "contextPanelSelection",
      "slot": "selection",
      "components": [
       {
@@ -1071,11 +1075,12 @@
   "module": "Access & Venue",
   "requiresModule": "maintenance",
   "wave": 3,
+  "permission": "ASSET_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/planned-maintenance",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PlannedMaintenanceDetail.tsx",
+   "component": "src/routes/venue-operations/PlannedMaintenanceDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1324,11 +1329,12 @@
   "module": "Access & Venue",
   "requiresModule": "maintenance",
   "wave": 2,
+  "permission": "INCIDENT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/incident-log",
-   "component": "apps/venue-management-web/src/routes/venue-operations/IncidentLogDetail.tsx",
+   "component": "src/routes/venue-operations/IncidentLogDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1640,10 +1646,11 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 1,
+  "permission": "VENUE_MAP_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-mapping/venue-maps",
-   "component": "apps/venue-management-web/src/routes/venue-mapping/VenueMapList.tsx",
+   "component": "src/routes/venue-mapping/VenueMapList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1835,10 +1842,11 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 1,
+  "permission": "VENUE_MAP_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-mapping/map-import",
-   "component": "apps/venue-management-web/src/routes/venue-mapping/VenueMapImportForm.tsx",
+   "component": "src/routes/venue-mapping/VenueMapImportForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2235,10 +2243,11 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 1,
+  "permission": "VENUE_MAP_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-mapping/map-editor",
-   "component": "apps/venue-management-web/src/routes/venue-mapping/VenueMapEditorForm.tsx",
+   "component": "src/routes/venue-mapping/VenueMapEditorForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2271,7 +2280,7 @@
    "template": "detail",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyRecord",
      "slot": "record",
      "components": [
       {
@@ -2749,10 +2758,11 @@
   "module": "Access & Venue",
   "requiresModule": "resources",
   "wave": 2,
+  "permission": "RESOURCE_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/resources/directory",
-   "component": "apps/venue-management-web/src/routes/resources/ResourceList.tsx",
+   "component": "src/routes/resources/ResourceList.tsx",
    "status": "notStarted"
   },
   "navigation": {

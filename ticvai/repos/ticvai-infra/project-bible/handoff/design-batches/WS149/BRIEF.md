@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-579` | Terminal & Card-Present Command Center | C | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-580` | Payment Terminal & Device Inventory | C | 0 | 0 | 6 | 8 | 0 | 4 | — | notStarted (—) |
 | `ADM-581` | Terminal Provisioning & Device Configuration | B | 9 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `ADM-582` | POS, Kiosk & Terminal Assignment Manager | B | 2 | 3 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `ADM-582` | POS, Kiosk & Terminal Assignment Manager | B | 9 | 3 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `ADM-583` | EMV & Card-Present Processing Configuration | C | 8 | 17 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-584` | Payment Server & Terminal Connectivity Manager | B | 0 | 8 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `ADM-585` | Card-Present Transaction Monitor & Operations | C | 2 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |

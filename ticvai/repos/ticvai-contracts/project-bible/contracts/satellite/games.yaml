@@ -53,6 +53,29 @@ tags:
 - name: game
 - name: play
 - name: prize
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  cardRecords:
+    module: games
+    table: games.card
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The games.card rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as VenueOps stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/GameCard'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). VenueOps answers with its games.card rows, as it stores them and as the caller's scope lets it
+      see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through VenueOps' service route (serviceAuth).
+    served: [service]
 paths:
   /game-cards:
     post:
@@ -91,6 +114,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GameCard'
         '409':
+          x-ticvai-problem-types: [game-card-already-active, unknown-card-code]
           description: Card already active, or the code is unknown
           content:
             application/problem+json:
@@ -98,12 +122,16 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /reader-profiles:
+  /reader-profiles/{readerProfileId}:
     put:
       operationId: setReaderProfile
       x-ticvai-consumed-by:
         - "P08 BO-412 Real-Time Tap Validation & Reader Response"
         - "P08 BO-476 Communication Protocol Configuration"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: How a reader behaves and what it shows
       description: 'BL-153. **A guest at an arcade machine cannot read a message, they can only see a
         light.**
@@ -122,6 +150,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: readerProfileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -160,15 +193,23 @@ paths:
         - "P08 BO-486 Customer Card / Wallet Identification"
       x-ticvai-audience:
       - guest
+      - staff
       x-ticvai-read-routing: primary
       summary: Read a card's balances
       description: 'The reader path. Offline-capable so a machine can validate a card during a network
         blip — the balance may be stale, which is why spend is reconciled on sync.
 
+
+        **Staff read a card here too** (Block A audit, 14 October 2026, CHG-SCR-015; the contract gap CHG-WIR-004
+        recorded): the back office''s card lifecycle, profile, activity, balance and identification screens (BO-454,
+        BO-455, BO-457, BO-462, BO-486) need `WALLET_VIEW`, a card''s credits being stored value. A guest calls it in
+        its own session without a permission (`x-ticvai-guest-callable`), as before.
+
         '
       tags:
       - card
-      x-ticvai-permission: null
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -248,6 +289,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GameCard'
         '409':
+          x-ticvai-problem-types: [target-card-has-balance, game-card-not-active]
           description: 'Target already carries a balance, or either card is not `active` (blocked,
             expired or already transferred).
 
@@ -335,6 +377,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Game'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /games/{gameId}:
@@ -403,6 +447,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Game'
         '409':
+          x-ticvai-problem-types: [plays-in-flight, game-transition-not-allowed]
           description: 'Refused. Either `creditCost`, `minPointsAwarded` or `maxPointsAwarded` changed
             while plays on this game are in flight, or `status` asks for a move states/game.yaml does not
             allow from `updateGame` (for example into `maintenance`, which only a work order does, or out
@@ -468,6 +513,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PlayResult'
         '409':
+          x-ticvai-problem-types: [insufficient-credits, card-blocked, game-out-of-service]
           description: 'Insufficient credits on a live play (never on an offline one, audit R106 (3)), card
             blocked, or the game is out of service.
 
@@ -565,7 +611,9 @@ paths:
       description: 'Point cost and stock. Out-of-stock prizes stay visible with their availability shown
         — hiding them means a child asks for the one thing that vanished.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending, then by `id`.'
       tags:
       - prize
       x-ticvai-permission: PRODUCT_VIEW
@@ -750,6 +798,7 @@ paths:
                   $ref: '#/components/schemas/AttractionType'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /attraction-types/{attractionTypeId}:
     put:
       operationId: setAttractionType
       x-ticvai-consumed-by:
@@ -763,6 +812,11 @@ paths:
       x-ticvai-scope-level: tenant
       x-ticvai-config-scope: tenant
       parameters:
+      - name: attractionTypeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -983,6 +1037,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReaderDeployment'
+        '409':
+          description: 'The reader is `unconfigured`, with nothing to deploy (`reader-not-configured`), or `disabled` (`reader-disabled`). Nothing is queued.'
+          x-ticvai-problem-types: [reader-not-configured, reader-disabled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /readers/{readerId}/test:
@@ -1092,6 +1153,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/GameEntitlement'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /gameplay-validation-rules:
@@ -1123,6 +1186,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-425 Gameplay Validation Rule Configuration"
         - "P08 BO-426 Deduction Priority & Funding Source Rules"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Deduction priority and the order of checks
       description: 'Boards 4.2 and 4.3. **The deduction order decides who pays, and the guest never
         sees it happen.** Entitlement before bonus before promotional before cash is the usual answer
@@ -1301,6 +1366,8 @@ paths:
         - "P08 BO-439 Normal & VIP Pricing Configuration"
         - "P08 BO-440 Retry Price Configuration"
         - "P08 BO-452 Direct-Pay / Crane & Prize Machine Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per game, the one the body''s `gameId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Standard, group, peak, VIP, retry and calendar prices
       description: 'Board 5. **Retry pricing is the one that is easy to miss and hard to explain
         afterwards.** A second go at a crane priced below the first is a deliberate commercial
@@ -1344,6 +1411,8 @@ paths:
         - "P08 BO-445 Redemption Credit Rule Configuration"
         - "P08 BO-446 Ticket-Based Redemption / Ticket-Eater Integration"
         - "P08 BO-447 Ticketless Redemption Game Integration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: How tickets are earned, held and spent
       description: 'Boards 6.2, 6.3 and 6.4. **Ticket-based and ticketless redemption are the same
         currency arriving two ways.** A ticket-eater counts paper; a ticketless game credits the card
@@ -1466,6 +1535,7 @@ paths:
               - action
               properties:
                 action:
+                  x-ticvai-stored-as: games.card.status
                   type: string
                   enum:
                   - block
@@ -1474,10 +1544,12 @@ paths:
                   - replace
                   - expire
                 replacementCardId:
+                  x-ticvai-persisted: false
                   type: string
                   format: uuid
                   nullable: true
                 reason:
+                  x-ticvai-stored-as: games.card.blocked_reason
                   type: string
                   nullable: true
       responses:
@@ -1491,6 +1563,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GameCard'
         '409':
+          x-ticvai-problem-types: [game-card-transition-not-allowed]
           description: 'The action is not a legal move from the card''s current status. `expired` and
             `transferred` are terminal (states/game-card.yaml), so nothing reactivates, blocks or
             replaces them.
@@ -1507,6 +1580,8 @@ paths:
       operationId: setGameCardExpiryRules
       x-ticvai-consumed-by:
         - "P08 BO-456 Card Expiry Rule Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: When a card lapses, and what warns the guest first
       description: 'Boards 7.3 to 7.6. **Expiry measured from last activity rather than from issue is
         the difference between a loyalty mechanic and a complaint.** A guest who visits every month
@@ -1691,6 +1766,8 @@ paths:
       operationId: setGameKioskConfiguration
       x-ticvai-consumed-by:
         - "P08 BO-493 Self-Service UI Theme, Language & Journey Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per kiosk, the one the body''s `kioskDeviceId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: The self-service journey, its theme and its languages
       description: 'Boards 10.2 and 10.10. **A kiosk in an arcade is used by a child holding a
         wristband**, and the configuration that matters is which steps appear, in what language, and
@@ -1794,6 +1871,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: '`code` already used by another game in the venue.'
           content:
             application/problem+json:
@@ -1921,11 +1999,19 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [target-is-source-reader, target-reader-not-found, target-reader-in-other-venue]
           description: A target is the source reader, does not exist, or is in another venue.
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          description: 'The source reader is `unconfigured`; it has no configuration to copy. No target changes.'
+          x-ticvai-problem-types: [reader-not-configured]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /prizes/lookup:
@@ -2048,6 +2134,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [oldest-pending-at-missing]
           description: '`oldestPendingAt` missing while `pendingTransactions` is above 0.'
           content:
             application/problem+json:
@@ -2125,6 +2212,7 @@ components:
                       nullable: true
                       description: The screen that fixes it, e.g. BO-407.
     AttractionType:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by listAttractionTypes
       type: object
       x-ticvai-persistence: games.attraction_type
       description: 'Board 1.4. **The type decides which settings apply.**'
@@ -2204,6 +2292,8 @@ components:
           type: integer
           nullable: true
         operatingHours:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           nullable: true
           description: 'Weekly opening windows, in venue local time, in the same window shape as
@@ -2237,6 +2327,7 @@ components:
       - deviceId
       properties:
         deviceId:
+          x-ticvai-references: platform.device
           type: string
           format: uuid
           description: '`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live
@@ -2310,10 +2401,16 @@ components:
         scopePath:
           type: string
     ReaderDeployment:
+      required: [scopePath]
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by deployReaderConfiguration, getGameplaySyncStatus, testReader, validateGameConfiguration
       type: object
       x-ticvai-persistence: games.reader_deployment
       description: 'Boards 9.5 and 9.8. **A change nobody deployed is a change that did not happen.**'
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -2400,6 +2497,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -2603,6 +2701,8 @@ components:
           type: integer
           nullable: true
         trace:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2638,6 +2738,8 @@ components:
         vipPrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
         groupPricing:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2647,6 +2749,8 @@ components:
               pricePerPlayer:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         peakPricing:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2662,6 +2766,8 @@ components:
               price:
                 $ref: ../shared/common.yaml#/components/schemas/Money
         calendarExceptions:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -2720,6 +2826,7 @@ components:
           type: string
           format: uuid
         gameId:
+          x-ticvai-references: games.game
           type: string
           format: uuid
         kind:
@@ -2796,6 +2903,8 @@ components:
           format: uuid
           nullable: true
         earnRules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3008,6 +3117,7 @@ components:
           type: string
           format: uuid
         readerId:
+          x-ticvai-references: games.reader
           type: string
           format: uuid
           x-ticvai-unique: tenant
@@ -3133,6 +3243,7 @@ components:
       - name
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         name:
@@ -3386,9 +3497,11 @@ components:
       - status
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         code:
+          x-ticvai-unique: venue
           type: string
           maxLength: 64
         name:
@@ -3423,6 +3536,7 @@ components:
           type: integer
           nullable: true
         status:
+          readOnly: true
           $ref: '#/components/schemas/GameStatus'
         playsToday:
           type: integer
@@ -3474,6 +3588,7 @@ components:
           type: string
           format: date-time
     PlayResult:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by getGameplaySyncStatus, recordGamePlay, updateGame
       x-ticvai-persistence: games.play
       type: object
       required:
@@ -3482,7 +3597,12 @@ components:
       - pointsAwarded
       - creditsRemaining
       - pointsBalance
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         playId:
           type: string
         cardCode:
@@ -3516,6 +3636,7 @@ components:
       - onHand
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         name:

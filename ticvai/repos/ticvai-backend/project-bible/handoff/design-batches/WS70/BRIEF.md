@@ -1,6 +1,6 @@
 # WS70 — Unified BI Reporting and AI Analytics Platform board 9
 
-**10 screens · 24 operations · 48 schemas · 5 permissions**
+**10 screens · 12 operations · 36 schemas · 4 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `AI_AUDIT_VIEW, AI_CONFIGURE, AI_USE, REPORT_MANAGE, REPORT_VIEW_VENUE`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `AI_AUDIT_VIEW, AI_USE, REPORT_MANAGE, REPORT_VIEW_VENUE`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -129,11 +129,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ANL-052` | Ask TICVAI — Natural Language Analytics | D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `ANL-053` | AI-Generated Dashboard Studio | D | 0 | 0 | 6 | 18 | 1 | 0 | — | notStarted (—) |
 | `ANL-054` | AI Report Generator | D | 0 | 14 | 6 | 82 | 1 | 0 | — | notStarted (—) |
-| `ANL-055` | Anomaly Detection Center | D | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ANL-056` | Root-Cause Analysis Explorer | D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ANL-055` | Anomaly Detection Center | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-056` | Root-Cause Analysis Explorer | D | 0 | 14 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ANL-057` | Forecasting & Predictive Analytics Studio | D | 7 | 0 | 5 | 39 | 0 | 0 | — | notStarted (—) |
-| `ANL-058` | AI Recommendation & Next-Best-Action Center | D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `ANL-059` | AI Insight History, Evidence & Explainability | D | 5 | 40 | 5 | 8 | 0 | 0 | — | notStarted (—) |
+| `ANL-058` | AI Recommendation & Next-Best-Action Center | D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-059` | AI Insight History, Evidence & Explainability | D | 5 | 40 | 5 | 7 | 0 | 0 | — | notStarted (—) |
 | `ANL-060` | AI Analytics Governance & Model Control | D | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

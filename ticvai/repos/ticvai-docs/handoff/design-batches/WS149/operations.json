@@ -339,7 +339,7 @@
  },
  "setPaymentTerminalConfiguration": {
   "method": "PUT",
-  "path": "/payment-terminals",
+  "path": "/payment-terminals/{deviceId}",
   "contract": "payments",
   "summary": "Merchant account, acquirer, EMV and offline behaviour",
   "permission": "PAYMENT_CONFIGURE",
@@ -347,6 +347,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "deviceId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

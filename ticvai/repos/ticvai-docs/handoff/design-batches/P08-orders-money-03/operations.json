@@ -756,7 +756,7 @@
  },
  "setFxRate": {
   "method": "PUT",
-  "path": "/fx-rates",
+  "path": "/fx-rates/{rateId}",
   "contract": "finance",
   "summary": "Set a rate",
   "permission": "LEDGER_APPROVE",
@@ -764,6 +764,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "region",
   "parameters": [
+   {
+    "name": "rateId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

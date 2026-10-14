@@ -31,7 +31,7 @@ schemas:
   tables: 20
   stores:
   - postgres
-  largestTable: resources.resource_type
+  largestTable: resources.resource
 - schema: venuemap
   tables: 8
   stores:
@@ -775,7 +775,7 @@ operationsByContract:
     permission: INCIDENT_MANAGE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: recordWorkOrderParts
     verb: POST
     path: /work-orders/{workOrderId}/parts
@@ -807,7 +807,7 @@ operationsByContract:
     permission: INCIDENT_REPORT
     offline: true
     reads: 2
-    writes: 2
+    writes: 3
   - operation: resumeWorkOrder
     verb: POST
     path: /work-orders/{workOrderId}/resume
@@ -1089,7 +1089,7 @@ operationsByContract:
     scope: venue
     permission: RENTAL_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: publishRentalProduct
     verb: POST
@@ -1209,7 +1209,7 @@ operationsByContract:
     scope: venue
     permission: RENTAL_BOOK
     offline: false
-    reads: 1
+    reads: 2
     writes: 1
   - operation: simulateRentalPricing
     verb: POST
@@ -1448,7 +1448,7 @@ operationsByContract:
     writes: 2
   - operation: setAttractionType
     verb: PUT
-    path: /attraction-types
+    path: /attraction-types/{attractionTypeId}
     scope: tenant
     permission: PRODUCT_CONFIGURE
     offline: false
@@ -1520,7 +1520,7 @@ operationsByContract:
     writes: 1
   - operation: setReaderProfile
     verb: PUT
-    path: /reader-profiles
+    path: /reader-profiles/{readerProfileId}
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
@@ -2002,7 +2002,7 @@ operationsByContract:
     scope: venue
     permission: ASSET_LIBRARY_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: setMediaAssetApproval
     verb: POST
@@ -2027,10 +2027,10 @@ operationsByContract:
     permission: ASSET_LIBRARY_MANAGE
     offline: false
     reads: 1
-    writes: 1
+    writes: 2
   - operation: setMediaDistributionChannels
     verb: PUT
-    path: /media-distribution/channels
+    path: /media-distribution/channels/{code}
     scope: tenant
     permission: ASSET_LIBRARY_MANAGE
     offline: false
@@ -2244,7 +2244,7 @@ operationsByContract:
     writes: 3
   - operation: configureQueueFeed
     verb: PUT
-    path: /queue-feeds
+    path: /queue-feeds/{feedId}
     scope: venue
     permission: QUEUE_MANAGE
     offline: false
@@ -2726,7 +2726,7 @@ tables:
   - assets
   foreignWriters: null
 - table: assets.rendition
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -2747,7 +2747,7 @@ tables:
   - assets
   foreignWriters: null
 - table: assets.taxonomy
-  columns: 2
+  columns: 5
   store: postgres
   parent: null
   writtenBy:
@@ -2761,7 +2761,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.authorisation
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -2818,21 +2818,21 @@ tables:
   - games
   foreignWriters: null
 - table: games.operational_config
-  columns: 12
+  columns: 13
   store: postgres
   parent: games.game
   writtenBy:
   - games
   foreignWriters: null
 - table: games.play
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
   - games
   foreignWriters: null
 - table: games.pricing
-  columns: 9
+  columns: 12
   store: postgres
   parent: games.game
   writtenBy:
@@ -2867,7 +2867,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.reader_deployment
-  columns: 8
+  columns: 9
   store: postgres
   parent: games.reader
   writtenBy:
@@ -2902,7 +2902,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.redemption_rules
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -2955,7 +2955,8 @@ tables:
   columns: 8
   store: postgres
   parent: maintenance.incident
-  writtenBy: []
+  writtenBy:
+  - maintenance
   foreignWriters: null
 - table: maintenance.incident_history
   columns: 8
@@ -3020,7 +3021,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: maintenance.priority_scoring_model
-  columns: 5
+  columns: 6
   store: postgres
   parent: null
   writtenBy:
@@ -3034,7 +3035,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: maintenance.work_order
-  columns: 56
+  columns: 58
   store: postgres
   parent: null
   writtenBy:
@@ -3062,7 +3063,7 @@ tables:
   - queue
   foreignWriters: null
 - table: queue.queue
-  columns: 40
+  columns: 39
   store: postgres
   parent: null
   writtenBy:
@@ -3097,7 +3098,7 @@ tables:
   - rental
   foreignWriters: null
 - table: rental.agreement_rules
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -3111,7 +3112,7 @@ tables:
   - rental
   foreignWriters: null
 - table: rental.availability_rules
-  columns: 6
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -3125,14 +3126,14 @@ tables:
   - rental
   foreignWriters: null
 - table: rental.booking
-  columns: 17
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
   - rental
   foreignWriters: null
 - table: rental.damage_assessment
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -3146,35 +3147,35 @@ tables:
   - rental
   foreignWriters: null
 - table: rental.duration_rules
-  columns: 11
-  store: postgres
-  parent: null
-  writtenBy:
-  - rental
-  foreignWriters: null
-- table: rental.equipment_assignment
-  columns: 8
-  store: postgres
-  parent: null
-  writtenBy:
-  - rental
-  foreignWriters: null
-- table: rental.fee_policy
-  columns: 14
-  store: postgres
-  parent: null
-  writtenBy:
-  - rental
-  foreignWriters: null
-- table: rental.incident
   columns: 12
   store: postgres
   parent: null
   writtenBy:
   - rental
   foreignWriters: null
-- table: rental.inspection
+- table: rental.equipment_assignment
   columns: 9
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.fee_policy
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.incident
+  columns: 13
+  store: postgres
+  parent: null
+  writtenBy:
+  - rental
+  foreignWriters: null
+- table: rental.inspection
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -3188,21 +3189,21 @@ tables:
   - rental
   foreignWriters: null
 - table: rental.inventory_model
-  columns: 10
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
   - rental
   foreignWriters: null
 - table: rental.location_rule
-  columns: 10
+  columns: 11
   store: postgres
   parent: inventory.location
   writtenBy:
   - rental
   foreignWriters: null
 - table: rental.operational_rules
-  columns: 20
+  columns: 21
   store: postgres
   parent: null
   writtenBy:
@@ -3216,14 +3217,14 @@ tables:
   - rental
   foreignWriters: null
 - table: rental.participant
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
   - rental
   foreignWriters: null
 - table: rental.pricing_profile
-  columns: 22
+  columns: 24
   store: postgres
   parent: null
   writtenBy:
@@ -3264,7 +3265,7 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.booking
-  columns: 16
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -3285,7 +3286,7 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.resource
-  columns: 17
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
@@ -3362,7 +3363,7 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.resource_schedule
-  columns: 8
+  columns: 10
   store: postgres
   parent: resources.resource
   writtenBy:
@@ -3383,7 +3384,7 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.venue_assignment
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -3425,7 +3426,7 @@ tables:
   - transport
   foreignWriters: null
 - table: transport.network_import
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -3439,7 +3440,7 @@ tables:
   - transport
   foreignWriters: null
 - table: transport.route
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -3474,7 +3475,7 @@ tables:
   - transport
   foreignWriters: null
 - table: venuemap.import_job
-  columns: 14
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -3495,28 +3496,28 @@ tables:
   - venue-map
   foreignWriters: null
 - table: venuemap.path
-  columns: 10
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
   - venue-map
   foreignWriters: null
 - table: venuemap.placed_resource
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
   - venue-map
   foreignWriters: null
 - table: venuemap.point
-  columns: 21
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
   - venue-map
   foreignWriters: null
 - table: venuemap.visit_plan
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:

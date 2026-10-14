@@ -1,6 +1,6 @@
 # WS100 — Subscription Licensing AI Self Service board 3
 
-**10 screens · 9 operations · 10 schemas · 3 permissions**
+**10 screens · 10 operations · 12 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 3 permissions apply here:
-  `PLATFORM_BILLING_MANAGE, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -96,10 +96,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-389` | Commercial Rules Engine Overview | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-389` | Commercial Rules Engine Overview | B | 0 | 90 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-390` | VSI Model Builder | B | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-391` | VSI Scoring & Tier Threshold Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-392` | Subscription Tier Configuration | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-392` | Subscription Tier Configuration | B | 0 | 20 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-393` | Tier Included Allowances | B | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-394` | Commercial & Licensing Model Configuration | B | 23 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-395` | Billable Unit, Minimum Guarantee & Enforcement Rules | B | 17 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

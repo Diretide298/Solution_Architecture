@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/home-default",
-   "component": "apps/guest-app/src/routes/general/HomeDefaultDashboard.tsx",
+   "component": "src/screens/general/HomeDefaultDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -287,10 +287,7 @@
     {
      "to": "GST-039",
      "trigger": "Profile",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-001 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-039 declares entryState.params  and GST-001 holds none of them. The edge carries nothing: GST-039 needs nothing to open"
     },
     {
      "to": "GST-040",
@@ -657,36 +654,15 @@
    {
     "operationId": "getCookieConsentRuntime",
     "contract": "marketing-crm",
-    "purpose": "Tracking consent prompt on first launch and the SDK gate",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "recordDeviceConsent",
-    "contract": "marketing-crm",
-    "purpose": "Accept, reject or customise tracking on first launch",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "decideRecommendations",
-    "contract": "ai",
-    "purpose": "Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "recordRecommendationEvents",
-    "contract": "ai",
-    "purpose": "Report impressions, clicks and declines of recommended items",
-    "trigger": "onAction",
+    "purpose": "Read by the app shell, not a control: which tracking categories this device has granted, so SDKs and the tag loader start only for those (none until granted)",
+    "trigger": "background",
     "provenance": "build, 29 September 2026"
    },
    {
     "operationId": "recordStorefrontSessionEvents",
     "contract": "white-label",
     "purpose": "App-shell beacon of hashed browsing behaviour for fraud prevention",
-    "trigger": "onLoad",
+    "trigger": "background",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -724,6 +700,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-001",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-001.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -764,6 +741,24 @@
     "removed": true,
     "why": "Replaced by `getMyProfile`, the guest's own profile; `getGuestProfile` is the staff read by subject and returns the CRM fields (engagement score, lifetime value, tags).",
     "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   },
+   {
+    "operation": "decideRecommendations",
+    "removed": true,
+    "why": "The client-approved Home has no recommendation slot, so nothing shows a decision; recommendations show in the cart slot (WEB-008, GST-048).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "recordRecommendationEvents",
+    "removed": true,
+    "why": "Goes with decideRecommendations: no recommended item is shown here to report on.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "recordDeviceConsent",
+    "removed": true,
+    "why": "The client-approved UI has no tracking-consent banner or prompt, so nothing records a decision here and tracking stays off (getCookieConsentRuntime). A consent prompt needs a design the client approves.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "_platform": {
@@ -807,7 +802,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/explore-categories",
-   "component": "apps/guest-app/src/routes/general/ExploreCategoriesList.tsx",
+   "component": "src/screens/general/ExploreCategoriesList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -839,10 +834,11 @@
      "to": "GST-004",
      "trigger": "Attraction Details",
      "carries": [
+      "bundleId",
       "eventId",
       "productId"
      ],
-     "provenance": "derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-002 holds eventId, productId, so an edge into it carries them"
+     "provenance": "derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-002 holds bundleId, eventId, productId, so an edge into it carries them"
     },
     {
      "to": "GST-063",
@@ -949,6 +945,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-002",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-002.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -999,7 +996,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/buy-tickets",
-   "component": "apps/guest-app/src/routes/general/BuyTicketsList.tsx",
+   "component": "src/screens/general/BuyTicketsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1028,10 +1025,11 @@
      "to": "GST-004",
      "trigger": "Attraction Details",
      "carries": [
+      "bundleId",
       "eventId",
       "productId"
      ],
-     "provenance": "derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-003 holds eventId, productId, so an edge into it carries them"
+     "provenance": "derived — GST-004 declares entryState.params bundleId, eventId, productId and GST-003 holds bundleId, eventId, productId, so an edge into it carries them"
     },
     {
      "to": "GST-007",
@@ -1239,6 +1237,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-003",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-003.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -1289,7 +1288,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/item-detail",
-   "component": "apps/guest-app/src/routes/general/ItemDetail.tsx",
+   "component": "src/screens/general/ItemDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1605,6 +1604,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-004",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-004.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -1655,7 +1655,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/whats-on",
-   "component": "apps/guest-app/src/routes/general/WhatsOnList.tsx",
+   "component": "src/screens/general/WhatsOnList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1700,7 +1700,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listPerformances` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Find what's on for this venue.",
+  "purpose": "What is on at this venue over the dates the guest picks: each performance and the products that run.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1863,7 +1863,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/event-exhibition-details",
-   "component": "apps/guest-app/src/routes/general/EventExhibitionDetailsDetail.tsx",
+   "component": "src/screens/general/EventExhibitionDetailsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1905,7 +1905,7 @@
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getPerformance` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "See event / exhibition details for this venue.",
+  "purpose": "One event or exhibition: what it is, and the performance being booked, before choosing tickets.",
   "layout": {
    "template": "detail",
    "regions": [
@@ -1980,6 +1980,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-006",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-006.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -2030,7 +2031,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/accessibility-information",
-   "component": "apps/guest-app/src/routes/general/AccessibilityInformationForm.tsx",
+   "component": "src/screens/general/AccessibilityInformationForm.tsx",
    "status": "notStarted"
   },
   "navigation": {

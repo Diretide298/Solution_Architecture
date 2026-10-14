@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/lost-and-found",
-   "component": "apps/guest-app/src/routes/general/LostAndFoundDetail.tsx",
+   "component": "src/screens/general/LostAndFoundDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -34,7 +34,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listMyCases` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "See lost & found for this venue.",
+  "purpose": "Report a lost item, follow the guest's lost-property cases and reply on them.",
   "layout": {
    "template": "split",
    "regions": [

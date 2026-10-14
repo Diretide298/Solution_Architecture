@@ -1,6 +1,6 @@
 # WS163 — Resource Management Configuration board 9
 
-**10 screens · 14 operations · 28 schemas · 7 permissions**
+**10 screens · 14 operations · 29 schemas · 7 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -158,8 +158,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-936` | Mobile Staff Check-In & Check-Out | D | 0 | 18 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-937` | Resource Collection, Handover & Return | D | 5 | 0 | 6 | 25 | 0 | 0 | — | notStarted (—) |
 | `BO-938` | Employee Requests & Resource Support | D | 6 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-939` | Shift Change, Swap, Pickup & Release | B–D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |
-| `BO-940` | Manager Mobile Approval Center | B | 0 | 0 | 6 | 13 | 0 | 3 | — | notStarted (—) |
+| `BO-939` | Shift Change, Swap, Pickup & Release | B–D | 0 | 8 | 6 | 1 | 1 | 6 | — | notStarted (—) |
+| `BO-940` | Manager Mobile Approval Center | B | 0 | 20 | 6 | 13 | 0 | 3 | — | notStarted (—) |
 | `BO-941` | Operational Notifications & Live Alerts | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-942` | Mobile Operations Control & Offline Sync | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 

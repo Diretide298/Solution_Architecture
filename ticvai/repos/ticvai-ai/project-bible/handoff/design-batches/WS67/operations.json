@@ -101,19 +101,6 @@
   "requestBody": null,
   "responds": "SemanticModel"
  },
- "listAnalyticsPipelines": {
-  "method": "GET",
-  "path": "/analytics-pipelines",
-  "contract": "reporting",
-  "summary": "Data sources, refresh state and freshness",
-  "permission": "REPORT_VIEW_TENANT",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "tenant",
-  "parameters": [],
-  "requestBody": null,
-  "responds": "AnalyticsPipeline"
- },
  "listDashboards": {
   "method": "GET",
   "path": "/dashboards",

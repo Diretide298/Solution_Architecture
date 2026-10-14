@@ -11,7 +11,7 @@
 | **States** | 42 |
 | **Events** | 48 |
 | **Tables** | 138 |
-| **Screens** | 194 |
+| **Screens** | 183 |
 | **Flows** | 11 |
 | **Documents** | 68 |
 | **Open conflicts** | 1 |
@@ -338,18 +338,14 @@
 
 **P01 Guest Web**
 
-- `WEB-001` Home / Landing — wave 1, 2 operations
 - `WEB-008` Add-ons & Upsell — wave 1, 2 operations
-- `WEB-043` Loyalty & Rewards — wave 1, 2 operations
 - `WEB-044` AI Concierge – Home — wave 1, 5 operations
 
 **P02 Guest App**
 
-- `GST-001` Home — wave 1, 2 operations
 - `GST-031` AI Concierge – Home — wave 1, 5 operations
-- `GST-032` AI Concierge – Chat — wave 1, 2 operations
+- `GST-032` AI Concierge – Chat — wave 1, 1 operation
 - `GST-033` AI Concierge – Contextual Help — wave 1, 4 operations
-- `GST-036` Loyalty & Rewards — wave 1, 2 operations
 - `GST-048` Upsell / Cross-Sell — wave 1, 2 operations
 - `GST-054` AI Planner — wave 1, 3 operations
 - `GST-068` Help & My Cases — wave 1, 1 operation
@@ -360,7 +356,7 @@
 
 **P05 Guest Kiosk**
 
-- `KSK-015` Assistant — wave 1, 3 operations
+- `KSK-015` Assistant — wave 1, 2 operations
 
 **P06 Venue Staff App**
 
@@ -405,7 +401,7 @@
 - `BO-597` AI Configuration Workspace — wave 3, 2 operations
 - `BO-598` AI Draft Review & Approval — wave 3, 3 operations
 - `BO-761` AI Audience Discovery — wave 3, 1 operation
-- `BO-762` Predictive Audiences — wave 3, 2 operations
+- `BO-762` Predictive Audiences — wave 3, 3 operations
 - `BO-764` Campaign Command Center — wave 3, 1 operation
 - `BO-766` Campaign Builder — wave 1, 1 operation
 - `BO-772` A/B & AI Optimization — wave 1, 4 operations
@@ -414,7 +410,7 @@
 - `BO-786` Newsletter Builder — wave 3, 1 operation
 - `BO-787` Content Blocks & Product Feed — wave 3, 1 operation
 - `BO-789` Transactional Notification Rules — wave 3, 1 operation
-- `BO-793` AI Content, Translation & Audit — wave 3, 3 operations
+- `BO-793` AI Content, Translation & Audit — wave 3, 4 operations
 - `BO-798` Intent & Knowledge Management — wave 1, 3 operations
 - `BO-919` AI Event Resource Forecasting — wave 1, 4 operations
 - `BO-925` AI Staff Recommendation & Workforce Matching — wave 3, 2 operations
@@ -431,98 +427,92 @@
 
 **P09 TICVAI Web**
 
-- `ADM-004` Platform Audit Log — wave 2, 2 operations
+- `ADM-004` Platform Audit Log — wave 2, 1 operation
 - `ADM-037` AI Provider & Credentials — wave 1, 10 operations
 - `ADM-469` AI Configuration Home & Start — wave 3, 3 operations
-- `ADM-470` Setup Type & Business Intent Discovery — wave 3, 4 operations
-- `ADM-471` Venue & Business Model Discovery — wave 3, 3 operations
+- `ADM-470` Setup Type & Business Intent Discovery — wave 3, 3 operations
+- `ADM-471` Venue & Business Model Discovery — wave 3, 2 operations
 - `ADM-472` Guided Question & Answer Workspace — wave 3, 2 operations
 - `ADM-473` Product & Admission Model Discovery — wave 3, 2 operations
 - `ADM-474` Operational Requirement Discovery — wave 3, 2 operations
 - `ADM-475` Commercial Requirement Discovery — wave 3, 2 operations
-- `ADM-476` Required, Recommended & Optional Decisions — wave 3, 2 operations
-- `ADM-477` Missing Information & Clarification Center — wave 3, 5 operations
+- `ADM-476` Required, Recommended & Optional Decisions — wave 3, 1 operation
+- `ADM-477` Missing Information & Clarification Center — wave 3, 3 operations
 - `ADM-478` Configuration Blueprint & Dependency Map — wave 3, 2 operations
-- `ADM-479` AI Configuration Build Command Center — wave 3, 3 operations
-- `ADM-480` Venue & Organization Configuration — wave 3, 3 operations
-- `ADM-481` Product Configuration Assistant — wave 3, 3 operations
-- `ADM-482` Schedule, Capacity & Availability Configuration — wave 3, 3 operations
-- `ADM-483` Pricing & Commercial Configuration — wave 3, 3 operations
-- `ADM-484` Promotion, Bundle & Upsell Configuration — wave 3, 3 operations
-- `ADM-485` Seating, Access & Operational Configuration — wave 3, 3 operations
-- `ADM-486` Channel, Media & Fulfillment Configuration — wave 3, 3 operations
-- `ADM-487` Cross-Module Conflict & Dependency Validation — wave 3, 2 operations
-- `ADM-488` Configuration Preview & Impact Analysis — wave 3, 2 operations
-- `ADM-489` AI Configuration Readiness Center — wave 3, 4 operations
+- `ADM-479` AI Configuration Build Command Center — wave 3, 2 operations
+- `ADM-480` Venue & Organization Configuration — wave 3, 2 operations
+- `ADM-481` Product Configuration Assistant — wave 3, 2 operations
+- `ADM-482` Schedule, Capacity & Availability Configuration — wave 3, 2 operations
+- `ADM-483` Pricing & Commercial Configuration — wave 3, 2 operations
+- `ADM-484` Promotion, Bundle & Upsell Configuration — wave 3, 2 operations
+- `ADM-485` Seating, Access & Operational Configuration — wave 3, 2 operations
+- `ADM-486` Channel, Media & Fulfillment Configuration — wave 3, 2 operations
+- `ADM-487` Cross-Module Conflict & Dependency Validation — wave 3, 1 operation
+- `ADM-488` Configuration Preview & Impact Analysis — wave 3, 1 operation
+- `ADM-489` AI Configuration Readiness Center — wave 3, 3 operations
 - `ADM-490` Configuration Validation Results — wave 3, 2 operations
-- `ADM-491` AI Recommendations & Best-Practice Review — wave 3, 2 operations
-- `ADM-492` Configuration Approval Workflow — wave 3, 3 operations
+- `ADM-491` AI Recommendations & Best-Practice Review — wave 3, 1 operation
 - `ADM-493` AI Configuration Execution Center — wave 3, 3 operations
-- `ADM-494` Execution Progress & Dependency Monitor — wave 3, 4 operations
-- `ADM-495` Configuration Results & Object Mapping — wave 3, 2 operations
-- `ADM-496` Configuration Change & Modification Assistant — wave 3, 3 operations
+- `ADM-494` Execution Progress & Dependency Monitor — wave 3, 2 operations
+- `ADM-495` Configuration Results & Object Mapping — wave 3, 1 operation
 - `ADM-497` Configuration History, Versions & Rollback — wave 3, 3 operations
 - `ADM-498` AI Configuration Audit & Governance — wave 3, 2 operations
 - `ADM-499` Forecasting Command Center — wave 3, 3 operations
 - `ADM-500` Forecast Configuration & Forecasting Strategy — wave 1, 3 operations
 - `ADM-501` Forecast Data & Signal Configuration — wave 3, 3 operations
-- `ADM-502` Attendance & Visitation Forecast — wave 3, 3 operations
+- `ADM-502` Attendance & Visitation Forecast — wave 3, 2 operations
 - `ADM-503` Ticket, Product & Timeslot Demand Forecast — wave 3, 3 operations
 - `ADM-504` Channel & Booking Pace Forecast — wave 3, 2 operations
 - `ADM-505` Revenue & Commercial Forecast — wave 3, 3 operations
 - `ADM-506` Forecast Drivers, Confidence & Explainability — wave 1, 5 operations
-- `ADM-507` Forecast Scenario & What-If Simulator — wave 3, 3 operations
+- `ADM-507` Forecast Scenario & What-If Simulator — wave 3, 1 operation
 - `ADM-508` Forecast Accuracy, Review & Publication Center — wave 1, 5 operations
-- `ADM-509` Operational Forecasting Command Center — wave 3, 2 operations
-- `ADM-510` Capacity & Occupancy Forecast — wave 3, 4 operations
-- `ADM-511` Attraction Utilization & Queue Forecast — wave 3, 3 operations
-- `ADM-512` Entry, Access & Guest Flow Forecast — wave 3, 2 operations
-- `ADM-513` Workforce Demand & Staffing Forecast — wave 3, 2 operations
-- `ADM-514` POS, Kiosk & Frontline Service Forecast — wave 3, 2 operations
-- `ADM-515` F&B, Retail & Inventory Demand Forecast — wave 3, 2 operations
-- `ADM-516` Resource, Equipment & Facility Requirement Forecast — wave 3, 2 operations
-- `ADM-517` Operational Scenario & Readiness Simulator — wave 3, 3 operations
-- `ADM-518` Operational Forecast Review, Recommendations & Handover — wave 3, 2 operations
-- `ADM-519` AI Governance Command Center — wave 3, 5 operations
+- `ADM-509` Operational Forecasting Command Center — wave 3, 1 operation
+- `ADM-510` Capacity & Occupancy Forecast — wave 3, 3 operations
+- `ADM-511` Attraction Utilization & Queue Forecast — wave 3, 2 operations
+- `ADM-512` Entry, Access & Guest Flow Forecast — wave 3, 1 operation
+- `ADM-515` F&B, Retail & Inventory Demand Forecast — wave 3, 1 operation
+- `ADM-516` Resource, Equipment & Facility Requirement Forecast — wave 3, 1 operation
+- `ADM-517` Operational Scenario & Readiness Simulator — wave 3, 1 operation
+- `ADM-519` AI Governance Command Center — wave 3, 2 operations
 - `ADM-520` AI Capability Registry & Ownership — wave 3, 2 operations
 - `ADM-521` AI Risk Classification & Assessment — wave 3, 2 operations
-- `ADM-522` AI Autonomy Level Configuration — wave 3, 3 operations
+- `ADM-522` AI Autonomy Level Configuration — wave 3, 2 operations
 - `ADM-523` AI Action & Permission Policy Builder — wave 1, 3 operations
 - `ADM-524` AI Data Access & Usage Policy — wave 3, 2 operations
-- `ADM-525` Environment, Tenant & Scope Governance — wave 3, 2 operations
-- `ADM-526` AI Policy Conflict, Exception & Override Management — wave 3, 4 operations
+- `ADM-525` Environment, Tenant & Scope Governance — wave 3, 1 operation
+- `ADM-526` AI Policy Conflict, Exception & Override Management — wave 3, 3 operations
 - `ADM-527` AI Policy Testing & Governance Simulation — wave 1, 2 operations
 - `ADM-528` AI Governance Policy Publication & Effective Policy Map — wave 1, 3 operations
-- `ADM-529` AI Human Oversight Command Center — wave 3, 2 operations
-- `ADM-530` AI Approval Requirement & Routing Configuration — wave 3, 3 operations
-- `ADM-531` AI Approval Review Workspace — wave 3, 3 operations
+- `ADM-529` AI Human Oversight Command Center — wave 3, 1 operation
+- `ADM-531` AI Approval Review Workspace — wave 3, 1 operation
 - `ADM-532` Conditional Approval & Approval Conditions — wave 3, 2 operations
-- `ADM-533` Human Review, Challenge & AI Clarification Workspace — wave 3, 3 operations
+- `ADM-533` Human Review, Challenge & AI Clarification Workspace — wave 3, 1 operation
 - `ADM-534` Escalation, Delegation & Approval SLA Management — wave 3, 2 operations
 - `ADM-535` Live AI Execution Oversight & Human Intervention — wave 3, 5 operations
 - `ADM-536` Human Override & Manual Control Center — wave 3, 7 operations
 - `ADM-537` Approval & Intervention History / Decision Timeline — wave 3, 2 operations
-- `ADM-538` Human Oversight Workflow Simulator & Readiness Center — wave 3, 2 operations
+- `ADM-538` Human Oversight Workflow Simulator & Readiness Center — wave 3, 1 operation
 - `ADM-539` AI Explainability & Audit Command Center — wave 3, 1 operation
 - `ADM-540` AI Decision Explorer & Search — wave 3, 2 operations
 - `ADM-541` AI Decision Explanation Workspace — wave 3, 1 operation
 - `ADM-542` Data, Feature & Evidence Provenance — wave 3, 1 operation
-- `ADM-543` Candidate, Rule & Decision Path Trace — wave 3, 2 operations
+- `ADM-543` Candidate, Rule & Decision Path Trace — wave 3, 1 operation
 - `ADM-544` Model, Provider & AI Runtime Trace — wave 3, 2 operations
 - `ADM-545` Governance, Approval & Human Decision Trace — wave 3, 1 operation
-- `ADM-546` Execution & Business Outcome Trace — wave 3, 2 operations
+- `ADM-546` Execution & Business Outcome Trace — wave 3, 1 operation
 - `ADM-547` AI Audit Record & Evidence Package — wave 3, 2 operations
 - `ADM-548` AI Trace Investigation & Replay Simulator — wave 3, 2 operations
 - `ADM-549` AI Governance Monitoring Command Center — wave 3, 4 operations
 - `ADM-550` AI Risk Register & Risk Exposure Management — wave 3, 2 operations
 - `ADM-551` AI Governance Control Library & Control Effectiveness — wave 3, 2 operations
-- `ADM-552` AI Policy Compliance & Violation Monitoring — wave 3, 2 operations
-- `ADM-553` AI Data, Privacy & Usage Compliance Monitoring — wave 3, 2 operations
+- `ADM-552` AI Policy Compliance & Violation Monitoring — wave 3, 1 operation
+- `ADM-553` AI Data, Privacy & Usage Compliance Monitoring — wave 3, 1 operation
 - `ADM-554` AI Quality, Behavior & Governance Drift Monitoring — wave 1, 6 operations
-- `ADM-555` AI Governance Alert & Detection Center — wave 3, 3 operations
+- `ADM-555` AI Governance Alert & Detection Center — wave 3, 2 operations
 - `ADM-556` AI Incident & Remediation Management — wave 1, 6 operations
-- `ADM-557` AI Compliance, Assurance & Governance Reporting — wave 3, 3 operations
-- `ADM-558` AI Governance Review, Action Plan & Continuous Improvement — wave 3, 2 operations
+- `ADM-557` AI Compliance, Assurance & Governance Reporting — wave 3, 2 operations
+- `ADM-558` AI Governance Review, Action Plan & Continuous Improvement — wave 3, 1 operation
 
 **P10 Partner Web**
 
@@ -532,12 +522,12 @@
 
 - `SUP-006` Knowledge Base Search — wave 3, 2 operations
 - `SUP-008` Agent Performance & SLA View — wave 3, 2 operations
-- `SUP-018` AI Customer Service Copilot & Knowledge Workspace — wave 3, 2 operations
+- `SUP-018` AI Customer Service Copilot & Knowledge Workspace — wave 3, 1 operation
 
 **P13 Venue CMS**
 
-- `CMS-007` Page Builder — wave 1, 2 operations
-- `CMS-008` Content Blocks — wave 1, 2 operations
+- `CMS-007` Page Builder — wave 1, 3 operations
+- `CMS-008` Content Blocks — wave 1, 3 operations
 - `CMS-010` Media Library — wave 1, 1 operation
 - `CMS-011` Translations — wave 1, 2 operations
 - `CMS-062` Central Digital Asset Library — wave 3, 1 operation
@@ -557,12 +547,11 @@
 - `ANL-010` Suggestions & Advice — wave 3, 2 operations
 - `ANL-019` AI Management Insights — wave 3, 4 operations
 - `ANL-052` Ask TICVAI — Natural Language Analytics — wave 3, 2 operations
-- `ANL-055` Anomaly Detection Center — wave 3, 3 operations
+- `ANL-055` Anomaly Detection Center — wave 3, 1 operation
 - `ANL-056` Root-Cause Analysis Explorer — wave 3, 2 operations
-- `ANL-057` Forecasting & Predictive Analytics Studio — wave 3, 4 operations
-- `ANL-058` AI Recommendation & Next-Best-Action Center — wave 3, 1 operation
-- `ANL-059` AI Insight History, Evidence & Explainability — wave 3, 4 operations
-- `ANL-060` AI Analytics Governance & Model Control — wave 3, 7 operations
+- `ANL-057` Forecasting & Predictive Analytics Studio — wave 3, 2 operations
+- `ANL-059` AI Insight History, Evidence & Explainability — wave 3, 2 operations
+- `ANL-060` AI Analytics Governance & Model Control — wave 3, 1 operation
 - `ANL-070` Analytics Governance, Security & Audit Center — wave 3, 2 operations
 - `ANL-071` AI Maturity & Learning — wave 3, 6 operations
 

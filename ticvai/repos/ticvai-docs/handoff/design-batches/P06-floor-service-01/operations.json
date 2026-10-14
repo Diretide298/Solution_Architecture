@@ -24,7 +24,7 @@
   "contract": "fnb",
   "summary": "Settle and close a visit",
   "permission": "ORDER_CREATE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "workstation",
   "parameters": [

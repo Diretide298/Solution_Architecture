@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "10",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-analytics-command-center-bo-943",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceAnalyticsCommandCenter.tsx",
+   "component": "src/routes/rentals/ResourceAnalyticsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -130,7 +131,7 @@
         "Resource Breakdown"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listResources",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Display"
       }
      ]
@@ -161,7 +162,8 @@
         "Resource Breakdown"
        ],
        "notes": null,
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Display"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 153 §Display",
+       "operation": "getResourceUtilisation"
       }
      ]
     },
@@ -270,6 +272,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "10",
@@ -279,7 +282,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-utilization-capacity-analytics-bo-944",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceUtilizationCapacityAnalytics.tsx",
+   "component": "src/routes/rentals/ResourceUtilizationCapacityAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -341,7 +344,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -473,6 +476,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "10",
@@ -482,7 +486,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-cost-revenue-efficiency-analytics-bo-945",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceCostRevenueEfficiencyAnalytics.tsx",
+   "component": "src/routes/rentals/ResourceCostRevenueEfficiencyAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -734,6 +738,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "10",
@@ -743,7 +748,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/demand-forecast-accuracy-planning-performance-bo-946",
-   "component": "apps/venue-management-web/src/routes/rentals/DemandForecastAccuracyPlanningPerformance.tsx",
+   "component": "src/routes/rentals/DemandForecastAccuracyPlanningPerformance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -891,6 +896,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "10",
@@ -900,7 +906,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-kpi-sla-performance-framework-bo-947",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceKpiSlaPerformanceFramework.tsx",
+   "component": "src/routes/rentals/ResourceKpiSlaPerformanceFramework.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1003,7 +1009,8 @@
         "Owner"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Target”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 158 §KPI Library"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 158 §KPI Library",
+       "operation": "getResourceUtilisation"
       }
      ]
     }
@@ -1070,6 +1077,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "10",
@@ -1079,7 +1087,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-governance-policy-center-bo-948",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceGovernancePolicyCenter.tsx",
+   "component": "src/routes/rentals/ResourceGovernancePolicyCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1103,6 +1111,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Centralize the administrative policies controlling how Resource Management behaves.",
   "purposeNote": "Administrators can centrally manage Resource Management policies with controlled inheritance, versioning, and effective dating.",
+  "division": "Shares `getResourceAllocationPolicy`, `setResourceAllocationPolicy` with BO-900, BO-901; this screen is Resource Governance & Policy Center (pack Resource_Management_Configuration_Reference.pdf, board 10.06, page 159): centralize the administrative policies controlling how Resource Management behaves.",
   "gaps": [
    {
     "operation": null,
@@ -1200,6 +1209,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "10",
@@ -1209,7 +1219,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/approval-exception-override-control-center-bo-949",
-   "component": "apps/venue-management-web/src/routes/rentals/ApprovalExceptionOverrideControlCenter.tsx",
+   "component": "src/routes/rentals/ApprovalExceptionOverrideControlCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1263,7 +1273,7 @@
         "Required approver"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listMemberExceptionOverride",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 160 §Each request shall show"
       }
      ]
@@ -1355,6 +1365,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "10",
@@ -1364,7 +1375,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/audit-trail-resource-decision-history-bo-950",
-   "component": "apps/venue-management-web/src/routes/rentals/AuditTrailResourceDecisionHistory.tsx",
+   "component": "src/routes/rentals/AuditTrailResourceDecisionHistory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1573,6 +1584,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "10",
@@ -1582,7 +1594,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-integration-system-health-center-bo-951",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceIntegrationSystemHealthCenter.tsx",
+   "component": "src/routes/rentals/ResourceIntegrationSystemHealthCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1632,7 +1644,7 @@
         "Latency"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAnalyticsPipelines",
        "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 163 §Display"
       }
      ]
@@ -1733,6 +1745,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "10",
@@ -1742,7 +1755,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/executive-resource-intelligence-ai-improvement-center-bo-952",
-   "component": "apps/venue-management-web/src/routes/rentals/ExecutiveResourceIntelligenceAiImprovementCenter.tsx",
+   "component": "src/routes/rentals/ExecutiveResourceIntelligenceAiImprovementCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1777,7 +1790,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1867,7 +1880,8 @@
         "Operational impact"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Executive Question”, “Overall Utilization”, “Resource Readiness”, “Assignment Fulfillment”, “Overtime”, “Resource-Related Cost”.",
-       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Each recommendation shall show"
+       "provenance": "pack Resource_Management_Configuration_Reference.pdf, page 165 §Each recommendation shall show",
+       "operation": "getResourceUtilisation"
       }
      ]
     }

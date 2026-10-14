@@ -176,7 +176,7 @@
  },
  "setReaderProfile": {
   "method": "PUT",
-  "path": "/reader-profiles",
+  "path": "/reader-profiles/{readerProfileId}",
   "contract": "games",
   "summary": "How a reader behaves and what it shows",
   "permission": "PRODUCT_CONFIGURE",
@@ -184,6 +184,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "readerProfileId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

@@ -5,6 +5,7 @@
   "module": "Security & Compliance",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C97",
   "implementation": {
    "app": "ticvai-web",
@@ -375,6 +376,7 @@
   "module": "Security & Compliance",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_CELL_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -517,6 +519,12 @@
      "from": "deepLink",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listWafRules` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "wafRuleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listWafRules`."
     }
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",

@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/lost-found",
-   "component": "apps/guest-web/src/routes/LostFound.tsx",
+   "component": "src/routes/LostFound.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -281,7 +281,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/help-centre-and-accessibility",
-   "component": "apps/guest-web/src/routes/HelpCentreAccessibility.tsx",
+   "component": "src/routes/HelpCentreAccessibility.tsx",
    "status": "notStarted"
   },
   "navigation": {

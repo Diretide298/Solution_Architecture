@@ -90,7 +90,7 @@
  },
  "setSeatHoldType": {
   "method": "PUT",
-  "path": "/seat-hold-types",
+  "path": "/seat-hold-types/{holdTypeId}",
   "contract": "seating",
   "summary": "Define a hold kind, its owner and its release rule",
   "permission": "CAPACITY_CONFIGURE",
@@ -98,6 +98,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "holdTypeId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

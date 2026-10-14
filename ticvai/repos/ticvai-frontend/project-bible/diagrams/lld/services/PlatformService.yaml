@@ -1,5 +1,5 @@
 id: LLD-PlatformService
-title: PlatformService — 228 operations, 109 tables
+title: PlatformService — 229 operations, 109 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 deployable: operations
@@ -14,7 +14,7 @@ why: '**Three contracts, two schemas, 109 tables.** Subscription, platform opera
 scale: Low volume, high consequence. Tenant provisioning and licensing.
 ifDown: Down blocks provisioning and the developer API. **Trading is unaffected.**
 coverage:
-  operations: 228
+  operations: 229
   inAFlow: 80
   percent: 35%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -32,7 +32,7 @@ schemas:
   largestTable: subscription.membership_product
 operationsByContract:
 - contract: subscription
-  count: 152
+  count: 153
   operations:
   - operation: actOnPartnerApplicationReview
     verb: POST
@@ -297,6 +297,14 @@ operationsByContract:
     permission: PLATFORM_CELL_VIEW
     offline: false
     reads: 2
+    writes: 0
+  - operation: getCommercialMetrics
+    verb: GET
+    path: /commercial-metrics
+    scope: platform
+    permission: PLATFORM_BILLING_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: getCommissionStatement
     verb: GET
@@ -628,7 +636,7 @@ operationsByContract:
     writes: 0
   - operation: listPartner2
     verb: GET
-    path: /partner
+    path: /partner-2
     scope: tenant
     permission: PLATFORM_TENANT_VIEW
     offline: false
@@ -964,7 +972,7 @@ operationsByContract:
     writes: 1
   - operation: setChannelListing
     verb: PUT
-    path: /channel-listings
+    path: /channel-listings/{listingId}
     scope: venue
     permission: PARTNER_MANAGE
     offline: false
@@ -988,7 +996,7 @@ operationsByContract:
     writes: 1
   - operation: setLicensingModel
     verb: PUT
-    path: /licensing-models
+    path: /licensing-models/{licensingModelId}
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
@@ -1044,7 +1052,7 @@ operationsByContract:
     writes: 4
   - operation: setModuleListing
     verb: PUT
-    path: /module-catalogue
+    path: /module-catalogue/{moduleCode}
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
@@ -1084,7 +1092,7 @@ operationsByContract:
     writes: 4
   - operation: setPartnerContact
     verb: PUT
-    path: /partner-contacts
+    path: /partner-contacts/{contactId}
     scope: tenant
     permission: PARTNER_MANAGE
     offline: false
@@ -1164,7 +1172,7 @@ operationsByContract:
     writes: 2
   - operation: setTrialConfiguration
     verb: PUT
-    path: /trial-configurations
+    path: /trial-configurations/{trialConfigurationId}
     scope: platform
     permission: PLATFORM_PLAN_MANAGE
     offline: false
@@ -1319,7 +1327,7 @@ operationsByContract:
     writes: 0
   - operation: getRelease
     verb: GET
-    path: /releases/{reinventoryHoldId}
+    path: /releases/{releaseId}
     scope: tenant
     permission: PLATFORM_RELEASE_VIEW
     offline: false
@@ -1327,7 +1335,7 @@ operationsByContract:
     writes: 0
   - operation: getReleaseReadiness
     verb: GET
-    path: /releases/{reinventoryHoldId}/readiness
+    path: /releases/{releaseId}/readiness
     scope: tenant
     permission: PLATFORM_RELEASE_VIEW
     offline: false
@@ -1463,7 +1471,7 @@ operationsByContract:
     writes: 3
   - operation: promoteRelease
     verb: POST
-    path: /releases/{reinventoryHoldId}/promote
+    path: /releases/{releaseId}/promote
     scope: tenant
     permission: PLATFORM_RELEASE_PROMOTE
     offline: false
@@ -1487,7 +1495,7 @@ operationsByContract:
     writes: 2
   - operation: rejectRelease
     verb: POST
-    path: /releases/{reinventoryHoldId}/reject
+    path: /releases/{releaseId}/reject
     scope: tenant
     permission: PLATFORM_RELEASE_PROMOTE
     offline: false
@@ -1543,7 +1551,7 @@ operationsByContract:
     writes: 1
   - operation: setWafPolicy
     verb: PUT
-    path: /waf-policies
+    path: /waf-policies/{wafRuleId}
     scope: region
     permission: PLATFORM_CELL_MANAGE
     offline: false
@@ -1555,8 +1563,8 @@ operationsByContract:
     scope: platform
     permission: PLATFORM_CELL_MANAGE
     offline: false
-    reads: 2
-    writes: 2
+    reads: 3
+    writes: 3
   - operation: startRollout
     verb: POST
     path: /rollouts/{rolloutId}/start
@@ -1567,7 +1575,7 @@ operationsByContract:
     writes: 2
   - operation: withdrawRelease
     verb: POST
-    path: /releases/{reinventoryHoldId}/withdraw
+    path: /releases/{releaseId}/withdraw
     scope: tenant
     permission: PLATFORM_RELEASE_MANAGE
     offline: false
@@ -1810,7 +1818,7 @@ operationsByContract:
     writes: 2
   - operation: setApiAnomalyRule
     verb: PUT
-    path: /api-anomaly-rules
+    path: /api-anomaly-rules/{anomalyRuleId}
     scope: tenant
     permission: DEVELOPER_ADMIN
     offline: false
@@ -1826,7 +1834,7 @@ operationsByContract:
     writes: 1
   - operation: setApiLicensing
     verb: PUT
-    path: /api-licensing
+    path: /api-licensing/{licenceId}
     scope: tenant
     permission: DEVELOPER_ADMIN
     offline: false
@@ -1834,7 +1842,7 @@ operationsByContract:
     writes: 3
   - operation: setApiQuota
     verb: PUT
-    path: /api-quotas
+    path: /api-quotas/{quotaId}
     scope: tenant
     permission: DEVELOPER_ADMIN
     offline: false
@@ -2140,7 +2148,7 @@ tables:
   - public-api
   foreignWriters: null
 - table: control.api_client
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -2161,7 +2169,7 @@ tables:
   - public-api
   foreignWriters: null
 - table: control.api_version
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -2674,7 +2682,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.tenant_migration_plan
-  columns: 13
+  columns: 14
   store: postgres
   parent: control.tenant
   writtenBy:
@@ -2744,21 +2752,21 @@ tables:
   - subscription
   foreignWriters: null
 - table: subscription.enforcement_policy
-  columns: 3
+  columns: 4
   store: postgres
   parent: null
   writtenBy:
   - subscription
   foreignWriters: null
 - table: subscription.go_live_readiness
-  columns: 8
+  columns: 9
   store: postgres
   parent: platform.tenant
   writtenBy:
   - subscription
   foreignWriters: null
 - table: subscription.licensing_model
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -2884,7 +2892,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: subscription.vsi_model
-  columns: 3
+  columns: 5
   store: postgres
   parent: null
   writtenBy:
@@ -3113,6 +3121,8 @@ screens:
 - P09:ADM-372 Operational Profile, VSI & Commercial Model Intelligence
 - P09:ADM-373 Revenue & Commercial Model Analytics
 - P09:ADM-374 Trial & Conversion Monitor
+- P09:ADM-375 Renewal & Retention Center
+- P09:ADM-376 Commercial Optimization & Expansion Opportunities
 - P09:ADM-377 Subscription Exceptions & Commercial Alerts
 - P09:ADM-378 Executive AI Commercial Intelligence
 - P09:ADM-380 Customer & Organization Registration
@@ -3176,6 +3186,7 @@ screens:
 - P09:ADM-461 Consumption Reconciliation & Billing Approval
 - P09:ADM-462 Invoice & Payment Management
 - P09:ADM-463 Subscription & Commercial Change Management
+- P09:ADM-464 Renewal Management Center
 - P09:ADM-465 AI Upgrade, Downgrade & Commercial Right-Sizing
 - P09:ADM-466 Commercial Scenario Simulator
 - P09:ADM-467 Discount, Credit & Commercial Override Management

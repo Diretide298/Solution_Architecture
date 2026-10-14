@@ -18,6 +18,7 @@
     "description": "The accreditation credential's id (`credentialId` on the events)."
    },
    "holderId": {
+    "x-ticvai-references": "accreditation.holder",
     "type": "string",
     "format": "uuid"
    },
@@ -266,10 +267,12 @@
     "format": "uuid"
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid"
    },
@@ -300,7 +303,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    }
   }
  },
@@ -321,6 +325,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -443,6 +448,20 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "directionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a direction change set by `setAccessPointDirection` takes effect; held `pending` until then."
+   },
+   "directionChangeReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the gate was last turned round (`setAccessPointDirection`)."
    }
   }
  },
@@ -662,6 +681,9 @@
   }
  },
  "CrossRegionEntitlement": {
+  "x-ticvai-retired-columns": [
+   "ticket_id"
+  ],
   "x-ticvai-persistence": "sync.cross_region_entitlement",
   "type": "object",
   "required": [
@@ -687,6 +709,8 @@
     "format": "uuid"
    },
    "ticketId": {
+    "x-ticvai-references": "access.entitlement",
+    "x-ticvai-column": "entitlement_id",
     "type": "string"
    },
    "guestLinkId": {
@@ -1281,6 +1305,9 @@
   }
  },
  "ScanEvent": {
+  "x-ticvai-retired-columns": [
+   "ticket_id"
+  ],
   "x-ticvai-append-only": "recordedAt",
   "x-ticvai-persistence": "access.scan_event",
   "type": "object",
@@ -1310,6 +1337,8 @@
     "type": "string"
    },
    "ticketId": {
+    "x-ticvai-references": "access.entitlement",
+    "x-ticvai-column": "entitlement_id",
     "type": "string",
     "format": "uuid",
     "nullable": true,

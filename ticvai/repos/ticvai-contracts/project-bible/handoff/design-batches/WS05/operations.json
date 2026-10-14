@@ -348,7 +348,7 @@
  },
  "setBiometricLifecycleRetention": {
   "method": "PUT",
-  "path": "/biometric-lifecycle-retention",
+  "path": "/biometric-lifecycle-retention/{retentionSettingId}",
   "contract": "access",
   "summary": "Save a biometric retention rule",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -356,6 +356,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "retentionSettingId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -386,7 +391,7 @@
  },
  "setFaceMatchingVerification": {
   "method": "PUT",
-  "path": "/face-matching-verification",
+  "path": "/face-matching-verification/{profileId}",
   "contract": "access",
   "summary": "Save face matching and verification thresholds",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -394,6 +399,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "profileId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -424,7 +434,7 @@
  },
  "setFaceTagTemporaryEnrollment": {
   "method": "PUT",
-  "path": "/face-tag-temporary",
+  "path": "/face-tag-temporary/{profileId}",
   "contract": "access",
   "summary": "Save a Face Tag profile",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -432,6 +442,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "profileId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

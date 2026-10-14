@@ -995,7 +995,7 @@ operationsByContract:
     writes: 0
   - operation: listMultiParkCrossover2
     verb: GET
-    path: /multi-park-crossover
+    path: /multi-park-crossover-2
     scope: venue
     permission: SCOPE_VIEW
     offline: false
@@ -1411,7 +1411,7 @@ operationsByContract:
     writes: 3
   - operation: setAccessAttributeCatalog
     verb: PUT
-    path: /access-attribute-catalog
+    path: /access-attribute-catalog/{attributeKey}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1432,7 +1432,7 @@ operationsByContract:
     permission: ACCESS_DIRECTION_SET
     offline: false
     reads: 2
-    writes: 1
+    writes: 3
   - operation: setAccessPointGeofence
     verb: PUT
     path: /access-points/{accessPointId}/geofence
@@ -1443,7 +1443,7 @@ operationsByContract:
     writes: 3
   - operation: setAccessPointGroup
     verb: PUT
-    path: /access-point-groups
+    path: /access-point-groups/{groupId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1467,7 +1467,7 @@ operationsByContract:
     writes: 3
   - operation: setBiometricLifecycleRetention
     verb: PUT
-    path: /biometric-lifecycle-retention
+    path: /biometric-lifecycle-retention/{retentionSettingId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1507,7 +1507,7 @@ operationsByContract:
     writes: 4
   - operation: setCredentialActivationDisplay
     verb: PUT
-    path: /credential-activation-display
+    path: /credential-activation-display/{credentialPolicyId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1595,7 +1595,7 @@ operationsByContract:
     writes: 3
   - operation: setEntitlementConsumption
     verb: PUT
-    path: /entitlement-consumption
+    path: /entitlement-consumption/{ruleId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1611,7 +1611,7 @@ operationsByContract:
     writes: 2
   - operation: setFaceMatchingVerification
     verb: PUT
-    path: /face-matching-verification
+    path: /face-matching-verification/{profileId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1627,7 +1627,7 @@ operationsByContract:
     writes: 3
   - operation: setFaceTagTemporaryEnrollment
     verb: PUT
-    path: /face-tag-temporary
+    path: /face-tag-temporary/{profileId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1635,7 +1635,7 @@ operationsByContract:
     writes: 3
   - operation: setFastPassProfile
     verb: PUT
-    path: /fast-pass-profiles
+    path: /fast-pass-profiles/{fastPassProfileId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1643,7 +1643,7 @@ operationsByContract:
     writes: 3
   - operation: setFraudDetectionRule
     verb: PUT
-    path: /fraud-detection-rule
+    path: /fraud-detection-rule/{ruleId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1659,7 +1659,7 @@ operationsByContract:
     writes: 3
   - operation: setGateModePolicy
     verb: PUT
-    path: /gate-mode-policies
+    path: /gate-mode-policies/{gateModePolicyId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1691,7 +1691,7 @@ operationsByContract:
     writes: 3
   - operation: setGuestCompanionEligibility
     verb: PUT
-    path: /guest-companion-eligibility
+    path: /guest-companion-eligibility/{ruleId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1707,7 +1707,7 @@ operationsByContract:
     writes: 3
   - operation: setHardwareModel
     verb: PUT
-    path: /hardware-models
+    path: /hardware-models/{modelId}
     scope: tenant
     permission: DEVICE_CONFIGURE
     offline: false
@@ -1723,7 +1723,7 @@ operationsByContract:
     writes: 1
   - operation: setHotelWalletExternal
     verb: PUT
-    path: /hotel-wallet-external
+    path: /hotel-wallet-external/{integrationId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1731,7 +1731,7 @@ operationsByContract:
     writes: 3
   - operation: setJourneyProfile
     verb: PUT
-    path: /journey-profiles
+    path: /journey-profiles/{journeyProfileId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1739,7 +1739,7 @@ operationsByContract:
     writes: 3
   - operation: setJourneySequenceRule
     verb: PUT
-    path: /journey-sequence-rules
+    path: /journey-sequence-rules/{ruleId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1755,7 +1755,7 @@ operationsByContract:
     writes: 3
   - operation: setMediaBindingRule
     verb: PUT
-    path: /media-binding-rules
+    path: /media-binding-rules/{ruleId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1763,7 +1763,7 @@ operationsByContract:
     writes: 3
   - operation: setMediaIssuanceEncoding
     verb: PUT
-    path: /media-issuance-encoding
+    path: /media-issuance-encoding/{encodingProfileId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1771,7 +1771,7 @@ operationsByContract:
     writes: 3
   - operation: setMediaReplacementRevocation
     verb: PUT
-    path: /media-replacement-revocation
+    path: /media-replacement-revocation/{replacementReason}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1779,7 +1779,7 @@ operationsByContract:
     writes: 3
   - operation: setMediaTypeTechnology
     verb: PUT
-    path: /media-type-technology
+    path: /media-type-technology/{mediaTypeId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1787,7 +1787,7 @@ operationsByContract:
     writes: 3
   - operation: setOperatingCalendarEntry
     verb: PUT
-    path: /operating-calendar-entries
+    path: /operating-calendar-entries/{entryId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1803,7 +1803,7 @@ operationsByContract:
     writes: 2
   - operation: setParkingFacility
     verb: PUT
-    path: /parking-facilities
+    path: /parking-facilities/{parkingFacilityId}
     scope: venue
     permission: PARKING_CONFIGURE
     offline: false
@@ -1819,7 +1819,7 @@ operationsByContract:
     writes: 3
   - operation: setPodium
     verb: PUT
-    path: /podiums
+    path: /podiums/{podiumId}
     scope: venue
     permission: DEVICE_CONFIGURE
     offline: false
@@ -1835,7 +1835,7 @@ operationsByContract:
     writes: 3
   - operation: setPolicyScopeHierarchy
     verb: PUT
-    path: /policy-scope-hierarchy
+    path: /policy-scope-hierarchy/{policyId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -1859,7 +1859,7 @@ operationsByContract:
     writes: 3
   - operation: setReasonCode
     verb: PUT
-    path: /reason-codes
+    path: /reason-codes/{reasonCodeId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -2371,7 +2371,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.access_point
-  columns: 18
+  columns: 20
   store: postgres
   parent: null
   writtenBy:
@@ -2447,7 +2447,7 @@ tables:
   - access
   foreignWriters: null
 - table: access.configuration_change
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -2605,7 +2605,7 @@ tables:
 - table: access.entry_rule_point
   columns: 5
   store: postgres
-  parent: null
+  parent: access.admission_rules
   writtenBy:
   - access
   foreignWriters: null
@@ -2847,7 +2847,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: access.security_alert
-  columns: 20
+  columns: 21
   store: postgres
   parent: null
   writtenBy:

@@ -5,6 +5,7 @@
   "module": "Partners",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
    "board": "3",
@@ -86,7 +87,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -115,79 +116,91 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "Partner Sales Today",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.partnerSalesToday"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.partnerSalesToday",
+       "operation": "listPartner2"
       },
       {
        "kind": "metricTile",
        "label": "Partner Sales MTD",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.partnerSalesMtd"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.partnerSalesMtd",
+       "operation": "listPartner2"
       },
       {
        "kind": "metricTile",
        "label": "Active Partner Orders",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.activePartnerOrders"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.activePartnerOrders",
+       "operation": "listPartner2"
       },
       {
        "kind": "metricTile",
        "label": "Active Reservations/Holds",
+       "operation": "listPartner2",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display"
       },
       {
        "kind": "metricTile",
        "label": "Tickets Sold",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.ticketsSold"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.ticketsSold",
+       "operation": "listPartner2"
       },
       {
        "kind": "metricTile",
        "label": "Cancellations",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.cancellations"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.cancellations",
+       "operation": "listPartner2"
       },
       {
        "kind": "metricTile",
        "label": "Refunds",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.refunds"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.refunds",
+       "operation": "listPartner2"
       },
       {
        "kind": "metricTile",
        "label": "Outstanding Receivables",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.outstandingReceivables"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.outstandingReceivables",
+       "operation": "listPartner2"
       },
       {
        "kind": "metricTile",
        "label": "Commission Payable",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.commissionPayable"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.commissionPayable",
+       "operation": "listPartner2"
       },
       {
        "kind": "metricTile",
        "label": "Pending Settlements",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.pendingSettlements"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.pendingSettlements",
+       "operation": "listPartner2"
       },
       {
        "kind": "metricTile",
        "label": "Operational Exceptions",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.operationalExceptions"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.operationalExceptions",
+       "operation": "listPartner2"
       },
       {
        "kind": "metricTile",
        "label": "Partners Requiring Attention",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 44 §Display",
-       "bindsTo": "PartnerOperationsCommandCenterSummary.partnersRequiringAttention"
+       "bindsTo": "PartnerOperationsCommandCenterSummary.partnersRequiringAttention",
+       "operation": "listPartner2"
       }
      ]
     },
@@ -228,6 +241,7 @@
        "kind": "detailPanel",
        "label": "The selected partner operations",
        "bindsTo": "PartnerOperationsCommandCenterView",
+       "operation": "listPartner2",
        "columns": [
         "PartnerOperationsCommandCenterView.partner",
         "PartnerOperationsCommandCenterView.partnerType",
@@ -263,12 +277,6 @@
     "operationId": "listPartner2",
     "contract": "subscription",
     "purpose": "Partner Operations Command Center",
-    "trigger": "onLoad"
-   },
-   {
-    "operationId": "listPartner",
-    "contract": "subscription",
-    "purpose": "Partner Management Command Center",
     "trigger": "onLoad"
    }
   ],
@@ -309,6 +317,7 @@
   "module": "Partners",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
    "board": "3",
@@ -348,7 +357,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -515,6 +524,7 @@
   "module": "Partners",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
    "board": "3",
@@ -554,7 +564,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
@@ -710,6 +720,7 @@
   "module": "Partners",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
    "board": "3",
@@ -880,6 +891,7 @@
   "module": "Partners",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
    "board": "3",
@@ -919,7 +931,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
@@ -991,21 +1003,25 @@
       {
        "kind": "metricTile",
        "label": "1–30 Days",
+       "operation": "listPartnerStatementAccount",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display"
       },
       {
        "kind": "metricTile",
        "label": "31–60 Days",
+       "operation": "listPartnerStatementAccount",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display"
       },
       {
        "kind": "metricTile",
        "label": "61–90 Days",
+       "operation": "listPartnerStatementAccount",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display"
       },
       {
        "kind": "metricTile",
        "label": "90+ Days",
+       "operation": "listPartnerStatementAccount",
        "provenance": "pack B2B, Reseller & OTA Partner Management_Reference.pdf, page 51 §Display"
       }
      ]
@@ -1108,6 +1124,7 @@
   "module": "Partners",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
    "board": "3",
@@ -1355,6 +1372,7 @@
   "module": "Partners",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
    "board": "3",
@@ -1484,6 +1502,7 @@
   "module": "Partners",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "B2B, Reseller & OTA Partner Management_Reference.pdf",
    "board": "3",

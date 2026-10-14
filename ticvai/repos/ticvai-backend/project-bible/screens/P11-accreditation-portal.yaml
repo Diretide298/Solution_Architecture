@@ -173,6 +173,7 @@ screens:
   name: Registration Form
   module: Applicant Journey
   wave: 3
+  permission: ACCREDITATION_VIEW
   requiresModule: accreditation
   pattern: multiStepForm
   density: compact
@@ -186,16 +187,16 @@ screens:
     purpose: Register the applicant, the organisation and the coverage requested
     trigger: onAction
     provenance: readiness close-out, 29 September 2026
-  - operationId: submitAccreditationDocument
-    contract: accreditation
-    purpose: Each supporting document, against the requirement it satisfies
-    trigger: onAction
-    provenance: readiness close-out, 29 September 2026
   - operationId: updateAccreditationApplication
     contract: accreditation
     purpose: Save the draft as each step is completed (Save and finish later)
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: getAccreditationApplication
+    contract: accreditation
+    purpose: 'The draft being resumed from the acknowledgement link: where each step and requirement stands'
+    trigger: onLoad
+    provenance: audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)
   gaps:
   - operation: saveAccreditationDraft
     why: 'The pattern requires a draft that autosaves. **A four-step form that loses everything to a dropped
@@ -207,11 +208,12 @@ screens:
   layout:
     template: wizard
     regions:
-    - name: contentBody
+    - name: progress
       slot: progress
       components:
       - kind: progressIndicator
         label: Step 1 of 4 — Organisation
+        operation: getAccreditationApplication
         notes: Organisation · Coverage · Documents · Check and submit.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
     - name: contentBody
@@ -219,26 +221,32 @@ screens:
       components:
       - kind: textField
         label: Organisation
+        operation: createAccreditationApplication
         notes: Who you work for. Free text — an outlet that is not on a list is still an outlet.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
       - kind: selectField
         label: Role
+        operation: createAccreditationApplication
         notes: Photographer, writer, broadcast, technical. **Drives what coverage may be requested.**
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
       - kind: textField
         label: Press card number
+        operation: createAccreditationApplication
         notes: Optional, and marked so. Its absence is a reviewer's signal, not a blocker.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
       - kind: textField
         label: Commissioning editor
+        operation: createAccreditationApplication
         notes: Who commissioned the coverage, where there is one.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
       - kind: fileUpload
         label: Supporting documents
+        operation: createAccreditationApplication
         notes: Commission letter and badge photo. Accepted formats stated before the picker opens.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
       - kind: consentBlock
         label: Consent
+        operation: createAccreditationApplication
         notes: '**Stated once, unticked, and collected before documents rather than after.** The 2 September
           session recorded consent language as a live question for face data; the same principle applies
           to a press photograph. An accepted-by-default consent is not consent.
@@ -252,6 +260,7 @@ screens:
         label: Continue
       - kind: secondaryButton
         label: Save and finish later
+        operation: updateAccreditationApplication
   overlays:
   - id: saveAndExit
     component: confirmDialog
@@ -327,6 +336,7 @@ screens:
   name: Application Review & Submit
   module: Applicant Journey
   wave: 3
+  permission: ACCREDITATION_APPLY
   requiresModule: accreditation
   pattern: multiStepForm
   density: compact
@@ -340,15 +350,10 @@ screens:
     purpose: Submit the reviewed draft; blocking-submission requirements are checked here
     trigger: onAction
     provenance: build, 29 September 2026
-  - operationId: updateAccreditationApplication
-    contract: accreditation
-    purpose: Apply a change made through a Change link
-    trigger: onAction
-    provenance: build, 29 September 2026
   layout:
     template: wizard
     regions:
-    - name: contentBody
+    - name: progress
       slot: progress
       components:
       - kind: progressIndicator
@@ -387,6 +392,7 @@ screens:
       components:
       - kind: primaryButton
         label: Submit application
+        operation: submitAccreditationApplication
   overlays:
   - id: submitConfirm
     component: confirmDialog
@@ -470,6 +476,7 @@ screens:
   name: Application Status Tracking
   module: Applicant Journey
   wave: 3
+  permission: ACCREDITATION_APPLY
   requiresModule: accreditation
   pattern: statusTracker
   density: compact
@@ -488,21 +495,6 @@ screens:
     purpose: Withdraw this application
     trigger: onAction
     provenance: build, 29 September 2026
-  - operationId: submitAccreditationDocument
-    contract: accreditation
-    purpose: Add a document the reviewer asked for
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: updateAccreditationApplication
-    contract: accreditation
-    purpose: Amend answers after a return for information
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: resubmitAccreditationApplication
-    contract: accreditation
-    purpose: Send it back after a return for information or a rejection
-    trigger: onAction
-    provenance: build, 29 September 2026
   gaps:
   - operation: getAccreditationApplicationByReference
     why: '**A status screen with no status read.** The screen declared no operation. It also cannot use
@@ -518,7 +510,7 @@ screens:
   layout:
     template: detail
     regions:
-    - name: contentBody
+    - name: state
       slot: state
       components:
       - kind: banner
@@ -533,6 +525,7 @@ screens:
       - kind: timeline
         label: Where it has been
         bindsTo: ApprovalRequest.decisions
+        operation: listMyAccreditationApplications
         notes: Received, documents checked, decision — each with its date.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
     - name: contentBody
@@ -541,6 +534,7 @@ screens:
       - kind: detailPanel
         label: Application
         bindsTo: ApprovalRequest.summary
+        operation: listMyAccreditationApplications
         notes: The reference, the performances, and what was requested.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
     - name: actionBar
@@ -550,6 +544,7 @@ screens:
         label: Add a document
       - kind: destructiveButton
         label: Withdraw this application
+        operation: withdrawAccreditationApplication
   overlays:
   - id: confirmWithdraw
     component: confirmDialog
@@ -619,6 +614,7 @@ screens:
   name: Accreditation Badge
   module: Applicant Journey
   wave: 3
+  permission: ACCREDITATION_APPLY
   requiresModule: accreditation
   pattern: credentialView
   density: touchLarge
@@ -657,7 +653,7 @@ screens:
   layout:
     template: fullscreen
     regions:
-    - name: contentBody
+    - name: credential
       slot: credential
       components:
       - kind: credentialDisplay
@@ -669,7 +665,7 @@ screens:
 
           '
         provenance: frame claude-design/Accreditation Board.dc.html#acc-005
-    - name: contentBody
+    - name: identity
       slot: identity
       components:
       - kind: detailPanel
@@ -773,6 +769,7 @@ screens:
   name: Reviewer Queue
   module: Reviewer (Internal)
   wave: 3
+  permission: ACCREDITATION_VIEW
   requiresModule: accreditation
   pattern: approvalInbox
   density: compact
@@ -803,7 +800,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -819,6 +816,7 @@ screens:
       - kind: dataTable
         label: Queue
         bindsTo: ApprovalRequest[]
+        operation: listAccreditationApplications
         columns:
         - ApprovalRequest.summary
         - ApprovalRequest.requestedAt
@@ -837,6 +835,7 @@ screens:
       - kind: detailPanel
         label: Selected application
         bindsTo: ApprovalRequest
+        operation: listAccreditationApplications
         notes: Enough to approve without opening `ACC-007`.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-006
     - name: actionBar
@@ -886,8 +885,9 @@ screens:
         applicationId, documentId, so an edge into it carries them
     - to: ACC-008
       trigger: Credential Register
-      provenance: 'derived — ACC-008 declares entryState.params  and ACC-006 holds none of them. The edge
-        carries nothing: ACC-008 needs nothing to open'
+      provenance: 'derived — ACC-008 declares entryState.params exportId and ACC-006 holds none of them.
+        The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens
+        on its own'
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-queue
@@ -927,6 +927,7 @@ screens:
   name: Reviewer Application Detail
   module: Reviewer (Internal)
   wave: 3
+  permission: ACCREDITATION_VIEW
   requiresModule: accreditation
   pattern: approvalInbox
   density: compact
@@ -945,16 +946,6 @@ screens:
     purpose: The application under review
     trigger: onLoad
     provenance: build, 29 September 2026
-  - operationId: listAccreditationDocuments
-    contract: accreditation
-    purpose: The application's documents (applicationId), each with its state
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: verifyAccreditationDocument
-    contract: accreditation
-    purpose: Verify or refuse each document
-    trigger: onAction
-    provenance: build, 29 September 2026
   gaps:
   - operation: getApprovalRequest
     why: 'The screen shows one application and the only read is a list. **A detail screen that fetches
@@ -971,6 +962,7 @@ screens:
       - kind: detailPanel
         label: The application
         bindsTo: ApprovalRequest
+        operation: getAccreditationApplication
         notes: 'Role, outlet, press card, commission — **including the ones that are absent**, stated
           as *Not stated* and *None attached* rather than left blank. A blank field and a declared absence
           look identical and only one is information.
@@ -987,12 +979,14 @@ screens:
       - kind: banner
         label: Decision due
         bindsTo: ApprovalRequest.slaDueAt
+        operation: getAccreditationApplication
         provenance: frame claude-design/Accreditation Board.dc.html#acc-007
     - name: actionBar
       slot: decision
       components:
       - kind: primaryButton
         label: Approve
+        operation: decideAccreditationApplication
         permission: APPROVAL_DECIDE
       - kind: destructiveButton
         label: Refuse
@@ -1014,6 +1008,8 @@ screens:
       what is granted**, so the two screens must agree.
 
       '
+    confirm:
+      operation: decideAccreditationApplication
     provenance: frame claude-design/Accreditation Board.dc.html#acc-005
   states:
     loading: The application.
@@ -1055,8 +1051,9 @@ screens:
         so an edge into it carries them
     - to: ACC-008
       trigger: Credential Register
-      provenance: 'derived — ACC-008 declares entryState.params  and ACC-007 holds none of them. The edge
-        carries nothing: ACC-008 needs nothing to open'
+      provenance: 'derived — ACC-008 declares entryState.params exportId and ACC-007 holds none of them.
+        The edge carries nothing: exportId only pre-selects (deep link or optional), and ACC-008 opens
+        on its own'
     - to: ACC-005
       trigger: The badge is issued
       provenance: flow F23 step 2→3
@@ -1089,6 +1086,7 @@ screens:
   name: Credential Register
   module: Reviewer (Internal)
   wave: 3
+  permission: ACCREDITATION_VIEW
   requiresModule: accreditation
   pattern: listDetail
   density: compact
@@ -1112,6 +1110,17 @@ screens:
     purpose: Where and when a credential was last used
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: exportAccreditationData
+    contract: accreditation
+    purpose: Hand the register to a security team before a performance; queues the export of the season's
+      credentials
+    trigger: onAction
+    provenance: audit fix S-EXPORT, 14 October 2026 (CHG-SCO-005)
+  - operationId: getAccreditationExport
+    contract: accreditation
+    purpose: Follows the queued export until it is ready, then gives its signed, expiring download link
+    trigger: onInterval
+    provenance: audit fix S-EXPORT, 14 October 2026 (CHG-SCO-005); the 202's pollExport link
   gaps:
   - operation: revokeAccreditationBadge
     why: 'The register offers **Revoke** and nothing performs it. `AccreditationBadge.state` and `revokedReason`
@@ -1128,7 +1137,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -1149,6 +1158,7 @@ screens:
       - kind: dataTable
         label: Credential register
         bindsTo: AccreditationBadge[]
+        operation: listAccreditationCredentials
         columns:
         - AccreditationBadge.holderName
         - AccreditationBadge.zones
@@ -1165,6 +1175,7 @@ screens:
       - kind: detailPanel
         label: Credential
         bindsTo: AccreditationBadge
+        operation: listAccreditationCredentials
         provenance: frame claude-design/Accreditation Board.dc.html#acc-008
     - name: actionBar
       slot: rowActions
@@ -1174,6 +1185,7 @@ screens:
         permission: APPROVAL_DECIDE
       - kind: secondaryButton
         label: Export
+        operation: exportAccreditationData
         notes: The register is what a venue hands to a security team before a performance.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-008
   overlays:
@@ -1196,6 +1208,12 @@ screens:
     params:
     - name: programmeId
       from: session
+    - name: exportId
+      from: navigation
+      optional: true
+      notes: 'Optional (14 October 2026, CHG-SCO-005): the export this screen queues. exportAccreditationData
+        answers 202 with its id and getAccreditationExport follows it to the signed download link; no
+        edge brings one.'
     preloaded: []
     coldEntry: Opens on the current season.
   navigation:

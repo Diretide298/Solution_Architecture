@@ -359,7 +359,7 @@
  },
  "setBadge": {
   "method": "PUT",
-  "path": "/badges",
+  "path": "/badges/{badgeId}",
   "contract": "marketing-crm",
   "summary": "Define a badge",
   "permission": "MARKETING_MANAGE",
@@ -367,6 +367,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "badgeId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -378,7 +383,7 @@
  },
  "setLoyaltyCampaign": {
   "method": "PUT",
-  "path": "/loyalty/campaigns",
+  "path": "/loyalty/campaigns/{loyaltyCampaignId}",
   "contract": "marketing-crm",
   "summary": "Define a loyalty campaign and its window",
   "permission": "MARKETING_MANAGE",
@@ -386,6 +391,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "loyaltyCampaignId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -421,7 +431,7 @@
  },
  "setReward": {
   "method": "PUT",
-  "path": "/loyalty/rewards",
+  "path": "/loyalty/rewards/{rewardId}",
   "contract": "marketing-crm",
   "summary": "Define a reward and its points cost",
   "permission": "MARKETING_MANAGE",
@@ -429,6 +439,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "rewardId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

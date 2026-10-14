@@ -225,6 +225,8 @@
   ],
   "properties": {
    "tiers": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 20,
     "items": {
@@ -347,6 +349,7 @@
     "format": "uuid"
    },
    "walletId": {
+    "x-ticvai-references": "wallet.wallet",
     "type": "string",
     "format": "uuid"
    },
@@ -391,6 +394,11 @@
    },
    "scopePath": {
     "type": "string"
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the device made the write** (R113; CHG-OFL-003). `linkWalletCredential` is offline-capable, so the client sets this from its own clock and keeps it on replay; `created_at` is when the server heard of it. Omitted online, the server sets it to the time it received the call."
    }
   }
  },

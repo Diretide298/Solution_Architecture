@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/in-venue-experience/menu-item-detail",
-   "component": "apps/guest-app/src/routes/in-venue-experience/MenuItemDetail.tsx",
+   "component": "src/screens/in-venue-experience/MenuItemDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -204,7 +204,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/in-venue-experience/shop-and-drop-collection",
-   "component": "apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx",
+   "component": "src/screens/in-venue-experience/ShopAndDropCollectionList.tsx",
    "status": "notStarted"
   },
   "navigation": {

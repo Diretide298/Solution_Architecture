@@ -334,6 +334,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -345,6 +346,7 @@
   ]
  },
  "MessageDispatch": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-append-only": "queuedAt",
   "x-ticvai-persistence": "marketing.message_dispatch",
   "type": "object",
@@ -453,6 +455,7 @@
   }
  },
  "MessageTemplate": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.message_template",
   "type": "object",
   "required": [
@@ -469,6 +472,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -550,6 +554,7 @@
     "description": "The platform event that fires it — `order.completed`, `access.validated`, `queue.turnApproaching`. **Named from the event catalogue** (`BusinessEvent.eventType`), so a trigger cannot bind to something nothing publishes. Its conditions are `MessageTriggerCondition` rows.\n**`entitlement.expiringSoon` is in the catalogue since 29 September** (build pass, group G2; 5.5.30): the pre-expiry reminder for a ticket or pass. Its anchor is the event time; the notice period is the template's `expiryNoticeDays`, so `offsetMinutes` is normally 0.\n"
    },
    "templateId": {
+    "x-ticvai-references": "marketing.message_template",
     "type": "string",
     "format": "uuid"
    },
@@ -617,6 +622,9 @@
   }
  },
  "ProposedAction": {
+  "x-ticvai-retired-columns": [
+   "interaction_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "ai.proposed_action",
   "required": [
@@ -633,6 +641,8 @@
     "format": "uuid"
    },
    "interactionId": {
+    "x-ticvai-references": "ai.activity",
+    "x-ticvai-column": "activity_id",
     "type": "string",
     "format": "uuid"
    },
@@ -1018,6 +1028,8 @@
     ]
    },
    "providers": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Tried in order; a provider below minimum health is skipped.",
     "items": {
@@ -1095,6 +1107,7 @@
   }
  },
  "Suppression": {
+  "x-ticvai-rls": "read-beneath",
   "x-ticvai-persistence": "marketing.suppression",
   "type": "object",
   "required": [

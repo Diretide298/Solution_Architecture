@@ -25,7 +25,7 @@
    "scope_path": "ltree",
    "security_classification": "text",
    "security_classification_level": "text",
-   "support_multi_park_environments": "boolean",
+   "supports_multi_park_environments": "boolean",
    "time_zone": "text",
    "updated_at": "timestamptz",
    "venue_id": "uuid",
@@ -47,8 +47,8 @@
    "changed_at": "timestamptz",
    "changed_by_principal_id": "uuid",
    "id": "uuid",
-   "new_access_id": "uuid",
-   "old_access_id": "uuid",
+   "new_entitlement_id": "uuid",
+   "old_entitlement_id": "uuid",
    "order_id": "uuid",
    "reason": "text",
    "type": "text",
@@ -71,7 +71,7 @@
   "access.access_map": {
    "created_at": "timestamptz",
    "id": "uuid",
-   "map_id": "text",
+   "map_id": "uuid",
    "proposal_status": "text",
    "proposed_topology": "jsonb",
    "scope_path": "ltree",
@@ -81,8 +81,11 @@
    "venue_id": "uuid"
   },
   "access.access_point": {
+   "captures_vehicle_location": "boolean",
    "code": "text",
    "direction": "text",
+   "direction_change_reason": "text",
+   "direction_effective_at": "timestamptz",
    "driver": "text",
    "external_credential_sources": "jsonb",
    "geofence": "jsonb",
@@ -97,7 +100,6 @@
    "scan_anomaly_rules": "jsonb",
    "scope_path": "ltree",
    "temporary_closure": "jsonb",
-   "vehicle_location_capture": "boolean",
    "venue_id": "uuid"
   },
   "access.access_point_configuration": {
@@ -151,6 +153,7 @@
    "entry_limit": "jsonb",
    "exit_scan": "text",
    "id": "uuid",
+   "is_same_day_only": "boolean",
    "max_duration_minutes": "integer",
    "max_exits": "integer",
    "max_reentries": "integer",
@@ -161,31 +164,30 @@
    "re_entry_window_minutes": "integer",
    "requires_exit_before_reentry": "boolean",
    "rule_conditions": "jsonb",
-   "same_day_only": "boolean",
    "scope_path": "ltree",
    "validity": "jsonb"
   },
   "access.attraction_access": {
-   "adult_companion_requirement": "boolean",
    "age_restriction": "integer",
    "attraction_id": "uuid",
-   "biometric_requirement": "boolean",
    "capacity": "integer",
    "created_at": "timestamptz",
    "entitlement_requirement": "text",
    "entry_access_point_ids": "text[]",
    "exit_access_point_ids": "text[]",
-   "fast_pass_support": "boolean",
+   "has_membership_access": "boolean",
+   "has_vip_access": "boolean",
    "height_restriction": "integer",
    "id": "uuid",
-   "membership_access": "boolean",
    "name": "text",
    "operating_calendar": "text",
+   "requires_adult_companion": "boolean",
+   "requires_biometric": "boolean",
    "scope_path": "ltree",
+   "supports_fast_pass": "boolean",
    "temporary_closure_behavior": "text",
    "updated_at": "timestamptz",
    "venue_id": "uuid",
-   "vip_access": "boolean",
    "zone_id": "uuid"
   },
   "access.biometric_audit_event": {
@@ -218,25 +220,25 @@
    "consent_capture": "text",
    "created_at": "timestamptz",
    "deletion_trigger": "text",
-   "duplicate_face_check": "boolean",
    "enrollment_channels": "text[]",
    "enrollment_expiry_days": "integer",
    "face_requirement": "text",
+   "has_duplicate_face_check": "boolean",
+   "has_liveness_check": "boolean",
+   "has_operator_fallback": "boolean",
    "high_confidence_min": "numeric(18,4)",
    "id": "uuid",
    "image_quality": "text",
    "is_account_login_required": "boolean",
    "is_identity_check_required": "boolean",
    "is_valid_ticket_pass_required": "boolean",
-   "liveness_check": "boolean",
    "mask_obstruction_handling": "text",
    "minimum_image_quality": "text",
    "name": "text",
    "number_of_capture_attempts": "integer",
-   "operator_fallback": "boolean",
-   "operator_verification": "boolean",
    "park_id": "uuid",
    "profile_kind": "text",
+   "requires_operator_verification": "boolean",
    "retention_threshold_hours": "integer",
    "retry_quantity": "integer",
    "review_range_min": "numeric(18,4)",
@@ -275,7 +277,7 @@
    "logo": "text",
    "parent_scope_id": "text",
    "reviewer_principal_id": "uuid",
-   "scope_id": "text",
+   "scope_id": "uuid",
    "scope_path": "ltree",
    "source_language": "text",
    "sponsor_placement": "text",
@@ -307,6 +309,7 @@
    "changed_by_principal_id": "uuid",
    "configuration_version_id": "uuid",
    "id": "uuid",
+   "reason": "text",
    "scope_path": "ltree",
    "subject_id": "text",
    "subject_type": "text",
@@ -342,9 +345,9 @@
    "credential_type": "text",
    "entitlement_type": "text",
    "id": "uuid",
+   "is_one_per_attraction": "boolean",
    "is_unlimited": "boolean",
    "name": "text",
-   "one_per_attraction": "boolean",
    "quantity": "integer",
    "scope_path": "ltree",
    "updated_at": "timestamptz"
@@ -480,20 +483,19 @@
    "venue_id": "uuid"
   },
   "access.credential_issuance_retry_policy": {
-   "automatic_retry": "boolean",
    "backoff_minutes": "integer",
    "escalate_after_attempts": "integer",
+   "has_automatic_retry": "boolean",
    "id": "uuid",
    "max_attempts": "integer",
    "scope_path": "ltree",
    "updated_at": "timestamptz",
-   "venue_id": "text"
+   "venue_id": "uuid"
   },
   "access.credential_policy": {
    "activation_triggers": "text[]",
    "active_display": "text[]",
    "before_activation_display": "text[]",
-   "before_first_validation_only": "boolean",
    "concurrent_sessions": "integer",
    "consumption_model": "text",
    "created_at": "timestamptz",
@@ -502,6 +504,7 @@
    "holder_assignment_requirements": "text",
    "id": "uuid",
    "id_generation_pattern": "text",
+   "is_before_first_validation_only": "boolean",
    "is_cancel_pending_allowed": "boolean",
    "is_transfer_allowed": "boolean",
    "is_transfer_audit_required": "boolean",
@@ -513,7 +516,7 @@
    "require_acceptance": "boolean",
    "require_otp": "boolean",
    "require_recipient_account": "boolean",
-   "return_to_sender": "boolean",
+   "returns_to_sender": "boolean",
    "scope_path": "ltree",
    "ticket_classification": "text",
    "ticket_ownership_model": "text",
@@ -530,9 +533,9 @@
    "device_bound": "text",
    "embedded_claims": "text[]",
    "id": "uuid",
+   "is_offline_ready": "boolean",
    "location_scope": "text",
    "name": "text",
-   "offline_ready": "boolean",
    "payload_components": "text[]",
    "qr_mode": "text",
    "refresh_interval_seconds": "integer",
@@ -558,7 +561,7 @@
    "app_installation_id": "text",
    "credential_binding_id": "uuid",
    "deactivated_at": "timestamptz",
-   "device_id": "text",
+   "device_id": "uuid",
    "device_reference": "text",
    "entitlement_id": "uuid",
    "id": "uuid",
@@ -573,7 +576,6 @@
   },
   "access.device_configuration": {
    "access_area_id": "uuid",
-   "biometric_capability": "boolean",
    "configuration_kind": "text",
    "created_at": "timestamptz",
    "deployment_stage": "text",
@@ -588,7 +590,6 @@
    "local_rules": "text",
    "media_profiles": "text[]",
    "name": "text",
-   "offline_capability": "boolean",
    "operator_group": "text",
    "outcome_profile_ids": "text[]",
    "permitted_operating_modes": "text[]",
@@ -596,6 +597,8 @@
    "reader_settings": "text",
    "scanner_source": "text",
    "scope_path": "ltree",
+   "supports_biometric": "boolean",
+   "supports_offline": "boolean",
    "updated_at": "timestamptz",
    "venue_id": "uuid",
    "version": "text"
@@ -693,16 +696,16 @@
    "device_ids": "text[]",
    "id": "uuid",
    "is_device_authorized": "boolean",
-   "package_complete": "boolean",
+   "is_package_complete": "boolean",
+   "is_signature_valid": "boolean",
+   "is_version_valid": "boolean",
    "scope_path": "ltree",
-   "signature_valid": "boolean",
    "size_bytes": "integer",
    "updated_at": "timestamptz",
    "valid_from": "timestamptz",
    "valid_to": "timestamptz",
    "venue_id": "uuid",
-   "version": "text",
-   "version_valid": "boolean"
+   "version": "text"
   },
   "access.entitlement": {
    "cancellation_kind": "text",
@@ -739,7 +742,7 @@
   },
   "access.entry_rule_point": {
    "access_point_id": "uuid",
-   "admission_profile_id": "uuid",
+   "admission_rules_id": "uuid",
    "created_at": "timestamptz",
    "id": "uuid",
    "is_active": "boolean"
@@ -784,9 +787,9 @@
    "created_at": "timestamptz",
    "eligible_attraction_categories": "text[]",
    "id": "uuid",
+   "is_one_per_ride": "boolean",
    "is_unlimited": "boolean",
    "name": "text",
-   "one_per_ride": "boolean",
    "scope_path": "ltree",
    "total_uses": "integer",
    "updated_at": "timestamptz",
@@ -798,7 +801,7 @@
    "created_at": "timestamptz",
    "id": "uuid",
    "is_enabled": "boolean",
-   "offline_availability": "boolean",
+   "is_offline_available": "boolean",
    "relationship_responses": "text[]",
    "relationship_rule_type": "text",
    "relationship_type": "text",
@@ -815,6 +818,7 @@
   },
   "access.gate_lane": {
    "access_point_id": "uuid",
+   "allows_re_entry": "boolean",
    "created_at": "timestamptz",
    "direction": "text",
    "id": "uuid",
@@ -825,7 +829,6 @@
    "location": "text",
    "name": "text",
    "operational_mode": "text",
-   "re_entry": "boolean",
    "scope_path": "ltree",
    "updated_at": "timestamptz",
    "venue_id": "uuid"
@@ -847,10 +850,10 @@
   },
   "access.gate_mode_policy": {
    "access_point_group_id": "uuid",
-   "automatic_notification": "boolean",
    "created_at": "timestamptz",
    "creates_incident": "boolean",
    "emergency_code": "text",
+   "has_automatic_notification": "boolean",
    "id": "uuid",
    "is_reason_required": "boolean",
    "mode": "text",
@@ -923,16 +926,16 @@
    "firmware_software_information": "text",
    "hardware_type": "text",
    "id": "uuid",
-   "light_capability": "boolean",
    "manufacturer": "text",
    "model": "text",
-   "offline_capability": "boolean",
-   "payment_capability": "boolean",
-   "relay_controller_support": "boolean",
    "scope_path": "ltree",
-   "screen_capability": "boolean",
-   "sound_capability": "boolean",
    "supported_technologies": "text[]",
+   "supports_light": "boolean",
+   "supports_offline": "boolean",
+   "supports_payment": "boolean",
+   "supports_relay_controller": "boolean",
+   "supports_screen": "boolean",
+   "supports_sound": "boolean",
    "updated_at": "timestamptz"
   },
   "access.identity_lock": {
@@ -1040,7 +1043,6 @@
    "media_type_id": "uuid",
    "name": "text",
    "nfc_uses": "text[]",
-   "offline_capability": "boolean",
    "offline_payload_profile": "text",
    "read_range": "text",
    "read_write_behavior": "text",
@@ -1048,6 +1050,7 @@
    "rfid_standard": "text",
    "scope_path": "ltree",
    "supported_readers": "text[]",
+   "supports_offline": "boolean",
    "tag_card_type": "text",
    "updated_at": "timestamptz",
    "venue_id": "uuid",
@@ -1057,7 +1060,6 @@
    "created_at": "timestamptz",
    "grace_period": "text",
    "id": "uuid",
-   "identity_verification": "boolean",
    "is_approval_required": "boolean",
    "is_old_media_automatically_revoked": "boolean",
    "is_recovery_allowed": "boolean",
@@ -1065,12 +1067,13 @@
    "maximum_replacements": "integer",
    "outcome": "text",
    "reason_codes": "text[]",
-   "reason_mandatory": "boolean",
    "replacement_fee_product_id": "uuid",
    "replacement_reason": "text",
+   "requires_identity_verification": "boolean",
+   "requires_reason": "boolean",
+   "requires_supervisor_approval": "boolean",
    "scope_path": "ltree",
    "simultaneous_media_policy": "text",
-   "supervisor_approval": "boolean",
    "updated_at": "timestamptz"
   },
   "access.media_template": {
@@ -1097,10 +1100,10 @@
    "approval_request_id": "uuid",
    "brand_ids": "text[]",
    "channels": "text[]",
-   "controlled_rollout": "boolean",
    "created_at": "timestamptz",
    "created_by_principal_id": "uuid",
    "design": "jsonb",
+   "has_controlled_rollout": "boolean",
    "id": "uuid",
    "media_template_id": "uuid",
    "preview_targets": "text[]",
@@ -1118,19 +1121,20 @@
    "activation_trigger": "text",
    "applicable_product_ids": "text[]",
    "applicable_venue_ids": "text[]",
-   "automatic_expiration": "boolean",
    "category": "text",
    "created_at": "timestamptz",
    "credential_type": "text",
    "encoding_format": "text",
    "fallback_media_type_ids": "text[]",
    "generation_method": "text",
+   "has_automatic_expiration": "boolean",
    "id": "uuid",
    "integration_adapter": "text",
    "is_active": "boolean",
+   "is_one_time_use": "boolean",
+   "is_temporary_media": "boolean",
    "media_type": "text",
    "name": "text",
-   "one_time_use": "boolean",
    "online_offline_capability": "text",
    "original_media_impact": "text",
    "providers": "text[]",
@@ -1149,7 +1153,6 @@
    "supports_signing": "boolean",
    "supports_visual_design": "boolean",
    "technology": "text",
-   "temporary_media": "boolean",
    "updated_at": "timestamptz",
    "validation_mechanism": "text",
    "validity_duration": "text",
@@ -1157,10 +1160,10 @@
   },
   "access.offline_policy": {
    "after_threshold_behavior": "text",
-   "automatic_switch": "boolean",
    "central_unavailable_after_seconds": "integer",
    "created_at": "timestamptz",
    "edge_unavailable_after_seconds": "integer",
+   "has_automatic_switch": "boolean",
    "id": "uuid",
    "max_offline_duration_hours": "integer",
    "offline_checks": "text[]",
@@ -1174,7 +1177,6 @@
   },
   "access.operating_calendar_entry": {
    "admission_type": "text",
-   "attraction_validation": "boolean",
    "created_at": "timestamptz",
    "day_type": "text",
    "ends_at": "timestamptz",
@@ -1184,6 +1186,7 @@
    "is_venue_closed": "boolean",
    "name": "text",
    "priority": "integer",
+   "requires_attraction_validation": "boolean",
    "scope_path": "ltree",
    "starts_at": "timestamptz",
    "updated_at": "timestamptz",
@@ -1295,6 +1298,7 @@
    "dynamic_policy_id": "uuid",
    "dynamic_policy_result": "text",
    "dynamic_policy_version": "integer",
+   "entitlement_id": "uuid",
    "id": "uuid",
    "local_sequence": "integer",
    "media_code": "text",
@@ -1309,7 +1313,6 @@
    "recorded_at": "timestamptz",
    "scope_path": "ltree",
    "synced_at": "timestamptz",
-   "ticket_id": "uuid",
    "venue_id": "uuid"
   },
   "access.security_alert": {
@@ -1326,6 +1329,7 @@
    "face_reenrolment_attempt_id": "uuid",
    "fraud_rule_id": "uuid",
    "id": "uuid",
+   "note": "text",
    "scope_path": "ltree",
    "security_investigation_id": "uuid",
    "severity": "text",
@@ -1379,7 +1383,7 @@
    "created_at": "timestamptz",
    "credential_format_override": "text",
    "id": "uuid",
-   "lock_on_first_successful_access": "boolean",
+   "locks_on_first_successful_access": "boolean",
    "product_id": "uuid",
    "reason_codes": "text[]",
    "scope_path": "ltree",
@@ -1515,6 +1519,8 @@
    "programme_id": "uuid",
    "scope_path": "ltree",
    "status": "text",
+   "status_effective_from": "timestamptz",
+   "status_review_at": "date",
    "subject_id": "uuid",
    "valid_from": "date",
    "valid_to": "date"
@@ -1529,7 +1535,7 @@
   },
   "accreditation.identity_conflict": {
    "detected_at": "timestamptz",
-   "differing_access": "boolean",
+   "has_differing_access": "boolean",
    "holder_ids": "text[]",
    "id": "uuid",
    "matched_on": "text[]",
@@ -1559,11 +1565,13 @@
   "accreditation.notification_rules": {
    "id": "uuid",
    "programme_id": "uuid",
+   "rules": "jsonb",
    "scope_path": "ltree"
   },
   "accreditation.print_job": {
    "credential_ids": "text[]",
    "failed": "integer",
+   "failures": "jsonb",
    "id": "uuid",
    "printed": "integer",
    "printer_device_id": "uuid",
@@ -1576,6 +1584,7 @@
    "applications_close_at": "timestamptz",
    "applications_open_at": "timestamptz",
    "approval_workflow_id": "uuid",
+   "categories": "jsonb",
    "code": "text",
    "event_ids": "text[]",
    "face_matching": "jsonb",
@@ -1592,6 +1601,7 @@
   "accreditation.requirements": {
    "id": "uuid",
    "programme_id": "uuid",
+   "rows": "jsonb",
    "scope_path": "ltree"
   },
   "accreditation.validity": {
@@ -1599,8 +1609,8 @@
    "id": "uuid",
    "on_expiry": "text",
    "programme_id": "uuid",
-   "renewal_requires_reverification": "boolean",
    "renewal_window_days": "integer",
+   "requires_renewal_reverification": "boolean",
    "scope_path": "ltree",
    "validity_kind": "text",
    "validity_months": "integer"
@@ -1716,6 +1726,7 @@
    "risk_score": "integer",
    "scope_path": "ltree",
    "scored_at": "timestamptz",
+   "signals": "jsonb",
    "trigger": "text"
   },
   "ai.assistant_profile": {
@@ -1870,6 +1881,7 @@
    "id": "uuid",
    "note": "text",
    "page_count": "integer",
+   "scope_path": "ltree",
    "session_id": "uuid",
    "source_kind": "text",
    "status": "text",
@@ -1911,6 +1923,7 @@
    "started_at": "timestamptz"
   },
   "ai.decision_record": {
+   "annotations": "jsonb",
    "approvals": "jsonb",
    "capability_key": "text",
    "created_at": "timestamptz",
@@ -2062,6 +2075,7 @@
   },
   "ai.forecast_scenario": {
    "base_version_id": "uuid",
+   "changes": "jsonb",
    "created_at": "timestamptz",
    "created_by_principal_id": "uuid",
    "id": "uuid",
@@ -2139,6 +2153,7 @@
    "model_version": "text",
    "product_count": "integer",
    "prompt_template_version": "text",
+   "questions": "jsonb",
    "scope_path": "ltree",
    "status": "text",
    "trigger": "text",
@@ -2151,8 +2166,9 @@
    "completed_at": "timestamptz",
    "created_at": "timestamptz",
    "data_kind": "text",
-   "dry_run": "boolean",
+   "findings": "jsonb",
    "id": "uuid",
+   "is_dry_run": "boolean",
    "months_covered": "integer",
    "period_from": "date",
    "period_to": "date",
@@ -2187,6 +2203,7 @@
    "capability_keys": "text[]",
    "closed_at": "timestamptz",
    "contained_at": "timestamptz",
+   "containment": "jsonb",
    "control_failure": "text",
    "id": "uuid",
    "impact": "text",
@@ -2384,8 +2401,9 @@
    "residency": "text",
    "residency_classes": "text[]",
    "scope_path": "ltree",
-   "structured_output": "boolean",
-   "tool_calling": "boolean",
+   "supports_structured_output": "boolean",
+   "supports_tool_calling": "boolean",
+   "task_fitness": "jsonb",
    "vendor": "text"
   },
   "ai.operational_requirement": {
@@ -2410,8 +2428,8 @@
   "ai.policy": {
    "allowed_role_ids": "text[]",
    "autonomy_overrides": "jsonb",
-   "cache_answers": "boolean",
    "cache_ttl_minutes": "integer",
+   "caches_answers": "boolean",
    "cascade": "jsonb",
    "ceiling_behaviour": "text",
    "ceiling_behaviour_by_capability": "jsonb",
@@ -2420,8 +2438,8 @@
    "enabled_capabilities": "text[]",
    "fallback_provider_id": "uuid",
    "global_endpoint_exclusions": "jsonb",
-   "guardrail_short_circuit": "boolean",
    "guest_capability_scope": "text[]",
+   "has_guardrail_short_circuit": "boolean",
    "hnsw": "jsonb",
    "id": "uuid",
    "masked_fields": "text[]",
@@ -2472,6 +2490,7 @@
    "version": "integer"
   },
   "ai.proposed_action": {
+   "activity_id": "uuid",
    "approval_level": "integer",
    "approval_request_id": "uuid",
    "change_set_hash": "text",
@@ -2480,7 +2499,6 @@
    "decision_reason": "text",
    "expires_at": "timestamptz",
    "id": "uuid",
-   "interaction_id": "uuid",
    "kind": "text",
    "payload": "jsonb",
    "plan_id": "uuid",
@@ -2499,9 +2517,10 @@
    "credential_hint": "text",
    "credential_ref": "text",
    "credential_rotated_at": "timestamptz",
-   "degrade_gracefully": "boolean",
+   "degrades_gracefully": "boolean",
    "endpoint": "text",
    "failover_provider_id": "uuid",
+   "fitness_warnings": "jsonb",
    "id": "uuid",
    "is_active": "boolean",
    "is_stateless_only": "boolean",
@@ -2609,7 +2628,7 @@
    "assessed_at": "timestamptz",
    "band": "text",
    "decision_record_id": "uuid",
-   "fell_back": "boolean",
+   "did_fall_back": "boolean",
    "id": "uuid",
    "latency_ms": "integer",
    "model_version": "text",
@@ -2628,6 +2647,7 @@
    "closed_at": "timestamptz",
    "closed_by_principal_id": "uuid",
    "closure_note": "text",
+   "entities": "jsonb",
    "id": "uuid",
    "opened_at": "timestamptz",
    "opened_by_principal_id": "uuid",
@@ -2674,6 +2694,7 @@
    "is_decline_governed": "boolean",
    "is_model_enabled": "boolean",
    "mode": "text",
+   "outcome_map": "jsonb",
    "published_at": "timestamptz",
    "published_by_principal_id": "uuid",
    "scope_path": "ltree",
@@ -2743,6 +2764,7 @@
    "id": "uuid",
    "is_idempotent": "boolean",
    "is_reversible": "boolean",
+   "is_validation_only": "boolean",
    "permission": "text",
    "risk_class": "text",
    "scope_path": "ltree",
@@ -2750,8 +2772,7 @@
    "target_contract": "text",
    "target_operation": "text",
    "timeout_ms": "integer",
-   "tool_key": "text",
-   "validate_only": "boolean"
+   "tool_key": "text"
   },
   "ai.training_run": {
    "artefact_ref": "text",
@@ -2778,6 +2799,7 @@
    "fnb_attach_rate": "numeric(18,4)",
    "id": "uuid",
    "is_outdoor": "boolean",
+   "opening_hours": "jsonb",
    "peak_months": "integer[]",
    "scope_path": "ltree",
    "staff_productivity": "jsonb",
@@ -2795,6 +2817,7 @@
    "id": "uuid",
    "issued_at": "timestamptz",
    "revoked_reason": "text",
+   "scope_path": "ltree",
    "state": "text",
    "zones": "text[]"
   },
@@ -2891,6 +2914,7 @@
    "decided_at": "timestamptz",
    "decision": "text",
    "delegated_from": "uuid",
+   "did_use_mfa": "boolean",
    "display_name": "text",
    "id": "uuid",
    "is_delegate": "boolean",
@@ -2898,8 +2922,7 @@
    "principal_id": "uuid",
    "reason": "text",
    "request_id": "uuid",
-   "signature_ref": "text",
-   "used_mfa": "boolean"
+   "signature_ref": "text"
   },
   "approvals.decision_record": {
    "comment": "text",
@@ -2908,6 +2931,7 @@
    "id": "uuid",
    "integrity": "text",
    "payload_hash": "text",
+   "policy_versions": "jsonb",
    "previous_record_hash": "text",
    "record_hash": "text",
    "recorded_at": "timestamptz",
@@ -3037,7 +3061,7 @@
    "reopened_from_id": "text",
    "requested_at": "timestamptz",
    "requested_by_principal_id": "uuid",
-   "reroute_on_no_approver": "boolean",
+   "reroutes_on_no_approver": "boolean",
    "resubmitted_from_id": "text",
    "scope_path": "ltree",
    "sla_due_at": "timestamptz",
@@ -3054,9 +3078,9 @@
    "legal_basis": "text",
    "on_expiry": "text",
    "overrides_privacy_deletion": "boolean",
-   "retain_attachments": "boolean",
-   "retain_signatures": "boolean",
    "retain_years": "integer",
+   "retains_attachments": "boolean",
+   "retains_signatures": "boolean",
    "scope_path": "ltree"
   },
   "approvals.rule": {
@@ -3105,7 +3129,6 @@
   },
   "approvals.sla_policy": {
    "applies_to_request_kinds": "text[]",
-   "business_hours_only": "boolean",
    "calendar_id": "uuid",
    "code": "text",
    "escalate_at_percent": "integer",
@@ -3113,7 +3136,9 @@
    "first_reminder_at_percent": "integer",
    "id": "uuid",
    "is_auto_action_allowed": "boolean",
+   "is_business_hours_only": "boolean",
    "on_breach": "text",
+   "reminders": "jsonb",
    "scope_path": "ltree",
    "second_reminder_at_percent": "integer",
    "target_minutes": "integer"
@@ -3313,7 +3338,7 @@
    "on_rights_expiry": "text",
    "scope_path": "ltree",
    "signed_url_ttl_seconds": "integer",
-   "signed_urls": "boolean"
+   "uses_signed_urls": "boolean"
   },
   "assets.media_asset": {
    "alt_text": "jsonb",
@@ -3360,7 +3385,7 @@
   },
   "assets.media_fingerprint": {
    "computed_at": "timestamptz",
-   "embedding": "text[]",
+   "embedding": "numeric[]",
    "id": "uuid",
    "media_asset_id": "uuid",
    "model_version": "text",
@@ -3391,6 +3416,7 @@
    "surface": "text"
   },
   "assets.rendition": {
+   "asset_id": "uuid",
    "failure_reason": "text",
    "format": "text",
    "height": "integer",
@@ -3428,7 +3454,10 @@
    "vocabulary": "text"
   },
   "assets.taxonomy": {
+   "categories": "jsonb",
+   "fields": "jsonb",
    "id": "uuid",
+   "keyword_vocabularies": "jsonb",
    "scope_path": "ltree"
   },
   "catalogue.ai_catalogue_session": {
@@ -3478,19 +3507,20 @@
    "partner_id": "uuid",
    "partner_name": "text",
    "product_id": "uuid",
+   "scope_path": "ltree",
    "variant_id": "uuid"
   },
   "catalogue.approval_policy": {
    "alternate_approver_role": "text",
    "change_types": "text[]",
    "created_at": "timestamptz",
-   "creator_cannot_give_final_approval": "boolean",
    "department_id": "uuid",
    "escalate_after_hours": "integer",
    "escalate_to_role": "text",
    "expected_approval_hours": "integer",
    "id": "uuid",
    "is_active": "boolean",
+   "is_creator_barred_from_final_approval": "boolean",
    "is_default": "boolean",
    "legal_entity_id": "uuid",
    "market_code": "text",
@@ -3654,8 +3684,8 @@
   "catalogue.channel_envelope": {
    "allocated_units": "integer",
    "channel": "text",
+   "channel_capacity_id": "uuid",
    "contractual_units": "integer",
-   "envelope_id": "uuid",
    "envelope_type": "text",
    "id": "uuid",
    "is_frozen": "boolean",
@@ -3686,6 +3716,7 @@
    "owner_principal_id": "uuid",
    "partner": "text",
    "product_id": "uuid",
+   "resolution_note": "text",
    "resolved_at": "timestamptz",
    "response_excerpt": "text",
    "retry_count": "integer",
@@ -3852,6 +3883,7 @@
    "beneficiary": "text",
    "channels": "text[]",
    "description": "text",
+   "fixed_amounts": "numeric(18,4)[]",
    "id": "uuid",
    "is_active": "boolean",
    "liability_account_id": "uuid",
@@ -3875,7 +3907,7 @@
    "effective_from": "timestamptz",
    "effective_to": "timestamptz",
    "evaluation_frequency_minutes": "integer",
-   "exclude_protected_rates": "boolean",
+   "excludes_protected_rates": "boolean",
    "execution_frequency_minutes": "integer",
    "id": "uuid",
    "is_frozen": "boolean",
@@ -3965,6 +3997,7 @@
    "transport_restriction": "jsonb",
    "valid_for_days": "integer",
    "valid_from_offset_days": "integer",
+   "valid_time_windows": "jsonb",
    "validity_kind": "text"
   },
   "catalogue.event": {
@@ -4001,11 +4034,12 @@
   },
   "catalogue.event_registration": {
    "admission_policy": "jsonb",
-   "capture_per_attendee": "boolean",
+   "captures_per_attendee": "boolean",
    "event_id": "uuid",
    "form_id": "uuid",
    "id": "uuid",
    "is_required": "boolean",
+   "participant_categories": "jsonb",
    "scope_path": "ltree"
   },
   "catalogue.event_reschedule": {
@@ -4020,22 +4054,25 @@
    "notify_guests": "boolean",
    "performance_ids": "text[]",
    "reason": "text",
-   "refund_fees": "boolean",
+   "refunds_fees": "boolean",
    "scope_path": "ltree",
    "ticket_treatment": "text"
   },
   "catalogue.event_resource_plan": {
+   "contractors": "jsonb",
    "event_id": "uuid",
    "id": "uuid",
    "readiness": "text",
+   "requirements": "jsonb",
    "scope_path": "ltree"
   },
   "catalogue.event_schedule": {
-   "cascade_overrun": "boolean",
-   "duration_is_dynamic": "boolean",
+   "cascades_overrun": "boolean",
    "event_id": "uuid",
    "id": "uuid",
+   "is_duration_dynamic": "boolean",
    "maximum_overrun_minutes": "integer",
+   "performances": "jsonb",
    "scope_path": "ltree"
   },
   "catalogue.event_type": {
@@ -4044,13 +4081,13 @@
    "default_lifecycle": "text[]",
    "has_performances": "boolean",
    "id": "uuid",
-   "multi_day": "boolean",
+   "is_multi_day": "boolean",
+   "is_ticket_dated": "boolean",
    "name": "text",
    "requires_accreditation": "boolean",
    "requires_registration": "boolean",
    "scope_path": "ltree",
-   "seating_modes_allowed": "text[]",
-   "ticket_names_date": "boolean"
+   "seating_modes_allowed": "text[]"
   },
   "catalogue.fee": {
    "amount": "numeric(18,4)",
@@ -4125,6 +4162,7 @@
    "direction": "text",
    "error_count": "integer",
    "file_id": "uuid",
+   "findings": "jsonb",
    "id": "uuid",
    "job_kind": "text",
    "missing_references": "text[]",
@@ -4175,11 +4213,11 @@
    "failure_reason": "text",
    "id": "uuid",
    "notify_roles": "text[]",
-   "pre_action_validation": "boolean",
    "product_id": "uuid",
    "reason": "text",
    "replacement_product_id": "uuid",
    "reporting_treatment": "text",
+   "requires_pre_action_validation": "boolean",
    "scheduled_at": "timestamptz",
    "scope_path": "ltree",
    "status": "text",
@@ -4207,6 +4245,7 @@
    "id": "uuid",
    "is_active": "boolean",
    "name": "text",
+   "scope_path": "ltree",
    "type": "text",
    "unit": "text",
    "value": "numeric(18,4)"
@@ -4219,6 +4258,7 @@
    "program_code": "text",
    "program_id": "uuid",
    "program_name": "text",
+   "scope_path": "ltree",
    "updated_at": "timestamptz"
   },
   "catalogue.package_pricing": {
@@ -4255,12 +4295,13 @@
    "asset_id": "uuid",
    "assigned_at": "timestamptz",
    "assigned_by_principal_id": "uuid",
+   "event_registration_id": "uuid",
    "id": "uuid",
-   "participant_id": "uuid",
    "performance_id": "uuid",
    "scope_path": "ltree"
   },
   "catalogue.performance_template": {
+   "bands": "jsonb",
    "code": "text",
    "concurrent_capacity": "integer",
    "id": "uuid",
@@ -4283,17 +4324,17 @@
   },
   "catalogue.prepaid_minutes": {
    "applicable_space_ids": "text[]",
-   "band_multipliers_apply": "boolean",
+   "applies_band_multipliers": "boolean",
    "code": "text",
    "credit_type_id": "uuid",
    "id": "uuid",
+   "is_transferable_within_household": "boolean",
    "list_price": "numeric(18,4)",
    "minimum_draw_minutes": "integer",
    "minutes": "integer",
    "name": "text",
    "rounding_minutes": "integer",
    "scope_path": "ltree",
-   "transferable_within_household": "boolean",
    "validity_months": "integer"
   },
   "catalogue.price": {
@@ -4359,11 +4400,11 @@
    "executed_at": "timestamptz",
    "executed_by_principal_id": "uuid",
    "execution_source": "text",
+   "has_price_inconsistency": "boolean",
    "id": "uuid",
    "new_price": "numeric(18,4)",
    "performance_id": "uuid",
    "previous_price": "numeric(18,4)",
-   "price_inconsistency": "boolean",
    "pricing_recommendation_id": "uuid",
    "product_id": "uuid",
    "scheduled_for": "timestamptz",
@@ -4468,6 +4509,7 @@
    "event_id": "uuid",
    "guardrail_checks": "jsonb",
    "id": "uuid",
+   "is_statistically_significant": "boolean",
    "maximum_price": "numeric(18,4)",
    "minimum_price": "numeric(18,4)",
    "name": "text",
@@ -4479,7 +4521,6 @@
    "scope_path": "ltree",
    "stage": "text",
    "start_date": "date",
-   "statistical_significance": "boolean",
    "success_metrics": "text[]",
    "target_confidence_level": "numeric(18,4)",
    "updated_at": "timestamptz",
@@ -4648,7 +4689,6 @@
   "catalogue.product": {
    "approved_by_principal_id": "uuid",
    "attraction_id": "uuid",
-   "blocked_offline": "boolean",
    "booking_flow_id": "uuid",
    "brand_id": "uuid",
    "business_unit_id": "uuid",
@@ -4661,12 +4701,14 @@
    "data_mask_values": "jsonb",
    "description": "text",
    "description_localised": "jsonb",
+   "display_tags": "jsonb",
    "entitlement_template_id": "uuid",
    "event_id": "uuid",
    "family_key": "text",
    "guest_listing": "text",
    "has_variants": "boolean",
    "id": "uuid",
+   "is_blocked_offline": "boolean",
    "is_sellable": "boolean",
    "is_stock_tracked": "boolean",
    "kind": "text",
@@ -4730,13 +4772,13 @@
    "guardian_signature_age_to": "integer",
    "height_bands_cm": "integer[]",
    "id": "uuid",
+   "is_refundable_if_ineligible_at_gate": "boolean",
    "is_waiver_required": "boolean",
    "max_age_years": "integer",
    "max_height_cm": "integer",
    "min_age_years": "integer",
    "min_height_cm": "integer",
    "product_id": "uuid",
-   "refundable_if_ineligible_at_gate": "boolean",
    "required_certification_code": "text",
    "scope_path": "ltree",
    "swim_ability": "text"
@@ -5016,7 +5058,8 @@
    "code": "text",
    "id": "uuid",
    "name": "text",
-   "product_id": "uuid"
+   "product_id": "uuid",
+   "values": "jsonb"
   },
   "catalogue.waiting_room_setting": {
    "active_until": "timestamptz",
@@ -5083,7 +5126,8 @@
    "last_used_at": "timestamptz",
    "name": "text",
    "scopes": "text[]",
-   "status": "text"
+   "status": "text",
+   "status_reason": "text"
   },
   "control.api_licence": {
    "call_allowance_per_month": "integer",
@@ -5107,6 +5151,7 @@
   },
   "control.api_version": {
    "active_client_count": "integer",
+   "changes": "jsonb",
    "deprecated_at": "timestamptz",
    "id": "uuid",
    "migration_guide_url": "text",
@@ -5195,9 +5240,9 @@
    "venue_count": "integer"
   },
   "control.cell_cluster": {
-   "accepting_new_tenants": "boolean",
    "cell_ids": "text[]",
    "id": "uuid",
+   "is_accepting_new_tenants": "boolean",
    "kind": "text",
    "modelled_on_cell_id": "uuid",
    "name": "text",
@@ -5236,7 +5281,7 @@
    "dropped_at": "timestamptz",
    "id": "uuid",
    "instance_id": "uuid",
-   "pinned_instance": "boolean",
+   "is_instance_pinned": "boolean",
    "provisioned_at": "timestamptz",
    "replication_mode": "text",
    "status": "text",
@@ -5300,7 +5345,7 @@
    "credit_note_number": "text",
    "gross_amount": "numeric(18,4)",
    "id": "uuid",
-   "invoice_id": "text",
+   "invoice_id": "uuid",
    "issued_at": "timestamptz",
    "issued_by_principal_id": "uuid",
    "net_amount": "numeric(18,4)",
@@ -5597,9 +5642,9 @@
    "rate_mode": "text",
    "refund_conditions": "text",
    "renewal_notice_days": "integer",
-   "renewal_requires_approval": "boolean",
    "renewal_type": "text",
    "requires_approval_above_value": "numeric(18,4)",
+   "requires_renewal_approval": "boolean",
    "sales_target": "numeric(18,4)",
    "scope_path": "ltree",
    "segment_tier": "text",
@@ -5686,9 +5731,9 @@
    "allowed_payment_methods": "text[]",
    "billing_contact_id": "uuid",
    "billing_entity_name": "text",
-   "consolidated_billing": "boolean",
    "created_at": "timestamptz",
    "finance_email": "text",
+   "has_consolidated_billing": "boolean",
    "id": "uuid",
    "invoice_frequency": "text",
    "invoice_grouping": "text",
@@ -5949,6 +5994,7 @@
    "event_id": "uuid",
    "id": "uuid",
    "is_manual_override_allowed": "boolean",
+   "is_seasonal_rate": "boolean",
    "margin_floor": "numeric(18,4)",
    "market": "text",
    "max_discount_percent": "numeric(18,4)",
@@ -5962,7 +6008,6 @@
    "product_family": "text",
    "product_id": "uuid",
    "scope_path": "ltree",
-   "seasonal_rate": "boolean",
    "ticket_type": "text",
    "updated_at": "timestamptz",
    "venue_id": "uuid"
@@ -5998,11 +6043,11 @@
    "event_portfolio": "text",
    "id": "uuid",
    "is_authorized": "boolean",
+   "is_seasonal_scope": "boolean",
    "market": "text",
    "partner_id": "uuid",
    "scope_exclusions": "text[]",
    "scope_path": "ltree",
-   "seasonal_scope": "boolean",
    "start_date": "date",
    "updated_at": "timestamptz",
    "venue_id": "uuid"
@@ -6178,10 +6223,10 @@
    "hreflang": "jsonb",
    "id": "uuid",
    "is_auto_generated": "boolean",
+   "is_excluded_from_index": "boolean",
    "keywords": "text[]",
    "locale": "text",
    "meta_description": "text",
-   "no_index": "boolean",
    "open_graph": "jsonb",
    "schema_org_type": "text",
    "scope_path": "ltree",
@@ -6255,6 +6300,7 @@
    "to_cell_id": "uuid"
   },
   "control.tenant_migration_plan": {
+   "blockers": "jsonb",
    "can_proceed": "boolean",
    "computed_at": "timestamptz",
    "cross_region_links_to_repoint": "integer",
@@ -6271,8 +6317,8 @@
   },
   "control.upgrade_schedule": {
    "deferral_reason": "text",
-   "deferred_by_tenant": "boolean",
    "id": "uuid",
+   "is_deferred_by_tenant": "boolean",
    "max_deferral_until": "timestamptz",
    "notified_at": "timestamptz",
    "release_version": "text",
@@ -6288,7 +6334,7 @@
    "is_active": "boolean",
    "reason": "text",
    "scope_path": "ltree",
-   "status_code": "text",
+   "status_code": "integer",
    "to_path": "text"
   },
   "control.usage_record": {
@@ -6369,6 +6415,7 @@
    "id": "uuid",
    "is_supplier_claim_raised": "boolean",
    "recorded_at": "timestamptz",
+   "scope_path": "ltree",
    "threshold_celsius": "numeric(18,4)",
    "transfer_id": "uuid",
    "value_celsius": "numeric(18,4)"
@@ -6380,7 +6427,8 @@
    "list_price": "numeric(18,4)",
    "name": "text",
    "name_localised": "jsonb",
-   "outlet_id": "uuid"
+   "outlet_id": "uuid",
+   "scope_path": "ltree"
   },
   "fnb.combo_slot": {
    "combo_id": "uuid",
@@ -6388,6 +6436,7 @@
    "max_select": "integer",
    "min_select": "integer",
    "name": "text",
+   "scope_path": "ltree",
    "sort_order": "integer"
   },
   "fnb.combo_slot_option": {
@@ -6445,12 +6494,12 @@
    "asap_delivery_minutes": "integer",
    "collection_hold_minutes": "integer",
    "collection_point": "text",
-   "cutlery_opt_in": "boolean",
    "delivery_fee": "numeric(18,4)",
    "emirates_served": "text[]",
    "free_delivery_above": "numeric(18,4)",
    "id": "uuid",
    "is_collection_enabled": "boolean",
+   "is_cutlery_opted_in": "boolean",
    "is_delivery_enabled": "boolean",
    "minimum_order": "numeric(18,4)",
    "outlet_id": "uuid",
@@ -6466,6 +6515,7 @@
    "label": "text",
    "outlet_id": "uuid",
    "position": "jsonb",
+   "scope_path": "ltree",
    "shape": "text",
    "zone": "text"
   },
@@ -6490,6 +6540,7 @@
    "outlet_id": "uuid",
    "raised_at": "timestamptz",
    "raised_by_principal_id": "uuid",
+   "scope_path": "ltree",
    "station_id": "uuid",
    "ticket_id": "uuid"
   },
@@ -6516,6 +6567,7 @@
    "name": "text",
    "outlet_id": "uuid",
    "printer_device_ids": "text[]",
+   "scope_path": "ltree",
    "serves_outlet_ids": "text[]"
   },
   "fnb.kitchen_ticket": {
@@ -6554,8 +6606,8 @@
   },
   "fnb.location_session": {
    "expires_at": "timestamptz",
+   "has_joined_existing_visit": "boolean",
    "id": "uuid",
-   "joined_existing_visit": "boolean",
    "kind": "text",
    "label": "text",
    "location_id": "uuid",
@@ -6591,6 +6643,7 @@
    "restore_at": "timestamptz",
    "sort_order": "integer",
    "station_id": "uuid",
+   "unavailable_note": "text",
    "unavailable_reason": "text"
   },
   "fnb.menu_item_modifier": {
@@ -6709,6 +6762,7 @@
    "id": "uuid",
    "outlet_id": "uuid",
    "released_run_ids": "text[]",
+   "scope_path": "ltree",
    "status": "text"
   },
   "fnb.production_plan_line": {
@@ -6755,7 +6809,8 @@
    "outlet_id": "uuid",
    "reserved_lead_minutes": "integer",
    "scope_path": "ltree",
-   "seating_buffer_minutes": "integer"
+   "seating_buffer_minutes": "integer",
+   "turn_time_bands": "jsonb"
   },
   "fnb.reservation_table": {
    "created_at": "timestamptz",
@@ -6770,14 +6825,14 @@
    "effective_from": "timestamptz",
    "effective_to": "timestamptz",
    "id": "uuid",
-   "included_in_display_price": "boolean",
    "is_discretionary": "boolean",
+   "is_included_in_display_price": "boolean",
+   "is_shown_separately": "boolean",
    "is_taxable": "boolean",
    "minimum_party_size": "integer",
    "rate_percent": "numeric(18,4)",
    "scope_path": "ltree",
    "service_types": "text[]",
-   "shown_separately": "boolean",
    "staff_pool_percent": "numeric(18,4)"
   },
   "fnb.service_order": {
@@ -6886,8 +6941,8 @@
   },
   "fnb.table_session": {
    "expires_at": "timestamptz",
+   "has_joined_existing_visit": "boolean",
    "id": "uuid",
-   "joined_existing_visit": "boolean",
    "outlet_id": "uuid",
    "outlet_name": "text",
    "subject_id": "uuid",
@@ -6902,6 +6957,7 @@
    "id": "uuid",
    "merged_from_visit_ids": "text[]",
    "merged_into_visit_id": "uuid",
+   "note": "text",
    "opened_at": "timestamptz",
    "outlet_id": "uuid",
    "running_total": "numeric(18,4)",
@@ -6936,6 +6992,7 @@
    "outcome": "text",
    "recorded_at": "timestamptz",
    "recorded_by_principal_id": "uuid",
+   "scope_path": "ltree",
    "value_celsius": "numeric(18,4)"
   },
   "fnb.waitlist_entry": {
@@ -6974,7 +7031,6 @@
   "games.authorisation": {
    "amount": "numeric(18,4)",
    "charged_from": "text",
-   "decided_offline": "boolean",
    "decision": "text",
    "entitlement_id": "uuid",
    "guest_message": "text",
@@ -6982,7 +7038,9 @@
    "reason": "text",
    "remaining_balance": "numeric(18,4)",
    "remaining_plays": "integer",
-   "scope_path": "ltree"
+   "scope_path": "ltree",
+   "trace": "jsonb",
+   "was_decided_offline": "boolean"
   },
   "games.card": {
    "blocked_reason": "text",
@@ -7003,7 +7061,7 @@
   },
   "games.card_expiry_rules": {
    "basis": "text",
-   "extend_on_recharge": "boolean",
+   "extends_on_recharge": "boolean",
    "hold_for_claim_days": "integer",
    "id": "uuid",
    "on_expiry": "text",
@@ -7068,7 +7126,6 @@
    "at": "timestamptz",
    "card_id": "uuid",
    "charged_from": "text",
-   "decided_offline": "boolean",
    "entitlement_id": "uuid",
    "game_id": "uuid",
    "id": "uuid",
@@ -7077,7 +7134,8 @@
    "reason": "text",
    "scope_path": "ltree",
    "synced_at": "timestamptz",
-   "tickets_earned": "integer"
+   "tickets_earned": "integer",
+   "was_decided_offline": "boolean"
   },
   "games.kiosk_config": {
    "id": "uuid",
@@ -7097,6 +7155,7 @@
    "maximum_height_cm": "integer",
    "minimum_age": "integer",
    "minimum_height_cm": "integer",
+   "operating_hours": "jsonb",
    "rider_capacity": "integer",
    "scope_path": "ltree",
    "staff_positions": "integer",
@@ -7112,11 +7171,15 @@
    "points_awarded": "integer",
    "points_balance": "integer",
    "recorded_at": "timestamptz",
+   "scope_path": "ltree",
    "synced_at": "timestamptz"
   },
   "games.pricing": {
+   "calendar_exceptions": "jsonb",
    "game_id": "uuid",
+   "group_pricing": "jsonb",
    "id": "uuid",
+   "peak_pricing": "jsonb",
    "priority": "text[]",
    "retry_offer_lead_seconds": "integer",
    "retry_price": "numeric(18,4)",
@@ -7184,6 +7247,7 @@
    "failure_reason": "text",
    "id": "uuid",
    "reader_id": "uuid",
+   "scope_path": "ltree",
    "status": "text"
   },
   "games.reader_profile": {
@@ -7228,13 +7292,14 @@
   },
   "games.redemption_rules": {
    "counter_approval_above_tickets": "integer",
+   "earn_rules": "jsonb",
+   "has_expiring_tickets": "boolean",
    "id": "uuid",
    "is_ticket_eater_enabled": "boolean",
    "is_ticketless_enabled": "boolean",
    "scope_path": "ltree",
    "ticket_credit_type_id": "uuid",
-   "ticket_validity_days": "integer",
-   "tickets_expire": "boolean"
+   "ticket_validity_days": "integer"
   },
   "games.validation_rules": {
    "allow_partial_entitlement": "boolean",
@@ -7252,6 +7317,7 @@
    "effect": "text",
    "id": "uuid",
    "latency_ms": "integer",
+   "matched_policies": "jsonb",
    "observed_attributes": "jsonb",
    "override_id": "uuid",
    "permission": "text",
@@ -7281,7 +7347,7 @@
    "item_count": "integer",
    "lookback_days": "integer",
    "name": "text",
-   "prefill_from_findings": "boolean",
+   "prefills_from_findings": "boolean",
    "recurrence": "text",
    "reviewer_mode": "text",
    "reviewer_principal_ids": "text[]",
@@ -7323,6 +7389,7 @@
    "priority": "integer",
    "scope_path": "ltree",
    "status": "text",
+   "status_reason": "text",
    "version": "integer"
   },
   "identity.authorisation_policy_version": {
@@ -7348,6 +7415,7 @@
    "membership_benefit_id": "uuid",
    "notes": "text",
    "quantity": "numeric(18,4)",
+   "recorded_at": "timestamptz",
    "remaining_quantity": "numeric(18,4)",
    "source_order_id": "uuid",
    "source_type": "text",
@@ -7426,6 +7494,7 @@
   },
   "identity.guest_verification_policy": {
    "accepted_document_kinds": "text[]",
+   "accepts_uae_pass_as_id_document": "boolean",
    "document_image_retention": "text",
    "id": "uuid",
    "id_document_required_for": "text[]",
@@ -7435,7 +7504,6 @@
    "registration_requires": "text[]",
    "review_mode": "text",
    "scope_path": "ltree",
-   "uae_pass_satisfies_id_document": "boolean",
    "updated_at": "timestamptz",
    "verification_provider": "text",
    "wallet_top_up_limit": "numeric(18,4)"
@@ -7533,7 +7601,7 @@
   },
   "identity.password_policy": {
    "device_restriction": "jsonb",
-   "force_change_on_first_logon": "boolean",
+   "forces_change_on_first_logon": "boolean",
    "id": "uuid",
    "lockout_after_attempts": "integer",
    "lockout_minutes": "integer",
@@ -7632,12 +7700,12 @@
   "identity.segregation_rule": {
    "allow_with_compensating_control": "boolean",
    "id": "uuid",
+   "is_scope_sensitive": "boolean",
    "name": "text",
    "permission_a": "text",
    "permission_b": "text",
    "rationale": "text",
    "scope_path": "ltree",
-   "scope_sensitive": "boolean",
    "severity": "text"
   },
   "identity.session": {
@@ -7968,6 +8036,7 @@
    "contact_email": "text",
    "contact_name": "text",
    "contact_phone": "text",
+   "contacts": "jsonb",
    "currency": "text",
    "id": "uuid",
    "is_active": "boolean",
@@ -8155,6 +8224,7 @@
    "budgeted_revenue": "numeric(18,4)",
    "committed_cost": "numeric(18,4)",
    "cost_center_id": "uuid",
+   "cost_lines": "jsonb",
    "event_id": "uuid",
    "id": "uuid"
   },
@@ -8226,6 +8296,7 @@
    "id": "uuid",
    "posted_at": "timestamptz",
    "posted_by_principal_id": "uuid",
+   "posting_date": "date",
    "reference": "text",
    "rejected_at": "timestamptz",
    "rejected_by_principal_id": "uuid",
@@ -8309,7 +8380,8 @@
    "product_kinds": "text[]",
    "recognised_account_id": "uuid",
    "recognition_site": "text",
-   "revalidate_on_validity_change": "boolean"
+   "revalidates_on_validity_change": "boolean",
+   "scope_path": "ltree"
   },
   "ledger.settlement": {
    "completed_at": "timestamptz",
@@ -8358,15 +8430,17 @@
    "is_active": "boolean",
    "is_inclusive": "boolean",
    "name": "text",
-   "rate": "numeric(18,4)"
+   "rate": "numeric(18,4)",
+   "scope_path": "ltree"
   },
   "ledger.tax_exemption": {
    "certificate_reference": "text",
-   "evidence_document_id": "uuid",
+   "evidence_asset_id": "uuid",
    "exemption_type": "text",
    "id": "uuid",
    "reason": "text",
    "scope": "text",
+   "scope_path": "ltree",
    "scope_ref": "text",
    "tax_code_id": "uuid",
    "valid_from": "date",
@@ -8532,7 +8606,6 @@
    "corrective_work_order_id": "uuid",
    "description": "text",
    "escalation": "jsonb",
-   "first_aid_given": "boolean",
    "id": "uuid",
    "incident_number": "text",
    "investigation_note": "text",
@@ -8551,6 +8624,7 @@
    "status": "text",
    "synced_at": "timestamptz",
    "venue_id": "uuid",
+   "was_first_aid_given": "boolean",
    "witness_count": "integer"
   },
   "maintenance.incident_authority_notification": {
@@ -8672,6 +8746,7 @@
    "usage_interval": "numeric(18,4)"
   },
   "maintenance.priority_scoring_model": {
+   "bands": "jsonb",
    "id": "uuid",
    "updated_at": "timestamptz",
    "updated_by_principal_id": "uuid",
@@ -8726,6 +8801,7 @@
    "labour_cost": "numeric(18,4)",
    "location_description": "text",
    "net_cost_amount": "numeric(18,4)",
+   "parts": "jsonb",
    "parts_cost": "numeric(18,4)",
    "priority": "text",
    "priority_score": "integer",
@@ -8744,6 +8820,7 @@
    "status": "text",
    "superseded_by_work_order_id": "uuid",
    "synced_at": "timestamptz",
+   "time_entries": "jsonb",
    "title": "text",
    "venue_id": "uuid",
    "verification_note": "text",
@@ -8798,7 +8875,7 @@
    "approval_request_id": "uuid",
    "destination": "text",
    "destination_reference": "text",
-   "enforce_consent": "boolean",
+   "enforces_consent": "boolean",
    "expires_at": "date",
    "frequency_cap_per_week": "integer",
    "id": "uuid",
@@ -8839,6 +8916,7 @@
    "id": "uuid",
    "is_active": "boolean",
    "name": "text",
+   "scope_path": "ltree",
    "type": "text",
    "updated_at": "timestamptz"
   },
@@ -8890,7 +8968,7 @@
    "kind": "text",
    "launched_at": "timestamptz",
    "name": "text",
-   "optimise_channel": "boolean",
+   "optimises_channel": "boolean",
    "scheduled_for": "timestamptz",
    "segment_id": "uuid",
    "send_time_mode": "text",
@@ -9029,6 +9107,7 @@
    "is_internal": "boolean",
    "recorded_at": "timestamptz",
    "resolution": "text",
+   "scope_path": "ltree",
    "synced_at": "timestamptz"
   },
   "marketing.case_resolution": {
@@ -9050,6 +9129,7 @@
   "marketing.case_routing_rule": {
    "code": "text",
    "fallback_queue_id": "uuid",
+   "has_sticky_ownership": "boolean",
    "id": "uuid",
    "is_active": "boolean",
    "match": "jsonb",
@@ -9059,9 +9139,8 @@
    "rank": "integer",
    "require_language_match": "boolean",
    "required_skills": "text[]",
-   "respect_sla_capability": "boolean",
+   "respects_sla_capability": "boolean",
    "scope_path": "ltree",
-   "sticky_ownership": "boolean",
    "sticky_window_hours": "integer",
    "strategy": "text",
    "updated_at": "timestamptz"
@@ -9116,7 +9195,6 @@
    "channel": "text",
    "communication_id": "text",
    "decision": "text",
-   "email_preference": "boolean",
    "evaluated_at": "timestamptz",
    "id": "uuid",
    "is_contact_restricted": "boolean",
@@ -9124,13 +9202,14 @@
    "language": "text",
    "marketing_consent": "text",
    "message_class": "text",
-   "push_preference": "boolean",
+   "prefers_email": "boolean",
+   "prefers_push": "boolean",
+   "prefers_sms": "boolean",
+   "prefers_whatsapp": "boolean",
    "reasons": "text[]",
    "rerouted_to_channel": "text",
-   "sms_preference": "boolean",
    "subject_id": "uuid",
-   "suppression_reason": "text",
-   "whatsapp_preference": "boolean"
+   "suppression_reason": "text"
   },
   "marketing.communication_preference_type": {
    "applicable_brand_ids": "text[]",
@@ -9178,15 +9257,16 @@
    "brand_id": "uuid",
    "channel": "text",
    "channel_fallback": "text[]",
-   "cost_aware": "boolean",
    "country": "text",
    "id": "uuid",
    "is_active": "boolean",
+   "is_cost_aware": "boolean",
    "message_class": "text",
    "priority_class": "text",
+   "providers": "jsonb",
    "recipient_type": "text",
    "scope_path": "ltree",
-   "skip_unhealthy_providers": "boolean",
+   "skips_unhealthy_providers": "boolean",
    "throttle": "jsonb",
    "updated_at": "timestamptz"
   },
@@ -9200,8 +9280,9 @@
    "languages": "text[]",
    "publication_status": "text",
    "scope_path": "ltree",
-   "skip_if_current_version_accepted": "boolean",
+   "skips_if_current_version_accepted": "boolean",
    "status": "text",
+   "steps": "jsonb",
    "updated_at": "timestamptz",
    "version": "integer"
   },
@@ -9281,7 +9362,7 @@
    "exception_queue_id": "uuid",
    "executions_last30_days": "integer",
    "id": "uuid",
-   "kill_switch": "boolean",
+   "is_kill_switch_engaged": "boolean",
    "last_simulation": "jsonb",
    "level": "text",
    "name": "text",
@@ -9318,7 +9399,7 @@
    "venue_id": "uuid"
   },
   "marketing.conversation_message": {
-   "ai_interaction_id": "uuid",
+   "ai_activity_id": "uuid",
    "body": "text",
    "conversation_id": "uuid",
    "id": "uuid",
@@ -9336,16 +9417,19 @@
   "marketing.cookie_banner_design": {
    "body": "jsonb",
    "brand_id": "uuid",
+   "buttons": "jsonb",
+   "categories": "jsonb",
    "channel": "text",
    "id": "uuid",
    "inherits_from_id": "uuid",
+   "is_reject_one_click": "boolean",
    "languages": "text[]",
+   "links": "jsonb",
    "logo_asset_id": "uuid",
    "notice_version": "text",
    "position": "text",
-   "record_ip_address": "boolean",
+   "records_ip_address": "boolean",
    "regulatory_regimes": "text[]",
-   "reject_is_one_click": "boolean",
    "scope_path": "ltree",
    "status": "text",
    "theme_id": "text",
@@ -9425,7 +9509,7 @@
    "country": "text",
    "decided_at": "timestamptz",
    "expires_at": "timestamptz",
-   "global_privacy_control": "boolean",
+   "honours_global_privacy_control": "boolean",
    "id": "uuid",
    "language": "text",
    "notice_version": "text",
@@ -9440,6 +9524,7 @@
   },
   "marketing.duplicate_candidate": {
    "band": "text",
+   "conflicts": "jsonb",
    "decided_at": "timestamptz",
    "decided_by": "uuid",
    "id": "uuid",
@@ -9521,7 +9606,10 @@
    "synced_at": "timestamptz"
   },
   "marketing.guest_attribute_model": {
+   "attributes": "jsonb",
+   "field_groups": "jsonb",
    "id": "uuid",
+   "identifiers": "jsonb",
    "published_at": "timestamptz",
    "scope_path": "ltree",
    "version": "integer"
@@ -9570,7 +9658,8 @@
    "field_id": "uuid",
    "id": "uuid",
    "is_active": "boolean",
-   "name": "text"
+   "name": "text",
+   "scope_path": "ltree"
   },
   "marketing.guest_extra_value": {
    "created_at": "timestamptz",
@@ -9578,6 +9667,7 @@
    "field_id": "uuid",
    "field_value": "text",
    "id": "uuid",
+   "scope_path": "ltree",
    "updated_at": "timestamptz"
   },
   "marketing.guest_match_decision": {
@@ -9592,19 +9682,19 @@
   "marketing.guest_match_policy": {
    "id": "uuid",
    "match_by": "text",
-   "offer_at_checkout": "boolean",
+   "offers_at_checkout": "boolean",
    "scope_path": "ltree"
   },
   "marketing.guest_note": {
    "author_principal_id": "uuid",
    "id": "uuid",
    "is_allergy": "boolean",
+   "is_visible_to_server": "boolean",
    "kind": "text",
    "recorded_at": "timestamptz",
    "subject_id": "uuid",
    "synced_at": "timestamptz",
-   "text": "text",
-   "visible_to_server": "boolean"
+   "text": "text"
   },
   "marketing.guest_preference": {
    "accessibility": "text[]",
@@ -9644,12 +9734,12 @@
    "authorities": "text[]",
    "effective_from": "date",
    "effective_to": "date",
+   "has_shared_benefits": "boolean",
    "id": "uuid",
    "kind": "text",
    "organisation_id": "uuid",
    "related_subject_id": "uuid",
    "scope_path": "ltree",
-   "shared_benefits": "boolean",
    "verified_at": "timestamptz"
   },
   "marketing.identity_rules": {
@@ -9658,23 +9748,22 @@
    "is_auto_merge_allowed": "boolean",
    "jurisdiction_restrictions": "text[]",
    "match_threshold": "numeric(18,4)",
+   "matchers": "jsonb",
    "possible_match_threshold": "numeric(18,4)",
-   "scope_path": "ltree"
+   "scope_path": "ltree",
+   "survivorship": "jsonb"
   },
   "marketing.invitation": {
-   "cost_center_id": "uuid",
+   "campaign_id": "uuid",
    "entitlement_ids": "text[]",
    "id": "uuid",
-   "issued_at": "timestamptz",
-   "issued_by_principal_id": "uuid",
-   "offered_by_principal_id": "uuid",
-   "performance_id": "uuid",
-   "product_id": "uuid",
-   "quantity": "integer",
-   "reason": "text",
+   "plus_ones": "integer",
    "recipient_email": "text",
-   "recipient_name": "text",
-   "scope_path": "ltree"
+   "responded_at": "timestamptz",
+   "scope_path": "ltree",
+   "status": "text",
+   "subject_id": "uuid",
+   "token": "text"
   },
   "marketing.invitation_campaign": {
    "accepted_count": "integer",
@@ -9737,6 +9826,7 @@
    "wait_until": "jsonb"
   },
   "marketing.kiosk_assist_session": {
+   "actions_taken": "jsonb",
    "cart_id": "uuid",
    "device_id": "uuid",
    "ended_at": "timestamptz",
@@ -9794,6 +9884,7 @@
    "is_active": "boolean",
    "name": "text",
    "program_id": "uuid",
+   "scope_path": "ltree",
    "start_at": "timestamptz"
   },
   "marketing.loyalty_points": {
@@ -9808,6 +9899,7 @@
    "program_id": "uuid",
    "reason": "text",
    "reversed_loyalty_points_id": "uuid",
+   "scope_path": "ltree",
    "source_reference_id": "uuid",
    "source_type": "text",
    "transaction_type": "text"
@@ -9845,10 +9937,6 @@
    "points_earning_rule_id": "uuid",
    "reward_id": "uuid",
    "type": "text"
-  },
-  "marketing.message_delivery": {
-   "campaign_id": "uuid",
-   "id": "uuid"
   },
   "marketing.message_dispatch": {
    "campaign_id": "uuid",
@@ -9947,10 +10035,10 @@
    "guardian_verification_methods": "text[]",
    "id": "uuid",
    "minor_below_age": "integer",
-   "restrict_marketing": "boolean",
-   "restrict_personalisation": "boolean",
-   "restrict_tracking": "boolean",
    "restricted_processing_purpose_codes": "text[]",
+   "restricts_marketing": "boolean",
+   "restricts_personalisation": "boolean",
+   "restricts_tracking": "boolean",
    "scope_path": "ltree",
    "updated_at": "timestamptz",
    "version": "integer"
@@ -9975,6 +10063,7 @@
    "product_id": "uuid",
    "redemption_type": "text",
    "required": "numeric(18,4)",
+   "scope_path": "ltree",
    "valid_from": "timestamptz",
    "valid_to": "timestamptz"
   },
@@ -9994,6 +10083,7 @@
    "scope_path": "ltree",
    "status": "text",
    "subject_id": "uuid",
+   "system_results": "jsonb",
    "updated_at": "timestamptz"
   },
   "marketing.privacy_audit_event": {
@@ -10019,6 +10109,7 @@
    "approval_request_id": "uuid",
    "change_set_id": "uuid",
    "id": "uuid",
+   "items": "jsonb",
    "publish_at": "timestamptz",
    "published_at": "timestamptz",
    "scope_path": "ltree",
@@ -10052,10 +10143,13 @@
    "updated_at": "timestamptz"
   },
   "marketing.privacy_export_package": {
+   "corrections": "jsonb",
    "discovered_at": "timestamptz",
    "export_package": "jsonb",
    "id": "uuid",
+   "identifiers": "jsonb",
    "request_id": "uuid",
+   "results": "jsonb",
    "scope_path": "ltree",
    "sources": "text[]",
    "updated_at": "timestamptz"
@@ -10091,13 +10185,13 @@
    "updated_at": "timestamptz"
   },
   "marketing.privacy_request": {
-   "at_risk": "boolean",
    "case_id": "uuid",
    "completed_at": "timestamptz",
    "days_remaining": "integer",
    "dsar_request_id": "text",
    "due_at": "timestamptz",
    "id": "uuid",
+   "is_at_risk": "boolean",
    "is_deadline_configured": "boolean",
    "is_escalated": "boolean",
    "jurisdiction": "text",
@@ -10138,6 +10232,7 @@
    "kind": "text",
    "name": "text",
    "scope_path": "ltree",
+   "stages": "jsonb",
    "status": "text",
    "updated_at": "timestamptz",
    "verification_methods": "text[]"
@@ -10187,18 +10282,21 @@
    "acknowledged_at": "timestamptz",
    "agent_comment": "text",
    "agent_principal_id": "uuid",
+   "ai_findings": "jsonb",
    "case_id": "uuid",
+   "coaching_actions": "jsonb",
    "conversation_id": "uuid",
+   "criteria": "jsonb",
    "critical_failures": "text[]",
    "evaluated_at": "timestamptz",
    "evaluated_by": "text",
    "evaluator_principal_id": "uuid",
    "feedback": "text",
    "id": "uuid",
+   "is_sla_met": "boolean",
    "overall_score": "integer",
    "resolution_seconds": "integer",
    "scope_path": "ltree",
-   "sla_met": "boolean",
    "source_type": "text",
    "status": "text",
    "updated_at": "timestamptz"
@@ -10245,13 +10343,13 @@
    "aspects": "text[]",
    "body": "text",
    "id": "uuid",
+   "is_response_public": "boolean",
    "opened_case_id": "uuid",
    "rating": "integer",
    "recorded_at": "timestamptz",
    "related_order_id": "uuid",
    "responded_by_principal_id": "uuid",
    "response": "text",
-   "response_is_public": "boolean",
    "status": "text",
    "subject_id": "uuid",
    "venue_id": "uuid"
@@ -10274,6 +10372,7 @@
    "name": "text",
    "points_cost": "numeric(18,4)",
    "product_id": "uuid",
+   "scope_path": "ltree",
    "type": "text",
    "validity_days": "integer"
   },
@@ -10347,7 +10446,7 @@
    "is_enabled": "boolean",
    "knowledge_collection_ids": "text[]",
    "pattern_detection": "jsonb",
-   "reply_in_customer_language": "boolean",
+   "replies_in_customer_language": "boolean",
    "scope_level": "text",
    "scope_path": "ltree",
    "updated_at": "timestamptz"
@@ -10363,13 +10462,13 @@
    "updated_at": "timestamptz"
   },
   "marketing.sla_policy": {
-   "business_hours_only": "boolean",
    "code": "text",
    "created_at": "timestamptz",
    "escalation_minutes": "integer",
    "first_response_minutes": "integer",
    "id": "uuid",
    "is_active": "boolean",
+   "is_business_hours_only": "boolean",
    "name": "text",
    "priority": "text",
    "resolution_minutes": "integer",
@@ -10496,6 +10595,7 @@
    "form_version": "integer",
    "id": "uuid",
    "scope_path": "ltree",
+   "sections": "jsonb",
    "status": "text",
    "updated_at": "timestamptz"
   },
@@ -10505,6 +10605,7 @@
    "form_id": "uuid",
    "form_version": "integer",
    "id": "uuid",
+   "languages": "jsonb",
    "scope_path": "ltree",
    "source_language": "text",
    "updated_at": "timestamptz"
@@ -10584,13 +10685,13 @@
   "marketing.waiver_signatory_rule": {
    "acceptance_method": "text",
    "allowed_signatories": "text[]",
-   "capture_relationship": "boolean",
+   "captures_relationship": "boolean",
    "co_signature": "text",
    "form_id": "uuid",
    "form_version": "integer",
    "group_signing_modes": "text[]",
-   "guardian_signs_for_each_minor": "boolean",
    "guardian_threshold_age": "integer",
+   "guardian_threshold_by_country": "jsonb",
    "id": "uuid",
    "identity_verification": "text",
    "is_initials_required": "boolean",
@@ -10600,6 +10701,7 @@
    "primary_signatory": "text",
    "recorded_evidence": "text[]",
    "requires_guardian_for_minors": "boolean",
+   "requires_guardian_signature_per_minor": "boolean",
    "scope_path": "ltree",
    "updated_at": "timestamptz"
   },
@@ -10608,6 +10710,7 @@
    "data_reference": "text",
    "device_info": "text",
    "document_hash": "text",
+   "form_definition_id": "uuid",
    "guardian_name": "text",
    "id": "uuid",
    "ip_address": "text",
@@ -10617,30 +10720,31 @@
    "source_reference_id": "uuid",
    "source_type": "text",
    "status": "text",
-   "subject_name": "text",
-   "template_id": "uuid"
+   "subject_name": "text"
   },
   "marketing.waiver_trigger_rule": {
    "allow_staff_override": "boolean",
    "completion_deadline": "jsonb",
+   "eligibility": "jsonb",
    "enforcement": "text[]",
    "form_id": "uuid",
    "id": "uuid",
    "name": "text",
+   "reminders": "jsonb",
    "scope_path": "ltree",
    "status": "text",
    "trigger_point": "text",
    "updated_at": "timestamptz"
   },
   "marketing.waiver_verification": {
-   "booking_match": "boolean",
    "escalated_to": "uuid",
-   "guardian_relationship_present": "boolean",
    "id": "uuid",
+   "is_guardian_relationship_present": "boolean",
+   "is_order_match": "boolean",
+   "is_participant_match": "boolean",
+   "is_required_evidence_present": "boolean",
    "note": "text",
-   "participant_match": "boolean",
    "reason_code": "text",
-   "required_evidence_present": "boolean",
    "result": "text",
    "reviewed_at": "timestamptz",
    "reviewed_by": "uuid",
@@ -10655,6 +10759,7 @@
    "effective_to": "timestamptz",
    "form_id": "uuid",
    "form_version": "integer",
+   "history": "jsonb",
    "id": "uuid",
    "is_suspended": "boolean",
    "lifecycle_status": "text",
@@ -10692,6 +10797,10 @@
    "free_reissue_count": "integer",
    "id": "uuid",
    "is_active": "boolean",
+   "is_void_before_fiscal_closure_only": "boolean",
+   "is_void_before_settlement_only": "boolean",
+   "is_void_before_ticket_use_only": "boolean",
+   "is_void_same_business_day_only": "boolean",
    "is_void_supervisor_required": "boolean",
    "maximum_amendments_per_order": "integer",
    "maximum_amendments_per_ticket": "integer",
@@ -10703,15 +10812,11 @@
    "permitted_modifications": "text[]",
    "product_id": "uuid",
    "reissue_supervisor_threshold": "integer",
+   "requires_void_dual_authorisation": "boolean",
    "scope_path": "ltree",
    "updated_at": "timestamptz",
-   "void_before_fiscal_closure_only": "boolean",
-   "void_before_settlement_only": "boolean",
-   "void_before_ticket_use_only": "boolean",
    "void_channels": "text[]",
-   "void_dual_authorisation": "boolean",
    "void_reason_codes": "text[]",
-   "void_same_business_day_only": "boolean",
    "void_types": "text[]"
   },
   "orders.after_sale_policy_window": {
@@ -10907,6 +11012,7 @@
    "expected_amount": "numeric(18,4)",
    "id": "uuid",
    "opening_float": "numeric(18,4)",
+   "recorded_at": "timestamptz",
    "shift_id": "uuid",
    "status": "text",
    "variance_amount": "numeric(18,4)",
@@ -10963,7 +11069,7 @@
    "external_transaction_id": "text",
    "id": "uuid",
    "is_manual": "boolean",
-   "merchant_id": "text",
+   "merchant_id": "uuid",
    "order_id": "uuid",
    "partner_order_id": "text",
    "payment_id": "uuid",
@@ -11043,6 +11149,7 @@
    "probability": "integer",
    "requirements": "text",
    "sales_owner_principal_id": "uuid",
+   "scope_path": "ltree",
    "source": "text"
   },
   "orders.group_participant": {
@@ -11152,9 +11259,9 @@
    "allocation_mode": "text",
    "group_booking_id": "uuid",
    "id": "uuid",
-   "keep_group_together": "boolean",
-   "updated_at": "timestamptz",
-   "vip_allocation": "boolean"
+   "is_vip": "boolean",
+   "keeps_group_together": "boolean",
+   "updated_at": "timestamptz"
   },
   "orders.group_ticket_allocation_line": {
    "group_ticket_allocation_id": "uuid",
@@ -11222,7 +11329,8 @@
    "quantity": "integer",
    "reason": "text",
    "recipient_email": "text",
-   "recipient_name": "text"
+   "recipient_name": "text",
+   "scope_path": "ltree"
   },
   "orders.invitation_allowance": {
    "allowance": "integer",
@@ -11232,6 +11340,7 @@
    "remaining": "integer",
    "requires_approval_above": "integer",
    "role_id": "uuid",
+   "scope_path": "ltree",
    "used": "integer"
   },
   "orders.member_exception": {
@@ -11245,7 +11354,8 @@
    "quantity": "integer",
    "reason": "text",
    "recorded_at": "timestamptz",
-   "recorded_by": "uuid"
+   "recorded_by": "uuid",
+   "scope_path": "ltree"
   },
   "orders.membership_activation_action": {
    "action": "text",
@@ -11266,10 +11376,11 @@
    "effective_timing": "text",
    "from_product_id": "uuid",
    "id": "uuid",
+   "is_pro_rata": "boolean",
    "membership_id": "uuid",
    "order_id": "uuid",
-   "pro_rata": "boolean",
    "pro_rata_amount": "numeric(18,4)",
+   "scope_path": "ltree",
    "status": "text",
    "target_product_id": "uuid"
   },
@@ -11363,9 +11474,9 @@
   "orders.order_line_eligibility": {
    "age_band": "text",
    "age_years": "integer",
-   "confident_swimmer": "boolean",
    "height_band_index": "integer",
    "id": "uuid",
+   "is_confident_swimmer": "boolean",
    "is_guardian_signed": "boolean",
    "order_line_id": "uuid"
   },
@@ -11435,7 +11546,7 @@
    "issued_by_principal_id": "uuid",
    "order_id": "uuid",
    "paid_at": "timestamptz",
-   "release_hold_on_expiry": "boolean",
+   "releases_reservation_on_expiry": "boolean",
    "resend_count": "integer",
    "reservation_id": "uuid",
    "scope_path": "ltree",
@@ -11443,10 +11554,6 @@
    "status": "text",
    "token": "text",
    "viewed_at": "timestamptz"
-  },
-  "orders.payment_tip": {
-   "id": "uuid",
-   "payment_id": "uuid"
   },
   "orders.pos_shift": {
    "bag_number": "text",
@@ -11542,6 +11649,7 @@
    "refund_destinations": "text[]",
    "refund_types": "text[]",
    "scope": "jsonb",
+   "scope_path": "ltree",
    "updated_at": "timestamptz"
   },
   "orders.refund_policy": {
@@ -11561,6 +11669,7 @@
    "refund_policy_id": "uuid"
   },
   "orders.resale_eligibility_rule": {
+   "allows_resale_immediately_after_purchase": "boolean",
    "blackout_from": "timestamptz",
    "blackout_to": "timestamptz",
    "created_at": "timestamptz",
@@ -11569,16 +11678,15 @@
    "id": "uuid",
    "is_active": "boolean",
    "is_identity_verification_required": "boolean",
+   "is_original_purchaser_only": "boolean",
    "is_resale_allowed": "boolean",
    "maximum_listings_per_customer": "integer",
    "maximum_resale_attempts": "integer",
    "minimum_ownership_hours": "integer",
-   "original_purchaser_only": "boolean",
    "performance_id": "uuid",
    "product_id": "uuid",
    "required_conditions": "text[]",
    "resale_closes_at": "timestamptz",
-   "resale_immediately_after_purchase": "boolean",
    "resale_opens_at": "timestamptz",
    "sales_channel": "text",
    "scope_path": "ltree",
@@ -11590,14 +11698,14 @@
    "effective_from": "timestamptz",
    "effective_to": "timestamptz",
    "event_id": "uuid",
-   "fees_shown_to_seller": "boolean",
    "id": "uuid",
    "is_active": "boolean",
    "minimum_ask_price": "numeric(18,4)",
    "price_cap_percent": "numeric(18,4)",
    "product_id": "uuid",
    "scope_path": "ltree",
-   "seller_fee_percent": "numeric(18,4)"
+   "seller_fee_percent": "numeric(18,4)",
+   "shows_fees_to_seller": "boolean"
   },
   "orders.resale_listing": {
    "ask_price": "numeric(18,4)",
@@ -11621,6 +11729,7 @@
    "authentication_method": "text",
    "branding": "jsonb",
    "buyer_terms": "text",
+   "can_seller_edit_price": "boolean",
    "cancellation_fee": "numeric(18,4)",
    "checkout_hold_minutes": "integer",
    "created_at": "timestamptz",
@@ -11646,7 +11755,6 @@
    "resale_ticket_label": "text",
    "review_triggers": "text[]",
    "scope_path": "ltree",
-   "seller_can_edit_price": "boolean",
    "seller_terms": "text",
    "settlement_delay_days": "integer",
    "settlement_timing": "text",
@@ -11705,7 +11813,6 @@
    "event_id": "uuid",
    "extension_duration_minutes": "integer",
    "extension_permission": "text",
-   "extension_requires_approval": "boolean",
    "hold_duration_minutes": "integer",
    "hold_type": "text",
    "id": "uuid",
@@ -11716,6 +11823,7 @@
    "on_expiry": "text[]",
    "performance_id": "uuid",
    "product_id": "uuid",
+   "requires_extension_approval": "boolean",
    "scope_path": "ltree",
    "ticket_type": "text",
    "updated_at": "timestamptz"
@@ -11801,6 +11909,7 @@
    "media_type": "text",
    "name": "text",
    "recycle_after_days": "integer",
+   "scope_path": "ltree",
    "selection_priority": "integer"
   },
   "orders.ticket_template_channel": {
@@ -11867,7 +11976,7 @@
    "eligible_ticket_statuses": "text[]",
    "entitlement_treatment": "text",
    "event_id": "uuid",
-   "exclude_fees_from_credit": "boolean",
+   "excludes_fees_from_credit": "boolean",
    "financial_method": "text",
    "fixed_credit_amount": "numeric(18,4)",
    "from_product_id": "uuid",
@@ -11935,6 +12044,7 @@
   "payments.chargeback_evidence": {
    "chargeback_id": "uuid",
    "deadline_at": "timestamptz",
+   "documents": "jsonb",
    "id": "uuid",
    "narrative": "text",
    "outcome": "text",
@@ -11946,10 +12056,10 @@
    "available_credit": "numeric(18,4)",
    "credit_limit": "numeric(18,4)",
    "id": "uuid",
+   "is_over_limit": "boolean",
    "organisation_id": "uuid",
    "outstanding_invoiced": "numeric(18,4)",
    "outstanding_unbilled": "numeric(18,4)",
-   "over_limit": "boolean",
    "scope_path": "ltree",
    "status": "text"
   },
@@ -11976,6 +12086,7 @@
    "occurred_at": "timestamptz",
    "payment_id": "uuid",
    "reason": "text",
+   "scope_path": "ltree",
    "type": "text"
   },
   "payments.dunning_case": {
@@ -12023,7 +12134,7 @@
   "payments.failover_policy": {
    "backoff_ms": "integer",
    "circuit_breaker": "jsonb",
-   "failover_to_next_provider": "boolean",
+   "fails_over_to_next_provider": "boolean",
    "id": "uuid",
    "max_attempts": "integer",
    "retryable_outcomes": "text[]",
@@ -12044,6 +12155,7 @@
    "payment_method_id": "uuid",
    "payment_policy_id": "uuid",
    "provider_id": "uuid",
+   "scope_path": "ltree",
    "updated_at": "timestamptz",
    "value": "numeric(18,4)"
   },
@@ -12100,7 +12212,7 @@
    "date_window_days": "integer",
    "fallback_keys": "text[]",
    "id": "uuid",
-   "net_of_fees": "boolean",
+   "is_net_of_fees": "boolean",
    "primary_key": "text",
    "scope_path": "ltree"
   },
@@ -12146,6 +12258,7 @@
    "updated_at": "timestamptz"
   },
   "payments.mixed_tender_rules": {
+   "allowed_combinations": "jsonb",
    "id": "uuid",
    "is_partial_payment_allowed": "boolean",
    "is_split_payment_allowed": "boolean",
@@ -12200,7 +12313,7 @@
    "scope_path": "ltree",
    "supported_currencies": "text[]",
    "supported_methods": "text[]",
-   "supports3ds": "boolean",
+   "supports_3ds": "boolean",
    "supports_partial_capture": "boolean",
    "supports_tokenisation": "boolean",
    "terminal": "jsonb"
@@ -12243,7 +12356,7 @@
    "status": "text"
   },
   "payments.reconciliation_source": {
-   "alert_if_missing": "boolean",
+   "alerts_if_missing": "boolean",
    "code": "text",
    "connection_id": "uuid",
    "expected_by_time": "text",
@@ -12256,6 +12369,8 @@
   },
   "payments.risk_rules": {
    "id": "uuid",
+   "lists": "jsonb",
+   "rules": "jsonb",
    "scope_path": "ltree"
   },
   "payments.routing_rule": {
@@ -12267,7 +12382,8 @@
    "priority": "integer",
    "provider_id": "uuid",
    "scope_path": "ltree",
-   "strategy": "text"
+   "strategy": "text",
+   "targets": "jsonb"
   },
   "payments.stored_forward": {
    "attempts": "integer",
@@ -12463,6 +12579,7 @@
    "id": "uuid",
    "is_active": "boolean",
    "kind": "text",
+   "scope_path": "ltree",
    "sort_order": "integer"
   },
   "platform.device": {
@@ -12501,16 +12618,13 @@
    "reason": "text",
    "retired_at": "timestamptz",
    "scanner_health": "text",
+   "scope_path": "ltree",
    "serial_number": "text",
    "state": "text",
    "status": "text",
    "test_result": "jsonb",
    "tested_by_principal_id": "uuid",
    "workstation_id": "uuid"
-  },
-  "platform.device_heartbeat": {
-   "device_id": "uuid",
-   "id": "uuid"
   },
   "platform.idempotency_record": {
    "created_at": "timestamptz",
@@ -12674,7 +12788,6 @@
    "identity": "jsonb",
    "inventory": "jsonb",
    "marketing": "jsonb",
-   "org_unit_id": "uuid",
    "promotions": "jsonb",
    "queue": "jsonb",
    "quiet_hours": "jsonb",
@@ -12703,7 +12816,6 @@
    "is_active": "boolean",
    "is_offline_capable": "boolean",
    "name": "text",
-   "org_unit_id": "uuid",
    "outlet_id": "uuid",
    "region_id": "uuid",
    "sale_board": "jsonb",
@@ -13060,6 +13172,7 @@
    "id": "uuid",
    "label": "text",
    "promotion_id": "uuid",
+   "scope_path": "ltree",
    "traffic_percent": "integer"
   },
   "promotions.recommendation_experiment": {
@@ -13074,6 +13187,7 @@
    "scope_path": "ltree",
    "started_at": "timestamptz",
    "status": "text",
+   "variants": "jsonb",
    "winning_variant": "text"
   },
   "promotions.recommendation_outcome": {
@@ -13084,6 +13198,7 @@
    "order_id": "uuid",
    "outcome": "text",
    "recommendation_id": "uuid",
+   "recorded_at": "timestamptz",
    "scope_path": "ltree"
   },
   "promotions.recommendation_strategy": {
@@ -13091,7 +13206,7 @@
    "code": "text",
    "effective_from": "date",
    "effective_to": "date",
-   "exclude_in_basket": "boolean",
+   "excludes_in_basket": "boolean",
    "guardrails": "jsonb",
    "id": "uuid",
    "item_kinds": "text[]",
@@ -13109,6 +13224,7 @@
   "promotions.recommendation_suppression": {
    "cooldown_after_accept_days": "integer",
    "cooldown_after_dismiss_days": "integer",
+   "hard_exclusions": "jsonb",
    "id": "uuid",
    "max_impressions_per_guest_per_session": "integer",
    "max_impressions_per_product_per_day": "integer",
@@ -13200,7 +13316,6 @@
   },
   "queue.queue": {
    "access_point_id": "uuid",
-   "accessibility_priority": "boolean",
    "allowed_access_point_ids": "text[]",
    "asset_id": "uuid",
    "attraction_product_id": "uuid",
@@ -13211,7 +13326,7 @@
    "entitlement_product_ids": "text[]",
    "expected_reopen_at": "timestamptz",
    "fast_pass_allocation_percent": "numeric(18,4)",
-   "fast_pass_id": "uuid",
+   "has_accessibility_priority": "boolean",
    "height_requirement_cm": "integer",
    "id": "uuid",
    "is_in_queue_offer_enabled": "boolean",
@@ -13298,11 +13413,12 @@
    "agreement_version": "text",
    "customer_fields": "jsonb",
    "group_waiver_mode": "text",
-   "guardian_signature_for_minor": "boolean",
    "id": "uuid",
    "is_agreement_required": "boolean",
    "is_e_signature_required": "boolean",
    "is_liability_waiver_required": "boolean",
+   "product_id": "uuid",
+   "requires_guardian_signature_for_minor": "boolean",
    "scope_path": "ltree",
    "terms_document_asset_id": "uuid"
   },
@@ -13321,8 +13437,10 @@
   "rental.availability_rules": {
    "hold_minutes": "integer",
    "id": "uuid",
+   "operating_windows": "jsonb",
    "overbook_percent": "numeric(18,4)",
-   "release_on_payment_failure": "boolean",
+   "product_id": "uuid",
+   "releases_on_payment_failure": "boolean",
    "scope_path": "ltree",
    "slot_minutes": "integer"
   },
@@ -13338,6 +13456,7 @@
   },
   "rental.booking": {
    "accrued_late_fee": "numeric(18,4)",
+   "change_reason": "text",
    "checked_out_at": "timestamptz",
    "customer_id": "uuid",
    "deposit_authorisation_id": "uuid",
@@ -13360,6 +13479,7 @@
    "approved_by": "uuid",
    "assessed_by": "uuid",
    "asset_id": "uuid",
+   "booking_id": "uuid",
    "customer_acknowledgement": "text",
    "description": "text",
    "id": "uuid",
@@ -13373,7 +13493,6 @@
    "category_id": "uuid",
    "fixed_amount": "numeric(18,4)",
    "id": "uuid",
-   "inspection_required_before_release": "boolean",
    "instruments": "text[]",
    "is_auto_release": "boolean",
    "is_partial_capture_permitted": "boolean",
@@ -13383,6 +13502,7 @@
    "minimum_amount": "numeric(18,4)",
    "percentage": "numeric(18,4)",
    "product_id": "uuid",
+   "requires_inspection_before_release": "boolean",
    "scope_path": "ltree",
    "supervisor_approval_threshold": "numeric(18,4)"
   },
@@ -13396,14 +13516,16 @@
    "maximum_extension_minutes": "integer",
    "maximum_minutes": "integer",
    "minimum_minutes": "integer",
+   "product_id": "uuid",
    "scope_path": "ltree",
    "turnaround_minutes": "integer"
   },
   "rental.equipment_assignment": {
    "asset_id": "uuid",
    "assigned_at": "timestamptz",
-   "assigned_manually": "boolean",
+   "booking_id": "uuid",
    "id": "uuid",
+   "is_assigned_manually": "boolean",
    "returned_at": "timestamptz",
    "scanned_code": "text",
    "scope_path": "ltree",
@@ -13418,6 +13540,7 @@
    "id": "uuid",
    "late_fee_amount": "numeric(18,4)",
    "late_fee_basis": "text",
+   "late_fee_tiers": "jsonb",
    "maximum_daily_charge": "numeric(18,4)",
    "missing_item_fee_amount": "numeric(18,4)",
    "missing_item_fee_basis": "text",
@@ -13433,6 +13556,7 @@
    "is_authority_notified": "boolean",
    "kind": "text",
    "photo_asset_ids": "text[]",
+   "recorded_at": "timestamptz",
    "reported_at": "timestamptz",
    "reported_by": "uuid",
    "scope_path": "ltree",
@@ -13441,6 +13565,8 @@
   },
   "rental.inspection": {
    "asset_id": "uuid",
+   "booking_id": "uuid",
+   "checklist": "jsonb",
    "condition": "text",
    "id": "uuid",
    "inspected_at": "timestamptz",
@@ -13448,6 +13574,7 @@
    "note": "text",
    "phase": "text",
    "photo_asset_ids": "text[]",
+   "recorded_at": "timestamptz",
    "scope_path": "ltree"
   },
   "rental.inspection_item": {
@@ -13465,10 +13592,12 @@
    "allow_equipment_swap": "boolean",
    "allow_manual_assignment": "boolean",
    "allow_substitution": "boolean",
-   "assignment_required_at_checkout": "boolean",
+   "components": "jsonb",
    "id": "uuid",
    "inventory_unit": "text",
    "is_scan_required": "boolean",
+   "product_id": "uuid",
+   "requires_assignment_at_checkout": "boolean",
    "scope_path": "ltree",
    "total_quantity": "integer",
    "tracking_model": "text"
@@ -13483,6 +13612,7 @@
    "is_return_allowed": "boolean",
    "location_id": "uuid",
    "operating_hours": "jsonb",
+   "product_id": "uuid",
    "scope_path": "ltree"
   },
   "rental.operational_rules": {
@@ -13503,6 +13633,7 @@
    "minimum_height_cm": "integer",
    "photo_at_checkout_required": "text",
    "photo_at_return_required": "text",
+   "product_id": "uuid",
    "return_scan_required": "text",
    "safety_briefing_required": "text",
    "scope_path": "ltree"
@@ -13529,14 +13660,17 @@
    "id": "uuid",
    "id_number": "text",
    "is_primary_renter": "boolean",
-   "name": "text"
+   "name": "text",
+   "scope_path": "ltree"
   },
   "rental.pricing_profile": {
    "additional_increment_price": "numeric(18,4)",
    "base_price": "numeric(18,4)",
    "billing_increment_minutes": "integer",
+   "calendar_rules": "jsonb",
    "code": "text",
    "customer_segment_id": "uuid",
+   "duration_tiers": "jsonb",
    "dynamic_max_decrease_percent": "numeric(18,4)",
    "dynamic_max_increase_percent": "numeric(18,4)",
    "effective_from": "date",
@@ -13659,6 +13793,7 @@
   "reporting.anomaly": {
    "acknowledged_at": "timestamptz",
    "acknowledged_by": "uuid",
+   "candidate_causes": "jsonb",
    "detected_at": "timestamptz",
    "deviation_sigma": "numeric(18,4)",
    "expected": "numeric(18,4)",
@@ -13700,7 +13835,7 @@
   },
   "reporting.delivery": {
    "attempted_at": "timestamptz",
-   "contained_personal_data": "boolean",
+   "did_contain_personal_data": "boolean",
    "failure_reason": "text",
    "id": "uuid",
    "recipient_count": "integer",
@@ -13746,9 +13881,9 @@
    "description": "text",
    "domain": "text",
    "formula": "text",
-   "higher_is_better": "boolean",
    "id": "uuid",
    "is_active": "boolean",
+   "is_higher_better": "boolean",
    "name": "text",
    "owner": "uuid",
    "scope_path": "ltree",
@@ -13866,7 +14001,7 @@
    "owner_principal_id": "uuid",
    "parameters": "jsonb",
    "report_id": "uuid",
-   "skip_if_empty": "boolean"
+   "skips_if_empty": "boolean"
   },
   "reporting.schedule_recipient": {
    "address": "text",
@@ -13876,8 +14011,10 @@
    "schedule_id": "uuid"
   },
   "reporting.semantic_model": {
+   "domains": "jsonb",
    "id": "uuid",
    "published_at": "timestamptz",
+   "relationships": "jsonb",
    "scope_path": "ltree",
    "version": "integer"
   },
@@ -13897,6 +14034,7 @@
    "id": "uuid",
    "includes_personal_data": "boolean",
    "is_active": "boolean",
+   "recipients": "jsonb",
    "report_id": "uuid",
    "runs_as_principal_id": "uuid",
    "schedule_id": "uuid",
@@ -13905,7 +14043,7 @@
   "resources.allocation_policy": {
    "allow_partial_allocation": "boolean",
    "id": "uuid",
-   "respect_resource_priority": "boolean",
+   "respects_resource_priority": "boolean",
    "scope_path": "ltree",
    "scoring_weights": "jsonb",
    "strategy": "text"
@@ -13927,6 +14065,7 @@
    "validation_expression": "text"
   },
   "resources.booking": {
+   "change_reason": "text",
    "checked_out_at": "timestamptz",
    "condition_in": "text",
    "condition_out": "text",
@@ -13972,12 +14111,17 @@
    "cleaning_policy": "jsonb",
    "code": "text",
    "deposit_amount": "numeric(18,4)",
+   "disposal": "jsonb",
    "id": "uuid",
    "is_active": "boolean",
    "kind": "text",
+   "lifecycle_effective_from": "timestamptz",
+   "lifecycle_reason": "text",
+   "lifecycle_state": "text",
    "name": "text",
    "parent_resource_id": "uuid",
    "principal_id": "uuid",
+   "replacement_resource_id": "uuid",
    "requires_qualification": "text[]",
    "resource_type_id": "uuid",
    "scope_path": "ltree",
@@ -14123,12 +14267,14 @@
   "resources.resource_schedule": {
    "advance_booking_days": "integer",
    "availability_mode": "text",
+   "exceptions": "jsonb",
    "id": "uuid",
    "maximum_booking_minutes": "integer",
    "minimum_booking_minutes": "integer",
    "resource_id": "uuid",
    "scope_path": "ltree",
-   "slot_minutes": "integer"
+   "slot_minutes": "integer",
+   "windows": "jsonb"
   },
   "resources.resource_type": {
    "code": "text",
@@ -14157,7 +14303,7 @@
    "resource_type_id": "uuid",
    "scope_path": "ltree",
    "show_qualifications": "boolean",
-   "ticket_type_id": "uuid",
+   "ticket_product_id": "uuid",
    "updated_at": "timestamptz"
   },
   "resources.venue_assignment": {
@@ -14165,11 +14311,12 @@
    "effective_to": "date",
    "id": "uuid",
    "is_cross_venue_booking_allowed": "boolean",
+   "is_shared_across_venues": "boolean",
    "is_transfer_required": "boolean",
    "primary_venue_id": "uuid",
+   "resource_id": "uuid",
    "scope_path": "ltree",
    "secondary_venue_ids": "text[]",
-   "shared_pool": "boolean",
    "travel_buffer_minutes": "integer"
   },
   "retail.exchange": {
@@ -14309,7 +14456,7 @@
    "collect_by": "timestamptz",
    "collected_at": "timestamptz",
    "collected_by_principal_id": "uuid",
-   "collection_point_id": "uuid",
+   "collection_location_id": "uuid",
    "collection_point_name": "text",
    "drop_reference": "text",
    "dropped_at": "timestamptz",
@@ -14350,7 +14497,8 @@
    "id": "uuid",
    "minimum_provision_percent": "numeric(18,4)",
    "scope_path": "ltree",
-   "seat_map_id": "uuid"
+   "seat_map_id": "uuid",
+   "spaces": "jsonb"
   },
   "seating.group_request": {
    "accessible_spaces_needed": "integer",
@@ -14397,14 +14545,14 @@
    "code": "text",
    "counts_against_capacity": "boolean",
    "id": "uuid",
+   "is_visible_to_guest": "boolean",
    "name": "text",
    "owner_role": "text",
    "purpose": "text",
    "release_hours_before": "integer",
    "release_rule": "text",
    "release_to": "text",
-   "scope_path": "ltree",
-   "visible_to_guest": "boolean"
+   "scope_path": "ltree"
   },
   "seating.import_job": {
    "completed_at": "timestamptz",
@@ -14424,19 +14572,20 @@
    "from_seat_ids": "text[]",
    "guest_notified_at": "timestamptz",
    "id": "uuid",
+   "is_refund_issued": "boolean",
    "order_id": "uuid",
    "performed_by": "uuid",
    "price_difference": "numeric(18,4)",
    "reason": "text",
-   "refund_issued": "boolean",
    "scope_path": "ltree",
    "to_seat_ids": "text[]"
   },
   "seating.recommendation_rule": {
-   "explain_to_guest": "boolean",
+   "explains_to_guest": "boolean",
    "id": "uuid",
    "performance_id": "uuid",
-   "reverse_row_order": "boolean",
+   "profiles": "jsonb",
+   "reverses_row_order": "boolean",
    "scope_path": "ltree",
    "seat_map_id": "uuid"
   },
@@ -14449,6 +14598,7 @@
    "is_active": "boolean",
    "position": "jsonb",
    "row_label": "text",
+   "scope_path": "ltree",
    "seat_map_id": "uuid",
    "seat_number": "text",
    "section_code": "text"
@@ -14514,6 +14664,7 @@
    "effective_to": "timestamptz",
    "id": "uuid",
    "list_price": "numeric(18,4)",
+   "scope_path": "ltree",
    "seat_category_id": "uuid"
   },
   "seating.seat_reservation": {
@@ -14554,11 +14705,12 @@
    "buffer_seats": "integer",
    "id": "uuid",
    "max_party_size": "integer",
-   "prevent_orphan_seats": "boolean",
+   "prevents_orphan_seats": "boolean",
    "require_contiguous": "boolean",
    "seat_map_id": "uuid"
   },
   "seating.section": {
+   "boundary": "jsonb",
    "code": "text",
    "id": "uuid",
    "name": "text",
@@ -14614,10 +14766,12 @@
   "subscription.enforcement_policy": {
    "grace_days": "integer",
    "id": "uuid",
-   "is_hard_stop_allowed": "boolean"
+   "is_hard_stop_allowed": "boolean",
+   "thresholds": "jsonb"
   },
   "subscription.go_live_readiness": {
    "blockers": "integer",
+   "groups": "jsonb",
    "id": "uuid",
    "run_at": "timestamptz",
    "signed_off_at": "timestamptz",
@@ -14636,6 +14790,7 @@
    "minimum_guarantee_period": "text",
    "name": "text",
    "on_below_minimum": "text",
+   "overage_pricing": "jsonb",
    "revenue_share_percent": "numeric(18,4)",
    "tier_code": "text",
    "unit_price": "numeric(18,4)"
@@ -14675,7 +14830,6 @@
    "age_transition_action": "text",
    "age_transition_grace_days": "integer",
    "created_at": "timestamptz",
-   "eligibility_revalidation": "boolean",
    "entitlement_model": "text",
    "id": "uuid",
    "is_member_change_approval_required": "boolean",
@@ -14689,6 +14843,7 @@
    "membership_structure": "text",
    "minimum_age": "integer",
    "relationship_requirement": "text",
+   "requires_eligibility_revalidation": "boolean",
    "scope_path": "ltree",
    "updated_at": "timestamptz",
    "verification_requirement": "text"
@@ -14728,11 +14883,13 @@
    "expiry_rule": "text",
    "fee_profile": "text",
    "grace_period_days": "integer",
+   "has_separate_purchase_and_activation_rules": "boolean",
    "holder_model": "text",
    "id": "uuid",
    "is_auto_renew_eligible": "boolean",
    "is_backdating_allowed": "boolean",
    "is_backdating_approval_required": "boolean",
+   "is_eligible_for_promotional_pricing": "boolean",
    "is_multiple_memberships_allowed": "boolean",
    "is_renewable": "boolean",
    "is_transferable": "boolean",
@@ -14744,13 +14901,11 @@
    "parent_membership": "text",
    "payment_terms": "text[]",
    "prerequisite_membership": "text",
-   "promotional_pricing_eligibility": "boolean",
    "published_at": "timestamptz",
    "replacement_membership": "text",
    "sales_period": "text",
    "scope_path": "ltree",
    "season_name": "text",
-   "separate_purchase_and_activation_rules": "boolean",
    "status": "text",
    "tax_profile": "text",
    "tier": "text",
@@ -14892,7 +15047,7 @@
    "limit_value": "numeric(18,4)",
    "name": "text",
    "period": "text",
-   "tier_id": "uuid",
+   "plan_id": "uuid",
    "updated_at": "timestamptz"
   },
   "subscription.tier_module": {
@@ -14902,7 +15057,7 @@
    "is_active": "boolean",
    "is_included": "boolean",
    "notes": "text",
-   "tier_id": "uuid",
+   "plan_id": "uuid",
    "updated_at": "timestamptz"
   },
   "subscription.trial_config": {
@@ -14912,7 +15067,7 @@
    "included_modules": "text[]",
    "notice_days_before_expiry": "integer[]",
    "on_expiry": "text",
-   "payment_method_required_up_front": "boolean",
+   "requires_payment_method_up_front": "boolean",
    "retain_data_days": "integer",
    "tier_code": "text",
    "usage_caps": "jsonb"
@@ -14927,8 +15082,10 @@
    "venue_type": "text"
   },
   "subscription.vsi_model": {
+   "factors": "jsonb",
    "id": "uuid",
    "published_at": "timestamptz",
+   "tiers": "jsonb",
    "version": "integer"
   },
   "sync.cell_connection": {
@@ -14960,6 +15117,7 @@
   "sync.cross_region_entitlement": {
    "admission_rules_id": "uuid",
    "consuming_cell_name": "text",
+   "entitlement_id": "uuid",
    "entries_allowed": "integer",
    "entries_consumed": "integer",
    "guest_link_id": "uuid",
@@ -14970,12 +15128,12 @@
    "media_codes": "text[]",
    "right_id": "uuid",
    "status": "text",
-   "ticket_id": "uuid",
    "valid_from": "timestamptz",
    "valid_to": "timestamptz",
    "venue_id": "uuid"
   },
   "sync.dsar_request": {
+   "cell_results": "jsonb",
    "completed_at": "timestamptz",
    "created_at": "timestamptz",
    "guest_link_id": "uuid",
@@ -14989,6 +15147,8 @@
    "guest_link_id": "uuid",
    "home_cell_name": "text",
    "linked_at": "timestamptz",
+   "linked_cells": "jsonb",
+   "local_subject_id": "uuid",
    "revoked_at": "timestamptz"
   },
   "sync.rejection": {
@@ -15029,6 +15189,7 @@
    "last_topped_up_at": "timestamptz",
    "mode": "text",
    "order_id": "uuid",
+   "share_percentage": "numeric(18,4)",
    "status": "text"
   },
   "tenancy.data_retention_setting": {
@@ -15106,7 +15267,8 @@
    "status": "text",
    "succeeded_count": "integer",
    "target_device_ids": "text[]",
-   "target_scope_path": "ltree"
+   "target_scope_path": "ltree",
+   "waves": "jsonb"
   },
   "tenancy.device_tamper_event": {
    "detail": "text",
@@ -15115,6 +15277,7 @@
    "id": "uuid",
    "is_device_trusted": "boolean",
    "kind": "text",
+   "recorded_at": "timestamptz",
    "resolution": "text",
    "resolved_at": "timestamptz",
    "resolved_by": "uuid",
@@ -15192,6 +15355,7 @@
    "applied_by": "uuid",
    "created_at": "timestamptz",
    "created_by": "uuid",
+   "findings": "jsonb",
    "format": "text",
    "id": "uuid",
    "preview": "jsonb",
@@ -15226,6 +15390,7 @@
    "name": "jsonb",
    "paired_route_id": "uuid",
    "status": "text",
+   "status_reason": "text",
    "total_minutes": "integer",
    "venue_id": "uuid"
   },
@@ -15269,6 +15434,7 @@
    "timetable_id": "uuid"
   },
   "venuemap.import_job": {
+   "findings": "jsonb",
    "hand_marked_paths": "jsonb",
    "id": "uuid",
    "layers_found": "text[]",
@@ -15280,6 +15446,7 @@
    "outcome": "text",
    "resource_rows_joined": "integer",
    "resources_found": "integer",
+   "scope_path": "ltree",
    "shapes_found": "integer",
    "status": "text",
    "unmapped_layers": "text[]"
@@ -15318,11 +15485,14 @@
    "version": "integer"
   },
   "venuemap.path": {
+   "closed_note": "text",
    "closed_reason": "text",
    "distance_metres": "numeric(18,4)",
+   "expected_reopen_at": "timestamptz",
    "from_point_id": "uuid",
    "geometry": "text",
    "id": "uuid",
+   "is_closed": "boolean",
    "is_indoor": "boolean",
    "is_step_free": "boolean",
    "map_id": "uuid",
@@ -15330,6 +15500,7 @@
    "to_point_id": "uuid"
   },
   "venuemap.placed_resource": {
+   "boundary": "jsonb",
    "capacity": "integer",
    "id": "uuid",
    "is_bookable": "boolean",
@@ -15356,6 +15527,7 @@
    "is_step_free": "boolean",
    "kind": "text",
    "map_id": "uuid",
+   "media": "jsonb",
    "name": "text",
    "name_localised": "jsonb",
    "opening_hours": "text",
@@ -15368,6 +15540,7 @@
   "venuemap.visit_plan": {
    "cart_id": "uuid",
    "created_at": "timestamptz",
+   "excluded": "jsonb",
    "id": "uuid",
    "inputs": "jsonb",
    "map_version": "integer",
@@ -15405,6 +15578,7 @@
   "wallet.accounting_mapping": {
    "breakage_policy": "jsonb",
    "id": "uuid",
+   "mappings": "jsonb",
    "scope_path": "ltree"
   },
   "wallet.adjustment": {
@@ -15421,7 +15595,8 @@
   },
   "wallet.authentication_policy": {
    "id": "uuid",
-   "scope_path": "ltree"
+   "scope_path": "ltree",
+   "tiers": "jsonb"
   },
   "wallet.auto_reload_setting": {
    "id": "uuid",
@@ -15460,6 +15635,7 @@
    "scope_path": "ltree"
   },
   "wallet.configuration_version": {
+   "findings": "jsonb",
    "id": "uuid",
    "note": "text",
    "published_at": "timestamptz",
@@ -15489,6 +15665,7 @@
    "identifier": "text",
    "kind": "text",
    "linked_at": "timestamptz",
+   "recorded_at": "timestamptz",
    "replaced_by_credential_id": "uuid",
    "scope_path": "ltree",
    "status": "text",
@@ -15589,9 +15766,11 @@
    "allowed_funding_sources": "text[]",
    "approval_above_amount": "numeric(18,4)",
    "auto_reload": "jsonb",
+   "bonus_rules": "jsonb",
    "id": "uuid",
    "maximum_top_up": "numeric(18,4)",
    "minimum_top_up": "numeric(18,4)",
+   "preset_amounts": "numeric(18,4)[]",
    "recurring_funding": "jsonb",
    "scope_path": "ltree",
    "velocity_limits": "jsonb",
@@ -15613,6 +15792,7 @@
   "wallet.gift_card_product": {
    "code": "text",
    "credit_type_id": "uuid",
+   "denominations": "numeric(18,4)[]",
    "id": "uuid",
    "is_activation_required": "boolean",
    "is_open_amount_allowed": "boolean",
@@ -15637,14 +15817,15 @@
   },
   "wallet.reconciliation_source": {
    "id": "uuid",
-   "scope_path": "ltree"
+   "scope_path": "ltree",
+   "sources": "jsonb"
   },
   "wallet.refund_policy": {
    "default_destination": "text",
    "destinations_by_source": "jsonb",
    "id": "uuid",
-   "restore_original_expiry": "boolean",
-   "restore_to_original_lots": "boolean",
+   "restores_original_expiry": "boolean",
+   "restores_to_original_lots": "boolean",
    "scope_path": "ltree",
    "wallet_refund_bonus_percent": "numeric(18,4)",
    "wallet_refund_credit_type_id": "uuid"
@@ -15707,11 +15888,11 @@
    "id": "uuid",
    "is_both_parties_identified": "boolean",
    "is_peer_to_peer_allowed": "boolean",
+   "is_within_shared_wallet_only": "boolean",
    "maximum_per_day": "numeric(18,4)",
    "maximum_per_transfer": "numeric(18,4)",
    "scope_path": "ltree",
-   "transferable_credit_type_ids": "text[]",
-   "within_shared_wallet_only": "boolean"
+   "transferable_credit_type_ids": "text[]"
   },
   "wallet.voucher_type": {
    "benefit_kind": "text",
@@ -15720,10 +15901,10 @@
    "conditions": "jsonb",
    "id": "uuid",
    "is_combinable": "boolean",
+   "is_single_use": "boolean",
    "issue_limit": "integer",
    "name": "text",
    "scope_path": "ltree",
-   "single_use": "boolean",
    "valid_from": "date",
    "valid_to": "date"
   },
@@ -15755,29 +15936,29 @@
   "wallet.wallet_type": {
    "allow_negative_balance": "boolean",
    "allowed_credit_type_ids": "text[]",
+   "can_holder_differ_from_owner": "boolean",
    "code": "text",
-   "gift_card_support": "boolean",
-   "holder_may_differ_from_owner": "boolean",
    "id": "uuid",
    "is_active": "boolean",
    "is_auto_reload_allowed": "boolean",
    "is_shared_structure_allowed": "boolean",
    "lifecycle_states": "text[]",
    "maximum_balance": "numeric(18,4)",
-   "membership_credit_support": "boolean",
    "name": "text",
    "numbering_pattern": "text",
    "owner_kind": "text",
    "preset_name": "text",
-   "refund_capability": "boolean",
    "requires_identification": "boolean",
    "scope_path": "ltree",
-   "stored_value_capability": "boolean",
-   "top_up_capability": "boolean",
-   "transfer_capability": "boolean",
-   "usage_channels": "text[]",
-   "voucher_support": "boolean",
-   "wearable_support": "boolean"
+   "supports_gift_card": "boolean",
+   "supports_membership_credit": "boolean",
+   "supports_refund": "boolean",
+   "supports_stored_value": "boolean",
+   "supports_top_up": "boolean",
+   "supports_transfer": "boolean",
+   "supports_voucher": "boolean",
+   "supports_wearable": "boolean",
+   "usage_channels": "text[]"
   },
   "whitelabel.analytics_provider": {
    "consent_category": "text",
@@ -15808,7 +15989,7 @@
    "scope_path": "ltree",
    "status": "text",
    "store_account_id": "uuid",
-   "submit_to_store": "boolean",
+   "submits_to_store": "boolean",
    "version_name": "text"
   },
   "whitelabel.banner": {
@@ -15842,6 +16023,7 @@
    "id": "uuid",
    "is_enabled": "boolean",
    "requirement": "text",
+   "scope_path": "ltree",
    "settings": "jsonb",
    "sort_order": "integer",
    "step_key": "text"
@@ -15852,6 +16034,7 @@
    "id": "uuid",
    "is_current": "boolean",
    "note": "text",
+   "pending_build_time_changes": "jsonb",
    "published_at": "timestamptz",
    "published_by_name": "text",
    "published_by_principal_id": "uuid",
@@ -16124,7 +16307,7 @@
   "whitelabel.site_setup_progress": {
    "current_step": "text",
    "id": "uuid",
-   "minimum_path_done": "boolean",
+   "is_minimum_path_done": "boolean",
    "preset_key": "text",
    "scope_path": "ltree",
    "steps": "jsonb",
@@ -16320,8 +16503,8 @@
   },
   "workforce.leave_request": {
    "approval_request_id": "uuid",
-   "half_day": "boolean",
    "id": "uuid",
+   "is_half_day": "boolean",
    "kind": "text",
    "principal_id": "uuid",
    "reason": "text",
@@ -16415,6 +16598,7 @@
    "to_principal_id": "uuid"
   },
   "workforce.shift_template": {
+   "breaks": "jsonb",
    "code": "text",
    "cost_centre": "text",
    "ends_at": "text",

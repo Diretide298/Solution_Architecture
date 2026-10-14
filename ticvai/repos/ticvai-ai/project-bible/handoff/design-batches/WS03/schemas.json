@@ -10,6 +10,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -79,6 +80,7 @@
     "description": "How the Virtual Ticket state change reaches every bound medium"
    },
    "scopePath": {
+    "readOnly": true,
     "type": "string",
     "description": "ltree of the owning scope node"
    },
@@ -327,6 +329,7 @@
     "description": "The guest (pii.subject)"
    },
    "entitlementId": {
+    "x-ticvai-references": "access.entitlement",
     "type": "string",
     "format": "uuid"
    },
@@ -336,6 +339,7 @@
     "nullable": true
    },
    "deviceId": {
+    "x-ticvai-references": "platform.device",
     "type": "string",
     "maxLength": 200
    },
@@ -405,10 +409,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
@@ -523,7 +529,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    },
    "createdAt": {
     "type": "string",
@@ -540,7 +547,7 @@
  "BleBeaconGeofenceConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.access_point` (with `access.configuration_change`, `access.device_placement`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What BLE Beacon & Geofence Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "beaconName": {
@@ -1277,7 +1284,7 @@
  "DynamicQrSecurityProfileBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.scan_event at 7%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; applied to `access.credential_security_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Dynamic QR Security Profile Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "name": {
@@ -1389,7 +1396,7 @@
  "EmbeddedEntitlementPayloadDesignerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.credential_security_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Embedded Entitlement Payload Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "profileId": {

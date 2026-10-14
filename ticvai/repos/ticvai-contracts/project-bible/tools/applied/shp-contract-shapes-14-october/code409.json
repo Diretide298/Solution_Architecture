@@ -1,0 +1,236 @@
+{
+ "createAccessPoint": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createAccreditationProgramme": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createAdmissionRules": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createAuthorisationPolicy": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createBundle": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createCostCenter": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createCouponCampaign": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createCreditType": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createEntitlementTemplate": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createGame": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createGameEntitlement": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createInspectionTemplate": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createKpi": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createLegalEntity": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createMenu": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createMessageTemplate": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createModifierGroup": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createPaymentMethod": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createPaymentProviderConnection": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createPlan": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createPlanVersion": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createPriceList": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createQueue": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createRecommendationExperiment": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createRecommendationStrategy": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createReferral": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createRentalCategory": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createRentalPricingProfile": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createRentalProduct": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createResource": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createResourceAttribute": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createResourceCategory": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createResourcePackage": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createResourceType": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createSeatCategory": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createStockLocation": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createTaxCode": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createVoucherType": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ },
+ "createWalletType": {
+  "code": "409",
+  "lines": [
+   "$ref: '../shared/common.yaml#/components/responses/DuplicateCode'"
+  ]
+ }
+}

@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/sales-channel-command-center-adm-258",
-   "component": "apps/venue-management-web/src/routes/commercial/SalesChannelCommandCenter.tsx",
+   "component": "src/routes/commercial/SalesChannelCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -124,7 +125,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -360,6 +361,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "1",
@@ -369,7 +371,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-creation-profile-configuration-adm-259",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelCreationProfileConfiguration.tsx",
+   "component": "src/routes/commercial/ChannelCreationProfileConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -545,6 +547,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "1",
@@ -554,7 +557,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/product-catalogue-assignment-adm-260",
-   "component": "apps/venue-management-web/src/routes/commercial/ProductCatalogueAssignment.tsx",
+   "component": "src/routes/commercial/ProductCatalogueAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -761,6 +764,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "1",
@@ -770,7 +774,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-pricing-commercial-profile-assignment-adm-261",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelPricingCommercialProfileAssignment.tsx",
+   "component": "src/routes/commercial/ChannelPricingCommercialProfileAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -892,6 +896,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "1",
@@ -901,7 +906,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/inventory-capacity-channel-allocation-adm-262",
-   "component": "apps/venue-management-web/src/routes/commercial/InventoryCapacityChannelAllocation.tsx",
+   "component": "src/routes/commercial/InventoryCapacityChannelAllocation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1038,6 +1043,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "1",
@@ -1047,7 +1053,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-sales-schedule-availability-windows-adm-263",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelSalesScheduleAvailabilityWindows.tsx",
+   "component": "src/routes/commercial/ChannelSalesScheduleAvailabilityWindows.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1078,7 +1084,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1279,6 +1285,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "1",
@@ -1288,7 +1295,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/customer-eligibility-rules-by-channel-adm-264",
-   "component": "apps/venue-management-web/src/routes/commercial/CustomerEligibilityRulesByChannel.tsx",
+   "component": "src/routes/commercial/CustomerEligibilityRulesByChannel.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1468,6 +1475,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "1",
@@ -1477,7 +1485,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-sales-rules-limits-restrictions-adm-265",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelSalesRulesLimitsRestrictions.tsx",
+   "component": "src/routes/commercial/ChannelSalesRulesLimitsRestrictions.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1717,6 +1725,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "1",
@@ -1726,7 +1735,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-fees-payment-fulfillment-configuration-adm-266",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelFeesPaymentFulfillmentConfiguration.tsx",
+   "component": "src/routes/commercial/ChannelFeesPaymentFulfillmentConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1895,6 +1904,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Sales_Channel_Management_Reference.pdf",
    "board": "1",
@@ -1904,7 +1914,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-publication-readiness-ai-validation-adm-267",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelPublicationReadinessAiValidation.tsx",
+   "component": "src/routes/commercial/ChannelPublicationReadinessAiValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1956,7 +1966,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
-       "provenance": "authored — required by check-screens for publishChannelReadinessValidation"
+       "provenance": "authored — required by check-screens for publishChannelReadinessValidation",
+       "operation": "publishChannelReadinessValidation"
       }
      ]
     }

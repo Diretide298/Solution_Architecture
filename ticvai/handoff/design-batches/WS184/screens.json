@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/personalization-nbo-command-center-adm-679",
-   "component": "apps/venue-management-web/src/routes/commercial/PersonalizationNboCommandCenter.tsx",
+   "component": "src/routes/commercial/PersonalizationNboCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -127,7 +128,9 @@
       {
        "kind": "metricTile",
        "label": "Incremental Revenue",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 124 §KPI Cards"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 124 §KPI Cards",
+       "operation": "getRecommendationPerformance",
+       "bindsTo": "RecommendationPerformance.incrementalRevenue"
       },
       {
        "kind": "metricTile",
@@ -214,6 +217,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "5",
@@ -223,7 +227,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/customer-recommendation-profile-adm-680",
-   "component": "apps/venue-management-web/src/routes/commercial/CustomerRecommendationProfile.tsx",
+   "component": "src/routes/commercial/CustomerRecommendationProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -269,7 +273,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getGuestProfile",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getGuestProfile"
       },
       {
        "kind": "primaryButton",
@@ -367,6 +372,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "5",
@@ -376,7 +382,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/customer-feature-signal-configuration-adm-681",
-   "component": "apps/venue-management-web/src/routes/commercial/CustomerFeatureSignalConfiguration.tsx",
+   "component": "src/routes/commercial/CustomerFeatureSignalConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -400,6 +406,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control which approved data signals the AI may use when calculating personalized recommendations. This is critical for governance and explainability.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-684, ADM-695; this screen is Customer Feature & Signal Configuration (pack Upsell,CrossSellEngine.pdf, board 5.3, page 127): control which approved data signals the AI may use when calculating personalized recommendations. This is critical for governance and explainability.",
   "gaps": [
    {
     "operation": null,
@@ -514,6 +521,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "5",
@@ -523,7 +531,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/propensity-model-customer-intent-manager-adm-682",
-   "component": "apps/venue-management-web/src/routes/commercial/PropensityModelCustomerIntentManager.tsx",
+   "component": "src/routes/commercial/PropensityModelCustomerIntentManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -607,7 +615,8 @@
         "Data freshness"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Membershi”, “Family”, “Meal”, “Propensity Bands”, “Important”.",
-       "provenance": "pack Upsell,CrossSellEngine.pdf, page 129 §Show"
+       "provenance": "pack Upsell,CrossSellEngine.pdf, page 129 §Show",
+       "operation": "getRecommendationPerformance"
       }
      ]
     }
@@ -674,6 +683,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "5",
@@ -683,7 +693,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/next-best-offer-decision-studio-adm-683",
-   "component": "apps/venue-management-web/src/routes/commercial/NextBestOfferDecisionStudio.tsx",
+   "component": "src/routes/commercial/NextBestOfferDecisionStudio.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -825,6 +835,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "5",
@@ -834,7 +845,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/personalized-ranking-decision-policy-builder-adm-684",
-   "component": "apps/venue-management-web/src/routes/commercial/PersonalizedRankingDecisionPolicyBuilder.tsx",
+   "component": "src/routes/commercial/PersonalizedRankingDecisionPolicyBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -857,6 +868,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure how TICVAI converts AI scores and commercial factors into the final recommendation ranking.",
+  "division": "Shares `listRecommendationStrategies`, `updateRecommendationStrategy` with ADM-641, ADM-643, ADM-644, ADM-646, ADM-647, ADM-651, ADM-655, ADM-665, ADM-666, ADM-670, ADM-671, ADM-672, ADM-673, ADM-674, ADM-675, ADM-681, ADM-695; this screen is Personalized Ranking & Decision Policy Builder (pack Upsell,CrossSellEngine.pdf, board 5.6, page 132): configure how TICVAI converts AI scores and commercial factors into the final recommendation ranking.",
   "gaps": [
    {
     "operation": null,
@@ -1015,6 +1027,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "5",
@@ -1024,7 +1037,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/customer-preference-fatigue-suppression-intelligence-adm-685",
-   "component": "apps/venue-management-web/src/routes/commercial/CustomerPreferenceFatigueSuppressionIntelligence.tsx",
+   "component": "src/routes/commercial/CustomerPreferenceFatigueSuppressionIntelligence.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1173,6 +1186,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "5",
@@ -1182,7 +1196,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/anonymous-known-identity-transition-personalization-123-adm-686",
-   "component": "apps/venue-management-web/src/routes/commercial/AnonymousKnownIdentityTransitionPersonalization1.tsx",
+   "component": "src/routes/commercial/AnonymousKnownIdentityTransitionPersonalization1.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1302,6 +1316,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "5",
@@ -1311,7 +1326,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ai-explainability-confidence-model-governance-adm-687",
-   "component": "apps/venue-management-web/src/routes/commercial/AiExplainabilityConfidenceModelGovernance.tsx",
+   "component": "src/routes/commercial/AiExplainabilityConfidenceModelGovernance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1472,6 +1487,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Upsell,CrossSellEngine.pdf",
    "board": "5",
@@ -1481,7 +1497,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/personalization-simulator-next-best-offer-lab-adm-688",
-   "component": "apps/venue-management-web/src/routes/commercial/PersonalizationSimulatorNextBestOfferLab.tsx",
+   "component": "src/routes/commercial/PersonalizationSimulatorNextBestOfferLab.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1505,6 +1521,7 @@
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Select) and no display directory — it is settings, not a population",
   "purpose": "Allow administrators to simulate how TICVAI would personalize recommendations for different customers before deploying changes.",
+  "division": "Shares `listRecommendationStrategies`, `simulateRecommendationStrategy` with ADM-648, ADM-658, ADM-668, ADM-698; this screen is Personalization Simulator & Next-Best-Offer Lab (pack Upsell,CrossSellEngine.pdf, board 5.10, page 139): allow administrators to simulate how TICVAI would personalize recommendations for different customers before deploying changes.",
   "layout": {
    "template": "form",
    "regions": [

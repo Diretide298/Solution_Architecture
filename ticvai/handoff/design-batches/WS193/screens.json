@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-security-risk-command-center-bo-1153",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletSecurityRiskCommandCenter.tsx",
+   "component": "src/routes/orders-money/WalletSecurityRiskCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -108,7 +109,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -259,6 +260,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "8",
@@ -268,7 +270,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-risk-policy-configuration-bo-1154",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletRiskPolicyConfiguration.tsx",
+   "component": "src/routes/orders-money/WalletRiskPolicyConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -416,6 +418,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "8",
@@ -425,7 +428,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/transaction-risk-scoring-engine-bo-1155",
-   "component": "apps/venue-management-web/src/routes/orders-money/TransactionRiskScoringEngine.tsx",
+   "component": "src/routes/orders-money/TransactionRiskScoringEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -541,6 +544,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "8",
@@ -550,7 +554,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/velocity-behavioral-rule-configuration-bo-1156",
-   "component": "apps/venue-management-web/src/routes/orders-money/VelocityBehavioralRuleConfiguration.tsx",
+   "component": "src/routes/orders-money/VelocityBehavioralRuleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -734,6 +738,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "8",
@@ -743,7 +748,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/device-credential-account-security-bo-1157",
-   "component": "apps/venue-management-web/src/routes/orders-money/DeviceCredentialAccountSecurity.tsx",
+   "component": "src/routes/orders-money/DeviceCredentialAccountSecurity.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -814,7 +819,7 @@
         "Block Wallet"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listWalletDisputes",
        "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 93 §Track"
       }
      ]
@@ -960,6 +965,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "8",
@@ -969,7 +975,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/ai-fraud-anomaly-detection-studio-bo-1158",
-   "component": "apps/venue-management-web/src/routes/orders-money/AiFraudAnomalyDetectionStudio.tsx",
+   "component": "src/routes/orders-money/AiFraudAnomalyDetectionStudio.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1134,6 +1140,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "8",
@@ -1143,7 +1150,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/automated-security-action-orchestration-bo-1159",
-   "component": "apps/venue-management-web/src/routes/orders-money/AutomatedSecurityActionOrchestration.tsx",
+   "component": "src/routes/orders-money/AutomatedSecurityActionOrchestration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1306,6 +1313,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "8",
@@ -1315,7 +1323,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/fraud-alert-investigation-case-management-bo-1160",
-   "component": "apps/venue-management-web/src/routes/orders-money/FraudAlertInvestigationCaseManagement.tsx",
+   "component": "src/routes/orders-money/FraudAlertInvestigationCaseManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1465,7 +1473,8 @@
         "Confirm Fraud"
        ],
        "notes": null,
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 96 §Display"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 96 §Display",
+       "operation": "getRiskCase"
       }
      ]
     }
@@ -1590,7 +1599,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/security-rules-testing-simulation-ai-sandbox-bo-1161",
-   "component": "apps/venue-management-web/src/routes/orders-money/SecurityRulesTestingSimulationAiSandbox.tsx",
+   "component": "src/routes/orders-money/SecurityRulesTestingSimulationAiSandbox.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1744,6 +1753,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "8",
@@ -1753,7 +1763,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/security-governance-audit-rule-publication-bo-1162",
-   "component": "apps/venue-management-web/src/routes/orders-money/SecurityGovernanceAuditRulePublication.tsx",
+   "component": "src/routes/orders-money/SecurityGovernanceAuditRulePublication.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1816,7 +1826,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "publishWalletConfiguration"
       },
       {
        "kind": "dataTable",
@@ -1897,7 +1908,10 @@
     "component": "confirmDialog",
     "trigger": "Rollback",
     "body": "**Rollback on a security governance audit is not reversible from this screen.** Names what it affects and what it leaves alone. The pack requires the decision to reach the audit trail, so the dialog states that it is recorded.",
-    "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Support"
+    "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 98 §Support",
+    "confirm": {
+     "operation": "restoreWalletConfigurationVersion"
+    }
    }
   ],
   "states": {

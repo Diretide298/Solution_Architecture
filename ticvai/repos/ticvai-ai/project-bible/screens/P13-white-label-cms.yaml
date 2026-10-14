@@ -67,6 +67,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -372,6 +373,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -525,6 +527,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -659,6 +662,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -871,6 +875,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -1023,6 +1028,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -1242,6 +1248,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -1477,6 +1484,12 @@ screens:
       4 October 2026'
     trigger: onAction
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: listProposedActions
+    contract: ai
+    purpose: 'Follows decideProposedAction (202) until what it started settles: What the assistant has
+      proposed and nobody has decided'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     provenance: generated
@@ -1611,6 +1624,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -1801,6 +1815,12 @@ screens:
     purpose: Record which AI draft or proposal was used, or why it was refused
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listProposedActions
+    contract: ai
+    purpose: 'Follows the drafts proposeMarketingContent queued and the decisions decideProposedAction
+      routed: each is an ai.proposed_action, polled while the screen is open until it is applied or refused'
+    trigger: onInterval
+    provenance: audit fix S-ASYNC-POLL, 14 October 2026 (CHG-SCO-011)
   entryState:
     preloaded:
     - PromoBlock.id
@@ -1942,6 +1962,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -2214,6 +2235,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: ASSET_LIBRARY_VIEW
   capability: C00
   implementation:
     app: venue-management-web
@@ -2658,6 +2680,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: MARKETING_VIEW
   capability: C00
   implementation:
     app: venue-management-web
@@ -2809,6 +2832,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -2944,6 +2968,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -3031,6 +3056,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -3121,6 +3147,7 @@ screens:
         notes: What is published and what is waiting in the draft. Maintenance is live state, never published
           or restored, so it is shown only as context, apart from what Publish changes.
       - kind: publishGate
+        operation: listBookingFlows
         impliedBy: publishTenantConfig
         notes: 'Declares `publishTenantConfig`. **The gate names what the publish will affect before it
           happens** — a disabled Publish with no reason is the state operators escalate. **Booking flows
@@ -3298,6 +3325,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -3472,6 +3500,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -3701,11 +3730,18 @@ screens:
     dismiss:
       label: Cancel
     provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
+  entryState:
+    params:
+    - name: analyticsProviderId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listAnalyticsProviders`.'
 - id: CMS-017
   name: Domain & Certificate
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -3928,6 +3964,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -4269,6 +4306,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: USER_MANAGE
   capability: C00
   implementation:
     app: venue-management-web
@@ -4435,6 +4473,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -4529,7 +4568,7 @@ screens:
   layout:
     template: form
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -4650,6 +4689,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -4738,6 +4778,11 @@ screens:
     - DataProcessingPurposeLawfulBasisRegistryView.description
     - DataProcessingPurposeLawfulBasisRegistryView.businessOwner
     - DataProcessingPurposeLawfulBasisRegistryView.dataControllerApplicableOrganization
+    params:
+    - name: purposeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listDataProcessingPurpose`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -4764,6 +4809,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -4802,54 +4848,71 @@ screens:
       components:
       - kind: selectField
         label: Consent ID
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Name
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Processing Purpose
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Description
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Consent Text
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Mandatory / Optional
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: textField
         label: Explicit / Other configured consent method
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Default state
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Withdrawal permitted
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Renewal required
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Expiry
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Reconfirmation interval
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Age restrictions
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Guardian requirement
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Channel applicability
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Country applicability
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
       - kind: selectField
         label: Brand applicability
+        operation: listConsentPurposes
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 7 §Configure
     - name: actionBar
       slot: publish
@@ -4869,6 +4932,11 @@ screens:
     contract: marketing-crm
     purpose: Configure consent purposes
     trigger: onAction
+  - operationId: listConsentPurposes
+    contract: marketing-crm
+    purpose: The consent purposes as configured, which fill the builder before a change is saved
+    trigger: onLoad
+    provenance: audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)
   wireframe:
     status: notStarted
     provenance: generated
@@ -4886,6 +4954,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5021,6 +5090,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 1
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5202,6 +5272,14 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCookieScans`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: scanPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listCookieScanPolicies`.'
+    - name: technologyId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listCookieTrackingDigital`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -5253,6 +5331,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 1
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5437,11 +5516,18 @@ screens:
     provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
   notes: '**Channel and brand, the upsert key, are fields on the form and choosing a row of the list loads
     that design (4 October 2026); the remaining selects are bound to the design''s properties** (CHG-FXS-002)'
+  entryState:
+    params:
+    - name: bannerDesignId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listCookieBannerPreference`.'
 - id: CMS-027
   name: Consent Capture Point & Customer Journey Configuration
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5622,6 +5708,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5711,6 +5798,11 @@ screens:
   entryState:
     preloaded:
     - PrivacyNoticePolicyTermsVersionManagementView.documentType
+    params:
+    - name: governanceId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPrivacyNoticePolicy`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -5751,6 +5843,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5849,6 +5942,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5893,103 +5987,133 @@ screens:
       components:
       - kind: selectField
         label: Country
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Brand
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Channel
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Customer age
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Customer status
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Product
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Membership
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Existing consents
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Existing policy acceptance
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Language
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Requested processing
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Missing policy
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing consent mapping
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing language
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Conflicting consent rules
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing processing purpose
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Invalid effective dates
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Unmapped tracking technology
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing guardian rule
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Unpublished dependency
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Circular configuration dependency
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: 1 Center
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: selectField
         label: 2 Registry processed
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: textField
         label: '# Backend Screen Core Responsibility'
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: selectField
         label: '3'
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: textField
         label: 17.1. Communication Preference & Marketing Marketing/channel
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: textField
         label: 4 Permission Configuration permissions
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: selectField
         label: 17.1. Cookie/SDK/tracker
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: textField
         label: Cookie, Tracking & Digital Technology Registry
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: selectField
         label: 5 inventory
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
     - name: actionBar
       slot: publish
@@ -6072,11 +6196,19 @@ screens:
       - approvedByPrincipalId
       - approvedAt
     provenance: contract marketing-crm.yaml PUT /privacy-notice-policy
+  entryState:
+    params:
+    - name: governanceId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setPrivacyNoticePolicyGovernance` takes it, from the record the user acts
+        on.'
 - id: CMS-031
   name: Privacy Operations Command Center
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6157,7 +6289,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -6272,6 +6404,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6362,6 +6495,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6411,6 +6545,7 @@ screens:
       - kind: detailPanel
         label: The selected consent evidence history
         bindsTo: ConsentEvidenceHistoryWithdrawalManagementView
+        operation: listConsentEvidenceWithdrawal
         columns:
         - ConsentEvidenceHistoryWithdrawalManagementView.propagation[].target
         - ConsentEvidenceHistoryWithdrawalManagementView.propagation[].status
@@ -6453,6 +6588,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6578,6 +6714,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6670,6 +6807,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6789,6 +6927,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6956,6 +7095,11 @@ screens:
     - DataRetentionExpiryLegalHoldOperationsView.underLegalHold
     - DataRetentionExpiryLegalHoldOperationsView.processingFailures
     - DataRetentionExpiryLegalHoldOperationsView.retentionExceptions
+    params:
+    - name: holdId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listDataRetentionExpiry`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -6970,6 +7114,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -7092,6 +7237,11 @@ screens:
     - PrivacyComplianceExceptionInvestigationWorkspaceView.severity
     - PrivacyComplianceExceptionInvestigationWorkspaceView.system
     - PrivacyComplianceExceptionInvestigationWorkspaceView.country
+    params:
+    - name: exceptionId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPrivacyComplianceExceptions`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -7106,6 +7256,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: AUDIT_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -7228,6 +7379,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -7259,7 +7411,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -7310,6 +7462,7 @@ screens:
       - kind: detailPanel
         label: The selected privacy analytics compliance
         bindsTo: PrivacyAnalyticsAiComplianceIntelligenceView
+        operation: listPrivacyCompliance
         columns:
         - PrivacyAnalyticsAiComplianceIntelligenceView.consentRate
         - PrivacyAnalyticsAiComplianceIntelligenceView.withdrawalRate
@@ -7376,6 +7529,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -7466,7 +7620,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -7487,7 +7641,7 @@ screens:
         notes: The pack filters this screen by type, brand, venue, product, event, language and 3 more
           — which are present is a decision the pack already made.
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 6 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -7659,6 +7813,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -7803,6 +7958,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -7940,6 +8096,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8088,6 +8245,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8132,41 +8290,53 @@ screens:
       components:
       - kind: selectField
         label: Signature Required
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Initials Required
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Typed Acceptance
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Checkbox Acceptance
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Digital Signature
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Date/Time
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Signatory Name
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: selectField
         label: Relationship
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: textField
         label: Identity Verification where required
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §Configure
       - kind: textField
         label: Each participant signs individually
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §For group bookings,
           configure whether
       - kind: textField
         label: Guardian signs for each minor
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §For group bookings,
           configure whether
       - kind: textField
         label: Group leader signs where legally/operationally permitted
+        operation: getSignatorySignatureGuardian
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 13 §For group bookings,
           configure whether
     - name: actionBar
@@ -8197,6 +8367,11 @@ screens:
     contract: marketing-crm
     purpose: Signatory, Signature & Guardian Rule Configuration
     trigger: onAction
+  - operationId: getSignatorySignatureGuardian
+    contract: marketing-crm
+    purpose: The signatory and guardian rules as configured, which fill the form before a change is saved
+    trigger: onLoad
+    provenance: audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)
   wireframe:
     status: notStarted
     provenance: generated
@@ -8211,6 +8386,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8334,6 +8510,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8455,6 +8632,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8555,6 +8733,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8677,6 +8856,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8721,17 +8901,21 @@ screens:
       components:
       - kind: selectField
         label: Required fields configured
+        operation: approveWaiverTesting
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Fields
       - kind: selectField
         label: 11.1.1
+        operation: approveWaiverTesting
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Configuration
           experience
       - kind: selectField
         label: '0'
+        operation: approveWaiverTesting
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Configuration
           experience
       - kind: textField
         label: → Approve & Publish
+        operation: approveWaiverTesting
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Board 1 Configuration
           Flow
     - name: actionBar
@@ -8775,6 +8959,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -8856,7 +9041,7 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -8874,7 +9059,7 @@ screens:
         notes: The pack filters this screen by brand, venue, event, product, waiver, date and 3 more —
           which are present is a decision the pack already made.
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 26 §Filter by
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
@@ -8996,6 +9181,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9027,7 +9213,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -9124,6 +9310,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9253,6 +9440,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9369,6 +9557,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9479,6 +9668,11 @@ screens:
     - WaiverVerificationValidationWorkspaceView.version
     - WaiverVerificationValidationWorkspaceView.booking
     - WaiverVerificationValidationWorkspaceView.signatory
+    params:
+    - name: verificationId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listWaiverVerificationQueue`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -9493,6 +9687,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9600,6 +9795,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9695,6 +9891,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9783,6 +9980,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9815,7 +10013,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -9917,6 +10115,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9971,6 +10170,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listWaiverComplianceRisk
         derived: true
         impliedBy: listWaiverComplianceRisk
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -10010,6 +10210,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10179,6 +10380,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10219,7 +10421,7 @@ screens:
   layout:
     template: split
     regions:
-    - name: contentBody
+    - name: filters
       slot: filters
       components:
       - kind: searchField
@@ -10227,6 +10429,7 @@ screens:
         provenance: pack Digital Asset Management DAM.pdf, page 5 §Allow filtering by
       - kind: multiSelect
         label: Filter by
+        operation: semanticSearch
         columns:
         - Tenant
         - Venue
@@ -10248,6 +10451,7 @@ screens:
           media are not library assets.'
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         bindsTo: MediaAsset.sizeBytes
+        operation: semanticSearch
     - name: contentBody
       slot: collection
       components:
@@ -10264,7 +10468,7 @@ screens:
         - owner
         - updated date
         bindsTo: null
-        operation: null
+        operation: searchMedia
         provenance: pack Digital Asset Management DAM.pdf, page 5 §Each card should show
     - name: contextPanel
       slot: selection
@@ -10272,6 +10476,7 @@ screens:
       - kind: detailPanel
         label: The selected central digital asset
         bindsTo: null
+        operation: searchMedia
         columns:
         - Thumbnail
         - asset name
@@ -10318,11 +10523,6 @@ screens:
     purpose: Browse and filter the library
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: listCollections
-    contract: assets
-    purpose: Collections to file into
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: semanticSearch
     contract: ai
     purpose: Natural-language search of the media library (kind media)
@@ -10349,6 +10549,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10403,6 +10604,7 @@ screens:
         provenance: pack Digital Asset Management DAM.pdf, page 6 §Support
       - kind: secondaryButton
         label: Bulk Upload
+        operation: completeUpload
         provenance: pack Digital Asset Management DAM.pdf, page 6 §Support
       - kind: secondaryButton
         label: Import from Approved Source
@@ -10465,6 +10667,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10575,6 +10778,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10680,6 +10884,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10716,21 +10921,25 @@ screens:
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Dubai Park
         bindsTo: MediaAsset.venueId
+        operation: setMediaAssetTags
       - kind: selectField
         label: Category
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Marketing
         bindsTo: MediaAsset.categoryId
+        operation: setMediaAssetTags
       - kind: selectField
         label: Campaign
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Summer 2026
         bindsTo: MediaAsset.tags
+        operation: setMediaAssetTags
       - kind: selectField
         label: Tags
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Family, Outdoor
         bindsTo: MediaAsset.tags
+        operation: setMediaAssetTags
   states:
     loading: The tags keywords classification configuration as saved.
     error: Could not load. Names which read failed and leaves the tags keywords classification untouched.
@@ -10775,6 +10984,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10870,6 +11080,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10928,7 +11139,7 @@ screens:
         - Tags
         - Keywords
         bindsTo: null
-        operation: null
+        operation: listMediaAssetVersions
         provenance: pack Digital Asset Management DAM.pdf, page 13 §Show
     - name: contextPanel
       slot: selection
@@ -10936,6 +11147,7 @@ screens:
       - kind: detailPanel
         label: The selected digital asset 360°
         bindsTo: null
+        operation: getMediaAsset
         columns:
         - Asset ID
         - title
@@ -11015,6 +11227,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -11106,6 +11319,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -11161,7 +11375,7 @@ screens:
         - Used Storage
         - Monthly Growth
         bindsTo: null
-        operation: null
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 16 §Display
     - name: contextPanel
       slot: selection
@@ -11169,6 +11383,7 @@ screens:
       - kind: detailPanel
         label: The selected asset activity recent
         bindsTo: null
+        operation: getMediaUsageAnalytics
         columns:
         - Assets Added
         - Assets Updated
@@ -11244,6 +11459,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -11461,6 +11677,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -11542,13 +11759,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: analyseMediaAsset
-    contract: assets
-    purpose: Auto-tag and describe
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getMediaAsset
   - operationId: setMediaAssetTags
     contract: assets
     purpose: Promote the proposals
@@ -11556,6 +11766,13 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates:
     - searchMedia
+    - getMediaAsset
+  - operationId: analyseMediaAsset
+    contract: assets
+    purpose: Auto-tag and describe
+    trigger: onAction
+    provenance: board reading, 19 September 2026
+    invalidates:
     - getMediaAsset
   wireframe:
     status: notStarted
@@ -11578,6 +11795,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -11627,7 +11845,7 @@ screens:
         - format
         - dimensions
         bindsTo: null
-        operation: null
+        operation: searchMedia
         provenance: pack Digital Asset Management DAM.pdf, page 28 §Each result should show
     - name: contextPanel
       slot: selection
@@ -11635,6 +11853,7 @@ screens:
       - kind: detailPanel
         label: The selected semantic natural-language asset
         bindsTo: null
+        operation: searchMedia
         columns:
         - Thumbnail
         - asset
@@ -11682,6 +11901,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -11792,6 +12012,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -11954,6 +12175,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -11998,6 +12220,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listMediaAssetVersions
         derived: true
         impliedBy: listMediaAssetVersions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -12061,6 +12284,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -12104,6 +12328,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listMediaAssetVersions
         derived: true
         impliedBy: listMediaAssetVersions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -12144,6 +12369,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -12180,11 +12406,13 @@ screens:
         label: Rendition Presets
         provenance: pack Digital Asset Management DAM.pdf, page 33 §Administrators should configure
       - kind: dataTable
+        operation: listMediaRenditions
         derived: true
         impliedBy: listMediaRenditions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
+        operation: requestMediaRendition
         derived: true
         impliedBy: requestMediaRendition
         notes: The act the screen exists for.
@@ -12236,6 +12464,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -12342,6 +12571,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -12399,7 +12629,7 @@ screens:
         - AI requests
         - estimated/actual AI consumption cost
         bindsTo: null
-        operation: null
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 35 §Track
     - name: contextPanel
       slot: selection
@@ -12407,6 +12637,7 @@ screens:
       - kind: detailPanel
         label: The selected quality intelligence review
         bindsTo: null
+        operation: getMediaUsageAnalytics
         columns:
         - Assets processed
         - images analyzed
@@ -12491,6 +12722,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -12592,7 +12824,7 @@ screens:
         - Blocked
         - Critical Alerts
         bindsTo: null
-        operation: null
+        operation: getExpiringRights
         provenance: pack Digital Asset Management DAM.pdf, page 43 §Display
     - name: contextPanel
       slot: selection
@@ -12600,6 +12832,7 @@ screens:
       - kind: detailPanel
         label: The selected dam governance rights
         bindsTo: null
+        operation: getExpiringRights
         columns:
         - Active Assets
         - Pending Approval
@@ -12644,11 +12877,6 @@ screens:
     purpose: Rights about to lapse
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: getMediaUsageAnalytics
-    contract: assets
-    purpose: Governance coverage
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Active Assets
@@ -12670,6 +12898,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -12725,6 +12954,7 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+        operation: getMediaAsset
         derived: true
         impliedBy: getMediaAsset
         notes: One record, read-only.
@@ -12743,11 +12973,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: updateMediaAsset
-    contract: assets
-    purpose: Set owner and responsibility
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getMediaAsset
     contract: assets
     purpose: The asset being assigned
@@ -12774,6 +12999,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -12865,6 +13091,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_APPROVE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -12971,6 +13198,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_APPROVE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13067,6 +13295,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: PERMISSION_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13199,6 +13428,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_SHARE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13310,6 +13540,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13360,7 +13591,7 @@ screens:
         - Expires in 60 Days
         - Expired
         bindsTo: null
-        operation: null
+        operation: getExpiringRights
         provenance: pack Digital Asset Management DAM.pdf, page 52 §Show
     - name: contextPanel
       slot: selection
@@ -13368,6 +13599,7 @@ screens:
       - kind: detailPanel
         label: The selected rights expiry renewal
         bindsTo: null
+        operation: getExpiringRights
         columns:
         - Expires in 7 Days
         - Expires in 30 Days
@@ -13412,14 +13644,6 @@ screens:
     purpose: What lapses, and what it would break
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: setMediaAssetRights
-    contract: assets
-    purpose: Renew
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getMediaAsset
-    - getExpiringRights
   entryState:
     preloaded:
     - Expires in 7 Days
@@ -13444,6 +13668,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13522,6 +13747,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13573,7 +13799,7 @@ screens:
         - Approval SLA Breaches
         - Risk Queue
         bindsTo: null
-        operation: null
+        operation: getExpiringRights
         provenance: pack Digital Asset Management DAM.pdf, page 54 §Display
     - name: contextPanel
       slot: selection
@@ -13581,6 +13807,7 @@ screens:
       - kind: detailPanel
         label: The selected governance risk compliance
         bindsTo: null
+        operation: getExpiringRights
         columns:
         - Assets Without Rights
         - Expired Assets
@@ -13639,6 +13866,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -13748,7 +13976,7 @@ screens:
         - ⚪ Inactive
         - Critical Alerts
         bindsTo: null
-        operation: null
+        operation: getMediaDistribution
         provenance: pack Digital Asset Management DAM.pdf, page 62 §Display
     - name: contextPanel
       slot: selection
@@ -13756,6 +13984,7 @@ screens:
       - kind: detailPanel
         label: The selected asset distribution delivery
         bindsTo: null
+        operation: getMediaDistribution
         columns:
         - Assets in Active Use
         - Active Asset References
@@ -13841,6 +14070,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -13890,7 +14120,7 @@ screens:
         - Marketing Campaign — 3
         - Digital Signage — 1
         bindsTo: null
-        operation: null
+        operation: getMediaDistribution
         provenance: pack Digital Asset Management DAM.pdf, page 64 §Show
     - name: contextPanel
       slot: selection
@@ -13898,6 +14128,7 @@ screens:
       - kind: detailPanel
         label: The selected asset usage distribution
         bindsTo: null
+        operation: getMediaDistribution
         columns:
         - TICVAI DAM Asset
         - ↓
@@ -13946,6 +14177,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -13979,42 +14211,55 @@ screens:
       components:
       - kind: selectField
         label: Channel name
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: channel type
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: tenant
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: venue scope
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: allowed asset types
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: allowed categories
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: required approval
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: required rights
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: preferred rendition
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: fallback rendition
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: delivery method
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: caching policy
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: authentication requirement
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
   states:
     loading: The channel distribution configuration as saved.
@@ -14041,11 +14286,18 @@ screens:
     bound to a contract property; 13 of 19 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: code
+      from: deepLink
+      optional: true
+      notes: 'Optional: only `setMediaDistributionChannels` takes it, from the record the user acts on.'
 - id: CMS-094
   name: Secure Delivery URL, CDN & Rendition Delivery
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14124,13 +14376,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setMediaDistributionChannels
-    contract: assets
-    purpose: Signed URLs and rendition delivery
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getMediaDistribution
   - operationId: listMediaRenditions
     contract: assets
     purpose: What can be delivered
@@ -14153,6 +14398,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14230,14 +14476,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: replaceMediaAsset
-    contract: assets
-    purpose: Replace and propagate
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - listMediaAssetVersions
-    - getMediaDistribution
   - operationId: getMediaDistribution
     contract: assets
     purpose: Everywhere it would propagate to
@@ -14264,6 +14502,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14309,6 +14548,7 @@ screens:
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: Picked from the library (e.g. DAM-IMG-009211, "Default Dubai Park Hero").
         bindsTo: MediaAsset.id
+        operation: setMediaDistributionChannels
     - name: actionBar
       slot: publish
       components:
@@ -14361,11 +14601,18 @@ screens:
     bound to a contract property; 14 of 25 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: code
+      from: deepLink
+      optional: true
+      notes: 'Optional: only `setMediaDistributionChannels` takes it, from the record the user acts on.'
 - id: CMS-097
   name: DAM API & Integration Hub
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14451,6 +14698,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14492,18 +14740,23 @@ screens:
       components:
       - kind: metricTile
         label: Delivery Availability
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 70 §Display
       - kind: metricTile
         label: Average Response Time
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 70 §Display
       - kind: metricTile
         label: CDN Cache Hit %
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 70 §Display
       - kind: metricTile
         label: API Success %
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 70 §Display
       - kind: metricTile
         label: Failed Requests
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 70 §Display
     - name: actionBar
       slot: rowActions
@@ -14560,6 +14813,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14594,23 +14848,28 @@ screens:
   layout:
     template: dashboard
     regions:
-    - name: contentBody
+    - name: headline
       slot: headline
       components:
       - kind: metricTile
         label: impressions
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics
       - kind: metricTile
         label: requests
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics
       - kind: metricTile
         label: downloads
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics
       - kind: metricTile
         label: delivery volume
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics
       - kind: metricTile
         label: reuse count
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 71 §Performance Metrics
     - name: contentBody
       slot: moduleTiles
@@ -14673,6 +14932,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14736,6 +14996,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   implementation:
     app: venue-management-web
     route: /white-label/help-me-choose
@@ -15036,6 +15297,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -15337,6 +15599,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -15481,6 +15744,7 @@ screens:
         provenance: contract marketing-crm.yaml GET /consent-questions
       - kind: livePreview
         label: Preview
+        operation: getPublishedBookingFlow
         notes: '**The flow as a guest meets it, step by step, on web and on mobile**, redrawn on every
           change and drawn from the record in hand. Calls nothing and publishes nothing; guests keep the
           published flow (`getPublishedBookingFlow`, shown beside it for comparison) until the site is
@@ -15700,6 +15964,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web

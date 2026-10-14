@@ -11,9 +11,12 @@ ticket. Both are read off handoff/service-docs/plan-tasks.csv by the same few ru
   scope(task, sid, ...)     the operations a frontend task of screen `sid` is answerable for: the screen's, or its
                             setup slice ("In the slice: ..."), or the rest of the screen after the sibling's slice
 
-**The ticket #27741 itself is not baselined.** Batch GAP fixes it (and the composition rule in
-build-service-docs.py) in parallel; its findings are `strict` in the guards that use this (audit_guard.Guard.add),
-so they fail until the fix lands and can never be written into the baseline.
+**The ticket #27741 itself is not baselined.** Its findings are `strict` in the guards that use this
+(audit_guard.Guard.add), so they can never be written into the baseline.
+
+**14 October 2026, CHG-TKT-001.** The composition rule in build-service-docs.py now writes a feature's own "Builds:"
+as its screens and the operations they call; `Feature.ops` is that list, `Feature.built` what the tasks under it
+build (a feature from an older plan, without the list, falls back to `built`).
 
 Imported, no main.
 """
@@ -28,9 +31,10 @@ import ticket_done as td
 
 # The feature tickets whose findings may not be baselined: the case that raised the class, fixed by its own batch.
 UNBASELINED = {
-    "AM-IDENTITY-SECURITY-P02": "#27741, the case that raised the class; batch GAP fixes it on 14 October 2026",
+    "AM-IDENTITY-SECURITY-P02": "#27741, the case that raised the class; fixed by CHG-TKT-001 on 14 October 2026",
 }
 SLICE = re.compile(r"In the slice:\s*([A-Za-z0-9, ]+?)(?:\)|\.|;|$)")
+WIRED = re.compile(r"the other (?:one|\d+) \(([A-Za-z0-9, ]+)\) (?:is|are) wired by [A-Z][A-Z0-9-]+")
 
 
 @dataclass
@@ -39,7 +43,9 @@ class Feature:
     block: str
     subject: str
     screens: set = field(default_factory=set)          # screen ids its tasks build
-    ops: dict = field(default_factory=dict)            # operationId -> the task key that builds it
+    ops: dict = field(default_factory=dict)            # operationId -> the task that builds it: what the feature
+    #                                                    lists ("Builds:"), else what its tasks build (CHG-TKT-001)
+    built: dict = field(default_factory=dict)          # operationId -> the task key under it that builds it
     frontend: list = field(default_factory=list)       # [(task row, screen id)] its frontend tasks
     platforms: set = field(default_factory=set)        # P01, P02 ... of its screens
 
@@ -66,6 +72,15 @@ def scope(task: dict, sid: str, screens: dict, by_key: dict) -> set:
     """The operations a frontend task of `sid` builds against: a setup task its slice, a rest-of-the-screen task the
     screen's other operations, any other task every operation the screen binds."""
     ops = screen_ops(screens[sid])
+    # **An operation the ticket says another ticket wires is not its scope** (14 October 2026, CHG-TKT-003). A
+    # decided app-module's wiring task wires its operations into screens other tickets build "without changing the
+    # A1 ticket's scope, points or waits" (CHG-R4-003: the kiosk customisation; APP-KIOSK-CONFIG wires
+    # getPublishedKioskConfig into KSK-001, -002, -008, -010, -013 and -014), and the screen's ticket says so: "Scope:
+    # listProducts, 1 of KSK-001's 2 operations; the other one (getPublishedKioskConfig) is wired by APP-KIOSK-CONFIG"
+    # (build-service-docs.py, ticket_done.scope_sentence). Read as its scope, those six were S-SCREEN-OP-UNBUILT.
+    wired = WIRED.search((task or {}).get("description") or "")
+    if wired:
+        ops = ops - {x.strip() for x in wired.group(1).split(",") if x.strip()}
     sl = slice_of(task)
     if sl is not None:
         return ops & sl
@@ -109,7 +124,16 @@ def features(rows, screens: dict, platform_of: dict) -> dict:
                     if c.get("track") == "Frontend":
                         feat.frontend.append((c, name))
                 elif kind == "operation":
-                    feat.ops.setdefault(name.split("#")[-1], c["key"])
+                    feat.built.setdefault(name.split("#")[-1], c["key"])
+        # **What a feature lists is its own "Builds:"** (14 October 2026, CHG-TKT-001): since the generator writes the
+        # operations its screens call there (build-service-docs.py), its back-end tasks' operations in a sentence of
+        # their own. A feature without such a list (a plan from before) lists what its tasks build, as it did.
+        listed = [b.split(" ", 1)[1].split("#")[-1] for b in td.listed_builds(f.get("description"))
+                  if b.startswith("operation ")]
+        if td.listed_builds(f.get("description")):
+            feat.ops = {o: feat.built.get(o) or f["key"] for o in listed}
+        else:
+            feat.ops = dict(feat.built)
         if feat.screens:
             out[f["key"]] = feat
     return out

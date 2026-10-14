@@ -242,14 +242,14 @@ tables:
   - cross-region
   foreignWriters: null
 - table: sync.dsar_request
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
   - cross-region
   foreignWriters: null
 - table: sync.guest_link
-  columns: 5
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -271,7 +271,7 @@ tables:
   - orders
   - subscription
 - table: sync.wallet_authorisation
-  columns: 25
+  columns: 26
   store: postgres
   parent: null
   writtenBy:

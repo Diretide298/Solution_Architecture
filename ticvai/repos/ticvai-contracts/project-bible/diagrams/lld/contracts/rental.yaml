@@ -292,6 +292,7 @@ operations:
   - staff
   offline: false
   reads:
+  - rental.location_rule
   - rental.product
   writes: []
 - operation: publishRentalProduct
@@ -483,6 +484,7 @@ operations:
   offline: false
   reads:
   - rental.agreement_signature
+  - rental.booking
   writes:
   - rental.agreement_signature
 - operation: simulateRentalPricing

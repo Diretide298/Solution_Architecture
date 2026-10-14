@@ -69,35 +69,6 @@
   "requestBody": null,
   "responds": "MediaAssetDetail"
  },
- "getMediaUsageAnalytics": {
-  "method": "GET",
-  "path": "/media-usage",
-  "contract": "assets",
-  "summary": "Downloads, views, shares and library health",
-  "permission": "ASSET_LIBRARY_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "from",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "to",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "groupBy",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MediaUsageRow"
- },
  "listAuthorisationPolicies": {
   "method": "GET",
   "path": "/authorisation-policies",
@@ -196,24 +167,5 @@
   ],
   "requestBody": "MediaRights",
   "responds": "MediaRights"
- },
- "updateMediaAsset": {
-  "method": "PATCH",
-  "path": "/media/{mediaId}",
-  "contract": "assets",
-  "summary": "Amend metadata, tags or rights",
-  "permission": "ASSET_LIBRARY_MANAGE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "MediaAsset"
  }
 }

@@ -231,7 +231,7 @@
  },
  "setAccessAttributeCatalog": {
   "method": "PUT",
-  "path": "/access-attribute-catalog",
+  "path": "/access-attribute-catalog/{attributeKey}",
   "contract": "access",
   "summary": "Add or amend an access attribute",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -239,6 +239,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "attributeKey",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -250,7 +255,7 @@
  },
  "setAccessProfile": {
   "method": "PUT",
-  "path": "/accreditation-access-profiles",
+  "path": "/accreditation-access-profiles/{accessProfileId}",
   "contract": "accreditation",
   "summary": "Define which zones, on which dates, at which times",
   "permission": "ACCREDITATION_CONFIGURE",
@@ -258,6 +263,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "accessProfileId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -307,7 +317,7 @@
  },
  "setPolicyScopeHierarchy": {
   "method": "PUT",
-  "path": "/policy-scope-hierarchy",
+  "path": "/policy-scope-hierarchy/{policyId}",
   "contract": "access",
   "summary": "Place a policy in the scope hierarchy",
   "permission": "ACCESS_POINT_CONFIGURE",
@@ -315,6 +325,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "policyId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

@@ -18,6 +18,19 @@
   "requestBody": "AccreditationApplication",
   "responds": "AccreditationApplication"
  },
+ "getAccreditationApplication": {
+  "method": "GET",
+  "path": "/accreditation-applications/{applicationId}",
+  "contract": "accreditation",
+  "summary": "One application, with where each requirement stands",
+  "permission": "ACCREDITATION_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationApplication"
+ },
  "issueMyAccreditationWalletPass": {
   "method": "POST",
   "path": "/my/accreditation-credentials/{credentialId}/wallet-pass",
@@ -114,25 +127,6 @@
   "requestBody": null,
   "responds": "AccreditationApplication"
  },
- "resubmitAccreditationApplication": {
-  "method": "POST",
-  "path": "/accreditation-applications/{applicationId}/resubmit",
-  "contract": "accreditation",
-  "summary": "Send an application back after a return for information or a rejection",
-  "permission": "ACCREDITATION_APPLY",
-  "offlineCapable": null,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AccreditationApplication"
- },
  "submitAccreditationApplication": {
   "method": "POST",
   "path": "/accreditation-applications/{applicationId}/submit",
@@ -151,25 +145,6 @@
   ],
   "requestBody": null,
   "responds": "AccreditationApplication"
- },
- "submitAccreditationDocument": {
-  "method": "POST",
-  "path": "/accreditation-documents",
-  "contract": "accreditation",
-  "summary": "Supply a document against a requirement",
-  "permission": "ACCREDITATION_APPLY",
-  "offlineCapable": null,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": "AccreditationDocument",
-  "responds": "AccreditationDocument"
  },
  "updateAccreditationApplication": {
   "method": "PUT",

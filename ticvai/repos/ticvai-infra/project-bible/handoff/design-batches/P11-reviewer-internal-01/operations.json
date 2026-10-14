@@ -18,6 +18,25 @@
   "requestBody": null,
   "responds": "AccreditationApplication"
  },
+ "exportAccreditationData": {
+  "method": "POST",
+  "path": "/accreditation-exports",
+  "contract": "accreditation",
+  "summary": "Export holders, applications, credentials or access assignments",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AccreditationDataExport",
+  "responds": null
+ },
  "getAccreditationApplication": {
   "method": "GET",
   "path": "/accreditation-applications/{applicationId}",
@@ -30,6 +49,19 @@
   "parameters": [],
   "requestBody": null,
   "responds": "AccreditationApplication"
+ },
+ "getAccreditationExport": {
+  "method": "GET",
+  "path": "/accreditation-exports/{exportId}",
+  "contract": "accreditation",
+  "summary": "One export, and its download link once ready",
+  "permission": "ACCREDITATION_MANAGE",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "AccreditationDataExport"
  },
  "listAccreditationAccessActivity": {
   "method": "GET",
@@ -117,73 +149,5 @@
   ],
   "requestBody": null,
   "responds": "AccreditationCredential"
- },
- "listAccreditationDocuments": {
-  "method": "GET",
-  "path": "/accreditation-documents",
-  "contract": "accreditation",
-  "summary": "Documents supplied, by holder, application, requirement or state",
-  "permission": "ACCREDITATION_VIEW",
-  "offlineCapable": null,
-  "conflictPolicy": null,
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "applicationId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "holderId",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "requirementCode",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "status",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": "expiringWithinDays",
-    "in": "query",
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
- "verifyAccreditationDocument": {
-  "method": "POST",
-  "path": "/accreditation-documents/{documentId}/verify",
-  "contract": "accreditation",
-  "summary": "Accept or refuse a submitted document",
-  "permission": "ACCREDITATION_APPROVE",
-  "offlineCapable": null,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AccreditationDocument"
  }
 }

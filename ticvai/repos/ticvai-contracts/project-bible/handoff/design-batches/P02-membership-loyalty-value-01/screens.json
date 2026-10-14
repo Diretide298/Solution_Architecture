@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/wallet-overview",
-   "component": "apps/guest-app/src/routes/general/WalletOverviewDashboard.tsx",
+   "component": "src/screens/general/WalletOverviewDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -110,7 +110,7 @@
        "kind": "toggle",
        "label": "Auto top-up",
        "bindsTo": "WalletAutoReloadSetting.enabled",
-       "operation": "setWalletAutoReloadSetting",
+       "operation": "getWalletAutoReloadSetting",
        "provenance": "contract wallet.yaml WalletAutoReloadSetting.enabled (defined 4 October 2026, CHG-FXS-003)"
       },
       {
@@ -180,20 +180,6 @@
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "getWalletExitBalance",
-    "contract": "wallet",
-    "purpose": "Balance due / refundable at exit",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "settleWalletAtExit",
-    "contract": "wallet",
-    "purpose": "Settle the wallet at exit",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "getGameCard",
     "contract": "games",
     "purpose": "Balance on a game card",
@@ -249,6 +235,20 @@
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
+  "gaps": [
+   {
+    "operation": "getWalletExitBalance",
+    "removed": true,
+    "why": "The client-approved wallet screen shows no balance due or refundable at exit.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "settleWalletAtExit",
+    "removed": true,
+    "why": "The client-approved wallet screen has no control to settle the wallet at exit.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -290,7 +290,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/memberships",
-   "component": "apps/guest-app/src/routes/general/MembershipsDetail.tsx",
+   "component": "src/screens/general/MembershipsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -322,7 +322,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listDelegations` reads the population and `getMyMemberships` reads one of them — list, select, act",
-  "purpose": "Find memberships for this venue.",
+  "purpose": "The guest's membership: plans, statements, payments that need them, and family members who may use it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -515,20 +515,6 @@
     "contract": "catalogue",
     "purpose": "List products",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "listInstalmentPlans",
-    "contract": "payments",
-    "purpose": "Instalment plans and schedule",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "createInstalmentPlan",
-    "contract": "payments",
-    "purpose": "Pay in instalments",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -628,6 +614,18 @@
     "removed": true,
     "why": "The staff-shaped membership list; the guest's own are `getMyMemberships`.",
     "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)"
+   },
+   {
+    "operation": "listInstalmentPlans",
+    "removed": true,
+    "why": "The client-approved membership screen shows no instalment plans.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "createInstalmentPlan",
+    "removed": true,
+    "why": "The client-approved membership screen has no control to pay in instalments.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "_platform": {
@@ -671,7 +669,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/loyalty-rewards",
-   "component": "apps/guest-app/src/routes/LoyaltyRewards.tsx",
+   "component": "src/screens/LoyaltyRewards.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -708,6 +706,18 @@
     "operation": "getLoyaltyPosition",
     "why": "**`getLoyaltyPosition` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.",
     "source": "contract marketing-crm.yaml GET /loyalty/position"
+   },
+   {
+    "operation": "decideRecommendations",
+    "removed": true,
+    "why": "The client-approved Loyalty & Rewards has no recommendation slot, so nothing shows a decision; recommendations show in the cart slot (WEB-008, GST-048).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "recordRecommendationEvents",
+    "removed": true,
+    "why": "Goes with decideRecommendations: no recommended item is shown here to report on.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "layout": {
@@ -831,20 +841,6 @@
     "contract": "promotions",
     "purpose": "List promotions",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "decideRecommendations",
-    "contract": "ai",
-    "purpose": "Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "recordRecommendationEvents",
-    "contract": "ai",
-    "purpose": "Report impressions, clicks and declines of recommended items",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
    },
    {
     "operationId": "listRewards",

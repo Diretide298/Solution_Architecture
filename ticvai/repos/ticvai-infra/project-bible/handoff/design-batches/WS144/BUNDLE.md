@@ -135,14 +135,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-824` | Gamification Command Center | B | 0 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-825` | Challenge Builder | A | 25 | 11 | 6 | 20 | 0 | 0 | — | notStarted (—) |
-| `BO-826` | Achievement & Badge Engine | A | 24 | 4 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-827` | Points & Activity Rules | A | 64 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-826` | Achievement & Badge Engine | A | 22 | 4 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-827` | Points & Activity Rules | A | 63 | 14 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-828` | Milestones & Reward Rules | A | 62 | 10 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-829` | Family, Team & Event Challenges | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-830` | Referral & Streak Management | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-831` | Progress, Leaderboards & Hub | D | 3 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-832` | AI Engagement Optimization | D | 0 | 0 | 6 | 9 | 0 | 0 | — | notStarted (—) |
-| `BO-833` | Gamification Analytics & Audit | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-832` | AI Engagement Optimization | D | 0 | 20 | 6 | 9 | 0 | 0 | — | notStarted (—) |
+| `BO-833` | Gamification Analytics & Audit | D | 0 | 40 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -458,6 +458,8 @@ terms: One reward per guest; visits on the same day count once.
 
 **A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listChallenges` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createChallenge`; `MARKETING_SEND` for `activateChallenge`.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 20 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -521,7 +523,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): The badge library with the selected badge edited beside it (defined 4 October 2026 from MarketingBadge, CHG-FXS-001). |
 | Offline | online only |
-| Opens with | `customerId` (navigation) · cold entry: Opened from BO-824 with the guest picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says … |
+| Opens with | `customerId` (navigation), `badgeId` (navigation) · cold entry: Opened from BO-824 with the guest picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says … |
 | Route | `/engagement-support/achievement-badge-engine-bo-826` |
 
 **What the spec says about it.** **Defined 4 October 2026 from MarketingBadge and MarketingCustomerBadge: the badge library (listBadges), a badge's form (setBadge) and a hand award to the guest the screen was opened for (awardBadge). Rarity, tiers and validity are not badge properties in the contract and left the screen** (CHG-FXS-001)
@@ -556,7 +558,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Icon URL `iconUrl` | text area | optional | — | max length 1000 | — | — | `setBadge` body |
 | Type `type` | text field | required | — | max length 30 | — | — | `setBadge` body |
 | Is active `isActive` | toggle | required | — | — | — | — | `setBadge` body |
-| Created at `createdAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setBadge` body |
 | Updated at `updatedAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setBadge` body |
 
 **Sent by *Award to this guest*** (`awardBadge`; no form is declared, so these are filled from the screen or collected inline)
@@ -571,7 +572,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Source reference `sourceReferenceId` | picker: choose a source reference | optional | — | — | shows names, sends the id | — | `awardBadge` body |
 | Awarded at `awardedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `awardBadge` body |
 | Expires at `expiresAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `awardBadge` body |
-| Status `status` | text field | required | — | max length 20 | — | — | `awardBadge` body |
 
 **Rules for these inputs** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -595,7 +595,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | New badge (primary button) | navigation or local | — | — | — | — |
-| Save badge (primary button) | `setBadge` PUT `/badges` | MarketingBadge | MarketingBadge | — | — |
+| Save badge (primary button) | `setBadge` PUT `/badges/{badgeId}` | MarketingBadge | MarketingBadge | — | — |
 | Award to this guest (secondary button) | `awardBadge` POST `/customers/{customerId}/badges` | MarketingCustomerBadge | MarketingCustomerBadge | 409 Already held and not expired | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
@@ -640,6 +640,8 @@ badges:
 
 **A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listBadges` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setBadge`, `awardBadge`.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -665,7 +667,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-826?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: New badge, Save badge, Award to this guest, Cancel.
@@ -689,7 +691,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): One programme's earning rules and bonus campaigns edited as one set (defined 4 October 2026 from LoyaltyProgramme.earnRules and LoyaltyRuleSet, CHG-FXS-001). |
 | Offline | online only |
-| Opens with | `programmeId` (navigation) |
+| Opens with | `programmeId` (navigation), `loyaltyCampaignId` (navigation) |
 | Route | `/engagement-support/points-activity-rules-bo-827` |
 
 **What the spec says about it.** **Defined 4 October 2026 from LoyaltyProgramme.earnRules (trigger, points, productKinds, multiplier), LoyaltyRuleSet.campaignRules and MarketingLoyaltyCampaign. Earning rules are saved with updateLoyaltyProgramme (agreed in the ledger), since setLoyaltyRules leaves them out. Daily and monthly limits and rounding are not in the contract and left the purpose** (CHG-FXS-001)
@@ -757,7 +759,6 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Start at `startAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setLoyaltyCampaign` body |
 | End at `endAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setLoyaltyCampaign` body |
 | Is active `isActive` | toggle | required | — | — | — | — | `setLoyaltyCampaign` body |
-| Created at `createdAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `setLoyaltyCampaign` body |
 
 **Sent by *Save campaign rules*** (`setLoyaltyRules`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -844,7 +845,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|---|---|---|
 | Save earning rules (primary button) | `updateLoyaltyProgramme` PATCH `/loyalty/programmes/{programmeId}` | inline | LoyaltyProgramme | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
-| Save campaign (secondary button) | `setLoyaltyCampaign` PUT `/loyalty/campaigns` | MarketingLoyaltyCampaign | MarketingLoyaltyCampaign | — | — |
+| Save campaign (secondary button) | `setLoyaltyCampaign` PUT `/loyalty/campaigns/{loyaltyCampaignId}` | MarketingLoyaltyCampaign | MarketingLoyaltyCampaign | — | — |
 | Save campaign rules (secondary button) | `setLoyaltyRules` PUT `/loyalty/programmes/{programmeId}/rules` | LoyaltyRuleSet | LoyaltyRuleSet | 409 A rule references a reward or product that does not exist | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
@@ -905,6 +906,8 @@ campaign: Ramadan double points - 1 Mar to 30 Mar 2027 - x2 on F&B
 
 **A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `getLoyaltyRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setLoyaltyRules`, `setLoyaltyCampaign`.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -935,7 +938,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (64), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (63), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-827?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save earning rules, Cancel, Save campaign, Save campaign rules.
@@ -961,7 +964,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): One programme's milestones (its tiers) and the rewards they give, edited side by side (defined 4 October 2026 from MarketingProgrammeTier and MarketingReward, CHG-FXS-001). |
 | Offline | online only |
-| Opens with | `programmeId` (navigation) |
+| Opens with | `programmeId` (navigation), `rewardId` (navigation) |
 | Route | `/engagement-support/milestones-reward-rules-bo-828` |
 
 **What the spec says about it.** **Defined 4 October 2026: a milestone is a programme tier (MarketingProgrammeTier, a lifetime-points threshold), saved with setLoyaltyRules after reading getLoyaltyRules; rewards are MarketingReward through setReward. 'Save milestones and rewards' no longer calls createLoyaltyProgramme, which creates a programme (programme creation is on BO-824)** (CHG-FXS-001)
@@ -1016,6 +1019,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Discount value `discountValue` | number field | optional | — | — | — | — | `setReward` body |
 | Validity days `validityDays` | number field (days) | optional | — | — | — | — | `setReward` body |
 | Is active `isActive` | toggle | required | — | — | — | — | `setReward` body |
+
+Carried, not typed: `rewardId`
 
 **Sent by *Save milestones*** (`setLoyaltyRules`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -1091,7 +1096,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|---|---|---|
 | Save milestones (primary button) | `setLoyaltyRules` PUT `/loyalty/programmes/{programmeId}/rules` | LoyaltyRuleSet | LoyaltyRuleSet | 409 A rule references a reward or product that does not exist | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
-| Save reward (secondary button) | `setReward` PUT `/loyalty/rewards` | MarketingReward | MarketingReward | — | opens modal first |
+| Save reward (secondary button) | `setReward` PUT `/loyalty/rewards/{rewardId}` | MarketingReward | MarketingReward | — | opens modal first |
 
 **Data it reads**: `listLoyaltyProgrammes` (onLoad, Show the programmes and their milestones); `listRewards` (onLoad, Show the rewards a milestone can give); `getLoyaltyRules` (onLoad, The programme's tiers (its milestones) as saved, read …)
 
@@ -1130,6 +1135,8 @@ milestones:
 - `setLoyaltyRules` → `MARKETING_MANAGE` (configure) · staff
 
 **A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listLoyaltyProgrammes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setReward`, `setLoyaltyRules`.
+
+Screen guard: `MARKETING_VIEW`
 
 #### Requirements it meets
 
@@ -1239,6 +1246,8 @@ challenge: Family Splash League - families of up to 5 - shared points - winner g
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_MANAGE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1329,6 +1338,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the referral streak are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -1343,6 +1353,8 @@ referral: Bring a friend - friend's first purchase - referrer 500 points, friend
 - `createReferral` → `MARKETING_MANAGE` (configure) · staff, guest
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `MARKETING_MANAGE`
 
 #### Requirements it meets
 
@@ -1369,7 +1381,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-830?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create referral, Cancel.
@@ -1554,7 +1566,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getGuestIntelligence`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Subject | the name it points at, never the id | — |
+| Scores | list or chips (count when long) | — |
+| Kind | chip: Historical ltv, Predicted ltv, Engagement, Churn risk, Inactivity risk … | — |
+| Value | 1,234.5 | — |
+| Band | text | — |
+| Confidence | 1,234.5 | — |
+| Model | text | — |
+| Model version | text | — |
+| Computed at | 1 Oct 2026, 14:30 | — |
+| Factors | list or chips (count when long) | — |
+| Factor | text | — |
+| Contribution | 1,234.5 | — |
+| Limitations | list or chips (count when long) | Policy and data limitations travel with the score, so the rule that prediction never overrides consent cannot be forgotten downstream. |
+| Affinities | list or chips (count when long) | — |
+| Product category | the name it points at, never the id | — |
+| Label | text | — |
+| Strength | 1,234.5 | — |
+| Next best actions | list or chips (count when long) | — |
+| Action | text | — |
+| Expected impact | text | — |
 
 **Where the user goes next**
 
@@ -1585,6 +1620,8 @@ suggestion: Weekday streak (3 Tuesdays) for lapsing families - predicted +6% wee
 - `getGuestIntelligence` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `GUEST_VIEW`
 
 #### Requirements it meets
 
@@ -1622,7 +1659,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-832?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-824`.
@@ -1680,9 +1717,55 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listLoyaltyProgrammes`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
 
-**Detail panel** (detail panel): One record, read-only.
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Tiers | list or chips (count when long) | Rows of `marketing.programme_tier`, the same shape `MarketingProgrammeTier` has — one definition of a tier, not a second copy that cannot … |
+| ID | the name it points at, never the id | — |
+| Loyalty programme | the name it points at, never the id | — |
+| Code | text | — |
+| Name | text | — |
+| Rank | 1,234 | Order, not threshold. Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is … |
+| Min lifetime points | 1,234 | What reaching this tier requires. `pointsToNextTier` on the position is this minus the guest's lifetime points, and until now it was this … |
+| Retain lifetime points | 1,234 | What keeping it requires, per review period. Usually lower than reaching it, and a scheme that cannot express the difference either never … |
+| Validity months | 1,234 | Null means the tier does not lapse on its own. |
+| Benefits | list or chips (count when long) | What the tier gives, as the guest reads it. Text shown, not rules enforced. |
+| Earn multiplier | 1,234.5 | Applied to every earn rule while the guest holds this tier. Null means 1. |
+| Is active | yes / no (icon or chip) | — |
+| ID | the name it points at, never the id | — |
+| Code | text | Unique per tenant (decided 28 September, audit R108). A code already used by any loyalty programme in the tenant, at any venue, is refused … |
+| Name | text | — |
+| Venue | the name it points at, never the id | — |
+| Points liability account | the name it points at, never the id | Points post here on accrual. They are a liability from the moment they are earned, not from the moment they are spent. |
+| Earn rules | list or chips (count when long) | — |
+| Trigger | chip: Per currency unit, Per visit, Per product, On signup, On birthday, On review | — |
+
+**Detail panel** (detail panel, from `getDashboard`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Name | text | — |
+| Module | chip: Core, Ticketing, Access, Fnb, Retail, Inventory… | Which module this dashboard belongs to, and therefore who may see it. Added 22 September for the command centre: one shell that shows each … |
+| Description | text | — |
+| Venue | the name it points at, never the id | Narrows every tile to one venue. Omitting it shows each viewer everything their own scope permits — it can never show a viewer beyond that. |
+| Is shared | yes / no (icon or chip) | — |
+| Tiles | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Title | text | — |
+| Report | the name it points at, never the id | — |
+| Visualisation | chip: Number, Line, Area, Bar, Stacked bar, Stacked bar100… | Extended 22 September from eight marks to twenty against `Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf`, which names … |
+| Parameters | grouped details | Open on purpose, and not yet specified. Holds the tile's run parameters (keyed by the report's `ReportParameter.key`, as … |
+| Refresh seconds | 1,234 | Minimum thirty seconds. A tile refreshing every second is a load problem wearing a convenience costume. |
+| Position | grouped details | — |
+| Row | 1,234 | — |
+| Column | 1,234 | — |
+| Width | 1,234 | — |
+| Height | 1,234 | — |
+| ID | the name it points at, never the id | — |
+| Owner principal | the name it points at, never the id | — |
+| Aggregate cost | chip: Low, Medium, High | Combined refresh load of every tile. |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -1728,6 +1811,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1759,7 +1844,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-833?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-824`, `BO-827`.
@@ -1877,10 +1962,10 @@ Method, path, parameters, request and response for every operation these screens
 "listLoyaltyCampaigns": {"method":"GET","path":"/loyalty/campaigns","contract":"marketing-crm","summary":"Time-boxed campaigns inside a programme","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":"activeOn","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listLoyaltyProgrammes": {"method":"GET","path":"/loyalty/programmes","contract":"marketing-crm","summary":"List loyalty programmes","permission":"MARKETING_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listRewards": {"method":"GET","path":"/loyalty/rewards","contract":"marketing-crm","summary":"What points can be turned into","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"setBadge": {"method":"PUT","path":"/badges","contract":"marketing-crm","summary":"Define a badge","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingBadge","responds":"MarketingBadge"},
-"setLoyaltyCampaign": {"method":"PUT","path":"/loyalty/campaigns","contract":"marketing-crm","summary":"Define a loyalty campaign and its window","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingLoyaltyCampaign","responds":"MarketingLoyaltyCampaign"},
+"setBadge": {"method":"PUT","path":"/badges/{badgeId}","contract":"marketing-crm","summary":"Define a badge","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"badgeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"MarketingBadge","responds":"MarketingBadge"},
+"setLoyaltyCampaign": {"method":"PUT","path":"/loyalty/campaigns/{loyaltyCampaignId}","contract":"marketing-crm","summary":"Define a loyalty campaign and its window","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"loyaltyCampaignId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"MarketingLoyaltyCampaign","responds":"MarketingLoyaltyCampaign"},
 "setLoyaltyRules": {"method":"PUT","path":"/loyalty/programmes/{programmeId}/rules","contract":"marketing-crm","summary":"Replace a programme's rules as one set","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"programmeId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"LoyaltyRuleSet","responds":"LoyaltyRuleSet"},
-"setReward": {"method":"PUT","path":"/loyalty/rewards","contract":"marketing-crm","summary":"Define a reward and its points cost","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MarketingReward","responds":"MarketingReward"},
+"setReward": {"method":"PUT","path":"/loyalty/rewards/{rewardId}","contract":"marketing-crm","summary":"Define a reward and its points cost","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"rewardId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"MarketingReward","responds":"MarketingReward"},
 "updateLoyaltyProgramme": {"method":"PATCH","path":"/loyalty/programmes/{programmeId}","contract":"marketing-crm","summary":"Change a loyalty programme","permission":"MARKETING_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":"programmeId","in":"path","required":true}],"requestBody":null,"responds":"LoyaltyProgramme"}
 }
 ```
@@ -1899,17 +1984,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "LoyaltyPosition": {"x-ticvai-persistence":"marketing.loyalty_position","type":"object","required":["subjectId","programmeId","pointsBalance","tierCode"],"properties":{"leaderboardNickname":{"type":"string","nullable":true,"maxLength":24,"description":"BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"},"subjectId":{"type":"string","format":"uuid"},"programmeId":{"type":"string","format":"uuid"},"pointsBalance":{"type":"integer"},"lifetimePoints":{"type":"integer"},"tierId":{"type":"string","format":"uuid","nullable":true,"description":"**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"},"tierCode":{"type":"string"},"tierName":{"type":"string"},"pointsToNextTier":{"type":"integer","nullable":true},"nextExpiryPoints":{"type":"integer","nullable":true},"nextExpiryAt":{"type":"string","format":"date-time","nullable":true}}},
 "LoyaltyProgramme": {"x-ticvai-persistence":"marketing.loyalty_programme + marketing.points_earning_rule + marketing.programme_tier","type":"object","required":["id","code","name","earnRules","tiers"],"properties":{"tiers":{"type":"array","description":"**Rows of `marketing.programme_tier`**, the same shape `MarketingProgrammeTier` has — one definition of a tier, not a second copy that cannot round-trip. `loyaltyProgrammeId` and `id` are the server's on create.\n","items":{"$ref":"#/components/schemas/MarketingProgrammeTier"}},"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"type":"string","x-ticvai-unique":"tenant","description":"**Unique per tenant** (decided 28 September, audit R108). A code already used by any loyalty programme in the tenant, at any venue, is refused with `409 duplicate-code`.\n"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid","nullable":true},"pointsLiabilityAccountId":{"type":"string","format":"uuid","description":"Points post here on accrual. They are a liability from the moment they are earned, not from the moment they are spent.\n"},"earnRules":{"type":"array","items":{"type":"object","required":["trigger","points"],"properties":{"trigger":{"type":"string","enum":["perCurrencyUnit","perVisit","perProduct","onSignup","onBirthday","onReview"]},"points":{"type":"number"},"productKinds":{"type":"array","description":"Limits a `perProduct` or `perCurrencyUnit` rule to these kinds. Empty means every kind.","items":{"$ref":"../spine/catalogue.yaml#/components/schemas/ProductKind"}},"multiplier":{"type":"number"}}}},"pointsExpireAfterMonths":{"type":"integer","nullable":true},"isActive":{"type":"boolean"}}},
 "LoyaltyRuleSet": {"type":"object","x-ticvai-persistence":"none — composed from the rule tables of one programme","description":"**Every rule a programme runs on, read and written as one thing.** Earning, redemption and campaign rules only make sense against each other: a 500-point redemption beside a 5-point earning rule is a hundred visits, and that ratio is the artefact being configured.\nEarning rules are not repeated here — they are `LoyaltyProgramme.earnRules[]` and reached through the programme, which is where they were already declared.\n","required":["programmeId"],"properties":{"programmeId":{"type":"string","format":"uuid"},"campaignRules":{"type":"array","description":"Bonus, multiplier and condition rules, each scoped to a campaign window.","items":{"$ref":"#/components/schemas/MarketingLoyaltyRule"}},"tiers":{"type":"array","description":"The programme's tiers, in `rank` order. **Read with the rules because a redemption rule that is tier-gated is meaningless without them** — 500 points off for Gold members is two facts, and reviewing one without the other is how a tier nobody can reach acquires a benefit.\n","items":{"$ref":"#/components/schemas/MarketingProgrammeTier"}},"redemptionRules":{"type":"array","items":{"$ref":"#/components/schemas/MarketingPointsRedemptionRule"}}}},
-"MarketingBadge": {"type":"object","x-ticvai-persistence":"marketing.badge","description":"**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.","required":["code","name","type","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":150},"description":{"type":"string","maxLength":500,"nullable":true},"iconUrl":{"type":"string","maxLength":1000,"nullable":true},"type":{"type":"string","maxLength":30},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
-"MarketingCustomerBadge": {"type":"object","x-ticvai-persistence":"marketing.customer_badge","description":"**Taken from the backend workbook, 20 September.** Stores badges actually awarded to customers and the source that generated each award.","required":["customerId","badgeId","awardedAt","status"],"properties":{"id":{"type":"string","format":"uuid"},"customerId":{"type":"string","format":"uuid"},"badgeId":{"type":"string","format":"uuid"},"challengeId":{"type":"string","format":"uuid","nullable":true},"sourceType":{"type":"string","maxLength":30,"nullable":true},"sourceReferenceId":{"type":"string","format":"uuid","nullable":true},"awardedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","maxLength":20}}},
-"MarketingLoyaltyCampaign": {"type":"object","x-ticvai-persistence":"marketing.loyalty_campaign","description":"**Taken from the backend workbook, 20 September.** Links a marketing campaign to temporary loyalty bonuses, rewards, or earning changes.","required":["programId","code","name","startAt","endAt","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"programId":{"type":"string","format":"uuid"},"campaignId":{"type":"string","format":"uuid","nullable":true},"code":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"startAt":{"type":"string","format":"date-time"},"endAt":{"type":"string","format":"date-time"},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"}}},
-"MarketingLoyaltyRule": {"type":"object","x-ticvai-persistence":"marketing.loyalty_rule","description":"**Taken from the backend workbook, 20 September.** Defines temporary bonus points, multipliers, earning rules, or rewards applied by a loyalty campaign.","required":["campaignId","type","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"campaignId":{"type":"string","format":"uuid"},"type":{"type":"string","maxLength":30},"pointsEarningRuleId":{"type":"string","format":"uuid","nullable":true},"rewardId":{"type":"string","format":"uuid","nullable":true},"bonusPoints":{"type":"number","nullable":true},"multiplier":{"type":"number","nullable":true},"conditionsJson":{"type":"string","nullable":true},"isActive":{"type":"boolean"}}},
-"MarketingPointsRedemptionRule": {"type":"object","x-ticvai-persistence":"marketing.points_redemption_rule","description":"**Taken from the backend workbook, 20 September.** Defines how loyalty points can be exchanged for discounts, products, or other benefits.","required":["loyaltyProgramId","pointRedemptionRuleCode","name","redemptionType","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"loyaltyProgramId":{"type":"string","format":"uuid"},"pointRedemptionRuleCode":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"redemptionType":{"type":"string","maxLength":30},"required":{"type":"number","nullable":true},"monetaryValue":{"type":"number","nullable":true},"minimumPoints":{"type":"number","nullable":true},"maximumPoints":{"type":"number","nullable":true},"productId":{"type":"string","format":"uuid","nullable":true},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean"}}},
+"MarketingBadge": {"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"marketing.badge","description":"**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.","required":["code","name","type","isActive","createdAt","scopePath"],"properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":150},"description":{"type":"string","maxLength":500,"nullable":true},"iconUrl":{"type":"string","maxLength":1000,"nullable":true},"type":{"type":"string","maxLength":30},"isActive":{"type":"boolean"},"createdAt":{"readOnly":true,"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"MarketingCustomerBadge": {"type":"object","x-ticvai-persistence":"marketing.customer_badge","description":"**Taken from the backend workbook, 20 September.** Stores badges actually awarded to customers and the source that generated each award.","required":["customerId","badgeId","awardedAt","status"],"properties":{"id":{"type":"string","format":"uuid"},"customerId":{"type":"string","format":"uuid"},"badgeId":{"x-ticvai-references":"marketing.badge","type":"string","format":"uuid"},"challengeId":{"type":"string","format":"uuid","nullable":true},"sourceType":{"type":"string","maxLength":30,"nullable":true},"sourceReferenceId":{"type":"string","format":"uuid","nullable":true},"awardedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"status":{"readOnly":true,"type":"string","maxLength":20}}},
+"MarketingLoyaltyCampaign": {"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"marketing.loyalty_campaign","description":"**Taken from the backend workbook, 20 September.** Links a marketing campaign to temporary loyalty bonuses, rewards, or earning changes.","required":["programId","code","name","startAt","endAt","isActive","createdAt","scopePath"],"properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid"},"programId":{"type":"string","format":"uuid"},"campaignId":{"type":"string","format":"uuid","nullable":true},"code":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"startAt":{"type":"string","format":"date-time"},"endAt":{"type":"string","format":"date-time"},"isActive":{"type":"boolean"},"createdAt":{"readOnly":true,"type":"string","format":"date-time"}}},
+"MarketingLoyaltyRule": {"type":"object","x-ticvai-persistence":"marketing.loyalty_rule","description":"**Taken from the backend workbook, 20 September.** Defines temporary bonus points, multipliers, earning rules, or rewards applied by a loyalty campaign.","required":["campaignId","type","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"campaignId":{"x-ticvai-references":"marketing.campaign","type":"string","format":"uuid"},"type":{"type":"string","maxLength":30},"pointsEarningRuleId":{"type":"string","format":"uuid","nullable":true},"rewardId":{"type":"string","format":"uuid","nullable":true},"bonusPoints":{"type":"number","nullable":true},"multiplier":{"type":"number","nullable":true},"conditionsJson":{"type":"string","nullable":true},"isActive":{"type":"boolean"}}},
+"MarketingPointsRedemptionRule": {"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"marketing.points_redemption_rule","description":"**Taken from the backend workbook, 20 September.** Defines how loyalty points can be exchanged for discounts, products, or other benefits.","required":["loyaltyProgramId","pointRedemptionRuleCode","name","redemptionType","isActive","scopePath"],"properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid"},"loyaltyProgramId":{"type":"string","format":"uuid"},"pointRedemptionRuleCode":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"redemptionType":{"type":"string","maxLength":30},"required":{"type":"number","nullable":true},"monetaryValue":{"type":"number","nullable":true},"minimumPoints":{"type":"number","nullable":true},"maximumPoints":{"type":"number","nullable":true},"productId":{"type":"string","format":"uuid","nullable":true},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean"}}},
 "MarketingProgrammeTier": {"type":"object","x-ticvai-persistence":"marketing.programme_tier","description":"**The tier definition decision 8 promised and nobody built.** `marketing.loyalty_position` carried `tierCode`, `tierName` and `pointsToNextTier` as denormalised strings and a number, with no table saying what tiers exist or what each one requires — so `pointsToNextTier` was computed from a threshold that lived nowhere.\n**Not named `marketing.loyalty_tier`**: that name is recorded in `schema-history.json` as renamed to `marketing.points_earning_rule` on 20 September, and a rename record that contradicts the schema is worse than a longer name. Not named `marketing.tier` either, because `subscription.tier_allowance` is a SaaS plan's tier and one bare `tier` in a package with two tier concepts is how `plan_id` came to point at `subscription.plan`.\n**The denormalised copy on the position stays.** A till rendering *Gold* beside a balance must not join, and must certainly not cross a cell boundary to print a word. This table is the source of truth and those columns are its cache.\n","required":["loyaltyProgrammeId","code","name","rank"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"loyaltyProgrammeId":{"type":"string","format":"uuid","readOnly":true},"code":{"type":"string","maxLength":40},"name":{"type":"string","maxLength":120},"rank":{"type":"integer","description":"**Order, not threshold.** Two tiers can share a qualifying rule and still have an order, and sorting by points breaks the moment a tier is granted rather than earned.\n"},"minLifetimePoints":{"type":"integer","nullable":true,"description":"What reaching this tier requires. **`pointsToNextTier` on the position is this minus the guest's lifetime points**, and until now it was this minus nothing.\n"},"retainLifetimePoints":{"type":"integer","nullable":true,"description":"What keeping it requires, per review period. **Usually lower than reaching it**, and a scheme that cannot express the difference either never demotes or demotes on the day a guest stops earning.\n"},"validityMonths":{"type":"integer","nullable":true,"description":"Null means the tier does not lapse on its own."},"benefits":{"type":"array","description":"What the tier gives, as the guest reads it. Text shown, not rules enforced.","items":{"type":"string"}},"earnMultiplier":{"type":"number","nullable":true,"description":"Applied to every earn rule while the guest holds this tier. Null means 1."},"isActive":{"type":"boolean","default":true}}},
-"MarketingReward": {"type":"object","x-ticvai-persistence":"marketing.reward","description":"**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.","required":["loyaltyProgramId","code","name","type","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"loyaltyProgramId":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"type":{"type":"string","maxLength":30},"productId":{"type":"string","format":"uuid","nullable":true},"pointsCost":{"type":"number","nullable":true},"discountValue":{"type":"number","nullable":true},"validityDays":{"type":"integer","nullable":true},"isActive":{"type":"boolean"}}},
+"MarketingReward": {"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"marketing.reward","description":"**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.","required":["loyaltyProgramId","code","name","type","isActive","scopePath"],"properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid"},"loyaltyProgramId":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":100},"name":{"type":"string","maxLength":200},"type":{"type":"string","maxLength":30},"productId":{"type":"string","format":"uuid","nullable":true},"pointsCost":{"type":"number","nullable":true},"discountValue":{"type":"number","nullable":true},"validityDays":{"type":"integer","nullable":true},"isActive":{"type":"boolean"}}},
 "MetricValue": {"x-ticvai-persistence-column":"numeric(18,4)","description":"**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n","oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "ProductKind": {"type":"string","description":"**`openDated` added 24 August** from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no kind: **valid on any date within an eligible range, rather than for a named performance or a fixed date.**\nThe mechanism already existed — `access.entitlement` carries `valid_from`, `valid_to`, `entries_allowed` and `frozen_days`, which is exactly an open-dated pass. **What was missing was the product saying it is one**, so a catalogue could not offer it and a report could not count it.\n**`datedAdmission` is a different thing and the two were being conflated**: dated is *this Tuesday*, open-dated is *any Tuesday between March and June*. A guest buying the second and being sold the first has bought the wrong ticket.\n**Transport uses two existing kinds, not a new one** (decided 29 September, rev 3 REV3-21). A one-way trip is `timedAdmission`: `transport.createTransportRoute` creates the route's product with one variant per passenger type, and each departure is a performance. A multi-trip or unlimited pass is `openDated`: `transport.createTransportPassType` creates it, with `EntitlementTemplate.entriesAllowed` = the pass's trips (null for unlimited), the validity = `validityDays`, and `EntitlementTemplate.transportRestriction` naming the station pair the pass was bought for, so `access` refuses it on another journey. The sale path is unchanged: both are cart lines, priced by `transport.quoteTransportFare` (orders `TransportLineAttributes`).\n","enum":["admission","timedAdmission","datedAdmission","openDated","seated","membership","bundle","fnb","retail","rental","addOn","giftCard"]},
-"Referral": {"type":"object","x-ticvai-persistence":"marketing.referral","description":"BL-034. **No referrer, no reward, nothing anywhere.**\n**The reward fires on the referee's qualifying act, not on the sign-up**, because a referral that pays on registration pays for accounts rather than for guests.\n","required":["id","referrerSubjectId","code","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"referrerSubjectId":{"type":"string","format":"uuid"},"refereeSubjectId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"code":{"readOnly":true,"type":"string"},"status":{"readOnly":true,"type":"string","enum":["issued","registered","qualified","rewarded","expired","void"]},"qualifyingAction":{"type":"string","enum":["firstPurchase","firstVisit","membershipPurchase"]},"referrerRewardId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"refereeRewardId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"Referral": {"type":"object","x-ticvai-persistence":"marketing.referral","description":"BL-034. **No referrer, no reward, nothing anywhere.**\n**The reward fires on the referee's qualifying act, not on the sign-up**, because a referral that pays on registration pays for accounts rather than for guests.\n","required":["id","referrerSubjectId","code","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"referrerSubjectId":{"x-ticvai-references":"pii.subject","type":"string","format":"uuid"},"refereeSubjectId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"code":{"x-ticvai-unique":"tenant","readOnly":true,"type":"string"},"status":{"readOnly":true,"type":"string","enum":["issued","registered","qualified","rewarded","expired","void"]},"qualifyingAction":{"type":"string","enum":["firstPurchase","firstVisit","membershipPurchase"]},"referrerRewardId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"refereeRewardId":{"readOnly":true,"type":"string","format":"uuid","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "ReportResult": {"x-ticvai-persistence":"none — result set, cached in object storage","type":"object","required":["executionId","columns","rows"],"properties":{"executionId":{"type":"string"},"columns":{"type":"array","items":{"type":"object","properties":{"key":{"type":"string"},"label":{"type":"string"},"type":{"$ref":"#/components/schemas/FieldType"}}}},"rows":{"type":"array","description":"**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n","items":{"type":"object","additionalProperties":true}},"totals":{"type":"object","additionalProperties":true,"description":"Aggregated columns only, keyed and typed as a row is."},"rowCount":{"type":"integer"},"nextCursor":{"type":"string","nullable":true},"generatedAt":{"type":"string","format":"date-time"},"dataAsOf":{"type":"string","format":"date-time","description":"Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"}}}
 }
 ```

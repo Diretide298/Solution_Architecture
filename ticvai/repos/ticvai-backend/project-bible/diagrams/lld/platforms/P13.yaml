@@ -24,12 +24,12 @@ modulesUsed:
 servicesCalled:
 - service: WhiteLabelService
   operationCalls: 119
-- service: VenueOpsService
-  operationCalls: 73
 - service: MarketingService
-  operationCalls: 71
+  operationCalls: 73
+- service: VenueOpsService
+  operationCalls: 67
 - service: AiService
-  operationCalls: 12
+  operationCalls: 13
 - service: CatalogueService
   operationCalls: 7
 - service: IdentityService
@@ -286,6 +286,7 @@ screens:
   - deletePromoBlock
   - listBanners
   - listPromoBlocks
+  - listProposedActions
   - proposeMarketingContent
   - updateBanner
   - updatePromoBlock
@@ -697,6 +698,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listConsentPurposes
   - setConsentPurposes
   states:
   - emptyFirstRun
@@ -1217,6 +1219,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getSignatorySignatureGuardian
   - setSignatorySignatureGuardian
   states:
   - emptyFirstRun
@@ -1607,7 +1610,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listCollections
   - searchMedia
   - semanticSearch
   states:
@@ -2061,7 +2063,6 @@ screens:
   density: compact
   operations:
   - getExpiringRights
-  - getMediaUsageAnalytics
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2093,7 +2094,6 @@ screens:
   density: compact
   operations:
   - getMediaAsset
-  - updateMediaAsset
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2232,7 +2232,6 @@ screens:
   density: compact
   operations:
   - getExpiringRights
-  - setMediaAssetRights
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2376,7 +2375,6 @@ screens:
   density: compact
   operations:
   - listMediaRenditions
-  - setMediaDistributionChannels
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2400,7 +2398,6 @@ screens:
   density: compact
   operations:
   - getMediaDistribution
-  - replaceMediaAsset
   states:
   - emptyFirstRun
   - emptyNoAccess

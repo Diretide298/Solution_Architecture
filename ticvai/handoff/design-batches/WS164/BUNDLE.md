@@ -1,6 +1,6 @@
 # WS164 — Resource Management Configuration board 10
 
-**10 screens · 12 operations · 13 schemas · 6 permissions**
+**10 screens · 12 operations · 14 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -260,7 +260,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every resource analytics** (data table)
+**Every resource analytics** (data table, from `listResources`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -280,7 +280,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | AI recommendations implemented | text | not in the schema: `AI recommendations implemented` |
 | Resource breakdown | text | not in the schema: `Resource Breakdown` |
 
-**The selected resource analytics** (detail panel)
+**The selected resource analytics** (detail panel, from `getResourceUtilisation`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -385,6 +385,8 @@ tiles:
 - `getResourceUtilisation` → `RESOURCE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RESOURCE_VIEW`
 
 #### Requirements it meets
 
@@ -586,6 +588,8 @@ underutilised:
 - `getResourceUtilisation` → `RESOURCE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RESOURCE_VIEW`
 
 #### Requirements it meets
 
@@ -793,6 +797,8 @@ ledger:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RESOURCE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -937,6 +943,8 @@ accuracy:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1050,7 +1058,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Effective period | text | not in the schema: `Effective period` |
 | Owner | text | not in the schema: `Owner` |
 
-**The selected resource kpi sla** (detail panel): The pack groups this record's detail under its own headings: “Target”.
+**The selected resource kpi sla** (detail panel, from `getResourceUtilisation`): The pack groups this record's detail under its own headings: “Target”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1146,6 +1154,8 @@ kpis:
 - `getResourceUtilisation` → `RESOURCE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RESOURCE_VIEW`
 
 #### Requirements it meets
 
@@ -1295,6 +1305,8 @@ hierarchy: 'Automatic staff replacement - Global: Allowed; Aqua Park: Allowed; S
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RESOURCE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1374,7 +1386,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every approval exception override** (data table)
+**Every approval exception override** (data table, from `listMemberExceptionOverride`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1458,6 +1470,8 @@ Every approval exception override:
 - `listMemberExceptionOverride` → `PLATFORM_TENANT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -1618,6 +1632,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RESOURCE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1686,7 +1702,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every resource integration system** (data table)
+**Every resource integration system** (data table, from `listAnalyticsPipelines`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1740,6 +1756,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `listAnalyticsPipelines` → `REPORT_VIEW_TENANT` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_TENANT`
 
 #### Requirements it meets
 
@@ -1852,7 +1870,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Financial impact | text | not in the schema: `Financial impact` |
 | Operational impact | text | not in the schema: `Operational impact` |
 
-**The selected executive resource intelligence** (detail panel): The pack groups this record's detail under its own headings: “Executive Question”, “Overall Utilization”, “Resource Readiness”, “Assignment Fulfillment”, “Overtime”, “Resource-Related Cost”.
+**The selected executive resource intelligence** (detail panel, from `getResourceUtilisation`): The pack groups this record's detail under its own headings: “Executive Question”, “Overall Utilization”, “Resource Readiness”, “Assignment Fulfillment”, “Overtime”, “Resource-Related Cost”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1937,6 +1955,8 @@ aiPerformance:
 - `getResourceUtilisation` → `RESOURCE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RESOURCE_VIEW`
 
 #### Requirements it meets
 
@@ -2092,13 +2112,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Channel": {"type":"string","enum":["pos","kiosk","web","mobile","b2b","ota","callCentre"]},
 "MemberExceptionsOverridesServiceRecoveryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Member Exceptions, Overrides & Service Recovery displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"member":{"type":"string","description":"Member"},"membership":{"type":"string","description":"Membership"},"requestedAction":{"type":"string","description":"Requested Action"},"standardPolicyResult":{"type":"string","description":"Standard Policy Result"},"requestedException":{"type":"string","description":"Requested Exception"},"reason":{"type":"string","description":"Reason"},"supportingDocumentation":{"type":"array","items":{"type":"string"},"description":"Supporting Documentation: document ids"},"financialImpact":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Financial Impact of the exception"},"entitlementImpact":{"type":"string","description":"Entitlement Impact"},"requestor":{"type":"string","description":"Requestor"},"exceptionType":{"type":"string","enum":["eligibilityOverride","activationExtension","expiryExtension","complimentaryRenewal","complimentaryBenefit","entitlementAdjustment","freezeException","suspensionOverride","replacementCredential","renewalException","dependentException"],"description":"Exception Type (pack p.32)"},"exceptionValue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Value used for approval routing"},"durationDays":{"type":"integer","description":"Duration in days, for extensions","nullable":true},"membershipTier":{"type":"string","description":"Membership Tier"},"exceptionId":{"type":"string","description":"Exception ID"},"approvalStatus":{"type":"string","description":"Approval status: pending, approved, rejected or applied"},"approver":{"type":"string","description":"Approver; must differ from the requestor for high-value exceptions","nullable":true},"remedy":{"type":"string","enum":["extendMembership","guestTicket","complimentaryVisit","feeWaiver","benefitCredit","renewalDiscount","alternativeEntitlement"],"description":"Service Recovery remedy (pack p.33)","nullable":true},"aiSuggestion":{"type":"string","description":"AI suggestion, advisory","nullable":true}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"Resource": {"type":"object","x-ticvai-persistence":"resources.resource","description":"**A specific object, not a quantity of interchangeable ones.** A venue with forty identical strollers has forty resources, because guest number twelve returned stroller number twelve.\n","required":["id","code","name","kind","venueId"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"kind":{"$ref":"#/components/schemas/ResourceKind"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentResourceId":{"type":"string","format":"uuid","nullable":true,"description":"**A pool cabana belongs to the pool area; a seat belongs to an auditorium.** Booking a parent takes its children with it, which is the behaviour a venue expects and would otherwise have to enforce by hand.\n"},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"},"attributes":{"type":"object","additionalProperties":true,"description":"Configurable per kind — capacity, size, shade, power, poolside."},"setupMinutes":{"type":"integer","default":0,"description":"**Before the booking, not inside it.** An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that cannot express that double-books every time.\n"},"teardownMinutes":{"type":"integer","default":0,"description":"After the booking. **Kept as it is** (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added after the teardown, so a room with no teardown and a 15-minute clean is free 15 minutes after each booking ends.\n"},"cleaningPolicy":{"allOf":[{"$ref":"#/components/schemas/ResourceCleaningPolicy"}],"nullable":true,"description":"How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`."},"requiresQualification":{"type":"array","items":{"type":"string"},"description":"Qualification codes a person must hold to be assigned to this."},"depositAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["available","booked","checkedOut","maintenance","retired"]},"isActive":{"type":"boolean","default":true},"resourceTypeId":{"type":"string","format":"uuid","nullable":true,"description":"**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003). `kind` is the fixed family a type belongs to; this is the tenant's own type within it, and the `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it."}}},
+"Resource": {"type":"object","x-ticvai-persistence":"resources.resource","description":"**A specific object, not a quantity of interchangeable ones.** A venue with forty identical strollers has forty resources, because guest number twelve returned stroller number twelve.\n","required":["id","code","name","kind","venueId"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"venue","type":"string"},"name":{"type":"string"},"kind":{"$ref":"#/components/schemas/ResourceKind"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"parentResourceId":{"type":"string","format":"uuid","nullable":true,"description":"**A pool cabana belongs to the pool area; a seat belongs to an auditorium.** Booking a parent takes its children with it, which is the behaviour a venue expects and would otherwise have to enforce by hand.\n"},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"For a resource of kind `instructor` or `staff`. **`workforce` still owns their rota** — this says whether they are qualified and whether they are already committed.\n"},"attributes":{"type":"object","additionalProperties":true,"description":"Configurable per kind — capacity, size, shade, power, poolside."},"setupMinutes":{"type":"integer","default":0,"description":"**Before the booking, not inside it.** An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that cannot express that double-books every time.\n"},"teardownMinutes":{"type":"integer","default":0,"description":"After the booking. **Kept as it is** (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added after the teardown, so a room with no teardown and a 15-minute clean is free 15 minutes after each booking ends.\n"},"cleaningPolicy":{"allOf":[{"$ref":"#/components/schemas/ResourceCleaningPolicy"}],"nullable":true,"description":"How the resource is cleaned between uses (decided 29 September, W10). Null means no cleaning is scheduled beyond `teardownMinutes`."},"requiresQualification":{"type":"array","items":{"type":"string"},"description":"Qualification codes a person must hold to be assigned to this."},"depositAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"status":{"type":"string","enum":["available","booked","checkedOut","maintenance","retired"]},"isActive":{"type":"boolean","default":true},"resourceTypeId":{"type":"string","format":"uuid","nullable":true,"description":"**The configurable resource type** (`resources.resource_type`, 4 October 2026, CHG-FXC-003). `kind` is the fixed family a type belongs to; this is the tenant's own type within it, and the `resourceTypeId` filter of `suggestResources` and `ResourceRequirement.resourceTypeId` match on it."},"lifecycleState":{"allOf":[{"$ref":"#/components/schemas/ResourceLifecycleState"}],"nullable":true,"readOnly":true,"description":"The lifecycle state `setResourceLifecycleState` set."},"lifecycleEffectiveFrom":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the lifecycle state takes effect (`setResourceLifecycleState`)."},"lifecycleReason":{"type":"string","nullable":true,"readOnly":true,"description":"Why the lifecycle state changed (`setResourceLifecycleState`)."},"replacementResourceId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"resources.resource","description":"The resource that replaces this one, where it was retired for a replacement."},"disposal":{"type":"object","additionalProperties":true,"nullable":true,"readOnly":true,"description":"How a disposed resource left (`setResourceLifecycleState`), as given."}}},
 "ResourceAllocationPolicy": {"type":"object","x-ticvai-persistence":"resources.allocation_policy","description":"Board 5.08, and the 26 August rotation decision. **Named rather than hidden in the allocator**, so somebody can answer why cabana three never gets used.\n","properties":{"strategy":{"type":"string","enum":["rotate","leastUtilised","priorityOrder","nearestFirst"],"default":"rotate","description":"**`rotate` is the default because 26 August made it one.** *\"rotate across all available resources… rather than repeatedly reusing the same resource, to avoid overburdening any single resource while others remain unused.\"*\n"},"respectResourcePriority":{"type":"boolean","default":true},"scoringWeights":{"type":"object","additionalProperties":{"type":"number"}},"allowPartialAllocation":{"type":"boolean","default":false,"description":"**False by default.** A stage allocated without its sound system is worse than no allocation, because it looks finished.\n"},"scopePath":{"type":"string"}}},
 "ResourceAuditEntry": {"type":"object","x-ticvai-persistence":"resources.resource_audit","description":"Board 1.10. **Immutable, and it carries the previous value.**","properties":{"id":{"type":"string","format":"uuid"},"resourceId":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"actorId":{"type":"string","format":"uuid","nullable":true},"action":{"type":"string"},"field":{"type":"string","nullable":true},"previousValue":{"nullable":true},"newValue":{"nullable":true},"reason":{"type":"string","nullable":true},"sourceChannel":{"type":"string","nullable":true},"apiOrigin":{"type":"string","nullable":true},"correlationId":{"type":"string","nullable":true},"scopePath":{"type":"string"}}},
 "ResourceCleaningPolicy": {"x-ticvai-persistence":"none — columns on resources.resource","type":"object","description":"**When the resource is cleaned, and what that takes out of availability** (decided 29 September, W10; the meeting-room case from the 29 September website review).\n- `afterEveryBooking` (option A): `bufferMinutes` blocked after every booking, after its teardown. - `timesPerDay` (option B): `cleaningsPerDay` cleanings of `bufferMinutes` each, between `windowStart` and `windowEnd`, **placed by the system**. The targets are spread evenly across the window; each is put in the free gap nearest its target that is long enough, and never on a booking, a hold or a block. **A confirmed booking is never moved for a cleaning.** Placement is computed on read from the day's bookings, so it moves when bookings change, and a start time is offered only if every cleaning of that day can still be placed after it is booked.\n`createResource` and `updateResource` refuse a policy with `timesPerDay` and no `cleaningsPerDay`, or a window that ends before it starts, with `422`.\n","required":["mode","bufferMinutes"],"properties":{"mode":{"type":"string","enum":["afterEveryBooking","timesPerDay"]},"bufferMinutes":{"type":"integer","minimum":5,"maximum":240,"description":"Minutes one cleaning takes. The prototype uses 15 (proposed default, client to correct)."},"cleaningsPerDay":{"type":"integer","minimum":1,"maximum":24,"nullable":true,"description":"Required for `timesPerDay`; ignored for `afterEveryBooking`."},"windowStart":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","nullable":true,"description":"Venue-local time the cleaning window opens. Null means the resource's opening time."},"windowEnd":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$","nullable":true,"description":"Venue-local time the cleaning window closes. Null means the resource's closing time."}}},
 "ResourceCostAnalytics": {"type":"object","x-ticvai-persistence":"none — projection over resources.resource_cost, bookings and maintenance work orders, computed at read time","description":"One group's cost and revenue for the window (decided 29 September, readiness close-out; BO-945).","required":["key","label"],"properties":{"key":{"type":"string"},"label":{"type":"string"},"transferCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"operatingCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"replacementCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"bookedHours":{"type":"number"},"costPerBookedHour":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Total cost over booked hours; null when nothing was booked."}}},
-"ResourceCostEntry": {"type":"object","x-ticvai-persistence":"resources.resource_cost","description":"**One cost booked against a resource**: a transfer between locations, an operating cost or a replacement. `getResourceCostAnalytics` sums these per group and window (decided 29 September, data model DM4).\n","required":["id","resourceId","kind","amount","incurredOn"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"resourceId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["transfer","operating","replacement"]},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"incurredOn":{"type":"string","format":"date"},"fromVenueId":{"type":"string","format":"uuid","nullable":true,"description":"A `transfer` only, with `toVenueId`."},"toVenueId":{"type":"string","format":"uuid","nullable":true},"note":{"type":"string","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005), written at `venue` scope."}}},
+"ResourceCostEntry": {"type":"object","x-ticvai-persistence":"resources.resource_cost","description":"**One cost booked against a resource**: a transfer between locations, an operating cost or a replacement. `getResourceCostAnalytics` sums these per group and window (decided 29 September, data model DM4).\n","required":["id","resourceId","kind","amount","incurredOn"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"resourceId":{"x-ticvai-references":"resources.resource","type":"string","format":"uuid"},"kind":{"type":"string","enum":["transfer","operating","replacement"]},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"incurredOn":{"type":"string","format":"date"},"fromVenueId":{"type":"string","format":"uuid","nullable":true,"description":"A `transfer` only, with `toVenueId`."},"toVenueId":{"type":"string","format":"uuid","nullable":true},"note":{"type":"string","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005), written at `venue` scope."}}},
 "ResourceKind": {"type":"string","description":"BL-135. **`locker` was an entitlement kind in `orders` and nothing issued, assigned or released one.** A locker is a specific object checked out to a named guest and returned — which is this context exactly, and modelling it as an entitlement would have needed a second check-out mechanism.\nA seed for `ResourceType` rather than the law (board 1.02): a customer adding a class does it with `createResourceType`, not by waiting for this list to grow.\n**`table` is a non-dining spot** (decided 29 September, rev 3 GAP-C2, confirmed by Chinmay): a beach or event table placed on a venue map, picked and sold like a cabana (`createResourceHold`, then the order). **A dining table is not this**: restaurant tables stay `fnb` tables, booked with `fnb.createTableReservation` and the waitlist (audit R073 (d)).\n","enum":["cabana","lounger","locker","wheelchair","stroller","equipment","room","auditorium","vehicle","instructor","staff","table","pitch","studio","other"],"x-ticvai-refuses":{"mealPlan":"**Listed by 5.5.8b and deliberately not a kind.** 5.5.8b groups meal plans with lockers and parking, but a meal plan is a balance rather than an object. It resolves to `retail.Wallet` with a `mealPlan` credit kind (CF-126), not to a resource — so it is not offered here, and a form built from this enum cannot offer it either."}},
+"ResourceLifecycleState": {"type":"string","description":"Board 1.10. **States of one machine**, whose allowed transitions are configuration.","enum":["draft","pendingApproval","approved","active","temporarilyUnavailable","underMaintenance","suspended","retired","archived"]},
 "ResourceUtilisation": {"type":"object","description":"Board 10.02. **Booked time over available time**, where available knows about schedules, blocks, setup and travel.\n","properties":{"key":{"type":"string"},"label":{"type":"string"},"availableMinutes":{"type":"integer"},"bookedMinutes":{"type":"integer"},"blockedMinutes":{"type":"integer"},"utilisationPercent":{"type":"number"},"bookingCount":{"type":"integer"}}}
 }
 ```

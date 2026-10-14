@@ -5,6 +5,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/game-ride-pricing-command-center-bo-434",
-   "component": "apps/venue-management-web/src/routes/games-rides/GameRidePricingCommandCenter.tsx",
+   "component": "src/routes/games-rides/GameRidePricingCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -96,7 +97,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -206,6 +207,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "5",
@@ -215,7 +217,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/standard-game-ride-price-configuration-bo-435",
-   "component": "apps/venue-management-web/src/routes/games-rides/StandardGameRidePriceConfiguration.tsx",
+   "component": "src/routes/games-rides/StandardGameRidePriceConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -359,6 +361,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "5",
@@ -368,7 +371,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/group-pricing-configuration-bo-436",
-   "component": "apps/venue-management-web/src/routes/games-rides/GroupPricingConfiguration.tsx",
+   "component": "src/routes/games-rides/GroupPricingConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -517,6 +520,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "5",
@@ -526,7 +530,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/peak-non-peak-dynamic-pricing-bo-437",
-   "component": "apps/venue-management-web/src/routes/games-rides/PeakNonPeakDynamicPricing.tsx",
+   "component": "src/routes/games-rides/PeakNonPeakDynamicPricing.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -665,6 +669,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "5",
@@ -674,7 +679,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/pricing-calendar-exception-dates-bo-438",
-   "component": "apps/venue-management-web/src/routes/games-rides/PricingCalendarExceptionDates.tsx",
+   "component": "src/routes/games-rides/PricingCalendarExceptionDates.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -803,6 +808,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "5",
@@ -812,7 +818,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/normal-vip-pricing-configuration-bo-439",
-   "component": "apps/venue-management-web/src/routes/games-rides/NormalVipPricingConfiguration.tsx",
+   "component": "src/routes/games-rides/NormalVipPricingConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -853,7 +859,8 @@
        "derived": true,
        "impliedBy": "setGamePricing",
        "label": "Save game pricing",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "setGamePricing"
       },
       {
        "kind": "secondaryButton",
@@ -920,6 +927,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRICE_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "5",
@@ -929,7 +937,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/retry-price-configuration-bo-440",
-   "component": "apps/venue-management-web/src/routes/games-rides/RetryPriceConfiguration.tsx",
+   "component": "src/routes/games-rides/RetryPriceConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1061,6 +1069,7 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "5",
@@ -1070,7 +1079,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/price-priority-conflict-rules-bo-441",
-   "component": "apps/venue-management-web/src/routes/games-rides/PricePriorityConflictRules.tsx",
+   "component": "src/routes/games-rides/PricePriorityConflictRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1129,7 +1138,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listRulePriorityConflict",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listRulePriorityConflict"
       }
      ]
     }
@@ -1192,6 +1202,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "5",
@@ -1201,7 +1212,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/effective-pricing-reader-price-preview-bo-442",
-   "component": "apps/venue-management-web/src/routes/games-rides/EffectivePricingReaderPricePreview.tsx",
+   "component": "src/routes/games-rides/EffectivePricingReaderPricePreview.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1282,7 +1293,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1400,6 +1411,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "5",
@@ -1409,7 +1421,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/pricing-audit-approval-publication-bo-443",
-   "component": "apps/venue-management-web/src/routes/games-rides/PricingAuditApprovalPublication.tsx",
+   "component": "src/routes/games-rides/PricingAuditApprovalPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {

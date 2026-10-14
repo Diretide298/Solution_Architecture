@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-659` | Cross-Sell Command Center | C | 0 | 2 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-659` | Cross-Sell Command Center | C | 0 | 66 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-660` | Cross-Sell Relationship Builder | C | 0 | 21 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-661` | Product Affinity Matrix & Relationship Map | C | 2 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-662` | Frequently Bought Together & Basket Pattern Engine | C | 0 | 14 | 6 | 1 | 0 | 0 | — | notStarted (—) |

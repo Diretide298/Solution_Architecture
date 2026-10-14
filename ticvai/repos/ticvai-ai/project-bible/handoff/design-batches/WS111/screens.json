@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-issuance-command-center-bo-644",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialIssuanceCommandCenter.tsx",
+   "component": "src/routes/access-venue/CredentialIssuanceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -215,6 +216,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "4",
@@ -224,7 +226,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-generation-workspace-bo-645",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialGenerationWorkspace.tsx",
+   "component": "src/routes/access-venue/CredentialGenerationWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -286,7 +288,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAccreditationCredentials",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAccreditationCredentials"
       }
      ]
     }
@@ -376,7 +379,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-media-configuration-bo-646",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialMediaConfiguration.tsx",
+   "component": "src/routes/access-venue/CredentialMediaConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -474,6 +477,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_CONFIGURE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "4",
@@ -483,7 +487,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/badge-template-designer-bo-647",
-   "component": "apps/venue-management-web/src/routes/access-venue/BadgeTemplateDesigner.tsx",
+   "component": "src/routes/access-venue/BadgeTemplateDesigner.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -586,7 +590,16 @@
    "workshopBoard": "wireframes/WS04 ACCREDITATION Board 4.dc.html#bo-647"
   },
   "apisNote": "Regenerated 9 September 2026 from ACCREDITATION.pdf page 30. 0 of 0 labels bound to a contract property; 0 of 26 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "badgeTemplateId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listBadgeTemplates`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -616,6 +629,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_ISSUE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "4",
@@ -625,7 +639,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/badge-printing-print-queue-bo-648",
-   "component": "apps/venue-management-web/src/routes/access-venue/BadgePrintingPrintQueue.tsx",
+   "component": "src/routes/access-venue/BadgePrintingPrintQueue.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -775,6 +789,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "4",
@@ -784,7 +799,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/digital-mobile-credential-management-bo-649",
-   "component": "apps/venue-management-web/src/routes/access-venue/DigitalMobileCredentialManagement.tsx",
+   "component": "src/routes/access-venue/DigitalMobileCredentialManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -807,6 +822,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage credentials delivered electronically to accreditation holders.",
+  "division": "Shares `deliverAccreditationCredential`, `listAccreditationCredentials` with BO-651; this screen is Digital & Mobile Credential Management (pack ACCREDITATION.pdf, board 4.6, page 32): manage credentials delivered electronically to accreditation holders.",
   "gaps": [
    {
     "operation": null,
@@ -927,6 +943,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "4",
@@ -936,7 +953,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/nfc-rfid-credential-encoding-bo-650",
-   "component": "apps/venue-management-web/src/routes/access-venue/NfcRfidCredentialEncoding.tsx",
+   "component": "src/routes/access-venue/NfcRfidCredentialEncoding.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1120,6 +1137,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "4",
@@ -1129,7 +1147,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-activation-delivery-bo-651",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialActivationDelivery.tsx",
+   "component": "src/routes/access-venue/CredentialActivationDelivery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1152,6 +1170,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control when an issued credential becomes operational.",
+  "division": "Shares `deliverAccreditationCredential`, `listAccreditationCredentials` with BO-649; this screen is Credential Activation & Delivery (pack ACCREDITATION.pdf, board 4.8, page 33): control when an issued credential becomes operational.",
   "gaps": [
    {
     "operation": null,
@@ -1271,6 +1290,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "4",
@@ -1280,7 +1300,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-registry-credential-history-bo-653",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialRegistryCredentialHistory.tsx",
+   "component": "src/routes/access-venue/CredentialRegistryCredentialHistory.tsx",
    "status": "notStarted"
   },
   "navigation": {

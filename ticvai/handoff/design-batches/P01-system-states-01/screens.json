@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/system-states/error-sold-out-maintenance",
-   "component": "apps/guest-web/src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx",
+   "component": "src/routes/system-states/ErrorSoldOutMaintenanceDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

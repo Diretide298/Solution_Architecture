@@ -34,13 +34,43 @@ The rule for agent edits:
 - **Migrations:** the baseline migrations are frozen at `r1`; table changes come out as new forward migrations (`check-migration-freeze`); anything destructive goes to `handoff/migration-review.md` for a person.
 - **Contracts:** a breaking change must be listed in `breaking-changes.yaml` (`check-contract-compat` against `r1`).
 - **Audit classes:** every root-issue class from the audit has its check (`docs/active/root-classes.md`).
+- **Ticket links:** every Block A feature and task links something ADAM pulls, and every link ADAM loads resolves to
+  an operation, table (or declared read view), screen, ADR, tracked file or service the package has
+  (`check-ticket-links`; CHG-GRD-001). It reads `handoff/service-docs/adam-links.json`, which a rebuild does not
+  write: run `python3 tools/adam-links.py` after the full refresh and before the release gate, so it checks the
+  links this release will load.
+- **Approved UI:** no visible change to a client-approved screen without the client's approval recorded in
+  `docs/active/approved-ui-changes.yaml` (`check-approved-ui` against `handoff/approved-ui.json`; CHG-GRD-002).
+
+### The rehearsal pull: the last gate step before the tag (CHG-GRD-003)
+The checks read the package; the rehearsal reads what a developer will get. It runs after the full gate is green
+and before anything is tagged or pushed (Block A audit plan, step 11a; lead, 14 October 2026: "before pushing r6
+can we simulate the results in the pulls?"):
+1. Tag `r<N>-rc` locally. Never push it.
+2. Run a local ADAM on the candidate, with the stand-in OpenProject (`viewer/api/fake-openproject.mjs`) loaded from
+   `r<N>`'s bundle (`handoff/service-docs/op-release.json`), so every ticket reads as it will after the apply.
+3. Pull every ticket of the block being delivered (Block A: every feature and task) against it with the shipped
+   connector, the same `adam_pull` a developer runs (the audit kit's `pull-direct.mjs`, with `ADAM_URL` set to the
+   local ADAM).
+4. Compare ticket by ticket with the last live pull, and keep the difference: it is the developer impact list.
+
+**It passes only with all four at zero:** 0 pull errors; release `r<N>` on every ticket (`release.current`); 0
+tickets with nothing linked (`linked: 0`, features and tasks alike); 0 dead links (`notFound: 0`). Anything else is
+fixed in `r<N>` and the rehearsal runs again; the tag waits. On r5 the pull found 123 features and 29 tasks with
+nothing linked and 55 tickets with links ADAM could not find, after the release was out; this step finds them while
+they are still the package's to fix.
 
 ## 5. Tag
-Once everything is green:
+Once everything is green, the rehearsal pull included (section 4):
 1. Commit.
 2. `git tag r<N>` on the package **and** the six mirror repos.
-3. Push both remotes.
-4. Rebuild the setup zip from a clean HEAD.
+3. Push the branch **and the tag by name** to both remotes: `git push origin main r<N>`, then
+   `git push github main r<N>`; the same push of its branch and `r<N>` in each of the six mirror repos. A bare
+   `git push` sends no tag, and ADAM's server knows only the tags it fetched: r5 was tagged and never pushed, so
+   ADAM served r4 for a day after OpenProject said r5 (PROCESS-LOG P-20, 14 October 2026; CHG-GTE-006).
+4. `python3 tools/check-adam-latest-release.py --remotes`: it fails if the newest `r<N>` here is missing from
+   `origin` or `github`.
+5. Rebuild the setup zip from a clean HEAD.
 
 ## 6. Distribute
 - **OpenProject:** on the server, run `op-release-server.sh r<N>`: dry run, then `APPLY=1`. That one script:
@@ -65,6 +95,9 @@ Once everything is green:
 - **ADAM:** on the box, run `git pull` and deploy. ADAM serves `r<N>`, and every developer and agent is always
   on the latest release: their next `/ticket` is at `r<N>` and shows what changed since their previous pull.
 - **Client:** send the release note, `python tools/release-notes.py r<N-1> r<N>`: what their answers changed, and what is waiting on them.
+- **Last, one pull through ADAM:** once ADAM is deployed, run one `adam_pull` of any ticket. Its release must say
+  `r<N>`. If it names an older release, ADAM has not fetched the tag (on the box: `git fetch --tags`, then
+  deploy) and the release is not out yet (PROCESS-LOG P-20; CHG-GTE-006).
 
 ## 7. Re-audit, every release
 - Every check is green.

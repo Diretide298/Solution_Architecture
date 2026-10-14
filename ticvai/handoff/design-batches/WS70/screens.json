@@ -5,6 +5,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "9",
@@ -132,7 +133,7 @@
         "AI Queries Today"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAnalyticsAnomalies",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 109 §Display"
       }
      ]
@@ -145,6 +146,7 @@
        "kind": "detailPanel",
        "label": "The selected analytics",
        "bindsTo": null,
+       "operation": "listAnalyticsAnomalies",
        "columns": [
         "Executive Insights",
         "Revenue Insights",
@@ -235,6 +237,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "9",
@@ -371,6 +374,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_MANAGE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "9",
@@ -499,6 +503,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_MANAGE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "9",
@@ -652,6 +657,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "9",
@@ -720,7 +726,7 @@
         "Confidence"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAnomalyDetectors",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 113 §Each Anomaly Displays"
       }
      ]
@@ -733,6 +739,7 @@
        "kind": "detailPanel",
        "label": "The selected anomaly detection",
        "bindsTo": null,
+       "operation": "listAnomalyDetectors",
        "columns": [
         "KPI",
         "Expected Range",
@@ -760,20 +767,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listAiInsights",
-    "contract": "ai",
-    "purpose": "Insights and anomalies",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "configureAnomalyDetector",
-    "contract": "ai",
-    "purpose": "Set up anomaly detection on a KPI",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
    {
     "operationId": "listAnomalyDetectors",
     "contract": "ai",
@@ -835,6 +828,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "9",
@@ -888,6 +882,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listAnalyticsAnomalies",
        "derived": true,
        "impliedBy": "listAnalyticsAnomalies",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -974,6 +969,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "9",
@@ -1028,36 +1024,43 @@
       {
        "kind": "selectField",
        "label": "Next Hour",
+       "operation": "createForecastScenario",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Today",
+       "operation": "createForecastScenario",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Tomorrow",
+       "operation": "createForecastScenario",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Next 7 Days",
+       "operation": "createForecastScenario",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Month End",
+       "operation": "createForecastScenario",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Quarter",
+       "operation": "createForecastScenario",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Custom",
+       "operation": "createForecastScenario",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure"
       }
      ]
@@ -1119,20 +1122,6 @@
   },
   "apis": [
    {
-    "operationId": "getKpiValues",
-    "contract": "reporting",
-    "purpose": "The series being forecast",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listForecastDefinitions",
-    "contract": "ai",
-    "purpose": "What is forecast",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "getForecast",
     "contract": "ai",
     "purpose": "Forecast values",
@@ -1143,13 +1132,6 @@
     "operationId": "createForecastScenario",
     "contract": "ai",
     "purpose": "Run a what-if",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "exportForecastVersion",
-    "contract": "ai",
-    "purpose": "Export the forecast version as CSV, Excel or JSON",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    }
@@ -1200,6 +1182,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "9",
@@ -1253,6 +1236,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listAnalyticsAnomalies",
        "derived": true,
        "impliedBy": "listNextBestAction",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -1275,13 +1259,6 @@
     "purpose": "What to act on",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listAiInsights",
-    "contract": "ai",
-    "purpose": "Insights and anomalies",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -1319,6 +1296,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "AI_AUDIT_VIEW",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "9",
@@ -1408,27 +1386,6 @@
   },
   "apis": [
    {
-    "operationId": "listAnalyticsAnomalies",
-    "contract": "reporting",
-    "purpose": "Past insights and their evidence",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "listAiInsights",
-    "contract": "ai",
-    "purpose": "Insights and anomalies",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "decideAiInsight",
-    "contract": "ai",
-    "purpose": "Review, accept, reject or mark an insight actioned",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "searchAiDecisions",
     "contract": "ai",
     "purpose": "The decision records behind each insight",
@@ -1488,6 +1445,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "9",
@@ -1559,7 +1517,7 @@
         "Module"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAiModels",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 119 §Display"
       }
      ]
@@ -1572,6 +1530,7 @@
        "kind": "detailPanel",
        "label": "The selected analytics governance model",
        "bindsTo": null,
+       "operation": "listAiModels",
        "columns": [
         "AI Service",
         "Model",
@@ -1615,51 +1574,9 @@
   },
   "apis": [
    {
-    "operationId": "listAiCapabilities",
-    "contract": "ai",
-    "purpose": "The capability registry",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "configureAiCapability",
-    "contract": "ai",
-    "purpose": "Register a capability, or change its owner, risk class or autonomy",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getEffectiveAiPolicy",
-    "contract": "ai",
-    "purpose": "The policy in force for a capability at a scope",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listAiModels",
     "contract": "ai",
     "purpose": "The model catalogue",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listPromptTemplates",
-    "contract": "ai",
-    "purpose": "The prompt registry",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "runAiEvaluation",
-    "contract": "ai",
-    "purpose": "Evaluate a candidate",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAiEvaluations",
-    "contract": "ai",
-    "purpose": "Evaluation runs",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    }

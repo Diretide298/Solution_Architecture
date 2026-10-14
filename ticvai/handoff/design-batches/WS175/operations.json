@@ -91,6 +91,32 @@
   "requestBody": null,
   "responds": "KpiValue"
  },
+ "getReportExecution": {
+  "method": "GET",
+  "path": "/report-executions/{executionId}",
+  "contract": "reporting",
+  "summary": "Execution status, and where its result is",
+  "permission": "REPORT_VIEW_VENUE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReportExecution"
+ },
+ "getReportExport": {
+  "method": "GET",
+  "path": "/report-exports/{exportId}",
+  "contract": "reporting",
+  "summary": "Export status and download link",
+  "permission": "REPORT_EXPORT",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [],
+  "requestBody": null,
+  "responds": "ReportExport"
+ },
  "getSeatInventory": {
   "method": "GET",
   "path": "/seat-inventory",

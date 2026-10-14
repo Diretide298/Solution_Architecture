@@ -276,14 +276,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: claimCustomDomain
-      x-ticvai-read-via:
-      - query: subscription#tenantRecords
-        route: in-process
-        for: 'its read of control.tenant, Platform''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 BO-835 Site, Brand & Domain Setup"
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-read-via:
+      - query: subscription#tenantRecords
+        route: in-process
+        for: 'its read of control.tenant, Platform''s data (CHG-MOD-001)'
       summary: Claim a domain and get a verification token
       description: '**Claiming is not owning.** The response carries the record the tenant must publish
         (`verificationRecord`), and nothing happens until it resolves.
@@ -365,10 +365,10 @@ paths:
         format: uuid
     post:
       operationId: verifyCustomDomain
-      x-ticvai-names-for-context: [control.tenant_domain]
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-names-for-context: [control.tenant_domain]
       summary: Check the record and issue the certificate
       description: '**Verification and issuance are one act from the tenant''s point of view and two states
         in the model.** A tenant who has published the record wants a working domain, not a green tick.
@@ -1054,10 +1054,10 @@ paths:
   /footer:
     put:
       operationId: setFooter
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Footer columns, legal links and social
       description: 'BL-002. **A header is chrome and a footer is a link surface**, which is why this is
         not `setHeader` with different fields.
@@ -1203,12 +1203,12 @@ paths:
   /content-blocks:
     get:
       operationId: listContentBlocks
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
       x-ticvai-read-via:
       - query: platform-ops#contentBlockRecords
         route: in-process
         for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-007 Page Builder"
       summary: The content blocks of a page
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, drafts and published alike.
@@ -1250,6 +1250,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createContentBlock
+      x-ticvai-consumed-by:
+        - "P08 BO-839 Dynamic Product Pages"
+        - "P13 CMS-007 Page Builder"
       x-ticvai-read-via:
       - query: marketing-crm#segmentRecords
         route: in-process
@@ -1257,9 +1260,6 @@ paths:
       - query: platform-ops#contentBlockRecords
         route: in-process
         for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-839 Dynamic Product Pages"
-        - "P13 CMS-007 Page Builder"
       summary: Author a block of content
       description: 'BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose
         between things a developer had built and could not write something new.
@@ -1306,6 +1306,8 @@ paths:
         format: uuid
     post:
       operationId: publishContentBlock
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
@@ -1313,8 +1315,6 @@ paths:
       - query: platform-ops#contentBlockRecords
         route: in-process
         for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-007 Page Builder"
       summary: Publish now, or schedule it
       description: '**A seasonal banner needing somebody awake at midnight is the same defect `Product.onSaleFrom`
         fixed**, and the answer is the same: a date on the object rather than a person with an alarm.
@@ -1440,6 +1440,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-025 Help Centre / FAQ"
+        - "P01 WEB-028 Contact & Venue Information"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
         - "P01 WEB-045 Help Centre & Accessibility"
         - "P01 WEB-050 Plan Your Visit"
@@ -1506,10 +1507,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setMaintenanceMode
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Enable or clear maintenance mode, and set the live app status
@@ -1603,14 +1604,14 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBrandIdentity
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-836 Design System & Components"
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-004 Logo & Assets"
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set logo, favicon and splash
@@ -1697,11 +1698,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setAppIcons
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set app icons
@@ -1770,10 +1771,6 @@ paths:
         format: uuid
     get:
       operationId: getPublishedKioskConfig
-      x-ticvai-read-via:
-      - query: tenancy#workstationRecords
-        route: service
-        for: 'whether the workstation is in this venue (404 not-found) (CHG-MOD-003)'
       x-ticvai-consumed-by:
         - "P05 KSK-001 Attract Loop"
         - "P05 KSK-002 Language Select"
@@ -1782,6 +1779,10 @@ paths:
         - "P05 KSK-013 Call staff"
         - "P05 KSK-014 Out of service"
         - "P13 CMS-105 Kiosk Builder"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'whether the workstation is in this venue (404 not-found) (CHG-MOD-003)'
       x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
         the kiosk''s counterpart of getPublishedTenantConfig, served the same way'
       x-ticvai-audience:
@@ -1916,10 +1917,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBookingFlowConfig
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-016 Site Settings"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Set how the guest booking flow looks and steps
       description: '**Design gap, 23 September.** The booking design has a white-label engine drawer (preset,
         step indicator, card and cart layout, extras step, seat picker, map view, density, embed mode) and
@@ -2008,11 +2009,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTheme
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-005 Theme Editor"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set colour theme
@@ -2101,10 +2102,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFonts
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-003 Typography"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set fonts
@@ -2159,10 +2160,10 @@ paths:
   /tenant-config/header:
     put:
       operationId: setHeader
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Configure the header
@@ -2226,10 +2227,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setNavigation
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set main and overflow navigation
@@ -2309,11 +2310,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setHomepageLayout
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per site template, the one the body''s `templateKey` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 BO-840 Mobile App CMS"
         - "P13 CMS-007 Page Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per site template, the one the body''s `templateKey` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -2424,9 +2425,9 @@ paths:
   /tenant-config/banners:
     get:
       operationId: listBanners
-      description: '**Order.** Soonest first, by `startsAt` ascending, then by `id`.'
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
+      description: '**Order.** Soonest first, by `startsAt` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2729,12 +2730,12 @@ paths:
         format: uuid
     put:
       operationId: assignKiosk
+      x-ticvai-consumed-by:
+        - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
       x-ticvai-read-via:
       - query: tenancy#workstationRecords
         route: service
         for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, ADM-582 assigns a kiosk to a kiosk group
         (docs/active/decisions/answers-5-october.md, CHG-R4-001)'
       x-ticvai-audience:
@@ -3292,6 +3293,10 @@ paths:
   /tenant-config/modules:
     get:
       operationId: getModuleEnablement
+      x-ticvai-consumed-by:
+        - "P09 ADM-424 Module Activation & Dependency Validation"
+        - "P13 CMS-001 Tenant Workspace"
+        - "P13 CMS-007 Page Builder"
       x-ticvai-read-via:
       - query: subscription#contractRecords
         route: in-process
@@ -3302,10 +3307,6 @@ paths:
       - query: subscription#planRecords
         route: in-process
         for: 'its read of subscription.plan, Platform''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P09 ADM-424 Module Activation & Dependency Validation"
-        - "P13 CMS-001 Tenant Workspace"
-        - "P13 CMS-007 Page Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3333,6 +3334,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setModuleEnablement
+      x-ticvai-consumed-by:
+        - "P09 ADM-424 Module Activation & Dependency Validation"
+        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-read-via:
       - query: subscription#contractRecords
         route: in-process
@@ -3345,9 +3349,6 @@ paths:
         for: 'its read of subscription.plan, Platform''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P09 ADM-424 Module Activation & Dependency Validation"
-        - "P13 CMS-001 Tenant Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -3434,10 +3435,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFeatureToggles
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -3495,11 +3496,11 @@ paths:
   /tenant-config/languages:
     put:
       operationId: setLanguages
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-018 Interface Languages"
         - "P13 CMS-011 Translations"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set enabled languages and default
@@ -3948,10 +3949,10 @@ paths:
   /tenant-config/versions:
     get:
       operationId: listConfigVersions
-      description: '**Order.** Newest first, by `publishedAt` descending, then by `approvalRequestId`.'
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-015 Version History"
+      description: '**Order.** Newest first, by `publishedAt` descending, then by `approvalRequestId`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -4083,12 +4084,12 @@ paths:
         format: uuid
     get:
       operationId: getKioskConfigValidation
+      x-ticvai-consumed-by:
+        - "P13 CMS-105 Kiosk Builder"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-105 Kiosk Builder"
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, the publish checks (docs/active/decisions/answers-5-october.md,
         CHG-R4-001); shape follows validateBookingFlow'
       x-ticvai-audience:
@@ -4927,7 +4928,6 @@ paths:
       operationId: getPublishedTenantConfig
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
-        - "P01 WEB-028 Contact & Venue Information"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
         - "P02 GST-001 Home"
         - "P02 GST-043 Arabic / RTL Experience"
@@ -5401,13 +5401,6 @@ paths:
         format: uuid
     get:
       operationId: getPublishedBookingFlow
-      x-ticvai-read-via:
-      - query: catalogue#productCategoryRecords
-        route: service
-        for: 'its read of catalogue.product_category, Catalogue''s data (CHG-MOD-001)'
-      - query: catalogue#productRecords
-        route: service
-        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P01 WEB-005 Ticket Type Selection"
         - "P01 WEB-006 Date & Performance Selection"
@@ -5421,6 +5414,13 @@ paths:
         - "P02 GST-009 Review & Payment"
         - "P02 GST-041 Checkout Entry"
         - "P13 CMS-103 Booking Flows"
+      x-ticvai-read-via:
+      - query: catalogue#productCategoryRecords
+        route: service
+        for: 'its read of catalogue.product_category, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: W12 (guest screens WEB-005..012, GST-007..009, GST-041 order their steps
         from the published flow); shape follows getPublishedGuidedChoice'
       x-ticvai-audience:
@@ -5654,6 +5654,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     delete:
       operationId: deleteBookingFlow
+      x-ticvai-consumed-by:
+        - "P13 CMS-103 Booking Flows"
       x-ticvai-read-via:
       - query: catalogue#productCategoryRecords
         route: service
@@ -5661,8 +5663,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-103 Booking Flows"
       x-ticvai-agreed: '29 September: W12; shape follows deleteGuidedChoice'
       x-ticvai-audience:
       - staff
@@ -5840,10 +5840,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setSiteSetupProgress
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-102 Site Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-agreed: '29 September: W12, M24-05; shape follows setBookingFlowConfig'
       x-ticvai-audience:
       - staff
@@ -5924,10 +5924,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setStoreAccounts
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-agreed: '29 September: M24-08 (every client creates and owns its own Apple Developer (DUNS) and
         Google Play accounts); shape follows setBrandIdentity'
       x-ticvai-make-or-break: 'Each client must register its own Apple Developer account (which needs a D-U-N-S
@@ -5989,11 +5989,11 @@ paths:
   /tenant-config/app-builds:
     get:
       operationId: listAppBuilds
+      x-ticvai-consumed-by:
+        - "P13 CMS-104 App Build & Store Publishing"
       description: '**Order.** Newest first, by `requestedAt` descending, then by `id`.
 
         **Statuses.** Every `status` is returned, ended ones included (`failed`, `rejected`); a screen that shows only live rows filters on `status` itself.'
-      x-ticvai-consumed-by:
-        - "P13 CMS-104 App Build & Store Publishing"
       x-ticvai-agreed: '29 September: M24-08 (submission status); shape follows listConfigVersions'
       x-ticvai-audience:
       - staff
@@ -6144,12 +6144,12 @@ paths:
   /content-blocks/{blockId}:
     patch:
       operationId: updateContentBlock
+      x-ticvai-consumed-by:
+        - "P13 CMS-007 Page Builder"
       x-ticvai-read-via:
       - query: platform-ops#contentBlockRecords
         route: in-process
         for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P13 CMS-007 Page Builder"
       summary: Change a draft content block
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007).** Changes a block's `body`, `localeVariants`, `position`,

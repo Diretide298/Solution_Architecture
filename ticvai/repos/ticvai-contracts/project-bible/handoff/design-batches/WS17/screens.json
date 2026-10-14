@@ -5,6 +5,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/delegation-escalation-command-center-bo-384",
-   "component": "apps/venue-management-web/src/routes/venue-operations/DelegationEscalationCommandCenter.tsx",
+   "component": "src/routes/venue-operations/DelegationEscalationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -275,6 +276,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "5",
@@ -284,7 +286,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/delegation-management-bo-385",
-   "component": "apps/venue-management-web/src/routes/venue-operations/DelegationManagement.tsx",
+   "component": "src/routes/venue-operations/DelegationManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -458,6 +460,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "5",
@@ -467,7 +470,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/temporary-delegation-availability-calendar-bo-386",
-   "component": "apps/venue-management-web/src/routes/venue-operations/TemporaryDelegationAvailabilityCalendar.tsx",
+   "component": "src/routes/venue-operations/TemporaryDelegationAvailabilityCalendar.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -519,7 +522,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listApprovalDelegations",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listApprovalDelegations"
       },
       {
        "kind": "secondaryButton",
@@ -564,6 +568,16 @@
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-386"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 42. 0 of 0 labels bound to a contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "availabilityId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApproverAvailability` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -593,6 +607,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_DECIDE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "5",
@@ -602,7 +617,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/out-of-office-substitute-routing-bo-387",
-   "component": "apps/venue-management-web/src/routes/venue-operations/OutOfOfficeSubstituteRouting.tsx",
+   "component": "src/routes/venue-operations/OutOfOfficeSubstituteRouting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -695,6 +710,16 @@
    "workshopBoard": "wireframes/WS34 Approval Workflows and Governance Board 5.dc.html#bo-387"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 7 of 23 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "availabilityId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApproverAvailability` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -724,6 +749,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "5",
@@ -733,7 +759,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/approval-sla-policy-configuration-bo-388",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ApprovalSlaPolicyConfiguration.tsx",
+   "component": "src/routes/venue-operations/ApprovalSlaPolicyConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -832,6 +858,16 @@
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 43. 0 of 0 labels bound to a contract property; 8 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
   "notes": "**One SLA policy screen (decided 2 October 2026, merge as proposed; CHG-SBO-021):** reminders and breach notifications (BO-389) and the escalation policy (BO-390) are sections of this one policy object.",
+  "entryState": {
+   "params": [
+    {
+     "name": "slaPolicyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalSlaPolicy` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -870,7 +906,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/reminder-breach-notification-rules-bo-389",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ReminderBreachNotificationRules.tsx",
+   "component": "src/routes/venue-operations/ReminderBreachNotificationRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -955,7 +991,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/escalation-policy-builder-bo-390",
-   "component": "apps/venue-management-web/src/routes/venue-operations/EscalationPolicyBuilder.tsx",
+   "component": "src/routes/venue-operations/EscalationPolicyBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1031,6 +1067,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "5",
@@ -1040,7 +1077,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/live-escalation-operations-center-bo-391",
-   "component": "apps/venue-management-web/src/routes/venue-operations/LiveEscalationOperationsCenter.tsx",
+   "component": "src/routes/venue-operations/LiveEscalationOperationsCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1213,6 +1250,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "5",
@@ -1222,7 +1260,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/sla-escalation-performance-analytics-bo-392",
-   "component": "apps/venue-management-web/src/routes/venue-operations/SlaEscalationPerformanceAnalytics.tsx",
+   "component": "src/routes/venue-operations/SlaEscalationPerformanceAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1293,7 +1331,8 @@
         "Peak approval periods"
        ],
        "notes": "The pack groups this record's detail under its own headings: “SLA Compliance”, “Average Response”, “Escalation Rate”, “Breach Rate”, “SLA by Department”, “Escalations by Reason”.",
-       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 47 §Identify"
+       "provenance": "pack Approval_Workflows_and_Governance_Reference.pdf, page 47 §Identify",
+       "operation": "getApprovalAnalytics"
       }
      ]
     }
@@ -1360,6 +1399,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "5",
@@ -1369,7 +1409,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/ai-sla-escalation-advisor-bo-393",
-   "component": "apps/venue-management-web/src/routes/venue-operations/AiSlaEscalationAdvisor.tsx",
+   "component": "src/routes/venue-operations/AiSlaEscalationAdvisor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1423,7 +1463,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {

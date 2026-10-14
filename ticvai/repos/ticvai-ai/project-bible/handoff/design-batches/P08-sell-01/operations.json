@@ -1638,7 +1638,7 @@
  },
  "setChannelListing": {
   "method": "PUT",
-  "path": "/channel-listings",
+  "path": "/channel-listings/{listingId}",
   "contract": "subscription",
   "summary": "List a product on a channel, with its own allocation",
   "permission": "PARTNER_MANAGE",
@@ -1646,6 +1646,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "listingId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -1748,7 +1753,7 @@
  },
  "setPerformanceTemplate": {
   "method": "PUT",
-  "path": "/performance-templates",
+  "path": "/performance-templates/{performanceTemplateId}",
   "contract": "catalogue",
   "summary": "Define slot length, capacity, bands and walk-in policy",
   "permission": "PERFORMANCE_CONFIGURE",
@@ -1756,6 +1761,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "performanceTemplateId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

@@ -581,6 +581,7 @@
   }
  },
  "MarketingBadge": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.badge",
   "description": "**Taken from the backend workbook, 20 September.** Defines a digital badge that can be awarded to a customer for challenge completion or other engagement achievement.",
@@ -589,9 +590,15 @@
    "name",
    "type",
    "isActive",
-   "createdAt"
+   "createdAt",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -622,6 +629,7 @@
     "type": "boolean"
    },
    "createdAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    },
@@ -652,6 +660,7 @@
     "format": "uuid"
    },
    "badgeId": {
+    "x-ticvai-references": "marketing.badge",
     "type": "string",
     "format": "uuid"
    },
@@ -680,12 +689,14 @@
     "nullable": true
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "maxLength": 20
    }
   }
  },
  "MarketingLoyaltyCampaign": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.loyalty_campaign",
   "description": "**Taken from the backend workbook, 20 September.** Links a marketing campaign to temporary loyalty bonuses, rewards, or earning changes.",
@@ -696,9 +707,15 @@
    "startAt",
    "endAt",
    "isActive",
-   "createdAt"
+   "createdAt",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -732,6 +749,7 @@
     "type": "boolean"
    },
    "createdAt": {
+    "readOnly": true,
     "type": "string",
     "format": "date-time"
    }
@@ -752,6 +770,7 @@
     "format": "uuid"
    },
    "campaignId": {
+    "x-ticvai-references": "marketing.campaign",
     "type": "string",
     "format": "uuid"
    },
@@ -787,6 +806,7 @@
   }
  },
  "MarketingPointsRedemptionRule": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.points_redemption_rule",
   "description": "**Taken from the backend workbook, 20 September.** Defines how loyalty points can be exchanged for discounts, products, or other benefits.",
@@ -795,9 +815,15 @@
    "pointRedemptionRuleCode",
    "name",
    "redemptionType",
-   "isActive"
+   "isActive",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -921,6 +947,7 @@
   }
  },
  "MarketingReward": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.reward",
   "description": "**Taken from the backend workbook, 20 September.** Defines a loyalty reward that can be issued to eligible customers.",
@@ -929,9 +956,15 @@
    "code",
    "name",
    "type",
-   "isActive"
+   "isActive",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid"
@@ -1040,6 +1073,7 @@
     "format": "uuid"
    },
    "referrerSubjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -1050,6 +1084,7 @@
     "nullable": true
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "readOnly": true,
     "type": "string"
    },

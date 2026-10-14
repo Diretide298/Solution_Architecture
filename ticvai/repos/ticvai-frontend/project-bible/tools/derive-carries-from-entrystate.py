@@ -191,6 +191,16 @@ class Contracts:
                 for media in ((resp or {}).get("content") or {}).values():
                     if isinstance(media, dict) and media.get("schema"):
                         self.names_in(media["schema"], rf, out)
+            # **A search hit's `id` with its `kind` is that kind's id** (Block A audit, 14 October 2026, CHG-SCR-018;
+            # asked by the guest-screens batch): `searchCatalogue` returns `{id, kind}` rows and takes `kind` as a
+            # query enum, so a product hit hands on its `productId` (GST-063 -> GST-004).
+            if "id" in out and "kind" in out:
+                for p in list(extra["shared"]) + list(op.get("parameters") or []):
+                    p, _, _ = self.deref(p, f)
+                    if isinstance(p, dict) and p.get("in") == "query" and p.get("name") == "kind":
+                        for k in ((p.get("schema") or {}).get("enum") or []):
+                            if isinstance(k, str) and re.match(r"^[a-z][A-Za-z0-9]*$", k):
+                                out.add(k + "Id")
         self._yield[operation_id] = out
         return out
 

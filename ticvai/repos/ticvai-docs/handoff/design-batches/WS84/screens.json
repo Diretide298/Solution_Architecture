@@ -5,6 +5,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "7",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/card-lifecycle-command-center-bo-454",
-   "component": "apps/venue-management-web/src/routes/games-rides/CardLifecycleCommandCenter.tsx",
+   "component": "src/routes/games-rides/CardLifecycleCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -111,7 +112,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -257,6 +258,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "7",
@@ -266,7 +268,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/card-credential-profile-bo-455",
-   "component": "apps/venue-management-web/src/routes/games-rides/CardCredentialProfile.tsx",
+   "component": "src/routes/games-rides/CardCredentialProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -347,7 +349,8 @@
         "Status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Linked Values”, “Page 65 of 105”.",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 65 §Card Information"
+       "provenance": "pack Game_and_Ride_Module.pdf, page 65 §Card Information",
+       "operation": "getGameCard"
       }
      ]
     }
@@ -420,6 +423,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "7",
@@ -429,7 +433,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/card-expiry-rule-configuration-bo-456",
-   "component": "apps/venue-management-web/src/routes/games-rides/CardExpiryRuleConfiguration.tsx",
+   "component": "src/routes/games-rides/CardExpiryRuleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -544,6 +548,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "7",
@@ -553,7 +558,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/last-recharge-last-activity-tracking-bo-457",
-   "component": "apps/venue-management-web/src/routes/games-rides/LastRechargeLastActivityTracking.tsx",
+   "component": "src/routes/games-rides/LastRechargeLastActivityTracking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -602,7 +607,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getGameCard",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getGameCard"
       }
      ]
     }
@@ -676,7 +682,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/expiry-monitoring-upcoming-expiration-bo-458",
-   "component": "apps/venue-management-web/src/routes/games-rides/ExpiryMonitoringUpcomingExpiration.tsx",
+   "component": "src/routes/games-rides/ExpiryMonitoringUpcomingExpiration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -797,6 +803,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "7",
@@ -806,7 +813,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/card-expiry-runtime-validation-bo-459",
-   "component": "apps/venue-management-web/src/routes/games-rides/CardExpiryRuntimeValidation.tsx",
+   "component": "src/routes/games-rides/CardExpiryRuntimeValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -963,6 +970,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "7",
@@ -972,7 +980,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/card-block-suspend-reactivation-control-bo-460",
-   "component": "apps/venue-management-web/src/routes/games-rides/CardBlockSuspendReactivationControl.tsx",
+   "component": "src/routes/games-rides/CardBlockSuspendReactivationControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1154,6 +1162,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "7",
@@ -1163,7 +1172,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/card-replacement-wallet-relinking-bo-461",
-   "component": "apps/venue-management-web/src/routes/games-rides/CardReplacementWalletRelinking.tsx",
+   "component": "src/routes/games-rides/CardReplacementWalletRelinking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1311,6 +1320,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "7",
@@ -1320,7 +1330,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/customer-balance-credential-status-view-bo-462",
-   "component": "apps/venue-management-web/src/routes/games-rides/CustomerBalanceCredentialStatusView.tsx",
+   "component": "src/routes/games-rides/CustomerBalanceCredentialStatusView.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1389,7 +1399,8 @@
         "Bonus Expiry: 30 Sep 2026"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Customer View”, “Redemption Credits”, “Free Games”, “Entitlements”.",
-       "provenance": "pack Game_and_Ride_Module.pdf, page 71 §Card Information"
+       "provenance": "pack Game_and_Ride_Module.pdf, page 71 §Card Information",
+       "operation": "getGameCard"
       }
      ]
     }
@@ -1459,6 +1470,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "7",
@@ -1468,7 +1480,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/card-lifecycle-audit-history-bo-463",
-   "component": "apps/venue-management-web/src/routes/games-rides/CardLifecycleAuditHistory.tsx",
+   "component": "src/routes/games-rides/CardLifecycleAuditHistory.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1514,7 +1526,7 @@
         "18 Apr 2026"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listGameplayTransactions",
        "provenance": "pack Game_and_Ride_Module.pdf, page 72 §Card Issued"
       }
      ]

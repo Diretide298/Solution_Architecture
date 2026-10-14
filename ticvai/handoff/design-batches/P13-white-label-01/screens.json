@@ -5,6 +5,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -395,6 +396,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -596,6 +598,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -773,6 +776,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1042,6 +1046,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1228,6 +1233,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1504,6 +1510,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1771,6 +1778,13 @@
     "purpose": "Edit or reorder a block (position): agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026",
     "trigger": "onAction",
     "provenance": "defined 4 October 2026 (CHG-FXS-003)"
+   },
+   {
+    "operationId": "listProposedActions",
+    "contract": "ai",
+    "purpose": "Follows decideProposedAction (202) until what it started settles: What the assistant has proposed and nobody has decided",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -1950,6 +1964,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -2194,6 +2209,13 @@
     "purpose": "Record which AI draft or proposal was used, or why it was refused",
     "trigger": "onAction",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "listProposedActions",
+    "contract": "ai",
+    "purpose": "Follows the drafts proposeMarketingContent queued and the decisions decideProposedAction routed: each is an ai.proposed_action, polled while the screen is open until it is applied or refused",
+    "trigger": "onInterval",
+    "provenance": "audit fix S-ASYNC-POLL, 14 October 2026 (CHG-SCO-011)"
    }
   ],
   "entryState": {
@@ -2383,6 +2405,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -2726,6 +2749,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "ASSET_LIBRARY_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",

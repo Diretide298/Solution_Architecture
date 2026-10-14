@@ -23,7 +23,7 @@ modulesUsed:
   screens: 8
 servicesCalled:
 - service: TenancyService
-  operationCalls: 21
+  operationCalls: 17
 coverage:
   screens: 8
   inAFlow: 3
@@ -60,7 +60,7 @@ screens:
   density: compact
   operations:
   - createAccreditationApplication
-  - submitAccreditationDocument
+  - getAccreditationApplication
   - updateAccreditationApplication
   states:
   - denied
@@ -87,7 +87,6 @@ screens:
   density: compact
   operations:
   - submitAccreditationApplication
-  - updateAccreditationApplication
   states:
   - denied
   - emptyFirstRun
@@ -112,9 +111,6 @@ screens:
   density: compact
   operations:
   - listMyAccreditationApplications
-  - resubmitAccreditationApplication
-  - submitAccreditationDocument
-  - updateAccreditationApplication
   - withdrawAccreditationApplication
   states:
   - denied
@@ -193,8 +189,6 @@ screens:
   operations:
   - decideAccreditationApplication
   - getAccreditationApplication
-  - listAccreditationDocuments
-  - verifyAccreditationDocument
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -220,6 +214,8 @@ screens:
   wave: 3
   density: compact
   operations:
+  - exportAccreditationData
+  - getAccreditationExport
   - listAccreditationAccessActivity
   - listAccreditationCredentials
   states:
@@ -231,6 +227,7 @@ screens:
   offlineState: false
   entryParams:
   - programmeId<-session
+  - exportId<-navigation
   goesTo:
   - ACC-006
   - ACC-007

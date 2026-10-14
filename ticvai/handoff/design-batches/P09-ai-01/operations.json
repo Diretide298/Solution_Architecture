@@ -271,7 +271,7 @@
  },
  "setAiProvider": {
   "method": "PUT",
-  "path": "/providers",
+  "path": "/providers/{providerId}",
   "contract": "ai",
   "summary": "Configure a provider",
   "permission": "PLATFORM_TENANT_MANAGE",
@@ -279,6 +279,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "providerId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

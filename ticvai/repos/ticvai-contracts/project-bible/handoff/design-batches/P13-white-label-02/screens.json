@@ -5,6 +5,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "MARKETING_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -216,6 +217,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -403,6 +405,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -532,6 +535,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -631,6 +635,7 @@
       },
       {
        "kind": "publishGate",
+       "operation": "listBookingFlows",
        "impliedBy": "publishTenantConfig",
        "notes": "Declares `publishTenantConfig`. **The gate names what the publish will affect before it happens** — a disabled Publish with no reason is the state operators escalate. **Booking flows publish here with the rest of the site (decided 29 September, W12)**: the gate lists each venue flow that changed, and an invalid one (`bookingFlowInvalid`) or a bookable kind with no flow (`bookingFlowMissing`) blocks the publish with a link to CMS-103.\n",
        "provenance": "carried from the previous definition"
@@ -877,6 +882,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1094,6 +1100,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1342,6 +1349,16 @@
     "provenance": "corrected 2 October 2026 (CHG-SGU-022, design-notes correction)"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "analyticsProviderId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listAnalyticsProviders`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -1371,6 +1388,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1671,6 +1689,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -2089,6 +2108,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "USER_MANAGE",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -2316,6 +2336,7 @@
   "module": "White Label",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "TENANT_CONFIGURE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/help-me-choose",

@@ -1,23 +1,4 @@
 {
- "createMfaChallenge": {
-  "method": "POST",
-  "path": "/auth/mfa/challenge",
-  "contract": "identity",
-  "summary": "Second factor at staff sign-in, and step-up for a sensitive action",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "createRefundRequest": {
   "method": "POST",
   "path": "/refund-requests",
@@ -400,25 +381,6 @@
   "requestBody": null,
   "responds": "GuestDevice"
  },
- "removeMfaMethod": {
-  "method": "DELETE",
-  "path": "/auth/mfa/methods/{methodId}",
-  "contract": "identity",
-  "summary": "Remove an MFA method",
-  "permission": null,
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
  "revokeFacePass": {
   "method": "DELETE",
   "path": "/face-pass/enrolments/{enrolmentId}",
@@ -501,25 +463,6 @@
   "contract": "identity",
   "summary": "Send a verification link, or consume one",
   "permission": "GUEST_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": null
- },
- "verifyMfaChallenge": {
-  "method": "POST",
-  "path": "/auth/mfa/challenge/{challengeId}/verify",
-  "contract": "identity",
-  "summary": "Complete a sign-in or step-up challenge",
-  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",

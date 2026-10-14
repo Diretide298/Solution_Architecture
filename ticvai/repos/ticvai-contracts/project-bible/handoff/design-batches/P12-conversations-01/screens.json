@@ -5,6 +5,7 @@
   "module": "Conversations",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "CASE_VIEW",
   "capability": "C32",
   "implementation": {
    "app": "venue-support-web",
@@ -244,6 +245,7 @@
   "module": "Conversations",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "CASE_VIEW",
   "capability": "C32",
   "implementation": {
    "app": "venue-support-web",

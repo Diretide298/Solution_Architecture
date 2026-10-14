@@ -1,6 +1,6 @@
 # WS123 — AI Governance board 3
 
-**10 screens · 10 operations · 20 schemas · 4 permissions**
+**10 screens · 9 operations · 19 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -95,14 +95,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-539` | AI Explainability & Audit Command Center | B | 8 | 6 | 7 | 5 | 0 | 0 | — | notStarted (—) |
-| `ADM-540` | AI Decision Explorer & Search | D | 9 | 6 | 7 | 5 | 2 | 0 | — | notStarted (—) |
+| `ADM-539` | AI Explainability & Audit Command Center | B | 8 | 206 | 7 | 5 | 0 | 0 | — | notStarted (—) |
+| `ADM-540` | AI Decision Explorer & Search | D | 9 | 26 | 7 | 5 | 2 | 0 | — | notStarted (—) |
 | `ADM-541` | AI Decision Explanation Workspace | B | 6 | 59 | 7 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-542` | Data, Feature & Evidence Provenance | B | 6 | 48 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-543` | Candidate, Rule & Decision Path Trace | D | 6 | 18 | 7 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-543` | Candidate, Rule & Decision Path Trace | D | 6 | 18 | 7 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-544` | Model, Provider & AI Runtime Trace | D | 6 | 50 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-545` | Governance, Approval & Human Decision Trace | B | 6 | 41 | 7 | 1 | 1 | 3 | — | notStarted (—) |
-| `ADM-546` | Execution & Business Outcome Trace | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-546` | Execution & Business Outcome Trace | D | 6 | 26 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-547` | AI Audit Record & Evidence Package | D | 6 | 6 | 7 | 5 | 0 | 0 | — | notStarted (—) |
 | `ADM-548` | AI Trace Investigation & Replay Simulator | D | 6 | 18 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
@@ -186,25 +186,255 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**AI Decisions Today** (metric tile)
+**AI Decisions Today** (metric tile, from `searchAiDecisions`)
 
-**Governed AI Actions** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
 
-**Automated Decisions** (metric tile)
+**Governed AI Actions** (metric tile, from `searchAiDecisions`)
 
-**Human-Reviewed Decisions** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
 
-**Human Overrides** (metric tile)
+**Automated Decisions** (metric tile, from `searchAiDecisions`)
 
-**Blocked Decisions** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
 
-**Explainability Coverage** (metric tile)
+**Human-Reviewed Decisions** (metric tile, from `searchAiDecisions`)
 
-**Complete Decision Traces** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
 
-**Incomplete Traces** (metric tile)
+**Human Overrides** (metric tile, from `searchAiDecisions`)
 
-**Audit Warnings** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
+
+**Blocked Decisions** (metric tile, from `searchAiDecisions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
+
+**Explainability Coverage** (metric tile, from `searchAiDecisions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
+
+**Complete Decision Traces** (metric tile, from `searchAiDecisions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
+
+**Incomplete Traces** (metric tile, from `searchAiDecisions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
+
+**Audit Warnings** (metric tile, from `searchAiDecisions`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
 
 **Actions and what each produces**
 
@@ -266,6 +496,8 @@ tiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_AUDIT_VIEW`
+
 #### Requirements it meets
 
 5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -308,7 +540,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (206 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-539?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-002`, `ADM-540`, `ADM-541`, `ADM-542`, `ADM-543`, `ADM-544`, `ADM-545`, `ADM-546`, `ADM-547`, `ADM-548`.
@@ -399,7 +631,30 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getAiDecisionTrace`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Record | grouped details | The standard record for every governed decision (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast … |
+| ID | the name it points at, never the id | — |
+| Trace | text | — |
+| Capability key | text | — |
+| Task | text | — |
+| Subject kind | text | — |
+| Subject ref | text | — |
+| Inputs ref | text | Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself. |
+| Evidence | list or chips (count when long) | The evidence of one decision record, stored with it. |
+| Label | chip: Source, Derived, Model inferred | — |
+| Kind | text | What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`. |
+| Ref | text | Where it came from: a table and id, a document chunk, a metric key. |
+| Name | text | — |
+| Value | grouped details | — |
+| Observed at | 1 Oct 2026, 14:30 | — |
+| Producer | text | — |
+| Model version | text | — |
+| Prompt template version | text | — |
+| Feature set version | text | — |
+| Knowledge version | text | — |
 
 **Actions and what each produces**
 
@@ -451,6 +706,8 @@ result:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_AUDIT_VIEW`
+
 #### Requirements it meets
 
 5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -486,7 +743,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-540?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-539`.
@@ -685,6 +942,8 @@ explanation: 'Recommended a Wave Rider fast pass product: 412 counter upgrades t
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for …
+
+Screen guard: `AI_AUDIT_VIEW`
 
 #### Requirements it meets
 
@@ -910,6 +1169,8 @@ items:
 
 **A refused user sees:** Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for …
 
+Screen guard: `AI_AUDIT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -957,7 +1218,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | Block D · task APP-CONSOLE-ADM-543 |
-| Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 2 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
@@ -1019,7 +1280,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Every candidate rule decision** (data table)
+**Every candidate rule decision** (data table, from `getAiDecisionTrace`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1030,7 +1291,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | VIP tour | text | not in the schema: `VIP Tour` |
 | Remaining capacity = 0 | text | not in the schema: `Remaining Capacity = 0` |
 
-**The selected candidate rule decision** (detail panel): The pack groups this record's detail under its own headings: “Candidate Table”, “Governance”, “Approval”, “Signals”.
+**The selected candidate rule decision** (detail panel, from `getAiDecisionTrace`): The pack groups this record's detail under its own headings: “Candidate Table”, “Governance”, “Approval”, “Signals”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1084,7 +1345,6 @@ removal:
 
 #### Permissions
 
-- `explainRecommendationDecision` → `AI_USE` (operate) · staff
 - `getAiDecisionTrace` → `AI_AUDIT_VIEW` (read) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
@@ -1092,13 +1352,14 @@ removal:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_AUDIT_VIEW`
+
 #### Requirements it meets
 
-2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
-| 8.6.20 | System shall support recommendation explainability. | Unified Operations Dashboard | CONTRACTED | `explainRecommendationDecision` |
 | 2.6.6 | It is expected to have one webstore/application API for each venue. | Ticketing Sales | CONTRACTED | data `Tenant` |
 
 #### Client meeting inputs
@@ -1127,7 +1388,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#ADM-543?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-539`.
-- [ ] Every gated control is gated: `AI_AUDIT_VIEW`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
+- [ ] Every gated control is gated: `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -1203,7 +1464,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Every model provider runtime** (data table)
+**Every model provider runtime** (data table, from `listAiModels`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1230,7 +1491,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Fallback provider | text | not in the schema: `Fallback Provider` |
 | Success | text | not in the schema: `Success` |
 
-**The selected model provider runtime** (detail panel): The pack groups this record's detail under its own headings: “Prompt Template”, “Latency”, “Version Traceability”, “Important Boundary”.
+**The selected model provider runtime** (detail panel, from `getAiDecisionTrace`): The pack groups this record's detail under its own headings: “Prompt Template”, “Latency”, “Version Traceability”, “Important Boundary”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1310,6 +1571,8 @@ record:
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1518,6 +1781,8 @@ chain:
 
 **A refused user sees:** Shown when the caller lacks `AI_AUDIT_VIEW`, which `getAiDecisionTrace` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for …
 
+Screen guard: `AI_AUDIT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1569,7 +1834,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | Block D · task APP-CONSOLE-ADM-546 |
-| Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 2 operate); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -1594,7 +1859,6 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Depth | segmented control | Business | Business · Governance · Technical | `getAiDecisionTrace` ?depth |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -1627,7 +1891,30 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getActionPlan`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -1639,7 +1926,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **outcome chain**: Proposal → approval → execution (plan steps, objects) → outcome measured over a period against a baseline. *(source: contracts/satellite/ai.yaml#getActionPlan / contracts/satellite/ai.yaml#getAiDecisionTrace / MoM 18 Sep 4.4)*
 
-**Data it reads**: `getAiDecisionTrace` (onLoad, The full trace of a decision); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -1673,12 +1960,13 @@ chain:
 #### Permissions
 
 - `getActionPlan` → `AI_USE` (operate) · staff
-- `getAiDecisionTrace` → `AI_AUDIT_VIEW` (read) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -1708,11 +1996,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-546?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-539`.
-- [ ] Every gated control is gated: `AI_AUDIT_VIEW`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1756,6 +2044,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
+| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
+| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 | Capability key | text field | — | — | `searchAiDecisions` ?capabilityKey |
 | Outcome | select | — | Answered · Refused · Allowed · Blocked · Executed · Failed · Approved then failed · Published · Suggested | `searchAiDecisions` ?outcome |
 | Subject ref | text field | — | — | `searchAiDecisions` ?subjectRef |
@@ -1764,8 +2054,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Model version | text field | — | — | `searchAiDecisions` ?modelVersion |
 | From | date and time picker | — | — | `searchAiDecisions` ?from |
 | To | date and time picker | — | — | `searchAiDecisions` ?to |
-| Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
-| Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
 **Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
 
@@ -1812,7 +2100,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Governance Policy (secondary button) | navigation or local | — | — | — | — |
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
-**Data it reads**: `searchAiDecisions` (onLoad, Find AI decisions); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …); `searchAiDecisions` (onLoad, Find AI decisions)
 
 **Where the user goes next**
 
@@ -1845,13 +2133,15 @@ package:
 
 #### Permissions
 
-- `searchAiDecisions` → `AI_AUDIT_VIEW` (read) · staff
-- `exportAiEvidencePackage` → `AI_AUDIT_VIEW` (read) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `exportAiEvidencePackage` → `AI_AUDIT_VIEW` (read) · staff
+- `searchAiDecisions` → `AI_AUDIT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -1971,7 +2261,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Every trace investigation replay** (data table)
+**Every trace investigation replay** (data table, from `getAiDecisionTrace`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1982,7 +2272,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | 5 | text | not in the schema: `Governance v1.5` |
 | Comparison | text | not in the schema: `Comparison` |
 
-**The selected trace investigation replay** (detail panel): The pack groups this record's detail under its own headings: “Original Time”, “Result”, “Exact Historical Replay”, “Element Original Replay”, “Eligibility Same Same”, “Authorized investigator can record”.
+**The selected trace investigation replay** (detail panel, from `getAiDecisionTrace`): The pack groups this record's detail under its own headings: “Original Time”, “Result”, “Exact Historical Replay”, “Element Original Replay”, “Eligibility Same Same”, “Authorized investigator can record”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -2036,12 +2326,14 @@ replay:
 #### Permissions
 
 - `getAiDecisionTrace` → `AI_AUDIT_VIEW` (read) · staff
-- `replayAiDecision` → `AI_AUDIT_VIEW` (read) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `replayAiDecision` → `AI_AUDIT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_AUDIT_VIEW`
 
 #### Requirements it meets
 
@@ -2159,7 +2451,6 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"explainRecommendationDecision": {"method":"GET","path":"/recommendations/decisions/{decisionId}/explanation","contract":"ai","summary":"Why these recommendations","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"depth","in":"query","required":null}],"requestBody":null,"responds":"AiRecommendationExplanation"},
 "exportAiEvidencePackage": {"method":"POST","path":"/evidence-packages","contract":"ai","summary":"Export an evidence package","permission":"AI_AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "getActionPlan": {"method":"GET","path":"/action-plans/{planId}","contract":"ai","summary":"A plan with its steps","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"AiActionPlanDetail"},
 "getAiDecisionTrace": {"method":"GET","path":"/decision-records/{decisionRecordId}/trace","contract":"ai","summary":"The full trace of a decision","permission":"AI_AUDIT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"depth","in":"query","required":null}],"requestBody":null,"responds":"AiDecisionTrace"},
@@ -2182,21 +2473,20 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiActionPlanDetail": {"type":"object","x-ticvai-persistence":"none — ai.action_plan with its ai.action_step rows","description":"A plan with its steps in DAG order.","required":["plan","steps"],"properties":{"plan":{"$ref":"#/components/schemas/AiActionPlan"},"steps":{"type":"array","items":{"$ref":"#/components/schemas/AiActionStep"}}}},
 "AiActionStep": {"type":"object","x-ticvai-persistence":"ai.action_step","description":"One step of a plan: a registered tool against `targetContract.targetOperation` at a contract version (AIC-095), with payload, provenance, compensation and the idempotency key `plan:{id}:step:{n}`. **Scoped through its plan** (`platform.apply_parent_rls`). Each step records its target object's version; drift pauses the plan (AIC-182).","required":["planId","stepNumber","toolKey","targetContract","targetOperation","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"planId":{"type":"string","format":"uuid","x-ticvai-references":"ai.action_plan"},"stepNumber":{"type":"integer","minimum":1},"dependsOn":{"type":"array","items":{"type":"integer","minimum":1},"description":"Step numbers that must succeed first. The plan is a DAG."},"toolKey":{"type":"string"},"targetContract":{"type":"string"},"targetOperation":{"type":"string"},"contractVersion":{"type":"string"},"payload":{"type":"object","additionalProperties":true,"description":"The request body of `targetOperation`, validated against it before the plan is approved."},"provenance":{"$ref":"#/components/schemas/AiProvenance"},"idempotencyKey":{"type":"string","readOnly":true},"targetObjectRef":{"type":"string","nullable":true},"targetObjectVersion":{"type":"string","nullable":true,"description":"The version the step was planned against. A different version at execution is drift."},"reversible":{"type":"boolean"},"compensation":{"type":"object","additionalProperties":true,"nullable":true},"status":{"type":"string","enum":["pending","validated","running","succeeded","failed","compensated","skipped","paused"],"readOnly":true},"attempts":{"type":"integer","minimum":0,"maximum":3,"readOnly":true,"description":"Bounded at 3 (AIC-135)."},"lastError":{"type":"string","nullable":true,"readOnly":true},"resultRef":{"type":"string","nullable":true,"readOnly":true,"description":"The owning service's response: success is its answer, not a model's judgement (AIC-097)."},"startedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"completedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
 "AiCapability": {"type":"string","description":"What a capability needs, not which provider serves it. This indirection is what makes \"no provider SDK in capability code\" enforceable.\n**`speechToText` and `textToSpeech` added 18 August (BL-164)** — voice added rather than declined. **Speech is the capability where UAE residency is hardest to satisfy**: the major providers run it in fewer regions than text, and a guest speaking into a kiosk is producing personal data in the moment. `AiProvider.residency` already carries the constraint and **speech is the capability most likely to fail it**, which is why it is separate rather than folded into `chat`.\n","enum":["chat","embedding","vision","rerank","speechToText","textToSpeech"]},
-"AiDecisionRecord": {"type":"object","x-ticvai-persistence":"ai.decision_record","description":"**The standard record for every governed decision** (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast publication, a plan step, an assistant answer at significant depth, a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.","required":["traceId","capabilityKey","outcome","recordHash"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"traceId":{"type":"string"},"capabilityKey":{"type":"string"},"task":{"type":"string","nullable":true},"subjectKind":{"type":"string","nullable":true},"subjectRef":{"type":"string","nullable":true},"inputsRef":{"type":"string","nullable":true,"description":"Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself."},"evidence":{"$ref":"#/components/schemas/AiEvidenceItemList"},"producer":{"type":"string","nullable":true},"modelVersion":{"type":"string","nullable":true},"promptTemplateVersion":{"type":"string","nullable":true},"featureSetVersion":{"type":"string","nullable":true},"knowledgeVersion":{"type":"string","nullable":true},"ruleVersions":{"type":"object","additionalProperties":true,"nullable":true},"governanceOutcome":{"allOf":[{"$ref":"#/components/schemas/AiGovernanceOutcome"}],"nullable":true},"policyVersion":{"type":"string","nullable":true},"approvals":{"type":"object","additionalProperties":true,"nullable":true,"description":"Approval requests and their decisions."},"humanDecision":{"type":"object","additionalProperties":true,"nullable":true,"description":"Override or intervention, where a person changed the outcome."},"executionResult":{"type":"object","additionalProperties":true,"nullable":true},"outcomeRef":{"type":"string","nullable":true,"description":"The business outcome it links to (an order, a published version, a closed case)."},"outcome":{"type":"string","enum":["answered","refused","allowed","blocked","executed","failed","approvedThenFailed","published","suggested"],"description":"`approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit)."},"annotations":{"type":"array","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"byPrincipalId":{"type":"string","format":"uuid"},"note":{"type":"string"}}},"readOnly":true,"description":"Corrections, appended; the original fields are never edited."},"previousHash":{"type":"string","readOnly":true},"recordHash":{"type":"string","readOnly":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiDecisionRecord": {"type":"object","x-ticvai-persistence":"ai.decision_record","description":"**The standard record for every governed decision** (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast publication, a plan step, an assistant answer at significant depth, a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.","required":["traceId","capabilityKey","outcome","recordHash"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"traceId":{"type":"string"},"capabilityKey":{"type":"string"},"task":{"type":"string","nullable":true},"subjectKind":{"type":"string","nullable":true},"subjectRef":{"type":"string","nullable":true},"inputsRef":{"type":"string","nullable":true,"description":"Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself."},"evidence":{"$ref":"#/components/schemas/AiEvidenceItemList"},"producer":{"type":"string","nullable":true},"modelVersion":{"type":"string","nullable":true},"promptTemplateVersion":{"type":"string","nullable":true},"featureSetVersion":{"type":"string","nullable":true},"knowledgeVersion":{"type":"string","nullable":true},"ruleVersions":{"type":"object","additionalProperties":true,"nullable":true},"governanceOutcome":{"allOf":[{"$ref":"#/components/schemas/AiGovernanceOutcome"}],"nullable":true},"policyVersion":{"type":"string","nullable":true},"approvals":{"type":"object","additionalProperties":true,"nullable":true,"description":"Approval requests and their decisions."},"humanDecision":{"type":"object","additionalProperties":true,"nullable":true,"description":"Override or intervention, where a person changed the outcome."},"executionResult":{"type":"object","additionalProperties":true,"nullable":true},"outcomeRef":{"type":"string","nullable":true,"description":"The business outcome it links to (an order, a published version, a closed case)."},"outcome":{"type":"string","enum":["answered","refused","allowed","blocked","executed","failed","approvedThenFailed","published","suggested"],"description":"`approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit)."},"annotations":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"byPrincipalId":{"type":"string","format":"uuid"},"note":{"type":"string"}}},"readOnly":true,"description":"Corrections, appended; the original fields are never edited."},"previousHash":{"type":"string","readOnly":true},"recordHash":{"type":"string","readOnly":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiDecisionTrace": {"type":"object","x-ticvai-persistence":"none — ai.decision_record with the rows it references","description":"**The full trace of one decision** (ADM-540..546): record, evidence, candidates and rules, model and runtime, governance and approvals, execution and business outcome. Depth is gated by permission (AIC-195).","required":["record"],"properties":{"record":{"$ref":"#/components/schemas/AiDecisionRecord"},"depth":{"type":"string","enum":["business","governance","technical"]},"explanation":{"type":"string","description":"Built from structured evidence, never a model's chain of thought (AIC-192)."},"activity":{"type":"array","items":{"$ref":"#/components/schemas/AiInteraction"},"description":"The model calls behind it (`technical` depth)."},"plan":{"allOf":[{"$ref":"#/components/schemas/AiActionPlanDetail"}],"nullable":true},"interventions":{"type":"array","items":{"$ref":"#/components/schemas/AiIntervention"}},"chainVerified":{"type":"boolean","description":"The hash chain around this record verifies."}}},
 "AiEvidenceItemList": {"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"The evidence of one decision record, stored with it.","items":{"$ref":"#/components/schemas/AiEvidenceItem"}},
 "AiGovernanceOutcome": {"type":"string","enum":["allow","allowWithConditions","prepareOnly","approvalRequired","escalate","block"],"description":"What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). `block` is an answer, not an error, and is logged as outcome `refused`."},
 "AiInteraction": {"type":"object","x-ticvai-persistence":"ai.activity","required":["id","principalId","capability","outcome","createdAt"],"properties":{"scrubAudit":{"type":"object","readOnly":true,"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"**The audit of one call's scrubbing and routing** (3 October 2026, CHG-R1S-016; the legal research `docs/active/research/openai-key-uae-3-october.md`, item 9). Counts of the entities found by type, **never the values**; the residency class, endpoint and region; the scrubber version; whether the call was allowed or blocked; and a hash of the outbound payload. Exportable to the tenant as controller.","properties":{"entityCounts":{"type":"object","additionalProperties":{"type":"integer","minimum":0},"description":"Per entity type, e.g. emiratesId 1 and uaePhone 2. Counts only, never values."},"residencyClass":{"$ref":"../shared/common.yaml#/components/schemas/AiResidencyClass"},"endpointRegion":{"type":"string","description":"Where the call went, e.g. `uaeNorth`, `ae.api.openai.com`, `global`."},"scrubberVersion":{"type":"string"},"decision":{"type":"string","enum":["allowed","blocked"]},"outboundPayloadHash":{"type":"string","description":"SHA-256 of the prompt as sent (after scrubbing), so a dispute can be checked without keeping the text."}}},"id":{"type":"string","format":"uuid"},"conversationId":{"type":"string","format":"uuid","nullable":true},"principalId":{"type":"string","format":"uuid"},"audience":{"type":"string","enum":["staff","guest"],"description":"**Billing divides on this.** Staff usage is bounded by headcount; guest usage is bounded by footfall and curiosity, and a venue cannot stop guests asking questions.\n"},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"The guest, where the audience is `guest`. `principalId` is null in that case — **a guest is not a principal**, and attributing their tokens to a staff member would be wrong twice.\n"},"billableToTenantId":{"type":"string","format":"uuid","description":"Resolved from `scopePath` at write time, not derived later. **Billing must not depend on walking a scope tree that has since been reorganised.**\n"},"scopePath":{"type":"string"},"capability":{"type":"string"},"prompt":{"type":"string"},"response":{"type":"string"},"sources":{"$ref":"#/components/schemas/AiSourceList"},"outcome":{"type":"string","enum":["answered","refused","applied","rejected","failed"]},"refusalReason":{"type":"string","nullable":true},"provider":{"$ref":"#/components/schemas/AiProviderKind"},"model":{"type":"string"},"promptTokens":{"type":"integer"},"completionTokens":{"type":"integer"},"cost":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"x-ticvai-column":"cost_amount","description":"What the call cost at the provider. **Money like every other amount** (naming-and-style 5.1) — it replaces an integer `costMinor` that carried no currency or scale, which AED and OMR read differently.\n"},"latencyMs":{"type":"integer"},"maskedFieldCount":{"type":"integer","description":"How many fields were redacted. Zero on a prompt touching guest data is a defect."},"traceId":{"type":"string"},"decisionRecordId":{"type":"string","format":"uuid","nullable":true,"description":"The `ai.decision_record` this call belongs to, where it was part of a governed decision (AI design 2.3, 3.9). Null for a call audited by this row alone."},"cacheLayer":{"type":"string","nullable":true,"enum":["guardrail","semantic","exact","negative","analytics"],"description":"Which cache answered, where one did (AI design 3.6). Null for a model call."},"createdAt":{"type":"string","format":"date-time"}}},
 "AiIntervention": {"type":"object","x-ticvai-persistence":"ai.intervention","description":"**A person stepping in** (AIC-187, ADM-535, ADM-536): an override, pause, resume, stop, retry or rollback, with the original AI decision and the human one side by side.","required":["kind","targetKind","targetRef"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["override","pause","resume","cancel","retry","rollback","capabilityPause","capabilityResume"]},"targetKind":{"type":"string","enum":["plan","step","decision","capability"]},"targetRef":{"type":"string"},"decisionRecordId":{"type":"string","format":"uuid","nullable":true},"originalDecision":{"type":"object","additionalProperties":true,"nullable":true},"humanDecision":{"type":"object","additionalProperties":true,"nullable":true},"reason":{"type":"string","maxLength":2000},"principalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
-"AiModel": {"type":"object","x-ticvai-persistence":"ai.model","description":"**The model catalogue** (design 3.1 Registry, 3.3; AIC-013, AIC-026). One row per model a task can be routed to: large language models, embedding and reranking models, and classical models (LightGBM, statistical forecasters) registered the same way so lifecycle, release and audit are uniform. **Platform rows** are mastered in the control plane and replicated read-only into each tenant database with the tenant root as `scopePath`; a tenant row exists only where bring-your-own-key is enabled for the tenant.","required":["layer","modelName","producerType"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"layer":{"type":"string","enum":["platform","tenant"]},"providerKind":{"allOf":[{"$ref":"#/components/schemas/AiProviderKind"}],"nullable":true},"vendor":{"type":"string","nullable":true,"pattern":"^[a-z0-9][a-z0-9-]{1,49}$","description":"**Whose model this is** (CHG-FUP-008): the provider company as `AiProvider.vendor` names it. Bring-your-own-key accepts any vendor, so the curated range carries each vendor's models with the tier they serve; the task-to-tier map (`AiByokEnablement.taskModelMap`) picks the row whose `vendor` matches the tenant's provider. TICVAI adds a new vendor's models after evaluating them (`runAiEvaluation`)."},"producerType":{"type":"string","enum":["llm","embedding","reranker","classical","rule"]},"modelName":{"type":"string","description":"The deployment or model name as the provider knows it, or the package and version for a classical model."},"capabilities":{"type":"array","items":{"$ref":"#/components/schemas/AiCapability"}},"contextTokens":{"type":"integer","nullable":true},"toolCalling":{"type":"boolean","default":false},"structuredOutput":{"type":"boolean","default":false},"languages":{"type":"array","items":{"type":"string"}},"residency":{"type":"string","nullable":true,"description":"Where inference happens. Checked against `tenancy.RegionSettings.allowedAiResidencies`."},"inputCostPerMillionTokens":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"outputCostPerMillionTokens":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"lifecycle":{"type":"object","description":"Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production.","properties":{"development":{"type":"string","enum":["draft","pilot","active","retired"]},"staging":{"type":"string","enum":["draft","pilot","active","retired"]},"production":{"type":"string","enum":["draft","pilot","active","retired"]}}},"isDefaultForTasks":{"type":"array","items":{"type":"string"},"description":"Tasks this model is the default for (AIC-010), e.g. `assistant.guest.answer`, `config.extract`."},"curatedRange":{"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"**TICVAI's curated range: the tasks this model may serve** (Chinmay, 2 October, workbook Q1, Q2 and Q9; the AI/ML model selection of 2 October; CHG-CSA-001). For each task: the tier it serves at and its rank, 1 being the best-suited model and 2 to 5 the alternatives. **A model may serve a task only where this lists it**: `setAiProvider` refuses any other choice (`422 model-not-curated`), and bring-your-own-key maps each task to the tenant provider's model at the same tier. `byokEligible` false marks the platform-owned tiers (embeddings, reranking, moderation, PII detection, OCR, speech), never served by a tenant key. Money paths (pricing, fraud scores, settlements) stay on classical models.\n","items":{"type":"object","description":"Every entry names `taskKey`, `tier` and `rank`.","properties":{"taskKey":{"type":"string"},"tier":{"type":"string","enum":["small","strong","reasoning","vision","embedding","reranking","moderation","piiDetection","ocr","speech","classical"]},"rank":{"type":"integer","minimum":1,"maximum":5},"byokEligible":{"type":"boolean","default":true}}}},"residencyClasses":{"type":"array","items":{"$ref":"../shared/common.yaml#/components/schemas/AiResidencyClass"},"description":"The tenant residency classes whose calls this model may serve (CHG-CSA-002)."},"taskFitness":{"type":"array","readOnly":true,"description":"**Evaluated fitness per task** (21 September minutes, M21-09, our proposal): a score from the task's golden set (`runAiEvaluation`) and the band the task needs. Below `floor` the model is underpowered for the task; far above `ceiling` it is overpowered (it costs more than the task needs). `setAiProvider` returns a warning (`AiProvider.fitnessWarnings`) when a choice falls outside the band, and ADM-037 shows the band beside `setAiModel`; neither refuses on it.","items":{"type":"object","required":["taskKey","score"],"properties":{"taskKey":{"type":"string"},"score":{"type":"number","minimum":0,"maximum":1},"floor":{"type":"number","minimum":0,"maximum":1},"ceiling":{"type":"number","minimum":0,"maximum":1,"nullable":true},"evaluationRunId":{"type":"string","format":"uuid","nullable":true},"evaluatedAt":{"type":"string","format":"date-time"}}}},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiModel": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"ai.model","description":"**The model catalogue** (design 3.1 Registry, 3.3; AIC-013, AIC-026). One row per model a task can be routed to: large language models, embedding and reranking models, and classical models (LightGBM, statistical forecasters) registered the same way so lifecycle, release and audit are uniform. **Platform rows** are mastered in the control plane and replicated read-only into each tenant database with the tenant root as `scopePath`; a tenant row exists only where bring-your-own-key is enabled for the tenant.","required":["layer","modelName","producerType"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"layer":{"type":"string","enum":["platform","tenant"]},"providerKind":{"allOf":[{"$ref":"#/components/schemas/AiProviderKind"}],"nullable":true},"vendor":{"type":"string","nullable":true,"pattern":"^[a-z0-9][a-z0-9-]{1,49}$","description":"**Whose model this is** (CHG-FUP-008): the provider company as `AiProvider.vendor` names it. Bring-your-own-key accepts any vendor, so the curated range carries each vendor's models with the tier they serve; the task-to-tier map (`AiByokEnablement.taskModelMap`) picks the row whose `vendor` matches the tenant's provider. TICVAI adds a new vendor's models after evaluating them (`runAiEvaluation`)."},"producerType":{"type":"string","enum":["llm","embedding","reranker","classical","rule"]},"modelName":{"type":"string","description":"The deployment or model name as the provider knows it, or the package and version for a classical model."},"capabilities":{"type":"array","items":{"$ref":"#/components/schemas/AiCapability"}},"contextTokens":{"type":"integer","nullable":true},"toolCalling":{"type":"boolean","default":false},"structuredOutput":{"type":"boolean","default":false},"languages":{"type":"array","items":{"type":"string"}},"residency":{"type":"string","nullable":true,"description":"Where inference happens. Checked against `tenancy.RegionSettings.allowedAiResidencies`."},"inputCostPerMillionTokens":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"outputCostPerMillionTokens":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true},"lifecycle":{"type":"object","description":"Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production.","properties":{"development":{"type":"string","enum":["draft","pilot","active","retired"]},"staging":{"type":"string","enum":["draft","pilot","active","retired"]},"production":{"type":"string","enum":["draft","pilot","active","retired"]}}},"isDefaultForTasks":{"type":"array","items":{"type":"string"},"description":"Tasks this model is the default for (AIC-010), e.g. `assistant.guest.answer`, `config.extract`."},"curatedRange":{"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"**TICVAI's curated range: the tasks this model may serve** (Chinmay, 2 October, workbook Q1, Q2 and Q9; the AI/ML model selection of 2 October; CHG-CSA-001). For each task: the tier it serves at and its rank, 1 being the best-suited model and 2 to 5 the alternatives. **A model may serve a task only where this lists it**: `setAiProvider` refuses any other choice (`422 model-not-curated`), and bring-your-own-key maps each task to the tenant provider's model at the same tier. `byokEligible` false marks the platform-owned tiers (embeddings, reranking, moderation, PII detection, OCR, speech), never served by a tenant key. Money paths (pricing, fraud scores, settlements) stay on classical models.\n","items":{"type":"object","description":"Every entry names `taskKey`, `tier` and `rank`.","properties":{"taskKey":{"type":"string"},"tier":{"type":"string","enum":["small","strong","reasoning","vision","embedding","reranking","moderation","piiDetection","ocr","speech","classical"]},"rank":{"type":"integer","minimum":1,"maximum":5},"byokEligible":{"type":"boolean","default":true}}}},"residencyClasses":{"type":"array","items":{"$ref":"../shared/common.yaml#/components/schemas/AiResidencyClass"},"description":"The tenant residency classes whose calls this model may serve (CHG-CSA-002)."},"taskFitness":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","readOnly":true,"description":"**Evaluated fitness per task** (21 September minutes, M21-09, our proposal): a score from the task's golden set (`runAiEvaluation`) and the band the task needs. Below `floor` the model is underpowered for the task; far above `ceiling` it is overpowered (it costs more than the task needs). `setAiProvider` returns a warning (`AiProvider.fitnessWarnings`) when a choice falls outside the band, and ADM-037 shows the band beside `setAiModel`; neither refuses on it.","items":{"type":"object","required":["taskKey","score"],"properties":{"taskKey":{"type":"string"},"score":{"type":"number","minimum":0,"maximum":1},"floor":{"type":"number","minimum":0,"maximum":1},"ceiling":{"type":"number","minimum":0,"maximum":1,"nullable":true},"evaluationRunId":{"type":"string","format":"uuid","nullable":true},"evaluatedAt":{"type":"string","format":"date-time"}}}},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiProviderKind": {"type":"string","enum":["openai","gemini","anthropic","azureOpenai","localLlm","openaiCompatible"],"description":"`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE as the fallback. OpenAI UAE is `openai` with a UAE `endpoint`: OpenAI's UAE-region API project, `ae.api.openai.com` (in-country processing, on OpenAI sales approval), allowed under `uaeOnly` and the only endpoint a `uaeOnly` BYOK OpenAI key may use (CHG-R1S-016). **We host no model** (Chinmay, 3 October, CHG-R1S-002): there is no in-cell open-weights fallback; `localLlm` is used only where a client asks for self-hosting and runs the model on the client's estate (`onPrem`).\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"},
-"AiRecommendationExplanation": {"type":"object","x-ticvai-persistence":"none — built from ai.rec_decision and its decision record","description":"Why these items (AIR-193..202), at three depths each gated by permission (AIC-195): business, governance, technical.","required":["decisionId","depth"],"properties":{"decisionId":{"type":"string","format":"uuid"},"depth":{"type":"string","enum":["business","governance","technical"]},"funnel":{"type":"object","additionalProperties":true},"exclusions":{"type":"object","additionalProperties":true},"items":{"type":"array","items":{"type":"object","properties":{"trackingId":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid"},"reasons":{"type":"array","items":{"type":"string"}},"scoreBreakdown":{"type":"object","additionalProperties":true,"nullable":true}}}},"versions":{"type":"object","additionalProperties":true,"nullable":true,"description":"Strategy, model and feature-set versions. `technical` depth only."}}},
 "AiReplayResult": {"type":"object","x-ticvai-persistence":"none — a re-simulation, never stored as a decision","description":"**A re-simulation, labelled as one** (AIC-206, ADM-548): the same inputs through today's or the recorded versions. It runs no production action and is never evidence of what happened.","required":["decisionRecordId","label","sameOutcome"],"properties":{"decisionRecordId":{"type":"string","format":"uuid"},"label":{"type":"string","enum":["reSimulation"]},"versionsUsed":{"type":"string","enum":["recorded","current"]},"sameOutcome":{"type":"boolean"},"original":{"type":"object","additionalProperties":true},"replayed":{"type":"object","additionalProperties":true},"differences":{"type":"array","items":{"type":"string"}}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Permission": {"type":"string","enum":["SESSION_FORCE_LOGOUT","USER_MANAGE","ROLE_MANAGE","PERMISSION_GRANT","PERMISSION_VIEW","PERMISSION_MANAGE","PLATFORM_TENANT_VIEW","PLATFORM_TENANT_MANAGE","PLATFORM_TENANT_TERMINATE","PLATFORM_PLAN_MANAGE","PLATFORM_CELL_VIEW","PLATFORM_CELL_MANAGE","PLATFORM_BILLING_VIEW","PLATFORM_AI_MANAGE","PLATFORM_BILLING_MANAGE","PLATFORM_RELEASE_VIEW","PLATFORM_RELEASE_MANAGE","PLATFORM_RELEASE_PROMOTE","PLATFORM_MIGRATION_VIEW","PLATFORM_MIGRATION_APPLY","PLATFORM_TENANT_ACCESS","TENANT_CONFIGURE","TENANT_VIEW","TENANT_PUBLISH","SCOPE_VIEW","SCOPE_MANAGE","REGION_CONFIGURE","WORKSTATION_CONFIGURE","PRODUCT_VIEW","PRODUCT_CONFIGURE","PRODUCT_APPROVE","PRODUCT_PUBLISH","PRICE_VIEW","PRICE_CONFIGURE","EVENT_CONFIGURE","PERFORMANCE_CONFIGURE","CAPACITY_CONFIGURE","ORDER_VIEW","ORDER_VIEW_OTHER","ORDER_CREATE","ORDER_MODIFY","ORDER_DISCOUNT","ORDER_CANCEL","ORDER_VOID","ORDER_REFUND","ORDER_REFUND_APPROVE","ORDER_REFUND_BULK","ORDER_EXCHANGE","ORDER_RESCHEDULE","ORDER_REPRINT","PRICE_OVERRIDE","DISCOUNT_APPLY","CREDIT_MANAGE","CREDIT_OVERRIDE","WALLET_VIEW","WALLET_OPERATE","WALLET_CONFIGURE","PAYMENT_VIEW","PAYMENT_CONFIGURE","PAYMENT_PROVIDER_MANAGE","PAYMENT_DISPUTE","SHIFT_OPEN","SHIFT_CLOSE","SHIFT_SUSPEND","SHIFT_CLOSE_OTHER","SHIFT_APPROVE_OPEN","SHIFT_APPROVE_CLOSE","SHIFT_REOPEN","CASH_LIFT","CASH_ADD","CASH_NO_SALE","DEPOSIT_BOX_MODIFY_OWN","DEPOSIT_BOX_MODIFY_OTHER","OVERSHORT_ACCEPT","ACCESS_VALIDATE","ACCESS_OVERRIDE","ACCESS_POINT_CONFIGURE","TURNSTILE_MODE_SET","TICKET_LOOKUP","ACCREDITATION_VIEW","ACCREDITATION_APPLY","ACCREDITATION_APPROVE","ACCREDITATION_ISSUE","ACCREDITATION_MANAGE","ACCREDITATION_CONFIGURE","REPORT_VIEW_OWN","REPORT_VIEW_WORKSTATION","REPORT_VIEW_VENUE","REPORT_VIEW_REGION","REPORT_VIEW_TENANT","REPORT_EXPORT","REPORT_EXPORT_PII","REPORT_MANAGE","REPORT_SCHEDULE","LEDGER_VIEW","LEDGER_POST","LEDGER_APPROVE","TAX_CONFIGURE","ACCOUNT_CONFIGURE","SETTLEMENT_VIEW","SETTLEMENT_RECONCILE","GUEST_VIEW","GUEST_VIEW_PII","GUEST_MANAGE","VENUE_MAP_VIEW","VENUE_MAP_MANAGE","VENUE_MAP_PUBLISH","RESOURCE_VIEW","RESOURCE_BOOK","RESOURCE_MANAGE","RESOURCE_CONFIGURE","RENTAL_VIEW","RENTAL_BOOK","RENTAL_OPERATE","RENTAL_MANAGE","RENTAL_CONFIGURE","RENTAL_PRICE","RENTAL_APPROVE","RENTAL_OVERRIDE","DEVELOPER_VIEW","DEVELOPER_MANAGE","DEVELOPER_ADMIN","LOYALTY_ACCRUE","LOYALTY_REDEEM","LOYALTY_ADJUST","MARKETING_VIEW","MARKETING_MANAGE","MARKETING_SEND","CASE_VIEW","CASE_MANAGE","ASSET_LIBRARY_VIEW","ASSET_LIBRARY_MANAGE","ASSET_LIBRARY_APPROVE","ASSET_LIBRARY_SHARE","QUEUE_VIEW","QUEUE_MANAGE","QUEUE_REDEEM","QUEUE_OVERRIDE","TRANSPORT_VIEW","TRANSPORT_MANAGE","TRANSPORT_PRICE","ASSET_VIEW","ASSET_MANAGE","WORK_ORDER_VIEW","WORK_ORDER_MANAGE","WORK_ORDER_VERIFY","INSPECTION_VIEW","INSPECTION_SUBMIT","INSPECTION_MANAGE","INCIDENT_REPORT","INCIDENT_VIEW","INCIDENT_MANAGE","KIOSK_ATTEND","DEVICE_VIEW","DEVICE_CONFIGURE","DEVICE_MANAGE","APPROVAL_ACT","APPROVAL_DELEGATE","AI_USE","AI_CONFIGURE","AI_APPROVE","AI_AUDIT_VIEW","RISK_REVIEW","RISK_INVESTIGATE","AUDIT_VIEW","APPROVAL_VIEW","APPROVAL_REQUEST","APPROVAL_DECIDE","APPROVAL_CONFIGURE","MAINTENANCE_EXECUTE","MAINTENANCE_APPROVE","WORKFORCE_VIEW","WORKFORCE_MANAGE","ATTENDANCE_RECORD","ANNOUNCEMENT_PUBLISH","ANNOUNCEMENT_EMERGENCY","PARTNER_VIEW","PARTNER_MANAGE","PARKING_CONFIGURE","PAYMENT_VOID","PROCUREMENT_VIEW","PROCUREMENT_REQUEST","PROCUREMENT_MANAGE","PROCUREMENT_RECEIVE","CORE_AI_PUBLISH","TICKETING_AI_PUBLISH","ACCESS_AI_PUBLISH","FNB_AI_PUBLISH","RETAIL_AI_PUBLISH","INVENTORY_AI_PUBLISH","SEATING_AI_PUBLISH","MEMBERSHIP_AI_PUBLISH","MARKETING_AI_PUBLISH","RESOURCES_AI_PUBLISH","QUEUE_AI_PUBLISH","TRANSPORT_AI_PUBLISH","GAMES_AI_PUBLISH","MAINTENANCE_AI_PUBLISH","ACCREDITATION_AI_PUBLISH","PARTNER_AI_PUBLISH","ANALYTICS_AI_PUBLISH","BIOMETRIC_IMAGE_VIEW","ACCESS_DIRECTION_SET","REPORT_GOVERNANCE_MANAGE"]},
-"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
+"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"x-ticvai-references":"identity.principal","type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
 "SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
-"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "TenantStatus": {"type":"string","enum":["onboarding","active","suspended","terminating","terminated"]}
 }
 ```

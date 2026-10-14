@@ -98,6 +98,9 @@ Board 2C. **Retire a season, reprice a category, change a tax class across two h
 Retail Board 4. **A lot number answers which delivery; a serial answers which one.**
 **Searchable by serial first**, because the question is almost always asked with a serial in hand — a guest at a counter with a broken phone, or an auditor with a stock list.
 
+
+**Order.** Newest first, by `receivedAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |

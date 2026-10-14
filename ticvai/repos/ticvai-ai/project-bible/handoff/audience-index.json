@@ -111,7 +111,7 @@
   }
  },
  "totals": {
-  "operations": 2802,
+  "operations": 2804,
   "screens": 2453,
   "flows": 291
  },
@@ -1004,6 +1004,7 @@
     "marketing.wishlist_item",
     "orders.cart",
     "orders.cart_line",
+    "orders.deposit",
     "orders.fraud_rule",
     "orders.group_booking",
     "orders.invitation",
@@ -1161,7 +1162,7 @@
     "screens": 144,
     "flows": 23,
     "contracts": 22,
-    "tables": 332
+    "tables": 333
    }
   },
   "partner": {
@@ -1518,6 +1519,7 @@
     "orders.cart",
     "orders.cart_line",
     "orders.credit_override",
+    "orders.deposit",
     "orders.fraud_rule",
     "orders.order_event",
     "orders.order_line",
@@ -1560,7 +1562,7 @@
     "screens": 51,
     "flows": 10,
     "contracts": 11,
-    "tables": 136
+    "tables": 137
    }
   },
   "prospect": {
@@ -1630,7 +1632,6 @@
     "P17"
    ],
    "operations": [
-    "decideApprovalRequest",
     "getNextTransportDeparture",
     "getTransportDeparture",
     "getTransportFareTable",
@@ -1639,61 +1640,41 @@
     "getWaitTimes",
     "listApiScopes",
     "listApiVersions",
-    "listApprovalRequests",
     "listIntegrationListings",
     "listTransportPassOffers",
     "listTransportRoutes",
     "listTransportStations",
-    "listVenueTypeTemplates",
     "quoteTransportFare",
     "registerDeveloper",
     "respondToInvitation",
     "searchTransportDepartures",
     "startProspectSignup",
-    "submitOnboardingApplication",
     "verifyProspectSignupCode"
    ],
    "screens": [
-    "SGN-002",
-    "SGN-020"
+    "SGN-002"
    ],
    "flows": [],
    "contracts": [
-    "approvals",
     "identity",
     "marketing-crm",
     "public-api",
     "queue",
-    "subscription",
     "transport"
    ],
    "tables": [
-    "approvals.decision",
-    "approvals.escalation",
-    "approvals.request",
-    "approvals.rule",
     "cache:idempotency",
     "catalogue.channel_capacity",
     "control.api_licence",
     "control.api_version",
-    "control.billing_entity",
     "control.developer_account",
     "control.integration_listing",
-    "control.onboarding_application",
-    "control.partner_agreement",
-    "control.partner_application",
-    "control.partner_change_request",
-    "control.venue_type_template",
-    "identity.principal",
     "marketing.invitation",
     "marketing.invitation_campaign",
-    "marketing.privacy_notice_governance",
     "orders.invitation",
-    "platform.outbox",
     "queue.entry",
     "queue.queue",
     "queue.reading",
-    "subscription.plan",
     "transport.departure",
     "transport.fare_matrix_cell",
     "transport.fare_passenger_type",
@@ -1705,11 +1686,11 @@
     "transport.timetable"
    ],
    "counts": {
-    "operations": 22,
-    "screens": 2,
+    "operations": 18,
+    "screens": 1,
     "flows": 0,
-    "contracts": 7,
-    "tables": 35
+    "contracts": 5,
+    "tables": 21
    }
   },
   "service": {
@@ -1725,6 +1706,7 @@
     "createInstalmentPlan",
     "createParkingEntitlement",
     "createShopAndDrop",
+    "endGuestDeviceSessions",
     "evaluateAiGovernance",
     "getDsarRequest",
     "getGuestLink",
@@ -1837,6 +1819,7 @@
     "control.usage_record",
     "identity.benefit_usage",
     "identity.delegated_access",
+    "identity.guest_session",
     "identity.password_policy",
     "identity.principal",
     "identity.principal_credential",
@@ -1927,11 +1910,11 @@
     "whitelabel.guided_choice_question"
    ],
    "counts": {
-    "operations": 59,
+    "operations": 60,
     "screens": 0,
     "flows": 5,
     "contracts": 17,
-    "tables": 122
+    "tables": 123
    }
   },
   "staff": {
@@ -2456,6 +2439,7 @@
     "getChannelAllocations",
     "getChargebackAnalytics",
     "getCommandCentre",
+    "getCommercialMetrics",
     "getCommissionStatement",
     "getConfigurationBlueprint",
     "getConfigurationProfile",
@@ -2514,6 +2498,7 @@
     "getForecastAccuracy",
     "getForeignTenderReport",
     "getForm",
+    "getGameCard",
     "getGameEligibility",
     "getGamePricing",
     "getGameplaySyncStatus",
@@ -3917,6 +3902,7 @@
     "setAfterSaleFinancial",
     "setAgentAvailability",
     "setAgentServiceProfile",
+    "setAgreementContractTerm",
     "setAiByokEnablement",
     "setAiCredential",
     "setAiModel",
@@ -4400,6 +4386,7 @@
     "submitCountLines",
     "submitForm",
     "submitInspection",
+    "submitOnboardingApplication",
     "submitPricingChangeRequest",
     "submitShiftCount",
     "suggestGuidedChoice",
@@ -4918,8 +4905,11 @@
     "ADM-372",
     "ADM-373",
     "ADM-374",
+    "ADM-375",
+    "ADM-376",
     "ADM-377",
     "ADM-378",
+    "ADM-380",
     "ADM-381",
     "ADM-382",
     "ADM-383",
@@ -4952,6 +4942,7 @@
     "ADM-412",
     "ADM-413",
     "ADM-414",
+    "ADM-415",
     "ADM-416",
     "ADM-417",
     "ADM-418",
@@ -4979,6 +4970,7 @@
     "ADM-461",
     "ADM-462",
     "ADM-463",
+    "ADM-464",
     "ADM-465",
     "ADM-466",
     "ADM-467",
@@ -5913,10 +5905,14 @@
     "BO-451",
     "BO-452",
     "BO-453",
+    "BO-454",
+    "BO-455",
     "BO-456",
+    "BO-457",
     "BO-459",
     "BO-460",
     "BO-461",
+    "BO-462",
     "BO-463",
     "BO-464",
     "BO-465",
@@ -5936,6 +5932,7 @@
     "BO-481",
     "BO-482",
     "BO-485",
+    "BO-486",
     "BO-487",
     "BO-488",
     "BO-489",
@@ -7227,6 +7224,7 @@
     "control.migration_run",
     "control.migration_run_cell",
     "control.migration_run_tenant",
+    "control.onboarding_application",
     "control.outbox_republish",
     "control.partner",
     "control.partner_agreement",
@@ -7326,6 +7324,7 @@
     "games.authorisation",
     "games.card",
     "games.card_expiry_rules",
+    "games.credit_ledger",
     "games.entitlement",
     "games.game",
     "games.gameplay_transaction",
@@ -7519,7 +7518,6 @@
     "marketing.loyalty_position",
     "marketing.loyalty_programme",
     "marketing.loyalty_rule",
-    "marketing.message_delivery",
     "marketing.message_dispatch",
     "marketing.message_dispatch_attempt",
     "marketing.message_template",
@@ -7625,7 +7623,6 @@
     "orders.payment",
     "orders.payment_allocation_rule",
     "orders.payment_link",
-    "orders.payment_tip",
     "orders.pos_shift",
     "orders.pos_shift_approval",
     "orders.pos_shift_incident",
@@ -7697,7 +7694,6 @@
     "platform.dead_letter",
     "platform.denomination",
     "platform.device",
-    "platform.device_heartbeat",
     "platform.idempotency_record",
     "platform.offline_policy",
     "platform.outbox",
@@ -8009,11 +8005,11 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2608,
-    "screens": 2158,
+    "operations": 2612,
+    "screens": 2168,
     "flows": 138,
     "contracts": 33,
-    "tables": 1115
+    "tables": 1114
    }
   }
  }

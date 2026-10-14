@@ -22,7 +22,7 @@ import yaml
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # 3 October 2026, after CHG-R1S-021 (and the problem types added with CHG-R1S-007/017/018/020). Lower it as
 # responses are named; never raise it.
-CEILING = 707
+CEILING = 168  # 14 October 2026, CHG-SHP-001: 531 operation-specific errors named in the Block A audit
 
 
 def main() -> int:

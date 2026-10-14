@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/branded-queue-waiting-room",
-   "component": "apps/guest-app/src/routes/general/BrandedQueueWaitingRoomDetail.tsx",
+   "component": "src/screens/general/BrandedQueueWaitingRoomDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

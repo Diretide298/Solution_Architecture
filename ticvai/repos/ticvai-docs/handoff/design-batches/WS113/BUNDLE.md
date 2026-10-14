@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-664` | Accreditation Lifecycle Command Center | D | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-664` | Accreditation Lifecycle Command Center | D | 0 | 20 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 | `BO-665` | Accreditation Status Workflow | D | 7 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
 | `BO-666` | Validity Period Configuration | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-667` | Event & Venue Accreditation Assignment | D | 25 | 20 | 6 | 1 | 0 | 6 | — | notStarted (—) |
@@ -105,8 +105,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-669` | Temporary & Seasonal Accreditation | B–D | 15 | 3 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-670` | Suspension & Reactivation Management | D | 9 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-671` | Accreditation Revocation Management | D | 0 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
-| `BO-672` | Expiry Monitor & Expiration Rules | D | 0 | 14 | 6 | 6 | 0 | 0 | — | notStarted (—) |
-| `BO-673` | Accreditation Renewal Workspace | D | 0 | 0 | 6 | 4 | 1 | 6 | — | notStarted (—) |
+| `BO-672` | Expiry Monitor & Expiration Rules | D | 2 | 34 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `BO-673` | Accreditation Renewal Workspace | D | 2 | 20 | 6 | 4 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -165,7 +165,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAccreditationHolders`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Accreditation number | text | — |
+| Full name | text | — |
+| Photo image | the image or video | — |
+| Date of birth | 1 Oct 2026 | — |
+| Nationality | text | — |
+| Email | email, tap to write | 12.1.16. |
+| Phone | +971 50 123 4567 | 12.1.16. |
+| Identity document verified | yes / no (icon or chip) | — |
+| Organisation | the name it points at, never the id | — |
+| Affiliation role | text | — |
+| Programme | the name it points at, never the id | — |
+| Category code | text | — |
+| Status | chip: Active, Suspended, Revoked, Expired, Archived | — |
+| Valid from | 1 Oct 2026 | — |
+| Valid to | 1 Oct 2026 | — |
+| Completeness percent | 1,234 | — |
+| Status effective from | 1 Oct 2026, 14:30 | When the status `setAccreditationStatus` set takes effect. |
+| Status review at | 1 Oct 2026 | When the status is due for review (`setAccreditationStatus`). |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -242,6 +265,8 @@ alerts:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -289,7 +314,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-664?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-665`, `BO-666`, `BO-667`, `BO-668`, `BO-669`, `BO-670`, `BO-671`, `BO-672`, `BO-673`.
@@ -423,6 +448,8 @@ transitions:
 - `setAccreditationStatus` → `ACCREDITATION_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ACCREDITATION_MANAGE`
 
 #### Requirements it meets
 
@@ -584,6 +611,8 @@ contractor:
 - `setAccreditationValidity` → `ACCREDITATION_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ACCREDITATION_CONFIGURE`
 
 #### Requirements it meets
 
@@ -800,6 +829,8 @@ clonedFrom: Summit Peaks Winter Festival 2025 - Media
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -858,7 +889,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `accessProfileId` (navigation) |
 | Route | `/access-venue/multi-venue-accreditation-management-bo-668` |
 
 **Known gaps.** **The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose, acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere in them. … **The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.
@@ -986,6 +1017,8 @@ venues:
 - `listAccessProfiles` → `ACCREDITATION_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ACCREDITATION_VIEW`
 
 #### Requirements it meets
 
@@ -1182,6 +1215,8 @@ presets:
 
 **A refused user sees:** Shown when the caller lacks `ACCREDITATION_VIEW`, which `listAccreditationProgrammes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCREDITATION_CONFIGURE` for `setAccreditationValidity`.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1337,6 +1372,8 @@ suspended:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_MANAGE`
+
 #### Requirements it meets
 
 4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1478,6 +1515,8 @@ credentials:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_MANAGE`
+
 #### Requirements it meets
 
 4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1570,7 +1609,12 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Status | radio group | — | Submitted · Verified · Rejected · Expired | `listAccreditationDocuments` ?status |
 | Expiring within days | number field (days) | — | min 0 | `listAccreditationDocuments` ?expiringWithinDays |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by **** (`renewAccreditation`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Category code `categoryCode` | text field | optional | — | — | — | A different category for the new period, where the programme allows it | `renewAccreditation` body |
+| Subject `subject` | key and value settings | optional | — | — | — | Answers that changed since the last period | `renewAccreditation` body |
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1581,7 +1625,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAccreditationHolders`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Accreditation number | text | — |
+| Full name | text | — |
+| Photo image | the image or video | — |
+| Date of birth | 1 Oct 2026 | — |
+| Nationality | text | — |
+| Email | email, tap to write | 12.1.16. |
+| Phone | +971 50 123 4567 | 12.1.16. |
+| Identity document verified | yes / no (icon or chip) | — |
+| Organisation | the name it points at, never the id | — |
+| Affiliation role | text | — |
+| Programme | the name it points at, never the id | — |
+| Category code | text | — |
+| Status | chip: Active, Suspended, Revoked, Expired, Archived | — |
+| Valid from | 1 Oct 2026 | — |
+| Valid to | 1 Oct 2026 | — |
+| Completeness percent | 1,234 | — |
+| Status effective from | 1 Oct 2026, 14:30 | When the status `setAccreditationStatus` set takes effect. |
+| Status review at | 1 Oct 2026 | When the status is due for review (`setAccreditationStatus`). |
 
 **Expiring documents** (data table, from `listAccreditationDocuments`)
 
@@ -1606,7 +1673,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `renewAccreditation` POST `/accreditation-holders/{holderId}/renew` | inline | AccreditationApplication | 403 A guest renewing an accreditation that is not theirs; 409 Outside the renewal window, the holder is revoked, suspended or archived, or a renewal is already open | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
@@ -1684,6 +1751,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1716,8 +1785,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (403, 409).
+- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-672?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-664`.
@@ -1773,7 +1842,12 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Status | text field | — | — | `listAccreditationHolders` ?status |
 | Expiring within days | number field (days) | — | — | `listAccreditationHolders` ?expiringWithinDays |
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by **** (`renewAccreditation`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Category code `categoryCode` | text field | optional | — | — | — | A different category for the new period, where the programme allows it | `renewAccreditation` body |
+| Subject `subject` | key and value settings | optional | — | — | — | Answers that changed since the last period | `renewAccreditation` body |
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1784,13 +1858,36 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAccreditationHolders`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Accreditation number | text | — |
+| Full name | text | — |
+| Photo image | the image or video | — |
+| Date of birth | 1 Oct 2026 | — |
+| Nationality | text | — |
+| Email | email, tap to write | 12.1.16. |
+| Phone | +971 50 123 4567 | 12.1.16. |
+| Identity document verified | yes / no (icon or chip) | — |
+| Organisation | the name it points at, never the id | — |
+| Affiliation role | text | — |
+| Programme | the name it points at, never the id | — |
+| Category code | text | — |
+| Status | chip: Active, Suspended, Revoked, Expired, Archived | — |
+| Valid from | 1 Oct 2026 | — |
+| Valid to | 1 Oct 2026 | — |
+| Completeness percent | 1,234 | — |
+| Status effective from | 1 Oct 2026, 14:30 | When the status `setAccreditationStatus` set takes effect. |
+| Status review at | 1 Oct 2026 | When the status is due for review (`setAccreditationStatus`). |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `renewAccreditation` POST `/accreditation-holders/{holderId}/renew` | inline | AccreditationApplication | 403 A guest renewing an accreditation that is not theirs; 409 Outside the renewal window, the holder is revoked, suspended or archived, or a renewal is already open | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
@@ -1861,6 +1958,8 @@ renewal:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ACCREDITATION_VIEW`
+
 #### Requirements it meets
 
 4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1898,8 +1997,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (2), with its required mark, default, format and its error state (403, 409).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-673?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-664`.
@@ -2015,7 +2114,7 @@ Method, path, parameters, request and response for every operation these screens
 "listAccreditationHolders": {"method":"GET","path":"/accreditation-holders","contract":"accreditation","summary":"Everybody accredited, and what state they are in","permission":"ACCREDITATION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"programmeId","in":"query","required":null},{"name":"organisationId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":"expiringWithinDays","in":"query","required":null}],"requestBody":null,"responds":"AccreditationHolder"},
 "listAccreditationProgrammes": {"method":"GET","path":"/accreditation-programmes","contract":"accreditation","summary":"Programmes, their categories and their applicant types","permission":"ACCREDITATION_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"isTemplate","in":"query","required":null}],"requestBody":null,"responds":"AccreditationProgramme"},
 "renewAccreditation": {"method":"POST","path":"/accreditation-holders/{holderId}/renew","contract":"accreditation","summary":"Renew a holder's accreditation for another period","permission":"ACCREDITATION_APPLY","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccreditationApplication"},
-"setAccessProfile": {"method":"PUT","path":"/accreditation-access-profiles","contract":"accreditation","summary":"Define which zones, on which dates, at which times","permission":"ACCREDITATION_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccessProfile","responds":"AccessProfile"},
+"setAccessProfile": {"method":"PUT","path":"/accreditation-access-profiles/{accessProfileId}","contract":"accreditation","summary":"Define which zones, on which dates, at which times","permission":"ACCREDITATION_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"accessProfileId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"AccessProfile","responds":"AccessProfile"},
 "setAccreditationStatus": {"method":"POST","path":"/accreditation-holders/{holderId}/status","contract":"accreditation","summary":"Suspend, reactivate, revoke or expire an accreditation","permission":"ACCREDITATION_MANAGE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AccreditationHolder"},
 "setAccreditationValidity": {"method":"PUT","path":"/accreditation-validity","contract":"accreditation","summary":"Validity periods, renewal windows and expiry behaviour","permission":"ACCREDITATION_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccreditationValidity","responds":"AccreditationValidity"},
 "updateAccreditationProgramme": {"method":"PUT","path":"/accreditation-programmes/{programmeId}","contract":"accreditation","summary":"Amend a programme, link its registration form, or mark it a template","permission":"ACCREDITATION_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccreditationProgramme","responds":"AccreditationProgramme"}
@@ -2029,10 +2128,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "AccessProfile": {"type":"object","x-ticvai-persistence":"accreditation.access_profile","description":"Board 5.2. **How an estate stays governable.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"zoneIds":{"type":"array","items":{"type":"string","format":"uuid"}},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"operationalAreas":{"type":"array","items":{"type":"string"}},"schedule":{"type":"array","x-ticvai-persistence-column":"jsonb","description":"**Zone, date and time are three dimensions and all three are needed.**","items":{"type":"object","properties":{"zoneId":{"type":"string","format":"uuid","nullable":true},"daysOfWeek":{"type":"array","items":{"type":"string"}},"dateFrom":{"type":"string","format":"date","nullable":true},"dateTo":{"type":"string","format":"date","nullable":true},"from":{"type":"string","nullable":true},"to":{"type":"string","nullable":true},"eventPhase":{"type":"string","nullable":true,"enum":["build","rehearsal","doorsOpen","liveShow","breakdown"]}}}},"escortRequired":{"type":"boolean","default":false},"holderCount":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
-"AccreditationApplication": {"type":"object","x-ticvai-persistence":"accreditation.application","description":"Board 1.3. **Usually submitted by an organisation on behalf of its people.**","required":["programmeId"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"applicantType":{"type":"string"},"submittedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"subject":{"type":"object","additionalProperties":true,"description":"Name, date of birth, nationality, contact — shaped by the requirements matrix."},"requirementStatus":{"type":"array","readOnly":true,"items":{"type":"object","properties":{"requirementCode":{"type":"string"},"satisfied":{"type":"boolean"},"documentId":{"type":"string","format":"uuid","nullable":true}}}},"status":{"type":"string","enum":["draft","submitted","underReview","informationRequested","approved","rejected","withdrawn","expired"]},"decisionReason":{"type":"string","nullable":true},"missingRequirements":{"type":"array","readOnly":true,"description":"The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting","items":{"type":"string"}},"decisionDueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a decision is due — the approvals request's SLA. **A date, not a queue position**"},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"holderId":{"type":"string","format":"uuid","nullable":true},"renewsHolderId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"},"resubmissionOfApplicationId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.33. The rejected application this one resubmits, so the rejection stays in the record"},"resubmissionNote":{"type":"string","maxLength":1000,"nullable":true,"readOnly":true,"description":"What the applicant changed, from `resubmitAccreditationApplication`"},"submittedAt":{"type":"string","format":"date-time","nullable":true},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
-"AccreditationDocument": {"type":"object","x-ticvai-persistence":"accreditation.document","description":"Board 2.5. **Submitted against a named requirement, not into a folder.**","required":["requirementCode","assetId"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","nullable":true},"applicationId":{"type":"string","format":"uuid","nullable":true},"requirementCode":{"type":"string"},"assetId":{"type":"string","format":"uuid"},"submittedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["submitted","verified","rejected","expired"]},"verifiedBy":{"type":"string","format":"uuid","nullable":true},"verifiedAt":{"type":"string","format":"date-time","nullable":true},"rejectionReason":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date","nullable":true,"description":"**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"},"scopePath":{"type":"string"}}},
-"AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"}}},
-"AccreditationProgramme": {"type":"object","x-ticvai-persistence":"accreditation.programme","description":"Boards 1.5 and 1.6. **The thing an application is made against.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"eventIds":{"type":"array","items":{"type":"string","format":"uuid"}},"categories":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"defaultAccessProfileId":{"type":"string","format":"uuid","nullable":true},"quota":{"type":"integer","nullable":true,"description":"**A cap on how many may be accredited in this category.** Without one, a category is a promise nobody counted.\n"},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true,"description":"The badge printed for this category; travels with the category when a programme is cloned"}}}},"applicantTypes":{"type":"array","items":{"type":"string"}},"applicationsOpenAt":{"type":"string","format":"date-time","nullable":true},"applicationsCloseAt":{"type":"string","format":"date-time","nullable":true},"approvalWorkflowId":{"type":"string","format":"uuid","nullable":true},"formId":{"type":"string","format":"uuid","nullable":true,"description":"12.1.2. The `marketing-crm` form definition (`createForm`, BO-618) the applicant fills in. The requirements matrix's `field` rows name the form fields they check, so the form is configured without software development and what blocks approval stays in one place.\n"},"isTemplate":{"type":"boolean","default":false,"description":"12.1.56. **A reusable programme template**: never opened for applications, and what `cloneAccreditationProgramme` copies its categories, requirements, validity, notification rules and form link from.\n"},"templateProgrammeId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The programme or template this one was cloned from"},"status":{"type":"string","enum":["draft","open","closed","archived"]},"faceMatching":{"type":"object","description":"**Face matching for duplicate applicants: only where the venue enables it, with each applicant's consent and the venue's legal sign-off; off by default** (Chinmay, 2 October, workbook Q461; ADR-0063; CHG-CSA-031). With `enabled` false, identity conflicts are raised on names, dates of birth and documents only and never on a face, and BO-631 shows no Face chip. Enabling needs `legalSignOffRef` (the venue's legal sign-off, recorded with who gave it and when), and a face is compared only for an applicant whose application carries a face-matching consent (the programme's consent form, CHG-CSA-026).","properties":{"enabled":{"type":"boolean","default":false},"legalSignOffRef":{"type":"string","nullable":true,"description":"The venue's legal sign-off document (a stored file reference)."},"signedOffByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"signedOffAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},"identityVerification":{"type":"object","description":"**UAE Pass and ICP verification, in release 1** (Chinmay, 2 October, workbook Q457; CHG-CSA-031). Which government identity checks an applicant passes through: UAE Pass sign-in (identity `guestUaePassLogin`) and the ICP identity check (access's verification adaptor). **Both need the client's access to the government services** (an external dependency); until it is granted, `methods` may name them but the check answers `manualReview`.","properties":{"methods":{"type":"array","items":{"type":"string","enum":["uaePass","icp","manualReview"]}},"required":{"type":"boolean","default":false,"description":"Whether an application is blocked from approval until a listed check passes."}}},"scopePath":{"type":"string"}}},
+"AccreditationApplication": {"type":"object","x-ticvai-persistence":"accreditation.application","description":"Board 1.3. **Usually submitted by an organisation on behalf of its people.**","required":["programmeId"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"programmeId":{"x-ticvai-references":"accreditation.programme","type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"applicantType":{"type":"string"},"submittedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"subject":{"type":"object","additionalProperties":true,"description":"Name, date of birth, nationality, contact — shaped by the requirements matrix."},"requirementStatus":{"x-ticvai-persisted":false,"type":"array","readOnly":true,"items":{"type":"object","properties":{"requirementCode":{"type":"string"},"satisfied":{"type":"boolean"},"documentId":{"type":"string","format":"uuid","nullable":true}}}},"status":{"type":"string","enum":["draft","submitted","underReview","informationRequested","approved","rejected","withdrawn","expired"]},"decisionReason":{"type":"string","nullable":true},"missingRequirements":{"type":"array","readOnly":true,"description":"The requirement codes a reviewer returned the application for, or rejected it over — what the applicant must change before resubmitting","items":{"type":"string"}},"decisionDueAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a decision is due — the approvals request's SLA. **A date, not a queue position**"},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"holderId":{"type":"string","format":"uuid","nullable":true},"renewsHolderId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.37. Set by `renewAccreditation`; approval extends this holder rather than creating one"},"resubmissionOfApplicationId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"12.1.33. The rejected application this one resubmits, so the rejection stays in the record"},"resubmissionNote":{"type":"string","maxLength":1000,"nullable":true,"readOnly":true,"description":"What the applicant changed, from `resubmitAccreditationApplication`"},"submittedAt":{"type":"string","format":"date-time","nullable":true},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
+"AccreditationDocument": {"type":"object","x-ticvai-persistence":"accreditation.document","description":"Board 2.5. **Submitted against a named requirement, not into a folder.**","required":["requirementCode","assetId"],"properties":{"id":{"type":"string","format":"uuid"},"holderId":{"type":"string","format":"uuid","nullable":true},"applicationId":{"type":"string","format":"uuid","nullable":true},"requirementCode":{"type":"string"},"assetId":{"x-ticvai-references":"assets.media_asset","type":"string","format":"uuid"},"submittedAt":{"type":"string","format":"date-time"},"status":{"type":"string","enum":["submitted","verified","rejected","expired"]},"verifiedBy":{"type":"string","format":"uuid","nullable":true},"verifiedAt":{"type":"string","format":"date-time","nullable":true},"rejectionReason":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date","nullable":true,"description":"**An insurance certificate valid until March accredits somebody until March**, whatever the programme says.\n"},"scopePath":{"type":"string"}}},
+"AccreditationHolder": {"type":"object","x-ticvai-persistence":"accreditation.holder","description":"**A subject who may never sign in to anything.** `identity` owns principals; this owns accredited people.\n","required":["id","fullName"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid","nullable":true},"accreditationNumber":{"type":"string"},"fullName":{"type":"string"},"photoAssetId":{"type":"string","format":"uuid","nullable":true},"dateOfBirth":{"type":"string","format":"date","nullable":true},"nationality":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true,"description":"12.1.16. The holder's own address — where a mobile credential and renewal notices go"},"phone":{"type":"string","nullable":true,"description":"12.1.16. E.164"},"identityDocumentVerified":{"type":"boolean","default":false},"organisationId":{"type":"string","format":"uuid","nullable":true},"affiliationRole":{"type":"string","nullable":true},"programmeId":{"type":"string","format":"uuid"},"categoryCode":{"type":"string","nullable":true},"status":{"type":"string","enum":["active","suspended","revoked","expired","archived"]},"validFrom":{"type":"string","format":"date","nullable":true},"validTo":{"type":"string","format":"date","nullable":true},"completenessPercent":{"type":"integer","readOnly":true},"scopePath":{"type":"string"},"statusEffectiveFrom":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the status `setAccreditationStatus` set takes effect."},"statusReviewAt":{"type":"string","format":"date","nullable":true,"readOnly":true,"description":"When the status is due for review (`setAccreditationStatus`)."}}},
+"AccreditationProgramme": {"type":"object","x-ticvai-persistence":"accreditation.programme","description":"Boards 1.5 and 1.6. **The thing an application is made against.**","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"eventIds":{"type":"array","items":{"type":"string","format":"uuid"}},"categories":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"defaultAccessProfileId":{"type":"string","format":"uuid","nullable":true},"quota":{"type":"integer","nullable":true,"description":"**A cap on how many may be accredited in this category.** Without one, a category is a promise nobody counted.\n"},"badgeTemplateId":{"type":"string","format":"uuid","nullable":true,"description":"The badge printed for this category; travels with the category when a programme is cloned"}}}},"applicantTypes":{"type":"array","items":{"type":"string"}},"applicationsOpenAt":{"type":"string","format":"date-time","nullable":true},"applicationsCloseAt":{"type":"string","format":"date-time","nullable":true},"approvalWorkflowId":{"type":"string","format":"uuid","nullable":true},"formId":{"type":"string","format":"uuid","nullable":true,"description":"12.1.2. The `marketing-crm` form definition (`createForm`, BO-618) the applicant fills in. The requirements matrix's `field` rows name the form fields they check, so the form is configured without software development and what blocks approval stays in one place.\n"},"isTemplate":{"type":"boolean","default":false,"description":"12.1.56. **A reusable programme template**: never opened for applications, and what `cloneAccreditationProgramme` copies its categories, requirements, validity, notification rules and form link from.\n"},"templateProgrammeId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The programme or template this one was cloned from"},"status":{"type":"string","enum":["draft","open","closed","archived"]},"faceMatching":{"type":"object","description":"**Face matching for duplicate applicants: only where the venue enables it, with each applicant's consent and the venue's legal sign-off; off by default** (Chinmay, 2 October, workbook Q461; ADR-0063; CHG-CSA-031). With `enabled` false, identity conflicts are raised on names, dates of birth and documents only and never on a face, and BO-631 shows no Face chip. Enabling needs `legalSignOffRef` (the venue's legal sign-off, recorded with who gave it and when), and a face is compared only for an applicant whose application carries a face-matching consent (the programme's consent form, CHG-CSA-026).","properties":{"enabled":{"type":"boolean","default":false},"legalSignOffRef":{"type":"string","nullable":true,"description":"The venue's legal sign-off document (a stored file reference)."},"signedOffByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"signedOffAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},"identityVerification":{"type":"object","description":"**UAE Pass and ICP verification, in release 1** (Chinmay, 2 October, workbook Q457; CHG-CSA-031). Which government identity checks an applicant passes through: UAE Pass sign-in (identity `guestUaePassLogin`) and the ICP identity check (access's verification adaptor). **Both need the client's access to the government services** (an external dependency); until it is granted, `methods` may name them but the check answers `manualReview`.","properties":{"methods":{"type":"array","items":{"type":"string","enum":["uaePass","icp","manualReview"]}},"required":{"type":"boolean","default":false,"description":"Whether an application is blocked from approval until a listed check passes."}}},"scopePath":{"type":"string"}}},
 "AccreditationValidity": {"type":"object","x-ticvai-persistence":"accreditation.validity","description":"Board 6.3. **The control most often configured as never.**","properties":{"programmeId":{"type":"string","format":"uuid"},"validityKind":{"type":"string","enum":["eventDuration","fixedPeriod","seasonal","rolling","permanent"]},"validityMonths":{"type":"integer","nullable":true},"renewalWindowDays":{"type":"integer","nullable":true},"renewalRequiresReverification":{"type":"boolean","default":true,"description":"**The point of an expiry is that somebody looks again.**"},"onExpiry":{"type":"string","enum":["revokeAccess","gracePeriod","autoRenew"],"default":"revokeAccess"},"gracePeriodDays":{"type":"integer","nullable":true},"scopePath":{"type":"string"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}}
 }

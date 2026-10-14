@@ -142,7 +142,7 @@
  },
  "setAttractionType": {
   "method": "PUT",
-  "path": "/attraction-types",
+  "path": "/attraction-types/{attractionTypeId}",
   "contract": "games",
   "summary": "Define a class of attraction",
   "permission": "PRODUCT_CONFIGURE",
@@ -150,6 +150,11 @@
   "conflictPolicy": null,
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "attractionTypeId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

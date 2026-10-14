@@ -127,15 +127,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-061` | BI & Analytics Administration Command Center | D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-061` | BI & Analytics Administration Command Center | D | 0 | 98 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-062` | Enterprise KPI Library | D | 0 | 28 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-063` | KPI Targets, Thresholds & Scorecards | D | 8 | 0 | 5 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-064` | Benchmark & Comparative Analytics Configuration | D | 12 | 6 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-064` | Benchmark & Comparative Analytics Configuration | D | 12 | 48 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ANL-065` | Data Source & Integration Registry | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-066` | Semantic Model & Business Data Catalogue | A | 14 | 19 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | D | 0 | 98 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-068` | Embedded BI, Workspace & Tenant Administration | D | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-069` | Analytics Performance, Usage & Cost Monitor | D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-069` | Analytics Performance, Usage & Cost Monitor | D | 0 | 124 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-070` | Analytics Governance, Security & Audit Center | D | 20 | 91 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -188,37 +188,169 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Active Dashboards** (metric tile)
+**Active Dashboards** (metric tile, from `getAnalyticsUsage`)
 
-**Active Reports** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Published KPIs** (metric tile)
+**Active Reports** (metric tile, from `getAnalyticsUsage`)
 
-**Connected Data Sources** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Active Datasets** (metric tile)
+**Published KPIs** (metric tile, from `getAnalyticsUsage`)
 
-**Data Refresh Success %** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Data Quality Score** (metric tile)
+**Connected Data Sources** (metric tile, from `getAnalyticsUsage`)
 
-**Failed Refreshes** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**BI Service Health** (metric tile)
+**Active Datasets** (metric tile, from `getAnalyticsUsage`)
 
-**AI Analytics Health** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Active Alerts** (metric tile)
+**Data Refresh Success %** (metric tile, from `getAnalyticsUsage`)
 
-**Analytics Users** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Every analytics administration** (data table)
+**Data Quality Score** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Failed Refreshes** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**BI Service Health** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**AI Analytics Health** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Active Alerts** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Analytics Users** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Every analytics administration** (data table, from `listAnalyticsPipelines`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Healthy / warning / critical / offline | text | not in the schema: `Healthy / Warning / Critical / Offline` |
 
-**The selected analytics administration** (detail panel)
+**The selected analytics administration** (detail panel, from `listAnalyticsPipelines`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -293,6 +425,8 @@ worst:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_TENANT`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -329,7 +463,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (2 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (98 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-061?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-001`, `ANL-070`, `ANL-062`, `ANL-063`, `ANL-064`, `ANL-065`, `ANL-066`, `ANL-067`, `ANL-068`, `ANL-069`.
@@ -387,7 +521,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every enterprise kpi** (data table)
+**Every enterprise kpi** (data table, from `listKpis`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -406,7 +540,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Inventory | text | not in the schema: `Inventory` |
 | Resources | text | not in the schema: `Resources` |
 
-**The selected enterprise kpi** (detail panel): The pack groups this record's detail under its own headings: “Formula”.
+**The selected enterprise kpi** (detail panel, from `listKpis`): The pack groups this record's detail under its own headings: “Formula”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -450,6 +584,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the enterprise kpi are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Edge cases to draw
 
@@ -497,6 +632,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_TENANT`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -522,7 +659,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-062?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -666,6 +803,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -782,19 +921,82 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 **Shown**
 
-**Revenue per Visitor** (metric tile)
+**Revenue per Visitor** (metric tile, from `getAnalyticsBenchmark`)
 
-**Transactions per 1,000 Visitors** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
-**Entries per Gate per Hour** (metric tile)
+**Transactions per 1,000 Visitors** (metric tile, from `getAnalyticsBenchmark`)
 
-**Incidents per 10,000 Visitors** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
-**Revenue per m² where applicable** (metric tile)
+**Entries per Gate per Hour** (metric tile, from `getAnalyticsBenchmark`)
 
-**Revenue per Operating Hour** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
-**Utilization %** (metric tile)
+**Incidents per 10,000 Visitors** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
+
+**Revenue per m² where applicable** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
+
+**Revenue per Operating Hour** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
+
+**Utilization %** (metric tile, from `getAnalyticsBenchmark`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Label | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalised value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Normalise by | chip: None, Per visitor, Per operating hour, Per staffed position, Per square metre | The basis a benchmark is compared on. Shared by `getAnalyticsBenchmark` and `BenchmarkRow`. |
+| Rank | 1,234 | — |
+| Percentile | 12.5% | — |
 
 **Every site normalisation basis** (data table, from `listSiteNormalisationBases`)
 
@@ -886,6 +1088,8 @@ comparison:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_TENANT`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -912,7 +1116,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (12), with its required mark, default, format and its error state (403, 422).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-064?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save site normalisation basis.
 - [ ] Every transition is wired: `ANL-061`.
@@ -958,7 +1162,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every data source integration** (data table)
+**Every data source integration** (data table, from `listAnalyticsPipelines`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -973,7 +1177,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Status | text | not in the schema: `Status` |
 | Data classification | text | not in the schema: `Data Classification` |
 
-**The selected data source integration** (detail panel): The pack groups this record's detail under its own headings: “Important Security Principle”.
+**The selected data source integration** (detail panel, from `listAnalyticsPipelines`): The pack groups this record's detail under its own headings: “Important Security Principle”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1048,6 +1252,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `listAnalyticsPipelines` → `REPORT_VIEW_TENANT` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_TENANT`
 
 #### Requirements it meets
 
@@ -1310,19 +1516,124 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Pipelines Running** (metric tile)
+**Pipelines Running** (metric tile, from `listAnalyticsPipelines`)
 
-**Successful Refreshes** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Source kind | text | — |
+| Datasets | list or chips (count when long) | — |
+| Schedule | text | — |
+| Last run at | 1 Oct 2026, 14:30 | — |
+| Last success at | 1 Oct 2026, 14:30 | — |
+| Freshness minutes | 1,234 | — |
+| Expected freshness minutes | 1,234 | — |
+| Status | chip: Healthy, Degraded, Stale, Failed, Paused | — |
+| Last error | text | — |
+| Rows last run | 1,234 | — |
 
-**Failed Refreshes** (metric tile)
+**Successful Refreshes** (metric tile, from `listAnalyticsPipelines`)
 
-**Average Refresh Duration** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Source kind | text | — |
+| Datasets | list or chips (count when long) | — |
+| Schedule | text | — |
+| Last run at | 1 Oct 2026, 14:30 | — |
+| Last success at | 1 Oct 2026, 14:30 | — |
+| Freshness minutes | 1,234 | — |
+| Expected freshness minutes | 1,234 | — |
+| Status | chip: Healthy, Degraded, Stale, Failed, Paused | — |
+| Last error | text | — |
+| Rows last run | 1,234 | — |
 
-**Data Latency** (metric tile)
+**Failed Refreshes** (metric tile, from `listAnalyticsPipelines`)
 
-**Stale Datasets** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Source kind | text | — |
+| Datasets | list or chips (count when long) | — |
+| Schedule | text | — |
+| Last run at | 1 Oct 2026, 14:30 | — |
+| Last success at | 1 Oct 2026, 14:30 | — |
+| Freshness minutes | 1,234 | — |
+| Expected freshness minutes | 1,234 | — |
+| Status | chip: Healthy, Degraded, Stale, Failed, Paused | — |
+| Last error | text | — |
+| Rows last run | 1,234 | — |
 
-**Records Processed** (metric tile)
+**Average Refresh Duration** (metric tile, from `listAnalyticsPipelines`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Source kind | text | — |
+| Datasets | list or chips (count when long) | — |
+| Schedule | text | — |
+| Last run at | 1 Oct 2026, 14:30 | — |
+| Last success at | 1 Oct 2026, 14:30 | — |
+| Freshness minutes | 1,234 | — |
+| Expected freshness minutes | 1,234 | — |
+| Status | chip: Healthy, Degraded, Stale, Failed, Paused | — |
+| Last error | text | — |
+| Rows last run | 1,234 | — |
+
+**Data Latency** (metric tile, from `listAnalyticsPipelines`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Source kind | text | — |
+| Datasets | list or chips (count when long) | — |
+| Schedule | text | — |
+| Last run at | 1 Oct 2026, 14:30 | — |
+| Last success at | 1 Oct 2026, 14:30 | — |
+| Freshness minutes | 1,234 | — |
+| Expected freshness minutes | 1,234 | — |
+| Status | chip: Healthy, Degraded, Stale, Failed, Paused | — |
+| Last error | text | — |
+| Rows last run | 1,234 | — |
+
+**Stale Datasets** (metric tile, from `listAnalyticsPipelines`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Source kind | text | — |
+| Datasets | list or chips (count when long) | — |
+| Schedule | text | — |
+| Last run at | 1 Oct 2026, 14:30 | — |
+| Last success at | 1 Oct 2026, 14:30 | — |
+| Freshness minutes | 1,234 | — |
+| Expected freshness minutes | 1,234 | — |
+| Status | chip: Healthy, Degraded, Stale, Failed, Paused | — |
+| Last error | text | — |
+| Rows last run | 1,234 | — |
+
+**Records Processed** (metric tile, from `listAnalyticsPipelines`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Source kind | text | — |
+| Datasets | list or chips (count when long) | — |
+| Schedule | text | — |
+| Last run at | 1 Oct 2026, 14:30 | — |
+| Last success at | 1 Oct 2026, 14:30 | — |
+| Freshness minutes | 1,234 | — |
+| Expected freshness minutes | 1,234 | — |
+| Status | chip: Healthy, Degraded, Stale, Failed, Paused | — |
+| Last error | text | — |
+| Rows last run | 1,234 | — |
 
 **Every data refresh pipeline** (data table)
 
@@ -1406,6 +1717,8 @@ pipelines:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_TENANT`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1430,7 +1743,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (98 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-067?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-061`.
@@ -1543,6 +1856,8 @@ language:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1624,33 +1939,187 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Active Analytics Users** (metric tile)
+**Active Analytics Users** (metric tile, from `getAnalyticsUsage`)
 
-**Dashboard Views** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Report Runs** (metric tile)
+**Dashboard Views** (metric tile, from `getAnalyticsUsage`)
 
-**AI Queries** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Exports** (metric tile)
+**Report Runs** (metric tile, from `getAnalyticsUsage`)
 
-**API Requests** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Peak Concurrent Users** (metric tile)
+**AI Queries** (metric tile, from `getAnalyticsUsage`)
 
-**Average Dashboard Load Time** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Query Duration** (metric tile)
+**Exports** (metric tile, from `getAnalyticsUsage`)
 
-**Slowest Reports** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Failed Queries** (metric tile)
+**API Requests** (metric tile, from `getAnalyticsUsage`)
 
-**Dataset Size** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
-**Refresh Duration** (metric tile)
+**Peak Concurrent Users** (metric tile, from `getAnalyticsUsage`)
 
-**Embedded BI Availability** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Average Dashboard Load Time** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Query Duration** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Slowest Reports** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Failed Queries** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Dataset Size** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Refresh Duration** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
+
+**Embedded BI Availability** (metric tile, from `getAnalyticsUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Opens | 1,234 | — |
+| Distinct users | 1,234 | — |
+| Last opened at | 1 Oct 2026, 14:30 | — |
+| Average runtime ms | 1,234 | — |
+| Rows scanned | 1,234 | — |
+| Never opened | yes / no (icon or chip) | — |
 
 **Every analytics performance usage** (data table)
 
@@ -1734,6 +2203,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_TENANT`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1758,7 +2229,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (124 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-069?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-061`.
@@ -2075,6 +2546,8 @@ ai:
 
 **A refused user sees:** Names the missing permission: reading the audit trail and the governance policy needs `REPORT_VIEW_TENANT`, and changing the policy needs `REPORT_GOVERNANCE_MANAGE` (CHG-FUP-007); without it the policy shows read-only and says who can change it. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_TENANT`
+
 #### Requirements it meets
 
 6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -2244,12 +2717,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CreateDashboardRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","module","tiles"],"properties":{"name":{"type":"string","maxLength":200},"module":{"$ref":"#/components/schemas/common::ModuleKey","description":"**Which module this dashboard belongs to, and therefore who may see it.** Added 22 September for the command centre: one shell that shows each login the dashboards of the modules it is entitled to. **A dashboard with no module could not be placed in that shell at all** — the field the whole design hangs on did not exist.\n**Required, and `core` is the answer for a dashboard that belongs to no optional module.** An empty field and *belongs everywhere* look identical, and only one of them is a decision — the rule `ModuleKey` already states for screens.\n**Creating one is gated twice**, by `REPORT_MANAGE` and by the module: a principal cannot build a dashboard for a module the tenant has not licensed or that the principal holds no permission in. The server refuses with `409`; a client that hides the option has not enforced anything.\n"},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid","description":"Narrows every tile to one venue. Omitting it shows each viewer everything their own scope permits — it can never show a viewer beyond that. The same rule as `RunReportRequest.venueId`.\n"},"isShared":{"type":"boolean","default":false},"tiles":{"type":"array","minItems":1,"maxItems":24,"items":{"$ref":"#/components/schemas/DashboardTile"}}}},
 "Dashboard": {"x-ticvai-persistence":"reporting.dashboard + reporting.dashboard_tile","allOf":[{"$ref":"#/components/schemas/CreateDashboardRequest"},{"type":"object","required":["id","ownerPrincipalId","aggregateCost","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"ownerPrincipalId":{"type":"string","format":"uuid"},"aggregateCost":{"type":"string","enum":["low","medium","high"],"description":"Combined refresh load of every tile."},"archivedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**Set by `deleteDashboard`, which archives rather than removes.** A dashboard's tiles carry `visualisation`, `parameters` and `refresh_seconds` that somebody configured, and `reporting.dashboard_tile` cascades — so a hard delete takes an afternoon's work with it and leaves nothing to say what was there.\nArchived dashboards are excluded from `listDashboards` unless asked for with `includeArchived=true`.\n"},"createdAt":{"type":"string","format":"date-time"}}}]},
 "FieldType": {"type":"string","enum":["string","integer","decimal","money","boolean","date","dateTime","uuid","enum"]},
-"KpiDefinition": {"type":"object","x-ticvai-persistence":"reporting.kpi_definition","description":"BI boards 2.5 and 10.2. **One definition, referenced everywhere** — otherwise *revenue* means two things in the same meeting.\n","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string","description":"`takings` and `admissions` are seeded for every tenant as system KPIs (decided 28 September, audit R283), and the five accreditation KPIs for every tenant with the accreditation module (29 September, build pass). The seeded codes are `ReportingSystemKpi`.\n"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"domain":{"type":"string","nullable":true},"formula":{"type":"string","description":"**Expressed against the semantic model, not against tables.** A KPI written in SQL is a KPI that breaks when the warehouse is reshaped.\n"},"unit":{"type":"string","enum":["currency","count","percentage","duration","ratio","score"]},"higherIsBetter":{"type":"boolean","default":true,"description":"**Refund rate and revenue both go up.** Without this the status colour is a coin toss.\n"},"defaultPeriod":{"type":"string","nullable":true},"owner":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
+"KpiDefinition": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"reporting.kpi_definition","description":"BI boards 2.5 and 10.2. **One definition, referenced everywhere** — otherwise *revenue* means two things in the same meeting.\n","required":["code","name"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string","description":"`takings` and `admissions` are seeded for every tenant as system KPIs (decided 28 September, audit R283), and the five accreditation KPIs for every tenant with the accreditation module (29 September, build pass). The seeded codes are `ReportingSystemKpi`.\n"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"domain":{"type":"string","nullable":true},"formula":{"type":"string","description":"**Expressed against the semantic model, not against tables.** A KPI written in SQL is a KPI that breaks when the warehouse is reshaped.\n"},"unit":{"type":"string","enum":["currency","count","percentage","duration","ratio","score"]},"higherIsBetter":{"type":"boolean","default":true,"description":"**Refund rate and revenue both go up.** Without this the status colour is a coin toss.\n"},"defaultPeriod":{"type":"string","nullable":true},"owner":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"isActive":{"type":"boolean","default":true}}},
 "KpiTarget": {"type":"object","x-ticvai-persistence":"reporting.kpi_target","description":"BI board 2.6. **The threshold is what turns a number into a status.**","required":["scopePath","period","target"],"properties":{"kpiId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","description":"The scope this target applies to. With `period`, the key `setKpiTargets` matches on."},"period":{"type":"string"},"target":{"$ref":"#/components/schemas/MetricValue"},"amberAt":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"redAt":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"stretch":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true}}},
 "KpiValue": {"type":"object","description":"BI board 10.3. **Value, target, variance, direction and freshness in one read.**","properties":{"kpiId":{"type":"string","format":"uuid"},"code":{"type":"string"},"bucketStart":{"type":"string","format":"date-time","nullable":true,"description":"The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise."},"groupKey":{"type":"string","nullable":true,"description":"The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked."},"name":{"type":"string"},"scopePath":{"type":"string"},"period":{"type":"string"},"value":{"$ref":"#/components/schemas/MetricValue"},"target":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"comparison":{"allOf":[{"$ref":"#/components/schemas/MetricValue"}],"nullable":true},"variancePercent":{"type":"number","nullable":true},"direction":{"type":"string","enum":["up","down","flat"]},"status":{"type":"string","enum":["green","amber","red","noTarget"]},"asOf":{"type":"string","format":"date-time"},"stale":{"type":"boolean","description":"**True when the pipeline behind it has not refreshed.** A number nobody flagged as stale is a number somebody will act on.\n"}}},
 "MetricValue": {"x-ticvai-persistence-column":"numeric(18,4)","description":"**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n","oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"SemanticModel": {"type":"object","x-ticvai-persistence":"reporting.semantic_model","description":"BI boards 3.3 and 10.6. **A vocabulary, not a schema.** Exposing joins to report authors produces reports that are wrong invisibly.\n","properties":{"version":{"type":"integer","readOnly":true,"description":"Assigned by the server on each publish."},"domains":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"datasets":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"grain":{"type":"string","description":"**What one row means.** The single most common cause of a wrong report is a join that silently multiplied the grain.\n"},"fields":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"dataType":{"$ref":"#/components/schemas/FieldType"},"aggregation":{"allOf":[{"$ref":"#/components/schemas/Aggregation"}],"nullable":true,"description":"The default aggregation for the field, where it has one."},"sensitive":{"type":"boolean","default":false},"description":{"type":"string","nullable":true}}}}}}}}}},"relationships":{"type":"array","items":{"type":"object","properties":{"fromDataset":{"type":"string"},"toDataset":{"type":"string"},"cardinality":{"type":"string","enum":["oneToOne","oneToMany","manyToOne","manyToMany"]}}}},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}},
+"SemanticModel": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"reporting.semantic_model","description":"BI boards 3.3 and 10.6. **A vocabulary, not a schema.** Exposing joins to report authors produces reports that are wrong invisibly.\n","properties":{"version":{"type":"integer","readOnly":true,"description":"Assigned by the server on each publish."},"domains":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"datasets":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"name":{"type":"string"},"grain":{"type":"string","description":"**What one row means.** The single most common cause of a wrong report is a join that silently multiplied the grain.\n"},"fields":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"dataType":{"$ref":"#/components/schemas/FieldType"},"aggregation":{"allOf":[{"$ref":"#/components/schemas/Aggregation"}],"nullable":true,"description":"The default aggregation for the field, where it has one."},"sensitive":{"type":"boolean","default":false},"description":{"type":"string","nullable":true}}}}}}}}}},"relationships":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"fromDataset":{"type":"string"},"toDataset":{"type":"string"},"cardinality":{"type":"string","enum":["oneToOne","oneToMany","manyToOne","manyToMany"]}}}},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string"}}},
 "SiteNormalisationBasis": {"type":"object","x-ticvai-persistence":"reporting.site_normalisation_basis","description":"BI boards 7.9 and 10.4. **The denominators a benchmark divides by**, per site and period: visitors, operating hours, staffed positions and area, one for each `BenchmarkNormalisation` other than `none`. Read by `getAnalyticsBenchmark` for the period that covers the benchmark (data model, 29 September).\n","required":["scopePath","periodStart","periodEnd"],"properties":{"id":{"type":"string","format":"uuid"},"scopePath":{"type":"string","description":"The site (venue scope) the basis applies to."},"periodStart":{"type":"string","format":"date"},"periodEnd":{"type":"string","format":"date"},"visitors":{"type":"integer","nullable":true,"minimum":0,"description":"`perVisitor`."},"operatingHours":{"type":"number","nullable":true,"minimum":0,"description":"`perOperatingHour`."},"staffedPositions":{"type":"number","nullable":true,"minimum":0,"description":"`perStaffedPosition`. Average positions staffed over the period."},"areaSquareMetres":{"type":"number","nullable":true,"minimum":0,"description":"`perSquareMetre`. Operated area."}}}
 }
 ```

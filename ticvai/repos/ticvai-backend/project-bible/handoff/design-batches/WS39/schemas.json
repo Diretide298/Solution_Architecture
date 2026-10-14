@@ -1727,6 +1727,7 @@
     "readOnly": true
    },
    "recommendationId": {
+    "x-ticvai-references": "catalogue.pricing_recommendation",
     "type": "string",
     "format": "uuid",
     "description": "A `catalogue.pricing_recommendation` (29 September, data model DM3)."
@@ -1788,6 +1789,7 @@
     "description": "The `createLiveDynamicPrice` execution that carried it out, once it has."
    },
    "decidedByPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true
@@ -1854,6 +1856,7 @@
   }
  },
  "SignalRegistryEntry": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "catalogue.signal_registry",
   "description": "**The registry of AI signals and models, with their trust and quality** (29 September, data model DM3). ADM-106 and ADM-118. A signal or model not `approved` for a use in `aiUsePermissions` is not used for it.",

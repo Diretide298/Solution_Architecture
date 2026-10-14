@@ -855,7 +855,7 @@
  },
  "setAnalyticsProvider": {
   "method": "PUT",
-  "path": "/tenant-config/analytics-providers",
+  "path": "/tenant-config/analytics-providers/{analyticsProviderId}",
   "contract": "white-label",
   "summary": "Connect the storefront and app to an analytics platform",
   "permission": "TENANT_CONFIGURE",
@@ -863,6 +863,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "analyticsProviderId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

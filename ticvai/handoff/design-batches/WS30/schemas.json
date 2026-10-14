@@ -176,6 +176,7 @@
     "type": "integer"
    },
    "pendingApprovers": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -468,6 +469,7 @@
     "description": "A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
+    "x-ticvai-references": "catalogue.entitlement_template",
     "type": "string",
     "format": "uuid",
     "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
@@ -703,10 +705,12 @@
     "readOnly": true
    },
    "customerMembershipId": {
+    "x-ticvai-references": "identity.customer_membership",
     "type": "string",
     "format": "uuid"
    },
    "membershipBenefitId": {
+    "x-ticvai-references": "catalogue.membership_benefit",
     "type": "string",
     "format": "uuid"
    },
@@ -737,6 +741,11 @@
     "type": "string",
     "maxLength": 500,
     "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the device made the write** (R113; CHG-OFL-003). `recordBenefitUsage` is offline-capable, so the client sets this from its own clock and keeps it on replay; `created_at` is when the server heard of it. Omitted online, the server sets it to the time it received the call."
    }
   }
  },
@@ -1116,6 +1125,7 @@
   }
  },
  "MemberExceptionView": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "orders.member_exception",
   "description": "**One exception made to a membership, and who made it.** Written by `createMemberException` (decided 29 September, readiness close-out); the audit trail a membership that behaves outside its plan is explained from.\n",
@@ -1124,9 +1134,15 @@
    "membershipId",
    "kind",
    "reason",
-   "recordedAt"
+   "recordedAt",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -1784,6 +1800,7 @@
   }
  },
  "MembershipActivationView": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "orders.membership_activation_action",
   "description": "**One action taken on a membership in the activation queue.** Written by `resolveMembershipActivation` (decided 29 September, readiness close-out).\n",
@@ -2204,6 +2221,7 @@
   }
  },
  "MembershipMigrationView": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "orders.membership_migration",
   "description": "**One move of a membership to another product.** Written by `migrateMembership` (decided 29 September, readiness close-out).\n",
@@ -2214,9 +2232,15 @@
    "targetProductId",
    "direction",
    "effectiveTiming",
-   "status"
+   "status",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",
@@ -2465,11 +2489,13 @@
     "readOnly": true
    },
    "customerMembershipId": {
+    "x-ticvai-references": "identity.customer_membership",
     "type": "string",
     "format": "uuid",
     "description": "The membership in the path. Taken from the path on `renewMembership`."
    },
    "entitlementTemplateId": {
+    "x-ticvai-references": "catalogue.entitlement_template",
     "type": "string",
     "format": "uuid"
    },

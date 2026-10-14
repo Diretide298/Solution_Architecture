@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Subscription & Licensing
   version: 0.1.0
-  x-ticvai-screen-count: 130
+  x-ticvai-screen-count: 131
   x-ticvai-tier: satellite
   x-ticvai-module: 20 — Subscription & Licensing Management
   x-ticvai-requirements: 59
@@ -288,12 +288,12 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPartnerUser
+      x-ticvai-consumed-by:
+        - "P10 PTR-025 Partner Contacts & User Administration"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-025 Partner Contacts & User Administration"
       x-ticvai-api-scope: partner.write
       summary: Add a user to a partner branch
       description: '2.7.51. **Quota and credit resolve nearest-ancestor-wins**, like configuration — a
@@ -340,12 +340,12 @@ paths:
   /channel-listings:
     get:
       operationId: listChannelListings
+      x-ticvai-consumed-by:
+        - "P08 BO-013 Channel & Distribution"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-013 Channel & Distribution"
       summary: What is listed on which OTA
       tags:
       - subscription
@@ -370,6 +370,8 @@ paths:
   /channel-listings/{listingId}:
     put:
       operationId: setChannelListing
+      x-ticvai-consumed-by:
+        - "P08 BO-013 Channel & Distribution"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
@@ -380,8 +382,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-013 Channel & Distribution"
       summary: List a product on a channel, with its own allocation
       description: 'BL-076. **An OTA pulls a feed, caches it and sells against the cache**, so the gap
         between pushes is the oversell window and the allocation is the bound on it.
@@ -501,6 +501,8 @@ paths:
   /ai-usage/settle:
     post:
       operationId: settleAiUsage
+      x-ticvai-consumed-by:
+        - "P09 ADM-461 Consumption Reconciliation & Billing Approval"
       x-ticvai-read-via:
       - query: ai#activityRecords
         route: service
@@ -508,8 +510,6 @@ paths:
       - query: ai#policyRecords
         route: service
         for: 'its read of ai.policy, AI''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P09 ADM-461 Consumption Reconciliation & Billing Approval"
       x-ticvai-audience:
       - staff
       summary: Turn metered AI interactions into a billable usage record
@@ -954,6 +954,9 @@ paths:
         format: uuid
     get:
       operationId: getCommissionStatement
+      x-ticvai-consumed-by:
+        - "P10 PTR-011 Quote Management"
+        - "P10 PTR-017 Commission Statement"
       x-ticvai-read-via:
       - query: finance#fxRateRecords
         route: service
@@ -964,9 +967,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-011 Quote Management"
-        - "P10 PTR-017 Commission Statement"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
@@ -1009,7 +1009,6 @@ paths:
   /tenants:
     get:
       operationId: listTenants
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-consumed-by:
         - "P08 BO-594 Environment Ready & Handoff to AI Setup"
         - "P09 ADM-002 Platform Dashboard"
@@ -1033,9 +1032,7 @@ paths:
         - "P09 ADM-031 Security & Compliance Dashboard"
         - "P09 ADM-037 AI Provider & Credentials"
         - "P09 ADM-068 Tax, Fee & Calculation Command Center"
-        - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-370 Customer Subscription & Commercial Portfolio"
-        - "P09 ADM-374 Trial & Conversion Monitor"
         - "P09 ADM-411 Billing & Legal Entity Information"
         - "P09 ADM-412 Payment Method & Settlement Setup"
         - "P09 ADM-420 Tenant & Organization Provisioning"
@@ -1136,6 +1133,7 @@ paths:
         - "P09 ADM-557 AI Compliance, Assurance & Governance Reporting"
         - "P09 ADM-558 AI Governance Review, Action Plan & Continuous Improvement"
         - "P09 ADM-619 Reconciliation & Settlement Command Center"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1719,7 +1717,6 @@ paths:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-009 Tenant Billing & Invoicing"
         - "P09 ADM-011 Licence & Seat Management"
-        - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-371 Customer Commercial 360°"
         - "P09 ADM-418 Subscription Lifecycle & Trial-to-Paid Handoff"
       x-ticvai-audience:
@@ -1749,7 +1746,6 @@ paths:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-410 Contract & Billing Cycle Selection"
         - "P09 ADM-417 Subscription Confirmation & Commercial Activation"
-        - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P17 SGN-019 Contract & Billing Cycle Selection"
         - "P17 SGN-024 Subscription Confirmation & Commercial Activation"
       security:
@@ -1842,16 +1838,16 @@ paths:
         format: uuid
     post:
       operationId: previewSubscriptionChange
-      x-ticvai-read-via:
-      - query: tenancy#tenantRecords
-        route: service
-        for: 'its read of platform.tenant, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-414 Order & Commercial Pricing Review"
         - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P17 SGN-022 Order & Commercial Pricing Review"
+      x-ticvai-read-via:
+      - query: tenancy#tenantRecords
+        route: service
+        for: 'its read of platform.tenant, Tenancy''s data (CHG-MOD-001)'
       security:
       - bearerAuth: []
       - prospectAuth: []
@@ -1950,7 +1946,6 @@ paths:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-007 Module & Feature Entitlement"
         - "P09 ADM-011 Licence & Seat Management"
-        - "P09 ADM-422 Administrator & Security Initialization"
       x-ticvai-audience:
       - staff
       summary: License a module outside the plan
@@ -2045,10 +2040,6 @@ paths:
         format: uuid
     get:
       operationId: getEntitlementUsage
-      x-ticvai-read-via:
-      - query: access#entitlementRecords
-        route: service
-        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P09 ADM-002 Platform Dashboard"
         - "P09 ADM-005 Tenant Directory"
@@ -2060,9 +2051,12 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
-        - "P09 ADM-371 Customer Commercial 360°"
         - "P09 ADM-449 Usage & License Command Center"
         - "P09 ADM-457 AI Usage Forecast & Commercial Optimization"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -2837,15 +2831,15 @@ paths:
         format: uuid
     get:
       operationId: listCellJobs
-      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.
-
-        **Statuses.** Every `status` is returned, ended ones included (`failed`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-consumed-by:
         - "P09 ADM-003 Cross-Tenant Health Dashboard"
         - "P09 ADM-013 Tenant Performance Monitor"
         - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
         - "P09 ADM-419 Provisioning Command Center"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`failed`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3002,12 +2996,12 @@ paths:
         type: string
     post:
       operationId: recordInvoicePayment
+      x-ticvai-consumed-by:
+        - "P09 ADM-462 Invoice & Payment Management"
       x-ticvai-read-via:
       - query: finance#fxRateRecords
         route: service
         for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P09 ADM-462 Invoice & Payment Management"
       x-ticvai-audience:
       - staff
       summary: Record payment against an invoice
@@ -3745,6 +3739,8 @@ paths:
   /membership-annual-pass:
     get:
       operationId: listMembershipAnnualPass
+      x-ticvai-consumed-by:
+        - "P08 BO-284 Membership & Annual Pass Command Center"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -3755,8 +3751,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-284 Membership & Annual Pass Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.4-5 (13.1.1
@@ -3865,14 +3859,14 @@ paths:
   /membership-product-tier:
     put:
       operationId: setMembershipProductTier
+      x-ticvai-consumed-by:
+        - "P08 BO-285 Membership Product & Tier Builder"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-285 Membership Product & Tier Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.5-7 (13.1.2
@@ -3926,14 +3920,14 @@ paths:
   /membership-eligibility-qualification:
     put:
       operationId: setMembershipEligibilityQualification
+      x-ticvai-consumed-by:
+        - "P08 BO-286 Membership Eligibility & Qualification Rule Builder"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-286 Membership Eligibility & Qualification Rule Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.7-8 (13.1.3
@@ -3982,14 +3976,14 @@ paths:
   /validity-activation-expiry:
     put:
       operationId: setValidityActivationExpiry
+      x-ticvai-consumed-by:
+        - "P08 BO-287 Validity, Activation & Expiry Configuration"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-287 Validity, Activation & Expiry Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.8-9 (13.1.4
@@ -4037,6 +4031,8 @@ paths:
   /membership-entitlement-admission:
     put:
       operationId: setMembershipEntitlementAdmission
+      x-ticvai-consumed-by:
+        - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-read-via:
       - query: catalogue#priceListRecords
         route: service
@@ -4046,8 +4042,6 @@ paths:
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.9-11 (13.1.5
@@ -4096,12 +4090,12 @@ paths:
   /membership-usage-visit:
     get:
       operationId: listMembershipUsageVisit
+      x-ticvai-consumed-by:
+        - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.11-12 (13.1.6
@@ -4161,14 +4155,14 @@ paths:
   /family-household-dependent:
     put:
       operationId: setFamilyHouseholdDependent
+      x-ticvai-consumed-by:
+        - "P08 BO-290 Family, Household & Dependent Membership Configuration"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-290 Family, Household & Dependent Membership Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.12-14 (13.1.7
@@ -4216,6 +4210,8 @@ paths:
   /membership-commercial-pricing:
     get:
       operationId: listMembershipCommercialPricing
+      x-ticvai-consumed-by:
+        - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
@@ -4226,8 +4222,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.14-15 (13.1.8
@@ -4300,14 +4294,14 @@ paths:
   /renewal-auto-membership:
     put:
       operationId: setRenewalAutoMembership
+      x-ticvai-consumed-by:
+        - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.15-16 (13.1.9
@@ -4358,6 +4352,8 @@ paths:
   /membership-product-validation:
     get:
       operationId: getMembershipProductValidation
+      x-ticvai-consumed-by:
+        - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
       x-ticvai-read-via:
       - query: approvals#requestRecords
         route: service
@@ -4365,8 +4361,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
       summary: A membership product's validation, as the approver sees it
       description: |-
         **Added 4 October 2026 (CHG-FXC-010; VM-BO-293): `approveMembershipProductValidation` was the only operation, and the
@@ -4405,6 +4399,9 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: approveMembershipProductValidation
+      x-ticvai-consumed-by:
+        - "P08 BO-284 Membership & Annual Pass Command Center"
+        - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -4417,9 +4414,6 @@ paths:
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-284 Membership & Annual Pass Command Center"
-        - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -4501,6 +4495,8 @@ paths:
   /member:
     get:
       operationId: listMember
+      x-ticvai-consumed-by:
+        - "P08 BO-294 Member Operations Command Center"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -4511,8 +4507,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-294 Member Operations Command Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.21-22 (13.2.1
@@ -4667,6 +4661,8 @@ paths:
   /member-membership-account:
     put:
       operationId: setMemberMembershipAccount
+      x-ticvai-consumed-by:
+        - "P08 BO-295 Member 360° Membership Account Workspace"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -4682,8 +4678,6 @@ paths:
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership, the one the body''s `membershipId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-295 Member 360° Membership Account Workspace"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.22-24 (13.2.2
@@ -4733,6 +4727,8 @@ paths:
   /membership-activation-credential:
     get:
       operationId: listMembershipActivationCredential
+      x-ticvai-consumed-by:
+        - "P08 BO-296 Membership Activation, Assignment & Credential Management"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -4746,8 +4742,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-296 Membership Activation, Assignment & Credential Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.24-25 (13.2.3
@@ -4826,6 +4820,8 @@ paths:
   /visit-admission-entitlement:
     get:
       operationId: listVisitAdmissionEntitlement
+      x-ticvai-consumed-by:
+        - "P08 BO-297 Visit, Admission & Entitlement Usage Monitor"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -4833,8 +4829,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-297 Visit, Admission & Entitlement Usage Monitor"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.26-27 (13.2.4
@@ -4925,6 +4919,8 @@ paths:
   /membership-freeze-suspension:
     get:
       operationId: listMembershipFreezeSuspension
+      x-ticvai-consumed-by:
+        - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -4932,8 +4928,6 @@ paths:
       - query: approvals#requestRecords
         route: service
         for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.27-28 (13.2.5
@@ -5005,6 +4999,8 @@ paths:
   /membership-upgrade-downgrade:
     get:
       operationId: listMembershipUpgradeDowngrade
+      x-ticvai-consumed-by:
+        - "P08 BO-299 Membership Upgrade, Downgrade & Product Migration Operations"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -5018,8 +5014,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-299 Membership Upgrade, Downgrade & Product Migration Operations"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.29-30 (13.2.6
@@ -5094,6 +5088,8 @@ paths:
   /renewal-auto:
     get:
       operationId: listRenewalAuto
+      x-ticvai-consumed-by:
+        - "P08 BO-300 Renewal Operations & Auto-Renewal Management"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -5107,8 +5103,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-300 Renewal Operations & Auto-Renewal Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.30-31 (13.2.7
@@ -5211,6 +5205,9 @@ paths:
   /member-exception-override:
     get:
       operationId: listMemberExceptionOverride
+      x-ticvai-consumed-by:
+        - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
+        - "P08 BO-949 Approval, Exception & Override Control Center"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -5221,9 +5218,6 @@ paths:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
-        - "P08 BO-949 Approval, Exception & Override Control Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.32-33 (13.2.8
@@ -5308,6 +5302,8 @@ paths:
   /member-lifecycle-case:
     get:
       operationId: listMemberLifecycleCase
+      x-ticvai-consumed-by:
+        - "P08 BO-302 Member Lifecycle History, Audit & Case Timeline"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -5327,8 +5323,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-302 Member Lifecycle History, Audit & Case Timeline"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.33-35 (13.2.9
@@ -5434,6 +5428,8 @@ paths:
   /membership-renewal-retention:
     get:
       operationId: listMembershipRenewalRetention
+      x-ticvai-consumed-by:
+        - "P08 BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center"
       x-ticvai-read-via:
       - query: access#entitlementRecords
         route: service
@@ -5450,8 +5446,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.35-37 (13.2.10
@@ -5565,6 +5559,8 @@ paths:
   /partner:
     get:
       operationId: listPartner
+      x-ticvai-consumed-by:
+        - "P10 PTR-022 Partner Management Command Center"
       x-ticvai-read-via:
       - query: orders#paymentRecords
         route: service
@@ -5572,9 +5568,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-022 Partner Management Command Center"
-        - "P10 PTR-042 Partner Operations Command Center"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -5734,14 +5727,14 @@ paths:
   /partner-profile-organization:
     put:
       operationId: setPartnerProfileOrganization
+      x-ticvai-consumed-by:
+        - "P10 PTR-023 Partner Profile & Organization Setup"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P10 PTR-023 Partner Profile & Organization Setup"
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
@@ -5790,12 +5783,12 @@ paths:
   /partner-onboarding-application:
     get:
       operationId: listPartnerOnboardingApplication
+      x-ticvai-consumed-by:
+        - "P10 PTR-024 Partner Onboarding & Application Workflow"
       x-ticvai-read-via:
       - query: approvals#requestRecords
         route: service
         for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-024 Partner Onboarding & Application Workflow"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -5890,12 +5883,12 @@ paths:
   /partner-contact-user:
     get:
       operationId: listPartnerContactUser
+      x-ticvai-consumed-by:
+        - "P10 PTR-025 Partner Contacts & User Administration"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-025 Partner Contacts & User Administration"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6092,10 +6085,10 @@ paths:
   /partner-brand-venue:
     put:
       operationId: setPartnerBrandVenue
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P10 PTR-027 Partner Brand, Venue & Business Scope Assignment"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
@@ -6228,12 +6221,12 @@ paths:
   /partner-access-role:
     get:
       operationId: listPartnerAccessRole
+      x-ticvai-consumed-by:
+        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-read-via:
       - query: approvals#requestRecords
         route: service
         for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6333,14 +6326,14 @@ paths:
   /partner-statu-lifecycle:
     put:
       operationId: approvePartnerStatuLifecycle
+      x-ticvai-consumed-by:
+        - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
       x-ticvai-read-via:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -6395,6 +6388,8 @@ paths:
   /partner-profile-readiness:
     get:
       operationId: listPartnerProfileReadiness
+      x-ticvai-consumed-by:
+        - "P10 PTR-031 Partner 360° Profile, Readiness & AI Review"
       x-ticvai-read-via:
       - query: approvals#requestRecords
         route: service
@@ -6408,8 +6403,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-031 Partner 360° Profile, Readiness & AI Review"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6491,6 +6484,8 @@ paths:
   /commercial-agreement:
     get:
       operationId: listCommercialAgreement
+      x-ticvai-consumed-by:
+        - "P10 PTR-032 Commercial Agreement Command Center"
       x-ticvai-read-via:
       - query: approvals#requestRecords
         route: service
@@ -6501,8 +6496,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-032 Commercial Agreement Command Center"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6634,6 +6627,10 @@ paths:
   /agreement-contract-term:
     put:
       operationId: setAgreementContractTerm
+      x-ticvai-consumed-by:
+        - "P09 ADM-415 Commercial Agreement, Billable Definition & Customer Acceptance"
+        - "P10 PTR-033 Agreement & Contract Terms Builder"
+        - "P17 SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance"
       x-ticvai-read-via:
       - query: finance#fxRateRecords
         route: service
@@ -6643,10 +6640,6 @@ paths:
         for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P09 ADM-415 Commercial Agreement, Billable Definition & Customer Acceptance"
-        - "P10 PTR-033 Agreement & Contract Terms Builder"
-        - "P17 SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -6705,6 +6698,8 @@ paths:
   /partner-rate-net:
     put:
       operationId: setPartnerRateNet
+      x-ticvai-consumed-by:
+        - "P10 PTR-034 Partner Rate & Net Pricing Configuration"
       x-ticvai-read-via:
       - query: catalogue#priceListRecords
         route: service
@@ -6714,8 +6709,6 @@ paths:
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P10 PTR-034 Partner Rate & Net Pricing Configuration"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -6769,6 +6762,8 @@ paths:
   /commission-margin-incentive:
     get:
       operationId: listCommissionMarginIncentive
+      x-ticvai-consumed-by:
+        - "P08 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-read-via:
       - query: catalogue#priceListRecords
         route: service
@@ -6776,8 +6771,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6856,6 +6849,8 @@ paths:
   /credit-limit-exposure:
     get:
       operationId: listCreditLimitExposure
+      x-ticvai-consumed-by:
+        - "P08 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-read-via:
       - query: finance#postingRecords
         route: service
@@ -6866,8 +6861,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6951,6 +6944,8 @@ paths:
   /deposit-guarantee-financial:
     get:
       operationId: listDepositGuaranteeFinancial
+      x-ticvai-consumed-by:
+        - "P08 PTR-037 Deposit, Guarantee & Financial Security Management"
       x-ticvai-read-via:
       - query: orders#paymentRecords
         route: service
@@ -6958,8 +6953,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-037 Deposit, Guarantee & Financial Security Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7047,6 +7040,8 @@ paths:
   /payment-term-billing:
     put:
       operationId: setPaymentTermBilling
+      x-ticvai-consumed-by:
+        - "P10 PTR-038 Payment Terms, Billing & Account Configuration"
       x-ticvai-read-via:
       - query: finance#legalEntityRecords
         route: service
@@ -7062,8 +7057,6 @@ paths:
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P10 PTR-038 Payment Terms, Billing & Account Configuration"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -7125,6 +7118,8 @@ paths:
   /commercial-allocation-quota:
     get:
       operationId: listCommercialAllocationQuota
+      x-ticvai-consumed-by:
+        - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
@@ -7138,8 +7133,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7218,14 +7211,14 @@ paths:
   /booking-limit-commercial:
     put:
       operationId: approveBookingLimitCommercial
+      x-ticvai-consumed-by:
+        - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
       x-ticvai-read-via:
       - query: approvals#requestRecords
         route: service
         for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -7282,6 +7275,9 @@ paths:
   /commercial-agreement-health:
     get:
       operationId: listCommercialAgreementHealth
+      x-ticvai-consumed-by:
+        - "P10 PTR-032 Commercial Agreement Command Center"
+        - "P10 PTR-041 Commercial Agreement 360°, Health & AI Review"
       x-ticvai-read-via:
       - query: approvals#requestRecords
         route: service
@@ -7298,9 +7294,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-032 Commercial Agreement Command Center"
-        - "P10 PTR-041 Commercial Agreement 360°, Health & AI Review"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7383,6 +7376,9 @@ paths:
   /partner-2:
     get:
       operationId: listPartner2
+      x-ticvai-consumed-by:
+        - "P10 PTR-022 Partner Management Command Center"
+        - "P10 PTR-042 Partner Operations Command Center"
       x-ticvai-read-via:
       - query: finance#fxRateRecords
         route: service
@@ -7399,9 +7395,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-022 Partner Management Command Center"
-        - "P10 PTR-042 Partner Operations Command Center"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7531,6 +7524,8 @@ paths:
   /partner-order-booking:
     get:
       operationId: listPartnerOrderBooking
+      x-ticvai-consumed-by:
+        - "P10 PTR-043 Partner Orders & Booking Management"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
         route: service
@@ -7550,8 +7545,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-043 Partner Orders & Booking Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7680,6 +7673,8 @@ paths:
   /reservation-hold-release:
     get:
       operationId: listReservationHoldRelease
+      x-ticvai-consumed-by:
+        - "P10 PTR-044 Reservations, Holds & Release Management"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
@@ -7690,8 +7685,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-044 Reservations, Holds & Release Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7776,6 +7769,8 @@ paths:
   /partner-cancellation-refund:
     get:
       operationId: listPartnerCancellationRefund
+      x-ticvai-consumed-by:
+        - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
       x-ticvai-read-via:
       - query: approvals#requestRecords
         route: service
@@ -7789,8 +7784,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7889,6 +7882,8 @@ paths:
   /partner-statement-account:
     get:
       operationId: listPartnerStatementAccount
+      x-ticvai-consumed-by:
+        - "P10 PTR-046 Partner Statement & Account Activity"
       x-ticvai-read-via:
       - query: finance#postingRecords
         route: service
@@ -7902,8 +7897,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-046 Partner Statement & Account Activity"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -8002,6 +7995,8 @@ paths:
   /partner-reconciliation-exception:
     get:
       operationId: listPartnerReconciliationException
+      x-ticvai-consumed-by:
+        - "P08 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-read-via:
       - query: finance#postingRecords
         route: service
@@ -8015,8 +8010,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -8108,6 +8101,8 @@ paths:
   /commission-calculation-settlement:
     get:
       operationId: listCommissionCalculationSettlement
+      x-ticvai-consumed-by:
+        - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-read-via:
       - query: finance#fxRateRecords
         route: service
@@ -8124,8 +8119,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -8213,6 +8206,8 @@ paths:
   /partner-dispute-case:
     get:
       operationId: listPartnerDisputeCase
+      x-ticvai-consumed-by:
+        - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-read-via:
       - query: approvals#slaPolicyRecords
         route: service
@@ -8220,8 +8215,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -8333,6 +8326,8 @@ paths:
   /partner-performance-scorecard:
     get:
       operationId: listPartnerPerformanceScorecard
+      x-ticvai-consumed-by:
+        - "P10 PTR-050 Partner Performance Scorecard & Risk Monitoring"
       x-ticvai-read-via:
       - query: orders#orderLineRecords
         route: service
@@ -8346,8 +8341,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-050 Partner Performance Scorecard & Risk Monitoring"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -8441,6 +8434,8 @@ paths:
   /partner-relationship:
     get:
       operationId: listPartnerRelationship
+      x-ticvai-consumed-by:
+        - "P10 PTR-051 Partner AI Intelligence & Relationship Optimization"
       x-ticvai-read-via:
       - query: orders#refundRecords
         route: service
@@ -8448,8 +8443,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-051 Partner AI Intelligence & Relationship Optimization"
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -8573,11 +8566,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setVsiModel
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per platform, the caller''s platform: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-390 VSI Model Builder"
         - "P09 ADM-391 VSI Scoring & Tier Threshold Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per platform, the caller''s platform: a PUT replaces it whole. There is no key in the path.'
       summary: Weights, thresholds and the tiers they map to
       tags:
       - subscription
@@ -9040,8 +9033,6 @@ paths:
       operationId: getLicenceEnforcement
       x-ticvai-consumed-by:
         - "P09 ADM-377 Subscription Exceptions & Commercial Alerts"
-        - "P09 ADM-378 Executive AI Commercial Intelligence"
-        - "P09 ADM-452 Operational Usage & Threshold Monitor"
         - "P09 ADM-454 Minimum Guarantee & Variable Consumption Monitor"
       summary: Where a tenant stands against its entitlements, and what happens next
       description: 'Board 9.5. **`getEntitlementUsage` reported consumption and nothing said what to do
@@ -9078,10 +9069,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setLicenceEnforcementPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per platform, the caller''s platform: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P09 ADM-453 License Enforcement & Decision Engine"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per platform, the caller''s platform: a PUT replaces it whole. There is no key in the path.'
       summary: What happens at each threshold
       tags:
       - subscription
@@ -9201,6 +9192,17 @@ paths:
   /commercial-metrics:
     get:
       operationId: getCommercialMetrics
+      x-ticvai-consumed-by:
+        - "P09 ADM-369 Commercial Command Center"
+        - "P09 ADM-372 Operational Profile, VSI & Commercial Model Intelligence"
+        - "P09 ADM-373 Revenue & Commercial Model Analytics"
+        - "P09 ADM-374 Trial & Conversion Monitor"
+        - "P09 ADM-375 Renewal & Retention Center"
+        - "P09 ADM-376 Commercial Optimization & Expansion Opportunities"
+        - "P09 ADM-378 Executive AI Commercial Intelligence"
+        - "P09 ADM-389 Commercial Rules Engine Overview"
+        - "P09 ADM-459 Billing & Commercial Command Center"
+        - "P09 ADM-464 Renewal Management Center"
       x-ticvai-agreed: '14 October: Block A audit, class S-METRIC-NO-OP (CHG-SCO-006); the P09 commercial command
         centres (pack Subscription_Licensing_AI_Self_Service.pdf boards 1, 3 and 10, Primary KPIs) show these figures
         and no operation read them; shape follows reporting getKpiValues'
@@ -9355,14 +9357,14 @@ paths:
   /membership-usage-policy:
     put:
       operationId: setMembershipUsagePolicy
+      x-ticvai-consumed-by:
+        - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-read-via:
       - query: catalogue#productRecords
         route: service
         for: 'the membership product''s catalogue product (404, 409) (CHG-MOD-003)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 open (subscription.membership_usage_policy had no writer,
@@ -9440,6 +9442,8 @@ paths:
   /membership-commercial-config:
     put:
       operationId: setMembershipCommercialConfig
+      x-ticvai-consumed-by:
+        - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-read-via:
       - query: catalogue#priceListRecords
         route: service
@@ -9452,8 +9456,6 @@ paths:
         for: 'whether payments supports instalments for the product (422 instalments-not-supported) (CHG-MOD-003)'
       x-ticvai-singleton: true
       x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
-      x-ticvai-consumed-by:
-        - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 open (the commercial columns of subscription.membership_product
@@ -9542,12 +9544,12 @@ paths:
         format: uuid
     post:
       operationId: actOnPartnerApplicationReview
+      x-ticvai-consumed-by:
+        - "P10 PTR-024 Partner Onboarding & Application Workflow"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-024 Partner Onboarding & Application Workflow"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -9702,12 +9704,12 @@ paths:
         format: uuid
     put:
       operationId: setPartnerDistributionRights
+      x-ticvai-consumed-by:
+        - "P08 PTR-026 Territory, Market & Distribution Rights"
       x-ticvai-read-via:
       - query: catalogue#eventRecords
         route: service
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-026 Territory, Market & Distribution Rights"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_distribution_right had no writer; listTerritoryMarketDistribution
@@ -9791,12 +9793,12 @@ paths:
         format: uuid
     put:
       operationId: setPartnerCapabilityGrants
+      x-ticvai-consumed-by:
+        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-read-via:
       - query: catalogue#eventRecords
         route: service
         for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_capability_grant had no writer; listPartnerAccessRole
@@ -9885,6 +9887,8 @@ paths:
         format: uuid
     put:
       operationId: setPartnerCommissionRules
+      x-ticvai-consumed-by:
+        - "P08 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-read-via:
       - query: catalogue#eventRecords
         route: service
@@ -9892,8 +9896,6 @@ paths:
       - query: catalogue#productRecords
         route: service
         for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -9984,12 +9986,12 @@ paths:
         format: uuid
     put:
       operationId: setPartnerCreditProfile
+      x-ticvai-consumed-by:
+        - "P08 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -10134,6 +10136,8 @@ paths:
         format: uuid
     put:
       operationId: setPartnerAllocations
+      x-ticvai-consumed-by:
+        - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-read-via:
       - query: catalogue#channelCapacityRecords
         route: service
@@ -10147,8 +10151,6 @@ paths:
       - query: orders#orderLineRecords
         route: service
         for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -10226,6 +10228,8 @@ paths:
   /partner-change-requests:
     post:
       operationId: createPartnerChangeRequest
+      x-ticvai-consumed-by:
+        - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
       x-ticvai-read-via:
       - query: catalogue#performanceRecords
         route: service
@@ -10239,8 +10243,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -10328,12 +10330,12 @@ paths:
         format: uuid
     post:
       operationId: actOnPartnerReconciliationException
+      x-ticvai-consumed-by:
+        - "P08 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_reconciliation_exception had no owner
@@ -10535,12 +10537,12 @@ paths:
         format: uuid
     post:
       operationId: actOnPartnerSettlementBatch
+      x-ticvai-consumed-by:
+        - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-read-via:
       - query: finance#legalEntityRecords
         route: service
         for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_settlement_batch is created by the settlement
@@ -10638,6 +10640,8 @@ paths:
   /partner-cases:
     post:
       operationId: createPartnerCase
+      x-ticvai-consumed-by:
+        - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-read-via:
       - query: approvals#slaPolicyRecords
         route: service
@@ -10645,8 +10649,6 @@ paths:
       - query: orders#salesOrderRecords
         route: service
         for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -10706,6 +10708,8 @@ paths:
         format: uuid
     post:
       operationId: actOnPartnerCase
+      x-ticvai-consumed-by:
+        - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-read-via:
       - query: approvals#slaPolicyRecords
         route: service
@@ -10713,8 +10717,6 @@ paths:
       - query: identity#principalRecords
         route: service
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -10899,8 +10901,6 @@ paths:
     get:
       operationId: listCreditNotes
       x-ticvai-consumed-by:
-        - "P09 ADM-009 Tenant Billing & Invoicing"
-        - "P09 ADM-462 Invoice & Payment Management"
         - "P09 ADM-467 Discount, Credit & Commercial Override Management"
       x-ticvai-audience:
       - staff

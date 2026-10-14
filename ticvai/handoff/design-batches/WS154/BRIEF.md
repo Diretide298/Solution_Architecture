@@ -134,11 +134,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-631` | Velocity, Behavioral & Transaction Risk Controls | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-632` | Risk Lists, Signals & Payment Control Center | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `ADM-633` | Fraud Alert, Investigation & Case Management | D | 0 | 44 | 6 | 29 | 0 | 0 | — | notStarted (—) |
-| `ADM-634` | Chargeback & Dispute Command Center | C | 0 | 26 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `ADM-634` | Chargeback & Dispute Command Center | C | 0 | 146 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 | `ADM-635` | Chargeback Evidence & Representment Workspace | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-636` | Payment Performance & Conversion Analytics | C | 3 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-637` | AI Fraud, Anomaly & Payment Intelligence Center | D | 0 | 0 | 6 | 29 | 0 | 0 | — | notStarted (—) |
-| `ADM-638` | Payment Executive Intelligence, Risk Simulator & AI Advisor | C | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-637` | AI Fraud, Anomaly & Payment Intelligence Center | D | 0 | 25 | 6 | 29 | 0 | 0 | — | notStarted (—) |
+| `ADM-638` | Payment Executive Intelligence, Risk Simulator & AI Advisor | C | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

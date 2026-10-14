@@ -5,11 +5,12 @@
   "module": "Shift",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_WORKSTATION",
   "capability": "C11",
   "implementation": {
    "app": "venue-pos",
    "route": "/sell/staff-roster",
-   "component": "apps/venue-pos/src/routes/sell/StaffRosterBoard.tsx",
+   "component": "src/routes/sell/StaffRosterBoard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -333,11 +334,12 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "capability": "C01",
   "implementation": {
    "app": "venue-pos",
    "route": "/sell/add-to-existing-ticket",
-   "component": "apps/venue-pos/src/routes/sell/AddToExistingTicketDetail.tsx",
+   "component": "src/routes/sell/AddToExistingTicketDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -635,10 +637,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_WORKSTATION",
   "implementation": {
    "app": "venue-pos",
    "route": "/sell/cash-operations-dashboard",
-   "component": "apps/venue-pos/src/routes/sell/CashOperationsDashboardBoard.tsx",
+   "component": "src/routes/sell/CashOperationsDashboardBoard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -841,10 +844,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_WORKSTATION",
   "implementation": {
    "app": "venue-pos",
    "route": "/sell/cash-in-cash-out-operations",
-   "component": "apps/venue-pos/src/routes/sell/CashInCashOutOperationsBoard.tsx",
+   "component": "src/routes/sell/CashInCashOutOperationsBoard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -874,7 +878,7 @@
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`createCashMovement`) and no read of a population — it is settings, not a list",
-  "purpose": "Cash In / Cash Out Operations — from the client design board, 20 August.",
+  "purpose": "Record cash added to or lifted from the drawer during the shift, counted by denomination and with a reason, against the shift's movements so far.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1021,10 +1025,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "SHIFT_OPEN",
   "implementation": {
    "app": "venue-pos",
    "route": "/sell/safe-drop-cash-transfer-management",
-   "component": "apps/venue-pos/src/routes/sell/SafeDropCashTransferManagementBoard.tsx",
+   "component": "src/routes/sell/SafeDropCashTransferManagementBoard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1275,10 +1280,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_WORKSTATION",
   "implementation": {
    "app": "venue-pos",
    "route": "/sell/shift-templates-policies",
-   "component": "apps/venue-pos/src/routes/sell/ShiftTemplatesPoliciesBoard.tsx",
+   "component": "src/routes/sell/ShiftTemplatesPoliciesBoard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1547,10 +1553,11 @@
   "module": "Sell",
   "requiresModule": "fnb",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-pos",
    "route": "/sell/outlet-setup",
-   "component": "apps/venue-pos/src/routes/sell/OutletSetupBoard.tsx",
+   "component": "src/routes/sell/OutletSetupBoard.tsx",
    "status": "notStarted"
   },
   "navigation": {

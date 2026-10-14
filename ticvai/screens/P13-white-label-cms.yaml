@@ -67,6 +67,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -372,6 +373,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -525,6 +527,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -659,6 +662,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -871,6 +875,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -1023,6 +1028,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -1242,6 +1248,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -1477,6 +1484,12 @@ screens:
       4 October 2026'
     trigger: onAction
     provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: listProposedActions
+    contract: ai
+    purpose: 'Follows decideProposedAction (202) until what it started settles: What the assistant has
+      proposed and nobody has decided'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     provenance: generated
@@ -1611,6 +1624,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -1804,10 +1818,9 @@ screens:
   - operationId: listProposedActions
     contract: ai
     purpose: 'Follows the drafts proposeMarketingContent queued and the decisions decideProposedAction
-      routed: each is an ai.proposed_action, polled while the screen is open until it is applied or
-      refused'
+      routed: each is an ai.proposed_action, polled while the screen is open until it is applied or refused'
     trigger: onInterval
-    provenance: 'audit fix S-ASYNC-POLL, 14 October 2026 (CHG-SCO-011)'
+    provenance: audit fix S-ASYNC-POLL, 14 October 2026 (CHG-SCO-011)
   entryState:
     preloaded:
     - PromoBlock.id
@@ -1949,6 +1962,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -2221,6 +2235,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: ASSET_LIBRARY_VIEW
   capability: C00
   implementation:
     app: venue-management-web
@@ -2665,6 +2680,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: MARKETING_VIEW
   capability: C00
   implementation:
     app: venue-management-web
@@ -2816,6 +2832,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -2951,6 +2968,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -3038,6 +3056,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -3306,6 +3325,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -3480,6 +3500,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -3709,11 +3730,18 @@ screens:
     dismiss:
       label: Cancel
     provenance: corrected 2 October 2026 (CHG-SGU-022, design-notes correction)
+  entryState:
+    params:
+    - name: analyticsProviderId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listAnalyticsProviders`.'
 - id: CMS-017
   name: Domain & Certificate
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -3936,6 +3964,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -4277,6 +4306,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: USER_MANAGE
   capability: C00
   implementation:
     app: venue-management-web
@@ -4443,6 +4473,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -4658,6 +4689,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -4746,6 +4778,11 @@ screens:
     - DataProcessingPurposeLawfulBasisRegistryView.description
     - DataProcessingPurposeLawfulBasisRegistryView.businessOwner
     - DataProcessingPurposeLawfulBasisRegistryView.dataControllerApplicableOrganization
+    params:
+    - name: purposeId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listDataProcessingPurpose`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -4772,6 +4809,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -4896,9 +4934,9 @@ screens:
     trigger: onAction
   - operationId: listConsentPurposes
     contract: marketing-crm
-    purpose: 'The consent purposes as configured, which fill the builder before a change is saved'
+    purpose: The consent purposes as configured, which fill the builder before a change is saved
     trigger: onLoad
-    provenance: 'audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)'
+    provenance: audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)
   wireframe:
     status: notStarted
     provenance: generated
@@ -4916,6 +4954,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5051,6 +5090,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 1
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5232,6 +5272,14 @@ screens:
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCookieScans`
         and the user picks one; an edge that holds one may still carry it to open on that record.'
+    - name: scanPolicyId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listCookieScanPolicies`.'
+    - name: technologyId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listCookieTrackingDigital`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -5283,6 +5331,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 1
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5467,11 +5516,18 @@ screens:
     provenance: corrected 2 October 2026 (CHG-SGU-017, design-notes correction)
   notes: '**Channel and brand, the upsert key, are fields on the form and choosing a row of the list loads
     that design (4 October 2026); the remaining selects are bound to the design''s properties** (CHG-FXS-002)'
+  entryState:
+    params:
+    - name: bannerDesignId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listCookieBannerPreference`.'
 - id: CMS-027
   name: Consent Capture Point & Customer Journey Configuration
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5652,6 +5708,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5741,6 +5798,11 @@ screens:
   entryState:
     preloaded:
     - PrivacyNoticePolicyTermsVersionManagementView.documentType
+    params:
+    - name: governanceId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPrivacyNoticePolicy`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -5781,6 +5843,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -5879,6 +5942,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'
@@ -6132,11 +6196,19 @@ screens:
       - approvedByPrincipalId
       - approvedAt
     provenance: contract marketing-crm.yaml PUT /privacy-notice-policy
+  entryState:
+    params:
+    - name: governanceId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `setPrivacyNoticePolicyGovernance` takes it, from the record the user acts
+        on.'
 - id: CMS-031
   name: Privacy Operations Command Center
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6332,6 +6404,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6422,6 +6495,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6514,6 +6588,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6639,6 +6714,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6731,6 +6807,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -6850,6 +6927,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -7017,6 +7095,11 @@ screens:
     - DataRetentionExpiryLegalHoldOperationsView.underLegalHold
     - DataRetentionExpiryLegalHoldOperationsView.processingFailures
     - DataRetentionExpiryLegalHoldOperationsView.retentionExceptions
+    params:
+    - name: holdId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listDataRetentionExpiry`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -7031,6 +7114,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -7153,6 +7237,11 @@ screens:
     - PrivacyComplianceExceptionInvestigationWorkspaceView.severity
     - PrivacyComplianceExceptionInvestigationWorkspaceView.system
     - PrivacyComplianceExceptionInvestigationWorkspaceView.country
+    params:
+    - name: exceptionId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listPrivacyComplianceExceptions`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -7167,6 +7256,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: AUDIT_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -7289,6 +7379,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '2'
@@ -7438,6 +7529,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -7721,6 +7813,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -7865,6 +7958,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8002,6 +8096,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8150,6 +8245,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8273,9 +8369,9 @@ screens:
     trigger: onAction
   - operationId: getSignatorySignatureGuardian
     contract: marketing-crm
-    purpose: 'The signatory and guardian rules as configured, which fill the form before a change is saved'
+    purpose: The signatory and guardian rules as configured, which fill the form before a change is saved
     trigger: onLoad
-    provenance: 'audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)'
+    provenance: audit fix S-NO-READ, 14 October 2026 (CHG-SCO-008)
   wireframe:
     status: notStarted
     provenance: generated
@@ -8290,6 +8386,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8413,6 +8510,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8534,6 +8632,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8634,6 +8733,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8756,6 +8856,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_MANAGE
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '1'
@@ -8858,6 +8959,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9079,6 +9181,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9207,6 +9310,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9336,6 +9440,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9452,6 +9557,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9562,6 +9668,11 @@ screens:
     - WaiverVerificationValidationWorkspaceView.version
     - WaiverVerificationValidationWorkspaceView.booking
     - WaiverVerificationValidationWorkspaceView.signatory
+    params:
+    - name: verificationId
+      from: navigation
+      optional: true
+      notes: 'Optional: opened without it, the screen finds it with `listWaiverVerificationQueue`.'
   wireframe:
     status: notStarted
     provenance: generated
@@ -9576,6 +9687,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9683,6 +9795,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9778,6 +9891,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW_PII
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -9866,6 +9980,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -10000,6 +10115,7 @@ screens:
   module: Policy
   requiresModule: core
   wave: 3
+  permission: GUEST_VIEW
   source:
     pack: Waiver, Consent & Digital Form Management_Reference.pdf
     board: '2'
@@ -10094,6 +10210,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10263,6 +10380,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10431,6 +10549,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10548,6 +10667,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10658,6 +10778,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10763,6 +10884,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10862,6 +10984,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -10957,6 +11080,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -11103,6 +11227,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -11194,6 +11319,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '1'
@@ -11333,6 +11459,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -11550,6 +11677,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -11667,6 +11795,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -11772,6 +11901,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -11882,6 +12012,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -12044,6 +12175,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -12152,6 +12284,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -12236,6 +12369,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -12330,6 +12464,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -12436,6 +12571,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '2'
@@ -12586,6 +12722,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -12761,6 +12898,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -12861,6 +12999,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -12952,6 +13091,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_APPROVE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13058,6 +13198,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_APPROVE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13154,6 +13295,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: PERMISSION_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13286,6 +13428,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_SHARE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13397,6 +13540,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13524,6 +13668,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13602,6 +13747,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '3'
@@ -13720,6 +13866,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -13923,6 +14070,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14029,6 +14177,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14137,11 +14286,18 @@ screens:
     bound to a contract property; 13 of 19 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: code
+      from: deepLink
+      optional: true
+      notes: 'Optional: only `setMediaDistributionChannels` takes it, from the record the user acts on.'
 - id: CMS-094
   name: Secure Delivery URL, CDN & Rendition Delivery
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14242,6 +14398,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14345,6 +14502,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_MANAGE
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14443,11 +14601,18 @@ screens:
     bound to a contract property; 14 of 25 pack bullets carried onto the screen — the rest are acceptance
     prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than
     here.
+  entryState:
+    params:
+    - name: code
+      from: deepLink
+      optional: true
+      notes: 'Optional: only `setMediaDistributionChannels` takes it, from the record the user acts on.'
 - id: CMS-097
   name: DAM API & Integration Hub
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14533,6 +14698,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14647,6 +14813,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14765,6 +14932,7 @@ screens:
   module: Media Library
   requiresModule: core
   wave: 3
+  permission: ASSET_LIBRARY_VIEW
   source:
     pack: Digital Asset Management DAM.pdf
     board: '4'
@@ -14828,6 +14996,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   implementation:
     app: venue-management-web
     route: /white-label/help-me-choose
@@ -15128,6 +15297,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -15429,6 +15599,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web
@@ -15793,6 +15964,7 @@ screens:
   module: White Label
   requiresModule: core
   wave: 1
+  permission: TENANT_CONFIGURE
   capability: C00
   implementation:
     app: venue-management-web

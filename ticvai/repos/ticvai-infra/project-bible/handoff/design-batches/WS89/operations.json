@@ -24,7 +24,7 @@
   "contract": "inventory",
   "summary": "Send stock to another location",
   "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -299,7 +299,7 @@
   "contract": "inventory",
   "summary": "Receive a transfer",
   "permission": "PRODUCT_CONFIGURE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

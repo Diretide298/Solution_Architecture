@@ -7,7 +7,7 @@
 | Tier | foundation: Read by everything, reads nothing above. Deploys first and alone. |
 | Contracts | `identity` |
 | Schemas owned | `identity`, `pii` |
-| Operations in the slice | 40 of 97 |
+| Operations in the slice | 36 of 98 |
 | Scale | Read-heavy, latency-critical, cached hard. Every request resolves a principal. |
 | If it is down | A restart is an outage everywhere. Deploys go out first and alone. |
 
@@ -22,7 +22,6 @@
 | [MarketingService](MarketingService.md) | `marketing.consent_record`, `marketing.form_submission`, `marketing.guest_document`, `marketing.guest_profile` |
 | [OrderService](OrderService.md) | `orders.sales_order` |
 | [TenancyService](TenancyService.md) | `platform.scope`, `platform.workstation` |
-| [VenueOpsService](VenueOpsService.md) | `assets.media_asset` |
 
 ## Operations in the first release
 
@@ -33,12 +32,11 @@
 | administration | [`listPrincipals`](#listprincipals) | GET | `/principals` | core | 1 | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019 … |
 | administration | [`listRoles`](#listroles) | GET | `/roles` | core | 1 | ADM-021, BO-054, BO-106, CMS-019, CMS-086 |
 | administration | [`openPlatformStaffGrant`](#openplatformstaffgrant) | POST | `/platform-staff-grants` | core | 1 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
-| administration | [`setCapabilityTemplate`](#setcapabilitytemplate) | PUT | `/capability-templates` | setup | 1 | BO-054 |
+| administration | [`setCapabilityTemplate`](#setcapabilitytemplate) | PUT | `/capability-templates/{capabilityTemplateId}` | setup | 1 | BO-054 |
 | administration | [`updatePrincipal`](#updateprincipal) | PATCH | `/principals/{principalId}` | core | 1 | ADM-020, BO-053, BO-054, CMS-019, PTR-003 |
 | administration | [`updateRole`](#updaterole) | PATCH | `/roles/{roleId}` | setup | 1 |  |
 | guestAuth | [`deleteGuestAccount`](#deleteguestaccount) | DELETE | `/auth/guest/account` | core | 1 | GST-066, WEB-024 |
 | guestAuth | [`getGuestSession`](#getguestsession) | GET | `/auth/guest/session` | core | 1 | GST-042, GST-073, WEB-016 |
-| guestAuth | [`getMyIdentityVerification`](#getmyidentityverification) | GET | `/auth/guest/identity-verifications/current` | core | 1 | WEB-020 |
 | guestAuth | [`guestLogout`](#guestlogout) | DELETE | `/auth/guest/session` | core | 1 | GST-042, GST-073, WEB-016 |
 | guestAuth | [`guestPasswordLogin`](#guestpasswordlogin) | POST | `/auth/guest/password` | core | 1 | GST-042, WEB-016 |
 | guestAuth | [`guestSocialLogin`](#guestsociallogin) | POST | `/auth/guest/social` | core | 1 | GST-042, WEB-016 |
@@ -46,7 +44,6 @@
 | guestAuth | [`linkGuestCheckout`](#linkguestcheckout) | POST | `/auth/guest/link-checkout` | core | 1 | GST-010, GST-042, WEB-013, WEB-016 |
 | guestAuth | [`registerGuest`](#registerguest) | POST | `/auth/guest/register` | core | 1 | GST-010, GST-042, WEB-013, WEB-016 |
 | guestAuth | [`requestGuestOtp`](#requestguestotp) | POST | `/auth/guest/otp` | core | 1 | GST-042, WEB-016 |
-| guestAuth | [`submitGuestIdentityDocument`](#submitguestidentitydocument) | POST | `/auth/guest/identity-verifications` | core | 1 | WEB-020 |
 | guestAuth | [`verifyGuestOtp`](#verifyguestotp) | POST | `/auth/guest/otp/verify` | core | 1 | GST-042, WEB-016 |
 | identity | [`changeOwnCredential`](#changeowncredential) | POST | `/auth/credential` | core | 1 | ADM-001, ADM-699, EMP-001, POS-000, PTR-001, SCN-001 … |
 | identity | [`exportSubjectData`](#exportsubjectdata) | POST | `/guests/{subjectId}/data-export` | core | 1 | GST-066, WEB-024 |
@@ -57,16 +54,14 @@
 | identity | [`login`](#login) | POST | `/auth/login` | core | 1 | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 | identity | [`refreshToken`](#refreshtoken) | POST | `/auth/refresh` | core | 1 | GST-042, WEB-016 |
 | identity | [`selectRole`](#selectrole) | POST | `/auth/select-role` | core | 1 | ADM-001, EMP-001, EMP-002, POS-000, POS-001, PTR-001 … |
-| identity | [`setGuestVerificationPolicy`](#setguestverificationpolicy) | PUT | `/guest-verification-policy` | setup | 1 | ADM-342 |
 | identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-422 |
 | identity | [`setSegregationRules`](#setsegregationrules) | PUT | `/segregation-rules` | setup | 1 | ADM-340 |
 | identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-010, GST-073, WEB-013, WEB-020 |
 | mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284 … |
-| mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 … |
+| mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
 | mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 1 | ADM-342, ADM-699, EMP-042, GST-073, WEB-024 |
-| mfa | [`removeMfaMethod`](#removemfamethod) | DELETE | `/auth/mfa/methods/{methodId}` | core | 1 | ADM-699, EMP-042, GST-073, WEB-024 |
 | mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284 … |
-| mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 … |
+| mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
 | session | [`listActiveSessions`](#listactivesessions) | GET | `/auth/sessions` | core | 1 | BO-053, POS-000 |
 
 ## Group: administration
@@ -373,7 +368,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 
 ### setCapabilityTemplate
 
-**`PUT /capability-templates`**: Save a tick-set under a name
+**`PUT /capability-templates/{capabilityTemplateId}`**: Save a tick-set under a name
 
 |  |  |
 |---|---|
@@ -392,6 +387,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| capabilityTemplateId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `CapabilityTemplate`
@@ -647,52 +643,6 @@ Raises an erasure request rather than deleting immediately. PII is removed from 
 | 401 | Unauthorized | Missing, expired or superseded session |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### getMyIdentityVerification
-
-**`GET /auth/guest/identity-verifications/current`**: The guest's own latest identity verification
-
-Status, outcome and, where it was refused or needs resubmission, the reason the guest is shown. `404` when the guest has never submitted one.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Read routing | primary |
-| Reads | `identity.guest_identity_verification` |
-| Writes | - |
-| Called by | WEB-020 |
-
-**Response**: `IdentityGuestVerification`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes | (read-only) |
-| subjectId | string (uuid) | yes |  |
-| subjectDocumentId | string (uuid) |  | The pii.subject_document row submitted. |
-| documentKind | enum (passport, emiratesId, nationalId, drivingLicence, residencePermit, other) |  |  |
-| documentNumberLast4 | string |  | (max length 4; read-only; nullable) |
-| reason | enum (policyRequired, ageRestrictedPurchase, residentPricing, accountRecovery) |  |  |
-| status | enum (pending, verified, rejected, resubmissionRequested) | yes | (read-only) |
-| method | enum (manualReview, documentScanner, provider) |  | (read-only; nullable) |
-| decisionReason | string |  | (max length 300; read-only; nullable) |
-| decidedByPrincipalId | string (uuid) |  | (read-only; nullable) |
-| submittedAt | string (date-time) | yes | (read-only) |
-| decidedAt | string (date-time) |  | (read-only; nullable) |
-| documentImageDeletedAt | string (date-time) |  | When the scan (and any selfie) was deleted under the policy's retention. (read-only; nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | The latest verification |
-| 401 | Unauthorized | Missing, expired or superseded session |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### guestLogout
 
 **`DELETE /auth/guest/session`**: End a guest session
@@ -827,7 +777,7 @@ Where the provider's verified email matches an existing account, the identities 
 |---|---|---|---|
 | provider | enum (apple, google) | yes |  |
 | idToken | string | yes |  |
-| deviceId | string |  |  |
+| deviceId | string |  | Send the app's installationId (the value it registers its push token with, marketing-crm registerGuestDevice), so revoking that device signs this session out (endGuestDeviceSessions, CHG-MOD-009). |
 | venueId | string (uuid) |  | The venue the guest app or booking is in. (nullable) |
 
 **Response**: `GuestSession`
@@ -899,7 +849,7 @@ Government onboarding has lead time and should be started before it becomes the 
 | code | string | yes |  |
 | redirectUri | string | yes |  |
 | state | string |  |  |
-| deviceId | string |  |  |
+| deviceId | string |  | Send the app's installationId (the value it registers its push token with, marketing-crm registerGuestDevice), so revoking that device signs this session out (endGuestDeviceSessions, CHG-MOD-009). |
 | venueId | string (uuid) |  | The venue the guest app or booking is in. (nullable) |
 
 **Response**: `GuestSession`
@@ -1106,74 +1056,6 @@ Delivered by WhatsApp, SMS or email. Rate-limited per identifier and per source 
 | 202 |  | Sent if the identifier is deliverable |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### submitGuestIdentityDocument
-
-**`POST /auth/guest/identity-verifications`**: Submit an identity document for verification
-
-5.3.21 (decided 29 September, build pass). **The guest-side ID verification the sign-in methods lacked.** Email (`verifyGuestEmail`), mobile OTP (`verifyGuestOtp`), social and UAE Pass prove a contact or an account; this proves the person, where the tenant's `IdentityGuestVerificationPolicy` asks for it (an age-restricted purchase, a resident rate, a high-value account).
-
-**The number is hashed on arrival and never returned**; only the last four characters are kept in clear, in `pii.subject_document`, as they are for every document in the package. The scan is an uploaded media asset and is deleted when the verification is decided, unless the policy keeps it (`documentImageRetention`).
-
-Creates a `pending` verification. `409` while another is pending for this guest; `422` when the document has expired or its kind is not one the tenant accepts. A guest verified through UAE Pass where the policy counts it (`uaePassSatisfiesIdDocument`) is never asked.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `assets.media_asset`, `cache:idempotency`, `identity.guest_identity_verification`, `identity.guest_verification_policy` |
-| Writes | `cache:idempotency`, `identity.guest_identity_verification`, `pii.subject_document` |
-| Called by | WEB-020 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `IdentityGuestDocumentSubmission`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| documentKind | enum (passport, emiratesId, nationalId, drivingLicence, residencePermit, other) | yes | The vocabulary of pii.subject_document.kind. |
-| documentNumber | string (password) | yes | Write-only, never returned. (max length 64) |
-| issuingCountry | string |  | (pattern ^[A-Z]{2}$; nullable) |
-| expiresOn | string (date) |  | (nullable) |
-| documentAssetId | string (uuid) | yes | The uploaded scan or photo of the document. |
-| selfieAssetId | string (uuid) |  | A live photo for the reviewer to compare, where the policy asks for one. (nullable) |
-| reason | enum (policyRequired, ageRestrictedPurchase, residentPricing, accountRecovery) |  | What the guest is verifying for; the review queue shows it. (default policyRequired) |
-
-**Response**: `IdentityGuestVerification`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) | yes | (read-only) |
-| subjectId | string (uuid) | yes |  |
-| subjectDocumentId | string (uuid) |  | The pii.subject_document row submitted. |
-| documentKind | enum (passport, emiratesId, nationalId, drivingLicence, residencePermit, other) |  |  |
-| documentNumberLast4 | string |  | (max length 4; read-only; nullable) |
-| reason | enum (policyRequired, ageRestrictedPurchase, residentPricing, accountRecovery) |  |  |
-| status | enum (pending, verified, rejected, resubmissionRequested) | yes | (read-only) |
-| method | enum (manualReview, documentScanner, provider) |  | (read-only; nullable) |
-| decisionReason | string |  | (max length 300; read-only; nullable) |
-| decidedByPrincipalId | string (uuid) |  | (read-only; nullable) |
-| submittedAt | string (date-time) | yes | (read-only) |
-| decidedAt | string (date-time) |  | (read-only; nullable) |
-| documentImageDeletedAt | string (date-time) |  | When the scan (and any selfie) was deleted under the policy's retention. (read-only; nullable) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 201 |  | Submitted, pending |
-| 401 | Unauthorized | Missing, expired or superseded session |
-| 409 |  | A verification is already pending for this guest |
-| 422 |  | The document has expired, or its kind is not accepted by the tenant's policy |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### verifyGuestOtp
 
 **`POST /auth/guest/otp/verify`**: Verify a one-time code and issue a session
@@ -1202,7 +1084,7 @@ Creates a `pending` verification. `409` while another is pending for this guest;
 |---|---|---|---|
 | identifier | string | yes |  |
 | code | string | yes | (min length 4; max length 10) |
-| deviceId | string |  |  |
+| deviceId | string |  | Send the app's installationId (the value it registers its push token with, marketing-crm registerGuestDevice), so revoking that device signs this session out (endGuestDeviceSessions, CHG-MOD-009). |
 | venueId | string (uuid) |  | The venue the guest app or booking is in. (nullable) |
 
 **Response**: `GuestSession`
@@ -1386,6 +1268,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 |---|---|---|
 | 204 |  | Session terminated and audited |
 | 403 |  | The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is missing or failed or the session is not at the till's venue (supervisor-step-up-refused; CHG-RUL-015). |
+| 409 |  | The session has already ended (signedOut, terminated or expired). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getCurrentSession
@@ -1395,7 +1278,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 |  |  |
 |---|---|
 | Permission | `None` |
-| Scope level | workstation |
+| Scope level | tenant |
 | Part of slice | core |
 | Wave | 1 |
 | Offline | yes |
@@ -1542,7 +1425,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | Conflict policy | serverWins |
 | Read routing | replica |
 | Guest callable | True |
-| Reads | `identity.delegated_access`, `marketing.guest_profile`, `pii.subject` |
+| Reads | `identity.delegated_access`, `pii.subject` |
 | Writes | - |
 | Called by | GST-015, GST-069, WEB-024 |
 
@@ -1833,85 +1716,6 @@ Per 12 Aug 2026 §4 — a user with one role logs in directly; a user with sever
 | 403 | Forbidden | Authenticated but not permitted at the requested scope |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### setGuestVerificationPolicy
-
-**`PUT /guest-verification-policy`**: Set which verifications a guest must pass, and when
-
-5.3.21 (decided 29 September, build pass). **The configurable identity workflow**: which verifications registration requires, which moments require a verified ID document, which documents are accepted, who reviews them, and how long the scan is kept. One policy per tenant (identity is tenant-level under ADR-0018); PUT replaces it whole.
-
-**UAE Pass and ICP are both in release 1** (decided 2 October 2026, Chinmay, critical set 2, BO-627; DEC-457; CHG-CSP-034): `verificationProvider` `icp` is the government check behind `reviewMode` `provider` and `providerThenManual`, and a UAE Pass sign-in satisfies the document requirement. Both need the client's access to the providers; until it exists a policy naming `icp` is refused `422 provider-not-connected` and manual review is what runs.
-
-|  |  |
-|---|---|
-| Permission | `TENANT_CONFIGURE` |
-| Scope level | tenant |
-| Part of slice | setup, makes `identity.guest_verification_policy` non-empty |
-| Wave | 1 |
-| Offline | no |
-| Config scope | tenant |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.guest_verification_policy` |
-| Writes | `cache:idempotency`, `identity.guest_verification_policy` |
-| Called by | ADM-342 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Request body**: `IdentityGuestVerificationPolicy`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| scopePath | string |  | The tenant, written by the server (x-ticvai-config-scope: tenant). (read-only) |
-| registrationRequires | array of enum (email, mobileOtp) | yes | Verifications a new account must pass before it is usable. |
-| idDocumentRequiredFor | array of enum (accountCreation, ageRestrictedPurchase, residentPricing, accountRecovery, walletTopUpAboveLimit) |  | The moments that need a verified ID document. |
-| walletTopUpLimit | Money |  | On the wire this is three fields; in the database it is one column. |
-| walletTopUpLimit.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| walletTopUpLimit.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| walletTopUpLimit.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| acceptedDocumentKinds | array of enum (passport, emiratesId, nationalId, drivingLicence, residencePermit, other) |  | Proposed default passport, emiratesId, nationalId. |
-| uaePassSatisfiesIdDocument | boolean |  | A guest signed in with UAE Pass (guestUaePassLogin) counts as ID-verified, since the national identity has already checked the person. (default True) |
-| socialLoginCountsAsEmailVerified | boolean |  | (default True) |
-| selfieRequired | boolean |  | (default False) |
-| reviewMode | enum (manual, provider, providerThenManual) |  | Who checks a document. (default manual) |
-| verificationProvider | enum (icp) |  | The government verification service behind reviewMode provider (decided 2 October 2026, Chinmay; DEC-457; CHG-CSP-034): the UAE Federal Authority for Identity, Citizenship, Customs and Port Security… (nullable) |
-| documentImageRetention | enum (deleteOnDecision, keepUntilDocumentExpiry) |  | How long the scan is kept. (default deleteOnDecision) |
-| maxResubmissions | integer |  | (min 0; max 10; default 3) |
-| updatedAt | string (date-time) |  | (read-only) |
-
-**Response**: `IdentityGuestVerificationPolicy`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| id | string (uuid) |  | (read-only) |
-| scopePath | string |  | The tenant, written by the server (x-ticvai-config-scope: tenant). (read-only) |
-| registrationRequires | array of enum (email, mobileOtp) | yes | Verifications a new account must pass before it is usable. |
-| idDocumentRequiredFor | array of enum (accountCreation, ageRestrictedPurchase, residentPricing, accountRecovery, walletTopUpAboveLimit) |  | The moments that need a verified ID document. |
-| walletTopUpLimit | Money |  | On the wire this is three fields; in the database it is one column. |
-| walletTopUpLimit.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
-| walletTopUpLimit.currency | string | yes | Resolved from the region, not stored on the row (ADR-0018). (pattern ^[A-Z]{3}$) |
-| walletTopUpLimit.scale | integer | yes | Resolved from the region alongside currency. (min 0; max 4) |
-| acceptedDocumentKinds | array of enum (passport, emiratesId, nationalId, drivingLicence, residencePermit, other) |  | Proposed default passport, emiratesId, nationalId. |
-| uaePassSatisfiesIdDocument | boolean |  | A guest signed in with UAE Pass (guestUaePassLogin) counts as ID-verified, since the national identity has already checked the person. (default True) |
-| socialLoginCountsAsEmailVerified | boolean |  | (default True) |
-| selfieRequired | boolean |  | (default False) |
-| reviewMode | enum (manual, provider, providerThenManual) |  | Who checks a document. (default manual) |
-| verificationProvider | enum (icp) |  | The government verification service behind reviewMode provider (decided 2 October 2026, Chinmay; DEC-457; CHG-CSP-034): the UAE Federal Authority for Identity, Citizenship, Customs and Port Security… (nullable) |
-| documentImageRetention | enum (deleteOnDecision, keepUntilDocumentExpiry) |  | How long the scan is kept. (default deleteOnDecision) |
-| maxResubmissions | integer |  | (min 0; max 10; default 3) |
-| updatedAt | string (date-time) |  | (read-only) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 200 |  | Set |
-| 422 |  | verificationProvider names a provider the tenant has no connection to yet (provider-not-connected; CHG-CSP-034). |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### setPasswordPolicy
 
 **`PUT /password-policy`**: Length, breach check, lockout and step-up
@@ -2122,7 +1926,7 @@ A session that authenticated hours ago is not the same as a person present at th
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_method`, `identity.session` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge` |
-| Called by | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, GST-073, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
+| Called by | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
 
 **Parameters**
 
@@ -2170,7 +1974,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_recovery_code`, `identity.principal` |
 | Writes | `cache:idempotency`, `identity.mfa_method`, `identity.mfa_recovery_code` |
-| Called by | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001, WEB-024 |
+| Called by | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
 
 **Parameters**
 
@@ -2230,39 +2034,6 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | 200 |  | Methods |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
-### removeMfaMethod
-
-**`DELETE /auth/mfa/methods/{methodId}`**: Remove an MFA method
-
-Refused where it is the only active method and the principal holds a permission listed in `PasswordPolicy.mfaRequiredForPermissions` (MFA is required by permission, not by role — decided 28 September, audit R135). Removing the last factor from an account that must have one is not a choice the account holder gets to make.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | tenant |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | no |
-| Conflict policy | serverWins |
-| Reads | `cache:idempotency`, `identity.mfa_method` |
-| Writes | `cache:idempotency`, `identity.mfa_method` |
-| Called by | ADM-699, EMP-042, GST-073, WEB-024 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| methodId | path | yes | string (uuid) |  |
-| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 204 |  | Removed |
-| 409 |  | Last remaining method of a principal who holds a permission that requires MFA (audit R135) |
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
 ### verifyMfaChallenge
 
 **`POST /auth/mfa/challenge/{challengeId}/verify`**: Complete a sign-in or step-up challenge
@@ -2281,7 +2052,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code`, `identity.password_policy` |
 | Writes | `cache:idempotency`, `identity.mfa_challenge`, `identity.mfa_recovery_code`, `identity.session`, `platform.outbox` |
-| Called by | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, GST-073, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
+| Called by | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284, BO-293, EMP-001, GST-042, POS-000, PTR-001, PTR-029, PTR-030, PTR-035, PTR-036, PTR-040, PTR-048, SCN-001, SUP-001, WEB-016 |
 
 **Parameters**
 
@@ -2342,6 +2113,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | 401 | Unauthorized | Missing, expired or superseded session |
 | 410 |  | The challenge has expired or was voided (by a fifth wrong code, or a newer challenge for the same purpose). |
 | 422 |  | A wrong code, attempts one to four (CHG-R1S-025; the r1 gate found only the fifth failure specified). |
+| 409 |  | The challenge was already completed; a challenge is single-use, so ask for a new one. |
 | 429 |  | Five wrong codes and step-up is locked (decided 28 September, audit R126 (6)). |
 
 ### verifyMfaEnrolment
@@ -2358,7 +2130,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method` |
 | Writes | `cache:idempotency`, `identity.mfa_method` |
-| Called by | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001, WEB-024 |
+| Called by | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 |
 
 **Parameters**
 
@@ -2518,49 +2290,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 | password_set_at | timestamptz | no |  |
 | id | uuid | yes | Synthesised key. |
 
-### `identity.guest_identity_verification`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| subject_id | uuid | yes |  |
-| subject_document_id | uuid | no | The pii.subject_document row submitted. |
-| document_kind | text | no |  |
-| document_number_last4 | text | no |  |
-| reason | text | no |  |
-| status | text | yes |  |
-| method | text | no |  |
-| decision_reason | text | no |  |
-| decided_by_principal_id | uuid | no |  |
-| submitted_at | timestamptz | yes |  |
-| decided_at | timestamptz | no |  |
-| document_image_deleted_at | timestamptz | no | When the scan (and any selfie) was deleted under the policy's retention. |
-
 ### `identity.guest_session`
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes | Synthesised key. |
 | subject_id | uuid | yes | Points at pii.subject. |
-
-### `identity.guest_verification_policy`
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| id | uuid | yes |  |
-| scope_path | text | no | The tenant, written by the server (x-ticvai-config-scope: tenant). |
-| registration_requires | text[] | yes | Verifications a new account must pass before it is usable. |
-| id_document_required_for | text[] | no | The moments that need a verified ID document. |
-| wallet_top_up_limit | numeric(18,4) | no |  |
-| accepted_document_kinds | text[] | no | Proposed default passport, emiratesId, nationalId. |
-| uae_pass_satisfies_id_document | boolean | no | A guest signed in with UAE Pass (guestUaePassLogin) counts as ID-verified, since the national identity has already checked the person. |
-| is_social_login_counts_as_email_verified | boolean | no |  |
-| is_selfie_required | boolean | no |  |
-| review_mode | text | no | Who checks a document. |
-| verification_provider | text | no | The government verification service behind reviewMode provider (decided 2 October 2026, Chinmay; DEC-457; CHG-CSP-034): the UAE Federal Authority for Identity, Citizenship, Customs and Port Security… |
-| document_image_retention | text | no | How long the scan is kept. |
-| max_resubmissions | integer | no |  |
-| updated_at | timestamptz | no |  |
 
 ### `identity.mfa_challenge`
 
@@ -2634,7 +2369,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | device_restriction | jsonb | no | BL-146. |
 | lockout_after_attempts | integer | no | Wrong passwords before a staff password is locked for lockoutMinutes, counted in PrincipalCredential.failedAttempts (14 October 2026, CHG-CRD-001). |
 | lockout_minutes | integer | no | A temporary lockout, not a permanent one. |
-| force_change_on_first_logon | boolean | no |  |
+| forces_change_on_first_logon | boolean | no |  |
 | reuse_prevention_count | integer | no | How many previous passwords a staff member may not reuse — the last 5 unless the tenant sets another (decided 28 September, audit R132). |
 | pin_length | integer | no | How many digits a staff PIN has, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078: "Give those as options that they select as a drop down"; CHG-CRD-002). |
 | pin_reuse_prevention | text | no | Whether a new PIN may repeat an old one, chosen by the tenant from a drop-down (decided by Chinmay, 14 October 2026, ADAM CR-078; CHG-CRD-002): none lets a PIN be reused, last3 and last5 refuse the c… |
@@ -2687,10 +2422,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | principal_credential_id | uuid | yes | The parent row. |
 | credential_hash | text | yes | The replaced credential's PHC string (ADR-0071), never the credential. |
 | replaced_at | timestamptz | yes | When it stopped being the current credential. |
+| id | uuid | yes | Synthesised key. |
 
 ### `identity.refresh_token`
 
@@ -2740,7 +2475,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | permission_b | text | yes |  |
 | severity | text | yes | What each severity does (decided 14 October 2026, ADAM CR-079; CHG-IDR-003). |
 | rationale | text | no | Why these two conflict, in words an auditor reads. |
-| scope_sensitive | boolean | no | Whether the two permissions must overlap in scope to conflict, and this is not scopePath below — that one is the partition key and says where the rule *row* lives (ADR-0005), not where the *conflict*… |
+| is_scope_sensitive | boolean | no | Whether the two permissions must overlap in scope to conflict, and this is not scopePath below — that one is the partition key and says where the rule *row* lives (ADR-0005), not where the *conflict*… |
 | allow_with_compensating_control | boolean | no | A small venue cannot always separate duties, and pretending otherwise means the rule gets disabled entirely. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
@@ -2765,7 +2500,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | subject_id | uuid | no | The guest who holds it (pii.subject). |
 | holding_kind | text | yes |  |
 | holding_id | uuid | yes | The order id (orders.sales_order.id) or the entitlement id (access.entitlement.id). |
@@ -2775,6 +2509,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | valid_to | timestamptz | no | For an entitlement, the end of its validity; null for an order. |
 | last_event_at | timestamptz | no | The occurredAt of the event last applied to the row; an older redelivery changes nothing. |
 | updated_at | timestamptz | yes |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `pii.subject`
 
@@ -2790,7 +2525,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | preferred_language | char(2) |  |  |
 | is_erased | boolean | yes | An erased subject keeps its row as a tombstone. |
 | erased_at | timestamptz |  |  |
-| erasure_request_id | char(26) |  | The DSAR that caused it |
+| erasure_request_id | text |  | The DSAR that caused it |
 | created_at | timestamptz | yes |  |
 | updated_at | timestamptz | yes |  |
 
@@ -2826,12 +2561,14 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-57 operations, added to this service in later releases without changing any of the above.
+62 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
 | administration | `createAccessReviewCampaign`, `createAuthorisationPolicy`, `createDelegatedAccess`, `createEmergencyAccessOverride`, `createPrincipal`, `decideAccessReviewItem`, `deleteDelegatedAccess`, `evaluateAccess`, `getAuthorisationPolicy`, `getAuthorisationPolicyBundle`, `getPrincipal`, `getPrincipalModuleAccess`, `listAccessDecisions`, `listAccessReviewCampaigns`, `listAccessReviewItems`, `listAuthorisationPolicies`, `listAuthorisationPolicyEffectiveness`, `listAuthorisationPolicyHistory`, `listAuthorisationPolicyTemplates`, `listCapabilityTemplates`, `listDelegatedAccess`, `listModuleCapabilities`, `listPermissionFindings`, `listPlatformStaffGrants`, `resetPrincipalCredential`, `resolvePermissions`, `restoreAuthorisationPolicyVersion`, `setAuthorisationPolicyState`, `setPrincipalModuleAccess`, `simulateAuthorisationPolicy`, `suggestRoleAssignment`, `updateAuthorisationPolicy` |
-| identity | `decideGuestIdentityVerification`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
+| guestAuth | `getMyIdentityVerification`, `submitGuestIdentityDocument` |
+| identity | `decideGuestIdentityVerification`, `endGuestDeviceSessions`, `getGuestVerificationPolicy`, `getMembership`, `getPasswordPolicy`, `listCustomerMemberships`, `listGuestIdentityVerifications`, `listModules`, `listPermissions`, `listSegregationRules`, `listSegregationViolations`, `logout`, `recordBenefitUsage`, `recordConsentIdentifier`, `setGuestVerificationPolicy`, `updateGuestSubjectDetails`, `verifySupervisorStepUp` |
+| mfa | `removeMfaMethod` |
 | prospectAuth | `startProspectSignup`, `verifyProspectSignupCode` |
 | session | `endOwnSession`, `listOwnSessions`, `revokeAllSessions` |
 | sso | `completeSsoAuthorization`, `getSsoConfig`, `listSsoProviders`, `setSsoConfig`, `startSsoAuthorization` |

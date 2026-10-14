@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/gift-card-digital-benefit-command-center-bo-1123",
-   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardDigitalBenefitCommandCenter.tsx",
+   "component": "src/routes/orders-money/GiftCardDigitalBenefitCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -297,6 +298,12 @@
     {
      "name": "cardCode",
      "from": "navigation"
+    },
+    {
+     "name": "giftCardProductId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setGiftCardProduct` takes it, from the record the user acts on."
     }
    ]
   },
@@ -335,6 +342,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -344,7 +352,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/gift-card-product-configuration-bo-1124",
-   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardProductConfiguration.tsx",
+   "component": "src/routes/orders-money/GiftCardProductConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -538,6 +546,14 @@
     "Fixed / variable value",
     "Minimum value",
     "Maximum value"
+   ],
+   "params": [
+    {
+     "name": "giftCardProductId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setGiftCardProduct` takes it, from the record the user acts on."
+    }
    ]
   },
   "wireframe": {
@@ -575,6 +591,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -584,7 +601,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/gift-card-issuance-activation-distribution-bo-1125",
-   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardIssuanceActivationDistribution.tsx",
+   "component": "src/routes/orders-money/GiftCardIssuanceActivationDistribution.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -832,6 +849,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -841,7 +859,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/voucher-coupon-type-configuration-bo-1126",
-   "component": "apps/venue-management-web/src/routes/orders-money/VoucherCouponTypeConfiguration.tsx",
+   "component": "src/routes/orders-money/VoucherCouponTypeConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -865,6 +883,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Create and manage digital vouchers and non-cash redemption instruments. The source requires the wallet to store and manage digital vouchers, coupons, meal vouchers, parking vouchers, attraction credits and campaign rewards. Voucher Types Monetary Voucher Percentage Voucher Complimentary Ticket Meal Voucher F&B Voucher Retail Voucher Parking Voucher Attraction Voucher Ride Voucher Rental Voucher Upgrade Voucher Campaign Reward Service Recovery Voucher Custom Voucher",
   "purposeNote": "New voucher types and redemption behaviors can be introduced without development changes.",
+  "division": "Shares `createVoucherType`, `listVoucherTypes` with BO-1127; this screen is Voucher & Coupon Type Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 5.04, page 53): create and manage digital vouchers and non-cash redemption instruments. The source requires the wallet to store and manage digital vouchers, coupons, meal vouchers, parking vouchers, attraction credits and campaign rewards. Voucher Types Monetary Voucher Percentage Voucher Complimentary Ticket Meal Voucher F&B Voucher Retail Voucher Parking Voucher Attraction Voucher Ride Voucher Rental Voucher Upgrade Voucher Campaign Reward Service Recovery Voucher Custom Voucher.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1047,6 +1066,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -1056,7 +1076,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/voucher-eligibility-redemption-rule-studio-bo-1127",
-   "component": "apps/venue-management-web/src/routes/orders-money/VoucherEligibilityRedemptionRuleStudio.tsx",
+   "component": "src/routes/orders-money/VoucherEligibilityRedemptionRuleStudio.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1080,6 +1100,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure by; Configure) and no display directory — it is settings, not a population",
   "purpose": "Define precisely when, where and by whom a voucher may be redeemed. Eligibility Rules",
   "purposeNote": "Every voucher redemption is validated in real time against the currently published eligibility and redemption policy.",
+  "division": "Shares `createVoucherType`, `listVoucherTypes` with BO-1126; this screen is Voucher Eligibility & Redemption Rule Studio (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 5.05, page 54): define precisely when, where and by whom a voucher may be redeemed. Eligibility Rules.",
   "gaps": [
    {
     "operation": null,
@@ -1317,6 +1338,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -1326,7 +1348,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/membership-benefits-entitlement-mapping-bo-1128",
-   "component": "apps/venue-management-web/src/routes/orders-money/MembershipBenefitsEntitlementMapping.tsx",
+   "component": "src/routes/orders-money/MembershipBenefitsEntitlementMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1522,6 +1544,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -1531,7 +1554,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/benefit-packaging-digital-wallet-presentation-bo-1129",
-   "component": "apps/venue-management-web/src/routes/orders-money/BenefitPackagingDigitalWalletPresentation.tsx",
+   "component": "src/routes/orders-money/BenefitPackagingDigitalWalletPresentation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1729,6 +1752,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -1738,7 +1762,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/gift-card-voucher-expiry-management-bo-1130",
-   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardVoucherExpiryManagement.tsx",
+   "component": "src/routes/orders-money/GiftCardVoucherExpiryManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1762,6 +1786,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Control validity, expiration, extension and customer notification. Expiry Models Never expires Fixed date X days after purchase X days after activation X days after issuance End of campaign End of event Membership expiry",
   "purposeNote": "Gift cards and vouchers follow configurable validity policies and customers receive applicable expiry notifications.",
+  "division": "Shares `expireCreditLots`, `listCreditLots` with BO-1111; this screen is Gift Card & Voucher Expiry Management (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 5.08, page 57): control validity, expiration, extension and customer notification. Expiry Models Never expires Fixed date X days after purchase X days after activation X days after issuance End of campaign End of event Membership expiry.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1905,6 +1930,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -1914,7 +1940,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/gift-card-balance-liability-breakage-control-bo-1131",
-   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardBalanceLiabilityBreakageControl.tsx",
+   "component": "src/routes/orders-money/GiftCardBalanceLiabilityBreakageControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1994,7 +2020,8 @@
         "Deferred liability"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Break down by”.",
-       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 58 §Display"
+       "provenance": "pack Wallet_Configuration_Backend_Structure_v1.0.pdf, page 58 §Display",
+       "operation": "getWalletLiability"
       }
      ]
     }
@@ -2061,6 +2088,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -2070,7 +2098,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/gift-card-voucher-simulator-validation-publication-bo-1132",
-   "component": "apps/venue-management-web/src/routes/orders-money/GiftCardVoucherSimulatorValidationPublication.tsx",
+   "component": "src/routes/orders-money/GiftCardVoucherSimulatorValidationPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2094,6 +2122,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow administrators to test complete gift-card, voucher and benefit configurations before activation. Scenario Example Customer: Gold Member Venue: Theme Park Configure how customers actually use TICVAI Wallet value across every sales and venue touchpoint—POS, mobile app, B2C website, kiosk, RFID/NFC wristbands, QR credentials, attractions, F&B, Retail, Parking, Rental and integrated third-party systems. This board primarily covers requirements 4.3.7, 4.3.8, 4.3.10, 4.3.12, 4.3.13 and 4.3.20, including cross-channel wallet usage, wearables, NFC/RFID/QR, Digital Key authentication and integration-based wallet usage.",
   "purposeNote": "No new gift-card, voucher or benefit configuration becomes operational until it passes system validation and applicable approval/publication controls. Board 5 — Backend Architecture Flow The backend should operate approximately as: Gift Card / Voucher / Benefit Definition → Issuance Rule → Activation → Wallet Association → Eligibility → Validity & Expiry → Redemption → Partial Balance / Remaining Entitlement → Wallet Ledger → Liability / Finance Event → Audit",
+  "division": "Shares `listWalletConfigurationVersions`, `publishWalletConfiguration` with BO-1092, BO-1180; this screen is Gift Card & Voucher Simulator, Validation & Publication (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 5.10, page 59): allow administrators to test complete gift-card, voucher and benefit configurations before activation. Scenario Example Customer: Gold Member Venue: Theme Park Configure how customers actually use TICVAI Wallet value across every sales and venue touchpoint—POS, mobile app, B2C website, kiosk, RFID/NFC wristbands, QR credentials, attractions, F&B, Retail, Parking, Rental and integrated third-party systems. This board primarily covers requirements 4.3.7, 4.3.8, 4.3.10, 4.3.12, 4.3.13 and 4.3.20, including cross-channel wallet usage, wearables, NFC/RFID/QR, Digital Key authentication and integration-based wallet usage.",
   "gaps": [
    {
     "operation": null,
@@ -2117,7 +2146,8 @@
        "derived": true,
        "impliedBy": "publishWalletConfiguration",
        "label": "Publish wallet configuration",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "publishWalletConfiguration"
       },
       {
        "kind": "secondaryButton",

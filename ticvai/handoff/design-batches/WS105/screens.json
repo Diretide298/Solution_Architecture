@@ -5,6 +5,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/go-live-readiness-command-center-bo-605",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/GoLiveReadinessCommandCenter.tsx",
+   "component": "src/routes/setup-go-live/GoLiveReadinessCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -113,7 +114,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -283,6 +284,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "8",
@@ -292,7 +294,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/automated-validation-plan-bo-606",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/AutomatedValidationPlan.tsx",
+   "component": "src/routes/setup-go-live/AutomatedValidationPlan.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -316,6 +318,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Automatically create the correct testing plan based on what the customer has actually purchased and configured. For example, if the customer purchased: Ticketing POS B2C B2B Access Control the system automatically creates the relevant validation plan.",
+  "division": "Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-607, BO-608, BO-609, BO-610, BO-611, BO-612; this screen is Automated Validation Plan (pack Subscription_Licensing_AI_Self_Service.pdf, board 8.2, page 98): automatically create the correct testing plan based on what the customer has actually purchased and configured. For example, if the customer purchased: Ticketing POS B2C B2B Access Control the system automatically creates the relevant validation plan.",
   "gaps": [
    {
     "operation": null,
@@ -368,6 +371,13 @@
     "invalidates": [
      "getGoLiveReadiness"
     ]
+   },
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Follows runGoLiveValidation (202) until what it started settles: Everything that must pass before a tenant can sell",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -405,6 +415,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "8",
@@ -414,7 +425,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/ticketing-product-validation-bo-607",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/TicketingProductValidation.tsx",
+   "component": "src/routes/setup-go-live/TicketingProductValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -438,6 +449,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Validate that configured products can actually operate correctly.",
+  "division": "Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-608, BO-609, BO-610, BO-611, BO-612; this screen is Ticketing & Product Validation (pack Subscription_Licensing_AI_Self_Service.pdf, board 8.3, page 99): validate that configured products can actually operate correctly.",
   "gaps": [
    {
     "operation": null,
@@ -490,6 +502,13 @@
     "invalidates": [
      "getGoLiveReadiness"
     ]
+   },
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Follows runGoLiveValidation (202) until what it started settles: Everything that must pass before a tenant can sell",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -527,6 +546,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "8",
@@ -536,7 +556,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/end-to-end-sales-channel-testing-bo-608",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/EndToEndSalesChannelTesting.tsx",
+   "component": "src/routes/setup-go-live/EndToEndSalesChannelTesting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -560,6 +580,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Test the real customer transaction journey across each activated sales channel.",
+  "division": "Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-607, BO-609, BO-610, BO-611, BO-612; this screen is End-to-End Sales Channel Testing (pack Subscription_Licensing_AI_Self_Service.pdf, board 8.4, page 100): test the real customer transaction journey across each activated sales channel.",
   "gaps": [
    {
     "operation": null,
@@ -612,6 +633,13 @@
     "invalidates": [
      "getGoLiveReadiness"
     ]
+   },
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Follows runGoLiveValidation (202) until what it started settles: Everything that must pass before a tenant can sell",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -649,6 +677,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "8",
@@ -658,7 +687,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/payment-financial-validation-bo-609",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/PaymentFinancialValidation.tsx",
+   "component": "src/routes/setup-go-live/PaymentFinancialValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -682,6 +711,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Confirm that payment, taxation, refunds, and financial configuration work before accepting real customer money.",
+  "division": "Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-607, BO-608, BO-610, BO-611, BO-612; this screen is Payment & Financial Validation (pack Subscription_Licensing_AI_Self_Service.pdf, board 8.5, page 101): confirm that payment, taxation, refunds, and financial configuration work before accepting real customer money.",
   "gaps": [
    {
     "operation": null,
@@ -734,6 +764,13 @@
     "invalidates": [
      "getGoLiveReadiness"
     ]
+   },
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Follows runGoLiveValidation (202) until what it started settles: Everything that must pass before a tenant can sell",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -771,6 +808,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "8",
@@ -780,7 +818,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/ticket-qr-access-validation-bo-610",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/TicketQrAccessValidation.tsx",
+   "component": "src/routes/setup-go-live/TicketQrAccessValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -804,6 +842,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Validate the complete journey from ticket creation to physical admission.",
+  "division": "Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-607, BO-608, BO-609, BO-611, BO-612; this screen is Ticket, QR & Access Validation (pack Subscription_Licensing_AI_Self_Service.pdf, board 8.6, page 102): validate the complete journey from ticket creation to physical admission.",
   "gaps": [
    {
     "operation": null,
@@ -856,6 +895,13 @@
     "invalidates": [
      "getGoLiveReadiness"
     ]
+   },
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Follows runGoLiveValidation (202) until what it started settles: Everything that must pass before a tenant can sell",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -893,6 +939,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "8",
@@ -902,7 +949,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/user-security-integration-validation-bo-611",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/UserSecurityIntegrationValidation.tsx",
+   "component": "src/routes/setup-go-live/UserSecurityIntegrationValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -926,6 +973,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Verify that the environment is technically and operationally secure before launch.",
+  "division": "Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-607, BO-608, BO-609, BO-610, BO-612; this screen is User, Security & Integration Validation (pack Subscription_Licensing_AI_Self_Service.pdf, board 8.7, page 103): verify that the environment is technically and operationally secure before launch.",
   "gaps": [
    {
     "operation": null,
@@ -990,6 +1038,13 @@
     "invalidates": [
      "getGoLiveReadiness"
     ]
+   },
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Follows runGoLiveValidation (202) until what it started settles: Everything that must pass before a tenant can sell",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -1027,6 +1082,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "8",
@@ -1036,7 +1092,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/communication-customer-journey-validation-bo-612",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/CommunicationCustomerJourneyValidation.tsx",
+   "component": "src/routes/setup-go-live/CommunicationCustomerJourneyValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1060,6 +1116,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Ensure that the customer receives the correct information throughout the booking journey.",
+  "division": "Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-607, BO-608, BO-609, BO-610, BO-611; this screen is Communication & Customer Journey Validation (pack Subscription_Licensing_AI_Self_Service.pdf, board 8.8, page 104): ensure that the customer receives the correct information throughout the booking journey.",
   "gaps": [
    {
     "operation": null,
@@ -1112,6 +1169,13 @@
     "invalidates": [
      "getGoLiveReadiness"
     ]
+   },
+   {
+    "operationId": "getGoLiveReadiness",
+    "contract": "subscription",
+    "purpose": "Follows runGoLiveValidation (202) until what it started settles: Everything that must pass before a tenant can sell",
+    "trigger": "onInterval",
+    "provenance": "Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)"
    }
   ],
   "wireframe": {
@@ -1149,6 +1213,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "8",
@@ -1158,7 +1223,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/blocker-warning-ai-resolution-center-bo-613",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/BlockerWarningAiResolutionCenter.tsx",
+   "component": "src/routes/setup-go-live/BlockerWarningAiResolutionCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1274,6 +1339,7 @@
   "module": "Setup & Go-Live",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "8",
@@ -1283,7 +1349,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/setup-go-live/final-go-live-approval-production-launch-bo-614",
-   "component": "apps/venue-management-web/src/routes/setup-go-live/FinalGoLiveApprovalProductionLaunch.tsx",
+   "component": "src/routes/setup-go-live/FinalGoLiveApprovalProductionLaunch.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1318,7 +1384,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1365,7 +1431,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyCollection",
      "slot": "collection",
      "components": [
       {

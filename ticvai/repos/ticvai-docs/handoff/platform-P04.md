@@ -9,12 +9,12 @@
 | Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 150 |
+| Operations with no screen | 149 |
 | Waves | wave1 32 |
 
 ## Gaps
 
-### 150 operations with no screen here
+### 149 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
-| … | | | 110 more |
+| … | | | 109 more |
 
 ## Modules
 
@@ -86,7 +86,7 @@
 | `POS-008` | Reports | Reports | 1 | 4 | yes |
 | `POS-009` | Staff Roster | Shift | 1 | 3 | yes |
 | `POS-010` | Add to Existing Ticket | Sell | 1 | 4 | yes |
-| `POS-011` | Returns, Refunds & Exchanges | Sell | 1 | 7 | yes |
+| `POS-011` | Returns, Refunds & Exchanges | Sell | 1 | 8 | yes |
 | `POS-012` | Omnichannel Order & Fulfilment Center | Sell | 1 | 6 | yes |
 | `POS-013` | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 3 | yes |
 | `POS-014` | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 4 | yes |

@@ -118,7 +118,7 @@
    "module": "Kitchen",
    "wave": 1,
    "route": "/kitchen/sla-priority-service-rules",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {

@@ -134,13 +134,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-154` | Access Rule Command Center | C | 0 | 2 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
 | `BO-155` | Visual Access Rule Builder | A | 15 | 4 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-156` | Entry, Exit & Re-entry Rules | C | 47 | 0 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
-| `BO-157` | Anti-Passback & Journey Sequence | C | 15 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-157` | Anti-Passback & Journey Sequence | C | 13 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-158` | Access Validity & Time Rules | C | 54 | 0 | 5 | 9 | 4 | 0 | — | notStarted (generated) |
 | `BO-159` | Entitlement Consumption Engine | C | 10 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-160` | Multi-Park & Crossover Rules | C | 47 | 0 | 6 | 9 | 1 | 0 | — | notStarted (generated) |
 | `BO-161` | Guest, Companion & Eligibility Rules | A | 17 | 15 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
 | `BO-162` | Group Admission & Quantity Validation | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-163` | Rule Simulation, Conflict Check & Publication | C | 11 | 0 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
+| `BO-163` | Rule Simulation, Conflict Check & Publication | C | 22 | 0 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

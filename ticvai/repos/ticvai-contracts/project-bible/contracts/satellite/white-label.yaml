@@ -89,6 +89,156 @@ tags:
 - name: bookingFlows
 - name: appPublishing
 - name: kiosk
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  bannerRecords:
+    module: white-label
+    table: whitelabel.banner
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.banner rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Banner'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.banner rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  bookingFlowRecords:
+    module: white-label
+    table: whitelabel.booking_flow
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.booking_flow rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/BookingFlow'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.booking_flow rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  contentPageRecords:
+    module: white-label
+    table: whitelabel.content_page
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.content_page rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/ContentPage'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.content_page rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  faqEntryRecords:
+    module: white-label
+    table: whitelabel.faq_entry
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.faq_entry rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/FaqCategory'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.faq_entry rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  guidedChoiceAnswerRecords:
+    module: white-label
+    table: whitelabel.guided_choice_answer
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.guided_choice_answer rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/GuidedChoice'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.guided_choice_answer rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  homepageSectionRecords:
+    module: white-label
+    table: whitelabel.homepage_section
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.homepage_section rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/HomepageLayout'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.homepage_section rows, as it stores them and as the
+      caller's scope lets it see them (the table's row-level security, under the caller's connection and
+      transaction). It decides nothing: an asker that refuses or chooses on these rows states that rule in its
+      own operation, and a question with a rule of its own (open, live, sellable) is declared as a query of its
+      own. It is asked from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
+  policyRecords:
+    module: white-label
+    table: whitelabel.policy
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.policy rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Policy'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.policy rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface WhiteLabel implements, and asked from another
+      deployable through WhiteLabel's service route (serviceAuth).
+    served: [in-process, service]
+  promoBlockRecords:
+    module: white-label
+    table: whitelabel.promo_block
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The whitelabel.promo_block rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as WhiteLabel stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PromoBlock'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). WhiteLabel answers with its whitelabel.promo_block rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through WhiteLabel's service route (serviceAuth).
+    served: [service]
 paths:
   /tenant-domains:
     get:
@@ -130,6 +280,10 @@ paths:
         - "P08 BO-835 Site, Brand & Domain Setup"
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-read-via:
+      - query: subscription#tenantRecords
+        route: in-process
+        for: 'its read of control.tenant, Platform''s data (CHG-MOD-001)'
       summary: Claim a domain and get a verification token
       description: '**Claiming is not owning.** The response carries the record the tenant must publish
         (`verificationRecord`), and nothing happens until it resolves.
@@ -191,6 +345,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CustomDomain'
         '409':
+          x-ticvai-problem-types: [domain-already-claimed]
           description: '**Already claimed.** Named as unavailable rather than attributed.
 
             '
@@ -213,6 +368,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
+      x-ticvai-names-for-context: [control.tenant_domain]
       summary: Check the record and issue the certificate
       description: '**Verification and issuance are one act from the tenant''s point of view and two states
         in the model.** A tenant who has published the record wants a working domain, not a green tick.
@@ -313,6 +469,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released
         '409':
+          x-ticvai-problem-types: [only-active-domain-for-app]
           description: '**The only active domain for a live app.** Refused, naming what would break.
 
             '
@@ -899,6 +1056,8 @@ paths:
       operationId: setFooter
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Footer columns, legal links and social
       description: 'BL-002. **A header is chrome and a footer is a link surface**, which is why this is
         not `setHeader` with different fields.
@@ -1046,9 +1205,15 @@ paths:
       operationId: listContentBlocks
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
+      x-ticvai-read-via:
+      - query: platform-ops#contentBlockRecords
+        route: in-process
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: The content blocks of a page
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, drafts and published alike.
+
+        **Statuses.** Every `status` is returned, ended ones included (`archived`, `expired`); a screen that shows only live rows filters on `status` itself.
       tags:
       - whiteLabel
       x-ticvai-permission: TENANT_CONFIGURE
@@ -1088,6 +1253,13 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-839 Dynamic Product Pages"
         - "P13 CMS-007 Page Builder"
+      x-ticvai-read-via:
+      - query: marketing-crm#segmentRecords
+        route: in-process
+        for: 'its read of marketing.segment, Marketing''s data (CHG-MOD-001)'
+      - query: platform-ops#contentBlockRecords
+        route: in-process
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: Author a block of content
       description: 'BL-172. **The CMS modelled configuration and not authoring** — a marketer could choose
         between things a developer had built and could not write something new.
@@ -1136,6 +1308,13 @@ paths:
       operationId: publishContentBlock
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: platform-ops#contentBlockRecords
+        route: in-process
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: Publish now, or schedule it
       description: '**A seasonal banner needing somebody awake at midnight is the same defect `Product.onSaleFrom`
         fixed**, and the answer is the same: a date on the object rather than a person with an alarm.
@@ -1184,6 +1363,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContentBlock'
+        '409':
+          description: 'The block is already `published` (`content-block-published`; a change goes through a new draft) or is `archived` (`content-block-archived`). Nothing changes.'
+          x-ticvai-problem-types: [content-block-published, content-block-archived]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenant-config:
@@ -1254,6 +1440,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-025 Help Centre / FAQ"
+        - "P01 WEB-028 Contact & Venue Information"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
         - "P01 WEB-045 Help Centre & Accessibility"
         - "P01 WEB-050 Plan Your Visit"
@@ -1322,6 +1509,8 @@ paths:
       operationId: setMaintenanceMode
       x-ticvai-consumed-by:
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Enable or clear maintenance mode, and set the live app status
@@ -1421,6 +1610,8 @@ paths:
         - "P13 CMS-002 Brand Kit"
         - "P13 CMS-004 Logo & Assets"
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set logo, favicon and splash
@@ -1461,6 +1652,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BrandIdentity'
         '400':
+          x-ticvai-problem-types: [media-too-large, media-type-not-permitted]
           description: An asset is larger than 2 MB, or is not PNG or SVG (audit R270)
           content:
             application/problem+json:
@@ -1509,6 +1701,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-004 Logo & Assets"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set app icons
@@ -1559,6 +1753,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AppIcons'
         '400':
+          x-ticvai-problem-types: [icon-wrong-size, icon-has-transparency]
           description: Source is not 1024×1024, or contains transparency
           content:
             application/problem+json:
@@ -1584,6 +1779,10 @@ paths:
         - "P05 KSK-013 Call staff"
         - "P05 KSK-014 Out of service"
         - "P13 CMS-105 Kiosk Builder"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'whether the workstation is in this venue (404 not-found) (CHG-MOD-003)'
       x-ticvai-agreed: '5 October 2026: decided by Chinmay (docs/active/decisions/answers-5-october.md, CHG-R4-001);
         the kiosk''s counterpart of getPublishedTenantConfig, served the same way'
       x-ticvai-audience:
@@ -1720,6 +1919,8 @@ paths:
       operationId: setBookingFlowConfig
       x-ticvai-consumed-by:
         - "P13 CMS-016 Site Settings"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       summary: Set how the guest booking flow looks and steps
       description: '**Design gap, 23 September.** The booking design has a white-label engine drawer (preset,
         step indicator, card and cart layout, extras step, seat picker, map view, density, embed mode) and
@@ -1811,6 +2012,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-005 Theme Editor"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set colour theme
@@ -1901,6 +2104,8 @@ paths:
       operationId: setFonts
       x-ticvai-consumed-by:
         - "P13 CMS-003 Typography"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set fonts
@@ -1943,6 +2148,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/FontConfig'
         '400':
+          x-ticvai-problem-types: [primary-arabic-font-required, secondary-arabic-font-required]
           description: '`ar` is among the tenant''s languages and `primaryArabic` is not set, or `secondaryLatin`
             is set without `secondaryArabic` (audit R163)'
           content:
@@ -1956,6 +2162,8 @@ paths:
       operationId: setHeader
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Configure the header
@@ -2021,6 +2229,8 @@ paths:
       operationId: setNavigation
       x-ticvai-consumed-by:
         - "P13 CMS-009 Navigation & Menus"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set main and overflow navigation
@@ -2064,6 +2274,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/NavigationConfig'
         '400':
+          x-ticvai-problem-types: [module-disabled, too-many-visible-items]
           description: An item targets a disabled module, or more than five are marked visible
           content:
             application/problem+json:
@@ -2102,6 +2313,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-840 Mobile App CMS"
         - "P13 CMS-007 Page Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per site template, the one the body''s `templateKey` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -2143,6 +2356,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/HomepageLayout'
         '400':
+          x-ticvai-problem-types: [module-disabled, content-block-missing]
           description: A section references a disabled module or a missing content block
           content:
             application/problem+json:
@@ -2213,6 +2427,7 @@ paths:
       operationId: listBanners
       x-ticvai-consumed-by:
         - "P13 CMS-008 Content Blocks"
+      description: '**Order.** Soonest first, by `startsAt` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2517,6 +2732,10 @@ paths:
       operationId: assignKiosk
       x-ticvai-consumed-by:
         - "P08 ADM-582 POS, Kiosk & Terminal Assignment Manager"
+      x-ticvai-read-via:
+      - query: tenancy#workstationRecords
+        route: service
+        for: 'its read of platform.workstation, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, ADM-582 assigns a kiosk to a kiosk group
         (docs/active/decisions/answers-5-october.md, CHG-R4-001)'
       x-ticvai-audience:
@@ -2664,7 +2883,9 @@ paths:
         **A guest screen reads `listPublishedContentPages`** (decided 2 October, GFIX-2), which needs no
         session: help and accessibility pages are public.
 
-        '
+        
+
+        **Order.** Sorted by `sortOrder` ascending, then by `id`.'
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
@@ -2762,6 +2983,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ContentPage'
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: Slug already in use
           content:
             application/problem+json:
@@ -2853,6 +3075,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Deleted
         '409':
+          x-ticvai-problem-types: [content-page-referenced]
           description: Page is referenced by navigation or the homepage
           content:
             application/problem+json:
@@ -2904,6 +3127,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFaqs
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set FAQ categories and entries
@@ -3057,6 +3282,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Policy'
         '400':
+          x-ticvai-problem-types: [english-version-required, arabic-version-required]
           description: The English (`en`) or Arabic (`ar`) version is missing (audit R096)
           content:
             application/problem+json:
@@ -3071,6 +3297,16 @@ paths:
         - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-007 Page Builder"
+      x-ticvai-read-via:
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'its read of subscription.contract, Platform''s data (CHG-MOD-001)'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'its read of control.licence_add_on, Platform''s data (CHG-MOD-001)'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'its read of subscription.plan, Platform''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3101,6 +3337,18 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-read-via:
+      - query: subscription#contractRecords
+        route: in-process
+        for: 'its read of subscription.contract, Platform''s data (CHG-MOD-001)'
+      - query: subscription#licenceAddOnRecords
+        route: in-process
+        for: 'its read of control.licence_add_on, Platform''s data (CHG-MOD-001)'
+      - query: subscription#planRecords
+        route: in-process
+        for: 'its read of subscription.plan, Platform''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -3189,6 +3437,8 @@ paths:
       operationId: setFeatureToggles
       x-ticvai-consumed-by:
         - "P13 CMS-001 Tenant Workspace"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -3249,6 +3499,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-018 Interface Languages"
         - "P13 CMS-011 Translations"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Set enabled languages and default
@@ -3299,6 +3551,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/LanguageConfig'
         '400':
+          x-ticvai-problem-types: [default-language-not-enabled]
           description: Default is not among the enabled languages
           content:
             application/problem+json:
@@ -3699,6 +3952,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-016 White-Label Branding Management"
         - "P13 CMS-015 Version History"
+      description: '**Order.** Newest first, by `publishedAt` descending, then by `approvalRequestId`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -3769,6 +4023,13 @@ paths:
                 $ref: '#/components/schemas/TenantConfig'
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: 'The working draft has unpublished changes that the restore would overwrite; publish or discard them first. Nothing changes.'
+          x-ticvai-problem-types: [unpublished-changes]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenant-config/versions/{version}/diff:
@@ -3825,6 +4086,10 @@ paths:
       operationId: getKioskConfigValidation
       x-ticvai-consumed-by:
         - "P13 CMS-105 Kiosk Builder"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-agreed: '5 October 2026: decided by Chinmay, the publish checks (docs/active/decisions/answers-5-october.md,
         CHG-R4-001); shape follows validateBookingFlow'
       x-ticvai-audience:
@@ -3880,7 +4145,9 @@ paths:
       description: 'Drafts, AI suggestions awaiting review and the published one (decided 29 September,
         rev 3 REV3-11). Filter by `status` or `source` to show the suggestions waiting for a person.
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - content
       x-ticvai-permission: TENANT_CONFIGURE
@@ -3958,6 +4225,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuidedChoice'
         '400':
+          x-ticvai-problem-types: [target-not-in-venue, target-id-missing, question-answer-count-out-of-bounds]
           description: A target is not in this venue, a required target id is missing for its `kind`, or
             the question and answer counts are outside their bounds
           content:
@@ -4027,6 +4295,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GuidedChoice'
         '400':
+          x-ticvai-problem-types: [target-not-in-venue, question-answer-count-out-of-bounds]
           description: A target is not in this venue, or the counts are outside their bounds
           content:
             application/problem+json:
@@ -4190,6 +4459,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [guided-choice-published]
           description: The choice is `published`
           content:
             application/problem+json:
@@ -4245,12 +4515,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [guided-choice-published]
           description: Already `published`
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [answer-target-not-on-sale, answer-target-not-enabled, answer-filter-or-target-missing]
           description: An answer's target is not on sale or not enabled, or an answer lacks the filter or
             target its behaviour needs; the problem names the answer
           content:
@@ -4298,6 +4570,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [guided-choice-not-published]
           description: Not `published`
           content:
             application/problem+json:
@@ -4431,6 +4704,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /tenant-config/analytics-providers/{analyticsProviderId}:
     put:
       operationId: setAnalyticsProvider
       x-ticvai-consumed-by:
@@ -4458,6 +4732,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: analyticsProviderId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -4480,6 +4759,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '422':
+          x-ticvai-problem-types: [measurement-id-invalid, venue-not-active]
           description: A `measurementId` that does not match the provider's format, or a `venueId` not among the tenant's active venues
           content:
             application/problem+json:
@@ -4633,6 +4913,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Accepted for publication. Nothing is returned.
         '400':
+          x-ticvai-problem-types: [field-outside-batch-shape, too-many-interactions]
           description: A field outside the batch shape (a URL with a query, free text, an unhashed id), or more than
             50 interactions.
           content:
@@ -4647,7 +4928,6 @@ paths:
       operationId: getPublishedTenantConfig
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
-        - "P01 WEB-028 Contact & Venue Information"
         - "P01 WEB-029 Error / Sold Out / Maintenance"
         - "P02 GST-001 Home"
         - "P02 GST-043 Arabic / RTL Experience"
@@ -4955,7 +5235,9 @@ paths:
         comes after date and time), and the settings each step owns. The full catalogue is `x-ticvai-system-catalogue`
         on `BookingFlowType`.
 
-        '
+        
+
+        **Order.** Sorted by `name` ascending.'
       tags:
       - bookingFlows
       x-ticvai-permission: TENANT_CONFIGURE
@@ -5016,7 +5298,9 @@ paths:
       description: 'The flows this venue has picked, each with its steps in the venue''s order. Draft rows:
         guests read the published copy through `getPublishedBookingFlow` (decided 29 September, W12).
 
-        '
+        
+
+        **Order.** Newest first, by `updatedAt` descending, then by `id`.'
       tags:
       - bookingFlows
       x-ticvai-permission: TENANT_CONFIGURE
@@ -5097,6 +5381,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingFlow'
         '400':
+          x-ticvai-problem-types: [unknown-flow-type, step-not-in-flow-type, duplicate-flow-step]
           description: An unknown flow type, a step the type does not have, or a step given twice
           content:
             application/problem+json:
@@ -5129,6 +5414,13 @@ paths:
         - "P02 GST-009 Review & Payment"
         - "P02 GST-041 Checkout Entry"
         - "P13 CMS-103 Booking Flows"
+      x-ticvai-read-via:
+      - query: catalogue#productCategoryRecords
+        route: service
+        for: 'its read of catalogue.product_category, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: W12 (guest screens WEB-005..012, GST-007..009, GST-041 order their steps
         from the published flow); shape follows getPublishedGuidedChoice'
       x-ticvai-audience:
@@ -5350,6 +5642,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/BookingFlow'
         '400':
+          x-ticvai-problem-types: [step-not-in-type, step-given-twice]
           description: A step the type does not have, or a step given twice
           content:
             application/problem+json:
@@ -5363,6 +5656,13 @@ paths:
       operationId: deleteBookingFlow
       x-ticvai-consumed-by:
         - "P13 CMS-103 Booking Flows"
+      x-ticvai-read-via:
+      - query: catalogue#productCategoryRecords
+        route: service
+        for: 'its read of catalogue.product_category, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-agreed: '29 September: W12; shape follows deleteGuidedChoice'
       x-ticvai-audience:
       - staff
@@ -5391,6 +5691,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [flow-in-use]
           description: A product or category still names this flow, or it is the default for products on
             sale; the problem names them
           content:
@@ -5541,6 +5842,8 @@ paths:
       operationId: setSiteSetupProgress
       x-ticvai-consumed-by:
         - "P13 CMS-102 Site Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per tenant, the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-agreed: '29 September: W12, M24-05; shape follows setBookingFlowConfig'
       x-ticvai-audience:
       - staff
@@ -5578,6 +5881,7 @@ paths:
         '400':
           $ref: ../shared/common.yaml#/components/responses/BadRequest
         '409':
+          x-ticvai-problem-types: [nothing-published]
           description: '`previewAndPublish` marked done while no version has been published'
           content:
             application/problem+json:
@@ -5622,6 +5926,8 @@ paths:
       operationId: setStoreAccounts
       x-ticvai-consumed-by:
         - "P13 CMS-104 App Build & Store Publishing"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One set per tenant, the caller''s tenant: a PUT replaces the whole set, and an entry the body leaves out is removed. There is no key in the path.'
       x-ticvai-agreed: '29 September: M24-08 (every client creates and owns its own Apple Developer (DUNS) and
         Google Play accounts); shape follows setBrandIdentity'
       x-ticvai-make-or-break: 'Each client must register its own Apple Developer account (which needs a D-U-N-S
@@ -5671,6 +5977,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/StorePublishingChecklist'
         '400':
+          x-ticvai-problem-types: [duns-number-invalid, duplicate-store, listing-language-missing]
           description: An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing
             text missing a tenant language
           content:
@@ -5684,6 +5991,9 @@ paths:
       operationId: listAppBuilds
       x-ticvai-consumed-by:
         - "P13 CMS-104 App Build & Store Publishing"
+      description: '**Order.** Newest first, by `requestedAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`failed`, `rejected`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-agreed: '29 September: M24-08 (submission status); shape follows listConfigVersions'
       x-ticvai-audience:
       - staff
@@ -5788,6 +6098,7 @@ paths:
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
         '409':
+          x-ticvai-problem-types: [store-account-missing, nothing-published, app-build-in-progress]
           description: No store account for the platform, nothing published yet, or a build for the platform
             already running; the problem says which
           content:
@@ -5835,6 +6146,10 @@ paths:
       operationId: updateContentBlock
       x-ticvai-consumed-by:
         - "P13 CMS-007 Page Builder"
+      x-ticvai-read-via:
+      - query: platform-ops#contentBlockRecords
+        route: in-process
+        for: 'its read of control.content_block, Platform''s data (CHG-MOD-001)'
       summary: Change a draft content block
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007).** Changes a block's `body`, `localeVariants`, `position`,
@@ -6075,6 +6390,7 @@ components:
           nullable: true
           description: The property `getStorefrontInsights` asks the reporting API about (a GA4 property id). Staff only.
         reportingCredentialRef:
+          x-ticvai-secret: vault-reference
           type: string
           maxLength: 200
           nullable: true
@@ -6279,6 +6595,7 @@ components:
           readOnly: true
           description: UUIDv7.
         venueId:
+          x-ticvai-references: platform.scope
           type: string
           format: uuid
           readOnly: true
@@ -7010,6 +7327,7 @@ components:
       - medium
       - large
     BookingFlowStep:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by createBookingFlowDefinition, getBookingFlow, getKioskConfigValidation, listBookingFlows and others
       x-ticvai-persistence: whitelabel.booking_flow_step
       type: object
       description: One step of a venue's flow, in the venue's order (decided 29 September, W12).
@@ -7017,7 +7335,12 @@ components:
       - stepKey
       - enabled
       - sortOrder
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -7327,6 +7650,7 @@ components:
           pattern: ^[A-Za-z][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$
           description: The bundle id (Apple) or application id (Google) the app is signed with.
         apiCredentialSecretRef:
+          x-ticvai-secret: vault-reference
           type: string
           nullable: true
           writeOnly: true
@@ -7344,6 +7668,7 @@ components:
             Apple Developer account, one per brand (Chinmay, 12 October 2026: the client owns the certificate;
             CHG-R6-033). Apple entry only; a Google entry sending it is refused with 400.'
         passCertificateSecretRef:
+          x-ticvai-secret: vault-reference
           type: string
           nullable: true
           writeOnly: true
@@ -7694,6 +8019,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         hostname:
@@ -8084,7 +8410,7 @@ components:
         each entry of `columns` is a `whitelabel.footer_config_column` row and each entry of `socialLinks`
         a `whitelabel.footer_config_social_link` row. Part of the working draft (see the header). **In
         the tenant''s own database, not the control plane (decided 28 September, audit R163)**: it moved
-        from `control.footer_config` and its two child tables.
+        from `control.footer_config` (renamed `whitelabel.footer_config`) and its two child tables.
 
         '
       required:
@@ -9142,6 +9468,7 @@ components:
           type: string
           pattern: ^#[0-9A-Fa-f]{6}$
         darkMode:
+          x-ticvai-persisted: false
           type: object
           deprecated: true
           description: '**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round;
@@ -9665,6 +9992,7 @@ components:
                 - null
                 description: For `heroBanner` only (decided 29 September, MOB-3).
     Banner:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.banner
       type: object
       required:
@@ -9715,6 +10043,7 @@ components:
         isActive:
           type: boolean
     PromoBlock:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.promo_block
       type: object
       required:
@@ -9890,6 +10219,7 @@ components:
           format: date-time
           readOnly: true
     ContentPage:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by proposeMarketingContent
       x-ticvai-persistence: whitelabel.content_page
       type: object
       required:
@@ -9904,6 +10234,7 @@ components:
           format: uuid
           readOnly: true
         slug:
+          x-ticvai-unique: tenant
           type: string
           pattern: ^[a-z0-9-]+$
         title:
@@ -10058,6 +10389,7 @@ components:
           format: uuid
           readOnly: true
         kioskConfigId:
+          x-ticvai-references: whitelabel.kiosk_config
           type: string
           format: uuid
           readOnly: true
@@ -10544,6 +10876,7 @@ components:
           items:
             $ref: '#/components/schemas/KioskConfigFinding'
     ConfigVersion:
+      x-ticvai-rls: read-beneath   # MOD audit, CHG-MOD-008: read below the tenant by getKioskConfigValidation
       x-ticvai-persistence: whitelabel.config_version
       type: object
       required:
@@ -10589,6 +10922,8 @@ components:
         contentHash:
           type: string
         pendingBuildTimeChanges:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           description: 'Changes in this version that will not reach guests until the next store release.
             Surfaced at publish so nobody expects a new icon tomorrow.

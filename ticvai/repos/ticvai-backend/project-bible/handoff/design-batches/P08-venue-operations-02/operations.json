@@ -375,7 +375,7 @@
  },
  "setAlertRule": {
   "method": "PUT",
-  "path": "/alert-rules",
+  "path": "/alert-rules/{alertRuleId}",
   "contract": "reporting",
   "summary": "Watch a metric and tell somebody",
   "permission": "REPORT_MANAGE",
@@ -383,6 +383,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "alertRuleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -394,7 +399,7 @@
  },
  "setConfigurationProfile": {
   "method": "PUT",
-  "path": "/configuration-profiles",
+  "path": "/configuration-profiles/{profileId}",
   "contract": "tenancy",
   "summary": "What a class of workstation is configured to be",
   "permission": "TENANT_CONFIGURE",

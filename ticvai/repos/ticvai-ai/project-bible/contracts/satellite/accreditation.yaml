@@ -47,6 +47,83 @@ servers:
 - url: https://api.ticvai.com/v1
 security:
 - bearerAuth: []
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  applicationRecords:
+    module: accreditation
+    table: accreditation.application
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The accreditation.application rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccreditationApplication'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its accreditation.application rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  credentialRecords:
+    module: accreditation
+    table: accreditation.credential
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The accreditation.credential rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccreditationCredential'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its accreditation.credential rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  holderRecords:
+    module: accreditation
+    table: accreditation.holder
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The accreditation.holder rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccreditationHolder'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its accreditation.holder rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
+  validityRecords:
+    module: accreditation
+    table: accreditation.validity
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The accreditation.validity rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Tenancy stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccreditationValidity'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Tenancy answers with its accreditation.validity rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Tenancy's service route (serviceAuth).
+    served: [service]
 paths:
   /accreditation-programmes:
     get:
@@ -120,6 +197,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationProgramme'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-requirements:
@@ -128,6 +207,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-621 Applicant Type Configuration"
         - "P08 BO-622 Application Requirements Matrix"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: What each applicant type must supply and pass
       description: 'Board 1.8 — the requirements matrix. **Different applicant types are vetted
@@ -265,6 +346,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '422':
+          x-ticvai-problem-types: [blocking-requirement-unsatisfied]
           description: Submitted with a requirement that blocks submission unsatisfied
           content:
             application/problem+json:
@@ -486,7 +568,6 @@ paths:
         - "P08 BO-630 Document Verification Queue"
         - "P08 BO-636 Application Review Workspace"
         - "P08 BO-672 Expiry Monitor & Expiration Rules"
-        - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.18, 12.1.19); pack ACCREDITATION.pdf pages 14-15
         (BO-629, BO-630); P11 ACC-007 listAccreditationDocuments gap; shape follows listAccreditationApplications'
       summary: Documents supplied, by holder, application, requirement or state
@@ -500,7 +581,9 @@ paths:
         its own expiry and who verified or refused it and why; `expiringWithinDays` finds the insurance
         certificates that will lapse before the accreditation does.
 
-        '
+        
+
+        **Order.** Newest first, by `submittedAt` descending, then by `id`; with `status=submitted` (the verification queue) oldest first, by `submittedAt` ascending.'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_VIEW
@@ -560,8 +643,6 @@ paths:
       operationId: submitAccreditationDocument
       x-ticvai-consumed-by:
         - "P08 BO-629 Document Repository"
-        - "P11 ACC-002 Registration Form"
-        - "P11 ACC-004 Application Status Tracking"
       x-ticvai-conflict-policy: append
       security:
       - guestAuth: []
@@ -616,7 +697,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-630 Document Verification Queue"
         - "P08 BO-636 Application Review Workspace"
-        - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-conflict-policy: serverWins
       summary: Accept or refuse a submitted document
       description: 'Board 2.6. **The verifier is recorded and so is the refusal reason**, because a
@@ -666,6 +746,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationDocument'
+        '409':
+          description: 'The document is not `submitted` (already `verified` or `rejected`, or `expired`); only a submitted document is decided. Nothing changes.'
+          x-ticvai-problem-types: [accreditation-document-not-submitted]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /accreditation-identity-conflicts:
@@ -849,6 +936,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccreditationCredential'
+        '409':
+          description: 'The credential was already `replaced` (`accreditation-credential-already-replaced`), or is `revoked` or `expired` (`accreditation-credential-transition-not-allowed`), so there is no live credential to replace. Nothing is issued.'
+          x-ticvai-problem-types: [accreditation-credential-already-replaced, accreditation-credential-transition-not-allowed]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /badge-templates:
@@ -881,6 +975,7 @@ paths:
                   $ref: '#/components/schemas/BadgeTemplate'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /badge-templates/{badgeTemplateId}:
     put:
       operationId: setBadgeTemplate
       x-ticvai-consumed-by:
@@ -895,6 +990,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: badgeTemplateId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1012,6 +1112,7 @@ paths:
                   $ref: '#/components/schemas/AccessProfile'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /accreditation-access-profiles/{accessProfileId}:
     put:
       operationId: setAccessProfile
       x-ticvai-consumed-by:
@@ -1039,6 +1140,11 @@ paths:
       - staff
       x-ticvai-scope-level: venue
       parameters:
+      - name: accessProfileId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -1202,10 +1308,12 @@ paths:
                 reason:
                   type: string
                 effectiveFrom:
+                  x-ticvai-stored-as: accreditation.holder.status_effective_from
                   type: string
                   format: date-time
                   nullable: true
                 reviewAt:
+                  x-ticvai-stored-as: accreditation.holder.status_review_at
                   type: string
                   format: date
                   nullable: true
@@ -1264,6 +1372,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-666 Validity Period Configuration"
         - "P08 BO-669 Temporary & Seasonal Accreditation"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Validity periods, renewal windows and expiry behaviour
       description: 'Boards 6.3 and 6.10. **Expiry is the control that keeps an accreditation estate
@@ -1306,6 +1416,8 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-675 Notification Rule Management"
         - "P08 BO-676 Expiry & Renewal Notification Scheduler"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per accreditation programme, the one the body''s `programmeId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-conflict-policy: serverWins
       summary: Who is told what, and when
       description: 'Boards 7.2 and 7.3. **Expiry notices go to the organisation as well as the
@@ -1584,12 +1696,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationIdentityConflict'
         '409':
+          x-ticvai-problem-types: [identity-conflict-already-resolved]
           description: The conflict is already merged or rejected
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [surviving-holder-required, surviving-holder-not-in-conflict]
           description: survivingHolderId missing for merged, or not one of the conflict's holders
           content:
             application/problem+json:
@@ -1654,6 +1768,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationProgramme'
         '409':
+          x-ticvai-problem-types: [programme-is-template]
           description: A template cannot be opened for applications
           content:
             application/problem+json:
@@ -1757,6 +1872,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationProgramme'
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: A programme with this code already exists at this scope
           content:
             application/problem+json:
@@ -1777,6 +1893,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-636 Application Review Workspace"
         - "P08 BO-640 Rejection & Resubmission Management"
+        - "P11 ACC-002 Registration Form"
         - "P11 ACC-007 Reviewer Application Detail"
       x-ticvai-agreed: '29 September: build pass, BL-180; P11 ACC-007 fetched a list to show one application;
         shape follows getAccreditationHolder'
@@ -1810,8 +1927,6 @@ paths:
         - "P08 BO-617 New Accreditation Application"
         - "P08 BO-640 Rejection & Resubmission Management"
         - "P11 ACC-002 Registration Form"
-        - "P11 ACC-003 Application Review & Submit"
-        - "P11 ACC-004 Application Status Tracking"
       x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
@@ -1859,18 +1974,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '403':
+          x-ticvai-problem-types: [not-own-application]
           description: A guest amending an application somebody else submitted
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [accreditation-application-not-editable]
           description: The application is not draft or informationRequested
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [subject-field-invalid]
           description: A subject field fails its requirement row's fieldType or validation
           content:
             application/problem+json:
@@ -1926,12 +2044,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '409':
+          x-ticvai-problem-types: [accreditation-application-not-draft, accreditation-window-closed]
           description: Not a draft, or the programme's application window is closed
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [blocking-requirement-unsatisfied]
           description: A requirement that blocks submission is not satisfied
           content:
             application/problem+json:
@@ -1951,7 +2071,6 @@ paths:
       operationId: resubmitAccreditationApplication
       x-ticvai-consumed-by:
         - "P08 BO-640 Rejection & Resubmission Management"
-        - "P11 ACC-004 Application Status Tracking"
       x-ticvai-conflict-policy: serverWins
       security:
       - guestAuth: []
@@ -2025,18 +2144,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '403':
+          x-ticvai-problem-types: [not-own-application]
           description: A guest resubmitting an application somebody else submitted
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [accreditation-application-not-resubmittable, accreditation-window-closed]
           description: Not informationRequested or rejected, or the programme's window is closed
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [blocking-requirement-unsatisfied]
           description: A requirement that blocks submission is still not satisfied
           content:
             application/problem+json:
@@ -2106,12 +2228,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '403':
+          x-ticvai-problem-types: [not-own-application]
           description: A guest withdrawing an application somebody else submitted
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [accreditation-application-already-closed]
           description: The application is already decided, withdrawn or expired
           content:
             application/problem+json:
@@ -2139,7 +2263,9 @@ paths:
         which is the date the status screen promises. A guest-facing list that takes a subject parameter is a
         list somebody will call with another subject.
 
-        '
+        
+
+        **Order.** Newest first, by `submittedAt` descending, then by `id`.'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
@@ -2192,7 +2318,9 @@ paths:
         the badge screen renders; a revoked, replaced or expired one is returned with that status and not
         rendered as scannable.
 
-        '
+        
+
+        **Order.** Newest first, by `issuedAt` descending, then by `id`.'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_APPLY
@@ -2289,12 +2417,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationCredentialDelivery'
         '403':
+          x-ticvai-problem-types: [not-own-credential]
           description: The credential is not the caller's
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [credential-not-mobile-or-qr, credential-not-issued-or-active]
           description: The credential is not a mobile or QR credential, or is not issued or active
           content:
             application/problem+json:
@@ -2369,12 +2499,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationCredentialDelivery'
         '409':
+          x-ticvai-problem-types: [credential-not-mobile-or-qr, credential-not-issued-or-active]
           description: Not a mobile or QR credential, or not issued or active
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [holder-contact-missing]
           description: The holder has no email or phone for the chosen channel
           content:
             application/problem+json:
@@ -2386,8 +2518,8 @@ paths:
     get:
       operationId: verifyAccreditationCredential
       x-ticvai-consumed-by:
-        - "P06 EMP-010 Scan — ready"
         - "P07 SCN-003 Ready to scan"
+      x-ticvai-names-for-context: [access.accreditation_credential]
       x-ticvai-agreed: '29 September: build pass, BL-181 (18.8.3 staff verifying a presented accreditation);
         shape follows access lookupTicket'
       summary: Who holds this credential, and where may they go
@@ -2439,6 +2571,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationCredentialVerification'
         '400':
+          x-ticvai-problem-types: [identifier-required]
           description: No identifier supplied
           content:
             application/problem+json:
@@ -2523,12 +2656,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/AccreditationApplication'
         '403':
+          x-ticvai-problem-types: [not-own-accreditation]
           description: A guest renewing an accreditation that is not theirs
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [outside-renewal-window, holder-not-renewable, renewal-already-open]
           description: Outside the renewal window, the holder is revoked, suspended or archived, or a renewal
             is already open
           content:
@@ -2549,7 +2684,9 @@ paths:
         The history BO-682 shows: who asked, when, with which filters and fields, how many records, and
         whether personal data went with it.
 
-        '
+        
+
+        **Order.** Newest first, by `requestedAt` descending, then by `id`.'
       tags:
       - accreditation
       x-ticvai-permission: ACCREDITATION_MANAGE
@@ -2585,6 +2722,7 @@ paths:
       operationId: exportAccreditationData
       x-ticvai-consumed-by:
         - "P08 BO-682 Accreditation Export & Data Extract Center"
+        - "P11 ACC-008 Credential Register"
       x-ticvai-conflict-policy: serverWins
       x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.55); pack ACCREDITATION.pdf page 61 (BO-682);
         shape follows reporting exportReportResult'
@@ -2633,12 +2771,14 @@ paths:
                 exportId: $response.body#/id
               description: Export status, and the download link once ready.
         '403':
+          x-ticvai-problem-types: [pii-export-not-permitted]
           description: Personal data requested without REPORT_EXPORT_PII
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [export-purpose-required]
           description: Personal data requested without a purpose
           content:
             application/problem+json:
@@ -2658,6 +2798,7 @@ paths:
       operationId: getAccreditationExport
       x-ticvai-consumed-by:
         - "P08 BO-682 Accreditation Export & Data Extract Center"
+        - "P11 ACC-008 Credential Register"
       x-ticvai-agreed: '29 September: build pass, BL-180 (12.1.55); shape follows reporting getReportExport'
       summary: One export, and its download link once ready
       description: 'The download link is signed and expires; an `expired` export is taken again rather than
@@ -2723,6 +2864,7 @@ components:
           format: uuid
           readOnly: true
         credentialId:
+          x-ticvai-references: accreditation.credential
           type: string
           format: uuid
         holderId:
@@ -2993,6 +3135,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -3007,6 +3150,8 @@ components:
             type: string
             format: uuid
         categories:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3135,6 +3280,8 @@ components:
           type: string
           format: uuid
         rows:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3242,6 +3389,7 @@ components:
         reference:
           type: string
         programmeId:
+          x-ticvai-references: accreditation.programme
           type: string
           format: uuid
         categoryCode:
@@ -3262,6 +3410,7 @@ components:
           additionalProperties: true
           description: Name, date of birth, nationality, contact — shaped by the requirements matrix.
         requirementStatus:
+          x-ticvai-persisted: false
           type: array
           readOnly: true
           items:
@@ -3350,6 +3499,7 @@ components:
       - fullName
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         subjectId:
@@ -3417,6 +3567,18 @@ components:
           readOnly: true
         scopePath:
           type: string
+        statusEffectiveFrom:
+          type: string
+          format: date-time
+          nullable: true
+          readOnly: true
+          description: When the status `setAccreditationStatus` set takes effect.
+        statusReviewAt:
+          type: string
+          format: date
+          nullable: true
+          readOnly: true
+          description: When the status is due for review (`setAccreditationStatus`).
     AccreditationDocument:
       type: object
       x-ticvai-persistence: accreditation.document
@@ -3439,6 +3601,7 @@ components:
         requirementCode:
           type: string
         assetId:
+          x-ticvai-references: assets.media_asset
           type: string
           format: uuid
         submittedAt:
@@ -3554,6 +3717,7 @@ components:
           type: string
           format: uuid
         holderId:
+          x-ticvai-references: accreditation.holder
           type: string
           format: uuid
         kind:
@@ -3702,6 +3866,8 @@ components:
           type: integer
           readOnly: true
         failures:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3910,6 +4076,8 @@ components:
           type: string
           format: uuid
         rules:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object

@@ -326,6 +326,8 @@
     "minimum": 1
    },
    "sections": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "minItems": 1,
     "items": {
@@ -483,6 +485,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -1036,6 +1039,8 @@
     "description": "A participant under this age needs a guardian. Written to `FormDefinition.minimumAge`. No default."
    },
    "guardianThresholdByCountry": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1794,6 +1799,8 @@
     ]
    },
    "eligibility": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "All must hold (AND). Empty means every participant the association reaches.",
     "items": {
@@ -1887,6 +1894,8 @@
     "description": "An authorised operator may admit the participant anyway; the override is recorded."
    },
    "reminders": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1945,6 +1954,7 @@
     "readOnly": true
    },
    "submissionId": {
+    "x-ticvai-references": "marketing.form_submission",
     "type": "string",
     "format": "uuid",
     "description": "The `FormSubmission` reviewed; the natural key."

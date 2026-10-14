@@ -19,6 +19,7 @@
   ]
  },
  "ConsentPurposeConfig": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.consent_purpose + marketing.consent_purpose_channel",
   "type": "object",
   "required": [
@@ -146,6 +147,7 @@
     "format": "uuid"
    },
    "subjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -170,6 +172,7 @@
     "description": "Where the opt-in happened, because a regulator asks."
    },
    "unsubscribeToken": {
+    "x-ticvai-secret": "blind-index",
     "writeOnly": true,
     "type": "string",
     "description": "**Unsubscribe must work without a login.** The link in a message carries the token and `setMarketingSubscription` accepts it in place of a session. **Write-only: never returned**, so a `MARKETING_VIEW` holder reading subscriptions cannot act as the guest."
@@ -182,6 +185,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",

@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/dynamic-pricing-strategy-command-center-adm-088",
-   "component": "apps/venue-management-web/src/routes/commercial/DynamicPricingStrategyCommandCenter.tsx",
+   "component": "src/routes/commercial/DynamicPricingStrategyCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -128,7 +129,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -393,6 +394,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "5",
@@ -402,7 +404,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/dynamic-pricing-strategy-builder-adm-089",
-   "component": "apps/venue-management-web/src/routes/commercial/DynamicPricingStrategyBuilder.tsx",
+   "component": "src/routes/commercial/DynamicPricingStrategyBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -671,6 +673,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "5",
@@ -680,7 +683,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/demand-occupancy-availability-rule-builder-adm-090",
-   "component": "apps/venue-management-web/src/routes/commercial/DemandOccupancyAvailabilityRuleBuilder.tsx",
+   "component": "src/routes/commercial/DemandOccupancyAvailabilityRuleBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -815,6 +818,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "5",
@@ -824,7 +828,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/booking-velocity-time-to-event-rule-builder-adm-091",
-   "component": "apps/venue-management-web/src/routes/commercial/BookingVelocityTimeToEventRuleBuilder.tsx",
+   "component": "src/routes/commercial/BookingVelocityTimeToEventRuleBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -988,6 +992,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "5",
@@ -997,7 +1002,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/seasonal-calendar-day-timeslot-dynamic-rules-adm-092",
-   "component": "apps/venue-management-web/src/routes/commercial/SeasonalCalendarDayTimeslotDynamicRules.tsx",
+   "component": "src/routes/commercial/SeasonalCalendarDayTimeslotDynamicRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1043,7 +1048,7 @@
    "template": "calendar",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBody2",
      "components": [
       {
        "kind": "dataTable",
@@ -1205,6 +1210,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "5",
@@ -1214,7 +1220,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-customer-segment-location-dynamic-rules-adm-093",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelCustomerSegmentLocationDynamicRules.tsx",
+   "component": "src/routes/commercial/ChannelCustomerSegmentLocationDynamicRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1352,6 +1358,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "5",
@@ -1361,7 +1368,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/dynamic-price-bands-ladders-adjustment-matrix-adm-094",
-   "component": "apps/venue-management-web/src/routes/commercial/DynamicPriceBandsLaddersAdjustmentMatrix.tsx",
+   "component": "src/routes/commercial/DynamicPriceBandsLaddersAdjustmentMatrix.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1559,6 +1566,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "5",
@@ -1568,7 +1576,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/dynamic-pricing-guardrails-commercial-protection-adm-095",
-   "component": "apps/venue-management-web/src/routes/commercial/DynamicPricingGuardrailsCommercialProtection.tsx",
+   "component": "src/routes/commercial/DynamicPricingGuardrailsCommercialProtection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1780,6 +1788,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "5",
@@ -1789,7 +1798,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/dynamic-pricing-automation-policy-control-adm-096",
-   "component": "apps/venue-management-web/src/routes/commercial/DynamicPricingAutomationPolicyControl.tsx",
+   "component": "src/routes/commercial/DynamicPricingAutomationPolicyControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2019,7 +2028,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/rule-priority-conflict-resolution-dynamic-pricing-test-c-adm-097",
-   "component": "apps/venue-management-web/src/routes/commercial/RulePriorityConflictResolutionDynamicPricingTest.tsx",
+   "component": "src/routes/commercial/RulePriorityConflictResolutionDynamicPricingTest.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2055,7 +2064,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {

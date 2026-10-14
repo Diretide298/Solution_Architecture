@@ -1,10 +1,10 @@
 id: LLD-OrderService
-title: OrderService — 299 operations, 116 tables
+title: OrderService — 299 operations, 115 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
 index: diagrams/hld/02-services.yaml
-why: '**The transactional core.** 299 operations, 116 tables, and the highest write rate in the platform.
+why: '**The transactional core.** 299 operations, 115 tables, and the highest write rate in the platform.
   Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
   morning.
 
@@ -35,7 +35,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: orders
-  tables: 83
+  tables: 82
   stores:
   - postgres
   largestTable: orders.upgrade_rule
@@ -183,7 +183,7 @@ operationsByContract:
     permission: null
     offline: false
     reads: 10
-    writes: 8
+    writes: 9
   - operation: claimCart
     verb: POST
     path: /carts/{cartId}/claim
@@ -367,7 +367,7 @@ operationsByContract:
     permission: ORDER_EXCHANGE
     offline: false
     reads: 2
-    writes: 4
+    writes: 5
   - operation: extendCart
     verb: POST
     path: /carts/{cartId}/extend
@@ -578,7 +578,7 @@ operationsByContract:
     writes: 0
   - operation: listAmendmentAfterSale2
     verb: GET
-    path: /amendment-after-sale
+    path: /amendment-after-sale-2
     scope: venue
     permission: ORDER_VIEW
     offline: false
@@ -786,7 +786,7 @@ operationsByContract:
     writes: 0
   - operation: listGroupSale2
     verb: GET
-    path: /group-sale
+    path: /group-sale-2
     scope: venue
     permission: ORDER_VIEW
     offline: false
@@ -894,7 +894,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 6
+    reads: 5
     writes: 0
   - operation: listOrderRefunds
     verb: GET
@@ -910,7 +910,7 @@ operationsByContract:
     scope: venue
     permission: ORDER_VIEW
     offline: false
-    reads: 7
+    reads: 8
     writes: 0
   - operation: listOrderSplitMerge
     verb: GET
@@ -1026,7 +1026,7 @@ operationsByContract:
     writes: 0
   - operation: listResale2
     verb: GET
-    path: /resale
+    path: /resale-2
     scope: venue
     permission: ORDER_VIEW
     offline: false
@@ -1519,7 +1519,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 4
-    writes: 3
+    writes: 4
   - operation: setDepositPolicy
     verb: PUT
     path: /deposit-policy
@@ -1546,7 +1546,7 @@ operationsByContract:
     writes: 2
   - operation: setGroupCustomerOrganization
     verb: PUT
-    path: /group-customer-organization
+    path: /group-customer-organization/{organisationId}
     scope: venue
     permission: PRODUCT_CONFIGURE
     offline: false
@@ -1642,7 +1642,7 @@ operationsByContract:
     writes: 1
   - operation: setPaymentProvider
     verb: PUT
-    path: /payment-providers
+    path: /payment-providers/{providerId}
     scope: venue
     permission: TENANT_CONFIGURE
     offline: false
@@ -2025,7 +2025,7 @@ operationsByContract:
     scope: venue
     permission: PAYMENT_VIEW
     offline: false
-    reads: 1
+    reads: 2
     writes: 0
   - operation: receivePaymentProviderWebhook
     verb: POST
@@ -2101,7 +2101,7 @@ operationsByContract:
     writes: 3
   - operation: setMerchantAccount
     verb: PUT
-    path: /merchant-accounts
+    path: /merchant-accounts/{merchantAccountId}
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
@@ -2157,7 +2157,7 @@ operationsByContract:
     writes: 3
   - operation: setPaymentTerminalConfiguration
     verb: PUT
-    path: /payment-terminals
+    path: /payment-terminals/{deviceId}
     scope: venue
     permission: PAYMENT_CONFIGURE
     offline: false
@@ -2173,7 +2173,7 @@ operationsByContract:
     writes: 1
   - operation: setReconciliationSource
     verb: PUT
-    path: /reconciliation-sources
+    path: /reconciliation-sources/{sourceId}
     scope: tenant
     permission: PAYMENT_CONFIGURE
     offline: false
@@ -2835,10 +2835,11 @@ tables:
   columns: 16
   store: postgres
   parent: null
-  writtenBy: []
+  writtenBy:
+  - orders
   foreignWriters: null
 - table: orders.deposit_box
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2906,7 +2907,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.group_enquiry
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -2994,21 +2995,21 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.invitation
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
   - orders
   foreignWriters: null
 - table: orders.invitation_allowance
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
   - orders
   foreignWriters: null
 - table: orders.member_exception
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -3022,7 +3023,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.membership_migration
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
@@ -3121,12 +3122,6 @@ tables:
   writtenBy:
   - orders
   foreignWriters: null
-- table: orders.payment_tip
-  columns: 2
-  store: postgres
-  parent: orders.payment
-  writtenBy: []
-  foreignWriters: null
 - table: orders.pos_shift
   columns: 31
   store: postgres
@@ -3164,7 +3159,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: orders.refund_calculation_policy
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -3283,7 +3278,7 @@ tables:
   - marketing-crm
   - resources
 - table: orders.ticket_template
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -3346,7 +3341,7 @@ tables:
   - payments
   foreignWriters: null
 - table: payments.chargeback_evidence
-  columns: 7
+  columns: 8
   store: postgres
   parent: orders.chargeback
   writtenBy:
@@ -3367,7 +3362,7 @@ tables:
   - payments
   foreignWriters: null
 - table: payments.deposit_activity
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -3402,7 +3397,7 @@ tables:
   - payments
   foreignWriters: null
 - table: payments.fee_rule
-  columns: 16
+  columns: 17
   store: postgres
   parent: null
   writtenBy:
@@ -3464,7 +3459,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: payments.mixed_tender_rules
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -3522,14 +3517,14 @@ tables:
   - payments
   foreignWriters: null
 - table: payments.risk_rules
-  columns: 2
+  columns: 4
   store: postgres
   parent: null
   writtenBy:
   - payments
   foreignWriters: null
 - table: payments.routing_rule
-  columns: 9
+  columns: 10
   store: postgres
   parent: payments.provider
   writtenBy:
@@ -3589,7 +3584,7 @@ readsFrom:
   operations: 1
 writesOutside:
 - service: TenancyService
-  operations: 37
+  operations: 38
   rule: 'ADR-0028: the owner defines the row; a foreign writer may only append, through a path the owner
     published.'
   why: '**The lineage records these writes, not how they honour the rule.** It does not say whether
@@ -3685,6 +3680,9 @@ writesOutside:
     tables:
     - platform.outbox
   - operation: revokeEntitlementShare
+    tables:
+    - platform.outbox
+  - operation: setCustomerGuestAccount
     tables:
     - platform.outbox
   - operation: setDenominations
@@ -3951,7 +3949,6 @@ screens:
 - P02:GST-045 Ticket Delivery & Sharing
 - P02:GST-048 Upsell / Cross-Sell
 - P02:GST-050 Resource Booking – Cabana
-- P02:GST-053 Your Plan
 - P02:GST-056 Bundle Package
 - P02:GST-067 Refunds & Resale
 - P02:GST-070 Reserve a Table

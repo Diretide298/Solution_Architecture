@@ -122,7 +122,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-474` | Reader Integration Command Center | D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-475` | Reader Manufacturer & Model Profile | C | 24 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-475` | Reader Manufacturer & Model Profile | C | 22 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-476` | Communication Protocol Configuration | D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-477` | Reader Command & Event Mapping | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-478` | Reader Configuration Deployment & Synchronization | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -293,6 +293,8 @@ readers:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `DEVICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -355,7 +357,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure supported capabilities) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `modelId` (navigation) |
 | Route | `/games-rides/reader-manufacturer-model-profile-bo-475` |
 
 **Known gaps.** Removed 2 October 2026 (CHG-WIR-001): ReaderProfile holds display behaviour, retry and replay window, not manufacturer, model or capabilities; the model belongs to the hardware model library …
@@ -390,7 +392,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `setHardwareModel` body |
 | Manufacturer `manufacturer` | text field | required | — | — | — | — | `setHardwareModel` body |
 | Model `model` | text field | required | — | — | — | — | `setHardwareModel` body |
 | Device category `deviceCategory` | radio group | required | — | Turnstile · Special gate · Mobile · Reader · Other | — | — | `setHardwareModel` body |
@@ -404,7 +405,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Relay controller support `relayControllerSupport` | toggle | optional | off | — | — | — | `setHardwareModel` body |
 | Payment capability `paymentCapability` | toggle | optional | off | — | — | Payment capability where available | `setHardwareModel` body |
 | Firmware software information `firmwareSoftwareInformation` | text field | optional | — | — | — | — | `setHardwareModel` body |
-| Scope path `scopePath` | text field | required | — | — | — | ltree of the owning scope node (ADR-0005) | `setHardwareModel` body |
+
+Carried, not typed: `modelId`
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.
 
@@ -444,7 +446,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save model (secondary button) | `setHardwareModel` PUT `/hardware-models` | AccessHardwareModel | AccessHardwareModel | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
+| Save model (secondary button) | `setHardwareModel` PUT `/hardware-models/{modelId}` | AccessHardwareModel | AccessHardwareModel | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -503,6 +505,8 @@ model:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `DEVICE_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -527,7 +531,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (400, 403, 404).
 - [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-475?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Save model.
@@ -553,7 +557,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Connection Configuration) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `readerProfileId` (navigation) |
 | Route | `/games-rides/communication-protocol-configuration-bo-476` |
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** How TICVAI talks to each reader family: protocol, address, authentication, timeouts, heartbeat and encryption, with a test that proves the connection. The one thing to get right: fields change with the protocol (a serial reader has no host, a REST reader has an endpoint), and secrets are write-only.
@@ -648,6 +652,8 @@ connection:
 - `setReaderProfile` → `PRODUCT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PRODUCT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -868,7 +874,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `deployReaderConfiguration` POST `/readers/{readerId}/deploy` | — | ReaderDeployment | 409 The reader is `unconfigured`, with nothing to deploy (`reader-not-configured`), or `disabled` (`reader-disabled`). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
 
@@ -898,6 +904,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the reader deployment synchronization are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The reader is `unconfigured`, with nothing to deploy (`reader-not-configured`), or `disabled` (`reader-disabled`). |
 
 #### Edge cases to draw
 
@@ -938,6 +945,8 @@ status:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `DEVICE_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -961,7 +970,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-478?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel, What publishing changes.
@@ -1091,6 +1100,8 @@ trigger:
 - `setReaderConfiguration` → `DEVICE_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `DEVICE_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1244,6 +1255,8 @@ mapping:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `DEVICE_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1329,7 +1342,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `deployReaderConfiguration` POST `/readers/{readerId}/deploy` | — | ReaderDeployment | 409 The reader is `unconfigured`, with nothing to deploy (`reader-not-configured`), or `disabled` (`reader-disabled`). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 | What publishing changes (publish gate) | navigation or local | — | — | — | — |
 
@@ -1356,6 +1369,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the edge cache offline are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The reader is `unconfigured`, with nothing to deploy (`reader-not-configured`), or `disabled` (`reader-disabled`). |
 
 #### Edge cases to draw
 
@@ -1385,6 +1399,8 @@ limits:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `DEVICE_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1408,7 +1424,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-481?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel, What publishing changes.
@@ -1462,7 +1478,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `testReader` POST `/readers/{readerId}/test` | — | ReaderTestResult | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
@@ -1529,6 +1545,8 @@ log:
 - `testReader` → `DEVICE_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `DEVICE_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1800,9 +1818,9 @@ Method, path, parameters, request and response for every operation these screens
 "deployReaderConfiguration": {"method":"POST","path":"/readers/{readerId}/deploy","contract":"games","summary":"Push configuration and the offline rule package to a reader","permission":"DEVICE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "listDeviceTypeHardware": {"method":"GET","path":"/device-type-hardware","contract":"access","summary":"Device Type & Hardware Library","permission":"DEVICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"DeviceTypeHardwareLibraryView"},
 "listReaders": {"method":"GET","path":"/readers","contract":"games","summary":"Readers, their attractions and their health","permission":"DEVICE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"status","in":"query","required":null}],"requestBody":null,"responds":"Reader"},
-"setHardwareModel": {"method":"PUT","path":"/hardware-models","contract":"access","summary":"Create or replace a hardware model in the library","permission":"DEVICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AccessHardwareModel","responds":"AccessHardwareModel"},
+"setHardwareModel": {"method":"PUT","path":"/hardware-models/{modelId}","contract":"access","summary":"Create or replace a hardware model in the library","permission":"DEVICE_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"modelId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"AccessHardwareModel","responds":"AccessHardwareModel"},
 "setReaderConfiguration": {"method":"PUT","path":"/readers/{readerId}","contract":"games","summary":"What this reader charges, opens, shows and refuses","permission":"DEVICE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Reader","responds":"Reader"},
-"setReaderProfile": {"method":"PUT","path":"/reader-profiles","contract":"games","summary":"How a reader behaves and what it shows","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ReaderProfile","responds":"ReaderProfile"},
+"setReaderProfile": {"method":"PUT","path":"/reader-profiles/{readerProfileId}","contract":"games","summary":"How a reader behaves and what it shows","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"readerProfileId","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"ReaderProfile","responds":"ReaderProfile"},
 "testReader": {"method":"POST","path":"/readers/{readerId}/test","contract":"games","summary":"Prove a reader works before a guest finds out it does not","permission":"DEVICE_CONFIGURE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ReaderTestResult"}
 }
 ```
@@ -1813,10 +1831,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"AccessHardwareModel": {"type":"object","x-ticvai-persistence":"access.hardware_model","description":"One hardware model in the reusable library, independent of deployed devices: manufacturer, model, category and type, supported technologies, connectivity, capability flags and firmware information (declared 29 September, data-model close-out DM1)","required":["id","manufacturer","model","deviceCategory","hardwareType","scopePath"],"properties":{"id":{"type":"string","format":"uuid"},"manufacturer":{"type":"string"},"model":{"type":"string"},"deviceCategory":{"type":"string","enum":["turnstile","specialGate","mobile","reader","other"]},"hardwareType":{"$ref":"../shared/common.yaml#/components/schemas/DeviceHardwareType"},"supportedTechnologies":{"type":"array","items":{"type":"string"}},"connectivity":{"type":"array","items":{"type":"string"}},"offlineCapability":{"type":"boolean","default":false},"screenCapability":{"type":"boolean","default":false},"soundCapability":{"type":"boolean","default":false},"lightCapability":{"type":"boolean","default":false},"relayControllerSupport":{"type":"boolean","default":false},"paymentCapability":{"type":"boolean","default":false,"description":"Payment capability where available"},"firmwareSoftwareInformation":{"type":"string","nullable":true},"scopePath":{"type":"string","description":"ltree of the owning scope node (ADR-0005)"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"AccessHardwareModel": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"access.hardware_model","description":"One hardware model in the reusable library, independent of deployed devices: manufacturer, model, category and type, supported technologies, connectivity, capability flags and firmware information (declared 29 September, data-model close-out DM1)","required":["id","manufacturer","model","deviceCategory","hardwareType","scopePath"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"manufacturer":{"type":"string"},"model":{"type":"string"},"deviceCategory":{"type":"string","enum":["turnstile","specialGate","mobile","reader","other"]},"hardwareType":{"$ref":"../shared/common.yaml#/components/schemas/DeviceHardwareType"},"supportedTechnologies":{"type":"array","items":{"type":"string"}},"connectivity":{"type":"array","items":{"type":"string"}},"offlineCapability":{"type":"boolean","default":false},"screenCapability":{"type":"boolean","default":false},"soundCapability":{"type":"boolean","default":false},"lightCapability":{"type":"boolean","default":false},"relayControllerSupport":{"type":"boolean","default":false},"paymentCapability":{"type":"boolean","default":false,"description":"Payment capability where available"},"firmwareSoftwareInformation":{"type":"string","nullable":true},"scopePath":{"type":"string","description":"ltree of the owning scope node (ADR-0005)","readOnly":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "DeviceTypeHardwareLibraryView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over access state, assembled at read time from tables that already exist","description":"**What Device Type & Hardware Library displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"hardwareType":{"type":"string","enum":["standardTurnstile","fullHeightTurnstile","tripodTurnstile","speedGate","wideLane","accessiblePodGate","buggyGate","vipGate","staffGate","androidHandheld","iosDevice","tablet","qrBarcodeReader","rfidReader","nfcReader","multiTechnologyReader","biometricReader","podium","counter","beacon","cameraController","externalAccessDevice"],"description":"Specific hardware type within the device category"},"manufacturer":{"type":"string","description":"Manufacturer"},"model":{"type":"string","description":"Model"},"deviceCategory":{"type":"string","enum":["turnstile","specialGate","mobile","reader","other"],"description":"Device Category"},"supportedTechnologies":{"type":"array","items":{"type":"string"},"description":"Supported technologies"},"connectivity":{"type":"array","items":{"type":"string"},"description":"Connectivity"},"offlineCapability":{"type":"boolean","description":"Offline capability"},"screenCapability":{"type":"boolean","description":"Screen capability"},"soundCapability":{"type":"boolean","description":"Sound capability"},"lightCapability":{"type":"boolean","description":"Light capability"},"relayControllerSupport":{"type":"boolean","description":"Relay/controller support"},"paymentCapabilityWhereAvailable":{"type":"boolean","description":"payment capability where available"},"firmwareSoftwareInformation":{"type":"string","description":"firmware/software information"},"hardwareModelId":{"type":"string"}}},
-"Reader": {"type":"object","x-ticvai-persistence":"games.reader","description":"Board 2. **A `tenancy` device with a game configuration on it.**","required":["deviceId"],"properties":{"deviceId":{"type":"string","format":"uuid","description":"`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"},"gameId":{"type":"string","format":"uuid","nullable":true},"readerProfileId":{"type":"string","format":"uuid","nullable":true},"acceptedCreditTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"acceptsDirectPay":{"type":"boolean","default":false},"retapDelaySeconds":{"type":"integer","default":3,"description":"**The setting that stops a guest paying twice for one go.** A wristband held against a reader for a second and a half is two taps to the hardware and one intention to the guest.\n"},"displayRules":{"type":"object","properties":{"freeGameGlow":{"type":"boolean","default":true,"description":"**What tells a guest their entitlement was used rather than their money.** Without it the complaint arrives at the desk.\n"},"showBalance":{"type":"boolean","default":true},"showPrice":{"type":"boolean","default":true},"themeCode":{"type":"string","nullable":true},"languages":{"type":"array","items":{"type":"string"}}}},"ioMapping":{"type":"object","additionalProperties":true,"description":"Board 9.6. Which output starts the game, which input reports it finished. **Deliberately open.** The keys are the reader model's own I/O lines, so the shape belongs to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012, ADR-0015), not to this contract.\n"},"status":{"type":"string","enum":["unconfigured","active","offline","maintenance","disabled"]},"scopePath":{"type":"string"}}},
-"ReaderProfile": {"type":"object","x-ticvai-persistence":"games.reader_profile","description":"BL-153. **`games` is well built on the money and what is missing sits at the reader.**\n10.2.14 and 10.2.17 want a different colour for a free game and a different one for insufficient credit — **because a guest at an arcade machine cannot read a message, they can only see a light.** The whole interaction is a second long and happens across a noisy room.\n","required":["id","name"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"displayBehaviour":{"type":"object","description":"**What the reader shows, per outcome.** Colour and tone, because the guest is looking at a machine rather than a screen.\n","properties":{"accepted":{"type":"string"},"freeGame":{"type":"string"},"insufficientCredit":{"type":"string"},"cardBlocked":{"type":"string"},"readError":{"type":"string"}}},"retryPricing":{"type":"object","nullable":true,"description":"**A retry after a machine fault is not a second play.** Without this a guest whose game crashed pays twice, and the attendant refunds by hand — which is how an arcade loses money and goodwill at once.\n","properties":{"isFree":{"type":"boolean","default":true},"withinSeconds":{"type":"integer","default":60},"maxRetries":{"type":"integer","default":1}}},"rePlayWindowSeconds":{"type":"integer","nullable":true,"description":"**A second tap within this window is the same play, not a new one.** A guest tapping twice because nothing appeared to happen should not be charged twice.\n"},"entitlementProductIds":{"type":"array","description":"**Per-game entitlement.** A pass that includes ten specific rides needs the reader to know which, and a card that works everywhere is a different product.\n","items":{"type":"string","format":"uuid"}},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"Reader": {"type":"object","x-ticvai-persistence":"games.reader","description":"Board 2. **A `tenancy` device with a game configuration on it.**","required":["deviceId"],"properties":{"deviceId":{"x-ticvai-references":"platform.device","type":"string","format":"uuid","description":"`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"},"gameId":{"type":"string","format":"uuid","nullable":true},"readerProfileId":{"type":"string","format":"uuid","nullable":true},"acceptedCreditTypeIds":{"type":"array","items":{"type":"string","format":"uuid"}},"acceptsDirectPay":{"type":"boolean","default":false},"retapDelaySeconds":{"type":"integer","default":3,"description":"**The setting that stops a guest paying twice for one go.** A wristband held against a reader for a second and a half is two taps to the hardware and one intention to the guest.\n"},"displayRules":{"type":"object","properties":{"freeGameGlow":{"type":"boolean","default":true,"description":"**What tells a guest their entitlement was used rather than their money.** Without it the complaint arrives at the desk.\n"},"showBalance":{"type":"boolean","default":true},"showPrice":{"type":"boolean","default":true},"themeCode":{"type":"string","nullable":true},"languages":{"type":"array","items":{"type":"string"}}}},"ioMapping":{"type":"object","additionalProperties":true,"description":"Board 9.6. Which output starts the game, which input reports it finished. **Deliberately open.** The keys are the reader model's own I/O lines, so the shape belongs to the vendor adaptor for that model (game readers are a driver, not a build — ADR-0012, ADR-0015), not to this contract.\n"},"status":{"type":"string","enum":["unconfigured","active","offline","maintenance","disabled"]},"scopePath":{"type":"string"}}},
+"ReaderProfile": {"type":"object","x-ticvai-persistence":"games.reader_profile","description":"BL-153. **`games` is well built on the money and what is missing sits at the reader.**\n10.2.14 and 10.2.17 want a different colour for a free game and a different one for insufficient credit — **because a guest at an arcade machine cannot read a message, they can only see a light.** The whole interaction is a second long and happens across a noisy room.\n","required":["id","name"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"name":{"type":"string"},"displayBehaviour":{"type":"object","description":"**What the reader shows, per outcome.** Colour and tone, because the guest is looking at a machine rather than a screen.\n","properties":{"accepted":{"type":"string"},"freeGame":{"type":"string"},"insufficientCredit":{"type":"string"},"cardBlocked":{"type":"string"},"readError":{"type":"string"}}},"retryPricing":{"type":"object","nullable":true,"description":"**A retry after a machine fault is not a second play.** Without this a guest whose game crashed pays twice, and the attendant refunds by hand — which is how an arcade loses money and goodwill at once.\n","properties":{"isFree":{"type":"boolean","default":true},"withinSeconds":{"type":"integer","default":60},"maxRetries":{"type":"integer","default":1}}},"rePlayWindowSeconds":{"type":"integer","nullable":true,"description":"**A second tap within this window is the same play, not a new one.** A guest tapping twice because nothing appeared to happen should not be charged twice.\n"},"entitlementProductIds":{"type":"array","description":"**Per-game entitlement.** A pass that includes ten specific rides needs the reader to know which, and a card that works everywhere is a different product.\n","items":{"type":"string","format":"uuid"}},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "ReaderTestResult": {"type":"object","description":"Boards 2.10 and 9.9. **Each check separately**, because they send an engineer to different places.\n","properties":{"readerId":{"type":"string","format":"uuid"},"testedAt":{"type":"string","format":"date-time"},"checks":{"type":"array","items":{"type":"object","properties":{"check":{"type":"string","enum":["connectivity","cardRead","balanceCheck","display","sound","gameTrigger","gameCompleteSignal"]},"passed":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"overall":{"type":"string","enum":["pass","partial","fail"]}}}
 }
 ```

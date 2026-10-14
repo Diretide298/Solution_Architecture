@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/offers-promotions",
-   "component": "apps/guest-web/src/routes/OffersPromotions.tsx",
+   "component": "src/routes/OffersPromotions.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -26,6 +26,8 @@
     "minimum": 1
    },
    "sections": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "minItems": 1,
     "items": {
@@ -629,6 +631,8 @@
     "description": "The language the legal text is written and reviewed in."
    },
    "languages": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "minItems": 1,
     "description": "Every language the version is offered in, the source language included. Arabic renders right to left.",
@@ -756,6 +760,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -1049,6 +1054,8 @@
     "description": "A participant under this age needs a guardian. Written to `FormDefinition.minimumAge`. No default."
    },
    "guardianThresholdByCountry": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1452,6 +1459,7 @@
     ]
    },
    "checklist": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -1551,6 +1559,7 @@
     }
    },
    "aiFindings": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -1691,6 +1700,8 @@
     }
    },
    "history": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Every action with its comment, oldest first.",
     "items": {
@@ -2083,6 +2094,8 @@
     ]
    },
    "eligibility": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "All must hold (AND). Empty means every participant the association reaches.",
     "items": {
@@ -2176,6 +2189,8 @@
     "description": "An authorised operator may admit the participant anyway; the override is recorded."
    },
    "reminders": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

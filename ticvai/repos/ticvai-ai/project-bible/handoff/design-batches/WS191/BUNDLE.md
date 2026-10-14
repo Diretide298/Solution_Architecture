@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1139` | Digital Key & Wallet Authentication Policy | C | 15 | 0 | 6 | 1 | 0 | 6 | — | notStarted (—) |
 | `BO-1140` | Offline Wallet & Degraded Mode Configuration | C | 20 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1141` | Device, Terminal & Acceptance Point Mapping | C | 14 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1142` | Wallet Transaction Simulator, Monitoring & Channel Audit | C | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-1142` | Wallet Transaction Simulator, Monitoring & Channel Audit | C | 0 | 14 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -397,6 +397,8 @@ channels:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -520,6 +522,8 @@ policy:
 - `setWalletChannelRules` → `WALLET_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_CONFIGURE`
 
 #### Requirements it meets
 
@@ -662,6 +666,8 @@ kinds:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -790,6 +796,8 @@ link:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_OPERATE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -910,6 +918,8 @@ rfid:
 - `setWalletChannelRules` → `WALLET_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1047,6 +1057,8 @@ tiers:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_CONFIGURE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1183,6 +1195,8 @@ offline:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1310,6 +1324,8 @@ rules:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1373,7 +1389,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listWalletTransactions`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | text | — |
+| Wallet | the name it points at, never the id | The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance … |
+| Wallet hold | the name it points at, never the id | The hold a spend settled, where it came through `holdWalletFunds`. |
+| Kind | chip: Top up, Spend, Refund, Adjustment, Bonus, Expiry… | — |
+| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Balance after | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Order | text | — |
+| Venue | the name it points at, never the id | — |
+| Reason | text | — |
+| Principal | the name it points at, never the id | — |
+| Recorded at | 1 Oct 2026, 14:30 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1419,6 +1452,8 @@ scenario:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `WALLET_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1457,7 +1492,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1142?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-1133`.
@@ -1586,9 +1621,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "PaymentTerminal": {"type":"object","x-ticvai-persistence":"payments.terminal","description":"Board 3. **The payment layer on a `tenancy` device**, not a second device register.","required":["deviceId"],"properties":{"deviceId":{"x-ticvai-references":"platform.device","type":"string","format":"uuid","description":"The `tenancy.RegisteredDevice`. **Enrolment, credentials, firmware and tamper state live there.**"},"merchantAccountId":{"type":"string","format":"uuid","nullable":true},"acquirerConnectionId":{"type":"string","format":"uuid","nullable":true},"terminalIdentifier":{"type":"string","nullable":true},"emvConfigurationVersion":{"type":"string","nullable":true},"terminalModelCode":{"type":"string","nullable":true,"description":"4.3.1. The model whose EMV and PCI certification applies (`listPaymentTerminalCertifications`)."},"entryModes":{"type":"array","description":"4.3.2. The card entry modes this terminal accepts. **`magstripe` (swipe) is off unless listed**, since a swiped card carries no chip cryptogram; it stays available as a fallback where the acquirer allows it.","items":{"type":"string","enum":["chip","contactless","magstripe","manualEntry","mobileWallet"]}},"dccEnabled":{"type":"boolean","default":false,"description":"4.3.2. Offer Dynamic Currency Conversion on a foreign card at this terminal. The rate is the provider's and is recorded on the payment (`fxRateSource` `cardScheme`); the ledger still holds the base currency."},"dccProviderConnectionId":{"type":"string","format":"uuid","nullable":true},"contactlessLimit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"pinBypassAllowed":{"type":"boolean","default":false},"storeAndForward":{"type":"object","description":"**A risk decision, not a technical one.**","properties":{"enabled":{"type":"boolean","default":false},"floorLimit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumHeldTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAgeMinutes":{"type":"integer","nullable":true}}},"status":{"type":"string","enum":["unconfigured","active","offline","suspended"]},"scopePath":{"type":"string"}}},
-"WalletAuthenticationPolicy": {"type":"object","x-ticvai-persistence":"wallet.authentication_policy","description":"Board 6, p.68. **Risk-tiered proof of identity for a wallet spend.** The highest matching tier wins; with no policy, `WalletChannelRules.requiresPin` applies.","required":["tiers"],"properties":{"tiers":{"type":"array","maxItems":20,"items":{"type":"object","required":["aboveAmount","methods"],"properties":{"aboveAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"channels":{"type":"array","description":"Empty means every channel in `WalletChannelRules.allowedChannels`.","items":{"type":"string"}},"transactionKinds":{"type":"array","description":"Empty means every kind.","items":{"$ref":"#/components/schemas/WalletTransactionKind"}},"methods":{"type":"array","minItems":1,"uniqueItems":true,"description":"Any one of these satisfies the tier.","items":{"type":"string","enum":["walletPin","deviceAuthentication","digitalKey","customerLogin","membershipCredential"]}}}}},"scopePath":{"type":"string"}}},
+"WalletAuthenticationPolicy": {"type":"object","x-ticvai-persistence":"wallet.authentication_policy","description":"Board 6, p.68. **Risk-tiered proof of identity for a wallet spend.** The highest matching tier wins; with no policy, `WalletChannelRules.requiresPin` applies.","required":["tiers"],"properties":{"tiers":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","maxItems":20,"items":{"type":"object","required":["aboveAmount","methods"],"properties":{"aboveAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"channels":{"type":"array","description":"Empty means every channel in `WalletChannelRules.allowedChannels`.","items":{"type":"string"}},"transactionKinds":{"type":"array","description":"Empty means every kind.","items":{"$ref":"#/components/schemas/WalletTransactionKind"}},"methods":{"type":"array","minItems":1,"uniqueItems":true,"description":"Any one of these satisfies the tier.","items":{"type":"string","enum":["walletPin","deviceAuthentication","digitalKey","customerLogin","membershipCredential"]}}}}},"scopePath":{"type":"string"}}},
 "WalletChannelRules": {"type":"object","x-ticvai-persistence":"wallet.channel_rule","description":"Board 6. **The offline rule is stated once, not per device.**","properties":{"allowedChannels":{"type":"array","items":{"type":"string"}},"allowedCredentialKinds":{"type":"array","items":{"type":"string","enum":["card","wristband","nfc","rfid","qr","mobileApp","digitalKey"]}},"requiresPin":{"type":"boolean","default":false},"pinAboveAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"offlineAllowed":{"type":"boolean","default":false},"offlineFloorLimit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"offlineMaximumAgeMinutes":{"type":"integer","nullable":true,"description":"**How stale a cached balance may be before the device refuses.** Without a ceiling an offline terminal spends a balance that ran out yesterday.\n"},"acceptancePointIds":{"type":"array","items":{"type":"string","format":"uuid"}},"scopePath":{"type":"string"}}},
-"WalletCredential": {"type":"object","x-ticvai-persistence":"wallet.credential","description":"Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n","required":["walletId","kind","identifier"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["card","wristband","nfc","rfid","qr","mobileApp","digitalKey"]},"identifier":{"type":"string"},"linkedAt":{"type":"string","format":"date-time"},"unlinkedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","lost","replaced","blocked","expired"]},"replacedByCredentialId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"}}},
+"WalletCredential": {"type":"object","x-ticvai-persistence":"wallet.credential","description":"Boards 6.4 and 6.5. **A credential is not the wallet** — a lost wristband is relinked, not refunded.\n","required":["walletId","kind","identifier"],"properties":{"id":{"type":"string","format":"uuid"},"walletId":{"x-ticvai-references":"wallet.wallet","type":"string","format":"uuid"},"kind":{"type":"string","enum":["card","wristband","nfc","rfid","qr","mobileApp","digitalKey"]},"identifier":{"type":"string"},"linkedAt":{"type":"string","format":"date-time"},"unlinkedAt":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["active","lost","replaced","blocked","expired"]},"replacedByCredentialId":{"type":"string","format":"uuid","nullable":true},"scopePath":{"type":"string"},"recordedAt":{"type":"string","format":"date-time","description":"**When the device made the write** (R113; CHG-OFL-003). `linkWalletCredential` is offline-capable, so the client sets this from its own clock and keeps it on replay; `created_at` is when the server heard of it. Omitted online, the server sets it to the time it received the call."}}},
 "WalletTransaction": {"x-ticvai-persistence":"wallet.wallet_transaction","type":"object","required":["id","kind","amount","balanceAfter","recordedAt"],"properties":{"id":{"type":"string"},"walletId":{"type":"string","format":"uuid","x-ticvai-references":"wallet.wallet","description":"The wallet this movement is on (SD-027, 29 September). A shared wallet has many subjects, so the subject alone cannot say which balance moved."},"walletHoldId":{"x-ticvai-column":"fund_reservation_id","type":"string","format":"uuid","nullable":true,"x-ticvai-references":"wallet.fund_reservation","description":"The hold a spend settled, where it came through `holdWalletFunds`."},"kind":{"$ref":"#/components/schemas/WalletTransactionKind"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money","x-ticvai-column":"transaction_amount"},"balanceAfter":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"orderId":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"reason":{"type":"string","nullable":true},"principalId":{"type":"string","format":"uuid","nullable":true},"recordedAt":{"type":"string","format":"date-time"}}},
 "WalletTransactionKind": {"type":"string","enum":["topUp","spend","refund","adjustment","bonus","expiry","transfer"]}
 }

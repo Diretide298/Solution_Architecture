@@ -551,7 +551,7 @@
   "contract": "marketing-crm",
   "summary": "Report something lost, or hand something in",
   "permission": "CASE_MANAGE",
-  "offlineCapable": true,
+  "offlineCapable": false,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

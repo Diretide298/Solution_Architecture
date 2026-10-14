@@ -1,11 +1,11 @@
 # Invitation — state model
-# Contract: marketing-crm.Invitation.status
+# Contract: marketing-crm.CampaignInvitation.status (the schema was Invitation until CHG-STO-011)
 
 entity: Invitation
 contract: marketing-crm
-enum: Invitation.status
+enum: CampaignInvitation.status
 enumKind: inline
-enumSchema: Invitation
+enumSchema: CampaignInvitation
 enumProperty: status
 owner: marketing-crm
 initial:

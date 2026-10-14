@@ -73,6 +73,137 @@ tags:
 - name: block
 - name: rules
 - name: recommendation
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  accessibleRecords:
+    module: seating
+    table: seating.accessible
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The seating.accessible rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/AccessibleSeating'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its seating.accessible rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
+  seatRecords:
+    module: seating
+    table: seating.seat
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The seating.seat rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Seat'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its seating.seat rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Catalogue's service route (serviceAuth).
+    served: [in-process, service]
+  seatCategoryRecords:
+    module: seating
+    table: seating.seat_category
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The seating.seat_category rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SeatCategory'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its seating.seat_category rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
+  seatMapRecords:
+    module: seating
+    table: seating.seat_map
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The seating.seat_map rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SeatMap'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its seating.seat_map rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
+  seatingRulesRecords:
+    module: seating
+    table: seating.seating_rules
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The seating.seating_rules rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/SeatingRules'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its seating.seating_rules rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
+  sectionRecords:
+    module: seating
+    table: seating.section
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The seating.section rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Section'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its seating.section rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
+  zoneRecords:
+    module: seating
+    table: seating.zone
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The seating.zone rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Catalogue stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/MapZone'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Catalogue answers with its seating.zone rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked from
+      another deployable through Catalogue's service route (serviceAuth).
+    served: [service]
 paths:
   /performances/{performanceId}/assign-seats:
     parameters:
@@ -258,6 +389,7 @@ paths:
         - "P08 BO-953 Seat Map Command Center"
         - "P08 BO-973 Layout Command Center"
         - "P08 BO-978 Multi-Performance Assignment"
+      description: '**Order.** Newest first, by `publishedAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -436,6 +568,7 @@ paths:
                 isActive:
                   type: boolean
                 sectionViews:
+                  x-ticvai-stored-as: seating.section.view_asset_id
                   type: array
                   description: 'Set or clear the view photo of one or more sections (`Section.viewAssetId`,
                     decided 29 September, rev 3 23SEP-14). **Not a structural change**, so it is accepted
@@ -467,6 +600,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SeatMap'
         '409':
+          x-ticvai-problem-types: [seat-map-published]
           description: Structural change attempted on a published map
           content:
             application/problem+json:
@@ -609,6 +743,7 @@ paths:
         - "P08 BO-1051 Seat Analytics Command Center"
         - "P08 BO-956 Rows & Seats"
         - "P08 BO-991 Seat History"
+      description: '**Order.** Sorted by `position` ascending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -703,6 +838,7 @@ paths:
                     type: integer
                     description: Seats with tickets sold against them, which cannot be recategorised.
         '409':
+          x-ticvai-problem-types: [seat-map-published]
           description: Map is published and the change is structural
           content:
             application/problem+json:
@@ -1183,6 +1319,7 @@ paths:
                   type: string
                   maxLength: 200
                 sourceSeatMapId:
+                  x-ticvai-persisted: false
                   type: string
                   format: uuid
                 description:
@@ -1306,6 +1443,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatCategory'
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seat-categories/{seatCategoryId}:
@@ -1374,6 +1513,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '422':
+          x-ticvai-problem-types: [duplicate-band-code, band-ends-before-start]
           description: Two bands with the same `code`, or a band whose `effectiveTo` is not after its
             `effectiveFrom` (audit R275 (d)).
           content:
@@ -1742,7 +1882,9 @@ paths:
       description: 'Seats withheld from sale — production holds, house seats, group allocations, maintenance.
         Distinct from a hold, which is a guest mid-purchase.
 
-        '
+        
+
+        **Order.** Newest first, by `createdAt` descending, then by `id`.'
       tags:
       - block
       x-ticvai-permission: PRODUCT_VIEW
@@ -1926,6 +2068,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatHold'
+        '409':
+          description: 'The block was already released (`seat-block-released`), or a named seat is no longer `blocked` (`seat-not-blocked`). No seat is allocated.'
+          x-ticvai-problem-types: [seat-block-released, seat-not-blocked]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seat-maps/{seatMapId}/rules:
@@ -2069,6 +2218,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/SeatRecommendation'
         '404':
+          x-ticvai-problem-types: [seat-selection-not-found]
           description: No selection satisfies the constraints
           content:
             application/problem+json:
@@ -2194,6 +2344,10 @@ paths:
       operationId: importSeatMap
       x-ticvai-consumed-by:
         - "P08 BO-964 PDF & Image Import"
+      x-ticvai-read-via:
+      - query: assets#mediaAssetRecords
+        route: service
+        for: 'its read of assets.media_asset, VenueOps''s data (CHG-MOD-001)'
       summary: Import a seat map from a plan or a manifest
       description: '**AI-assisted import, decided 21 August** — PDF, image, Excel or CSV alongside manual
         building.
@@ -2327,6 +2481,7 @@ paths:
                   $ref: '#/components/schemas/SeatHoldType'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /seat-hold-types/{holdTypeId}:
     put:
       operationId: setSeatHoldType
       x-ticvai-consumed-by:
@@ -2343,6 +2498,11 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       parameters:
+      - name: holdTypeId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -2509,6 +2669,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SeatHoldPool'
+        '409':
+          description: 'The pool is already `released` (`seat-hold-pool-already-released`) or `expired` (`seat-hold-pool-expired`); its seats are no longer held. Nothing changes.'
+          x-ticvai-problem-types: [seat-hold-pool-already-released, seat-hold-pool-expired]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /seat-rules:
@@ -2551,6 +2718,8 @@ paths:
         - "P08 BO-1016 Companion Seat Rules"
         - "P08 BO-1017 Wheelchair Companion Rules"
         - "P08 BO-1021 Flexible Spacing Rules"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per seat map, the one the body''s `seatMapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Which seats are killed, buffered, paired or reserved for access
       description: 'Board 7. **Four rules that all move the same seats and are decided by different
         people.**
@@ -2642,6 +2811,8 @@ paths:
         - "P08 BO-1018 Accessible Seating Master"
         - "P08 BO-1019 Accessible Route Mapping"
         - "P08 BO-1020 Accessible Filters & Eligibility"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per seat map, the one the body''s `seatMapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Define accessible seats, routes and eligibility
       tags:
       - seating
@@ -2932,6 +3103,8 @@ paths:
         - "P08 BO-1037 Family Seating Recommendations"
         - "P08 BO-1038 Accessibility Recommendations"
         - "P08 BO-1041 Scoring Rules & Model Governance"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per seat map, the one the body''s `seatMapId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       summary: Scoring for best seat, best value, closest, family and accessible
       description: 'Board 9, and it is the 21 August minute made configurable: *"best-seat ranking (e.g.
         last-row-is-best vs. first-row-is-best, depending on venue sightlines) must be configurable per
@@ -3139,6 +3312,7 @@ components:
           format: uuid
           x-ticvai-references: seating.seat_block
         seatId:
+          x-ticvai-references: seating.seat
           type: string
           format: uuid
         createdAt:
@@ -3162,6 +3336,7 @@ components:
           format: uuid
           x-ticvai-references: seating.seat_reservation
         seatId:
+          x-ticvai-references: seating.seat
           type: string
           format: uuid
         heldPrice:
@@ -3242,9 +3417,11 @@ components:
           type: string
           format: uuid
         holdTypeId:
+          x-ticvai-references: seating.hold_type
           type: string
           format: uuid
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
         seatIds:
@@ -3374,6 +3551,8 @@ components:
           type: string
           format: uuid
         spaces:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3456,6 +3635,7 @@ components:
         reference:
           type: string
         performanceId:
+          x-ticvai-references: catalogue.performance
           type: string
           format: uuid
         organisationId:
@@ -3595,6 +3775,8 @@ components:
           format: uuid
           nullable: true
         profiles:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -3986,6 +4168,8 @@ components:
         seatCount:
           type: integer
         boundary:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             $ref: '#/components/schemas/Point'
@@ -4057,6 +4241,7 @@ components:
           format: uuid
           description: Create from a template rather than empty.
     Seat:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by allocateGroupSeats, assignSeats, generateConfiguration, getSeatAvailability and others
       x-ticvai-persistence: seating.seat
       # One seat per position on a map (CHG-R6-006): unique (seat_map_id, section_code, row_label, seat_number).
       x-ticvai-unique-together:
@@ -4068,7 +4253,12 @@ components:
       - rowLabel
       - seatNumber
       - attribute
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -4171,6 +4361,7 @@ components:
           items:
             $ref: '#/components/schemas/SeatPriceBand'
     SeatPriceBand:
+      x-ticvai-rls: grant-holder-read   # MOD audit, CHG-MOD-007: read below the tenant by allocateGroupSeats, createSeatCategory, listSeatCategories, recommendSeats and others
       x-ticvai-persistence: seating.seat_price_band
       # One band per code within a seat category (CHG-R6-006): unique (seat_category_id, code).
       x-ticvai-unique-together:
@@ -4186,7 +4377,12 @@ components:
       - displayLabel
       - amount
       - effectiveFrom
+      - scopePath
       properties:
+        scopePath:
+          type: string
+          readOnly: true
+          description: 'Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller''s scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007).'
         id:
           type: string
           format: uuid
@@ -4470,6 +4666,7 @@ components:
           items:
             type: string
         findings:
+          x-ticvai-persisted: false
           type: array
           items:
             $ref: '#/components/schemas/ValidationFinding'

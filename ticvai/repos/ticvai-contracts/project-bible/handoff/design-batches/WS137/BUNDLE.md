@@ -1,6 +1,6 @@
 # WS137 — Marketing CRM Configuration Reference v1.0 board 3
 
-**10 screens · 12 operations · 15 schemas · 4 permissions**
+**10 screens · 13 operations · 15 schemas · 4 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -137,16 +137,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-754` | Audience Intelligence | D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-754` | Audience Intelligence | D | 0 | 20 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-755` | Dynamic Segment Builder | A | 33 | 11 | 6 | 12 | 1 | 6 | — | notStarted (—) |
-| `BO-756` | Static Lists & Imports | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-756` | Static Lists & Imports | D | 0 | 19 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-757` | Behavioral Segmentation | D | 0 | 20 | 6 | 13 | 1 | 6 | — | notStarted (—) |
 | `BO-758` | Membership & Loyalty Segments | D | 0 | 0 | 6 | 12 | 1 | 6 | — | notStarted (—) |
 | `BO-759` | Demographic & Geographic | D | 0 | 0 | 6 | 9 | 0 | 0 | — | notStarted (—) |
 | `BO-760` | Revenue & Engagement Segments | D | 0 | 0 | 6 | 12 | 0 | 6 | — | notStarted (—) |
-| `BO-761` | AI Audience Discovery | C | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-761` | AI Audience Discovery | C | 0 | 16 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-762` | Predictive Audiences | D | 0 | 0 | 6 | 14 | 0 | 0 | — | notStarted (—) |
-| `BO-763` | Activation & Governance | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-763` | Activation & Governance | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -194,7 +194,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listSegments`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Name | text | — |
+| Description | text | — |
+| Venue | the name it points at, never the id | — |
+| Match | chip: All, Any | — |
+| Criteria | list or chips (count when long) | — |
+| Attribute | text | Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language. |
+| Operator | chip: Equals, Not equals, Greater than, Less than, Between, In… | — |
+| Value | text | — |
+| Values | list or chips (count when long) | — |
+| Exclude segments | list or chips (count when long) | — |
+| Rule groups | list or chips (count when long) | Nested AND / OR / NOT groups (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by … |
+| Operator | chip: And, Or, Not | — |
+| Criteria | list or chips (count when long) | Each entry has the shape of `SegmentCriterion` (`attribute`, `operator`, `value`). |
+| Groups | list or chips (count when long) | — |
+| Effective from | 1 Oct 2026, 14:30 | The segment is evaluated for sends only from this time. |
+| Effective to | 1 Oct 2026, 14:30 | — |
+| Owner principal | the name it points at, never the id | Who answers for the segment; defaults to its creator. |
+| Requires approval | yes / no (icon or chip) | Where true, a campaign may use the segment only after an `approvals` request on it is approved. |
+| ID | the name it points at, never the id | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -252,6 +275,8 @@ overlap: Lapsed pass holders x Kids Club parents - 1,120 shared
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -290,7 +315,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-754?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-755`, `BO-756`, `BO-757`, `BO-758`, `BO-759`, `BO-760`, `BO-761`, `BO-762`, `BO-763`.
@@ -486,6 +511,8 @@ counts:
 
 **A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createSegment`.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -583,7 +610,29 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAudienceLists`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Name | text | — |
+| Kind | chip: Manual, Imported, Suppression | — |
+| Asset | the image or video | — |
+| Field mapping | grouped details | — |
+| Rows read | 1,234 | — |
+| Matched | 1,234 | — |
+| Unmatched | 1,234 | — |
+| Duplicates removed | 1,234 | — |
+| Rejected | 1,234 | — |
+| Unmatched handling | chip: Create lead, Quarantine | The two honest answers. Silently dropping them tells a marketer their list of ten thousand reached ten thousand. |
+| Source | text | — |
+| Owner | the name it points at, never the id | — |
+| Purpose | text | — |
+| Consent basis | text | — |
+| Expires at | 1 Oct 2026 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -629,6 +678,8 @@ consentBasis: Existing customers, email consent recorded at source (import)
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -655,7 +706,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-756?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Import audience list, Cancel.
 - [ ] Every transition is wired: `BO-754`.
@@ -780,6 +831,8 @@ counts:
 - `previewSegment` → `MARKETING_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `MARKETING_VIEW`
 
 #### Requirements it meets
 
@@ -913,6 +966,8 @@ counts:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_MANAGE`
+
 #### Requirements it meets
 
 12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1040,6 +1095,8 @@ counts:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_MANAGE`
+
 #### Requirements it meets
 
 9 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1164,6 +1221,8 @@ engagementTiers:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_MANAGE`
+
 #### Requirements it meets
 
 12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1250,7 +1309,26 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAudienceDiscoveryTargeting`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Narrow audience | text | Narrow audience |
+| Expand audience | text | Expand audience |
+| Exclude low value segment | text | Exclude low-value segment |
+| Change eligibility | text | Change eligibility |
+| Change channel | text | Change channel |
+| Change timing | text | Change timing |
+| Change promotion | text | Change promotion |
+| Reduce frequency | text | Reduce frequency |
+| Membership tier eligibility | text | Membership/tier eligibility |
+| Membership and loyalty eligibility | text | Membership and loyalty eligibility |
+| Audience name | text | Discovered audience |
+| Audience size | 1,234 | Audience size |
+| Suggested offer | text | Suggested offer |
+| Predicted conversion | 1,234.5 | Predicted conversion, percent |
+| Estimated incremental revenue | AED 1,234.50 | Estimated incremental revenue |
+| Rationale | text | Why this audience (explainable factors) |
 
 **Actions and what each produces**
 
@@ -1300,6 +1378,8 @@ cluster:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRICE_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1330,7 +1410,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-761?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-754`.
@@ -1382,6 +1462,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Accept AI proposal**: A person approves; saving the segment happens under their own permission. *(source: contracts/satellite/ai.yaml#decideProposedAction)*
 
+**Data it reads**: `listProposedActions` (onInterval, Follows decideProposedAction (202) until what it started …)
+
 **Where the user goes next**
 
 - → `BO-754` Audience Intelligence: *Back to Audience Intelligence*
@@ -1412,8 +1494,11 @@ audience: Likely to renew annual pass in 30 days - threshold 0.7 - 1,880 guests 
 - `previewSegment` → `MARKETING_VIEW` (read) · staff
 - `decideProposedAction` → `AI_USE` (operate) · staff
 - `proposeLookalikeSegment` → `AI_USE` (operate) · staff
+- `listProposedActions` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `MARKETING_MANAGE`
 
 #### Requirements it meets
 
@@ -1497,7 +1582,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAudienceActivations`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Segment | the name it points at, never the id | — |
+| Destination | chip: Campaign, Journey, Website, Mobile app, External ad platform, Partner feed | — |
+| Destination reference | text | — |
+| External | yes / no (icon or chip) | — |
+| Suppression lists | list or chips (count when long) | — |
+| Enforce consent | yes / no (icon or chip) | — |
+| Frequency cap per week | 1,234 | — |
+| Refresh schedule | text | — |
+| Expires at | 1 Oct 2026 | — |
+| Pre flight | grouped details | — |
+| Members | 1,234 | — |
+| Reachable | 1,234 | — |
+| Suppressed | 1,234 | — |
+| Consent blocked | 1,234 | — |
+| Frequency blocked | 1,234 | — |
+| Approval request | the name it points at, never the id | — |
+| Status | chip: Draft, Pending approval, Active, Failed, Expired | — |
+| Last synced at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -1546,6 +1654,8 @@ activation: Lapsed pass holders -> Meta custom audience - pending approval - 2,1
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `MARKETING_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1570,7 +1680,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-763?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel, What publishing changes.
 - [ ] Every transition is wired: `BO-754`.
@@ -1680,6 +1790,7 @@ Method, path, parameters, request and response for every operation these screens
 "listAudienceActivations": {"method":"GET","path":"/audience-activations","contract":"marketing-crm","summary":"Where audiences are being used, and whether they are still in sync","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listAudienceDiscoveryTargeting": {"method":"GET","path":"/audience-discovery-targeting","contract":"promotions","summary":"AI Audience Discovery & Targeting Optimization","permission":"PRICE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiAudienceDiscoveryTargetingOptimizationView"},
 "listAudienceLists": {"method":"GET","path":"/audience-lists","contract":"marketing-crm","summary":"Static and imported audiences","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listProposedActions": {"method":"GET","path":"/proposed-actions","contract":"ai","summary":"What the assistant has proposed and nobody has decided","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ProposedAction"},
 "listSegments": {"method":"GET","path":"/segments","contract":"marketing-crm","summary":"List segments","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"search","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "previewSegment": {"method":"POST","path":"/segments/{segmentId}/preview","contract":"marketing-crm","summary":"Estimate segment size and reachability","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SegmentPreview"},
 "previewSegmentDraft": {"method":"POST","path":"/segments/preview","contract":"marketing-crm","summary":"Estimate an unsaved segment's size and reachability","permission":"MARKETING_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":"CreateSegmentRequest","responds":"SegmentDraftPreview"},
@@ -1695,13 +1806,13 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AiAudienceDiscoveryTargetingOptimizationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over promotions state, assembled at read time from tables that already exist","description":"**What AI Audience Discovery & Targeting Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"narrowAudience":{"type":"string","description":"Narrow audience"},"expandAudience":{"type":"string","description":"Expand audience"},"excludeLowValueSegment":{"type":"string","description":"Exclude low-value segment"},"changeEligibility":{"type":"string","description":"Change eligibility"},"changeChannel":{"type":"string","description":"Change channel"},"changeTiming":{"type":"string","description":"Change timing"},"changePromotion":{"type":"string","description":"Change promotion"},"reduceFrequency":{"type":"string","description":"Reduce frequency"},"membershipTierEligibility":{"type":"string","description":"Membership/tier eligibility"},"membershipAndLoyaltyEligibility":{"type":"string","description":"Membership and loyalty eligibility"},"audienceName":{"type":"string","description":"Discovered audience"},"audienceSize":{"type":"integer","description":"Audience size"},"suggestedOffer":{"type":"string","description":"Suggested offer"},"predictedConversion":{"type":"number","description":"Predicted conversion, percent"},"estimatedIncrementalRevenue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Estimated incremental revenue"},"rationale":{"type":"string","description":"Why this audience (explainable factors)"}}},
 "AiLookalikeSegmentProposal": {"type":"object","x-ticvai-persistence":"none — the draft is an ai.proposed_action row (kind audience); the evidence is its decision record","description":"A lookalike segment as rules a person can read, edit and save (22.14.12). The criteria are shaped as `marketing-crm` `SegmentCriterion` (attribute, operator, value) and restated here because a satellite cannot reference another satellite.","required":["proposedActionId","criteria","estimatedReach"],"properties":{"proposedActionId":{"type":"string","format":"uuid","description":"The `ai.proposed_action` row whose payload is the `marketing-crm.createSegment` body."},"name":{"type":"string","nullable":true},"criteria":{"type":"array","items":{"type":"object","required":["attribute","operator"],"properties":{"attribute":{"type":"string"},"operator":{"type":"string"},"value":{"description":"As `SegmentCriterion.value` in marketing-crm (any type)."},"weight":{"type":"number","nullable":true,"description":"How much this attribute separated the seed from everyone else."}}}},"similarityBasis":{"type":"array","items":{"type":"object","properties":{"attribute":{"type":"string"},"seedShare":{"type":"number","description":"Share of the seed holding the value."},"populationShare":{"type":"number","description":"Share of the tenant's consented guests holding it."}}}},"estimatedReach":{"type":"integer","description":"Consented guests the criteria select, excluding the seed where `excludeSeed`."},"seedSize":{"type":"integer"},"overlapWithSeed":{"type":"number","minimum":0,"maximum":1,"description":"Share of the seed the criteria would also select; a check that the rules describe the seed."},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"decisionRecordId":{"type":"string","format":"uuid"}}},
-"AudienceActivation": {"type":"object","x-ticvai-persistence":"marketing.audience_activation","description":"Board 3.10. **Consent is enforced at activation, not at definition.**","required":["segmentId","destination"],"properties":{"id":{"type":"string","format":"uuid"},"segmentId":{"type":"string","format":"uuid"},"destination":{"type":"string","enum":["campaign","journey","website","mobileApp","externalAdPlatform","partnerFeed"]},"destinationReference":{"type":"string","nullable":true},"external":{"type":"boolean","default":false},"suppressionListIds":{"type":"array","items":{"type":"string","format":"uuid"}},"enforceConsent":{"type":"boolean","default":true},"frequencyCapPerWeek":{"type":"integer","nullable":true},"refreshSchedule":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date","nullable":true},"preFlight":{"type":"object","readOnly":true,"properties":{"members":{"type":"integer"},"reachable":{"type":"integer"},"suppressed":{"type":"integer"},"consentBlocked":{"type":"integer"},"frequencyBlocked":{"type":"integer"}}},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["draft","pendingApproval","active","failed","expired"]},"lastSyncedAt":{"type":"string","format":"date-time","nullable":true},"lastSyncErrors":{"type":"integer","default":0},"scopePath":{"type":"string"}}},
-"AudienceList": {"type":"object","x-ticvai-persistence":"marketing.audience_list","description":"Board 3.3. **Consent basis is required on the import, not optional metadata.**","required":["name"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string","enum":["manual","imported","suppression"]},"assetId":{"type":"string","format":"uuid","nullable":true},"fieldMapping":{"type":"object","additionalProperties":{"type":"string"}},"rowsRead":{"type":"integer","readOnly":true},"matched":{"type":"integer","readOnly":true},"unmatched":{"type":"integer","readOnly":true},"duplicatesRemoved":{"type":"integer","readOnly":true},"rejected":{"type":"integer","readOnly":true},"unmatchedHandling":{"type":"string","enum":["createLead","quarantine"],"default":"quarantine","description":"**The two honest answers.** Silently dropping them tells a marketer their list of ten thousand reached ten thousand.\n"},"source":{"type":"string"},"owner":{"type":"string","format":"uuid"},"purpose":{"type":"string"},"consentBasis":{"type":"string"},"expiresAt":{"type":"string","format":"date","nullable":true},"scopePath":{"type":"string"}}},
+"AudienceActivation": {"type":"object","x-ticvai-persistence":"marketing.audience_activation","description":"Board 3.10. **Consent is enforced at activation, not at definition.**","required":["segmentId","destination"],"properties":{"id":{"type":"string","format":"uuid"},"segmentId":{"x-ticvai-references":"marketing.segment","type":"string","format":"uuid"},"destination":{"type":"string","enum":["campaign","journey","website","mobileApp","externalAdPlatform","partnerFeed"]},"destinationReference":{"type":"string","nullable":true},"external":{"type":"boolean","default":false},"suppressionListIds":{"type":"array","items":{"type":"string","format":"uuid"}},"enforceConsent":{"type":"boolean","default":true},"frequencyCapPerWeek":{"type":"integer","nullable":true},"refreshSchedule":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date","nullable":true},"preFlight":{"type":"object","readOnly":true,"properties":{"members":{"type":"integer"},"reachable":{"type":"integer"},"suppressed":{"type":"integer"},"consentBlocked":{"type":"integer"},"frequencyBlocked":{"type":"integer"}}},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"status":{"type":"string","enum":["draft","pendingApproval","active","failed","expired"]},"lastSyncedAt":{"type":"string","format":"date-time","nullable":true},"lastSyncErrors":{"type":"integer","default":0},"scopePath":{"type":"string"}}},
+"AudienceList": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"marketing.audience_list","description":"Board 3.3. **Consent basis is required on the import, not optional metadata.**","required":["name"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string","enum":["manual","imported","suppression"]},"assetId":{"type":"string","format":"uuid","nullable":true},"fieldMapping":{"type":"object","additionalProperties":{"type":"string"}},"rowsRead":{"type":"integer","readOnly":true},"matched":{"type":"integer","readOnly":true},"unmatched":{"type":"integer","readOnly":true},"duplicatesRemoved":{"type":"integer","readOnly":true},"rejected":{"type":"integer","readOnly":true},"unmatchedHandling":{"type":"string","enum":["createLead","quarantine"],"default":"quarantine","description":"**The two honest answers.** Silently dropping them tells a marketer their list of ten thousand reached ten thousand.\n"},"source":{"type":"string"},"owner":{"type":"string","format":"uuid"},"purpose":{"type":"string"},"consentBasis":{"type":"string"},"expiresAt":{"type":"string","format":"date","nullable":true},"scopePath":{"type":"string"}}},
 "AudienceOverlap": {"type":"object","description":"Board 3.1. **Reachable is always smaller, and it is the number that matters.**","properties":{"segments":{"type":"array","items":{"type":"object","properties":{"segmentId":{"type":"string","format":"uuid"},"name":{"type":"string"},"members":{"type":"integer"},"reachable":{"type":"integer"},"suppressed":{"type":"integer"},"consentBlocked":{"type":"integer"},"duplicates":{"type":"integer"}}}},"pairwiseOverlap":{"type":"array","items":{"type":"object","properties":{"segmentIds":{"type":"array","items":{"type":"string","format":"uuid"}},"shared":{"type":"integer"},"sharedPercent":{"type":"number"}}}},"totalUnique":{"type":"integer"},"totalReachable":{"type":"integer"}}},
 "CreateSegmentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","criteria"],"properties":{"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid"},"match":{"type":"string","enum":["all","any"],"default":"all"},"criteria":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/SegmentCriterion"}},"excludeSegmentIds":{"type":"array","items":{"type":"string","format":"uuid"}},"ruleGroups":{"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","type":"array","description":"**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.","items":{"$ref":"#/components/schemas/SegmentRuleGroup"}},"effectiveFrom":{"type":"string","format":"date-time","nullable":true,"description":"The segment is evaluated for sends only from this time."},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who answers for the segment; defaults to its creator."},"requiresApproval":{"type":"boolean","default":false,"description":"Where true, a campaign may use the segment only after an `approvals` request on it is approved."}}},
-"MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
+"MessageChannel": {"x-ticvai-rls":"grant-holder-read","type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"ProposedAction": {"type":"object","x-ticvai-persistence":"ai.proposed_action","required":["id","kind","targetContract","targetOperation","payload","status"],"properties":{"id":{"type":"string","format":"uuid"},"interactionId":{"type":"string","format":"uuid"},"translationJobId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."},"kind":{"type":"string","enum":["pricing","promotion","operational","financial","configuration","content","audience"],"description":"`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."},"targetContract":{"type":"string","description":"Which contract would perform it. The assistant never performs it itself."},"targetOperation":{"type":"string"},"payload":{"type":"object","additionalProperties":true,"description":"The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"},"summary":{"type":"string"},"status":{"type":"string","description":"**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n","enum":["proposed","approved","rejected","applied","expired"]},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."},"approvalLevel":{"type":"integer","minimum":1,"maximum":2,"description":"8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"decisionReason":{"type":"string","nullable":true,"description":"Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"},"proposedAt":{"type":"string","format":"date-time"},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan","description":"The plan this action presents for a decision (AI design 2.2 D, 3.8)."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."},"changeSetHash":{"type":"string","nullable":true,"readOnly":true,"description":"Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."}}},
+"ProposedAction": {"x-ticvai-retired-columns":["interaction_id"],"type":"object","x-ticvai-persistence":"ai.proposed_action","required":["id","kind","targetContract","targetOperation","payload","status"],"properties":{"id":{"type":"string","format":"uuid"},"interactionId":{"x-ticvai-references":"ai.activity","x-ticvai-column":"activity_id","type":"string","format":"uuid"},"translationJobId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."},"kind":{"type":"string","enum":["pricing","promotion","operational","financial","configuration","content","audience"],"description":"`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."},"targetContract":{"type":"string","description":"Which contract would perform it. The assistant never performs it itself."},"targetOperation":{"type":"string"},"payload":{"type":"object","additionalProperties":true,"description":"The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"},"summary":{"type":"string"},"status":{"type":"string","description":"**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n","enum":["proposed","approved","rejected","applied","expired"]},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."},"approvalLevel":{"type":"integer","minimum":1,"maximum":2,"description":"8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"decisionReason":{"type":"string","nullable":true,"description":"Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"},"proposedAt":{"type":"string","format":"date-time"},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan","description":"The plan this action presents for a decision (AI design 2.2 D, 3.8)."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."},"changeSetHash":{"type":"string","nullable":true,"readOnly":true,"description":"Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."}}},
 "Segment": {"x-ticvai-persistence":"marketing.segment + marketing.segment_criterion","allOf":[{"$ref":"#/components/schemas/CreateSegmentRequest"},{"type":"object","required":["id","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"lastEvaluatedSize":{"type":"integer","nullable":true},"lastEvaluatedAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time"}}}]},
 "SegmentCriterion": {"x-ticvai-persistence":"marketing.segment_criterion","type":"object","required":["attribute","operator"],"properties":{"attribute":{"type":"string","description":"Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language.\n**Free-form rather than an enum, which is why 22.14.8, 5.3.19 and 5.5.17b were readable as gaps and are not.** `walletBalance`, `engagementTier` and `portfolioScope` are expressible today; what was missing was anybody saying so.\n**Three that need saying, because the naive reading is wrong:**\n`walletBalance` should segment on **`cash` credit only**. A guest with 200 dirhams of promotional credit expiring Friday is a different campaign from one with 200 of their own money, and treating them alike sends a spend-it-now message to somebody who was given it.\n`walletBalance.expiringWithinDays` is the segment that earns the attribute — **credit about to expire unspent is a guest about to be disappointed and a venue about to book breakage**, and only one of those is worth a message.\n`portfolioScope` aggregates across a `DelegatedAccess` delegation (CF-132) and **must not message every member about a household total** — that is how a venue tells a teenager what their parent spends.\n`entitlementExpiringWithinDays` (29 September, build pass, group G2; 5.5.30): the guest holds a ticket or pass in `issued` or `partiallyConsumed` whose `validTo` is within that many days, kept current from `entitlement.expiringSoon` and the entitlement read model. **Unused passes about to lapse** are this attribute with `entitlementRemainingUses` greater than zero.\n"},"operator":{"type":"string","enum":["equals","notEquals","greaterThan","lessThan","between","in","notIn","exists","notExists","withinDays"]},"value":{},"values":{"type":"array","items":{}}}},
 "SegmentDraftPreview": {"x-ticvai-persistence":"none — evaluated live","type":"object","description":"The preview of an unsaved segment (`previewSegmentDraft`, CHG-CSA-045); `SegmentPreview` without a segment id.","properties":{"matchingCount":{"type":"integer"},"reachable":{"$ref":"#/components/schemas/SegmentPreview/properties/reachable"},"evaluatedAt":{"type":"string","format":"date-time"}}},

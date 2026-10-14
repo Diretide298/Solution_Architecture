@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/order-reservation-command-center-bo-304",
-   "component": "apps/venue-management-web/src/routes/orders-money/OrderReservationCommandCenter.tsx",
+   "component": "src/routes/orders-money/OrderReservationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -227,6 +228,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "1",
@@ -236,7 +238,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/order-detail-transaction-workspace-bo-305",
-   "component": "apps/venue-management-web/src/routes/orders-money/OrderDetailTransactionWorkspace.tsx",
+   "component": "src/routes/orders-money/OrderDetailTransactionWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -265,7 +267,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -532,6 +534,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "1",
@@ -541,7 +544,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/reservation-hold-policy-configuration-bo-306",
-   "component": "apps/venue-management-web/src/routes/orders-money/ReservationHoldPolicyConfiguration.tsx",
+   "component": "src/routes/orders-money/ReservationHoldPolicyConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -741,6 +744,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "1",
@@ -750,7 +754,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/order-reservation-status-lifecycle-configuration-bo-307",
-   "component": "apps/venue-management-web/src/routes/orders-money/OrderReservationStatusLifecycleConfiguration.tsx",
+   "component": "src/routes/orders-money/OrderReservationStatusLifecycleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -895,6 +899,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "1",
@@ -904,7 +909,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/order-creation-source-channel-configuration-bo-308",
-   "component": "apps/venue-management-web/src/routes/orders-money/OrderCreationSourceChannelConfiguration.tsx",
+   "component": "src/routes/orders-money/OrderCreationSourceChannelConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1139,6 +1144,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "1",
@@ -1148,7 +1154,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/customer-guest-account-assignment-bo-309",
-   "component": "apps/venue-management-web/src/routes/orders-money/CustomerGuestAccountAssignment.tsx",
+   "component": "src/routes/orders-money/CustomerGuestAccountAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1328,6 +1334,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "1",
@@ -1337,7 +1344,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/order-line-product-entitlement-composition-bo-310",
-   "component": "apps/venue-management-web/src/routes/orders-money/OrderLineProductEntitlementComposition.tsx",
+   "component": "src/routes/orders-money/OrderLineProductEntitlementComposition.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1499,6 +1506,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "1",
@@ -1508,7 +1516,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/capacity-reservation-inventory-commitment-bo-311",
-   "component": "apps/venue-management-web/src/routes/orders-money/CapacityReservationInventoryCommitment.tsx",
+   "component": "src/routes/orders-money/CapacityReservationInventoryCommitment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1618,6 +1626,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "1",
@@ -1627,7 +1636,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/reservation-confirmation-expiry-fulfillment-readiness-bo-312",
-   "component": "apps/venue-management-web/src/routes/orders-money/ReservationConfirmationExpiryFulfillmentReadines.tsx",
+   "component": "src/routes/orders-money/ReservationConfirmationExpiryFulfillmentReadines.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1759,6 +1768,7 @@
   "module": "Orders & Money",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Order___Reservation_Management_Reference.pdf",
    "board": "1",
@@ -1768,7 +1778,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/order-lifecycle-timeline-sla-exceptions-ai-operations-bo-313",
-   "component": "apps/venue-management-web/src/routes/orders-money/OrderLifecycleTimelineSlaExceptionsAiOperations.tsx",
+   "component": "src/routes/orders-money/OrderLifecycleTimelineSlaExceptionsAiOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {

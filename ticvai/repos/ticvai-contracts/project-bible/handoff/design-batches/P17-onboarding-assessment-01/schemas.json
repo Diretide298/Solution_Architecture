@@ -202,6 +202,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -230,6 +231,7 @@
     "format": "uuid"
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "enum": [
      "submitted",

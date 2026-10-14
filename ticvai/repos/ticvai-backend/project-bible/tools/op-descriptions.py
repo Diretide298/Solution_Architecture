@@ -485,7 +485,9 @@ def build(schedule, keys):
             errs = [str(c) for c in (o.get("responses") or {}) if str(c)[:1] in "45"]
             if errs:
                 out.append(f"- [ ] `{x}`: each of its errors ({', '.join(errs)}) shows the screen's error state, not a crash")
-        out.append("- [ ] `pnpm lint`, `pnpm typecheck` and `pnpm test` pass")
+        # The build gates of the screen's own repository, from its profile (CHG-RPO-003): #27741's guest app is npm
+        # with no typecheck script, so `pnpm typecheck` was a gate nobody could run.
+        out.append(fr.gate_line((fr.screen_index().get(sid) or {}).get("platform") or ""))
         return out
 
     out = {}

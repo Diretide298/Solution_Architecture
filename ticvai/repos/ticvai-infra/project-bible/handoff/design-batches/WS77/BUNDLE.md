@@ -1,6 +1,6 @@
 # WS77 — Digital Asset Management DAM board 4
 
-**10 screens · 5 operations · 6 schemas · 2 permissions**
+**10 screens · 4 operations · 4 schemas · 2 permissions**
 
 Platform P13 Venue CMS · ships as **venue-management** ·
 staff audience · web ·
@@ -99,12 +99,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-091` | Asset Distribution & Delivery Command Center | B | 0 | 48 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-092` | Asset Usage & Distribution Map | B | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-093` | Channel & Distribution Configuration | B | 13 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | B | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `CMS-095` | Asset Replacement & Propagation Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `CMS-095` | Asset Replacement & Propagation Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `CMS-096` | Fallback, Expiry & Distribution Continuity | B | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `CMS-097` | DAM API & Integration Hub | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `CMS-098` | Delivery Monitoring & Integration Health | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-099` | Asset Usage & Performance Analytics | B | 0 | 6 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `CMS-098` | Delivery Monitoring & Integration Health | B | 0 | 45 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-099` | Asset Usage & Performance Analytics | B | 0 | 51 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `CMS-100` | Distribution Intelligence, AI Insights & Optimization | B | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -157,7 +157,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every asset distribution delivery** (data table)
+**Every asset distribution delivery** (data table, from `getMediaDistribution`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -186,7 +186,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | ⚪ inactive | text | not in the schema: `⚪ Inactive` |
 | Critical alerts | text | not in the schema: `Critical Alerts` |
 
-**The selected asset distribution delivery** (detail panel): The pack groups this record's detail under its own headings: “Digital Asset Management”, “Active Channels 28”.
+**The selected asset distribution delivery** (detail panel, from `getMediaDistribution`): The pack groups this record's detail under its own headings: “Digital Asset Management”, “Active Channels 28”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -294,6 +294,8 @@ Every asset distribution delivery:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -381,7 +383,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every asset usage distribution** (data table)
+**Every asset usage distribution** (data table, from `getMediaDistribution`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -394,7 +396,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Marketing campaign — 3 | text | not in the schema: `Marketing Campaign — 3` |
 | Digital signage — 1 | text | not in the schema: `Digital Signage — 1` |
 
-**The selected asset usage distribution** (detail panel): The pack groups this record's detail under its own headings: “Dubai Park Hero”, “Usage Table”, “Reference Type”, “Follow Current Version”, “Critical Requirement”.
+**The selected asset usage distribution** (detail panel, from `getMediaDistribution`): The pack groups this record's detail under its own headings: “Dubai Park Hero”, “Usage Table”, “Reference Type”, “Follow Current Version”, “Critical Requirement”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -463,6 +465,8 @@ Every asset usage distribution:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -513,7 +517,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `code` (deepLink) |
 | Route | `/media-library/channel-distribution-configuration-cms-093` |
 
 **From the Platform Foundation (identity, roles and security; tenancy, venues and devices; platform operations; subscription and licensing; approval workflows; developer portal and public API; digital asset management) process.** How each channel may consume assets: types, categories, approval and rights required, renditions, caching.
@@ -581,6 +585,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_MANAGE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -630,7 +636,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29635 (APP-CMS-CMS-094) |
-| Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -698,18 +704,15 @@ listMediaRenditions (MediaRendition):
 
 #### Permissions
 
-- `setMediaDistributionChannels` → `ASSET_LIBRARY_MANAGE` (configure) · staff
 - `listMediaRenditions` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_VIEW`
+
 #### Requirements it meets
 
-1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 23.1.13 | System shall distribute approved assets to websites, mobile apps, kiosks, CRM campaigns, and digital channels. | Digital Asset Management | CONTRACTED | `setMediaDistributionChannels` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -735,7 +738,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every state opens from `#CMS-094?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: tokenized access, configurable expiry, cache policy, revocation where applicable.
 - [ ] Every transition is wired: `CMS-091`.
-- [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`.
+- [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -751,7 +754,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
 | Block | Block B · ticket #29627 (APP-CMS-CMS-095) |
-| Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` (1 configure, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
@@ -802,7 +805,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the asset replacement propagation are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 The upload cannot be used: it is a different kind — an image cannot replace a document (`kindMismatch`) — or the transfer never finished … (UploadRefusedProblem) |
 
 #### Edge cases to draw
 
@@ -826,18 +828,15 @@ mode: Replace everywhere eligible
 
 #### Permissions
 
-- `replaceMediaAsset` → `ASSET_LIBRARY_MANAGE` (configure) · staff
 - `getMediaDistribution` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_VIEW`
+
 #### Requirements it meets
 
-1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
-
-| Ref | Requirement (shortened) | Domain | Verdict | Via |
-|---|---|---|---|---|
-| 23.1.8 | System shall maintain historical versions of assets and allow comparison, rollback, and restoration. | Digital Asset Management | CONTRACTED | `replaceMediaAsset` |
+No matrix row traces to this screen's operations or data.
 
 #### Client meeting inputs
 
@@ -860,12 +859,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-095?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Replace Everywhere Eligible, Replace Selected Uses, Schedule Replacement, Keep Existing Version, Create Fallback.
 - [ ] Every transition is wired: `CMS-091`.
-- [ ] Every gated control is gated: `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`.
+- [ ] Every gated control is gated: `ASSET_LIBRARY_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -885,7 +884,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configured Fallback) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `code` (deepLink) |
 | Route | `/media-library/fallback-expiry-distribution-continuity-cms-096` |
 
 **Known gaps.** **The pack names 12 actions on this screen and the screen declares 0 operations.** Unserved: Usage-Level Fallback, Asset archived, rights expired, approval revoked, rendition unavailable, asset …
@@ -950,6 +949,8 @@ triggers:
 - `setMediaDistributionChannels` → `ASSET_LIBRARY_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_MANAGE`
 
 #### Requirements it meets
 
@@ -1074,6 +1075,8 @@ consumers:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1147,15 +1150,75 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Delivery Availability** (metric tile)
+**Delivery Availability** (metric tile, from `getMediaUsageAnalytics`)
 
-**Average Response Time** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
 
-**CDN Cache Hit %** (metric tile)
+**Average Response Time** (metric tile, from `getMediaUsageAnalytics`)
 
-**API Success %** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
 
-**Failed Requests** (metric tile)
+**CDN Cache Hit %** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**API Success %** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**Failed Requests** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -1206,6 +1269,8 @@ metric tiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1232,7 +1297,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (45 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-098?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: View Consumer, Assign Replacement, Retry, View Logs, Notify Owner, Alerting, high error rate, delivery latency.
 - [ ] Every transition is wired: `CMS-091`.
@@ -1284,15 +1349,75 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**impressions** (metric tile)
+**impressions** (metric tile, from `getMediaUsageAnalytics`)
 
-**requests** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
 
-**downloads** (metric tile)
+**requests** (metric tile, from `getMediaUsageAnalytics`)
 
-**delivery volume** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
 
-**reuse count** (metric tile)
+**downloads** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**delivery volume** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
+
+**reuse count** (metric tile, from `getMediaUsageAnalytics`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Key | text | — |
+| Label | text | — |
+| Asset count | 1,234 | — |
+| Storage bytes | 1,234 | — |
+| Downloads | 1,234 | — |
+| Views | 1,234 | — |
+| Shares | 1,234 | — |
+| Never used count | 1,234 | — |
+| Unclassified count | 1,234 | — |
 
 **Every asset usage performance** (data table)
 
@@ -1356,6 +1481,8 @@ Every asset usage performance:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ASSET_LIBRARY_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1380,7 +1507,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (51 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-099?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `CMS-091`.
@@ -1472,6 +1599,8 @@ getMediaUsageAnalytics (MediaUsageRow):
 - `getMediaUsageAnalytics` → `ASSET_LIBRARY_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `ASSET_LIBRARY_VIEW`
 
 #### Requirements it meets
 
@@ -1591,8 +1720,7 @@ Method, path, parameters, request and response for every operation these screens
 "getMediaDistribution": {"method":"GET","path":"/media-distribution","contract":"assets","summary":"Where an asset is used and how it is delivered","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"assetId","in":"query","required":true}],"requestBody":null,"responds":"MediaDistribution"},
 "getMediaUsageAnalytics": {"method":"GET","path":"/media-usage","contract":"assets","summary":"Downloads, views, shares and library health","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"groupBy","in":"query","required":null}],"requestBody":null,"responds":"MediaUsageRow"},
 "listMediaRenditions": {"method":"GET","path":"/media-assets/{assetId}/renditions","contract":"assets","summary":"The derived sizes and formats, and whether they are ready","permission":"ASSET_LIBRARY_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"MediaRendition"},
-"replaceMediaAsset": {"method":"POST","path":"/media/{mediaId}/replace","contract":"assets","summary":"Replace the file behind an asset","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MediaReplaceResult"},
-"setMediaDistributionChannels": {"method":"PUT","path":"/media-distribution/channels","contract":"assets","summary":"CDN, delivery URLs, fallbacks and expiry behaviour","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"MediaDistributionChannel","responds":"MediaDistributionChannel"}
+"setMediaDistributionChannels": {"method":"PUT","path":"/media-distribution/channels/{code}","contract":"assets","summary":"CDN, delivery URLs, fallbacks and expiry behaviour","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"code","in":"path","required":true},{"name":null,"in":null,"required":null}],"requestBody":"MediaDistributionChannel","responds":"MediaDistributionChannel"}
 }
 ```
 
@@ -1602,11 +1730,9 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
-"MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/assets::MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/assets::LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/assets::LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/assets::LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},
 "MediaDistribution": {"type":"object","description":"Boards 4.2 and 4.5. **The usage map that makes replacement safe.**","properties":{"assetId":{"type":"string","format":"uuid"},"deliveryUrls":{"type":"array","items":{"type":"object","properties":{"channel":{"type":"string"},"rendition":{"type":"string"},"url":{"type":"string"},"cdn":{"type":"string","nullable":true}}}},"usedBy":{"type":"array","items":{"type":"object","properties":{"surface":{"type":"string"},"referenceId":{"type":"string","format":"uuid"},"label":{"type":"string"},"live":{"type":"boolean"}}}},"lastDeliveredAt":{"type":"string","format":"date-time","nullable":true}}},
-"MediaDistributionChannel": {"type":"object","x-ticvai-persistence":"assets.distribution_channel","description":"Boards 4.3, 4.4 and 4.6. **The fallback keeps a page from breaking.**","required":["code"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"cdnBaseUrl":{"type":"string","nullable":true},"signedUrls":{"type":"boolean","default":false},"signedUrlTtlSeconds":{"type":"integer","nullable":true},"defaultRendition":{"type":"string","nullable":true},"fallbackAssetId":{"type":"string","format":"uuid","nullable":true,"description":"**What renders when the real one cannot.** Rights expired, rendition failed, CDN unreachable — three causes, one visible outcome, and one place to decide it.\n"},"onRightsExpiry":{"type":"string","enum":["serveFallback","serveNothing","continueServing"],"default":"serveFallback"},"scopePath":{"type":"string"}}},
-"MediaRendition": {"type":"object","x-ticvai-persistence":"assets.rendition","description":"Boards 2.8 and 2.9. **Readiness is the fact that matters**, not existence.","required":["preset"],"properties":{"id":{"type":"string","format":"uuid"},"preset":{"type":"string","description":"e.g. `thumbnail`, `web1600`, `printCmyk`, `hls720`."},"format":{"type":"string","nullable":true},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"sizeBytes":{"type":"integer","nullable":true},"status":{"type":"string","enum":["queued","processing","ready","failed"]},"failureReason":{"type":"string","nullable":true},"url":{"type":"string","nullable":true},"scopePath":{"type":"string"}}},
-"MediaReplaceResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["asset","affectedSurfaces"],"properties":{"asset":{"$ref":"#/components/schemas/MediaAsset"},"affectedSurfaces":{"type":"integer","description":"How many surfaces now show the new file."},"liveSurfaces":{"type":"integer","description":"Of those, how many are published to guests right now."},"derivativesRegenerating":{"type":"boolean"}}},
+"MediaDistributionChannel": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"assets.distribution_channel","description":"Boards 4.3, 4.4 and 4.6. **The fallback keeps a page from breaking.**","required":["code"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"cdnBaseUrl":{"type":"string","nullable":true},"signedUrls":{"type":"boolean","default":false},"signedUrlTtlSeconds":{"type":"integer","nullable":true},"defaultRendition":{"type":"string","nullable":true},"fallbackAssetId":{"type":"string","format":"uuid","nullable":true,"description":"**What renders when the real one cannot.** Rights expired, rendition failed, CDN unreachable — three causes, one visible outcome, and one place to decide it.\n"},"onRightsExpiry":{"type":"string","enum":["serveFallback","serveNothing","continueServing"],"default":"serveFallback"},"scopePath":{"type":"string"}}},
+"MediaRendition": {"type":"object","x-ticvai-persistence":"assets.rendition","description":"Boards 2.8 and 2.9. **Readiness is the fact that matters**, not existence.","required":["preset"],"properties":{"id":{"type":"string","format":"uuid"},"preset":{"type":"string","description":"e.g. `thumbnail`, `web1600`, `printCmyk`, `hls720`."},"format":{"type":"string","nullable":true},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"sizeBytes":{"type":"integer","nullable":true},"status":{"type":"string","enum":["queued","processing","ready","failed"]},"failureReason":{"type":"string","nullable":true},"url":{"type":"string","nullable":true},"scopePath":{"type":"string"},"assetId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"assets.media_asset","description":"The media asset this is a rendition of, from the path of `requestMediaRendition`."}}},
 "MediaUsageRow": {"type":"object","description":"Boards 1.10 and 4.9. **Assets never used is the number that justifies the library.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"assetCount":{"type":"integer"},"storageBytes":{"type":"integer"},"downloads":{"type":"integer"},"views":{"type":"integer"},"shares":{"type":"integer"},"neverUsedCount":{"type":"integer"},"unclassifiedCount":{"type":"integer"}}}
 }
 ```

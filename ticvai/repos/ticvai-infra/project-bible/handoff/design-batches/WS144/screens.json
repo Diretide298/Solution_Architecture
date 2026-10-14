@@ -14,7 +14,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/gamification-command-center-bo-824",
-   "component": "apps/venue-management-web/src/routes/engagement-support/GamificationCommandCenter.tsx",
+   "component": "src/routes/engagement-support/GamificationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -113,7 +113,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -218,6 +218,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -227,7 +228,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/challenge-builder-bo-825",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ChallengeBuilder.tsx",
+   "component": "src/routes/engagement-support/ChallengeBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -487,6 +488,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -496,7 +498,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/achievement-badge-engine-bo-826",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AchievementBadgeEngine.tsx",
+   "component": "src/routes/engagement-support/AchievementBadgeEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -665,6 +667,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `awardBadge` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+    },
+    {
+     "name": "badgeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listBadges`."
     }
    ],
    "coldEntry": "Opened from BO-824 with the guest picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the guest no longer exists."
@@ -705,6 +713,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -714,7 +723,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/points-activity-rules-bo-827",
-   "component": "apps/venue-management-web/src/routes/engagement-support/PointsActivityRules.tsx",
+   "component": "src/routes/engagement-support/PointsActivityRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -977,6 +986,12 @@
     {
      "name": "programmeId",
      "from": "navigation"
+    },
+    {
+     "name": "loyaltyCampaignId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listLoyaltyCampaigns`."
     }
    ]
   },
@@ -1010,6 +1025,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -1019,7 +1035,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/milestones-reward-rules-bo-828",
-   "component": "apps/venue-management-web/src/routes/engagement-support/MilestonesRewardRules.tsx",
+   "component": "src/routes/engagement-support/MilestonesRewardRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1315,6 +1331,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Opened without it, the screen lists the programmes (listLoyaltyProgrammes) and the user picks one (CHG-FXS-001)."
+    },
+    {
+     "name": "rewardId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listRewards`."
     }
    ]
   },
@@ -1348,6 +1370,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -1357,7 +1380,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/family-team-event-challenges-bo-829",
-   "component": "apps/venue-management-web/src/routes/engagement-support/FamilyTeamEventChallenges.tsx",
+   "component": "src/routes/engagement-support/FamilyTeamEventChallenges.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1467,6 +1490,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -1476,7 +1500,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/referral-streak-management-bo-830",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ReferralStreakManagement.tsx",
+   "component": "src/routes/engagement-support/ReferralStreakManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1596,7 +1620,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/progress-leaderboards-hub-bo-831",
-   "component": "apps/venue-management-web/src/routes/engagement-support/ProgressLeaderboardsHub.tsx",
+   "component": "src/routes/engagement-support/ProgressLeaderboardsHub.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1679,7 +1703,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyCollection",
      "slot": "collection",
      "components": [
       {
@@ -1790,6 +1814,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "GUEST_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -1799,7 +1824,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/ai-engagement-optimization-bo-832",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AiEngagementOptimization.tsx",
+   "component": "src/routes/engagement-support/AiEngagementOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1844,7 +1869,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getGuestIntelligence",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getGuestIntelligence"
       }
      ]
     }
@@ -1911,6 +1937,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -1920,7 +1947,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/gamification-analytics-audit-bo-833",
-   "component": "apps/venue-management-web/src/routes/engagement-support/GamificationAnalyticsAudit.tsx",
+   "component": "src/routes/engagement-support/GamificationAnalyticsAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1974,13 +2001,15 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listLoyaltyProgrammes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listLoyaltyProgrammes"
       },
       {
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getDashboard",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getDashboard"
       }
      ]
     }

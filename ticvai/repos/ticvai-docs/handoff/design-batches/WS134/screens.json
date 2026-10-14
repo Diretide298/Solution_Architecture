@@ -5,6 +5,7 @@
   "module": "Operations",
   "requiresModule": "fnb",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/operations/f-b-command-center-bo-727",
-   "component": "apps/venue-management-web/src/routes/operations/FBCommandCenter.tsx",
+   "component": "src/routes/operations/FBCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -204,7 +205,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/operations/outlet-management-bo-728",
-   "component": "apps/venue-management-web/src/routes/operations/OutletManagement.tsx",
+   "component": "src/routes/operations/OutletManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -289,7 +290,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/operations/create-edit-outlet-bo-729",
-   "component": "apps/venue-management-web/src/routes/operations/CreateEditOutlet.tsx",
+   "component": "src/routes/operations/CreateEditOutlet.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -378,6 +379,7 @@
   "module": "Operations",
   "requiresModule": "fnb",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
    "board": "1",
@@ -387,7 +389,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/operations/outlet-types-templates-bo-730",
-   "component": "apps/venue-management-web/src/routes/operations/OutletTypesTemplates.tsx",
+   "component": "src/routes/operations/OutletTypesTemplates.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -450,7 +452,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listOutletTemplates",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listOutletTemplates"
       },
       {
        "kind": "secondaryButton",
@@ -490,6 +493,16 @@
    "workshopBoard": "wireframes/WS57 F&B Backend Structure Module Sample Reference v1.0 Board 1.dc.html#bo-730"
   },
   "apisNote": "Regenerated 9 September 2026 from F&B_Backend_Structure_Module Sample Reference v1.0.pdf page 7. 0 of 0 labels bound to a contract property; 1 of 29 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here. **Pack actions reconciled 29 September (VM close-out):** still owed by a contract change: `setOutletTemplate`, `listOutletTemplates`.",
+  "entryState": {
+   "params": [
+    {
+     "name": "code",
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listOutletTemplates`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -519,6 +532,7 @@
   "module": "Operations",
   "requiresModule": "fnb",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
    "board": "1",
@@ -528,7 +542,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/operations/operating-hours-service-periods-bo-731",
-   "component": "apps/venue-management-web/src/routes/operations/OperatingHoursServicePeriods.tsx",
+   "component": "src/routes/operations/OperatingHoursServicePeriods.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -680,6 +694,7 @@
   "module": "Operations",
   "requiresModule": "fnb",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
    "board": "1",
@@ -689,7 +704,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/operations/pos-device-assignment-bo-732",
-   "component": "apps/venue-management-web/src/routes/operations/PosDeviceAssignment.tsx",
+   "component": "src/routes/operations/PosDeviceAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -733,7 +748,7 @@
         "Terminal Outlet Type Cashier Payment Printer Status"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listOutlets",
        "provenance": "pack F&B_Backend_Structure_Module Sample Reference v1.0.pdf, page 8 §Device cards/table"
       },
       {
@@ -865,6 +880,7 @@
   "module": "Operations",
   "requiresModule": "fnb",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "F&B_Backend_Structure_Module Sample Reference v1.0.pdf",
    "board": "1",
@@ -874,7 +890,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/operations/service-channel-configuration-bo-733",
-   "component": "apps/venue-management-web/src/routes/operations/ServiceChannelConfiguration.tsx",
+   "component": "src/routes/operations/ServiceChannelConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -925,7 +941,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyCollection",
      "slot": "collection",
      "components": [
       {

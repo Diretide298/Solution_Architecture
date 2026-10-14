@@ -170,7 +170,7 @@
  },
  "setApprovalControlPolicy": {
   "method": "PUT",
-  "path": "/approval-control-policies",
+  "path": "/approval-control-policies/{controlPolicyId}",
   "contract": "approvals",
   "summary": "Require a second, independent pair of eyes",
   "permission": "APPROVAL_CONFIGURE",
@@ -178,6 +178,11 @@
   "conflictPolicy": null,
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "controlPolicyId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -189,7 +194,7 @@
  },
  "setApprovalRetentionPolicy": {
   "method": "PUT",
-  "path": "/approval-retention",
+  "path": "/approval-retention/{retentionPolicyId}",
   "contract": "approvals",
   "summary": "How long decision records are kept, and what survives",
   "permission": "APPROVAL_CONFIGURE",
@@ -197,6 +202,11 @@
   "conflictPolicy": null,
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "retentionPolicyId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

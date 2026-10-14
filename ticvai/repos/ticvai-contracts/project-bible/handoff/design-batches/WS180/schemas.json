@@ -14,10 +14,12 @@
     "format": "uuid"
    },
    "fromProductId": {
+    "x-ticvai-references": "catalogue.product",
     "type": "string",
     "format": "uuid"
    },
    "toProductId": {
+    "x-ticvai-references": "catalogue.product",
     "type": "string",
     "format": "uuid"
    },
@@ -119,6 +121,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -289,6 +292,8 @@
     "nullable": true
    },
    "hardExclusions": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

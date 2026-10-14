@@ -5,6 +5,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C95",
   "implementation": {
    "app": "ticvai-web",
@@ -652,6 +653,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C20",
   "implementation": {
    "app": "ticvai-web",
@@ -1095,6 +1097,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C75",
   "implementation": {
    "app": "ticvai-web",
@@ -1311,6 +1314,9 @@
     "component": "confirmDialog",
     "trigger": "Remove licence add on",
     "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A module feature entitlement this affects should be identified in the dialog, not just counted. **Collects what `removeLicenceAddOn` sends before it is called.** Required: `moduleKey`, `reason`.",
+    "confirm": {
+     "operation": "removeLicenceAddOn"
+    },
     "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
    },
    {
@@ -1461,6 +1467,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C74",
   "implementation": {
    "app": "ticvai-web",
@@ -2027,6 +2034,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "PLATFORM_BILLING_VIEW",
   "capability": "C74",
   "implementation": {
    "app": "ticvai-web",
@@ -2263,13 +2271,6 @@
     "contract": "subscription",
     "purpose": "List tenants",
     "trigger": "onLoad"
-   },
-   {
-    "operationId": "listCreditNotes",
-    "contract": "subscription",
-    "purpose": "Credit notes beside the invoices",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
    }
   ],
   "entryState": {
@@ -2360,6 +2361,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C74",
   "implementation": {
    "app": "ticvai-web",
@@ -2625,6 +2627,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C75",
   "implementation": {
    "app": "ticvai-web",
@@ -2838,6 +2841,9 @@
     "component": "confirmDialog",
     "trigger": "Remove licence add on",
     "body": "**Names what `removeLicenceAddOn` changes and what it leaves alone**, in the consequence rather than the verb. A licence seat this affects should be identified in the dialog, not just counted. **Collects what `removeLicenceAddOn` sends before it is called.** Required: `moduleKey`, `reason`.",
+    "confirm": {
+     "operation": "removeLicenceAddOn"
+    },
     "provenance": "contract subscription.yaml DELETE /tenants/{tenantId}/licences/add-ons"
    },
    {
@@ -3025,6 +3031,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -3361,6 +3368,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "implementation": {
    "app": "ticvai-web",
    "route": "/general/api-rate-limit-and-quota-management",
@@ -3723,6 +3731,18 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProductionAccessRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "anomalyRuleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApiAnomalyRule` takes it, from the record the user acts on."
+    },
+    {
+     "name": "quotaId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApiQuota` takes it, from the record the user acts on."
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",

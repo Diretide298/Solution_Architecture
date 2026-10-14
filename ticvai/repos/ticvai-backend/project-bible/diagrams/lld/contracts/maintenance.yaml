@@ -363,6 +363,7 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.incident
+  - maintenance.incident_authority_notification
 - operation: recordWorkOrderParts
   verb: POST
   path: /work-orders/{workOrderId}/parts
@@ -422,6 +423,7 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.incident
+  - maintenance.incident_involved_party
 - operation: resumeWorkOrder
   verb: POST
   path: /work-orders/{workOrderId}/resume

@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/digital-payments-command-center-t71-adm-589",
-   "component": "apps/venue-management-web/src/routes/commercial/DigitalPaymentsCommandCenterT71.tsx",
+   "component": "src/routes/commercial/DigitalPaymentsCommandCenterT71.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -103,7 +104,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -206,7 +207,8 @@
         "Partner/API"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Show by”.",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §Compare"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 70 §Compare",
+       "operation": "getPaymentPerformance"
       }
      ]
     }
@@ -263,6 +265,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "4",
@@ -272,7 +275,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/digital-alternative-payment-method-manager-t71-adm-590",
-   "component": "apps/venue-management-web/src/routes/commercial/DigitalAlternativePaymentMethodManagerT71.tsx",
+   "component": "src/routes/commercial/DigitalAlternativePaymentMethodManagerT71.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -296,6 +299,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure the digital payment experiences available through TICVAI.",
+  "division": "Shares `listPaymentMethods`, `updatePaymentMethod` with ADM-561, ADM-562, ADM-563, ADM-591; this screen is Digital & Alternative Payment Method Manager (pack Payment_Payment_Orchestration.pdf, board 4.2, page 70): configure the digital payment experiences available through TICVAI.",
   "gaps": [
    {
     "operation": null,
@@ -429,6 +433,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "4",
@@ -438,7 +443,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/digital-wallet-mobile-payment-configuration-t72-adm-591",
-   "component": "apps/venue-management-web/src/routes/commercial/DigitalWalletMobilePaymentConfigurationT72.tsx",
+   "component": "src/routes/commercial/DigitalWalletMobilePaymentConfigurationT72.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -462,6 +467,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Manage wallet-based and mobile digital payment methods.",
+  "division": "Shares `listPaymentMethods`, `updatePaymentMethod` with ADM-561, ADM-562, ADM-563, ADM-590; this screen is Digital Wallet & Mobile Payment Configuration (pack Payment_Payment_Orchestration.pdf, board 4.3, page 71): manage wallet-based and mobile digital payment methods.",
   "gaps": [
    {
     "operation": null,
@@ -576,6 +582,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "4",
@@ -585,7 +592,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-link-builder-configuration-t73-adm-592",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentLinkBuilderConfigurationT73.tsx",
+   "component": "src/routes/commercial/PaymentLinkBuilderConfigurationT73.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -748,6 +755,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "4",
@@ -757,7 +765,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-link-distribution-customer-journey-manager-t74-adm-593",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentLinkDistributionCustomerJourneyManagerT74.tsx",
+   "component": "src/routes/commercial/PaymentLinkDistributionCustomerJourneyManagerT74.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -827,13 +835,15 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "resendPaymentLink",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "resendPaymentLink"
       },
       {
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getPaymentLink",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getPaymentLink"
       },
       {
        "kind": "secondaryButton",
@@ -947,6 +957,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_CONFIGURE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "4",
@@ -956,7 +967,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/hosted-checkout-redirect-return-flow-configuration-t75-adm-594",
-   "component": "apps/venue-management-web/src/routes/commercial/HostedCheckoutRedirectReturnFlowConfigurationT75.tsx",
+   "component": "src/routes/commercial/HostedCheckoutRedirectReturnFlowConfigurationT75.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1120,6 +1131,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "4",
@@ -1129,7 +1141,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/digital-payment-session-transaction-monitor-t76-adm-595",
-   "component": "apps/venue-management-web/src/routes/commercial/DigitalPaymentSessionTransactionMonitorT76.tsx",
+   "component": "src/routes/commercial/DigitalPaymentSessionTransactionMonitorT76.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1169,7 +1181,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -1335,6 +1347,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_CONFIGURE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "4",
@@ -1344,7 +1357,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/authentication-tokenization-recurring-payment-controls-t-adm-596",
-   "component": "apps/venue-management-web/src/routes/commercial/AuthenticationTokenizationRecurringPaymentContro.tsx",
+   "component": "src/routes/commercial/AuthenticationTokenizationRecurringPaymentContro.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1520,6 +1533,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_CONFIGURE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "4",
@@ -1529,7 +1543,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/digital-payment-exception-recovery-expiry-center-t79-adm-597",
-   "component": "apps/venue-management-web/src/routes/commercial/DigitalPaymentExceptionRecoveryExpiryCenterT79.tsx",
+   "component": "src/routes/commercial/DigitalPaymentExceptionRecoveryExpiryCenterT79.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1685,6 +1699,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "4",
@@ -1694,7 +1709,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/digital-payment-simulator-conversion-ai-advisor-t80-adm-598",
-   "component": "apps/venue-management-web/src/routes/commercial/DigitalPaymentSimulatorConversionAiAdvisorT80.tsx",
+   "component": "src/routes/commercial/DigitalPaymentSimulatorConversionAiAdvisorT80.tsx",
    "status": "notStarted"
   },
   "navigation": {

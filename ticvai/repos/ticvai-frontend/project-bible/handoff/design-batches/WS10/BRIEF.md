@@ -104,7 +104,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-238` | Identity, Membership & Accreditation Policies | C | 0 | 0 | 6 | 7 | 0 | 6 | — | notStarted (generated) |
 | `BO-239` | Policy Scope, Hierarchy & Inheritance | C | 11 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-240` | Authorization Governance & Temporary Access | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-241` | Policy Evaluation Architecture & Offline Distribution | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-241` | Policy Evaluation Architecture & Offline Distribution | C | 5 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-242` | Policy Simulation, Conflict & Impact Analysis | C | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | C | 2 | 7 | 6 | 13 | 0 | 3 | — | notStarted (generated) |
 

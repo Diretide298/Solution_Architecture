@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 10 permissions apply here:
   `ACCESS_OVERRIDE, ACCESS_VALIDATE, AI_USE, ATTENDANCE_RECORD, ORDER_REPRINT, ORDER_VIEW, PRODUCT_VIEW, REPORT_VIEW_VENUE, TICKET_LOOKUP, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **11 of these operations work offline**: getOrder, listCatalogueBundles, listOrderRefunds, listOrders, listRotaAssignments, lookupTicket, overrideAccess, recordAttendance
+- **12 of these operations work offline**: getOrder, listCatalogueBundles, listOrderRefunds, listOrders, listRotaAssignments, lookupTicket, overrideAccess, recordAttendance
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.

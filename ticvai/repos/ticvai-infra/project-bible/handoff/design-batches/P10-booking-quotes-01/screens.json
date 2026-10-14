@@ -5,6 +5,7 @@
   "module": "Booking & Quotes",
   "requiresModule": "partner",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "capability": "C02",
   "implementation": {
    "app": "partner-web",
@@ -63,7 +64,8 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Add booking creation for this venue.",
+  "purpose": "A partner books against its allocation: creates the order, then holds, resumes, modifies, exchanges, reschedules or reprints it.",
+  "division": "Shares `createOrder`, `exchangeOrderLines`, `getOrder`, `getOrderStatement` and more with PTR-015; this screen is Booking Creation: a partner books against its allocation: creates the order, then holds, resumes, modifies, exchanges, reschedules or reprints it.",
   "layout": {
    "template": "split",
    "regions": [
@@ -554,6 +556,7 @@
   "module": "Booking & Quotes",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "capability": "C54",
   "implementation": {
    "app": "partner-web",
@@ -584,7 +587,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listSeatBlocks` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Work with group / bulk booking for this venue.",
+  "purpose": "A partner blocks seats for a group, issues them from the block, and releases what the group does not take back to sale.",
   "layout": {
    "template": "split",
    "regions": [
@@ -832,6 +835,7 @@
   "module": "Booking & Quotes",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "capability": "C02",
   "implementation": {
    "app": "partner-web",
@@ -868,7 +872,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listPromotions` reads the population and `getPromotion` reads one of them — list, select, act",
-  "purpose": "Work with cart & quote for this venue.",
+  "purpose": "A partner builds a cart, sees the promotions that apply and their usage, changes its lines, and turns it into an order.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1147,7 +1151,7 @@
    {
     "operationId": "addCartLine",
     "contract": "orders",
-    "purpose": "Add something",
+    "purpose": "Add a product, its quantity and date to the partner's cart, priced against its rates",
     "trigger": "onAction",
     "invalidates": [
      "listPromotions"
@@ -1253,6 +1257,7 @@
   "module": "Booking & Quotes",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "PARTNER_MANAGE",
   "implementation": {
    "app": "partner-web",
    "route": "/general/quote-management",

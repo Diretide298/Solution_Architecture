@@ -5,11 +5,12 @@
   "module": "Operations",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/ticket-lookup",
-   "component": "apps/venue-staff-app/src/routes/operations/TicketLookupDetail.tsx",
+   "component": "src/routes/operations/TicketLookupDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -365,11 +366,12 @@
   "module": "Operations",
   "requiresModule": "access",
   "wave": 2,
+  "permission": "REPORT_VIEW_VENUE",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/group-scan",
-   "component": "apps/venue-staff-app/src/routes/operations/GroupScanDetail.tsx",
+   "component": "src/routes/operations/GroupScanDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -727,11 +729,12 @@
   "module": "Operations",
   "requiresModule": "access",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/sync-reconciliation",
-   "component": "apps/venue-staff-app/src/routes/operations/SyncReconciliationDetail.tsx",
+   "component": "src/routes/operations/SyncReconciliationDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1115,11 +1118,12 @@
   "module": "Operations",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/offline-package",
-   "component": "apps/venue-staff-app/src/routes/operations/OfflinePackageDetail.tsx",
+   "component": "src/routes/operations/OfflinePackageDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1336,11 +1340,12 @@
   "module": "Operations",
   "requiresModule": "ai",
   "wave": 1,
+  "permission": "AI_USE",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/ai-assistant-home",
-   "component": "apps/venue-staff-app/src/routes/operations/AiAssistantHomeDetail.tsx",
+   "component": "src/routes/operations/AiAssistantHomeDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1573,11 +1578,12 @@
   "module": "Operations",
   "requiresModule": "ai",
   "wave": 1,
+  "permission": "AI_USE",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/ai-assistant-answer",
-   "component": "apps/venue-staff-app/src/routes/operations/AiAssistantAnswerDetail.tsx",
+   "component": "src/routes/operations/AiAssistantAnswerDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1855,11 +1861,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/roster",
-   "component": "apps/venue-staff-app/src/routes/operations/RosterDetail.tsx",
+   "component": "src/routes/operations/RosterDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1906,6 +1913,7 @@
   "pattern": "listDetail",
   "patternReason": "`listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "See who is on, and where.",
+  "division": "Shares `listRotaAssignments`, `requestShiftSwap` with EMP-022; this screen is Roster: see who is on, and where.",
   "layout": {
    "template": "split",
    "regions": [
@@ -2086,11 +2094,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/my-rota",
-   "component": "apps/venue-staff-app/src/routes/operations/MyRotaDetail.tsx",
+   "component": "src/routes/operations/MyRotaDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2138,6 +2147,7 @@
   "pattern": "listDetail",
   "patternReason": "`listRotaAssignments` reads the population and `getCurrentShift` reads one of them — list, select, act",
   "purpose": "Know when to turn up next.",
+  "division": "Shares `listRotaAssignments`, `requestShiftSwap` with EMP-021; this screen is My rota: know when to turn up next.",
   "layout": {
    "template": "split",
    "regions": [
@@ -2324,11 +2334,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/swap-request",
-   "component": "apps/venue-staff-app/src/routes/operations/SwapRequestDetail.tsx",
+   "component": "src/routes/operations/SwapRequestDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2568,11 +2579,12 @@
   "module": "Operations",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "WORKFORCE_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/clock-in-out",
-   "component": "apps/venue-staff-app/src/routes/operations/ClockInOutDetail.tsx",
+   "component": "src/routes/operations/ClockInOutDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2619,6 +2631,7 @@
   "pattern": "listDetail",
   "patternReason": "`listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
   "purpose": "Record attendance from the device already in hand.",
+  "division": "Shares `listAttendance`, `recordAttendance` with EMP-025; this screen is Clock in / out: record attendance from the device already in hand.",
   "layout": {
    "template": "split",
    "regions": [

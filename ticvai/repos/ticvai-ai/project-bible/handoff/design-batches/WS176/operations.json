@@ -439,6 +439,40 @@
   "requestBody": null,
   "responds": "Page"
  },
+ "listProfileDeployments": {
+  "method": "GET",
+  "path": "/profile-deployments",
+  "contract": "tenancy",
+  "summary": "Recent deployments, with a date, a target and an outcome",
+  "permission": "TENANT_CONFIGURE",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "profileId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "status",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listSeatMaps": {
   "method": "GET",
   "path": "/seat-maps",
@@ -526,7 +560,7 @@
  },
  "setConfigurationProfile": {
   "method": "PUT",
-  "path": "/configuration-profiles",
+  "path": "/configuration-profiles/{profileId}",
   "contract": "tenancy",
   "summary": "What a class of workstation is configured to be",
   "permission": "TENANT_CONFIGURE",

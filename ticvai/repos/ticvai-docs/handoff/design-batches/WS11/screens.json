@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "11",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-security-fraud-command-center-bo-244",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessSecurityFraudCommandCenter.tsx",
+   "component": "src/routes/access-venue/AccessSecurityFraudCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -118,7 +119,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -409,6 +410,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "11",
@@ -418,7 +420,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/fraud-detection-rule-signal-library-bo-245",
-   "component": "apps/venue-management-web/src/routes/access-venue/FraudDetectionRuleSignalLibrary.tsx",
+   "component": "src/routes/access-venue/FraudDetectionRuleSignalLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -508,6 +510,14 @@
   "entryState": {
    "preloaded": [
     "FraudDetectionRuleSignalLibraryView.signal"
+   ],
+   "params": [
+    {
+     "name": "ruleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listFraudDetectionRule`."
+    }
    ]
   },
   "wireframe": {
@@ -546,6 +556,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "11",
@@ -555,7 +566,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/credential-sharing-concurrent-usage-detection-bo-246",
-   "component": "apps/venue-management-web/src/routes/access-venue/CredentialSharingConcurrentUsageDetection.tsx",
+   "component": "src/routes/access-venue/CredentialSharingConcurrentUsageDetection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -721,6 +732,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "11",
@@ -730,7 +742,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/unified-identity-credential-lock-manager-bo-247",
-   "component": "apps/venue-management-web/src/routes/access-venue/UnifiedIdentityCredentialLockManager.tsx",
+   "component": "src/routes/access-venue/UnifiedIdentityCredentialLockManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -942,6 +954,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "11",
@@ -951,7 +964,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/biometric-identity-integrity-monitoring-bo-248",
-   "component": "apps/venue-management-web/src/routes/access-venue/BiometricIdentityIntegrityMonitoring.tsx",
+   "component": "src/routes/access-venue/BiometricIdentityIntegrityMonitoring.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1193,6 +1206,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "11",
@@ -1202,7 +1216,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/relationship-companion-fraud-monitoring-bo-249",
-   "component": "apps/venue-management-web/src/routes/access-venue/RelationshipCompanionFraudMonitoring.tsx",
+   "component": "src/routes/access-venue/RelationshipCompanionFraudMonitoring.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1359,6 +1373,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "11",
@@ -1368,7 +1383,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/access-risk-scoring-decision-engine-bo-250",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessRiskScoringDecisionEngine.tsx",
+   "component": "src/routes/access-venue/AccessRiskScoringDecisionEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1531,6 +1546,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "11",
@@ -1540,7 +1556,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/real-time-security-response-playbook-builder-bo-251",
-   "component": "apps/venue-management-web/src/routes/access-venue/RealTimeSecurityResponsePlaybookBuilder.tsx",
+   "component": "src/routes/access-venue/RealTimeSecurityResponsePlaybookBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1689,6 +1705,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "11",
@@ -1698,7 +1715,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/security-investigation-evidence-workspace-bo-252",
-   "component": "apps/venue-management-web/src/routes/access-venue/SecurityInvestigationEvidenceWorkspace.tsx",
+   "component": "src/routes/access-venue/SecurityInvestigationEvidenceWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1820,6 +1837,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "11",
@@ -1829,7 +1847,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/security-analytics-ai-detection-governance-bo-253",
-   "component": "apps/venue-management-web/src/routes/access-venue/SecurityAnalyticsAiDetectionGovernance.tsx",
+   "component": "src/routes/access-venue/SecurityAnalyticsAiDetectionGovernance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1861,7 +1879,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {

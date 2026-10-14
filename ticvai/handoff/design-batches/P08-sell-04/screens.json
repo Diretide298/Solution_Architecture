@@ -5,10 +5,11 @@
   "module": "Sell",
   "requiresModule": "marketing",
   "wave": 2,
+  "permission": "MARKETING_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/personalized-offers-guest-engagement",
-   "component": "apps/venue-management-web/src/routes/sell/PersonalizedOffersGuestEngagementList.tsx",
+   "component": "src/routes/sell/PersonalizedOffersGuestEngagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -35,7 +36,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listSegments` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Personalized Offers & Guest Engagement — from the client design board, 20 August.",
+  "purpose": "Personalized Offers & Guest Engagement: shows list segments (`listSegments`), and acts with create a campaign (`createCampaign`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -216,10 +217,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "SCOPE_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/pos-experience-dashboard",
-   "component": "apps/venue-management-web/src/routes/sell/PosExperienceDashboardList.tsx",
+   "component": "src/routes/sell/PosExperienceDashboardList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -390,10 +392,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "SCOPE_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/pos-profile-management",
-   "component": "apps/venue-management-web/src/routes/sell/PosProfileManagementList.tsx",
+   "component": "src/routes/sell/PosProfileManagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -507,7 +510,7 @@
    {
     "operationId": "setConfigurationProfile",
     "contract": "tenancy",
-    "purpose": "setConfigurationProfile",
+    "purpose": "What a class of workstation is configured to be",
     "trigger": "onAction",
     "invalidates": [
      "listSaleBoards"
@@ -525,6 +528,12 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "profileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setConfigurationProfile` takes it, from the record the user acts on."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
@@ -595,10 +604,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "DEVICE_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/layout-journey-builder",
-   "component": "apps/venue-management-web/src/routes/sell/LayoutJourneyBuilderList.tsx",
+   "component": "src/routes/sell/LayoutJourneyBuilderList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -744,7 +754,7 @@
    {
     "operationId": "deployConfigurationProfile",
     "contract": "tenancy",
-    "purpose": "deployConfigurationProfile",
+    "purpose": "Push a version to a fleet, in stages",
     "trigger": "onAction"
    },
    {
@@ -904,10 +914,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/product-category-button-configuration",
-   "component": "apps/venue-management-web/src/routes/sell/ProductCategoryButtonConfigurationList.tsx",
+   "component": "src/routes/sell/ProductCategoryButtonConfigurationList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1137,10 +1148,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "AUDIT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/deployment-preview-audit",
-   "component": "apps/venue-management-web/src/routes/sell/DeploymentPreviewAuditList.tsx",
+   "component": "src/routes/sell/DeploymentPreviewAuditList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1257,7 +1269,7 @@
    {
     "operationId": "deployConfigurationProfile",
     "contract": "tenancy",
-    "purpose": "deployConfigurationProfile",
+    "purpose": "Push a version to a fleet, in stages",
     "trigger": "onAction",
     "invalidates": [
      "listAuditRecords"
@@ -1406,10 +1418,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/store-rules-controls-permissions",
-   "component": "apps/venue-management-web/src/routes/ops/StoreRulesControlsPermissionsList.tsx",
+   "component": "src/routes/ops/StoreRulesControlsPermissionsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1436,7 +1449,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listRoles` reads the population and `getVenueSettings` reads one of them — list, select, act",
-  "purpose": "Store Rules, Controls & Permissions — from the client design board, 20 August.",
+  "purpose": "Store Rules, Controls & Permissions: shows rules and controls in force in the store (`listStoreRules`), and acts with change a store rule (`setStoreRules`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -1510,6 +1523,12 @@
     {
      "name": "venueId",
      "from": "session"
+    },
+    {
+     "name": "storeRuleId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listStoreRules`."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
@@ -1598,10 +1617,11 @@
   "module": "Sell",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/retail-global-settings-controls",
-   "component": "apps/venue-management-web/src/routes/ops/RetailGlobalSettingsControlsList.tsx",
+   "component": "src/routes/ops/RetailGlobalSettingsControlsList.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -440,6 +440,7 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   capability: C00
   implementation:
     app: venue-staff-app
@@ -1074,6 +1075,7 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: INSPECTION_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -1218,6 +1220,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: SHIFT_OPEN
   capability: C00
   implementation:
     app: venue-staff-app
@@ -1534,6 +1537,7 @@ screens:
   module: Operations
   requiresModule: access
   wave: 1
+  permission: TICKET_LOOKUP
   capability: C00
   implementation:
     app: venue-staff-app
@@ -1724,6 +1728,7 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -2009,6 +2014,7 @@ screens:
   module: Operations
   requiresModule: access
   wave: 2
+  permission: REPORT_VIEW_VENUE
   capability: C00
   implementation:
     app: venue-staff-app
@@ -2281,6 +2287,7 @@ screens:
   module: Operations
   requiresModule: access
   wave: 1
+  permission: ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -2575,6 +2582,7 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 1
+  permission: PRODUCT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -2739,6 +2747,7 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: WORK_ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -2998,6 +3007,7 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: WORK_ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -3458,6 +3468,7 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: WORK_ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -3962,6 +3973,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: WORK_ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -4090,6 +4102,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: REPORT_VIEW_WORKSTATION
   capability: C00
   implementation:
     app: venue-staff-app
@@ -4289,6 +4302,7 @@ screens:
   module: Operations
   requiresModule: ai
   wave: 1
+  permission: AI_USE
   capability: C00
   implementation:
     app: venue-staff-app
@@ -4462,6 +4476,7 @@ screens:
   module: Operations
   requiresModule: ai
   wave: 1
+  permission: AI_USE
   capability: C00
   implementation:
     app: venue-staff-app
@@ -4670,6 +4685,7 @@ screens:
   module: Operations
   requiresModule: queue
   wave: 2
+  permission: QUEUE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -4931,6 +4947,7 @@ screens:
   module: Operations
   requiresModule: queue
   wave: 1
+  permission: QUEUE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -5108,6 +5125,7 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 2
+  permission: PRODUCT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -5293,6 +5311,7 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 2
+  permission: PRODUCT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -5868,6 +5887,7 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 2
+  permission: ORDER_CREATE
   capability: C00
   implementation:
     app: venue-staff-app
@@ -6046,6 +6066,7 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 2
+  permission: ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -6221,6 +6242,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -6417,6 +6439,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -6456,6 +6479,8 @@ screens:
   patternReason: '`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them
     — list, select, act'
   purpose: Read what the venue told everybody.
+  division: 'Shares `acknowledgeAnnouncement`, `listAnnouncements` with EMP-047; this screen is Announcements:
+    read what the venue told everybody.'
   layout:
     template: split
     regions:
@@ -6569,6 +6594,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -6615,6 +6641,8 @@ screens:
   patternReason: '`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them
     — list, select, act'
   purpose: Evacuate, and stop pretending to be a ticketing app.
+  division: 'Shares `acknowledgeAnnouncement`, `listAnnouncements` with EMP-039; this screen is Emergency
+    mode: evacuate, and stop pretending to be a ticketing app.'
   layout:
     template: split
     regions:
@@ -6733,6 +6761,7 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 2
+  permission: INCIDENT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -6933,6 +6962,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -6982,6 +7012,8 @@ screens:
   patternReason: '`listRotaAssignments` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
   purpose: See who is on, and where.
+  division: 'Shares `listRotaAssignments`, `requestShiftSwap` with EMP-022; this screen is Roster: see
+    who is on, and where.'
   layout:
     template: split
     regions:
@@ -7106,6 +7138,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -7156,6 +7189,8 @@ screens:
   patternReason: '`listRotaAssignments` reads the population and `getCurrentShift` reads one of them —
     list, select, act'
   purpose: Know when to turn up next.
+  division: 'Shares `listRotaAssignments`, `requestShiftSwap` with EMP-021; this screen is My rota: know
+    when to turn up next.'
   layout:
     template: split
     regions:
@@ -7284,6 +7319,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -7468,6 +7504,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -7514,6 +7551,8 @@ screens:
   patternReason: '`listAttendance` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
   purpose: Record attendance from the device already in hand.
+  division: 'Shares `listAttendance`, `recordAttendance` with EMP-025; this screen is Clock in / out:
+    record attendance from the device already in hand.'
   layout:
     template: split
     regions:
@@ -7664,6 +7703,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -7706,6 +7746,8 @@ screens:
   patternReason: '`listAttendance` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
   purpose: Take a break without leaving a gate unstaffed.
+  division: 'Shares `listAttendance`, `recordAttendance` with EMP-024; this screen is Break management:
+    take a break without leaving a gate unstaffed.'
   layout:
     template: split
     regions:
@@ -7828,6 +7870,7 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: INCIDENT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -8088,6 +8131,7 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 2
+  permission: INCIDENT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -8316,6 +8360,7 @@ screens:
   module: Operations
   requiresModule: marketing
   wave: 2
+  permission: CASE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -8614,6 +8659,7 @@ screens:
   module: Operations
   requiresModule: marketing
   wave: 2
+  permission: CASE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -9048,6 +9094,7 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 2
+  permission: VENUE_MAP_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -9195,6 +9242,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -9395,6 +9443,7 @@ screens:
   module: Operations
   requiresModule: ai
   wave: 2
+  permission: AI_USE
   capability: C00
   implementation:
     app: venue-staff-app
@@ -9488,6 +9537,7 @@ screens:
   module: Operations
   requiresModule: ai
   wave: 3
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -9853,6 +9903,7 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: DEVICE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
@@ -10229,6 +10280,7 @@ screens:
   module: Operations
   requiresModule: access
   wave: 1
+  permission: REPORT_VIEW_VENUE
   capability: C00
   implementation:
     app: venue-staff-app
@@ -10398,6 +10450,7 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: ORDER_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/restaurant-service-command-center
@@ -10553,6 +10606,7 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: ORDER_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/floor-plan-table-map
@@ -10660,6 +10714,7 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: PRODUCT_CONFIGURE
   implementation:
     app: venue-staff-app
     route: /operations/table-seating-configuration
@@ -10822,6 +10877,7 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: ORDER_MODIFY
   implementation:
     app: venue-staff-app
     route: /operations/reservation-calendar-timeline
@@ -10959,6 +11015,7 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/create-edit-reservation
@@ -11184,6 +11241,7 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: ORDER_MODIFY
   implementation:
     app: venue-staff-app
     route: /operations/walk-in-waitlist-management
@@ -11364,6 +11422,7 @@ screens:
   module: Floor Service
   requiresModule: marketing
   wave: 2
+  permission: GUEST_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/guest-profile-dining-history
@@ -11614,6 +11673,7 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/live-table-service-management
@@ -12029,6 +12089,7 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/table-order-bill-payment-management
@@ -12320,6 +12381,7 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: ORDER_MODIFY
   implementation:
     app: venue-staff-app
     route: /operations/reservation-table-performance
@@ -12474,6 +12536,7 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/retail-inventory-command-center
@@ -12632,6 +12695,7 @@ screens:
   module: Stock on the Floor
   requiresModule: retail
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/store-stock-sku-availability
@@ -12782,6 +12846,7 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PROCUREMENT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/requisition-smart-store-replenishment
@@ -12975,6 +13040,7 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/store-to-store-warehouse-transfers
@@ -13163,6 +13229,7 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 1
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/receiving-store-put-away
@@ -13397,6 +13464,7 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/stock-count-cycle-count-management
@@ -13619,6 +13687,7 @@ screens:
   module: Stock on the Floor
   requiresModule: fnb
   wave: 1
+  permission: INCIDENT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/damage-loss-shrinkage-stock-adjustment
@@ -13869,6 +13938,7 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/reservation-allocation-omnichannel-inventory
@@ -14028,6 +14098,7 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/barcode-rfid-serialized-stock-traceability
@@ -14160,6 +14231,7 @@ screens:
   module: Stock on the Floor
   requiresModule: analytics
   wave: 2
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-staff-app
     route: /operations/inventory-exceptions-ai-replenishment-action-cen
@@ -14363,6 +14435,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-544
     book: Rental_Management.pdf
@@ -14544,6 +14617,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-545
     book: Rental_Management.pdf
@@ -14633,6 +14707,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-546
     book: Rental_Management.pdf
@@ -14721,6 +14796,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-547
     book: Rental_Management.pdf
@@ -14825,6 +14901,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-548
     book: Rental_Management.pdf
@@ -14933,6 +15010,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-549
     book: Rental_Management.pdf
@@ -15033,6 +15111,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-550
     book: Rental_Management.pdf
@@ -15132,6 +15211,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-551
     book: Rental_Management.pdf
@@ -15235,6 +15315,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-552
     book: Rental_Management.pdf
@@ -15331,6 +15412,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-553
     book: Rental_Management.pdf
@@ -15412,6 +15494,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-554
     book: Rental_Management.pdf
@@ -15588,6 +15671,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-555
     book: Rental_Management.pdf
@@ -15676,6 +15760,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-556
     book: Rental_Management.pdf
@@ -15799,6 +15884,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-557
     book: Rental_Management.pdf
@@ -15899,6 +15985,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-558
     book: Rental_Management.pdf
@@ -15994,6 +16081,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-559
     book: Rental_Management.pdf
@@ -16080,6 +16168,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-560
     book: Rental_Management.pdf
@@ -16162,6 +16251,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-561
     book: Rental_Management.pdf
@@ -16255,6 +16345,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-562
     book: Rental_Management.pdf
@@ -16343,6 +16434,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-563
     book: Rental_Management.pdf
@@ -16445,6 +16537,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-564
     book: Rental_Management.pdf
@@ -16636,6 +16729,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-565
     book: Rental_Management.pdf
@@ -16725,6 +16819,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-566
     book: Rental_Management.pdf
@@ -16821,6 +16916,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-567
     book: Rental_Management.pdf
@@ -16915,6 +17011,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-568
     book: Rental_Management.pdf
@@ -17013,6 +17110,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-569
     book: Rental_Management.pdf
@@ -17108,6 +17206,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-570
     book: Rental_Management.pdf
@@ -17205,6 +17304,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-571
     book: Rental_Management.pdf
@@ -17308,6 +17408,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: PAYMENT_VIEW
   source:
     sameAs: BO-572
     book: Rental_Management.pdf
@@ -17418,6 +17519,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-573
     book: Rental_Management.pdf

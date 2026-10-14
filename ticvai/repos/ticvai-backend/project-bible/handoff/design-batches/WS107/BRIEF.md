@@ -1,6 +1,6 @@
 # WS107 — Subscription Licensing AI Self Service board 10
 
-**10 screens · 14 operations · 19 schemas · 5 permissions**
+**10 screens · 14 operations · 20 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 5 permissions apply here:
-  `PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 4 permissions apply here:
+  `PLATFORM_BILLING_MANAGE, PLATFORM_BILLING_VIEW, PLATFORM_PLAN_MANAGE, PLATFORM_TENANT_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -96,14 +96,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-459` | Billing & Commercial Command Center | B | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-459` | Billing & Commercial Command Center | B | 0 | 108 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-460` | Billing Calculation & Charge Breakdown | B | 6 | 70 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `ADM-461` | Consumption Reconciliation & Billing Approval | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `ADM-462` | Invoice & Payment Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `ADM-463` | Subscription & Commercial Change Management | B | 0 | 12 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-464` | Renewal Management Center | B | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-462` | Invoice & Payment Management | B | 0 | 20 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `ADM-463` | Subscription & Commercial Change Management | B | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-464` | Renewal Management Center | B | 0 | 83 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-465` | AI Upgrade, Downgrade & Commercial Right-Sizing | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-466` | Commercial Scenario Simulator | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-466` | Commercial Scenario Simulator | B | 0 | 135 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-467` | Discount, Credit & Commercial Override Management | B | 10 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-468` | Renewal Approval, Activation & Commercial Handoff | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 

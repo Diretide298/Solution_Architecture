@@ -5,11 +5,12 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "LEDGER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/finance/account-mapping",
-   "component": "apps/venue-management-web/src/routes/finance/AccountMapping.tsx",
+   "component": "src/routes/finance/AccountMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -346,11 +347,12 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "LEDGER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/finance/revenue-recognition",
-   "component": "apps/venue-management-web/src/routes/finance/RevenueRecognition.tsx",
+   "component": "src/routes/finance/RevenueRecognition.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -608,11 +610,12 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "LEDGER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/finance/fx-rates-variances",
-   "component": "apps/venue-management-web/src/routes/finance/FxRatesVariances.tsx",
+   "component": "src/routes/finance/FxRatesVariances.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -804,6 +807,12 @@
      "from": "deepLink",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPriceVariances` and the user picks one; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "rateId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listFxRates`."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `varianceId`.",
@@ -913,11 +922,12 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "LEDGER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/finance/journal-entries",
-   "component": "apps/venue-management-web/src/routes/finance/JournalEntries.tsx",
+   "component": "src/routes/finance/JournalEntries.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1222,11 +1232,12 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "LEDGER_VIEW",
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
    "route": "/finance/period-close",
-   "component": "apps/venue-management-web/src/routes/finance/PeriodClose.tsx",
+   "component": "src/routes/finance/PeriodClose.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1524,10 +1535,11 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "ORDER_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money",
-   "component": "apps/venue-management-web/src/routes/home/OrdersMoneyList.tsx",
+   "component": "src/routes/home/OrdersMoneyList.tsx",
    "status": "notStarted"
   },
   "navigation": {

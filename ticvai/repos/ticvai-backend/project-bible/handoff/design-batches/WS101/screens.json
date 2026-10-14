@@ -5,6 +5,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "4",
@@ -179,6 +180,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "4",
@@ -231,6 +233,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listPlans",
        "derived": true,
        "impliedBy": "listPlans",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -311,6 +314,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "4",
@@ -372,7 +376,7 @@
         "Trial Availability"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listModuleCatalogue",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 46 §Each module displays"
       }
      ]
@@ -385,6 +389,7 @@
        "kind": "detailPanel",
        "label": "The selected module marketplace",
        "bindsTo": null,
+       "operation": "listModuleCatalogue",
        "columns": [
         "Module Name",
         "Description",
@@ -465,6 +470,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "4",
@@ -524,7 +530,7 @@
         "Reason"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listModuleCatalogue",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 48 §Each recommendation shows"
       }
      ]
@@ -537,6 +543,7 @@
        "kind": "detailPanel",
        "label": "The selected module package recommendations",
        "bindsTo": null,
+       "operation": "listModuleCatalogue",
        "columns": [
         "Additional Monthly Cost",
         "Annual Cost",
@@ -615,6 +622,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "4",
@@ -667,6 +675,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listModuleCatalogue",
        "derived": true,
        "impliedBy": "listModuleCatalogue",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -727,6 +736,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "4",
@@ -790,6 +800,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listModuleCatalogue",
        "derived": true,
        "impliedBy": "listModuleCatalogue",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -850,6 +861,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "4",
@@ -974,6 +986,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "4",
@@ -1130,6 +1143,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "4",
@@ -1188,7 +1202,7 @@
         "Contract Exception"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "simulateCommercialPackage",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 53 §Show"
       }
      ]
@@ -1201,6 +1215,7 @@
        "kind": "detailPanel",
        "label": "The selected package review commercial",
        "bindsTo": null,
+       "operation": "simulateCommercialPackage",
        "columns": [
         "Discount",
         "Special Rate",

@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-363` | Approval Trend & Comparative Analytics | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 | `ADM-364` | Approver & Team Performance Analytics | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-365` | Risk & Governance Analytics | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-366` | AI Approval Intelligence Center | B | 0 | 0 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `ADM-366` | AI Approval Intelligence Center | B | 0 | 16 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `ADM-367` | AI Optimization & What-If Simulator | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-368` | AI Governance Executive Advisor | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 

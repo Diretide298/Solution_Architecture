@@ -5,10 +5,11 @@
   "module": "Stock & Supply",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/stock-supply",
-   "component": "apps/venue-management-web/src/routes/home/StockSupplyList.tsx",
+   "component": "src/routes/home/StockSupplyList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -296,10 +297,11 @@
   "module": "Stock & Supply",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/stock-supply/recipe-consumption-theoretical-inventory",
-   "component": "apps/venue-management-web/src/routes/ops/RecipeConsumptionTheoreticalInventoryList.tsx",
+   "component": "src/routes/ops/RecipeConsumptionTheoreticalInventoryList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -335,7 +337,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listRecipes` reads the population and `getCountVariance` reads one of them — list, select, act",
-  "purpose": "Recipe Consumption & Theoretical Inventory — from the client design board, 20 August.",
+  "purpose": "Recipe Consumption & Theoretical Inventory: shows list recipes (`listRecipes`); variance between counted and expected (`getCountVariance`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -541,7 +543,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/stock-supply/production-execution-batch-management",
-   "component": "apps/venue-management-web/src/routes/ops/ProductionExecutionBatchManagementList.tsx",
+   "component": "src/routes/ops/ProductionExecutionBatchManagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -565,7 +567,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Production Execution & Batch Management — from the client design board, 20 August (merged into BO-112 Production Planning & Production Sheets).",
+  "purpose": "Production Execution & Batch Management: merged into BO-112; this id routes there and nothing on it is built separately.",
   "layout": {
    "template": "split",
    "regions": [
@@ -651,10 +653,11 @@
   "module": "Stock & Supply",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/stock-supply/wastage-spoilage-returns-write-off",
-   "component": "apps/venue-management-web/src/routes/ops/WastageSpoilageReturnsWriteOffList.tsx",
+   "component": "src/routes/ops/WastageSpoilageReturnsWriteOffList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -682,7 +685,7 @@
   ],
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`recordWaste`) and no read of a population — it is settings, not a list",
-  "purpose": "Wastage, Spoilage, Returns & Write-Off — from the client design board, 20 August.",
+  "purpose": "Wastage, Spoilage, Returns & Write-Off: shows the venue's waste-approval policy (`getWasteApprovalPolicy`), and acts with record waste (`recordWaste`); ask for an answer, however it is currently produced (`requestSuggestion`); switch waste approval on or off, and set its bands (`setWasteApprovalPolicy`).",
   "layout": {
    "template": "form",
    "regions": [
@@ -871,10 +874,11 @@
   "module": "Stock & Supply",
   "requiresModule": "fnb",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/stock-supply/product-availability-86-operational-food-safet",
-   "component": "apps/venue-management-web/src/routes/ops/ProductAvailability86OperationalFoodSaList.tsx",
+   "component": "src/routes/ops/ProductAvailability86OperationalFoodSaList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -898,7 +902,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Product Availability, 86 & Operational Food Safety — from the client design board, 20 August.",
+  "purpose": "Product Availability, 86 & Operational Food Safety: shows read a menu with sections and items (`getMenu`); where this venue stands, right now (`getHaccpStatus`), and acts with mark an item available or eighty-sixed (`setItemAvailability`); define a checkpoint and its safe range (`setTemperatureCheckpoint`); set today's count for a dish (`setMenuItemDailyCount`).",
   "layout": {
    "template": "split",
    "regions": [
@@ -1043,6 +1047,12 @@
      "from": "navigation",
      "optional": true,
      "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getMenu`; an edge that holds one may still carry it to open on that record."
+    },
+    {
+     "name": "checkpointId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listTemperatureCheckpoints`."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
@@ -1135,10 +1145,11 @@
   "module": "Stock & Supply",
   "requiresModule": "analytics",
   "wave": 2,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/stock-supply/operational-alerts-ai-replenishment-action-cen",
-   "component": "apps/venue-management-web/src/routes/ops/OperationalAlertsAiReplenishmentActionList.tsx",
+   "component": "src/routes/ops/OperationalAlertsAiReplenishmentActionList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1175,7 +1186,7 @@
   ],
   "pattern": "listDetail",
   "patternReason": "`listAlerts` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
-  "purpose": "Operational Alerts, AI Replenishment & Action Center — from the client design board, 20 August.",
+  "purpose": "Operational Alerts, AI Replenishment & Action Center: shows what is currently wrong (`listAlerts`), and acts with mark it seen (`acknowledgeAlert`); raise a requisition (`createRequisition`).",
   "layout": {
    "template": "split",
    "regions": [

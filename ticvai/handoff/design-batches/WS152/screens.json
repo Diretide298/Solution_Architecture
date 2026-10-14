@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "6",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/refund-payment-adjustment-command-center-t116-adm-609",
-   "component": "apps/venue-management-web/src/routes/commercial/RefundPaymentAdjustmentCommandCenterT116.tsx",
+   "component": "src/routes/commercial/RefundPaymentAdjustmentCommandCenterT116.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -231,6 +232,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "6",
@@ -240,7 +242,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/refund-request-eligibility-workspace-t117-adm-610",
-   "component": "apps/venue-management-web/src/routes/commercial/RefundRequestEligibilityWorkspaceT117.tsx",
+   "component": "src/routes/commercial/RefundRequestEligibilityWorkspaceT117.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -324,7 +326,8 @@
         "Maximum Remaining Refundable: AED 1,050"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Find original transaction using”, “Before allowing the refund”, “Eligible for Refund”, “Refund Restricted”.",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 116 §Display"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 116 §Display",
+       "operation": "getRefundPolicy"
       }
      ]
     },
@@ -469,7 +472,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/refund-policy-rule-configuration-t118-adm-611",
-   "component": "apps/venue-management-web/src/routes/commercial/RefundPolicyRuleConfigurationT118.tsx",
+   "component": "src/routes/commercial/RefundPolicyRuleConfigurationT118.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -617,6 +620,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "6",
@@ -626,7 +630,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/refund-allocation-original-tender-manager-t119-adm-612",
-   "component": "apps/venue-management-web/src/routes/commercial/RefundAllocationOriginalTenderManagerT119.tsx",
+   "component": "src/routes/commercial/RefundAllocationOriginalTenderManagerT119.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -756,6 +760,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "6",
@@ -765,7 +770,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/void-reversal-cancellation-manager-t120-adm-613",
-   "component": "apps/venue-management-web/src/routes/commercial/VoidReversalCancellationManagerT120.tsx",
+   "component": "src/routes/commercial/VoidReversalCancellationManagerT120.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -929,6 +934,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "6",
@@ -938,7 +944,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/refund-approval-exception-workflow-t121-adm-614",
-   "component": "apps/venue-management-web/src/routes/commercial/RefundApprovalExceptionWorkflowT121.tsx",
+   "component": "src/routes/commercial/RefundApprovalExceptionWorkflowT121.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -995,7 +1001,7 @@
         "Age"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listFraudRules",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 120 §Show"
       }
      ]
@@ -1108,6 +1114,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "6",
@@ -1117,7 +1124,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/refund-processing-provider-status-recovery-center-t122-adm-615",
-   "component": "apps/venue-management-web/src/routes/commercial/RefundProcessingProviderStatusRecoveryCenterT122.tsx",
+   "component": "src/routes/commercial/RefundProcessingProviderStatusRecoveryCenterT122.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1280,6 +1287,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "6",
@@ -1289,7 +1297,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-adjustment-financial-correction-manager-t123-adm-616",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentAdjustmentFinancialCorrectionManagerT123.tsx",
+   "component": "src/routes/commercial/PaymentAdjustmentFinancialCorrectionManagerT123.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1429,6 +1437,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "6",
@@ -1438,7 +1447,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/refund-transaction-trace-audit-investigation-t124-adm-617",
-   "component": "apps/venue-management-web/src/routes/commercial/RefundTransactionTraceAuditInvestigationT124.tsx",
+   "component": "src/routes/commercial/RefundTransactionTraceAuditInvestigationT124.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1494,7 +1503,7 @@
         "Final status"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listOrderPaymentDetail",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 123 §Card AED 800"
       }
      ]
@@ -1598,7 +1607,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/refund-simulator-risk-analysis-ai-advisor-t126-adm-618",
-   "component": "apps/venue-management-web/src/routes/commercial/RefundSimulatorRiskAnalysisAiAdvisorT126.tsx",
+   "component": "src/routes/commercial/RefundSimulatorRiskAnalysisAiAdvisorT126.tsx",
    "status": "notStarted"
   },
   "navigation": {

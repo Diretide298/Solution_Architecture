@@ -1,0 +1,706 @@
+{
+ "acknowledgeAlert": {
+  "description": "The alert is already `acknowledged`, `resolved` or `expired`; only a `raised` alert can be acknowledged. Nothing changes.",
+  "types": [
+   "alert-not-raised"
+  ]
+ },
+ "acknowledgeAnnouncement": {
+  "keep": "Queued offline and replayed, so acknowledging must be harmless to repeat, and an announcement has no status that refuses an acknowledgement."
+ },
+ "activateJourney": {
+  "description": "The journey is `archived` (`journey-archived`), or the move is not one its state model allows, such as pausing a `draft` journey or activating one already `active` (`journey-transition-not-allowed`). Nothing changes.",
+  "types": [
+   "journey-archived",
+   "journey-transition-not-allowed"
+  ]
+ },
+ "addToWishlist": {
+  "keep": "An idempotent save into the guest's wishlist (saving twice is one entry); the wishlist has no lifecycle that can refuse it."
+ },
+ "adjustGameCard": {
+  "description": "The card is `expired` (`game-card-expired`) or was `transferred` (`game-card-transferred`), or the guest wallet behind it is `closed` (`wallet-closed`); only an `active` or `blocked` card is adjusted. Nothing changes.",
+  "types": [
+   "game-card-expired",
+   "game-card-transferred",
+   "wallet-closed"
+  ]
+ },
+ "adjustWallet": {
+  "description": "The wallet is `closed`; its balance is final and takes no adjustment. Nothing changes.",
+  "types": [
+   "wallet-closed"
+  ]
+ },
+ "allocateBlockedSeats": {
+  "description": "The block was already released (`seat-block-released`), or a named seat is no longer `blocked` (`seat-not-blocked`). No seat is allocated.",
+  "types": [
+   "seat-block-released",
+   "seat-not-blocked"
+  ]
+ },
+ "amendAttendance": {
+  "keep": "Every correction is appended as its own row (audit R129 (7)), and an attendance record has no status that refuses another amendment."
+ },
+ "analyseMediaAsset": {
+  "description": "The asset is still `processing`, or is `failed` or `quarantined`, so there is no usable file to analyse. Nothing is queued.",
+  "types": [
+   "media-asset-not-ready"
+  ]
+ },
+ "assessProductChange": {
+  "keep": "A dry run that reports the impact and writes nothing, so no product state can conflict with it."
+ },
+ "assessRentalDamage": {
+  "description": "The booking never went out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`), so there is no equipment to assess. Nothing is recorded.",
+  "types": [
+   "rental-booking-not-checked-out"
+  ]
+ },
+ "assignPerformanceMedia": {
+  "description": "The performance is `cancelled`; it has no participants to attribute media to. Nothing is assigned.",
+  "types": [
+   "performance-cancelled"
+  ]
+ },
+ "blockGiftCard": {
+  "description": "The card is already `blocked` (`gift-card-already-blocked`), or is `issued` and not yet activated, `redeemed` or `expired`, with no live balance to protect (`gift-card-transition-not-allowed`). Nothing changes.",
+  "types": [
+   "gift-card-already-blocked",
+   "gift-card-transition-not-allowed"
+  ]
+ },
+ "callNextParties": {
+  "description": "The queue is `paused` or `closed`; parties are called only from an `open` or `atCapacity` queue. Nobody is called.",
+  "types": [
+   "queue-not-open"
+  ]
+ },
+ "cancelMerchandiseReservation": {
+  "description": "The reservation is already `collected`, `expired` or `cancelled`; only a `reserved` one can be cancelled. Stock does not move.",
+  "types": [
+   "merchandise-reservation-not-reserved"
+  ]
+ },
+ "cancelSubscription": {
+  "description": "The subscription is already `cancelled` (`subscription-already-cancelled`), or is `trial` or `expired` (`subscription-not-active`); only an `active` or `pastDue` subscription is cancelled. Nothing changes.",
+  "types": [
+   "subscription-already-cancelled",
+   "subscription-not-active"
+  ]
+ },
+ "certifyIntegration": {
+  "description": "`certify` or `reject` on a listing that is not `submitted` or `inReview` (`integration-listing-not-in-review`), or `revoke` on one that is not `certified` (`integration-listing-not-certified`). Nothing changes.",
+  "types": [
+   "integration-listing-not-in-review",
+   "integration-listing-not-certified"
+  ]
+ },
+ "chaseStation": {
+  "description": "The ticket is already `served` or `cancelled`; there is nothing left to chase. No chase is recorded.",
+  "types": [
+   "kitchen-ticket-closed"
+  ]
+ },
+ "claimCart": {
+  "description": "The cart is `checkedOut` or `abandoned` (`cart-not-open`), or already belongs to another guest (`cart-already-claimed`). Nothing is attached or merged.",
+  "types": [
+   "cart-not-open",
+   "cart-already-claimed"
+  ]
+ },
+ "claimTicketTransfer": {
+  "keep": "Every state but `offered` is already answered by the 410 (`offerExpired`, `alreadyClaimed`, `offerCancelled`); a 409 would duplicate it."
+ },
+ "clearTable": {
+  "description": "The table has an open bill (`ordered` or `billRequested`; `table-has-open-bill`) or is `reserved` (`table-reserved`); it is cleared only from `seated`, `needsClearing`, `free` or `outOfService`. Nothing changes.",
+  "types": [
+   "table-has-open-bill",
+   "table-reserved"
+  ]
+ },
+ "cloneProduct": {
+  "keep": "The source is read, never changed, and any product can be copied into a new draft, an `archived` one included."
+ },
+ "cloneReaderConfiguration": {
+  "description": "The source reader is `unconfigured`; it has no configuration to copy. No target changes.",
+  "types": [
+   "reader-not-configured"
+  ]
+ },
+ "cloneResource": {
+  "keep": "Copies configuration into new resources and leaves the source untouched; a resource in any status can be the template."
+ },
+ "cloneSeatMap": {
+  "keep": "The source map is read, not changed, and the clone starts as a new draft; a map in any status, `archived` included, can be cloned."
+ },
+ "cloneTicketTemplate": {
+  "keep": "The source template is read, not changed, and the copy is created inactive; a template in any state can be the source."
+ },
+ "closeConversation": {
+  "description": "The conversation is already `resolved`, `abandoned` or `timedOut` (`conversation-already-closed`), or is `queued` or `waitingOnGuest` (`conversation-transition-not-allowed`); only a conversation `withAssistant` or `withAgent` is closed. Nothing changes.",
+  "types": [
+   "conversation-already-closed",
+   "conversation-transition-not-allowed"
+  ]
+ },
+ "closeCorrectiveAction": {
+  "description": "The finding is not `signed` (still `open`, `actioned` or `escalated`, or already `closed`); only a signed finding is closed. Nothing changes.",
+  "types": [
+   "corrective-action-not-signed"
+  ]
+ },
+ "closeWorkOrder": {
+  "description": "The work order is already `closed` or `cancelled` (`work-order-already-closed`), or is `assigned` or `inProgress` with a technician on it (`work-order-in-progress`); pause, complete or reject it first. Nothing changes.",
+  "types": [
+   "work-order-already-closed",
+   "work-order-in-progress"
+  ]
+ },
+ "collectMerchandiseReservation": {
+  "description": "The reservation is already `collected`, `expired` or `cancelled`; only a `reserved` one can be collected. Stock does not move.",
+  "types": [
+   "merchandise-reservation-not-reserved"
+  ]
+ },
+ "compItem": {
+  "description": "The visit is `settled`, `merged` or `cancelled`; a line is comped only while the visit is `open` or `billRequested`. Nothing changes.",
+  "types": [
+   "table-visit-closed"
+  ]
+ },
+ "completeSsoAuthorization": {
+  "keep": "The SSO provider has no lifecycle; a stale or reused `code` or `state` is answered 401, not as a state conflict."
+ },
+ "completeWorkOrder": {
+  "description": "The work order is not `inProgress`; only work that has been started can be completed. Nothing changes.",
+  "types": [
+   "work-order-not-in-progress"
+  ]
+ },
+ "convertToTermProduct": {
+  "description": "The order is not paid (`pending`, `held`, `partiallyPaid`, `voided` or `failed`; `order-not-paid`) or has been `refunded` (`order-refunded`), so there is no payment to credit. Nothing changes.",
+  "types": [
+   "order-not-paid",
+   "order-refunded"
+  ]
+ },
+ "copyPriceList": {
+  "keep": "The source price list is read, not changed, and the copy is a new list; any price list can be copied."
+ },
+ "deployReaderConfiguration": {
+  "description": "The reader is `unconfigured`, with nothing to deploy (`reader-not-configured`), or `disabled` (`reader-disabled`). Nothing is queued.",
+  "types": [
+   "reader-not-configured",
+   "reader-disabled"
+  ]
+ },
+ "deprecateApiVersion": {
+  "description": "The version is not `current` (still `preview`, or already `deprecated` or `sunset`); only the current version is deprecated. Nothing changes and nobody is notified.",
+  "types": [
+   "api-version-not-current"
+  ]
+ },
+ "disposeShopAndDrop": {
+  "description": "The item is still within its hold (`awaitingCollection` or `partiallyCollected`; `shop-and-drop-still-held`) or is already `collected` or `disposed` (`shop-and-drop-already-closed`); only an `uncollected` item is disposed of. Nothing changes.",
+  "types": [
+   "shop-and-drop-still-held",
+   "shop-and-drop-already-closed"
+  ]
+ },
+ "drainBurstEnvironment": {
+  "description": "The environment is not `live` (not live yet, already `draining` or beyond, or `failed`); only a live environment is drained. Nothing changes.",
+  "types": [
+   "burst-environment-not-live"
+  ]
+ },
+ "endKioskAssist": {
+  "description": "The assist session has already ended (`endedAt` is set). Nothing changes.",
+  "types": [
+   "kiosk-assist-already-ended"
+  ]
+ },
+ "escalateApprovalRequest": {
+  "description": "The request is already `escalated` (`approval-request-already-escalated`), or is not `pending` because it was decided, returned, withdrawn, cancelled or expired (`approval-request-not-pending`). Nothing changes.",
+  "types": [
+   "approval-request-already-escalated",
+   "approval-request-not-pending"
+  ]
+ },
+ "escalateCase": {
+  "description": "The case is already `escalated` (`case-already-escalated`), or is not `inProgress` (`open`, `awaitingGuest`, `resolved` or `closed`; `case-not-in-progress`). Nothing changes.",
+  "types": [
+   "case-already-escalated",
+   "case-not-in-progress"
+  ]
+ },
+ "fireCourse": {
+  "description": "The ticket is already `served` or `cancelled`; there is no course left to fire. Nothing changes.",
+  "types": [
+   "kitchen-ticket-closed"
+  ]
+ },
+ "forceLogout": {
+  "description": "The session has already ended (`signedOut`, `terminated` or `expired`). Nothing changes.",
+  "types": [
+   "session-ended"
+  ]
+ },
+ "forceReleaseInventoryHold": {
+  "description": "The hold is not `active` (expired, released, force-released or converted), so nothing is held to reclaim. Nothing changes.",
+  "types": [
+   "hold-not-active"
+  ]
+ },
+ "freezeEntitlement": {
+  "description": "Already `frozen`, or `suspended`, or ended as `expired` or `cancelled`; only an `active` one is frozen. Nothing changes.",
+  "types": [
+   "entitlement-already-frozen",
+   "entitlement-suspended",
+   "entitlement-ended"
+  ]
+ },
+ "holdCourse": {
+  "description": "The ticket is already `served` or `cancelled`; there is no course left to hold. Nothing changes.",
+  "types": [
+   "kitchen-ticket-closed"
+  ]
+ },
+ "importVenueGeometry": {
+  "description": "The map is `archived`; an archived map takes no import. No job is started.",
+  "types": [
+   "map-archived"
+  ]
+ },
+ "inquirePaymentStatus": {
+  "description": "The payment is not `pendingConfirmation`; its outcome is already known and there is nothing to ask the provider. Nothing changes.",
+  "types": [
+   "payment-not-pending-confirmation"
+  ]
+ },
+ "markOrderCollected": {
+  "description": "The order is not `ready` yet (`ordered`, `accepted` or `inPreparation`; `fnb-order-not-ready`), was already handed over (`served`, `collected`, `delivered` or `refunded`; `order-already-fulfilled`), or was `cancelled` (`fnb-order-cancelled`). Nothing changes.",
+  "types": [
+   "fnb-order-not-ready",
+   "order-already-fulfilled",
+   "fnb-order-cancelled"
+  ]
+ },
+ "markStaffConversationRead": {
+  "keep": "The read marker only moves forward and the call is queued offline, so repeating it is harmless; a conversation has no state that refuses it."
+ },
+ "notifyServer": {
+  "description": "The visit is `settled`, `merged` or `cancelled`; nobody is called to the pass for a closed table. Nothing is sent.",
+  "types": [
+   "table-visit-closed"
+  ]
+ },
+ "notifyWaitlistParty": {
+  "description": "The party is already `seated`, `walkedAway`, `noShow` or `cancelled`; only a `waiting` or `notified` party is notified. Nothing is sent.",
+  "types": [
+   "waitlist-entry-closed"
+  ]
+ },
+ "offerWaitlistCapacity": {
+  "description": "The entry already holds an offer (`offered`; `waitlist-entry-already-offered`), or has `converted`, `left` or `expired` (`waitlist-entry-closed`); only a `waiting` entry is offered capacity. Nothing is held.",
+  "types": [
+   "waitlist-entry-already-offered",
+   "waitlist-entry-closed"
+  ]
+ },
+ "overrideAiDecision": {
+  "keep": "Human override is always possible (AIC-187, ADM-536) and each one is kept as its own intervention, so no decision state refuses it."
+ },
+ "overrideWaitingGuest": {
+  "description": "The entry was already `redeemed` (`queue-entry-already-redeemed`), or was `cancelled` or `released` from the queue (`queue-entry-cancelled`); there is no failed redemption to override. Nobody is admitted.",
+  "types": [
+   "queue-entry-already-redeemed",
+   "queue-entry-cancelled"
+  ]
+ },
+ "pauseRollout": {
+  "description": "The rollout is already `paused` (`rollout-already-paused`), or is not `rolling` (`queued`, `canary`, or finished as `complete`, `failed` or `rolledBack`; `rollout-not-rolling`). Nothing changes.",
+  "types": [
+   "rollout-already-paused",
+   "rollout-not-rolling"
+  ]
+ },
+ "pauseWorkOrder": {
+  "description": "The work order is not `inProgress`; only work under way can be paused. Nothing changes.",
+  "types": [
+   "work-order-not-in-progress"
+  ]
+ },
+ "printOrderLabel": {
+  "description": "The ticket is `cancelled`; there is no order to bag. No label is produced.",
+  "types": [
+   "kitchen-ticket-cancelled"
+  ]
+ },
+ "printTicketProof": {
+  "keep": "A proof sells nothing and changes nothing, and is wanted in every state of the template, before activation included."
+ },
+ "prioritiseKitchenTicket": {
+  "description": "The ticket is already `ready` (`kitchen-ticket-already-ready`), or `served` or `cancelled` (`kitchen-ticket-closed`); only a ticket still being made can move up the queue. Nothing changes.",
+  "types": [
+   "kitchen-ticket-already-ready",
+   "kitchen-ticket-closed"
+  ]
+ },
+ "publishContentBlock": {
+  "description": "The block is already `published` (`content-block-published`; a change goes through a new draft) or is `archived` (`content-block-archived`). Nothing changes.",
+  "types": [
+   "content-block-published",
+   "content-block-archived"
+  ]
+ },
+ "publishMenu": {
+  "description": "The menu has no draft changes since the live version, so there is nothing to publish. No version is written.",
+  "types": [
+   "nothing-to-publish"
+  ]
+ },
+ "pushWalletPassUpdate": {
+  "description": "The pass is `voided` or `expired`; nothing is pushed to its devices.",
+  "types": [
+   "wallet-pass-voided",
+   "wallet-pass-expired"
+  ]
+ },
+ "reconcileBurstEnvironment": {
+  "description": "The environment has not been drained (still `requested`, `provisioning`, `warming` or `live`, or `failed`; `burst-environment-not-drained`), or is already `reconciled` or `decommissioned` (`burst-environment-already-reconciled`). Nothing is replayed.",
+  "types": [
+   "burst-environment-not-drained",
+   "burst-environment-already-reconciled"
+  ]
+ },
+ "recordAnswerFeedback": {
+  "description": "This person has already labelled this answer; it takes one label per message per person (AIC-062). Nothing changes.",
+  "types": [
+   "answer-feedback-already-recorded"
+  ]
+ },
+ "recordCorrectiveAction": {
+  "description": "The finding is not `open` (already `actioned`, `signed`, `escalated` or `closed`); an action is recorded only against an open finding. Nothing changes.",
+  "types": [
+   "corrective-action-not-open"
+  ]
+ },
+ "recordDepositActivity": {
+  "description": "The deposit is already settled (`settledAt` is set) and takes no further movement. Nothing is recorded.",
+  "types": [
+   "deposit-already-settled"
+  ]
+ },
+ "recordDeviceHeartbeat": {
+  "keep": "A heartbeat is legal from every reported status; the status transitions are its outcome, not its precondition."
+ },
+ "recordRentalInspection": {
+  "description": "The booking is `cancelled` or `noShow` (`rental-booking-cancelled`), or the phase does not fit it: `preRental` once the equipment has gone out, or `postRental` before it has (`inspection-phase-mismatch`). Nothing is recorded.",
+  "types": [
+   "rental-booking-cancelled",
+   "inspection-phase-mismatch"
+  ]
+ },
+ "recordSuggestionOutcome": {
+  "keep": "A suggestion has no lifecycle and outcomes are appended as rows (a job also records `ignored` and `expired`), so no state refuses one."
+ },
+ "recordWaste": {
+  "keep": "Appends a waste record against the outlet's stock; the outlet has no status that refuses it, and two wastings are two records."
+ },
+ "redeemWaitingGuest": {
+  "keep": "A wrong-state scan is answered in the 200 as `outcome: denied` with a `denyReason` (`notCalled`, `alreadyRedeemed`, `cancelled`), like every offline-capable gate operation."
+ },
+ "refireItem": {
+  "description": "The ticket is `cancelled`; a cancelled order is not made again. Nothing changes.",
+  "types": [
+   "kitchen-ticket-cancelled"
+  ]
+ },
+ "reinstateEntitlement": {
+  "description": "Not `suspended`; only a suspended one is reinstated. Nothing changes.",
+  "types": [
+   "entitlement-not-suspended"
+  ]
+ },
+ "rejectWorkOrder": {
+  "description": "The work order is not `assigned`; only an assigned job can be declined. Nothing changes.",
+  "types": [
+   "work-order-not-assigned"
+  ]
+ },
+ "releaseProductionPlan": {
+  "description": "The plan is not a `draft` (already `released`, `superseded` or `cancelled`); only a draft is released. No runs are created.",
+  "types": [
+   "production-plan-not-draft"
+  ]
+ },
+ "releaseSeatHoldPool": {
+  "description": "The pool is already `released` (`seat-hold-pool-already-released`) or `expired` (`seat-hold-pool-expired`); its seats are no longer held. Nothing changes.",
+  "types": [
+   "seat-hold-pool-already-released",
+   "seat-hold-pool-expired"
+  ]
+ },
+ "relinquishWalletAuthorisation": {
+  "description": "Nothing is held to release: the authorisation is already `captured`, `released` or `expired`. Nothing changes.",
+  "types": [
+   "authorisation-not-held"
+  ]
+ },
+ "replaceAccreditationCredential": {
+  "description": "The credential was already `replaced` (`accreditation-credential-already-replaced`), or is `revoked` or `expired` (`accreditation-credential-transition-not-allowed`), so there is no live credential to replace. Nothing is issued.",
+  "types": [
+   "accreditation-credential-already-replaced",
+   "accreditation-credential-transition-not-allowed"
+  ]
+ },
+ "replaceResourceAllocation": {
+  "description": "The booking is `returned`, `cancelled` or `noShow`; there is no allocation left to replace. Nothing changes.",
+  "types": [
+   "resource-booking-closed"
+  ]
+ },
+ "replayAiDecision": {
+  "keep": "A labelled re-simulation that runs no production action and changes nothing, so no decision state refuses it."
+ },
+ "replayDeadLetter": {
+  "keep": "Each replay is recorded as a new, counted attempt (ADR-0033), so a dead letter has no state that refuses another."
+ },
+ "replayEvents": {
+  "description": "The subscription is `pendingVerification` (`webhook-subscription-not-verified`) or `disabled` (`webhook-subscription-disabled`); events are replayed only to a verified, enabled endpoint. Nothing is queued.",
+  "types": [
+   "webhook-subscription-not-verified",
+   "webhook-subscription-disabled"
+  ]
+ },
+ "reportBundleApplied": {
+  "keep": "A terminal reporting a fact about itself; any bundle version, current or stale, can be reported, and drift is what the report is for."
+ },
+ "reprintReceipt": {
+  "keep": "A reprint or resend changes nothing on the sale, and a receipt can be reproduced whatever the sale's state."
+ },
+ "requestBill": {
+  "description": "The bill is already requested (`table-visit-bill-already-requested`), or the visit is `settled`, `merged` or `cancelled` (`table-visit-closed`). Nothing changes.",
+  "types": [
+   "table-visit-bill-already-requested",
+   "table-visit-closed"
+  ]
+ },
+ "requestRecount": {
+  "description": "A named line already has a recount pending (`recount-already-requested`), or is `recounted`, `accepted` or `rejected` (`count-line-not-entered`); only an `entered` line is sent back. No line changes.",
+  "types": [
+   "recount-already-requested",
+   "count-line-not-entered"
+  ]
+ },
+ "rescheduleEvent": {
+  "description": "The event is already `cancelled` (`event-already-cancelled`), or is `closed` or `archived` (`event-closed`); there is nothing left to move. Nothing changes and nobody is notified.",
+  "types": [
+   "event-already-cancelled",
+   "event-closed"
+  ]
+ },
+ "resendPaymentLink": {
+  "description": "The link is not live (`paid`, `expired`, `superseded` or `cancelled`); only an `issued` or `viewed` link is resent. Nothing is sent.",
+  "types": [
+   "payment-link-not-live"
+  ]
+ },
+ "resetPrincipalCredential": {
+  "description": "A `password` reset for a principal provisioned by single sign-on (`Principal.ssoProviderId` set), who has no local password; it is changed at the identity provider. Nothing is written.",
+  "types": [
+   "credential-managed-by-sso"
+  ]
+ },
+ "resetSandbox": {
+  "description": "The sandbox is already `resetting` (`sandbox-already-resetting`), or is not `active` (`provisioning`, `expired` or `deleted`; `sandbox-not-active`). Nothing changes.",
+  "types": [
+   "sandbox-already-resetting",
+   "sandbox-not-active"
+  ]
+ },
+ "respondToReview": {
+  "description": "The review was `rejected` in moderation and is shown to nobody; it takes no response. Nothing changes.",
+  "types": [
+   "review-rejected"
+  ]
+ },
+ "restoreConfigVersion": {
+  "description": "The working draft has unpublished changes that the restore would overwrite; publish or discard them first. Nothing changes.",
+  "types": [
+   "unpublished-changes"
+  ]
+ },
+ "restoreProductVersion": {
+  "description": "The product is `archived`; an archived product takes no new version. Nothing changes.",
+  "types": [
+   "product-archived"
+  ]
+ },
+ "restoreWalletConfigurationVersion": {
+  "description": "The working draft has unpublished changes that the restore would overwrite; publish or discard them first. Nothing changes.",
+  "types": [
+   "unpublished-changes"
+  ]
+ },
+ "resubmitApprovalRequest": {
+  "description": "The request is not `rejected`; only a rejected request is resubmitted (a `returned` or `informationRequested` one goes back through `submitApprovalRequest`). No request is created.",
+  "types": [
+   "approval-request-not-rejected"
+  ]
+ },
+ "resumeWorkOrder": {
+  "description": "The work order is not `paused` or `awaitingParts`; only a stopped job resumes. Nothing changes.",
+  "types": [
+   "work-order-not-paused"
+  ]
+ },
+ "retryMessageDispatch": {
+  "description": "The dispatch has not failed (`queued`, `sent`, `delivered`, `opened` or `clicked`; `message-dispatch-not-failed`), or was `suppressed` (`message-dispatch-suppressed`); only a `failed` or `bounced` dispatch is retried. Nothing is sent.",
+  "types": [
+   "message-dispatch-not-failed",
+   "message-dispatch-suppressed"
+  ]
+ },
+ "returnRental": {
+  "description": "The booking never went out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`; `rental-booking-not-checked-out`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is settled.",
+  "types": [
+   "rental-booking-not-checked-out",
+   "rental-booking-already-settled"
+  ]
+ },
+ "rollbackMenu": {
+  "description": "`toVersion` is the version already `live` (`menu-version-already-live`), or was never published (`draft` or `scheduled`; `menu-version-not-published`). No version is written.",
+  "types": [
+   "menu-version-already-live",
+   "menu-version-not-published"
+  ]
+ },
+ "saveNaturalLanguageQuery": {
+  "keep": "Each save creates a new report definition; the conversation has no lifecycle that refuses it (no kept query is a 404)."
+ },
+ "scoreApprovalRequest": {
+  "description": "The request is no longer `pending` or `escalated` (decided, withdrawn, cancelled or expired); there is no reviewer left to inform. No score is written.",
+  "types": [
+   "approval-request-closed"
+  ]
+ },
+ "sendBookingConfirmation": {
+  "description": "A confirmation, reminder or reconfirmation request for a reservation that is `cancelled`, `seated`, `completed` or `noShow` (`table-reservation-closed`), or a `cancellation` message for one that is not `cancelled` (`table-reservation-not-cancelled`). Nothing is sent.",
+  "types": [
+   "table-reservation-closed",
+   "table-reservation-not-cancelled"
+  ]
+ },
+ "sendOrderNotification": {
+  "description": "The order is `cancelled` or `refunded` (`fnb-order-closed`), or has not reached the `stage` being announced, such as `ready` while still `inPreparation` (`fnb-order-stage-not-reached`). Nothing is sent.",
+  "types": [
+   "fnb-order-closed",
+   "fnb-order-stage-not-reached"
+  ]
+ },
+ "setAuthorisationPolicyState": {
+  "description": "The policy is `retired` (`authorisation-policy-retired`), or the move is not one its lifecycle allows, such as activating a policy that has not been through approval (`authorisation-policy-transition-not-allowed`). Nothing changes.",
+  "types": [
+   "authorisation-policy-retired",
+   "authorisation-policy-transition-not-allowed"
+  ]
+ },
+ "setCallDisposition": {
+  "description": "The conversation has not ended (`withAssistant`, `queued`, `withAgent` or `waitingOnGuest`); a disposition records why it ended. Nothing is recorded.",
+  "types": [
+   "conversation-not-ended"
+  ]
+ },
+ "signApprovalDecision": {
+  "description": "The request has no decision to sign: it is not yet decided (`draft`, `pending`, `escalated`, `returned` or `informationRequested`) or ended without one (`withdrawn`, `cancelled` or `expired`); only an `approved` or `rejected` request is signed. Nothing is signed.",
+  "types": [
+   "approval-request-not-decided"
+  ]
+ },
+ "signRentalAgreement": {
+  "description": "The booking is `cancelled` or `noShow` (`rental-booking-cancelled`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is signed.",
+  "types": [
+   "rental-booking-cancelled",
+   "rental-booking-already-settled"
+  ]
+ },
+ "skipRolloutCell": {
+  "description": "The cell is not `pending` (already `running`, `complete`, `failed`, `skipped` or `rolledBack`); only a cell the wave has not reached can be skipped. Nothing changes.",
+  "types": [
+   "rollout-cell-not-pending"
+  ]
+ },
+ "startWorkOrder": {
+  "description": "The work order is not `assigned`; only an assigned job can be started. Nothing changes.",
+  "types": [
+   "work-order-not-assigned"
+  ]
+ },
+ "submitChargebackEvidence": {
+  "description": "The chargeback is still `received` and not yet under review (`chargeback-not-under-review`), its evidence was already submitted (`chargeback-evidence-already-submitted`), or it is closed as `accepted`, `won`, `lost` or `expired` (`chargeback-closed`). Nothing is sent.",
+  "types": [
+   "chargeback-not-under-review",
+   "chargeback-evidence-already-submitted",
+   "chargeback-closed"
+  ]
+ },
+ "suspendEntitlement": {
+  "description": "Already ended (`fullyConsumed`, `expired`, `cancelled` or `surrendered`); only a live one is suspended or reinstated. Nothing changes.",
+  "types": [
+   "entitlement-ended"
+  ]
+ },
+ "suspendTenant": {
+  "description": "The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`). Nothing changes.",
+  "types": [
+   "tenant-already-suspended",
+   "tenant-not-active"
+  ]
+ },
+ "swapRentalEquipment": {
+  "description": "The booking is not out (`draft`, `confirmed`, `awaitingArrival`, `cancelled` or `noShow`; `rental-booking-not-checked-out`), or is already settled (`completed`, `completedWithDamage` or `notReturned`; `rental-booking-already-settled`). Nothing is swapped.",
+  "types": [
+   "rental-booking-not-checked-out",
+   "rental-booking-already-settled"
+  ]
+ },
+ "transferConversation": {
+  "description": "The conversation is not `withAgent` (still with the assistant, queued, waiting on the guest, or ended); only an agent's conversation is transferred. Nothing changes.",
+  "types": [
+   "conversation-not-with-agent"
+  ]
+ },
+ "transferTableVisit": {
+  "description": "The visit is `settled`, `merged` or `cancelled`; only an `open` or `billRequested` check changes server. Nothing changes.",
+  "types": [
+   "table-visit-closed"
+  ]
+ },
+ "verifyAccreditationDocument": {
+  "description": "The document is not `submitted` (already `verified` or `rejected`, or `expired`); only a submitted document is decided. Nothing changes.",
+  "types": [
+   "accreditation-document-not-submitted"
+  ]
+ },
+ "verifyMfaChallenge": {
+  "description": "The challenge was already completed; a challenge is single-use, so ask for a new one. Nothing changes.",
+  "types": [
+   "mfa-challenge-already-verified"
+  ]
+ },
+ "verifyWorkOrder": {
+  "description": "The work order is not `completed`; only completed work is verified. Nothing changes.",
+  "types": [
+   "work-order-not-completed"
+  ]
+ },
+ "voidVoucher": {
+  "description": "The voucher is already `voided` (`voucher-already-voided`), or is `redeemed` or `expired` with nothing left to void (`voucher-transition-not-allowed`). Nothing changes.",
+  "types": [
+   "voucher-already-voided",
+   "voucher-transition-not-allowed"
+  ]
+ }
+}

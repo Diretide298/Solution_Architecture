@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/my-tickets",
-   "component": "apps/guest-app/src/routes/general/MyTicketsList.tsx",
+   "component": "src/screens/general/MyTicketsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -46,7 +46,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act",
-  "purpose": "Find my tickets for this venue.",
+  "purpose": "The guest's tickets and passes, current and past: open one to see its code and history, or send it to another guest.",
   "gaps": [
    {
     "operation": "getEntitlementCredential",
@@ -205,6 +205,13 @@
     "contract": "access",
     "purpose": "Every entitlement this guest holds, including expired",
     "trigger": "onLoad"
+   },
+   {
+    "operationId": "listTicketTransfers",
+    "contract": "orders",
+    "purpose": "Re-read by the screen after transferOrderTickets answers 202, not a control: the guest's transfers, so the ticket shows as offered, then claimed or returned when the offer lapses",
+    "trigger": "background",
+    "provenance": "Block A audit, 14 October 2026: S-ASYNC-POLL (CHG-SCG-005)"
    }
   ],
   "entryState": {
@@ -235,6 +242,7 @@
    "status": "notStarted",
    "provenance": "client-verified",
    "board": "wireframes/P02 Guest App.dc.html#gst-012",
+   "note": "Drawn frame: wireframes/incoming/P02-mobile-v4/gst-012.html, captured from the prototype view below (wireframes/incoming/P02-mobile-v4/manifest.json).",
    "prototype": {
     "file": "sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html",
     "rev": "mobile v4 (30 September build)",
@@ -306,7 +314,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/ticket-details",
-   "component": "apps/guest-app/src/routes/general/TicketDetailsDetail.tsx",
+   "component": "src/screens/general/TicketDetailsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -342,7 +350,7 @@
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getEntitlement` reads one record and nothing reads a population — the screen is about that one thing",
-  "purpose": "Find ticket details for this venue.",
+  "purpose": "One ticket: its code to scan, what remains on it and every scan against it; send it to another guest or bind it to this phone.",
   "gaps": [
    {
     "operation": "getEntitlementCredential",
@@ -455,6 +463,13 @@
      "getEntitlementCredential",
      "getEntitlementHistory"
     ]
+   },
+   {
+    "operationId": "listTicketTransfers",
+    "contract": "orders",
+    "purpose": "Re-read by the screen after transferOrderTickets answers 202, not a control: the guest's transfers, so the ticket shows as offered, then claimed or returned when the offer lapses",
+    "trigger": "background",
+    "provenance": "Block A audit, 14 October 2026: S-ASYNC-POLL (CHG-SCG-005)"
    }
   ],
   "entryState": {
@@ -577,7 +592,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/add-to-calendar-reminders",
-   "component": "apps/guest-app/src/routes/general/AddToCalendarRemindersDetail.tsx",
+   "component": "src/screens/general/AddToCalendarRemindersDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -601,7 +616,7 @@
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listOrders` reads the population and `getOrder` reads one of them — list, select, act",
-  "purpose": "Find add to calendar / reminders for this venue.",
+  "purpose": "Put a booked visit in the phone's calendar or wallet, and turn its visit reminder on or off.",
   "layout": {
    "template": "split",
    "regions": [
@@ -823,7 +838,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/order-history-wallet",
-   "component": "apps/guest-app/src/routes/general/OrderHistoryWalletDashboard.tsx",
+   "component": "src/screens/general/OrderHistoryWalletDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1118,7 +1133,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/saved-items-wishlist",
-   "component": "apps/guest-app/src/routes/general/SavedItemsWishlistList.tsx",
+   "component": "src/screens/general/SavedItemsWishlistList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1295,7 +1310,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/profile",
-   "component": "apps/guest-app/src/routes/general/ProfileDashboard.tsx",
+   "component": "src/screens/general/ProfileDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1448,7 +1463,7 @@
    "params": [
     {
      "name": "subjectId",
-     "from": "GST-001"
+     "from": "session"
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
@@ -1533,7 +1548,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/simple-registration-and-otp",
-   "component": "apps/guest-app/src/routes/general/SimpleRegistrationAndOtpDetail.tsx",
+   "component": "src/screens/general/SimpleRegistrationAndOtpDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1883,8 +1898,8 @@
    {
     "operationId": "createMfaChallenge",
     "contract": "identity",
-    "purpose": "Ask for the second factor (`action: signIn`) when the session comes back `requiresMfa` at a venue with guest two-step verification on",
-    "trigger": "onAction"
+    "purpose": "Sent by the screen after sign-in returns requiresMfa at a venue with guest two-step verification on (action signIn), not a control: the code is then typed in Verification code",
+    "trigger": "background"
    },
    {
     "operationId": "verifyMfaChallenge",
@@ -1898,8 +1913,8 @@
    {
     "operationId": "claimDeviceConsent",
     "contract": "marketing-crm",
-    "purpose": "Attach this device's tracking decision to the guest after sign-in or registration",
-    "trigger": "onAction",
+    "purpose": "Sent by the screen after sign-in or registration, not a control: attaches this device's tracking decision to the guest",
+    "trigger": "background",
     "provenance": "build, 29 September 2026"
    }
   ],
@@ -1977,7 +1992,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/ticket-delivery-and-sharing",
-   "component": "apps/guest-app/src/routes/general/TicketDeliveryAndSharingDetail.tsx",
+   "component": "src/screens/general/TicketDeliveryAndSharingDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2001,7 +2016,7 @@
   "density": "comfortable",
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list",
-  "purpose": "Find ticket delivery & sharing for this venue.",
+  "purpose": "Send some of the guest's tickets to someone else, and see the tickets sent and received.",
   "layout": {
    "template": "form",
    "regions": [
@@ -2163,7 +2178,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/dynamic-qr-ticket",
-   "component": "apps/guest-app/src/routes/general/DynamicQrTicketCanvas.tsx",
+   "component": "src/screens/general/DynamicQrTicketCanvas.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2391,7 +2406,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/account/privacy-my-data",
-   "component": "apps/guest-app/src/routes/account/PrivacyMyData.tsx",
+   "component": "src/screens/account/PrivacyMyData.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2407,10 +2422,7 @@
     {
      "to": "GST-039",
      "trigger": "Profile",
-     "carries": [
-      "subjectId"
-     ],
-     "provenance": "derived — GST-039 declares entryState.params subjectId and GST-066 holds subjectId, so an edge into it carries them"
+     "provenance": "derived — GST-039 declares entryState.params  and GST-066 holds none of them. The edge carries nothing: GST-066 is opened from GST-039, so this edge is the way back and GST-039 keeps its own state"
     }
    ]
   },
@@ -2520,34 +2532,6 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "getCookieConsentRuntime",
-    "contract": "marketing-crm",
-    "purpose": "Tracking preferences: categories and the current decision",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listPublishedTrackingTechnologies",
-    "contract": "marketing-crm",
-    "purpose": "Each SDK and tracker the app uses",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "getDeviceConsentHistory",
-    "contract": "marketing-crm",
-    "purpose": "My tracking decisions so far",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "recordDeviceConsent",
-    "contract": "marketing-crm",
-    "purpose": "Change or withdraw tracking preferences",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "recordConsent",
     "contract": "marketing-crm",
     "purpose": "Withdraw or give a consent from the privacy page: withdrawal as easy as granting",
@@ -2583,6 +2567,32 @@
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
   "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
+  "gaps": [
+   {
+    "operation": "getCookieConsentRuntime",
+    "removed": true,
+    "why": "The client-approved privacy screen has no tracking preference centre (categories, the trackers, past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client approves.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "listPublishedTrackingTechnologies",
+    "removed": true,
+    "why": "The client-approved privacy screen has no tracking preference centre (categories, the trackers, past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client approves.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "getDeviceConsentHistory",
+    "removed": true,
+    "why": "The client-approved privacy screen has no tracking preference centre (categories, the trackers, past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client approves.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "recordDeviceConsent",
+    "removed": true,
+    "why": "The client-approved privacy screen has no tracking preference centre (categories, the trackers, past decisions, change or withdraw), so nothing shows or sends this. It needs a design the client approves.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",

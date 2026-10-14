@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 1663 |
-| Operations | 1889 |
+| Operations | 1892 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
-| Operations with no screen | 186 |
+| Operations with no screen | 185 |
 | Waves | wave1 141 · wave2 58 · wave3 1464 |
 
 ## Gaps
 
-### 186 operations with no screen here
+### 185 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
 | `setEventChangeTreatmentPolicy` | catalogue | PUT | Set the default treatment per kind of event change |
 | `setSeatPricingRule` | catalogue | PUT | Create or replace a seat-level dynamic pricing rule |
-| … | | | 146 more |
+| … | | | 145 more |
 
 ### 14 modules split across waves
 
@@ -497,7 +497,7 @@
 | `ADM-616` | Payment Adjustment & Financial Correction Manager | Commercial | 3 | 2 | yes |
 | `ADM-617` | Refund Transaction Trace & Audit Investigation | Commercial | 3 | 1 | yes |
 | `ADM-618` | Refund Simulator, Risk Analysis & AI Advisor | Commercial | 3 | 0 | yes |
-| `ADM-620` | Reconciliation Source & Import Manager | Commercial | 3 | 3 | yes |
+| `ADM-620` | Reconciliation Source & Import Manager | Commercial | 3 | 4 | yes |
 | `ADM-621` | Transaction Matching & Reconciliation Engine | Commercial | 3 | 1 | yes |
 | `ADM-622` | Reconciliation Exception & Investigation Center | Commercial | 3 | 2 | yes |
 | `ADM-623` | Settlement & Payout Manager | Commercial | 3 | 1 | yes |
@@ -740,9 +740,9 @@
 | `BO-1056` | Seat Utilization Analytics | Access & Venue | 3 | 1 | yes |
 | `BO-1057` | Hold Inventory Reporting | Access & Venue | 3 | 1 | yes |
 | `BO-1058` | Sales Pace & Pick Curves | Access & Venue | 3 | 1 | yes |
-| `BO-1059` | Heat Maps & Drill-Down | Access & Venue | 3 | 2 | yes |
+| `BO-1059` | Heat Maps & Drill-Down | Access & Venue | 3 | 3 | yes |
 | `BO-106` | People & Access Rights | People & Access Rights | 1 | 3 | yes |
-| `BO-1060` | Report Builder, Export & Audit | Access & Venue | 3 | 2 | yes |
+| `BO-1060` | Report Builder, Export & Audit | Access & Venue | 3 | 3 | yes |
 | `BO-1061` | Platform Command Center | Access & Venue | 3 | 2 | yes |
 | `BO-1062` | Tenant & Brand Context | Access & Venue | 1 | 3 | yes |
 | `BO-1063` | Venue-Specific Configuration | Access & Venue | 3 | 2 | yes |
@@ -750,7 +750,7 @@
 | `BO-1065` | Currency, Timezone & Channels | Setup | 1 | 4 | yes |
 | `BO-1066` | Roles, Permissions & Masking | Access & Venue | 3 | 14 | yes |
 | `BO-1067` | Seat Approval Workflows | Access & Venue | 3 | 1 | yes |
-| `BO-1068` | Lifecycle & Environment Promotion | Access & Venue | 3 | 1 | yes |
+| `BO-1068` | Lifecycle & Environment Promotion | Access & Venue | 3 | 2 | yes |
 | `BO-1069` | Platform Health & Observability | Access & Venue | 3 | 0 | yes |
 | `BO-107` | Guests & Marketing | Guests & Marketing | 1 | 4 | yes |
 | `BO-1070` | Setup, Clone & Inheritance | Access & Venue | 3 | 4 | yes |
@@ -873,7 +873,7 @@
 | `BO-1177` | API Security, Access & Integration Permissions | Orders & Money | 3 | 4 | yes |
 | `BO-1178` | Synchronization, Retry & Resilience Configuration | Orders & Money | 3 | 1 | yes |
 | `BO-1179` | Integration Monitoring & Exception Workbench | Orders & Money | 3 | 8 | yes |
-| `BO-118` | Campaign & Audience Management | Sell | 2 | 4 | yes |
+| `BO-118` | Campaign & Audience Management | Sell | 2 | 5 | yes |
 | `BO-1180` | Wallet Configuration Governance & Version Control | Orders & Money | 3 | 2 | yes |
 | `BO-1181` | Approval, Publication & Change Management | Orders & Money | 3 | 4 | yes |
 | `BO-1182` | Wallet Platform Health, Audit & Administration Center | Orders & Money | 3 | 1 | yes |
@@ -1368,16 +1368,16 @@
 | `BO-600` | Venue, Calendar & Operational Setup | Setup & Go-Live | 3 | 1 | yes |
 | `BO-601` | Product, Pricing & Sales Channel Setup | Setup & Go-Live | 3 | 3 | yes |
 | `BO-602` | POS, Payment & Access Setup | Setup & Go-Live | 3 | 1 | yes |
-| `BO-603` | Configuration Health & AI Review | Setup & Go-Live | 3 | 1 | yes |
+| `BO-603` | Configuration Health & AI Review | Setup & Go-Live | 3 | 2 | yes |
 | `BO-604` | Setup Completion & Handoff to Go-Live | Setup & Go-Live | 3 | 1 | yes |
 | `BO-605` | Go-Live Readiness Command Center | Setup & Go-Live | 3 | 1 | yes |
-| `BO-606` | Automated Validation Plan | Setup & Go-Live | 3 | 1 | yes |
-| `BO-607` | Ticketing & Product Validation | Setup & Go-Live | 3 | 1 | yes |
-| `BO-608` | End-to-End Sales Channel Testing | Setup & Go-Live | 3 | 1 | yes |
-| `BO-609` | Payment & Financial Validation | Setup & Go-Live | 3 | 1 | yes |
-| `BO-610` | Ticket, QR & Access Validation | Setup & Go-Live | 3 | 1 | yes |
-| `BO-611` | User, Security & Integration Validation | Setup & Go-Live | 3 | 1 | yes |
-| `BO-612` | Communication & Customer Journey Validation | Setup & Go-Live | 3 | 1 | yes |
+| `BO-606` | Automated Validation Plan | Setup & Go-Live | 3 | 2 | yes |
+| `BO-607` | Ticketing & Product Validation | Setup & Go-Live | 3 | 2 | yes |
+| `BO-608` | End-to-End Sales Channel Testing | Setup & Go-Live | 3 | 2 | yes |
+| `BO-609` | Payment & Financial Validation | Setup & Go-Live | 3 | 2 | yes |
+| `BO-610` | Ticket, QR & Access Validation | Setup & Go-Live | 3 | 2 | yes |
+| `BO-611` | User, Security & Integration Validation | Setup & Go-Live | 3 | 2 | yes |
+| `BO-612` | Communication & Customer Journey Validation | Setup & Go-Live | 3 | 2 | yes |
 | `BO-613` | Blocker, Warning & AI Resolution Center | Setup & Go-Live | 3 | 1 | yes |
 | `BO-614` | Final Go-Live Approval & Production Launch | Setup & Go-Live | 3 | 1 | yes |
 | `BO-615` | Accreditation Command Center | Access & Venue | 3 | 5 | yes |
@@ -1526,7 +1526,7 @@
 | `BO-759` | Demographic & Geographic | Engagement & Support | 3 | 1 | yes |
 | `BO-760` | Revenue & Engagement Segments | Engagement & Support | 3 | 2 | yes |
 | `BO-761` | AI Audience Discovery | Engagement & Support | 3 | 2 | yes |
-| `BO-762` | Predictive Audiences | Engagement & Support | 3 | 4 | yes |
+| `BO-762` | Predictive Audiences | Engagement & Support | 3 | 5 | yes |
 | `BO-763` | Activation & Governance | Engagement & Support | 3 | 2 | yes |
 | `BO-764` | Campaign Command Center | Engagement & Support | 3 | 2 | yes |
 | `BO-765` | Campaign Library & Calendar | Engagement & Support | 3 | 1 | yes |
@@ -1557,7 +1557,7 @@
 | `BO-790` | Scheduling, Priority & Approval | Engagement & Support | 3 | 1 | yes |
 | `BO-791` | Delivery, Retry & Failover | Engagement & Support | 3 | 2 | yes |
 | `BO-792` | Deliverability & Analytics | Engagement & Support | 3 | 1 | yes |
-| `BO-793` | AI Content, Translation & Audit | Engagement & Support | 3 | 3 | yes |
+| `BO-793` | AI Content, Translation & Audit | Engagement & Support | 3 | 4 | yes |
 | `BO-794` | Omnichannel Command Center | Engagement & Support | 3 | 1 | yes |
 | `BO-795` | Unified Inbox | Engagement & Support | 3 | 2 | yes |
 | `BO-796` | Guest Conversation 360 | Engagement & Support | 3 | 2 | yes |

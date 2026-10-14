@@ -1,6 +1,6 @@
 # P02-membership-loyalty-value-01 — P02 · Membership, Loyalty & Value
 
-**3 screens · 29 operations · 43 schemas · 13 permissions**
+**3 screens · 23 operations · 37 schemas · 10 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 13 permissions apply here:
-  `AI_USE, GUEST_MANAGE, GUEST_VIEW, LOYALTY_REDEEM, MARKETING_MANAGE, MARKETING_VIEW, ORDER_CREATE, ORDER_VIEW, PAYMENT_VIEW, PRICE_VIEW, PRODUCT_VIEW, WALLET_OPERATE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 10 permissions apply here:
+  `GUEST_MANAGE, GUEST_VIEW, LOYALTY_REDEEM, MARKETING_MANAGE, MARKETING_VIEW, ORDER_VIEW, PRICE_VIEW, PRODUCT_VIEW, WALLET_OPERATE, WALLET_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **4 of these operations work offline**: getGameCard, listLoyaltyProgrammes, listProducts, listPromotions
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -128,8 +128,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-011` | Wallet Overview | A | 4 | 15 | 6 | 32 | 14 | 6 | guest | notStarted (designed) |
-| `GST-015` | Memberships | A | 10 | 26 | 6 | 53 | 7 | 0 | guest | notStarted (designed) |
-| `GST-036` | Loyalty & Rewards | A | 9 | 49 | 6 | 54 | 2 | 2 | guest | notStarted (designed) |
+| `GST-015` | Memberships | A | 10 | 26 | 6 | 52 | 7 | 0 | guest | notStarted (designed) |
+| `GST-036` | Loyalty & Rewards | A | 9 | 49 | 6 | 12 | 2 | 2 | guest | notStarted (designed) |
 
 ## Design inputs from the client meetings
 

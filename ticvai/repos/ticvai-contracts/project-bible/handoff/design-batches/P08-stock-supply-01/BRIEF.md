@@ -108,7 +108,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-080` | Stock Transfers | D | 18 | 12 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
 | `BO-081` | Inventory Items | A | 33 | 18 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
 | `BO-082` | Stock Movements | D | 14 | 16 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
-| `BO-083` | Suppliers | D | 36 | 13 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
+| `BO-083` | Suppliers | D | 35 | 13 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

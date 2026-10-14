@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upgrade-conversion-command-center-adm-308",
-   "component": "apps/venue-management-web/src/routes/commercial/UpgradeConversionCommandCenter.tsx",
+   "component": "src/routes/commercial/UpgradeConversionCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -108,7 +109,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -135,7 +136,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -318,6 +319,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "board": "1",
@@ -327,7 +329,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upgrade-conversion-path-builder-adm-309",
-   "component": "apps/venue-management-web/src/routes/commercial/UpgradeConversionPathBuilder.tsx",
+   "component": "src/routes/commercial/UpgradeConversionPathBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -449,6 +451,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "board": "1",
@@ -458,7 +461,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upgrade-eligibility-qualification-rules-adm-310",
-   "component": "apps/venue-management-web/src/routes/commercial/UpgradeEligibilityQualificationRules.tsx",
+   "component": "src/routes/commercial/UpgradeEligibilityQualificationRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -588,6 +591,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "board": "1",
@@ -597,7 +601,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upgrade-timing-usage-ticket-status-rules-adm-311",
-   "component": "apps/venue-management-web/src/routes/commercial/UpgradeTimingUsageTicketStatusRules.tsx",
+   "component": "src/routes/commercial/UpgradeTimingUsageTicketStatusRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -778,6 +782,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "board": "1",
@@ -787,7 +792,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upgrade-financial-treatment-price-difference-rules-adm-312",
-   "component": "apps/venue-management-web/src/routes/commercial/UpgradeFinancialTreatmentPriceDifferenceRules.tsx",
+   "component": "src/routes/commercial/UpgradeFinancialTreatmentPriceDifferenceRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -932,6 +937,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_CREATE",
   "source": {
    "pack": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "board": "1",
@@ -941,7 +947,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pro-rata-residual-value-entitlement-credit-configuration-adm-313",
-   "component": "apps/venue-management-web/src/routes/commercial/ProRataResidualValueEntitlementCreditConfigurati.tsx",
+   "component": "src/routes/commercial/ProRataResidualValueEntitlementCreditConfigurati.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1066,6 +1072,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "board": "1",
@@ -1075,7 +1082,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/person-type-product-entitlement-conversion-rules-adm-314",
-   "component": "apps/venue-management-web/src/routes/commercial/PersonTypeProductEntitlementConversionRules.tsx",
+   "component": "src/routes/commercial/PersonTypeProductEntitlementConversionRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1191,6 +1198,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "board": "1",
@@ -1200,7 +1208,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/bulk-group-assisted-upgrade-operations-adm-315",
-   "component": "apps/venue-management-web/src/routes/commercial/BulkGroupAssistedUpgradeOperations.tsx",
+   "component": "src/routes/commercial/BulkGroupAssistedUpgradeOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1366,6 +1374,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "board": "1",
@@ -1375,7 +1384,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upgrade-execution-credential-regeneration-channel-contro-adm-316",
-   "component": "apps/venue-management-web/src/routes/commercial/UpgradeExecutionCredentialRegenerationChannelCon.tsx",
+   "component": "src/routes/commercial/UpgradeExecutionCredentialRegenerationChannelCon.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1528,6 +1537,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Ticket Upgrade, Exchange & Conversion_Reference.pdf",
    "board": "1",
@@ -1537,7 +1547,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/upgrade-history-exception-management-audit-explorer-adm-317",
-   "component": "apps/venue-management-web/src/routes/commercial/UpgradeHistoryExceptionManagementAuditExplorer.tsx",
+   "component": "src/routes/commercial/UpgradeHistoryExceptionManagementAuditExplorer.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1560,7 +1570,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {

@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
-  "operations": 23,
+  "operations": 22,
   "contracts": 7,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 9
+  "operationsWithNoScreen": 12
  },
  "waves": {
   "wave1": 2,
@@ -44,7 +44,7 @@
    "operations": 7
   },
   {
-   "contract": "ai",
+   "contract": "white-label",
    "operations": 3
   },
   {
@@ -52,19 +52,19 @@
    "operations": 3
   },
   {
-   "contract": "white-label",
+   "contract": "catalogue",
    "operations": 3
   },
   {
-   "contract": "catalogue",
-   "operations": 3
+   "contract": "fnb",
+   "operations": 2
   },
   {
    "contract": "marketing-crm",
    "operations": 2
   },
   {
-   "contract": "fnb",
+   "contract": "ai",
    "operations": 2
   }
  ],
@@ -201,7 +201,7 @@
    "module": "AI",
    "wave": 1,
    "route": "/kiosk/assistant",
-   "operations": 7,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -266,6 +266,24 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Use the existing profile or keep this booking separate"
+   },
+   {
+    "operation": "getDeviceConsentHistory",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "A visitor's own cookie decisions, oldest first"
+   },
+   {
+    "operation": "listPublishedTrackingTechnologies",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "The approved cookie registry, as the preference centre shows it"
+   },
+   {
+    "operation": "recordDeviceConsent",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Record a visitor's cookie decision, before anyone is known"
    },
    {
     "operation": "uploadGuestDocument",

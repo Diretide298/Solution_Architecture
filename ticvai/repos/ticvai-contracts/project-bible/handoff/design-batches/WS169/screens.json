@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/experience-command-center-bo-993",
-   "component": "apps/venue-management-web/src/routes/access-venue/ExperienceCommandCenter.tsx",
+   "component": "src/routes/access-venue/ExperienceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -113,7 +114,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatingRules",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatingRules"
       },
       {
        "kind": "primaryButton",
@@ -200,6 +202,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "5",
@@ -209,7 +212,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/choose-my-seats-bo-994",
-   "component": "apps/venue-management-web/src/routes/access-venue/ChooseMySeats.tsx",
+   "component": "src/routes/access-venue/ChooseMySeats.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -257,7 +260,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatAvailability",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatAvailability"
       },
       {
        "kind": "primaryButton",
@@ -345,6 +349,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "5",
@@ -354,7 +359,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/find-seats-for-me-bo-995",
-   "component": "apps/venue-management-web/src/routes/access-venue/FindSeatsForMe.tsx",
+   "component": "src/routes/access-venue/FindSeatsForMe.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -488,6 +493,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "5",
@@ -497,7 +503,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/filters-interactive-legend-bo-996",
-   "component": "apps/venue-management-web/src/routes/access-venue/FiltersInteractiveLegend.tsx",
+   "component": "src/routes/access-venue/FiltersInteractiveLegend.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -545,7 +551,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatAvailability",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatAvailability"
       }
      ]
     }
@@ -612,6 +619,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "5",
@@ -621,7 +629,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/real-time-availability-locking-bo-997",
-   "component": "apps/venue-management-web/src/routes/access-venue/RealTimeAvailabilityLocking.tsx",
+   "component": "src/routes/access-venue/RealTimeAvailabilityLocking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -740,7 +748,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/lock-timeout-concurrency-bo-998",
-   "component": "apps/venue-management-web/src/routes/access-venue/LockTimeoutConcurrency.tsx",
+   "component": "src/routes/access-venue/LockTimeoutConcurrency.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -845,6 +853,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "5",
@@ -854,7 +863,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/cart-multi-seat-management-bo-999",
-   "component": "apps/venue-management-web/src/routes/access-venue/CartMultiSeatManagement.tsx",
+   "component": "src/routes/access-venue/CartMultiSeatManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -899,13 +908,15 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatHold",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatHold"
       },
       {
        "kind": "destructiveButton",
        "derived": true,
        "impliedBy": "relinquishSeatHold",
-       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — which seat hold is affected and what goes with it, in the screen's own words; *are you sure* is not a confirmation."
+       "notes": "**Always confirms, never the default focus.** The consequence goes in the body — which seat hold is affected and what goes with it, in the screen's own words; *are you sure* is not a confirmation.",
+       "operation": "relinquishSeatHold"
       },
       {
        "kind": "secondaryButton",
@@ -986,6 +997,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "5",
@@ -995,7 +1007,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/mobile-accessible-selection-bo-1000",
-   "component": "apps/venue-management-web/src/routes/access-venue/MobileAccessibleSelection.tsx",
+   "component": "src/routes/access-venue/MobileAccessibleSelection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1043,7 +1055,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getSeatAvailability",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getSeatAvailability"
       }
      ]
     }
@@ -1117,6 +1130,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "5",
@@ -1126,7 +1140,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/view-preview-compare-heat-map-bo-1001",
-   "component": "apps/venue-management-web/src/routes/access-venue/ViewPreviewCompareHeatMap.tsx",
+   "component": "src/routes/access-venue/ViewPreviewCompareHeatMap.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1152,6 +1166,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Help customers understand qualitative and demand differences before choosing. Show approved seat-view previews or representative section views with source, freshness and obstruction disclosure. Compare seats by price, distance, view, level, amenities, accessibility and overall match. Display configurable demand, price or availability heat maps without revealing sensitive sales strategy. All channels shall use the same authoritative availability, lock and pricing services; no channel may maintain an independent seat-state cache beyond approved freshness rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatAvailability`, `recommendSeats` with BO-1002, BO-1039; this screen is View Preview, Compare & Heat Map (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 5.09, page 24): help customers understand qualitative and demand differences before choosing. Show approved seat-view previews or representative section views with source, freshness and obstruction disclosure. Compare seats by price, distance, view, level, amenities, accessibility and overall match. Display configurable demand, price or availability heat maps without revealing sensitive sales strategy. All channels shall use the same authoritative availability, lock and pricing services; no channel may maintain an independent seat-state cache beyond approved freshness rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -1260,6 +1275,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "5",
@@ -1269,7 +1285,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/ai-conversational-seat-assistant-bo-1002",
-   "component": "apps/venue-management-web/src/routes/access-venue/AiConversationalSeatAssistant.tsx",
+   "component": "src/routes/access-venue/AiConversationalSeatAssistant.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1295,6 +1311,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow natural-language seat discovery through governed AI. Understand requests such as family size, budget, view, aisle, stage proximity, accessibility and preferred level. Return only currently valid seat groups with match score, rationale, trade-offs, total price and add-to-cart action. Record model/version and feedback, disclose uncertainty and prevent AI from bypassing locks, pricing, eligibility or accessible-seat rules. All channels shall use the same authoritative availability, lock and pricing services; no channel may maintain an independent seat-state cache beyond approved freshness rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 24 Board 6 - Holds, Blocks & Inventory Controls Figure 6. High-definition configuration board with all 10 screens. Visual reference: information architecture and configuration coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work | Version 1.0 25",
+  "division": "Shares `getSeatAvailability`, `recommendSeats` with BO-1001, BO-1039; this screen is AI Conversational Seat Assistant (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 5.10, page 24): allow natural-language seat discovery through governed AI. Understand requests such as family size, budget, view, aisle, stage proximity, accessibility and preferred level. Return only currently valid seat groups with match score, rationale, trade-offs, total price and add-to-cart action. Record model/version and feedback, disclose uncertainty and prevent AI from bypassing locks, pricing, eligibility or accessible-seat rules. All channels shall use the same authoritative availability, lock and pricing services; no channel may maintain an independent seat-state cache beyond approved freshness rules. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 24 Board 6 - Holds, Blocks & Inventory Controls Figure 6. High-definition configuration board with all 10 screens. Visual reference: information architecture and configuration coverage; detailed production behavior is defined in the following scope. Configuration Scope of Work | Version 1.0 25.",
   "gaps": [
    {
     "operation": null,

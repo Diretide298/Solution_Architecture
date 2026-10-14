@@ -300,6 +300,7 @@ operations:
   writes:
   - cache:idempotency
   - marketing.case
+  - marketing.case_message
 - operation: createCaseClassificationIntelligent
   verb: POST
   path: /case-classification-intelligent
@@ -581,7 +582,6 @@ operations:
   - marketing.attribution_touch
   - marketing.campaign
   - marketing.campaign_variant
-  - marketing.message_delivery
   - marketing.message_dispatch
   writes: []
 - operation: getCase
@@ -1016,6 +1016,7 @@ operations:
   - staff
   offline: false
   reads:
+  - marketing.waiver_association
   - marketing.waiver_version_control
   writes: []
 - operation: getWishlist
@@ -1926,6 +1927,7 @@ operations:
   - marketing.privacy_exception
   - marketing.privacy_request
   - marketing.retention_policy
+  - marketing.segment
   - marketing.tracking_technology
   writes: []
 - operation: listPrivacyComplianceExceptions
@@ -2130,6 +2132,7 @@ operations:
   offline: false
   reads:
   - marketing.waiver_exception
+  - marketing.waiver_requirement
   writes: []
 - operation: listSlaPolicies
   verb: GET
@@ -2188,6 +2191,7 @@ operations:
   - staff
   offline: false
   reads:
+  - marketing.case
   - marketing.case_message
   - marketing.conversation
   - marketing.conversation_message
@@ -2745,6 +2749,7 @@ operations:
   - marketing.guest_device
   writes:
   - cache:idempotency
+  - identity.guest_session
   - marketing.guest_device
 - operation: runDataRetention
   verb: POST
@@ -2840,7 +2845,7 @@ operations:
   - marketing.agent_availability
 - operation: setAgentServiceProfile
   verb: PUT
-  path: /agent-workload-availability
+  path: /agent-workload-availability/{agentServiceProfileId}
   scope: venue
   permission: CASE_MANAGE
   audience:
@@ -2852,7 +2857,7 @@ operations:
   - marketing.agent_service_profile
 - operation: setBadge
   verb: PUT
-  path: /badges
+  path: /badges/{badgeId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -2864,7 +2869,7 @@ operations:
   - marketing.badge
 - operation: setBusinessEventMapping
   verb: PUT
-  path: /business-event-notification
+  path: /business-event-notification/{eventId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -2899,7 +2904,7 @@ operations:
   - marketing.conversation
 - operation: setCaseCategoryDefinition
   verb: PUT
-  path: /case-categories
+  path: /case-categories/{caseCategoryId}
   scope: venue
   permission: CASE_MANAGE
   audience:
@@ -2913,7 +2918,7 @@ operations:
   - marketing.case_category
 - operation: setCaseInternalRequest
   verb: PUT
-  path: /escalation-collaboration-internal
+  path: /escalation-collaboration-internal/{internalRequestId}
   scope: venue
   permission: CASE_MANAGE
   audience:
@@ -2937,7 +2942,7 @@ operations:
   - marketing.case_linked_record
 - operation: setCaseResolution
   verb: PUT
-  path: /case-resolution-closure
+  path: /case-resolution-closure/{caseResolutionId}
   scope: venue
   permission: CASE_MANAGE
   audience:
@@ -2949,7 +2954,7 @@ operations:
   - marketing.case_resolution
 - operation: setChannelProvider
   verb: PUT
-  path: /channel-provider
+  path: /channel-provider/{communicationProviderId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -2973,7 +2978,7 @@ operations:
   - marketing.communication_preference_type
 - operation: setCommunicationRoutingRule
   verb: PUT
-  path: /routing-priority-throttling
+  path: /routing-priority-throttling/{routingRuleId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -3014,7 +3019,7 @@ operations:
   - marketing.consent_purpose_channel
 - operation: setContactAutomation
   verb: PUT
-  path: /contact-automation
+  path: /contact-automation/{automationId}
   scope: venue
   permission: AI_CONFIGURE
   audience:
@@ -3026,7 +3031,7 @@ operations:
   - marketing.contact_automation
 - operation: setCookieBannerDesign
   verb: PUT
-  path: /cookie-banner-preference
+  path: /cookie-banner-preference/{bannerDesignId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3038,7 +3043,7 @@ operations:
   - marketing.cookie_banner_design
 - operation: setCookieScanPolicy
   verb: PUT
-  path: /cookie-scan-policy
+  path: /cookie-scan-policy/{scanPolicyId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3076,7 +3081,7 @@ operations:
   - marketing.privacy_export_package
 - operation: setDataProcessingPurpose
   verb: PUT
-  path: /data-processing-purpose
+  path: /data-processing-purpose/{purposeId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3088,7 +3093,7 @@ operations:
   - marketing.processing_purpose
 - operation: setDataRetentionPolicy
   verb: PUT
-  path: /retention-policies
+  path: /retention-policies/{retentionPolicyId}
   scope: tenant
   permission: GUEST_MANAGE
   audience:
@@ -3114,7 +3119,7 @@ operations:
   - marketing.waiver_form_layout
 - operation: setDynamicFieldQuestion
   verb: PUT
-  path: /dynamic-field-question
+  path: /dynamic-field-question/{formId}/{key}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3202,7 +3207,7 @@ operations:
   - marketing.identity_rules
 - operation: setIntelligentRoutingSkill
   verb: PUT
-  path: /intelligent-routing-skill
+  path: /intelligent-routing-skill/{routingRuleId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -3226,7 +3231,7 @@ operations:
   - marketing.loyalty_position
 - operation: setLegalHold
   verb: PUT
-  path: /data-retention-expiry
+  path: /data-retention-expiry/{holdId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3250,7 +3255,7 @@ operations:
   - marketing.waiver_localisation
 - operation: setLoyaltyCampaign
   verb: PUT
-  path: /loyalty/campaigns
+  path: /loyalty/campaigns/{loyaltyCampaignId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -3317,7 +3322,7 @@ operations:
   - marketing.minor_privacy_rule
 - operation: setOrderBookingTicket
   verb: PUT
-  path: /order-booking-ticket
+  path: /order-booking-ticket/{serviceActionId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -3329,7 +3334,7 @@ operations:
   - marketing.case_service_action
 - operation: setPrivacyAction
   verb: PUT
-  path: /deletion-anonymization-restriction
+  path: /deletion-anonymization-restriction/{actionId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3341,7 +3346,7 @@ operations:
   - marketing.privacy_action
 - operation: setPrivacyComplianceException
   verb: PUT
-  path: /privacy-compliance-exception
+  path: /privacy-compliance-exception/{exceptionId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -3353,7 +3358,7 @@ operations:
   - marketing.privacy_exception
 - operation: setPrivacyNoticePolicyGovernance
   verb: PUT
-  path: /privacy-notice-policy
+  path: /privacy-notice-policy/{governanceId}
   scope: tenant
   permission: GUEST_MANAGE
   audience:
@@ -3368,7 +3373,7 @@ operations:
   - marketing.privacy_notice_governance
 - operation: setPrivacyRequest
   verb: PUT
-  path: /data-subject-customer
+  path: /data-subject-customer/{requestId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3380,7 +3385,7 @@ operations:
   - marketing.privacy_request
 - operation: setPrivacyRequestTypes
   verb: PUT
-  path: /privacy
+  path: /privacy/{requestTypeId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3394,7 +3399,7 @@ operations:
   - marketing.privacy_request_type
 - operation: setQualityEvaluation
   verb: PUT
-  path: /quality-agent-evaluation
+  path: /quality-agent-evaluation/{evaluationId}
   scope: venue
   permission: CASE_MANAGE
   audience:
@@ -3406,7 +3411,7 @@ operations:
   - marketing.quality_evaluation
 - operation: setRefundCompensationService
   verb: PUT
-  path: /refund-compensation-service
+  path: /refund-compensation-service/{compensationRequestId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -3418,7 +3423,7 @@ operations:
   - marketing.case_compensation_request
 - operation: setReward
   verb: PUT
-  path: /loyalty/rewards
+  path: /loyalty/rewards/{rewardId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -3430,7 +3435,7 @@ operations:
   - marketing.reward
 - operation: setSenderIdentityDomain
   verb: PUT
-  path: /sender-identity-domain
+  path: /sender-identity-domain/{senderIdentityId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -3458,7 +3463,7 @@ operations:
   - control.seo_metadata
 - operation: setServiceQueueDefinition
   verb: PUT
-  path: /service-queues
+  path: /service-queues/{queueId}
   scope: venue
   permission: CASE_MANAGE
   audience:
@@ -3486,7 +3491,7 @@ operations:
   - marketing.waiver_signatory_rule
 - operation: setSlaPolicy
   verb: PUT
-  path: /sla-policies
+  path: /sla-policies/{slaPolicyId}
   scope: venue
   permission: CASE_MANAGE
   audience:
@@ -3498,7 +3503,7 @@ operations:
   - marketing.sla_policy
 - operation: setTrackingTechnology
   verb: PUT
-  path: /cookie-tracking-digital
+  path: /cookie-tracking-digital/{technologyId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3522,7 +3527,7 @@ operations:
   - marketing.tracking_technology_catalogue
 - operation: setWaiverAssociation
   verb: PUT
-  path: /product-event-experience
+  path: /product-event-experience/{associationId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3534,7 +3539,7 @@ operations:
   - marketing.waiver_association
 - operation: setWaiverException
   verb: PUT
-  path: /site-waiver-exception
+  path: /site-waiver-exception/{waiverExceptionId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3548,7 +3553,7 @@ operations:
   - marketing.waiver_requirement_event
 - operation: setWaiverTemplateMaster
   verb: PUT
-  path: /waiver-template-master
+  path: /waiver-template-master/{waiverId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3560,7 +3565,7 @@ operations:
   - marketing.waiver_master
 - operation: setWaiverTriggerRule
   verb: PUT
-  path: /waiver-trigger-eligibility
+  path: /waiver-trigger-eligibility/{triggerRuleId}
   scope: venue
   permission: GUEST_MANAGE
   audience:
@@ -3572,7 +3577,7 @@ operations:
   - marketing.waiver_trigger_rule
 - operation: setWaiverVerificationValidation
   verb: PUT
-  path: /waiver-verification-validation
+  path: /waiver-verification-validation/{verificationId}
   scope: venue
   permission: MARKETING_MANAGE
   audience:
@@ -3829,6 +3834,7 @@ operations:
   - marketing.guest_profile
   writes:
   - cache:idempotency
+  - marketing.guest_preference
   - marketing.guest_profile
   - pii.subject
 - operation: uploadGuestDocument

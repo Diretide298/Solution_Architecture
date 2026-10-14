@@ -160,13 +160,20 @@
   }
  },
  "AlternativeCode": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "catalogue.alternative_code",
   "type": "object",
   "required": [
    "code",
-   "partnerId"
+   "partnerId",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "code": {
     "type": "string",
     "maxLength": 128
@@ -213,7 +220,8 @@
    },
    "amendedByPrincipalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "identity.principal"
    },
    "amendedAt": {
     "type": "string",
@@ -517,6 +525,7 @@
   ]
  },
  "CaseMessage": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.case_message",
   "type": "object",
   "required": [
@@ -524,9 +533,16 @@
    "body",
    "isInternal",
    "authorKind",
-   "recordedAt"
+   "recordedAt",
+   "scopePath",
+   "caseId"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "resolution": {
     "type": "string",
     "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
@@ -573,6 +589,13 @@
     "format": "date-time",
     "readOnly": true,
     "description": "Server time the message arrived."
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "marketing.case",
+    "description": "The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`)."
    }
   }
  },
@@ -609,6 +632,9 @@
   ]
  },
  "ChannelAllocation": {
+  "x-ticvai-retired-columns": [
+   "envelope_id"
+  ],
   "x-ticvai-persistence": "catalogue.channel_envelope",
   "type": "object",
   "required": [
@@ -647,6 +673,13 @@
     "format": "date-time",
     "nullable": true,
     "description": "Unsold units return to the general pool at this time. How distribution holds are freed close to a performance without someone remembering to do it.\n"
+   },
+   "channelCapacityId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "catalogue.channel_capacity",
+    "description": "The capacity envelope this allocation draws from (`catalogue.channel_capacity`), from the path of `setChannelAllocations`."
    },
    "salesChannelId": {
     "type": "string",
@@ -889,6 +922,7 @@
     "type": "string"
    },
    "attachmentRefs": {
+    "x-ticvai-stored-as": "marketing.case_message.attachment_refs",
     "type": "array",
     "description": "Stored on the opening `CaseMessage`, not on the case.",
     "items": {
@@ -918,6 +952,7 @@
     "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
+    "x-ticvai-references": "catalogue.variant",
     "type": "string",
     "format": "uuid"
    },
@@ -1054,11 +1089,13 @@
     "description": "Null for an anonymous sale. Identity and entitlement are separate."
    },
    "guestLinkId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells."
    },
    "catalogueBundleVersion": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
    },
@@ -1088,7 +1125,8 @@
   "properties": {
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "venue"
    },
    "name": {
     "$ref": "#/components/schemas/queue::LocalisedText"
@@ -1225,6 +1263,7 @@
     "nullable": true
    },
    "fastPass": {
+    "x-ticvai-persisted": false,
     "allOf": [
      {
       "$ref": "#/components/schemas/QueueFastPass"
@@ -1597,7 +1636,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "authority": {
     "type": "string",
@@ -1713,7 +1753,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "note": {
     "type": "string",
@@ -1772,7 +1813,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "kind": {
     "type": "string",
@@ -1845,7 +1887,8 @@
    },
    "incidentId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "maintenance.incident"
    },
    "kind": {
     "type": "string",
@@ -1991,6 +2034,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -2205,7 +2249,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -2922,6 +2967,8 @@
     }
    },
    "boundary": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "nullable": true,
     "description": "The shape drawn, as a polygon in drawing coordinates. Null for a pin.",
@@ -3013,13 +3060,15 @@
     "type": "string",
     "format": "uuid",
     "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164).",
     "description": "1.4.18. **The approval gate refuses an approver who is the author, and nothing recorded either.** `SeatBlock`, `DelegatedAccess` and `ManualDiscountRequest` all carry this and the product passing through approval did not.\n"
    },
    "approvedByPrincipalId": {
     "type": "string",
     "format": "uuid",
     "nullable": true,
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest or a visitor (R164)."
    },
    "responsibleDepartmentId": {
     "type": "string",
@@ -3125,6 +3174,8 @@
     "description": "**The booking flow this product is sold through** (decided 29 September, W8 and W12): a white-label `BookingFlow` of the venue, which orders the guest's steps (for a workshop, the product first and then the date and time). Null means the category's flow (`ProductCategory.bookingFlowId`), and failing that the venue's flow for the product's `kind`. Written by `createProduct` and `updateProduct`, which refuse an id that is not a flow of the venue with `422`.\n"
    },
    "displayTags": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 6,
     "items": {
@@ -4188,6 +4239,60 @@
    }
   }
  },
+ "VenueMapLiveState": {
+  "type": "object",
+  "x-ticvai-persistence": "none — response only; live state over the published map, assembled at read time",
+  "description": "**The live operational state on the published map** (`getVenueMapLive`): one entry per point that has a live figure. Changes every few seconds, so it is read apart from the map itself (`getVenueMap`).",
+  "required": [
+   "mapId",
+   "asOf",
+   "points"
+  ],
+  "properties": {
+   "mapId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "points": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "required": [
+      "pointId"
+     ],
+     "properties": {
+      "pointId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "isOpen": {
+       "type": "boolean",
+       "nullable": true
+      },
+      "waitMinutes": {
+       "type": "integer",
+       "minimum": 0,
+       "nullable": true
+      },
+      "queueLength": {
+       "type": "integer",
+       "minimum": 0,
+       "nullable": true
+      },
+      "occupancyPercent": {
+       "type": "number",
+       "minimum": 0,
+       "nullable": true
+      }
+     }
+    }
+   }
+  }
+ },
  "VenueModel3d": {
   "type": "object",
   "x-ticvai-persistence": "none — jsonb column",
@@ -4275,6 +4380,26 @@
     "nullable": true,
     "readOnly": true,
     "description": "Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"
+   },
+   "isClosed": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "Closed by `setPathClosure`; routing does not use a closed path."
+   },
+   "expectedReopenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a closed path is expected to reopen (`setPathClosure`)."
+   },
+   "closedNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The free text with an `other` closure reason (`setPathClosure`; audit R222)."
    }
   }
  },
@@ -4415,6 +4540,8 @@
     "description": "**What the guest reads on Item Detail** (29 September, MOB-4). Keyed by locale, like `nameLocalised`. One screen now serves rides, shows, restaurants and shops (GST-004 and GST-006 merged), and it opens from the map pin, so the point carries the words rather than each kind borrowing them from a different module. Set on BO-094.\n"
    },
    "media": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "maxItems": 12,
     "description": "**The gallery on Item Detail** (29 September, MOB-4): images and short clips from the asset library, first `isPrimary` shown on the map card. Assets are referenced, never copied, so a replaced photo changes everywhere.\n",

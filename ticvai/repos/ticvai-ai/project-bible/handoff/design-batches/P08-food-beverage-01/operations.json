@@ -618,7 +618,7 @@
   "contract": "fnb",
   "summary": "Move a ticket up the queue",
   "permission": "ORDER_MODIFY",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [

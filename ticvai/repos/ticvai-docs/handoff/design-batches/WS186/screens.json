@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-command-center-bo-1083",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletCommandCenter.tsx",
+   "component": "src/routes/orders-money/WalletCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -309,6 +310,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -318,7 +320,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-type-library-bo-1084",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletTypeLibrary.tsx",
+   "component": "src/routes/orders-money/WalletTypeLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -564,6 +566,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -573,7 +576,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-creation-provisioning-rules-bo-1085",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletCreationProvisioningRules.tsx",
+   "component": "src/routes/orders-money/WalletCreationProvisioningRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -786,6 +789,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -795,7 +799,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-ownership-account-association-bo-1086",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletOwnershipAccountAssociation.tsx",
+   "component": "src/routes/orders-money/WalletOwnershipAccountAssociation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -984,6 +988,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -993,7 +998,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-currency-monetary-configuration-bo-1087",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletCurrencyMonetaryConfiguration.tsx",
+   "component": "src/routes/orders-money/WalletCurrencyMonetaryConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1017,6 +1022,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define currencies and monetary rules applicable to wallet balances.",
   "purposeNote": "Wallet transactions consistently follow configured currency, conversion and rounding rules.",
+  "division": "Shares `listWalletTypes`, `updateWalletType` with BO-1089, BO-1090; this screen is Wallet Currency & Monetary Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 1.05, page 7): define currencies and monetary rules applicable to wallet balances.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1184,6 +1190,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -1193,7 +1200,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/credit-balance-type-configuration-bo-1088",
-   "component": "apps/venue-management-web/src/routes/orders-money/CreditBalanceTypeConfiguration.tsx",
+   "component": "src/routes/orders-money/CreditBalanceTypeConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1217,6 +1224,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Administrators can define; For each balance type configure) and no display directory — it is settings, not a population",
   "purpose": "Configure all value types that may be stored inside a TICVAI wallet. The attached requirements explicitly call for multiple wallet credit types including Cash Credit, Bonus Credit, Redemption Tickets Credit and Rides Credit.",
   "purposeNote": "New wallet credit types can be introduced through configuration without development changes.",
+  "division": "Shares `createCreditType`, `listCreditTypes`, `updateCreditType` with BO-1104; this screen is Credit & Balance Type Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 1.06, page 8): configure all value types that may be stored inside a TICVAI wallet. The attached requirements explicitly call for multiple wallet credit types including Cash Credit, Bonus Credit, Redemption Tickets Credit and Rides Credit.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1459,6 +1467,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -1468,7 +1477,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-feature-profile-bo-1089",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletFeatureProfile.tsx",
+   "component": "src/routes/orders-money/WalletFeatureProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1492,6 +1501,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control which capabilities are available for each wallet type.",
   "purposeNote": "Features can be centrally enabled or restricted based on wallet context.",
+  "division": "Shares `listWalletTypes`, `updateWalletType` with BO-1087, BO-1090; this screen is Wallet Feature Profile (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 1.07, page 8): control which capabilities are available for each wallet type.",
   "gaps": [
    {
     "operation": null,
@@ -1604,6 +1614,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -1613,7 +1624,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-lifecycle-configuration-bo-1090",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletLifecycleConfiguration.tsx",
+   "component": "src/routes/orders-money/WalletLifecycleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1637,6 +1648,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Govern the complete wallet lifecycle from creation through closure.",
   "purposeNote": "Every status transition is controlled by permissions, configurable business rules and audit logging.",
+  "division": "Shares `listWalletTypes`, `updateWalletType` with BO-1087, BO-1089; this screen is Wallet Lifecycle Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 1.08, page 9): govern the complete wallet lifecycle from creation through closure.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1779,6 +1791,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -1788,7 +1801,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-numbering-identity-digital-credentials-bo-1091",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletNumberingIdentityDigitalCredentials.tsx",
+   "component": "src/routes/orders-money/WalletNumberingIdentityDigitalCredentials.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1994,6 +2007,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "1",
@@ -2003,7 +2017,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/wallet-configuration-preview-validation-publication-bo-1092",
-   "component": "apps/venue-management-web/src/routes/orders-money/WalletConfigurationPreviewValidationPublication.tsx",
+   "component": "src/routes/orders-money/WalletConfigurationPreviewValidationPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2027,6 +2041,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Show configuration summary covering; Every configuration publication records) and no display directory — it is settings, not a population",
   "purpose": "Provide a governed final validation step before wallet configuration becomes operational. Configure how value enters a TICVAI wallet across digital and physical channels, including manual top-ups, payment-method funding, automatic reload, recurring funding, authorization controls, reversals, limits, and operational monitoring. This board directly covers the wallet requirements for multiple funding methods, auto-reload, recurring funding, configurable limits, security controls, and complete transaction auditing.",
   "purposeNote": "No wallet configuration can become operational unless validation, permissions and applicable approval requirements have been successfully completed. This makes Board 1 the foundation of the entire wallet engine, rather than jumping immediately into transactions. Once these 10 screens exist, Boards 2–10 can reuse the Wallet Type, Credit Type, Currency, Ownership and Lifecycle objects without recreating them. The next board should therefore be Board 2 — Funding, Top-Up & Reload Management, covering cash/card top-up, payment-source rules, auto-reload, recurring funding, funding authorization, rev",
+  "division": "Shares `listWalletConfigurationVersions`, `publishWalletConfiguration` with BO-1132, BO-1180; this screen is Wallet Configuration Preview, Validation & Publication (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 1.10, page 11): provide a governed final validation step before wallet configuration becomes operational. Configure how value enters a TICVAI wallet across digital and physical channels, including manual top-ups, payment-method funding, automatic reload, recurring funding, authorization controls, reversals, limits, and operational monitoring. This board directly covers the wallet requirements for multiple funding methods, auto-reload, recurring funding, configurable limits, security controls, and complete transaction auditing.",
   "layout": {
    "template": "form",
    "regions": [
@@ -2128,7 +2143,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "publishWalletConfiguration"
       },
       {
        "kind": "dataTable",

@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "7",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/rules-command-center-bo-1013",
-   "component": "apps/venue-management-web/src/routes/access-venue/RulesCommandCenter.tsx",
+   "component": "src/routes/access-venue/RulesCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -115,7 +116,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -265,6 +266,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "7",
@@ -274,7 +276,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/seat-kill-rules-bo-1014",
-   "component": "apps/venue-management-web/src/routes/access-venue/SeatKillRules.tsx",
+   "component": "src/routes/access-venue/SeatKillRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -297,6 +299,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Remove seats from sale based on permanent or conditional unusability. Configure sightline, stage, production, obstruction, equipment, safety, maintenance and venue-defined kill reasons. Apply by seat list, section, row, polygon, obstruction distance, event type or layout condition. Preview affected capacity, sold/reserved inventory and alternative seating before activation. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatRules`, `setSeatRules` with BO-1015, BO-1016, BO-1021; this screen is Seat Kill Rules (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.02, page 30): remove seats from sale based on permanent or conditional unusability. Configure sightline, stage, production, obstruction, equipment, safety, maintenance and venue-defined kill reasons. Apply by seat list, section, row, polygon, obstruction distance, event type or layout condition. Preview affected capacity, sold/reserved inventory and alternative seating before activation. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -403,6 +406,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "7",
@@ -412,7 +416,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/buffer-seat-rules-bo-1015",
-   "component": "apps/venue-management-web/src/routes/access-venue/BufferSeatRules.tsx",
+   "component": "src/routes/access-venue/BufferSeatRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -435,6 +439,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create controlled unsold spacing around seats, zones or production objects. Define left/right, radial, row, perimeter, alternating or custom buffer patterns and minimum distance. Apply dynamically around selected seats, wheelchair spaces, camera positions, stages or restricted zones. Configure release behavior, priority, interaction with holds and treatment when a buffer conflicts with a sale. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 30",
+  "division": "Shares `getSeatRules`, `setSeatRules` with BO-1014, BO-1016, BO-1021; this screen is Buffer Seat Rules (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.03, page 30): create controlled unsold spacing around seats, zones or production objects. Define left/right, radial, row, perimeter, alternating or custom buffer patterns and minimum distance. Apply dynamically around selected seats, wheelchair spaces, camera positions, stages or restricted zones. Configure release behavior, priority, interaction with holds and treatment when a buffer conflicts with a sale. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 30.",
   "gaps": [
    {
     "operation": null,
@@ -541,6 +546,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "7",
@@ -550,7 +556,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/companion-seat-rules-bo-1016",
-   "component": "apps/venue-management-web/src/routes/access-venue/CompanionSeatRules.tsx",
+   "component": "src/routes/access-venue/CompanionSeatRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -573,6 +579,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Keep appropriate companion inventory linked to designated seats. Configure eligible seat types, adjacency, ratio, maximum companions and same-row or nearby rules. Control whether companions must be selected together and when unneeded companion seats may be released. Support family, premium, group and venue-defined companion policies without overriding wheelchair-specific rules. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatRules`, `setSeatRules` with BO-1014, BO-1015, BO-1021; this screen is Companion Seat Rules (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.04, page 31): keep appropriate companion inventory linked to designated seats. Configure eligible seat types, adjacency, ratio, maximum companions and same-row or nearby rules. Control whether companions must be selected together and when unneeded companion seats may be released. Support family, premium, group and venue-defined companion policies without overriding wheelchair-specific rules. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -679,6 +686,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "7",
@@ -688,7 +696,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/wheelchair-companion-rules-bo-1017",
-   "component": "apps/venue-management-web/src/routes/access-venue/WheelchairCompanionRules.tsx",
+   "component": "src/routes/access-venue/WheelchairCompanionRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -809,6 +817,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "7",
@@ -818,7 +827,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accessible-seating-master-bo-1018",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessibleSeatingMaster.tsx",
+   "component": "src/routes/access-venue/AccessibleSeatingMaster.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -842,6 +851,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Maintain a standard catalog of accessible seat and space attributes. Configure wheelchair, companion, ambulatory, transfer, hearing, vision, service-animal and other supported types. Store dimensions, capacity treatment, route requirements, amenities, assisted access and display labels. Map each type to venue inventory, ticket products, customer-facing filters and compliance reporting. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getAccessibleSeating`, `setAccessibleSeating` with BO-1019, BO-1020; this screen is Accessible Seating Master (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.06, page 31): maintain a standard catalog of accessible seat and space attributes. Configure wheelchair, companion, ambulatory, transfer, hearing, vision, service-animal and other supported types. Store dimensions, capacity treatment, route requirements, amenities, assisted access and display labels. Map each type to venue inventory, ticket products, customer-facing filters and compliance reporting. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -940,6 +950,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "7",
@@ -949,7 +960,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accessible-route-mapping-bo-1019",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessibleRouteMapping.tsx",
+   "component": "src/routes/access-venue/AccessibleRouteMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -972,6 +983,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Identify accessible journeys from entry to seats and facilities. Create routes through accessible entrances, lifts, ramps, concourses, restrooms and designated seating. Store distance, slope, level changes, width, surface, assistance requirement and temporary closure status. Validate route continuity and show impact when a layout, facility or access point becomes unavailable. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 31",
+  "division": "Shares `getAccessibleSeating`, `setAccessibleSeating` with BO-1018, BO-1020; this screen is Accessible Route Mapping (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.07, page 31): identify accessible journeys from entry to seats and facilities. Create routes through accessible entrances, lifts, ramps, concourses, restrooms and designated seating. Store distance, slope, level changes, width, surface, assistance requirement and temporary closure status. Validate route continuity and show impact when a layout, facility or access point becomes unavailable. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 31.",
   "gaps": [
    {
     "operation": null,
@@ -1078,6 +1090,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "7",
@@ -1087,7 +1100,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accessible-filters-eligibility-bo-1020",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessibleFiltersEligibility.tsx",
+   "component": "src/routes/access-venue/AccessibleFiltersEligibility.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1110,6 +1123,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure inclusive discovery without exposing sensitive guest information. Define filters and labels for wheelchair, companion, aisle, step-free, transfer, hearing, vision and service-animal needs. Configure eligibility attestation, documentation policy where lawful, assisted-sale path and privacy restrictions. Preview the B2C, mobile, POS and call-center experience and ensure equivalent inventory visibility. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getAccessibleSeating`, `setAccessibleSeating` with BO-1018, BO-1019; this screen is Accessible Filters & Eligibility (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.08, page 32): configure inclusive discovery without exposing sensitive guest information. Define filters and labels for wheelchair, companion, aisle, step-free, transfer, hearing, vision and service-animal needs. Configure eligibility attestation, documentation policy where lawful, assisted-sale path and privacy restrictions. Preview the B2C, mobile, POS and call-center experience and ensure equivalent inventory visibility. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -1216,6 +1230,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "7",
@@ -1225,7 +1240,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/flexible-spacing-rules-bo-1021",
-   "component": "apps/venue-management-web/src/routes/access-venue/FlexibleSpacingRules.tsx",
+   "component": "src/routes/access-venue/FlexibleSpacingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1248,6 +1263,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Support temporary public-health or operational spacing requirements. Configure distance, seat count, checkerboard, blocked-row, household-group and custom patterns. Apply by event, venue, zone, seat type or time window and preview capacity and revenue impact. Coordinate with group seating, accessible inventory, holds and sold seats and prevent retroactive unsafe changes. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatRules`, `setSeatRules` with BO-1014, BO-1015, BO-1016; this screen is Flexible Spacing Rules (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 7.09, page 32): support temporary public-health or operational spacing requirements. Configure distance, seat count, checkerboard, blocked-row, household-group and custom patterns. Apply by event, venue, zone, seat type or time window and preview capacity and revenue impact. Coordinate with group seating, accessible inventory, holds and sold seats and prevent retroactive unsafe changes. Accessibility inventory and companion rules shall be policy-driven and auditable; overrides require authority and reason and must not unlawfully reduce accessible availability. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -1354,6 +1370,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "7",
@@ -1363,7 +1380,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/compliance-validation-audit-bo-1022",
-   "component": "apps/venue-management-web/src/routes/access-venue/ComplianceValidationAudit.tsx",
+   "component": "src/routes/access-venue/ComplianceValidationAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1410,7 +1427,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {

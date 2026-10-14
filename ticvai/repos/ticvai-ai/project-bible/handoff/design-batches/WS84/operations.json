@@ -4,7 +4,7 @@
   "path": "/game-cards/{cardCode}",
   "contract": "games",
   "summary": "Read a card's balances",
-  "permission": null,
+  "permission": "WALLET_VIEW",
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",

@@ -27,6 +27,7 @@
     "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
+    "x-ticvai-references": "catalogue.variant",
     "type": "string",
     "format": "uuid"
    },
@@ -163,11 +164,13 @@
     "description": "Null for an anonymous sale. Identity and entitlement are separate."
    },
    "guestLinkId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells."
    },
    "catalogueBundleVersion": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
    },
@@ -438,7 +441,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",

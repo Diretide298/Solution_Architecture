@@ -60,7 +60,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/sign-in
-    component: apps/venue-staff-app/src/routes/operations/SignInDetail.tsx
+    component: src/routes/operations/SignInDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -288,7 +288,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/select-venue-role
-    component: apps/venue-staff-app/src/routes/operations/SelectVenueRoleDetail.tsx
+    component: src/routes/operations/SelectVenueRoleDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -440,11 +440,12 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: REPORT_VIEW_WORKSTATION
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/home-on-duty
-    component: apps/venue-staff-app/src/routes/operations/HomeOnDutyDetail.tsx
+    component: src/routes/operations/HomeOnDutyDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -955,6 +956,12 @@ screens:
     trigger: onAction
     invalidates:
     - listIncidents
+  - operationId: uploadIncidentMedia
+    contract: maintenance
+    purpose: The signed upload for a photo or document the incident form attaches, requested when the
+      form is sent; no control of its own
+    trigger: background
+    provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
     params:
     - name: incidentId
@@ -1068,11 +1075,12 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: INSPECTION_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/opening-checklist
-    component: apps/venue-staff-app/src/routes/operations/OpeningChecklistDetail.tsx
+    component: src/routes/operations/OpeningChecklistDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1212,11 +1220,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: SHIFT_OPEN
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/end-shift
-    component: apps/venue-staff-app/src/routes/operations/EndShiftDetail.tsx
+    component: src/routes/operations/EndShiftDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1373,6 +1382,8 @@ screens:
   - id: confirmSuspendShift
     component: confirmDialog
     trigger: Suspend shift
+    confirm:
+      operation: suspendShift
     body: '**Names what `suspendShift` changes and what it leaves alone**, in the consequence rather than
       the verb. A end shift this affects should be identified in the dialog, not just counted. **Collects
       what `suspendShift` sends before it is called.** Required: `recordedAt`. Optional: `reason`.'
@@ -1526,11 +1537,12 @@ screens:
   module: Operations
   requiresModule: access
   wave: 1
+  permission: TICKET_LOOKUP
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/scan-ready
-    component: apps/venue-staff-app/src/routes/operations/ScanReadyDetail.tsx
+    component: src/routes/operations/ScanReadyDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1678,11 +1690,6 @@ screens:
     contract: access
     purpose: Admit a group on one read
     trigger: onAction
-  - operationId: verifyAccreditationCredential
-    contract: accreditation
-    purpose: 'Verify a presented accreditation: photo, name, category, zones allowed now, validity'
-    trigger: onAction
-    provenance: build, 29 September 2026
   entryState:
     preloaded:
     - ScanEvent.id
@@ -1721,11 +1728,12 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 1
+  permission: ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/ticket-lookup
-    component: apps/venue-staff-app/src/routes/operations/TicketLookupDetail.tsx
+    component: src/routes/operations/TicketLookupDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2006,11 +2014,12 @@ screens:
   module: Operations
   requiresModule: access
   wave: 2
+  permission: REPORT_VIEW_VENUE
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/group-scan
-    component: apps/venue-staff-app/src/routes/operations/GroupScanDetail.tsx
+    component: src/routes/operations/GroupScanDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2278,11 +2287,12 @@ screens:
   module: Operations
   requiresModule: access
   wave: 1
+  permission: ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/sync-reconciliation
-    component: apps/venue-staff-app/src/routes/operations/SyncReconciliationDetail.tsx
+    component: src/routes/operations/SyncReconciliationDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2572,11 +2582,12 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 1
+  permission: PRODUCT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/offline-package
-    component: apps/venue-staff-app/src/routes/operations/OfflinePackageDetail.tsx
+    component: src/routes/operations/OfflinePackageDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2736,11 +2747,12 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: WORK_ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/task-list
-    component: apps/venue-staff-app/src/routes/operations/TaskListDetail.tsx
+    component: src/routes/operations/TaskListDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2995,11 +3007,12 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: WORK_ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/task-detail
-    component: apps/venue-staff-app/src/routes/operations/TaskDetailDetail.tsx
+    component: src/routes/operations/TaskDetailDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -3172,7 +3185,7 @@ screens:
         label: Resume work order
         operation: resumeWorkOrder
         provenance: contract maintenance.yaml POST /work-orders/{workOrderId}/resume
-    - name: contextPanel
+    - name: partsPanel
       slot: selection
       components:
       - kind: dataTable
@@ -3455,11 +3468,12 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: WORK_ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/raise-a-task
-    component: apps/venue-staff-app/src/routes/operations/RaiseATaskDetail.tsx
+    component: src/routes/operations/RaiseATaskDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -3959,11 +3973,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: WORK_ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/handover-notes
-    component: apps/venue-staff-app/src/routes/operations/HandoverNotesDetail.tsx
+    component: src/routes/operations/HandoverNotesDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4087,11 +4102,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: REPORT_VIEW_WORKSTATION
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/shift-summary
-    component: apps/venue-staff-app/src/routes/operations/ShiftSummaryDetail.tsx
+    component: src/routes/operations/ShiftSummaryDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4286,11 +4302,12 @@ screens:
   module: Operations
   requiresModule: ai
   wave: 1
+  permission: AI_USE
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/ai-assistant-home
-    component: apps/venue-staff-app/src/routes/operations/AiAssistantHomeDetail.tsx
+    component: src/routes/operations/AiAssistantHomeDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4459,11 +4476,12 @@ screens:
   module: Operations
   requiresModule: ai
   wave: 1
+  permission: AI_USE
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/ai-assistant-answer
-    component: apps/venue-staff-app/src/routes/operations/AiAssistantAnswerDetail.tsx
+    component: src/routes/operations/AiAssistantAnswerDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4667,11 +4685,12 @@ screens:
   module: Operations
   requiresModule: queue
   wave: 2
+  permission: QUEUE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/queue-monitor
-    component: apps/venue-staff-app/src/routes/operations/QueueMonitorDetail.tsx
+    component: src/routes/operations/QueueMonitorDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4928,11 +4947,12 @@ screens:
   module: Operations
   requiresModule: queue
   wave: 1
+  permission: QUEUE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/manual-wait-entry
-    component: apps/venue-staff-app/src/routes/operations/ManualWaitEntryDetail.tsx
+    component: src/routes/operations/ManualWaitEntryDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -5105,11 +5125,12 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 2
+  permission: PRODUCT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/capacity-view
-    component: apps/venue-staff-app/src/routes/operations/CapacityViewDetail.tsx
+    component: src/routes/operations/CapacityViewDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -5290,11 +5311,12 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 2
+  permission: PRODUCT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/walk-up-sale
-    component: apps/venue-staff-app/src/routes/operations/WalkUpSaleDetail.tsx
+    component: src/routes/operations/WalkUpSaleDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -5865,11 +5887,12 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 2
+  permission: ORDER_CREATE
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/payment-on-device
-    component: apps/venue-staff-app/src/routes/operations/PaymentOnDeviceDetail.tsx
+    component: src/routes/operations/PaymentOnDeviceDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6043,11 +6066,12 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 2
+  permission: ORDER_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/issue-media
-    component: apps/venue-staff-app/src/routes/operations/IssueMediaDetail.tsx
+    component: src/routes/operations/IssueMediaDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6218,11 +6242,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/notifications
-    component: apps/venue-staff-app/src/routes/operations/NotificationsDetail.tsx
+    component: src/routes/operations/NotificationsDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6414,11 +6439,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/announcements
-    component: apps/venue-staff-app/src/routes/operations/AnnouncementsDetail.tsx
+    component: src/routes/operations/AnnouncementsDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6453,6 +6479,8 @@ screens:
   patternReason: '`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them
     — list, select, act'
   purpose: Read what the venue told everybody.
+  division: 'Shares `acknowledgeAnnouncement`, `listAnnouncements` with EMP-047; this screen is Announcements:
+    read what the venue told everybody.'
   layout:
     template: split
     regions:
@@ -6566,11 +6594,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/emergency-mode
-    component: apps/venue-staff-app/src/routes/operations/EmergencyModeDetail.tsx
+    component: src/routes/operations/EmergencyModeDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6612,6 +6641,8 @@ screens:
   patternReason: '`listAnnouncements` reads the population and `getAnnouncementReach` reads one of them
     — list, select, act'
   purpose: Evacuate, and stop pretending to be a ticketing app.
+  division: 'Shares `acknowledgeAnnouncement`, `listAnnouncements` with EMP-039; this screen is Emergency
+    mode: evacuate, and stop pretending to be a ticketing app.'
   layout:
     template: split
     regions:
@@ -6730,11 +6761,12 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 2
+  permission: INCIDENT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/post-incident-restore
-    component: apps/venue-staff-app/src/routes/operations/PostIncidentRestoreDetail.tsx
+    component: src/routes/operations/PostIncidentRestoreDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6867,6 +6899,12 @@ screens:
     trigger: onAction
     invalidates:
     - listIncidents
+  - operationId: uploadIncidentMedia
+    contract: maintenance
+    purpose: The signed upload for a photo or document the incident form attaches, requested when the
+      form is sent; no control of its own
+    trigger: background
+    provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
     params:
     - name: incidentId
@@ -6924,11 +6962,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/roster
-    component: apps/venue-staff-app/src/routes/operations/RosterDetail.tsx
+    component: src/routes/operations/RosterDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6973,6 +7012,8 @@ screens:
   patternReason: '`listRotaAssignments` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
   purpose: See who is on, and where.
+  division: 'Shares `listRotaAssignments`, `requestShiftSwap` with EMP-022; this screen is Roster: see
+    who is on, and where.'
   layout:
     template: split
     regions:
@@ -7097,11 +7138,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/my-rota
-    component: apps/venue-staff-app/src/routes/operations/MyRotaDetail.tsx
+    component: src/routes/operations/MyRotaDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -7147,6 +7189,8 @@ screens:
   patternReason: '`listRotaAssignments` reads the population and `getCurrentShift` reads one of them —
     list, select, act'
   purpose: Know when to turn up next.
+  division: 'Shares `listRotaAssignments`, `requestShiftSwap` with EMP-021; this screen is My rota: know
+    when to turn up next.'
   layout:
     template: split
     regions:
@@ -7275,11 +7319,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/swap-request
-    component: apps/venue-staff-app/src/routes/operations/SwapRequestDetail.tsx
+    component: src/routes/operations/SwapRequestDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -7459,11 +7504,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/clock-in-out
-    component: apps/venue-staff-app/src/routes/operations/ClockInOutDetail.tsx
+    component: src/routes/operations/ClockInOutDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -7505,6 +7551,8 @@ screens:
   patternReason: '`listAttendance` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
   purpose: Record attendance from the device already in hand.
+  division: 'Shares `listAttendance`, `recordAttendance` with EMP-025; this screen is Clock in / out:
+    record attendance from the device already in hand.'
   layout:
     template: split
     regions:
@@ -7655,11 +7703,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/break-management
-    component: apps/venue-staff-app/src/routes/operations/BreakManagementDetail.tsx
+    component: src/routes/operations/BreakManagementDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -7697,6 +7746,8 @@ screens:
   patternReason: '`listAttendance` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
   purpose: Take a break without leaving a gate unstaffed.
+  division: 'Shares `listAttendance`, `recordAttendance` with EMP-024; this screen is Break management:
+    take a break without leaving a gate unstaffed.'
   layout:
     template: split
     regions:
@@ -7819,11 +7870,12 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 1
+  permission: INCIDENT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/incident-report
-    component: apps/venue-staff-app/src/routes/operations/IncidentReportDetail.tsx
+    component: src/routes/operations/IncidentReportDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -8079,11 +8131,12 @@ screens:
   module: Operations
   requiresModule: maintenance
   wave: 2
+  permission: INCIDENT_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/incident-detail
-    component: apps/venue-staff-app/src/routes/operations/IncidentDetailDetail.tsx
+    component: src/routes/operations/IncidentDetailDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -8240,6 +8293,12 @@ screens:
     purpose: Record that an external authority was notified, where required
     trigger: onAction
     provenance: wiring fix, 2 October 2026 (CHG-WIR-001)
+  - operationId: uploadIncidentMedia
+    contract: maintenance
+    purpose: The signed upload for a photo or document the incident form attaches, requested when the
+      form is sent; no control of its own
+    trigger: background
+    provenance: Block A audit, 14 October 2026 (CHG-SCP-009)
   entryState:
     params:
     - name: incidentId
@@ -8301,11 +8360,12 @@ screens:
   module: Operations
   requiresModule: marketing
   wave: 2
+  permission: CASE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/lost-found
-    component: apps/venue-staff-app/src/routes/operations/LostFoundDetail.tsx
+    component: src/routes/operations/LostFoundDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -8599,11 +8659,12 @@ screens:
   module: Operations
   requiresModule: marketing
   wave: 2
+  permission: CASE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/guest-assistance
-    component: apps/venue-staff-app/src/routes/operations/GuestAssistanceDetail.tsx
+    component: src/routes/operations/GuestAssistanceDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9033,11 +9094,12 @@ screens:
   module: Operations
   requiresModule: ticketing
   wave: 2
+  permission: VENUE_MAP_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/venue-map
-    component: apps/venue-staff-app/src/routes/operations/VenueMapDetail.tsx
+    component: src/routes/operations/VenueMapDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9145,8 +9207,8 @@ screens:
     trigger: onLoad
   - operationId: getVenueMapLive
     contract: venue-map
-    purpose: The map with live operational state on it
-    trigger: onLoad
+    purpose: The live operational state on the venue map, refreshed while the map is open
+    trigger: onInterval
   entryState:
     params:
     - name: mapId
@@ -9180,11 +9242,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 2
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/broadcast-to-team
-    component: apps/venue-staff-app/src/routes/operations/BroadcastToTeamDetail.tsx
+    component: src/routes/operations/BroadcastToTeamDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9380,11 +9443,12 @@ screens:
   module: Operations
   requiresModule: ai
   wave: 2
+  permission: AI_USE
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/knowledge-base
-    component: apps/venue-staff-app/src/routes/operations/KnowledgeBaseDetail.tsx
+    component: src/routes/operations/KnowledgeBaseDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9473,11 +9537,12 @@ screens:
   module: Operations
   requiresModule: ai
   wave: 3
+  permission: WORKFORCE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/training
-    component: apps/venue-staff-app/src/routes/operations/TrainingDetail.tsx
+    component: src/routes/operations/TrainingDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9611,7 +9676,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/profile
-    component: apps/venue-staff-app/src/routes/operations/ProfileDetail.tsx
+    component: src/routes/operations/ProfileDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9838,11 +9903,12 @@ screens:
   module: Operations
   requiresModule: core
   wave: 1
+  permission: DEVICE_VIEW
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/device-settings
-    component: apps/venue-staff-app/src/routes/operations/DeviceSettingsDetail.tsx
+    component: src/routes/operations/DeviceSettingsDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10002,7 +10068,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/accessibility
-    component: apps/venue-staff-app/src/routes/operations/AccessibilityDetail.tsx
+    component: src/routes/operations/AccessibilityDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10068,7 +10134,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/arabic-rtl
-    component: apps/venue-staff-app/src/routes/operations/ArabicRtlDetail.tsx
+    component: src/routes/operations/ArabicRtlDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10134,7 +10200,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/sign-out
-    component: apps/venue-staff-app/src/routes/operations/SignOutDetail.tsx
+    component: src/routes/operations/SignOutDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10214,11 +10280,12 @@ screens:
   module: Operations
   requiresModule: access
   wave: 1
+  permission: REPORT_VIEW_VENUE
   capability: C00
   implementation:
     app: venue-staff-app
     route: /operations/hand-over-the-journal
-    component: apps/venue-staff-app/src/routes/operations/HandOverTheJournalDetail.tsx
+    component: src/routes/operations/HandOverTheJournalDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10383,10 +10450,11 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: ORDER_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/restaurant-service-command-center
-    component: apps/venue-staff-app/src/routes/operations/RestaurantServiceCommandCenterDetail.tsx
+    component: src/routes/operations/RestaurantServiceCommandCenterDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10409,7 +10477,8 @@ screens:
   pattern: listDetail
   patternReason: '`listTableReservations` reads the population and `getTableMap` reads one of them — list,
     select, act'
-  purpose: Restaurant Service Command Center — from the client design board, 20 August.
+  purpose: 'See a service period at a glance for one outlet: its table bookings, the F&B orders in flight
+    and the table map with each table''s live state.'
   layout:
     template: split
     regions:
@@ -10537,10 +10606,11 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: ORDER_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/floor-plan-table-map
-    component: apps/venue-staff-app/src/routes/operations/FloorPlanTableMapDetail.tsx
+    component: src/routes/operations/FloorPlanTableMapDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10562,7 +10632,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getTableMap` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Floor Plan & Table Map — from the client design board, 20 August.
+  purpose: Show the outlet's floor as it is laid out, with each table's live state, so a host can see
+    where to seat a party.
   layout:
     template: detail
     regions:
@@ -10643,10 +10714,11 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: PRODUCT_CONFIGURE
   implementation:
     app: venue-staff-app
     route: /operations/table-seating-configuration
-    component: apps/venue-staff-app/src/routes/operations/TableSeatingConfigurationDetail.tsx
+    component: src/routes/operations/TableSeatingConfigurationDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10669,7 +10741,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`setTableLayout`) and no read of a population — it is
     settings, not a list
-  purpose: Table & Seating Configuration — from the client design board, 20 August.
+  purpose: Set out the outlet's tables (label, capacity, zone, position and shape) and which tables can
+    be pushed together, and to what capacity.
   layout:
     template: form
     regions:
@@ -10804,10 +10877,11 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: ORDER_MODIFY
   implementation:
     app: venue-staff-app
     route: /operations/reservation-calendar-timeline
-    component: apps/venue-staff-app/src/routes/operations/ReservationCalendarTimelineDetail.tsx
+    component: src/routes/operations/ReservationCalendarTimelineDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10829,7 +10903,8 @@ screens:
   pattern: listDetail
   patternReason: '`listTableReservations` reads a population and nothing reads one of them; the detail
     is the row until a `get` exists'
-  purpose: Reservation Calendar & Timeline — from the client design board, 20 August.
+  purpose: See an outlet's table bookings for a date, on a calendar and as a list, with the double bookings
+    still to resolve.
   layout:
     template: split
     regions:
@@ -10940,10 +11015,11 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/create-edit-reservation
-    component: apps/venue-staff-app/src/routes/operations/CreateEditReservationDetail.tsx
+    component: src/routes/operations/CreateEditReservationDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10966,7 +11042,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`createTableReservation`) and no read of a population
     — it is settings, not a list
-  purpose: Create / Edit Reservation — from the client design board, 20 August.
+  purpose: Book a table for a guest at the host stand (party size, time, tables, seating preference and
+    occasion) after checking whether the guest already has a record, then send the confirmation.
   layout:
     template: form
     regions:
@@ -11164,10 +11241,11 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: ORDER_MODIFY
   implementation:
     app: venue-staff-app
     route: /operations/walk-in-waitlist-management
-    component: apps/venue-staff-app/src/routes/operations/WalkInWaitlistManagementDetail.tsx
+    component: src/routes/operations/WalkInWaitlistManagementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11189,7 +11267,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`joinRestaurantWaitlist`) and no read of a population
     — it is settings, not a list
-  purpose: Walk-In & Waitlist Management — from the client design board, 20 August.
+  purpose: Put a walk-in party on the outlet's waitlist, quote them a wait, tell them when their table
+    is ready, or take them off the list.
   layout:
     template: form
     regions:
@@ -11343,10 +11422,11 @@ screens:
   module: Floor Service
   requiresModule: marketing
   wave: 2
+  permission: GUEST_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/guest-profile-dining-history
-    component: apps/venue-staff-app/src/routes/operations/GuestProfileDiningHistoryDetail.tsx
+    component: src/routes/operations/GuestProfileDiningHistoryDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11369,7 +11449,8 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getGuestProfile` reads one of them — list, select,
     act'
-  purpose: Guest Profile & Dining History — from the client design board, 20 August.
+  purpose: Read a guest's profile and their orders at the venue, and find and merge duplicate records
+    of the same person once somebody has decided.
   layout:
     template: split
     regions:
@@ -11592,10 +11673,11 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/live-table-service-management
-    component: apps/venue-staff-app/src/routes/operations/LiveTableServiceManagementDetail.tsx
+    component: src/routes/operations/LiveTableServiceManagementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11637,7 +11719,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`openTableVisit`, `updateTableVisit`, `mergeTableVisits`)
     and no read of a population — it is settings, not a list
-  purpose: Live Table & Service Management — from the client design board, 20 August.
+  purpose: 'Run a table during service: open the visit or seat a booked party, change covers, server or
+    table, move the meal on a stage, place an order and fire or hold a course.'
   layout:
     template: form
     regions:
@@ -12006,10 +12089,11 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 1
+  permission: ORDER_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/table-order-bill-payment-management
-    component: apps/venue-staff-app/src/routes/operations/TableOrderBillPaymentManagementDetail.tsx
+    component: src/routes/operations/TableOrderBillPaymentManagementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12044,7 +12128,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getBill` reads one record and nothing reads a population — the screen is about that
     one thing'
-  purpose: Table Order, Bill & Payment Management — from the client design board, 20 August.
+  purpose: 'Settle a table: read the bill, add an order, split the bill, comp or move items, take payment
+    and close the visit.'
   layout:
     template: detail
     regions:
@@ -12296,10 +12381,11 @@ screens:
   module: Floor Service
   requiresModule: fnb
   wave: 2
+  permission: ORDER_MODIFY
   implementation:
     app: venue-staff-app
     route: /operations/reservation-table-performance
-    component: apps/venue-staff-app/src/routes/operations/ReservationTablePerformanceDetail.tsx
+    component: src/routes/operations/ReservationTablePerformanceDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12324,7 +12410,8 @@ screens:
   pattern: listDetail
   patternReason: '`listTableReservations` reads the population and `getTableMap` reads one of them — list,
     select, act'
-  purpose: Reservation & Table Performance — from the client design board, 20 August.
+  purpose: 'See how the outlet''s bookings and tables perform: turn time, no-shows, covers and wait-quote
+    accuracy, beside the bookings and the table map.'
   layout:
     template: split
     regions:
@@ -12449,10 +12536,11 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/retail-inventory-command-center
-    component: apps/venue-staff-app/src/routes/operations/RetailInventoryCommandCenterDetail.tsx
+    component: src/routes/operations/RetailInventoryCommandCenterDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12472,7 +12560,8 @@ screens:
   pattern: listDetail
   patternReason: '`listStockMovements` reads the population and `getStockPositions` reads one of them
     — list, select, act'
-  purpose: Retail Inventory Command Center — from the client design board, 20 August.
+  purpose: See a store's stock on hand and the movements behind it, by item, location and kind, from the
+    floor.
   layout:
     template: split
     regions:
@@ -12570,26 +12659,6 @@ screens:
     contract: inventory
     purpose: The movement ledger
     trigger: onLoad
-  - operationId: getKpiValues
-    contract: reporting
-    purpose: Today's takings and revenue KPIs on the phone
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getDashboard
-    contract: reporting
-    purpose: Store manager's mobile dashboard
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listAlerts
-    contract: reporting
-    purpose: Daily revenue alerts (also pushed, deliverTo push)
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: acknowledgeAlert
-    contract: reporting
-    purpose: Acknowledge an alert
-    trigger: onAction
-    provenance: build, 29 September 2026
   entryState:
     params:
     - name: venueId
@@ -12626,10 +12695,11 @@ screens:
   module: Stock on the Floor
   requiresModule: retail
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/store-stock-sku-availability
-    component: apps/venue-staff-app/src/routes/operations/StoreStockSkuAvailabilityDetail.tsx
+    component: src/routes/operations/StoreStockSkuAvailabilityDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12654,7 +12724,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getStockPositions` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: Store Stock & SKU Availability — from the client design board, 20 August.
+  purpose: Check what an outlet has in stock, low stock first and beside its sibling outlets, and scan
+    an item for its price and stock.
   gaps:
   - operation: getHaccpStatus
     why: '**`getHaccpStatus` declares its response inline**, so the component that shows it names fields
@@ -12775,10 +12846,11 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PROCUREMENT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/requisition-smart-store-replenishment
-    component: apps/venue-staff-app/src/routes/operations/RequisitionSmartStoreReplenishmentDetail.tsx
+    component: src/routes/operations/RequisitionSmartStoreReplenishmentDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12796,7 +12868,8 @@ screens:
   pattern: listDetail
   patternReason: '`listRequisitions` reads a population and nothing reads one of them; the detail is the
     row until a `get` exists'
-  purpose: Requisition & Smart Store Replenishment — from the client design board, 20 August.
+  purpose: Raise a requisition for the store, starting from the suggested below-par items, and change
+    its lines before it is approved.
   layout:
     template: split
     regions:
@@ -12967,10 +13040,11 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/store-to-store-warehouse-transfers
-    component: apps/venue-staff-app/src/routes/operations/StoreToStoreWarehouseTransfersDetail.tsx
+    component: src/routes/operations/StoreToStoreWarehouseTransfersDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12988,7 +13062,7 @@ screens:
   pattern: listDetail
   patternReason: '`listStockLocations` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Store-to-Store & Warehouse Transfers — from the client design board, 20 August.
+  purpose: Send stock to another store or the warehouse, and receive inbound transfers against their manifest.
   layout:
     template: split
     regions:
@@ -13155,10 +13229,11 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 1
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/receiving-store-put-away
-    component: apps/venue-staff-app/src/routes/operations/ReceivingStorePutAwayDetail.tsx
+    component: src/routes/operations/ReceivingStorePutAwayDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13197,7 +13272,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getStockTransfer` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Receiving & Store Put-Away — from the client design board, 20 August.
+  purpose: Receive the expected supplier deliveries and inbound transfers, log the temperature a chilled
+    delivery arrived at, and reject goods that fail.
   layout:
     template: detail
     regions:
@@ -13339,7 +13415,7 @@ screens:
     trigger: onAction
   - operationId: logColdChain
     contract: fnb
-    purpose: logColdChain
+    purpose: The temperature a chilled delivery arrived at, and what was decided about it
     trigger: onAction
   - operationId: getStockTransfer
     contract: inventory
@@ -13388,10 +13464,11 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/stock-count-cycle-count-management
-    component: apps/venue-staff-app/src/routes/operations/StockCountCycleCountManagementDetail.tsx
+    component: src/routes/operations/StockCountCycleCountManagementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13428,7 +13505,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getCountVariance` reads one record and nothing reads a population — the screen is about
     that one thing'
-  purpose: Stock Count & Cycle Count Management — from the client design board, 20 August.
+  purpose: Start a stock count, enter what is on the shelf line by line, and set which items are counted
+    every day.
   layout:
     template: detail
     regions:
@@ -13609,10 +13687,11 @@ screens:
   module: Stock on the Floor
   requiresModule: fnb
   wave: 1
+  permission: INCIDENT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/damage-loss-shrinkage-stock-adjustment
-    component: apps/venue-staff-app/src/routes/operations/DamageLossShrinkageStockAdjustmentDetail.tsx
+    component: src/routes/operations/DamageLossShrinkageStockAdjustmentDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13644,7 +13723,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`recordWaste`, `createStockMovement`, `logTemperature`)
     and no read of a population — it is settings, not a list
-  purpose: Damage, Loss, Shrinkage & Stock Adjustment — from the client design board, 20 August.
+  purpose: Record waste and stock adjustments with a reason, log food-safety temperatures, and sign the
+    corrective actions waiting for a supervisor.
   layout:
     template: form
     regions:
@@ -13743,11 +13823,11 @@ screens:
     trigger: onAction
   - operationId: logTemperature
     contract: fnb
-    purpose: logTemperature
+    purpose: Record a food-safety temperature check, in range or not
     trigger: onAction
   - operationId: signCorrectiveAction
     contract: fnb
-    purpose: signCorrectiveAction
+    purpose: Say what was done about a food-safety finding, and put a name to it
     trigger: onAction
   - operationId: getHaccpStatus
     contract: fnb
@@ -13858,10 +13938,11 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/reservation-allocation-omnichannel-inventory
-    component: apps/venue-staff-app/src/routes/operations/ReservationAllocationOmnichannelInDetail.tsx
+    component: src/routes/operations/ReservationAllocationOmnichannelInDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13884,7 +13965,8 @@ screens:
   pattern: statusTracker
   patternReason: '`getStockPositions` reads one record and nothing reads a population — the screen is
     about that one thing'
-  purpose: Reservation, Allocation & Omnichannel Inventory — from the client design board, 20 August.
+  purpose: Hold an item for a guest to collect, see the stock it comes from, and mark the hold collected
+    or release it.
   layout:
     template: detail
     regions:
@@ -14016,10 +14098,11 @@ screens:
   module: Stock on the Floor
   requiresModule: inventory
   wave: 2
+  permission: PRODUCT_VIEW
   implementation:
     app: venue-staff-app
     route: /operations/barcode-rfid-serialized-stock-traceability
-    component: apps/venue-staff-app/src/routes/operations/BarcodeRfidSerializedStockTraceabiDetail.tsx
+    component: src/routes/operations/BarcodeRfidSerializedStockTraceabiDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14041,7 +14124,8 @@ screens:
   pattern: listDetail
   patternReason: '`listSerialisedItems` reads a population and nothing reads one of them; the detail is
     the row until a `get` exists'
-  purpose: Barcode, RFID, Serialized Stock & Traceability — from the client design board, 20 August.
+  purpose: Find where each serialised item is, by serial or status, and scan a barcode for its price and
+    stock.
   layout:
     template: split
     regions:
@@ -14113,7 +14197,7 @@ screens:
   apis:
   - operationId: listSerialisedItems
     contract: inventory
-    purpose: listSerialisedItems
+    purpose: Where each serialised item is, found by serial or status
     trigger: onLoad
   - operationId: lookupMerchandise
     contract: retail
@@ -14147,10 +14231,11 @@ screens:
   module: Stock on the Floor
   requiresModule: analytics
   wave: 2
+  permission: REPORT_VIEW_VENUE
   implementation:
     app: venue-staff-app
     route: /operations/inventory-exceptions-ai-replenishment-action-cen
-    component: apps/venue-staff-app/src/routes/operations/InventoryExceptionsAiReplenishmentDetail.tsx
+    component: src/routes/operations/InventoryExceptionsAiReplenishmentDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14172,7 +14257,8 @@ screens:
   pattern: listDetail
   patternReason: '`listAlerts` reads a population and nothing reads one of them; the detail is the row
     until a `get` exists'
-  purpose: Inventory Exceptions, AI Replenishment & Action Center — from the client design board, 20 August.
+  purpose: 'Work the inventory alerts raised at the venue: acknowledge each one, and raise a requisition
+    where stock needs replenishing.'
   layout:
     template: split
     regions:
@@ -14349,6 +14435,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-544
     book: Rental_Management.pdf
@@ -14358,7 +14445,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/rental-checkout-command-center-emp-071
-    component: apps/venue-staff-app/src/routes/rentals/RentalCheckoutCommandCenter.tsx
+    component: src/routes/rentals/RentalCheckoutCommandCenter.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-544`, for the attendant at the rental counter. Decided 11 September
@@ -14390,7 +14477,7 @@ screens:
           (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type,
           group/individual, readiness and 1 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 64 §Filters
-      name: contentBody
+      name: contentBodyFilters
       slot: filters
     - components:
       - kind: metricTile
@@ -14530,6 +14617,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-545
     book: Rental_Management.pdf
@@ -14539,7 +14627,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/voucher-scan-reservation-retrieval-emp-072
-    component: apps/venue-staff-app/src/routes/rentals/VoucherScanReservationRetrieval.tsx
+    component: src/routes/rentals/VoucherScanReservationRetrieval.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-545`, for the attendant at the rental counter. Decided 11 September
@@ -14558,6 +14646,7 @@ screens:
         impliedBy: getRentalBooking
         kind: detailPanel
         notes: One record, read-only.
+        operation: getRentalBooking
       name: contentBody
     template: split
   states:
@@ -14609,15 +14698,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-073
   name: Checkout Readiness Validation
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-546
     book: Rental_Management.pdf
@@ -14627,7 +14717,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/checkout-readiness-validation-emp-073
-    component: apps/venue-staff-app/src/routes/rentals/CheckoutReadinessValidation.tsx
+    component: src/routes/rentals/CheckoutReadinessValidation.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-546`, for the attendant at the rental counter. Decided 11 September
@@ -14645,6 +14735,7 @@ screens:
         impliedBy: getRentalBooking
         kind: detailPanel
         notes: One record, read-only.
+        operation: getRentalBooking
       name: contentBody
     template: split
   states:
@@ -14696,15 +14787,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-074
   name: Equipment Assignment Workspace
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-547
     book: Rental_Management.pdf
@@ -14714,7 +14806,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/equipment-assignment-workspace-emp-074
-    component: apps/venue-staff-app/src/routes/rentals/EquipmentAssignmentWorkspace.tsx
+    component: src/routes/rentals/EquipmentAssignmentWorkspace.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-547`, for the attendant at the rental counter. Decided 11 September
@@ -14738,9 +14830,9 @@ screens:
         kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
-      - kind: detailPanel
+      - bindsTo: RentalAvailability
+        kind: detailPanel
         label: Available units
-        bindsTo: RentalAvailability
         operation: getRentalAvailability
         provenance: contract rental.yaml GET /rental-availability; wiring fix, 2 October 2026
       name: contentBody
@@ -14774,11 +14866,11 @@ screens:
     provenance: board reading, 19 September 2026
     purpose: Bind the assets
     trigger: onAction
-  - operationId: getRentalAvailability
-    contract: rental
+  - contract: rental
+    operationId: getRentalAvailability
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
     purpose: Units available to assign
     trigger: onLoad
-    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 67. 0 of 0 labels bound to a
     contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -14800,15 +14892,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-075
   name: Equipment Scan & Validation
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-548
     book: Rental_Management.pdf
@@ -14818,7 +14911,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/equipment-scan-validation-emp-075
-    component: apps/venue-staff-app/src/routes/rentals/EquipmentScanValidation.tsx
+    component: src/routes/rentals/EquipmentScanValidation.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-548`, for the attendant at the rental counter. Decided 11 September
@@ -14837,12 +14930,14 @@ screens:
         kind: primaryButton
         label: Assign rental equipment
         notes: The act the screen exists for.
+        operation: assignRentalEquipment
       - derived: true
         impliedBy: lookupAsset
         kind: searchField
         label: Search
         notes: Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012).
           A search that returns nothing must say so differently from a search not yet run.
+        operation: lookupAsset
       - derived: true
         impliedBy: assignRentalEquipment
         kind: secondaryButton
@@ -14906,15 +15001,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-076
   name: Pre-Rental Condition Inspection
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-549
     book: Rental_Management.pdf
@@ -14924,7 +15020,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/pre-rental-condition-inspection-emp-076
-    component: apps/venue-staff-app/src/routes/rentals/PreRentalConditionInspection.tsx
+    component: src/routes/rentals/PreRentalConditionInspection.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-549`, for the attendant at the rental counter. Decided 11 September
@@ -14966,15 +15062,15 @@ screens:
       a connection, and no minute has decided it.
   gaps:
   - operation: null
+    source: pack Rental_Management.pdf, page 69
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
       acceptance conditions, worked examples — with no directory of metrics, columns or fields anywhere
       in them. The screen has no content region rather than an empty one, and it needs a person before
       it is built.'
-    source: pack Rental_Management.pdf, page 69
   - operation: null
+    source: pack Rental_Management.pdf, page 69
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-    source: pack Rental_Management.pdf, page 69
   apis:
   - contract: rental
     invalidates:
@@ -15006,15 +15102,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-077
   name: Safety & Handover Checklist
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-550
     book: Rental_Management.pdf
@@ -15024,7 +15121,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/safety-handover-checklist-emp-077
-    component: apps/venue-staff-app/src/routes/rentals/SafetyHandoverChecklist.tsx
+    component: src/routes/rentals/SafetyHandoverChecklist.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-550`, for the attendant at the rental counter. Decided 11 September
@@ -15106,14 +15203,15 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-078
   name: Deposit & Financial Handover Validation
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-551
     book: Rental_Management.pdf
@@ -15123,7 +15221,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/deposit-financial-handover-validation-emp-078
-    component: apps/venue-staff-app/src/routes/rentals/DepositFinancialHandoverValidation.tsx
+    component: src/routes/rentals/DepositFinancialHandoverValidation.tsx
     status: notStarted
   density: comfortable
   notes: 'The staff-app form of `BO-551`, for the attendant at the rental counter. Decided 11 September
@@ -15209,14 +15307,15 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-079
   name: Group & Multi-Item Checkout
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-552
     book: Rental_Management.pdf
@@ -15226,7 +15325,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/group-multi-item-checkout-emp-079
-    component: apps/venue-staff-app/src/routes/rentals/GroupMultiItemCheckout.tsx
+    component: src/routes/rentals/GroupMultiItemCheckout.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-552`, for the attendant at the rental counter. Decided 11 September
@@ -15304,15 +15403,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-080
   name: Checkout Confirmation & Rental Activation
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-553
     book: Rental_Management.pdf
@@ -15322,7 +15422,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/checkout-confirmation-rental-activation-emp-080
-    component: apps/venue-staff-app/src/routes/rentals/CheckoutConfirmationRentalActivation.tsx
+    component: src/routes/rentals/CheckoutConfirmationRentalActivation.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-553`, for the attendant at the rental counter. Decided 11 September
@@ -15386,14 +15486,15 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-081
   name: Active Rental Operations Command Center
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-554
     book: Rental_Management.pdf
@@ -15403,7 +15504,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/active-rental-operations-command-center-emp-081
-    component: apps/venue-staff-app/src/routes/rentals/ActiveRentalOperationsCommandCenter.tsx
+    component: src/routes/rentals/ActiveRentalOperationsCommandCenter.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-554`, for the attendant at the rental counter. Decided 11 September
@@ -15435,7 +15536,7 @@ screens:
           (CHG-RFM-012). The pack filters this screen by venue, location, product, customer, rental status,
           expected return and 2 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 78 §Filters
-      name: contentBody
+      name: contentBodyFilters
       slot: filters
     - components:
       - kind: metricTile
@@ -15570,6 +15671,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-555
     book: Rental_Management.pdf
@@ -15579,7 +15681,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/active-rental-detail-live-timeline-emp-082
-    component: apps/venue-staff-app/src/routes/rentals/ActiveRentalDetailLiveTimeline.tsx
+    component: src/routes/rentals/ActiveRentalDetailLiveTimeline.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-555`, for the attendant at the rental counter. Decided 11 September
@@ -15597,6 +15699,7 @@ screens:
         impliedBy: getRentalBooking
         kind: detailPanel
         notes: One record, read-only.
+        operation: getRentalBooking
       name: contentBody
     template: split
   states:
@@ -15648,15 +15751,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-083
   name: Rental Extension Request
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-556
     book: Rental_Management.pdf
@@ -15666,7 +15770,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/rental-extension-request-emp-083
-    component: apps/venue-staff-app/src/routes/rentals/RentalExtensionRequest.tsx
+    component: src/routes/rentals/RentalExtensionRequest.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-556`, for the attendant at the rental counter. Decided 11 September
@@ -15679,22 +15783,19 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   layout:
-    template: split
     regions:
-    - name: contextPanel
-      slot: selection
-      components:
-      - kind: detailPanel
-        label: Current rental
-        columns:
+    - components:
+      - columns:
         - Start
         - Expected return
         - Current duration
+        kind: detailPanel
+        label: Current rental
         notes: No rental read is bound; these are the pack's labels.
         provenance: pack Rental_Management.pdf, page 81
-    - name: contentBody
-      slot: fields
-      components:
+      name: contextPanel
+      slot: selection
+    - components:
       - kind: selectField
         label: Additional duration
         notes: Sends `?to=` to `getRentalAvailability` (the expected return plus the added time) (CHG-RFM-012).
@@ -15705,34 +15806,37 @@ screens:
         label: Requested new return
         notes: Computed from expected return plus the added duration; read-only.
         provenance: pack Rental_Management.pdf, page 81
-    - name: contentBody
-      slot: collection
-      components:
-      - kind: dataTable
-        label: Extension check
-        bindsTo: RentalAvailability
+      name: contentBodyFields
+      slot: fields
+    - components:
+      - bindsTo: RentalAvailability
         columns:
         - RentalAvailability.windows[].availableQuantity
         - RentalAvailability.blockedWindows[].from
         - RentalAvailability.blockedWindows[].to
         - RentalAvailability.blockedWindows[].reason
         - Blocking asset
-        operation: getRentalAvailability
+        kind: dataTable
+        label: Extension check
         notes: EXTENSION AVAILABLE when the window stays open; otherwise the first blocking window's reason.
           The pack names the blocking asset (BIKE-017); no field does.
+        operation: getRentalAvailability
         provenance: pack Rental_Management.pdf, page 81
-    - name: actionBar
-      slot: rowActions
-      components:
+      name: contentBody
+      slot: collection
+    - components:
       - kind: secondaryButton
         label: Check availability
-        operation: getRentalAvailability
         notes: Re-reads availability for the extended window.
+        operation: getRentalAvailability
         provenance: contract rental.yaml GET /rental-availability
       - kind: primaryButton
         label: Continue to pricing
         notes: Hands over to Extension Pricing & Confirmation (pack page 82).
         provenance: pack Rental_Management.pdf, page 82
+      name: actionBar
+      slot: rowActions
+    template: split
   states:
     emptyFirstRun: No rental extension request yet. Carries the create action; distinct from a filter
       that matched nothing.
@@ -15746,9 +15850,9 @@ screens:
       a connection, and no minute has decided it.
   gaps:
   - operation: null
+    source: pack Rental_Management.pdf, page 81
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
-    source: pack Rental_Management.pdf, page 81
   apis:
   - contract: rental
     operationId: getRentalAvailability
@@ -15780,6 +15884,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-557
     book: Rental_Management.pdf
@@ -15789,7 +15894,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/extension-pricing-confirmation-emp-084
-    component: apps/venue-staff-app/src/routes/rentals/ExtensionPricingConfirmation.tsx
+    component: src/routes/rentals/ExtensionPricingConfirmation.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-557`, for the attendant at the rental counter. Decided 11 September
@@ -15872,14 +15977,15 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `extendRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-085
   name: Equipment Swap / Replacement
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-558
     book: Rental_Management.pdf
@@ -15889,7 +15995,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/equipment-swap-replacement-emp-085
-    component: apps/venue-staff-app/src/routes/rentals/EquipmentSwapReplacement.tsx
+    component: src/routes/rentals/EquipmentSwapReplacement.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-558`, for the attendant at the rental counter. Decided 11 September
@@ -15966,15 +16072,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `swapRentalEquipment`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-086
   name: Rental Incident & Operational Exception
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-559
     book: Rental_Management.pdf
@@ -15984,7 +16091,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/rental-incident-operational-exception-emp-086
-    component: apps/venue-staff-app/src/routes/rentals/RentalIncidentOperationalException.tsx
+    component: src/routes/rentals/RentalIncidentOperationalException.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-559`, for the attendant at the rental counter. Decided 11 September
@@ -16061,6 +16168,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-560
     book: Rental_Management.pdf
@@ -16070,7 +16178,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/due-soon-customer-notification-management-emp-087
-    component: apps/venue-staff-app/src/routes/rentals/DueSoonCustomerNotificationManagement.tsx
+    component: src/routes/rentals/DueSoonCustomerNotificationManagement.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-560`, for the attendant at the rental counter. Decided 11 September
@@ -16090,6 +16198,7 @@ screens:
         kind: dataTable
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listOverdueRentals
       name: contentBody
     template: split
   states:
@@ -16142,6 +16251,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-561
     book: Rental_Management.pdf
@@ -16151,7 +16261,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/overdue-rental-management-emp-088
-    component: apps/venue-staff-app/src/routes/rentals/OverdueRentalManagement.tsx
+    component: src/routes/rentals/OverdueRentalManagement.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-561`, for the attendant at the rental counter. Decided 11 September
@@ -16172,6 +16282,7 @@ screens:
         kind: dataTable
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        operation: listOverdueRentals
       name: contentBody
     template: split
   states:
@@ -16198,14 +16309,14 @@ screens:
       a default rather than a reading. It needs a person before it is built.'
   - operation: sendTransactionalMessage
     removed: true
+    source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage
     why: 'Removed 2 October 2026 (CHG-WIR-008): sendTransactionalMessage declares the service and partner
       audiences, not staff, so a staff device cannot call it as declared (design-notes correction fnb-retail
       EMP-088).'
-    source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage
   - operation: null
+    source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage
     why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-callable reminder for an overdue
       rental.'
-    source: contracts/satellite/marketing-crm.yaml#sendTransactionalMessage
   apis:
   - contract: rental
     operationId: listOverdueRentals
@@ -16234,6 +16345,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-562
     book: Rental_Management.pdf
@@ -16243,7 +16355,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/active-group-rental-management-emp-089
-    component: apps/venue-staff-app/src/routes/rentals/ActiveGroupRentalManagement.tsx
+    component: src/routes/rentals/ActiveGroupRentalManagement.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-562`, for the attendant at the rental counter. Decided 11 September
@@ -16261,6 +16373,7 @@ screens:
         impliedBy: getRentalBooking
         kind: detailPanel
         notes: One record, read-only.
+        operation: getRentalBooking
       name: contentBody
     template: split
   states:
@@ -16312,15 +16425,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-090
   name: Active Rental Intelligence & Operational Alerts
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-563
     book: Rental_Management.pdf
@@ -16330,7 +16444,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/active-rental-intelligence-operational-alerts-emp-090
-    component: apps/venue-staff-app/src/routes/rentals/ActiveRentalIntelligenceOperationalAlerts.tsx
+    component: src/routes/rentals/ActiveRentalIntelligenceOperationalAlerts.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-563`, for the attendant at the rental counter. Decided 11 September
@@ -16350,7 +16464,7 @@ screens:
         - Extension demand
         kind: dataTable
         label: Every active rental intelligence
-        operation: null
+        operation: listOverdueRentals
         provenance: pack Rental_Management.pdf, page 87 §Display
       name: contentBody
       slot: collection
@@ -16423,6 +16537,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-564
     book: Rental_Management.pdf
@@ -16432,7 +16547,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/rental-return-command-center-emp-091
-    component: apps/venue-staff-app/src/routes/rentals/RentalReturnCommandCenter.tsx
+    component: src/routes/rentals/RentalReturnCommandCenter.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-564`, for the attendant at the rental counter. Decided 11 September
@@ -16462,9 +16577,13 @@ screens:
         kind: multiSelect
         label: Filter by
         notes: The pack filters this screen by venue, return location, product, expected return, rental
-          status, damage status and 2 more — which are present is a decision the pack already made.
+          status, damage status and 2 more — which are present is a decision the pack already made. Sends
+          `?status=` to `listRentalBookings` for Rental Status; Return Location sends `?locationId=` and
+          Expected Return `?from=` and `?to=`; Venue, Product, Damage Status, Deposit Status and Group/Individual
+          have no parameter on it yet (Block A audit, 14 October 2026, CHG-SCR-020).
+        operation: listRentalBookings
         provenance: pack Rental_Management.pdf, page 92 §Filters
-      name: contentBody
+      name: contentBodyFilters
       slot: filters
     - components:
       - kind: metricTile
@@ -16610,6 +16729,7 @@ screens:
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_VIEW
   source:
     sameAs: BO-565
     book: Rental_Management.pdf
@@ -16619,7 +16739,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/return-scan-rental-retrieval-emp-092
-    component: apps/venue-staff-app/src/routes/rentals/ReturnScanRentalRetrieval.tsx
+    component: src/routes/rentals/ReturnScanRentalRetrieval.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-565`, for the attendant at the rental counter. Decided 11 September
@@ -16638,6 +16758,7 @@ screens:
         impliedBy: getRentalBooking
         kind: detailPanel
         notes: One record, read-only.
+        operation: getRentalBooking
       name: contentBody
     template: split
   states:
@@ -16689,15 +16810,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-093
   name: Return Summary & Actual Return Time
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-566
     book: Rental_Management.pdf
@@ -16707,7 +16829,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/return-summary-actual-return-time-emp-093
-    component: apps/venue-staff-app/src/routes/rentals/ReturnSummaryActualReturnTime.tsx
+    component: src/routes/rentals/ReturnSummaryActualReturnTime.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-566`, for the attendant at the rental counter. Decided 11 September
@@ -16786,14 +16908,15 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-094
   name: Post-Rental Condition Inspection
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-567
     book: Rental_Management.pdf
@@ -16803,7 +16926,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/post-rental-condition-inspection-emp-094
-    component: apps/venue-staff-app/src/routes/rentals/PostRentalConditionInspection.tsx
+    component: src/routes/rentals/PostRentalConditionInspection.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-567`, for the attendant at the rental counter. Decided 11 September
@@ -16879,15 +17002,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-095
   name: Before vs After Condition Comparison
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-568
     book: Rental_Management.pdf
@@ -16897,7 +17021,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/before-vs-after-condition-comparison-emp-095
-    component: apps/venue-staff-app/src/routes/rentals/BeforeVsAfterConditionComparison.tsx
+    component: src/routes/rentals/BeforeVsAfterConditionComparison.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-568`, for the attendant at the rental counter. Decided 11 September
@@ -16946,8 +17070,8 @@ screens:
     why: '**The pack gives this screen no display, metric or configuration directory**, so its shape is
       a default rather than a reading. It needs a person before it is built.'
   - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No read returns a rental booking''s inspections.'
     source: contracts/satellite/rental.yaml#recordRentalInspection
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): No read returns a rental booking''s inspections.'
   apis:
   - contract: rental
     invalidates:
@@ -16977,15 +17101,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-096
   name: Damage Assessment & Charge Workflow
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-569
     book: Rental_Management.pdf
@@ -16995,7 +17120,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/damage-assessment-charge-workflow-emp-096
-    component: apps/venue-staff-app/src/routes/rentals/DamageAssessmentChargeWorkflow.tsx
+    component: src/routes/rentals/DamageAssessmentChargeWorkflow.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-569`, for the attendant at the rental counter. Decided 11 September
@@ -17072,15 +17197,16 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assessRentalDamage`
         takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
         it.'
+      optional: true
 - id: EMP-097
   name: Partial Return & Missing Equipment
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-570
     book: Rental_Management.pdf
@@ -17090,7 +17216,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/partial-return-missing-equipment-emp-097
-    component: apps/venue-staff-app/src/routes/rentals/PartialReturnMissingEquipment.tsx
+    component: src/routes/rentals/PartialReturnMissingEquipment.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-570`, for the attendant at the rental counter. Decided 11 September
@@ -17170,14 +17296,15 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-098
   name: Late Fees, Damage Fees & Final Settlement
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-571
     book: Rental_Management.pdf
@@ -17187,7 +17314,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/late-fees-damage-fees-final-settlement-emp-098
-    component: apps/venue-staff-app/src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx
+    component: src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx
     status: notStarted
   density: comfortable
   notes: 'The staff-app form of `BO-571`, for the attendant at the rental counter. Decided 11 September
@@ -17273,14 +17400,15 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true
 - id: EMP-099
   name: Deposit Release, Capture & Customer Confirmation
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: PAYMENT_VIEW
   source:
     sameAs: BO-572
     book: Rental_Management.pdf
@@ -17290,7 +17418,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/deposit-release-capture-customer-confirmation-emp-099
-    component: apps/venue-staff-app/src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx
+    component: src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-572`, for the attendant at the rental counter. Decided 11 September
@@ -17315,9 +17443,9 @@ screens:
         kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
-      - kind: dataTable
+      - bindsTo: PaymentsDepositActivity
+        kind: dataTable
         label: Deposit history
-        bindsTo: PaymentsDepositActivity
         operation: listDepositActivity
         provenance: contract payments.yaml GET /deposits/{depositId}/activity; wiring fix, 2 October 2026
       name: contentBody
@@ -17355,11 +17483,11 @@ screens:
     provenance: board reading, 19 September 2026
     purpose: Capture or release the deposit
     trigger: onAction
-  - operationId: listDepositActivity
-    contract: payments
+  - contract: payments
+    operationId: listDepositActivity
+    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
     purpose: The deposit's movement history
     trigger: onLoad
-    provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
   apisNote: Regenerated 9 September 2026 from Rental_Management.pdf page 100. 0 of 0 labels bound to a
     contract property; 0 of 4 pack bullets carried onto the screen — the rest are acceptance prose, worked
     examples and AI narrative, which belong to the matrix and the contracts rather than here.
@@ -17381,16 +17509,17 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
-    - name: depositId
-      from: navigation
+      optional: true
+    - from: navigation
+      name: depositId
 - id: EMP-100
   name: Return Completion & Equipment Disposition
   module: Rentals
   requiresModule: resources
   wave: 3
+  permission: RENTAL_OPERATE
   source:
     sameAs: BO-573
     book: Rental_Management.pdf
@@ -17400,7 +17529,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/return-completion-equipment-disposition-emp-100
-    component: apps/venue-staff-app/src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx
+    component: src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-573`, for the attendant at the rental counter. Decided 11 September
@@ -17451,13 +17580,13 @@ screens:
       a default rather than a reading. It needs a person before it is built.'
   - operation: setAssetStatus
     removed: true
+    source: contracts/satellite/maintenance.yaml#setAssetStatus | DI-500
     why: 'Removed 2 October 2026 (CHG-WIR-008): setAssetStatus needs ASSET_MANAGE (a configure-tier grant
       on the staff app), offers six maintenance statuses and takes one asset per screen; the unit''s next
       state belongs to the return (DI-500; design-notes correction fnb-retail EMP-100).'
-    source: contracts/satellite/maintenance.yaml#setAssetStatus | DI-500
   - operation: null
-    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): returnRental carries no per-unit disposition.'
     source: contracts/satellite/rental.yaml#returnRental | DI-500
+    why: 'Contract gap recorded 2 October 2026 (CHG-WIR-011): returnRental carries no per-unit disposition.'
   apis:
   - contract: rental
     invalidates:
@@ -17490,6 +17619,6 @@ screens:
     params:
     - from: navigation
       name: bookingId
-      optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes
         the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
+      optional: true

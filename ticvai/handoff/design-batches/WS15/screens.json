@@ -5,6 +5,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approval-matrix-command-center-adm-329",
-   "component": "apps/venue-management-web/src/routes/platform/ApprovalMatrixCommandCenter.tsx",
+   "component": "src/routes/platform/ApprovalMatrixCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -204,6 +205,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "3",
@@ -213,7 +215,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approval-authority-matrix-adm-330",
-   "component": "apps/venue-management-web/src/routes/platform/ApprovalAuthorityMatrix.tsx",
+   "component": "src/routes/platform/ApprovalAuthorityMatrix.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -317,7 +319,16 @@
    "workshopBoard": "wireframes/WS32 Approval Workflows and Governance Board 3.dc.html#adm-330"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 22. 0 of 0 labels bound to a contract property; 9 of 17 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalMatrix` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -347,6 +358,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "3",
@@ -356,7 +368,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/organizational-hierarchy-routing-adm-331",
-   "component": "apps/venue-management-web/src/routes/platform/OrganizationalHierarchyRouting.tsx",
+   "component": "src/routes/platform/OrganizationalHierarchyRouting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -441,7 +453,16 @@
    "workshopBoard": "wireframes/WS32 Approval Workflows and Governance Board 3.dc.html#adm-331"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 23. 0 of 0 labels bound to a contract property; 0 of 18 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalMatrix` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -471,6 +492,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "3",
@@ -480,7 +502,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/department-based-approval-matrix-adm-332",
-   "component": "apps/venue-management-web/src/routes/platform/DepartmentBasedApprovalMatrix.tsx",
+   "component": "src/routes/platform/DepartmentBasedApprovalMatrix.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -558,7 +580,16 @@
    "workshopBoard": "wireframes/WS32 Approval Workflows and Governance Board 3.dc.html#adm-332"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 2 of 12 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalMatrix` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -588,6 +619,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "3",
@@ -597,7 +629,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/venue-tenant-approval-matrix-adm-333",
-   "component": "apps/venue-management-web/src/routes/platform/VenueTenantApprovalMatrix.tsx",
+   "component": "src/routes/platform/VenueTenantApprovalMatrix.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -682,7 +714,16 @@
    "workshopBoard": "wireframes/WS32 Approval Workflows and Governance Board 3.dc.html#adm-333"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 24. 0 of 0 labels bound to a contract property; 0 of 10 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalMatrix` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -712,6 +753,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "3",
@@ -721,7 +763,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/value-threshold-routing-adm-334",
-   "component": "apps/venue-management-web/src/routes/platform/ValueThresholdRouting.tsx",
+   "component": "src/routes/platform/ValueThresholdRouting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -806,7 +848,16 @@
    "workshopBoard": "wireframes/WS32 Approval Workflows and Governance Board 3.dc.html#adm-334"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 25. 0 of 0 labels bound to a contract property; 0 of 9 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalMatrix` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -836,6 +887,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "3",
@@ -845,7 +897,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/risk-based-conditional-routing-adm-335",
-   "component": "apps/venue-management-web/src/routes/platform/RiskBasedConditionalRouting.tsx",
+   "component": "src/routes/platform/RiskBasedConditionalRouting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -930,7 +982,16 @@
    "workshopBoard": "wireframes/WS32 Approval Workflows and Governance Board 3.dc.html#adm-335"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 22 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "matrixId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalMatrix` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -960,6 +1021,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "3",
@@ -969,7 +1031,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approver-group-decision-policy-adm-336",
-   "component": "apps/venue-management-web/src/routes/platform/ApproverGroupDecisionPolicy.tsx",
+   "component": "src/routes/platform/ApproverGroupDecisionPolicy.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1054,7 +1116,16 @@
    "workshopBoard": "wireframes/WS32 Approval Workflows and Governance Board 3.dc.html#adm-336"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 11 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "controlPolicyId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setApprovalControlPolicy` takes it, from the record the user acts on."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1084,6 +1155,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "3",
@@ -1093,7 +1165,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/routing-simulator-conflict-detection-adm-337",
-   "component": "apps/venue-management-web/src/routes/platform/RoutingSimulatorConflictDetection.tsx",
+   "component": "src/routes/platform/RoutingSimulatorConflictDetection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1211,6 +1283,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "3",
@@ -1220,7 +1293,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/ai-routing-advisor-matrix-optimization-adm-338",
-   "component": "apps/venue-management-web/src/routes/platform/AiRoutingAdvisorMatrixOptimization.tsx",
+   "component": "src/routes/platform/AiRoutingAdvisorMatrixOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1266,7 +1339,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listApprovalMatrices",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listApprovalMatrices"
       }
      ]
     }

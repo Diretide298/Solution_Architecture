@@ -16,6 +16,7 @@
     "format": "uuid"
    },
    "ruleId": {
+    "x-ticvai-references": "reporting.alert_rule",
     "type": "string",
     "format": "uuid"
    },
@@ -115,6 +116,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -190,6 +192,7 @@
     "type": "boolean"
    },
    "scopePath": {
+    "readOnly": true,
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**\n\n**Required, and it is the write target.** `setAlertRule` has no id in its path and a caller may hold several venues, so the rule names the venue it watches here — inside the caller's scope, or the write is refused."
    }
@@ -316,7 +319,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "name": {
     "type": "string"
@@ -378,6 +382,7 @@
     "readOnly": true
    },
    "scopePath": {
+    "readOnly": true,
     "type": "string",
     "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
     "description": "**The node these thresholds are for, and the key `setConnectivityThresholds` upserts on.** The body names its target here, because the path does not.\n"
@@ -455,11 +460,13 @@
     "description": "Null for an anonymous sale. Identity and entitlement are separate."
    },
    "guestLinkId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells."
    },
    "catalogueBundleVersion": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
    },
@@ -516,17 +523,20 @@
     "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
    },
    "walletAuthorisationId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "nullable": true,
     "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
    },
    "walletHoldId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "format": "uuid",
     "nullable": true,
     "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
    },
    "returnUrl": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "format": "uri",
     "nullable": true,
@@ -539,6 +549,7 @@
     "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
    },
    "deviceId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -666,6 +677,7 @@
     "type": "string"
    },
    "version": {
+    "readOnly": true,
     "type": "string"
    },
    "vendor": {
@@ -748,6 +760,7 @@
     "readOnly": true
    },
    "firmwareId": {
+    "x-ticvai-references": "tenancy.device_firmware",
     "type": "string",
     "format": "uuid"
    },
@@ -763,6 +776,8 @@
     }
    },
    "waves": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "**A canary first.** Gate hardware failing across a venue at once is an evacuation problem rather than an IT one.\n",
     "items": {
@@ -846,7 +861,7 @@
  },
  "MetricSource": {
   "type": "string",
-  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.waiting_guest.estimated_call_at` against `called_at` | | `throughput` | `queue.waiting_guest` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
+  "description": "**A named metric with a verified source.** BL-053, 75 requirement rows.\n`reporting` is a generic builder, and **a generic builder makes every reporting requirement look covered** — it will happily assemble a report over data nobody produces. That is the shape to watch across the whole walk, and this enum is the answer to it: each value below was checked against the schema before being named.\n| Metric | Source | |---|---| | `occupancy` | `catalogue.channel_capacity.sold` and `leased` against `capacity` | | `capacityUtilisation` | `catalogue.channel_capacity.remaining` over the same window | | `admissionRate` | `access.scan_event.outcome`, in-direction | | `noShowRate` | Entitlements issued against scans that never arrived | | `conversion` | `orders.cart` against `orders.sales_order` | | `salesByOperator` | `orders.sales_order.principal_id` | | `salesByWorkstation` | The workstation on the shift that took it | | `waitTime` | `queue.entry.estimated_call_at` against `called_at` | | `throughput` | `queue.entry` completions per hour | | `abandonmentRate` | Queue entries that left before being called |\n**`salesByInstructor` was deliberately absent from the first cut** because it needed the staff-assignment link CL-01 covers. It was added on 18 August once `resources.Resource` produced it — see `x-ticvai-extension-note` below. Naming a metric with no source is still the defect this enum exists to prevent.\n**Money-valued metrics are listed in `x-ticvai-money-valued`.** A reading or threshold on one of them is a `Money`, never a float (`MetricValue`).\n",
   "enum": [
    "occupancy",
    "capacityUtilisation",
@@ -977,6 +992,7 @@
     "readOnly": true
    },
    "scopePath": {
+    "readOnly": true,
     "type": "string",
     "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
     "description": "**The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body names its target here, because the path does not.\n"
@@ -1148,12 +1164,14 @@
     "readOnly": true
    },
    "profileId": {
+    "x-ticvai-references": "platform.configuration_profile",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
     "description": "Taken from the path of `deployConfigurationProfile`."
    },
    "version": {
+    "readOnly": true,
     "type": "integer",
     "description": "The published version to deploy."
    },
@@ -1510,6 +1528,9 @@
   }
  },
  "Workstation": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "x-ticvai-persistence": "platform.workstation",
   "type": "object",
   "required": [

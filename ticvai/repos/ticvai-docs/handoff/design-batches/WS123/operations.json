@@ -1,23 +1,4 @@
 {
- "explainRecommendationDecision": {
-  "method": "GET",
-  "path": "/recommendations/decisions/{decisionId}/explanation",
-  "contract": "ai",
-  "summary": "Why these recommendations",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "depth",
-    "in": "query",
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiRecommendationExplanation"
- },
  "exportAiEvidencePackage": {
   "method": "POST",
   "path": "/evidence-packages",

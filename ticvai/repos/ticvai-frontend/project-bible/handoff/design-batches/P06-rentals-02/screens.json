@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "sameAs": "BO-554",
    "book": "Rental_Management.pdf",
@@ -15,7 +16,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/active-rental-operations-command-center-emp-081",
-   "component": "apps/venue-staff-app/src/routes/rentals/ActiveRentalOperationsCommandCenter.tsx",
+   "component": "src/routes/rentals/ActiveRentalOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -49,7 +50,7 @@
        "provenance": "pack Rental_Management.pdf, page 78 §Filters"
       }
      ],
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters"
     },
     {
@@ -259,6 +260,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "sameAs": "BO-555",
    "book": "Rental_Management.pdf",
@@ -269,7 +271,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/active-rental-detail-live-timeline-emp-082",
-   "component": "apps/venue-staff-app/src/routes/rentals/ActiveRentalDetailLiveTimeline.tsx",
+   "component": "src/routes/rentals/ActiveRentalDetailLiveTimeline.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -285,7 +287,8 @@
        "derived": true,
        "impliedBy": "getRentalBooking",
        "kind": "detailPanel",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getRentalBooking"
       }
      ],
      "name": "contentBody"
@@ -349,8 +352,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -381,6 +384,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "sameAs": "BO-556",
    "book": "Rental_Management.pdf",
@@ -391,7 +395,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/rental-extension-request-emp-083",
-   "component": "apps/venue-staff-app/src/routes/rentals/RentalExtensionRequest.tsx",
+   "component": "src/routes/rentals/RentalExtensionRequest.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -400,28 +404,25 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "layout": {
-   "template": "split",
    "regions": [
     {
-     "name": "contextPanel",
-     "slot": "selection",
      "components": [
       {
-       "kind": "detailPanel",
-       "label": "Current rental",
        "columns": [
         "Start",
         "Expected return",
         "Current duration"
        ],
+       "kind": "detailPanel",
+       "label": "Current rental",
        "notes": "No rental read is bound; these are the pack's labels.",
        "provenance": "pack Rental_Management.pdf, page 81"
       }
-     ]
+     ],
+     "name": "contextPanel",
+     "slot": "selection"
     },
     {
-     "name": "contentBody",
-     "slot": "fields",
      "components": [
       {
        "kind": "selectField",
@@ -436,15 +437,13 @@
        "notes": "Computed from expected return plus the added duration; read-only.",
        "provenance": "pack Rental_Management.pdf, page 81"
       }
-     ]
+     ],
+     "name": "contentBodyFields",
+     "slot": "fields"
     },
     {
-     "name": "contentBody",
-     "slot": "collection",
      "components": [
       {
-       "kind": "dataTable",
-       "label": "Extension check",
        "bindsTo": "RentalAvailability",
        "columns": [
         "RentalAvailability.windows[].availableQuantity",
@@ -453,21 +452,23 @@
         "RentalAvailability.blockedWindows[].reason",
         "Blocking asset"
        ],
-       "operation": "getRentalAvailability",
+       "kind": "dataTable",
+       "label": "Extension check",
        "notes": "EXTENSION AVAILABLE when the window stays open; otherwise the first blocking window's reason. The pack names the blocking asset (BIKE-017); no field does.",
+       "operation": "getRentalAvailability",
        "provenance": "pack Rental_Management.pdf, page 81"
       }
-     ]
+     ],
+     "name": "contentBody",
+     "slot": "collection"
     },
     {
-     "name": "actionBar",
-     "slot": "rowActions",
      "components": [
       {
        "kind": "secondaryButton",
        "label": "Check availability",
-       "operation": "getRentalAvailability",
        "notes": "Re-reads availability for the extended window.",
+       "operation": "getRentalAvailability",
        "provenance": "contract rental.yaml GET /rental-availability"
       },
       {
@@ -476,9 +477,12 @@
        "notes": "Hands over to Extension Pricing & Confirmation (pack page 82).",
        "provenance": "pack Rental_Management.pdf, page 82"
       }
-     ]
+     ],
+     "name": "actionBar",
+     "slot": "rowActions"
     }
-   ]
+   ],
+   "template": "split"
   },
   "states": {
    "emptyFirstRun": "No rental extension request yet. Carries the create action; distinct from a filter that matched nothing.",
@@ -491,8 +495,8 @@
   "gaps": [
    {
     "operation": null,
-    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built.",
-    "source": "pack Rental_Management.pdf, page 81"
+    "source": "pack Rental_Management.pdf, page 81",
+    "why": "**The pack gives this screen no display, metric or configuration directory**, so its shape is a default rather than a reading. It needs a person before it is built."
    }
   ],
   "apis": [
@@ -553,6 +557,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "sameAs": "BO-557",
    "book": "Rental_Management.pdf",
@@ -563,7 +568,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/extension-pricing-confirmation-emp-084",
-   "component": "apps/venue-staff-app/src/routes/rentals/ExtensionPricingConfirmation.tsx",
+   "component": "src/routes/rentals/ExtensionPricingConfirmation.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -661,8 +666,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `extendRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `extendRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -693,6 +698,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "sameAs": "BO-558",
    "book": "Rental_Management.pdf",
@@ -703,7 +709,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/equipment-swap-replacement-emp-085",
-   "component": "apps/venue-staff-app/src/routes/rentals/EquipmentSwapReplacement.tsx",
+   "component": "src/routes/rentals/EquipmentSwapReplacement.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -793,8 +799,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `swapRentalEquipment` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `swapRentalEquipment` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -825,6 +831,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "sameAs": "BO-559",
    "book": "Rental_Management.pdf",
@@ -835,7 +842,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/rental-incident-operational-exception-emp-086",
-   "component": "apps/venue-staff-app/src/routes/rentals/RentalIncidentOperationalException.tsx",
+   "component": "src/routes/rentals/RentalIncidentOperationalException.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -947,6 +954,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "sameAs": "BO-560",
    "book": "Rental_Management.pdf",
@@ -957,7 +965,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/due-soon-customer-notification-management-emp-087",
-   "component": "apps/venue-staff-app/src/routes/rentals/DueSoonCustomerNotificationManagement.tsx",
+   "component": "src/routes/rentals/DueSoonCustomerNotificationManagement.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -973,7 +981,8 @@
        "derived": true,
        "impliedBy": "listOverdueRentals",
        "kind": "dataTable",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listOverdueRentals"
       }
      ],
      "name": "contentBody"
@@ -1059,6 +1068,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "sameAs": "BO-561",
    "book": "Rental_Management.pdf",
@@ -1069,7 +1079,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/overdue-rental-management-emp-088",
-   "component": "apps/venue-staff-app/src/routes/rentals/OverdueRentalManagement.tsx",
+   "component": "src/routes/rentals/OverdueRentalManagement.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -1085,7 +1095,8 @@
        "derived": true,
        "impliedBy": "listOverdueRentals",
        "kind": "dataTable",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listOverdueRentals"
       }
      ],
      "name": "contentBody"
@@ -1115,13 +1126,13 @@
    {
     "operation": "sendTransactionalMessage",
     "removed": true,
-    "why": "Removed 2 October 2026 (CHG-WIR-008): sendTransactionalMessage declares the service and partner audiences, not staff, so a staff device cannot call it as declared (design-notes correction fnb-retail EMP-088).",
-    "source": "contracts/satellite/marketing-crm.yaml#sendTransactionalMessage"
+    "source": "contracts/satellite/marketing-crm.yaml#sendTransactionalMessage",
+    "why": "Removed 2 October 2026 (CHG-WIR-008): sendTransactionalMessage declares the service and partner audiences, not staff, so a staff device cannot call it as declared (design-notes correction fnb-retail EMP-088)."
    },
    {
     "operation": null,
-    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-callable reminder for an overdue rental.",
-    "source": "contracts/satellite/marketing-crm.yaml#sendTransactionalMessage"
+    "source": "contracts/satellite/marketing-crm.yaml#sendTransactionalMessage",
+    "why": "Contract gap recorded 2 October 2026 (CHG-WIR-011): No staff-callable reminder for an overdue rental."
    }
   ],
   "apis": [
@@ -1182,6 +1193,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "sameAs": "BO-562",
    "book": "Rental_Management.pdf",
@@ -1192,7 +1204,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/active-group-rental-management-emp-089",
-   "component": "apps/venue-staff-app/src/routes/rentals/ActiveGroupRentalManagement.tsx",
+   "component": "src/routes/rentals/ActiveGroupRentalManagement.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -1208,7 +1220,8 @@
        "derived": true,
        "impliedBy": "getRentalBooking",
        "kind": "detailPanel",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getRentalBooking"
       }
      ],
      "name": "contentBody"
@@ -1272,8 +1285,8 @@
     {
      "from": "navigation",
      "name": "bookingId",
-     "optional": true,
-     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it.",
+     "optional": true
     }
    ]
   },
@@ -1304,6 +1317,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "sameAs": "BO-563",
    "book": "Rental_Management.pdf",
@@ -1314,7 +1328,7 @@
   "implementation": {
    "app": "venue-staff-app",
    "route": "/rentals/active-rental-intelligence-operational-alerts-emp-090",
-   "component": "apps/venue-staff-app/src/routes/rentals/ActiveRentalIntelligenceOperationalAlerts.tsx",
+   "component": "src/routes/rentals/ActiveRentalIntelligenceOperationalAlerts.tsx",
    "status": "notStarted"
   },
   "density": "comfortable",
@@ -1336,7 +1350,7 @@
        ],
        "kind": "dataTable",
        "label": "Every active rental intelligence",
-       "operation": null,
+       "operation": "listOverdueRentals",
        "provenance": "pack Rental_Management.pdf, page 87 §Display"
       }
      ],

@@ -5,6 +5,7 @@
   "module": "Support",
   "requiresModule": "partner",
   "wave": 3,
+  "permission": "CASE_VIEW",
   "capability": "C32",
   "implementation": {
    "app": "partner-web",

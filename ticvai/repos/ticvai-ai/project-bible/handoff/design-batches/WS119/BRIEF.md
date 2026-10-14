@@ -1,6 +1,6 @@
 # WS119 — AI Forecasting and Predictive Intelligence board 1
 
-**10 screens · 18 operations · 20 schemas · 4 permissions**
+**10 screens · 15 operations · 16 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -95,15 +95,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-499` | Forecasting Command Center | D | 6 | 6 | 7 | 39 | 0 | 0 | — | notStarted (—) |
+| `ADM-499` | Forecasting Command Center | D | 6 | 186 | 7 | 39 | 0 | 0 | — | notStarted (—) |
 | `ADM-500` | Forecast Configuration & Forecasting Strategy | A | 39 | 6 | 7 | 10 | 1 | 0 | — | notStarted (—) |
-| `ADM-501` | Forecast Data & Signal Configuration | D | 6 | 6 | 7 | 9 | 0 | 0 | — | notStarted (—) |
-| `ADM-502` | Attendance & Visitation Forecast | D | 6 | 6 | 7 | 43 | 0 | 0 | — | notStarted (—) |
+| `ADM-501` | Forecast Data & Signal Configuration | D | 26 | 18 | 7 | 9 | 0 | 0 | — | notStarted (—) |
+| `ADM-502` | Attendance & Visitation Forecast | D | 27 | 21 | 7 | 42 | 0 | 0 | — | notStarted (—) |
 | `ADM-503` | Ticket, Product & Timeslot Demand Forecast | B | 9 | 26 | 7 | 44 | 1 | 0 | — | notStarted (—) |
 | `ADM-504` | Channel & Booking Pace Forecast | B | 9 | 22 | 7 | 41 | 0 | 6 | — | notStarted (—) |
 | `ADM-505` | Revenue & Commercial Forecast | B | 14 | 26 | 7 | 42 | 0 | 0 | — | notStarted (—) |
 | `ADM-506` | Forecast Drivers, Confidence & Explainability | A | 14 | 36 | 7 | 46 | 0 | 0 | — | notStarted (—) |
-| `ADM-507` | Forecast Scenario & What-If Simulator | D | 6 | 20 | 7 | 40 | 0 | 0 | — | notStarted (—) |
+| `ADM-507` | Forecast Scenario & What-If Simulator | D | 6 | 20 | 7 | 39 | 0 | 0 | — | notStarted (—) |
 | `ADM-508` | Forecast Accuracy, Review & Publication Center | A | 13 | 24 | 7 | 6 | 0 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings

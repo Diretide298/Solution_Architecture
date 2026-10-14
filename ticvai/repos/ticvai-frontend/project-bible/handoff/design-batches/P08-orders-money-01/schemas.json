@@ -132,6 +132,7 @@
     "description": "The movement this line counts, where `countKind` is `movement`. How `listCashMovements` rebuilds each movement's `denominations`.\n"
    },
    "denominationId": {
+    "x-ticvai-references": "platform.denomination",
     "type": "string",
     "format": "uuid",
     "description": "References `platform.denomination` — face value, kind and sort order live there."
@@ -555,6 +556,7 @@
   ],
   "properties": {
    "groupQuoteId": {
+    "x-ticvai-persisted": false,
     "x-ticvai-references": "orders.group_quote",
     "type": "string",
     "format": "uuid",
@@ -658,6 +660,7 @@
     "description": "Client-generated UUIDv7 of the line. `lineIds` everywhere in this contract are these."
    },
    "variantId": {
+    "x-ticvai-references": "catalogue.variant",
     "type": "string",
     "format": "uuid"
    },
@@ -794,11 +797,13 @@
     "description": "Null for an anonymous sale. Identity and entitlement are separate."
    },
    "guestLinkId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells."
    },
    "catalogueBundleVersion": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
    },
@@ -1204,6 +1209,7 @@
   ]
  },
  "Deposit": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "ledger.deposit",
   "description": "**Money taken before the sale is complete.** Not deferred revenue — that is a sold entitlement not yet consumed, and the sale happened.\n",
@@ -1329,6 +1335,7 @@
      ],
      "properties": {
       "denominationId": {
+       "x-ticvai-references": "platform.denomination",
        "type": "string",
        "format": "uuid",
        "description": "References `platform.denomination`, as `CashCountLine.denominationId` does. Until 26 September this was `denomination: number` — a face value as a JSON float, which naming-and-style 5.1 forbids and which could disagree with the note it named (pull audit R122).\n"
@@ -1426,6 +1433,11 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "recordedAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the device made the write** (R113; CHG-OFL-003): for an allocation, the same moment as `allocatedAt`, kept in `recorded_at`, the column every offline-written table carries for the sync to order replays by. Omitted online, the server sets it to the time it received the call."
    }
   }
  },
@@ -1574,6 +1586,7 @@
     "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
    },
    "taxInvoiceId": {
+    "x-ticvai-references": "ledger.tax_invoice",
     "type": "string",
     "format": "uuid"
    },
@@ -1610,6 +1623,7 @@
     "nullable": true
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -1980,6 +1994,7 @@
     "$ref": "#/components/schemas/FinTaxInvoiceStatus"
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -2459,6 +2474,7 @@
     "format": "uuid"
    },
    "leaderSubjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -2658,6 +2674,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -2669,6 +2686,7 @@
   ]
  },
  "MessageDispatch": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-append-only": "queuedAt",
   "x-ticvai-persistence": "marketing.message_dispatch",
   "type": "object",
@@ -3203,7 +3221,8 @@
    },
    "principalId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-staff-only": "Omitted from the response when the caller is a guest (R164)."
    },
    "workstationId": {
     "type": "string",
@@ -5121,7 +5140,8 @@
       },
       "principalId": {
        "type": "string",
-       "format": "uuid"
+       "format": "uuid",
+       "x-ticvai-references": "identity.principal"
       },
       "at": {
        "type": "string",
@@ -5494,6 +5514,9 @@
   ]
  },
  "Workstation": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "x-ticvai-persistence": "platform.workstation",
   "type": "object",
   "required": [

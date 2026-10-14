@@ -524,7 +524,7 @@ operationsByContract:
     writes: 2
   - operation: setEInvoicingProvider
     verb: PUT
-    path: /e-invoicing/providers
+    path: /e-invoicing/providers/{providerId}
     scope: tenant
     permission: TAX_CONFIGURE
     offline: false
@@ -540,7 +540,7 @@ operationsByContract:
     writes: 3
   - operation: setFxRate
     verb: PUT
-    path: /fx-rates
+    path: /fx-rates/{rateId}
     scope: region
     permission: LEDGER_APPROVE
     offline: false
@@ -548,7 +548,7 @@ operationsByContract:
     writes: 2
   - operation: setTaxInvoiceTemplate
     verb: PUT
-    path: /tax-invoice-templates
+    path: /tax-invoice-templates/{invoiceTemplateId}
     scope: tenant
     permission: TAX_CONFIGURE
     offline: false
@@ -793,7 +793,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.event_budget
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy: []
@@ -834,7 +834,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.journal_entry
-  columns: 20
+  columns: 21
   store: postgres
   parent: null
   writtenBy:
@@ -885,7 +885,7 @@ tables:
   foreignWriters:
   - orders
 - table: ledger.recognition_schedule
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -906,14 +906,14 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.tax_code
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
   - finance
   foreignWriters: null
 - table: ledger.tax_exemption
-  columns: 14
+  columns: 15
   store: postgres
   parent: null
   writtenBy:
@@ -1040,8 +1040,6 @@ screens:
 - P08:BO-1081 Finance Dashboard
 - P08:BO-1170 Wallet Financial Period & Closing Controls
 - P08:BO-1172 Finance Validation, Reporting & Audit Center
-- P09:ADM-068 Tax, Fee & Calculation Command Center
-- P09:ADM-411 Billing & Legal Entity Information
 - P09:ADM-619 Reconciliation & Settlement Command Center
 - P10:PTR-014 Settlement & Payment History
 - P10:PTR-018 Reports & Sales Performance

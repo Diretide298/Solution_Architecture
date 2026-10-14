@@ -179,7 +179,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    },
    "createdAt": {
     "type": "string",
@@ -205,10 +206,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
@@ -232,7 +235,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    },
    "createdAt": {
     "type": "string",
@@ -249,7 +253,7 @@
  "AccessAreaZoneBuilderInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.parking_facility at 14%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; applied to `access.access_area` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Access Area & Zone Builder submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *Each zone receives* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
    "name": {
@@ -546,7 +550,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    },
    "createdAt": {
     "type": "string",
@@ -644,7 +649,7 @@
  "AccessControlGraphicalMapDesignerInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.access_map` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Access Control Graphical Map Designer submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "venueId": {
@@ -758,10 +763,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
@@ -832,7 +839,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    },
    "createdAt": {
     "type": "string",
@@ -863,6 +871,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -985,6 +994,20 @@
     "type": "string",
     "format": "date-time",
     "nullable": true
+   },
+   "directionEffectiveAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a direction change set by `setAccessPointDirection` takes effect; held `pending` until then."
+   },
+   "directionChangeReason": {
+    "type": "string",
+    "maxLength": 200,
+    "nullable": true,
+    "readOnly": true,
+    "description": "Why the gate was last turned round (`setAccessPointDirection`)."
    }
   }
  },
@@ -1038,7 +1061,7 @@
  "AttractionAccessConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table covers these fields** — the closest is access.parking_facility at 6%, so this is not an update to anything the package stores today and no new table has been decided",
+  "x-ticvai-persistence": "none — request only; applied to `access.attraction_access` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Attraction Access Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.\n\n**The pack defines this as a record**, under *For each attraction* - one of only 13 drafted writes that does. That is the client writing a row rather than a screen, and it is where the table conversation should start.",
   "properties": {
    "attractionId": {
@@ -1322,7 +1345,7 @@
  "GateLaneConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.gate_lane` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Gate & Lane Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "gateId": {
@@ -1631,7 +1654,7 @@
  "TopologyValidationPublicationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.configuration_version` (with `access.configuration_change`, `access.hardware_deployment`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Topology Validation & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "publishMode": {

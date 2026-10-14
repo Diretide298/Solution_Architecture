@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/arabic-rtl-experience",
-   "component": "apps/guest-app/src/routes/general/ArabicRtlExperienceDetail.tsx",
+   "component": "src/screens/general/ArabicRtlExperienceDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -129,7 +129,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/maintenance-page",
-   "component": "apps/guest-app/src/routes/general/MaintenancePageDetail.tsx",
+   "component": "src/screens/general/MaintenancePageDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

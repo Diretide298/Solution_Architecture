@@ -23,18 +23,39 @@
   "requestBody": null,
   "responds": "BillingReconciliation"
  },
- "getEntitlementUsage": {
+ "getCommercialMetrics": {
   "method": "GET",
-  "path": "/tenants/{tenantId}/entitlement-usage",
+  "path": "/commercial-metrics",
   "contract": "subscription",
-  "summary": "Usage against licensed limits",
-  "permission": "PLATFORM_TENANT_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [],
+  "summary": "The commercial figures across the customer portfolio, by code",
+  "permission": "PLATFORM_BILLING_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "codes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
   "requestBody": null,
-  "responds": "EntitlementUsage"
+  "responds": "CommercialMetricSet"
  },
  "getLicenceEnforcement": {
   "method": "GET",

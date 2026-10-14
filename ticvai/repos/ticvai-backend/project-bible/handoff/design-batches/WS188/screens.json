@@ -5,6 +5,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/stored-value-credit-command-center-bo-1103",
-   "component": "apps/venue-management-web/src/routes/orders-money/StoredValueCreditCommandCenter.tsx",
+   "component": "src/routes/orders-money/StoredValueCreditCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -108,7 +109,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -246,6 +247,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -255,7 +257,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/credit-type-definition-studio-bo-1104",
-   "component": "apps/venue-management-web/src/routes/orders-money/CreditTypeDefinitionStudio.tsx",
+   "component": "src/routes/orders-money/CreditTypeDefinitionStudio.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -279,6 +281,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§For each credit type configure) and no display directory — it is settings, not a population",
   "purpose": "Create and maintain the individual value buckets that can exist inside a TICVAI wallet. The source explicitly requires support for different digital wallet credit types such as Cash Credit, Bonus Credit, Redemption Tickets Credit and Rides Credit, with configurable usage criteria.",
   "purposeNote": "Administrators can introduce and configure new stored-value or entitlement credit types without software development.",
+  "division": "Shares `createCreditType`, `listCreditTypes`, `updateCreditType` with BO-1088; this screen is Credit Type Definition Studio (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.02, page 24): create and maintain the individual value buckets that can exist inside a TICVAI wallet. The source explicitly requires support for different digital wallet credit types such as Cash Credit, Bonus Credit, Redemption Tickets Credit and Rides Credit, with configurable usage criteria.",
   "gaps": [
    {
     "operation": null,
@@ -503,6 +506,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -512,7 +516,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/credit-issuance-rule-configuration-bo-1105",
-   "component": "apps/venue-management-web/src/routes/orders-money/CreditIssuanceRuleConfiguration.tsx",
+   "component": "src/routes/orders-money/CreditIssuanceRuleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -536,6 +540,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Define how credits enter a wallet after the wallet itself has already been funded or as the result of another TICVAI business process. This screen is deliberately different from Board 2: Board 2 controls funding/payment into a wallet; this screen controls the creation of individual credit buckets and entitlements.",
   "purposeNote": "Configured business events generate the correct wallet credits with appropriate source references, expiry rules and audit history.",
+  "division": "Shares `listCreditTypes`, `updateCreditType` with BO-1108, BO-420; this screen is Credit Issuance Rule Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.03, page 25): define how credits enter a wallet after the wallet itself has already been funded or as the result of another TICVAI business process. This screen is deliberately different from Board 2: Board 2 controls funding/payment into a wallet; this screen controls the creation of individual credit buckets and entitlements.",
   "layout": {
    "template": "form",
    "regions": [
@@ -695,6 +700,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_CONFIGURE",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -704,7 +710,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/credit-usage-eligibility-rules-bo-1106",
-   "component": "apps/venue-management-web/src/routes/orders-money/CreditUsageEligibilityRules.tsx",
+   "component": "src/routes/orders-money/CreditUsageEligibilityRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -831,6 +837,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -840,7 +847,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/consumption-priority-engine-bo-1107",
-   "component": "apps/venue-management-web/src/routes/orders-money/ConsumptionPriorityEngine.tsx",
+   "component": "src/routes/orders-money/ConsumptionPriorityEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1027,6 +1034,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -1036,7 +1044,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/expiry-validity-policy-configuration-bo-1108",
-   "component": "apps/venue-management-web/src/routes/orders-money/ExpiryValidityPolicyConfiguration.tsx",
+   "component": "src/routes/orders-money/ExpiryValidityPolicyConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1060,6 +1068,7 @@
   "patternReason": "the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population",
   "purpose": "Configure how long each type of wallet value remains valid. The source requires configurable expiry periods for all credit types, including the ability to configure unlimited validity, particularly for cash credit.",
   "purposeNote": "Each issued credit receives the correct validity period based on the applicable published expiry policy.",
+  "division": "Shares `listCreditTypes`, `updateCreditType` with BO-1105, BO-420; this screen is Expiry & Validity Policy Configuration (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.06, page 28): configure how long each type of wallet value remains valid. The source requires configurable expiry periods for all credit types, including the ability to configure unlimited validity, particularly for cash credit.",
   "layout": {
    "template": "form",
    "regions": [
@@ -1202,6 +1211,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -1211,7 +1221,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/fefo-credit-lot-management-bo-1109",
-   "component": "apps/venue-management-web/src/routes/orders-money/FefoCreditLotManagement.tsx",
+   "component": "src/routes/orders-money/FefoCreditLotManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1336,6 +1346,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -1345,7 +1356,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/split-tender-multi-credit-consumption-bo-1110",
-   "component": "apps/venue-management-web/src/routes/orders-money/SplitTenderMultiCreditConsumption.tsx",
+   "component": "src/routes/orders-money/SplitTenderMultiCreditConsumption.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1546,6 +1557,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -1555,7 +1567,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/credit-expiry-extension-forfeiture-operations-bo-1111",
-   "component": "apps/venue-management-web/src/routes/orders-money/CreditExpiryExtensionForfeitureOperations.tsx",
+   "component": "src/routes/orders-money/CreditExpiryExtensionForfeitureOperations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1580,6 +1592,7 @@
   "patternReason": "the pack gives this screen a display directory (§Display) and no metric row",
   "purpose": "Provide governed administrative management of credits approaching or reaching expiry.",
   "purposeNote": "Expiry-related administrative actions preserve the original credit history and create immutable audit entries.",
+  "division": "Shares `expireCreditLots`, `listCreditLots` with BO-1130; this screen is Credit Expiry, Extension & Forfeiture Operations (pack Wallet_Configuration_Backend_Structure_v1.0.pdf, board 3.09, page 31): provide governed administrative management of credits approaching or reaching expiry.",
   "gaps": [
    {
     "operation": null,
@@ -1691,6 +1704,7 @@
   "module": "Orders & Money",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "WALLET_VIEW",
   "source": {
    "pack": "Wallet_Configuration_Backend_Structure_v1.0.pdf",
    "board": "3",
@@ -1700,7 +1714,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/orders-money/consumption-simulator-validation-rule-publication-bo-1112",
-   "component": "apps/venue-management-web/src/routes/orders-money/ConsumptionSimulatorValidationRulePublication.tsx",
+   "component": "src/routes/orders-money/ConsumptionSimulatorValidationRulePublication.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1759,7 +1773,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Takes effect at every till and reader immediately.** Credit types, consumption order and funding rules change for balances that already exist, not only for new ones.",
-       "provenance": "authored — required by check-screens, 19 September 2026"
+       "provenance": "authored — required by check-screens, 19 September 2026",
+       "operation": "publishWalletConfiguration"
       },
       {
        "kind": "detailPanel",

@@ -263,8 +263,17 @@ def check_stub_tables(guard, backend) -> None:
     for op, e in lineage.items():
         for t in (e or {}).get("writes") or []:
             writers.setdefault(t, []).append(op)
+    # A stub the generator no longer writes, whose drop handoff/migration-review.md lists for the migration owner
+    # (derive-schema-history.py RETIRED_TABLES, CHG-STO-008), is on its way out: a note, not a finding.
+    ref_tables = set(((g.load_json(g.ROOT / "handoff" / "schema-reference.json", {}) or {}).get("cols") or {}))
+    review = g.ROOT / "handoff" / "migration-review.md"
+    dropping = set(re.findall(r"^\| table dropped \| \w+ \| `([a-z_]+\.[a-z_0-9]+)` \|",
+                              review.read_text(encoding="utf-8"), re.M)) if review.exists() else set()
     for t, names in sorted(effective_tables(backend).items()):
         if names and len(names) <= 2 and all(c == "id" or c.endswith("_id") for c in names):
+            if t not in ref_tables and t in dropping:
+                guard.note(f"{t}: only {', '.join(names)}; retired, its drop listed in handoff/migration-review.md")
+                continue
             w = sorted(writers.get(t, []))
             if w:
                 guard.add("D-STUB-TABLE", t, f"{t}: only {', '.join(names)}, and written by {', '.join(w[:4])}"
@@ -370,6 +379,22 @@ def check_unique_case(guard, backend, ref_cols: dict, by: dict) -> None:
 BOOL_OK = re.compile(r"^(is|has|can|require|requires|allows|allow|should|was|were|did|does|must|needs|include|includes|"
                      r"show|shows|auto|use|uses|supports|accepts|enable|enabled|send|notify|override)_|"
                      r"_(enabled|required|allowed|visible|active|locked|verified|confirmed|approved)$")
+
+
+def reads_as_assertion(column: str) -> bool:
+    """The generator's own rule (tools/derive-schema.py `bool_reads_as_assertion`, CHG-STO-009), so the check and the
+    name it derives cannot disagree again; BOOL_OK above is the standard's core and stays inside that rule."""
+    fn = _cache.get("bool")
+    if fn is None:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("derive_schema", str(g.ROOT / "tools" / "derive-schema.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        fn = _cache["bool"] = mod.bool_reads_as_assertion
+    return bool(BOOL_OK.search(column)) or fn(column)
+
+
+_cache: dict = {}
 # A key may name its target's concept rather than its table (ADR-0056 venue keys, principal actors).
 FK_ALIASES = {"venue": "scope", "region": "scope", "department": "scope", "org_unit": "scope",
               "scope": "scope", "parent": "", "principal": "principal", "subject": "subject"}
@@ -462,13 +487,34 @@ def main() -> int:
     # when each names a role (debit/credit, from/to, sandbox/production, venue/department of a
     # scope); what the audit found was a key named after the parent itself beside the contract's
     # own key, or a key named after a table the schema history says was renamed (R160).
+    #
+    # **Read from the DDL the generator writes now, not from the frozen r1 files** (CHG-STO-005, 14 October 2026). The
+    # baseline under backend/ is frozen at r1 and only a forward migration changes a table, so a key, a key's name or a
+    # boolean's name read from 900 and 010 could never be fixed at its source: the contract and the generators, which
+    # write the schema reference derive-ddl writes the DDL from (as check-storage-promises reads it). Where the fix to
+    # an r1 table is a rename or a constraint, derive-ddl lists it in handoff/migration-review.md for the migration
+    # owner, and check-migrations and check-migration-freeze hold the databases to it.
+    ref = g.load_json(g.ROOT / "handoff" / "schema-reference.json", {}) or {}
+    ref_cols = ref.get("cols") or {}
+    ref_store = ref.get("store") or {}
+
+    def _area(t):
+        return "control" if t.split(".")[0] == "control" else "tenant"
+    ref_fks = []
+    for t, cs in sorted(ref_cols.items()):
+        if "." not in t or ":" in t or ref_store.get(t, "postgres") not in ("postgres", "postgres-analytical"):
+            continue
+        for c in cs:
+            to = c.get("references")
+            if c.get("enforced") == "yes" and to in ref_cols and _area(to) == _area(t) and c.get("column") != "id":
+                ref_fks.append((t, [c["column"]], to))
     renamed = {}
     for r in ((g.load_json(g.ROOT / "handoff" / "schema-history.json", {}) or {}).get("renames") or []):
         old = str(r.get("from") or "").split(".")[-1]
         if old:
             renamed[old + "_id"] = r.get("to")
     by_parent = {}
-    for t, cols, target in fks:
+    for t, cols, target in ref_fks:
         by_parent.setdefault((t, target), []).append(cols[-1])
     for (t, target), cols in sorted(by_parent.items()):
         for c in cols:
@@ -482,7 +528,7 @@ def main() -> int:
         if own in cols and target != t:
             others = [c for c in cols if c != own and not ACTOR.search(c)]
             if others and not all(re.search(r"(from|to|source|target|parent|previous|next|original|"
-                                            r"replac|merged|primary|secondary|credit|debit|new|old)", c)
+                                            r"replac|merged|primary|secondary|fallback|credit|debit|new|old)", c)
                                   for c in others):
                 guard.add("D-DOUBLE-KEY", f"{t}->{target}",
                           f"{t}: {own} beside {', '.join(others)}, all keys to {target}")
@@ -519,7 +565,6 @@ def main() -> int:
     check_stub_tables(guard, backend)
 
     # R019: a column description that is its contract field's description, cut.
-    ref = g.load_json(g.ROOT / "handoff" / "schema-reference.json", {}) or {}
     by, _ = g.schemas()
     for t, cols in (ref.get("cols") or {}).items():
         for c in cols:
@@ -593,11 +638,14 @@ def main() -> int:
                       "MIG-BASELINE does not say it creates the schemas, the ltree extension and the "
                       "row-level security helpers every later migration assumes (R056)")
 
-    # R093 R119: naming-and-style 6.1.
-    for t, cols in sorted(tables.items()):
-        for c, line in cols.items():
-            parts = line.split()
-            if len(parts) > 1 and parts[1].lower() == "boolean" and not BOOL_OK.search(c):
+    # R093 R119: naming-and-style 6.1. A boolean's name, as the generator names it now (CHG-STO-005: an r1 column's
+    # rename is a "column renamed" row in migration-review.md, declared in derive-schema-history.py COLUMN_RENAMES).
+    for t, cs in sorted(ref_cols.items()):
+        if "." not in t or ":" in t or ref_store.get(t, "postgres") not in ("postgres", "postgres-analytical"):
+            continue
+        for col in cs:
+            c = str(col.get("column") or "")
+            if str(col.get("type") or "").lower() == "boolean" and not reads_as_assertion(c):
                 guard.add("D-NAMING", f"{t}.{c}", f"{t}.{c}: a boolean that does not read as an assertion")
     for db in ("tenant", "control"):
         for f in (backend / db).glob("*.sql"):
@@ -607,20 +655,22 @@ def main() -> int:
                 if not name.endswith(want) and not name.endswith("_gist") and not name.endswith("_idx"):
                     guard.add("D-NAMING", f"index:{name}", f"{name} on {t}: an index name should end {want}")
 
-    # R082: a key named for one table that references another.
-    for t, cols, target in fks:
+    # R082: a key named for one table that references another (read from the generator's DDL, CHG-STO-005).
+    for t, cols, target in ref_fks:
         # `_ref` is the package's name for a key to an asset (`imageAssetRef`, `sourceRef`): strip it like `_id`
         # (CHG-GTRB-006: maintenance.incident_media.asset_ref references assets.media_asset).
         stem = re.sub(r"_(?:ids?|refs?)$", "", cols[-1])
         tname = target.split(".")[-1]
         if stem in ("current", "previous", "next", "original", "source", "target", "replacement", "parent"):
             continue  # a role within one table's own history, not a table name
-        if stem in FK_ALIASES:
-            alias = FK_ALIASES[stem]
+        head = stem.split("_")[-1]
+        # a role in front of an aliased concept names it too (`home_region_id`, `primary_venue_id` -> platform.scope)
+        akey = stem if stem in FK_ALIASES else head if FK_ALIASES.get(head) else None
+        if akey:
+            alias = FK_ALIASES[akey]
             if alias and alias not in tname:
                 guard.add("D-FK-TARGET-NAME", f"{t}.{cols[-1]}", f"{t}.{cols[-1]} references {target}")
             continue
-        head = stem.split("_")[-1]
         if not (tname.endswith(stem) or stem.endswith(tname) or head in tname.split("_") or tname in stem
                 or ACTOR.search(stem)):
             guard.add("D-FK-TARGET-NAME", f"{t}.{cols[-1]}", f"{t}.{cols[-1]} references {target}")
@@ -667,10 +717,23 @@ def main() -> int:
         if not m or f"{s}.{m.group(1)}" not in ref_cols:
             continue
         parent, p = f"{s}.{m.group(1)}", m.group(1)
+        # A key named for the parent with its module in front (`rental_agreement_id` -> `rental.agreement`) is the
+        # parent key too (CHG-STO-004).
         keys = [c for c in cols if str(c.get("column", "")).endswith("_id") and c.get("column") != "id"
-                and (p.endswith(c["column"][:-3]) or c["column"][:-3].startswith(p))]
-        if not any(c.get("references") == parent and c.get("enforced") == "yes" and c.get("required") == "yes"
-                   for c in keys):
+                and (p.endswith(c["column"][:-3]) or c["column"][:-3].startswith(p)
+                     or c["column"][:-3] == f"{s}_{p}")]
+
+        def reaches(c, depth=0):
+            """A NOT NULL declared key to the parent, or to a table of the parent's that has one (a menu item sits in
+            a section, the section in its menu: `fnb.menu_item.menu_section_id` -> `fnb.menu_section.menu_id`)."""
+            if c.get("enforced") != "yes" or c.get("required") != "yes":
+                return False
+            to = c.get("references")
+            if to == parent:
+                return True
+            return depth < 2 and str(to).startswith(parent + "_") and any(
+                reaches(x, depth + 1) for x in ref_cols.get(to, []) if str(x.get("column", "")).endswith("_id"))
+        if not any(reaches(c) for c in keys):
             have = ", ".join(f"{c['column']} -> {c.get('references')} ({c.get('referenceHow')})" for c in keys)
             guard.add("D-CHILD-PARENT", t, f"{t}: no NOT NULL declared key to {parent}"
                       + (f" (has {have})" if have else " (no key column)"))

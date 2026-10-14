@@ -5,6 +5,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/registration-attendance-command-center-bo-706",
-   "component": "apps/venue-management-web/src/routes/sell/RegistrationAttendanceCommandCenter.tsx",
+   "component": "src/routes/sell/RegistrationAttendanceCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -65,6 +66,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Review and set how guests register for an event and how attendance is recorded.",
   "purposeNote": "Authorized users can obtain a consolidated view of event commercial and operational performance while data visibility remains controlled by tenant, entity and role permissions. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-706)",
+  "division": "Shares `getEvent`, `setEventRegistration` with BO-707, BO-709; this screen is Registration & Attendance Command Center (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 5.01, page 81): review and set how guests register for an event and how attendance is recorded.",
   "gaps": [
    {
     "operation": null,
@@ -174,6 +176,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -183,7 +186,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/attendee-data-registration-form-configuration-bo-707",
-   "component": "apps/venue-management-web/src/routes/sell/AttendeeDataRegistrationFormConfiguration.tsx",
+   "component": "src/routes/sell/AttendeeDataRegistrationFormConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -210,6 +213,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Choose what each attendee is asked for when registering for an event.",
   "purposeNote": "Authorized users can monitor configured sales and attendance KPIs with current check-in information supplied by shared Ticketing and Access Control services. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-707)",
+  "division": "Shares `getEvent`, `setEventRegistration` with BO-706, BO-709; this screen is Attendee Data & Registration Form Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 5.05, page 85): choose what each attendee is asked for when registering for an event.",
   "gaps": [
    {
     "operation": null,
@@ -319,6 +323,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -328,7 +333,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/accreditation-participant-category-configuration-bo-708",
-   "component": "apps/venue-management-web/src/routes/sell/AccreditationParticipantCategoryConfiguration.tsx",
+   "component": "src/routes/sell/AccreditationParticipantCategoryConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -377,7 +382,7 @@
         "Existing / Approved Configuration"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAccessProfiles",
        "provenance": "pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, page 85 §Display"
       }
      ]
@@ -471,6 +476,7 @@
   "module": "Sell",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Event_Management_Configuration_Backend_Structure_v1.0.pdf",
    "board": "5",
@@ -480,7 +486,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/event-admission-entry-policy-configuration-bo-709",
-   "component": "apps/venue-management-web/src/routes/sell/EventAdmissionEntryPolicyConfiguration.tsx",
+   "component": "src/routes/sell/EventAdmissionEntryPolicyConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -507,6 +513,7 @@
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Set an event's admission policy: when entry opens, who may enter and on what credential.",
   "purposeNote": "Eligible event transactions can trigger automated invoice requests with complete event and customer references while financial posting remains controlled by Finance. Purpose rewritten 2 October 2026 (CHG-WIR-026): The purpose was pack text attached by page rather than by screen and does not describe this screen; it is rewritten from the screen's name and operations (design-notes correction ticketing-backoffice BO-709)",
+  "division": "Shares `getEvent`, `setEventRegistration` with BO-706, BO-707; this screen is Event Admission & Entry Policy Configuration (pack Event_Management_Configuration_Backend_Structure_v1.0.pdf, board 5.08, page 87): set an event's admission policy: when entry opens, who may enter and on what credential.",
   "gaps": [
    {
     "operation": null,

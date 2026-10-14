@@ -56,6 +56,40 @@
   "requestBody": "CreatePlanRequest",
   "responds": "Plan"
  },
+ "getCommercialMetrics": {
+  "method": "GET",
+  "path": "/commercial-metrics",
+  "contract": "subscription",
+  "summary": "The commercial figures across the customer portfolio, by code",
+  "permission": "PLATFORM_BILLING_VIEW",
+  "offlineCapable": null,
+  "conflictPolicy": null,
+  "scopeLevel": "platform",
+  "parameters": [
+   {
+    "name": "codes",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "tenantId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "period",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "compareTo",
+    "in": "query",
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "CommercialMetricSet"
+ },
  "getVsiModel": {
   "method": "GET",
   "path": "/vsi-models",
@@ -108,7 +142,7 @@
  },
  "setLicensingModel": {
   "method": "PUT",
-  "path": "/licensing-models",
+  "path": "/licensing-models/{licensingModelId}",
   "contract": "subscription",
   "summary": "Define the billable unit and what happens at the edges",
   "permission": "PLATFORM_PLAN_MANAGE",
@@ -116,6 +150,11 @@
   "conflictPolicy": null,
   "scopeLevel": "platform",
   "parameters": [
+   {
+    "name": "licensingModelId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

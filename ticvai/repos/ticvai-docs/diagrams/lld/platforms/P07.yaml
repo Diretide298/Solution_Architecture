@@ -136,6 +136,7 @@ screens:
   entryParams:
   - mediaCode<-deepLink
   - rightId<-deepLink
+  - workstationId<-session
   goesTo:
   - SCN-001
   - SCN-002
@@ -172,7 +173,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - workstationId<-session
   goesTo:
   - SCN-001
   - SCN-002
@@ -200,7 +202,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - workstationId<-session
   goesTo:
   - SCN-001
   - SCN-002
@@ -228,7 +231,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - workstationId<-session
   goesTo:
   - SCN-001
   - SCN-002
@@ -255,6 +259,7 @@ screens:
   offlineState: true
   entryParams:
   - rightId<-deepLink
+  - workstationId<-session
   goesTo:
   - SCN-001
   - SCN-002
@@ -283,7 +288,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - workstationId<-session
   goesTo:
   - SCN-001
   - SCN-002
@@ -316,7 +322,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - workstationId<-session
   goesTo:
   - SCN-001
   - SCN-002
@@ -345,7 +352,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - workstationId<-session
   goesTo:
   - SCN-001
   - SCN-002

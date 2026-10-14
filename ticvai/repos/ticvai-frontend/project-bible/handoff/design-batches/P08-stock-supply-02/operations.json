@@ -5,7 +5,7 @@
   "contract": "reporting",
   "summary": "Mark it seen",
   "permission": "REPORT_VIEW_VENUE",
-  "offlineCapable": false,
+  "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
@@ -428,7 +428,7 @@
  },
  "setTemperatureCheckpoint": {
   "method": "PUT",
-  "path": "/food-safety/checkpoints",
+  "path": "/food-safety/checkpoints/{checkpointId}",
   "contract": "fnb",
   "summary": "Define a checkpoint and its safe range",
   "permission": "PRODUCT_CONFIGURE",
@@ -436,6 +436,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "checkpointId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

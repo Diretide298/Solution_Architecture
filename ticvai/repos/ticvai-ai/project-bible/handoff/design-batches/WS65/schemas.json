@@ -99,6 +99,7 @@
     "format": "uuid"
    },
    "originalOrderLineId": {
+    "x-ticvai-references": "orders.order_line",
     "type": "string",
     "format": "uuid"
    },

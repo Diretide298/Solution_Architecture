@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "LEDGER_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/tax-profile-jurisdiction-configuration-adm-069",
-   "component": "apps/venue-management-web/src/routes/commercial/TaxProfileJurisdictionConfiguration.tsx",
+   "component": "src/routes/commercial/TaxProfileJurisdictionConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -342,6 +343,22 @@
   },
   "apisNote": "Defined by hand 4 October 2026 (CHG-FXS-001) from the bound operations' schemas, the design notes and the decisions; every field names its contract property.",
   "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-068 stays on the console (DEC-207 (Chinmay, 2 October, batch 6): TICVAI staff maintain the country tax templates); this screen keeps that edge and is also reached from BO-100 Venue Home.\n\n**Taxable base: one setting, here** (decided 2 October 2026, Chinmay; CHG-FIN-004). It was set in two places, the tax profile (`TaxProfile.taxBase`) and a venue policy flag on the tax calculation (`discountsAreTaxInclusive`), which could disagree; the flag is deprecated and ignored. The setting shows the Egypt worked example. **Tax documents** (CHG-FIN-011): the template sets the title the law prescribes, the auto-issue of the simplified tax invoice (on for a UAE registrant), and the AED 10,000 limit above which a VAT-registered buyer gets a full tax invoice.\n\n**Defined 4 October 2026: one tax profile per venue, read and saved as one record (Chinmay's default of 3 October: one tax-profile read, a list only if the design needs it); the legal entities come from listLegalEntities, which fills the invoice-template and e-invoicing calls and tells whether the entity is UAE VAT-registered** (CHG-FXS-001)",
+  "entryState": {
+   "params": [
+    {
+     "name": "invoiceTemplateId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listTaxInvoiceTemplates`."
+    },
+    {
+     "name": "providerId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listEInvoicingProviders`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -371,6 +388,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",
@@ -380,7 +398,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/tax-rule-treatment-builder-adm-070",
-   "component": "apps/venue-management-web/src/routes/commercial/TaxRuleTreatmentBuilder.tsx",
+   "component": "src/routes/commercial/TaxRuleTreatmentBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -528,6 +546,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",
@@ -537,7 +556,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/fee-surcharge-library-adm-071",
-   "component": "apps/venue-management-web/src/routes/commercial/FeeSurchargeLibrary.tsx",
+   "component": "src/routes/commercial/FeeSurchargeLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -783,6 +802,16 @@
     "provenance": "contract catalogue.yaml PUT /fees"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "feeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listFeeSurcharge`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -812,6 +841,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",
@@ -821,7 +851,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/fee-applicability-charging-rule-builder-adm-072",
-   "component": "apps/venue-management-web/src/routes/commercial/FeeApplicabilityChargingRuleBuilder.tsx",
+   "component": "src/routes/commercial/FeeApplicabilityChargingRuleBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1000,6 +1030,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",
@@ -1009,7 +1040,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/fee-waiver-tax-exemption-exception-rules-adm-073",
-   "component": "apps/venue-management-web/src/routes/commercial/FeeWaiverTaxExemptionExceptionRules.tsx",
+   "component": "src/routes/commercial/FeeWaiverTaxExemptionExceptionRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1213,6 +1244,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",
@@ -1222,7 +1254,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/price-calculation-sequence-formula-engine-adm-074",
-   "component": "apps/venue-management-web/src/routes/commercial/PriceCalculationSequenceFormulaEngine.tsx",
+   "component": "src/routes/commercial/PriceCalculationSequenceFormulaEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1373,6 +1405,16 @@
     "provenance": "contract catalogue.yaml PUT /calculation-profiles"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "calculationProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listPriceCalculationSequence`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1402,6 +1444,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",
@@ -1411,7 +1454,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/currency-precision-rounding-monetary-rules-adm-075",
-   "component": "apps/venue-management-web/src/routes/commercial/CurrencyPrecisionRoundingMonetaryRules.tsx",
+   "component": "src/routes/commercial/CurrencyPrecisionRoundingMonetaryRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1529,6 +1572,14 @@
   "entryState": {
    "preloaded": [
     "AED 199.50"
+   ],
+   "params": [
+    {
+     "name": "roundingProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: only `setCurrencyRoundingRule` takes it, from the record the user acts on."
+    }
    ]
   },
   "wireframe": {
@@ -1597,6 +1648,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",
@@ -1606,7 +1658,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/price-breakdown-calculation-simulation-explainability-adm-076",
-   "component": "apps/venue-management-web/src/routes/commercial/PriceBreakdownCalculationSimulationExplainabilit.tsx",
+   "component": "src/routes/commercial/PriceBreakdownCalculationSimulationExplainabilit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1785,6 +1837,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 1,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",
@@ -1794,7 +1847,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/calculation-validation-reconciliation-service-interface-adm-077",
-   "component": "apps/venue-management-web/src/routes/commercial/CalculationValidationReconciliationServiceInterf.tsx",
+   "component": "src/routes/commercial/CalculationValidationReconciliationServiceInterf.tsx",
    "status": "notStarted"
   },
   "navigation": {

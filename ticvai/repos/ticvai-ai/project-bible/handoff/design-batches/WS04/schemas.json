@@ -13,11 +13,13 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid",
     "description": "The policyId of listVerificationMethodSelection"
    },
    "productId": {
+    "x-ticvai-references": "catalogue.product",
     "type": "string",
     "format": "uuid",
     "description": "Unique per scope"
@@ -73,6 +75,7 @@
     "description": "**The per-product override of MOM-0330** (MoM 2 Sep 2026 §4.7; CHG-R6-031): a product whose tickets must not carry dynamic QR (a VIP invitation, a B2B or reseller ticket type) sets `staticQr` or `rfidCard`, even inside a fully dynamic event. Null: the product takes its sales channel's `ticketCredentialFormat` (catalogue `SalesChannelProfile`), and that null, the platform's signed QR. Wins over the channel when `issueOrderEntitlements` resolves the format."
    },
    "scopePath": {
+    "readOnly": true,
     "type": "string",
     "description": "ltree of the owning scope node"
    },
@@ -249,7 +252,7 @@
  "MediaCompatibilityTestingPublicationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.media_compatibility_test`, the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What Media Compatibility, Testing & Publication submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "mediaProfileId": {
@@ -852,7 +855,7 @@
  "RfidNfcConfigurationInput": {
   "type": "object",
   "x-ticvai-drafted-shape": true,
-  "x-ticvai-persistence": "none — request only; **no existing table shares a single field with this**, so nothing the package stores today is what this configures",
+  "x-ticvai-persistence": "none — request only; applied to `access.media_encoding_profile` (with `access.configuration_change`), the table its operation writes (CHG-STO-021); a field with no column there is a working input of the screen and is not kept",
   "description": "**What RFID & NFC Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.",
   "properties": {
    "name": {

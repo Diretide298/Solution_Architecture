@@ -216,6 +216,7 @@
   ]
  },
  "CaseMessage": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.case_message",
   "type": "object",
   "required": [
@@ -223,9 +224,16 @@
    "body",
    "isInternal",
    "authorKind",
-   "recordedAt"
+   "recordedAt",
+   "scopePath",
+   "caseId"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "resolution": {
     "type": "string",
     "description": "**What was actually done about it.** Indexed for retrieval: an agent facing a complaint benefits more from how the last one was resolved than from a policy. Without this column `marketing.case` can only embed its subject line.\n"
@@ -272,6 +280,13 @@
     "format": "date-time",
     "readOnly": true,
     "description": "Server time the message arrived."
+   },
+   "caseId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "marketing.case",
+    "description": "The case this message belongs to, from the path of `addCaseMessage` (the opening one, `createCase`)."
    }
   }
  },
@@ -296,6 +311,7 @@
   ]
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -353,7 +369,8 @@
    },
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "platform.scope"
    },
    "scopePath": {
     "type": "string",
@@ -365,7 +382,7 @@
     "format": "uuid",
     "nullable": true,
     "readOnly": true,
-    "x-ticvai-references": "marketing.guest_profile",
+    "x-ticvai-references": "pii.subject",
     "description": "The signed-in guest. From the session, never from the body."
    },
    "sessionRef": {
@@ -426,6 +443,8 @@
     "description": "The cart `bookVisitPlan` filled."
    },
    "excluded": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "readOnly": true,
     "description": "**What was left out and why**, e.g. a coaster excluded because one of the party is under its 120 cm minimum. Shown on GST-053, so the planner never looks as if it forgot.\n",
@@ -504,6 +523,7 @@
     }
    },
    "days": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "readOnly": true,
     "description": "One per date, in order. The items of the version read.",

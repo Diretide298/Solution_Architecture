@@ -11,11 +11,11 @@
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 104,
-  "operations": 207,
+  "operations": 209,
   "contracts": 8,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 95
+  "operationsWithNoScreen": 94
  },
  "waves": {
   "wave1": 26,
@@ -59,7 +59,7 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 65
+   "operations": 66
   },
   {
    "contract": "assets",
@@ -67,22 +67,22 @@
   },
   {
    "contract": "ai",
-   "operations": 9
-  },
-  {
-   "contract": "catalogue",
-   "operations": 5
+   "operations": 10
   },
   {
    "contract": "identity",
    "operations": 5
   },
   {
-   "contract": "tenancy",
-   "operations": 1
+   "contract": "catalogue",
+   "operations": 5
   },
   {
    "contract": "orders",
+   "operations": 1
+  },
+  {
+   "contract": "tenancy",
    "operations": 1
   }
  ],
@@ -147,7 +147,7 @@
    "module": "White Label",
    "wave": 1,
    "route": "/white-label/page-builder",
-   "operations": 14,
+   "operations": 15,
    "drawn": true
   },
   {
@@ -156,7 +156,7 @@
    "module": "White Label",
    "wave": 1,
    "route": "/white-label/content-blocks",
-   "operations": 10,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -282,7 +282,7 @@
    "module": "Policy",
    "wave": 3,
    "route": "/policy/consent-purpose-consent-type-builder-cms-023",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -480,7 +480,7 @@
    "module": "Policy",
    "wave": 3,
    "route": "/policy/signatory-signature-guardian-rule-configuration-cms-045",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -633,7 +633,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/central-digital-asset-library-cms-062",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -804,7 +804,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/dam-governance-rights-command-center-cms-081",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -813,7 +813,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-ownership-responsibility-management-cms-082",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -867,7 +867,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/rights-expiry-renewal-usage-impact-cms-088",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -921,7 +921,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/secure-delivery-url-cdn-rendition-delivery-cms-094",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -930,7 +930,7 @@
    "module": "Media Library",
    "wave": 3,
    "route": "/media-library/asset-replacement-propagation-management-cms-095",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -1577,12 +1577,6 @@
     "contract": "tenancy",
     "verb": "GET",
     "summary": "Devices that report having been interfered with"
-   },
-   {
-    "operation": "listProfileDeployments",
-    "contract": "tenancy",
-    "verb": "GET",
-    "summary": "Recent deployments, with a date, a target and an outcome"
    },
    {
     "operation": "recordDeviceTamperEvent",

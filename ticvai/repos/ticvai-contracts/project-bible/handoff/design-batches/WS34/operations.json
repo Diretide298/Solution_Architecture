@@ -361,7 +361,7 @@
  },
  "setConfigurationTemplate": {
   "method": "PUT",
-  "path": "/configuration-templates",
+  "path": "/configuration-templates/{configurationTemplateId}",
   "contract": "catalogue",
   "summary": "Create or update a product or price-list template",
   "permission": "PRODUCT_CONFIGURE",
@@ -369,6 +369,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "configurationTemplateId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -380,7 +385,7 @@
  },
  "setMarketPricingConfiguration": {
   "method": "PUT",
-  "path": "/pricing-markets",
+  "path": "/pricing-markets/{marketId}",
   "contract": "catalogue",
   "summary": "Create or update a node of the market pricing structure",
   "permission": "PRICE_CONFIGURE",
@@ -388,6 +393,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "marketId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -418,7 +428,7 @@
  },
  "setPriceCategoryRateType": {
   "method": "PUT",
-  "path": "/price-categories",
+  "path": "/price-categories/{priceCategoryId}",
   "contract": "catalogue",
   "summary": "Create or update a price category or rate type",
   "permission": "PRICE_CONFIGURE",
@@ -426,6 +436,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "priceCategoryId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 104 |
-| Operations | 207 |
+| Operations | 209 |
 | Contracts | 8 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 95 |
+| Operations with no screen | 94 |
 | Waves | wave1 26 · wave3 78 |
 
 ## Gaps
 
-### 95 operations with no screen here
+### 94 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,7 +60,7 @@
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
 | `createLoyaltyProgramme` | marketing-crm | POST | Create a loyalty programme |
 | `getCaseInvestigationResolution` | marketing-crm | GET | Read the case workspace |
-| … | | | 55 more |
+| … | | | 54 more |
 
 ### 1 modules split across waves
 
@@ -87,8 +87,8 @@
 | `CMS-004` | Logo & Assets | White Label | 1 | 7 | yes |
 | `CMS-005` | Theme Editor | White Label | 1 | 2 | yes |
 | `CMS-006` | Component Preview | White Label | 1 | 6 | yes |
-| `CMS-007` | Page Builder | White Label | 1 | 14 | yes |
-| `CMS-008` | Content Blocks | White Label | 1 | 10 | yes |
+| `CMS-007` | Page Builder | White Label | 1 | 15 | yes |
+| `CMS-008` | Content Blocks | White Label | 1 | 11 | yes |
 | `CMS-009` | Navigation & Menus | White Label | 1 | 7 | yes |
 | `CMS-010` | Media Library | White Label | 1 | 11 | yes |
 | `CMS-011` | Translations | White Label | 1 | 4 | yes |
@@ -102,7 +102,7 @@
 | `CMS-019` | User Access | White Label | 1 | 3 | yes |
 | `CMS-021` | Privacy & Consent Configuration Command Center | Policy | 3 | 1 | yes |
 | `CMS-022` | Data Processing Purpose & Lawful Basis Registry | Policy | 3 | 2 | yes |
-| `CMS-023` | Consent Purpose & Consent Type Builder | Policy | 3 | 1 | yes |
+| `CMS-023` | Consent Purpose & Consent Type Builder | Policy | 3 | 2 | yes |
 | `CMS-024` | Communication Preference & Marketing Permission Configuration | Policy | 3 | 1 | yes |
 | `CMS-025` | Cookie, Tracking & Digital Technology Registry | Policy | 1 | 8 | yes |
 | `CMS-026` | Cookie Banner & Preference Center Designer | Policy | 1 | 2 | yes |
@@ -124,7 +124,7 @@
 | `CMS-042` | Waiver Template Library & Master Setup | Policy | 3 | 2 | yes |
 | `CMS-043` | Digital Waiver & Form Builder | Policy | 3 | 2 | yes |
 | `CMS-044` | Dynamic Fields, Questions & Conditional Logic | Policy | 3 | 1 | yes |
-| `CMS-045` | Signatory, Signature & Guardian Rule Configuration | Policy | 3 | 1 | yes |
+| `CMS-045` | Signatory, Signature & Guardian Rule Configuration | Policy | 3 | 2 | yes |
 | `CMS-046` | Product, Event & Experience Association | Policy | 3 | 1 | yes |
 | `CMS-047` | Waiver Trigger, Eligibility & Completion Rules | Policy | 3 | 1 | yes |
 | `CMS-048` | Versioning, Effective Dates & Legal Change Control | Policy | 3 | 1 | yes |
@@ -141,7 +141,7 @@
 | `CMS-059` | Waiver Analytics, Compliance & Operational Insights | Policy | 3 | 1 | yes |
 | `CMS-060` | AI Waiver Compliance & Risk Intelligence Center | Policy | 3 | 1 | yes |
 | `CMS-061` | Digital Asset Management Command Center | Media Library | 3 | 2 | yes |
-| `CMS-062` | Central Digital Asset Library | Media Library | 3 | 3 | yes |
+| `CMS-062` | Central Digital Asset Library | Media Library | 3 | 2 | yes |
 | `CMS-063` | Upload & Asset Ingestion Workspace | Media Library | 3 | 3 | yes |
 | `CMS-064` | Folder, Collection & Workspace Management | Media Library | 3 | 2 | yes |
 | `CMS-065` | Metadata & Taxonomy Management | Media Library | 3 | 2 | yes |
@@ -160,21 +160,21 @@
 | `CMS-078` | Transformation & Rendition Management | Media Library | 3 | 2 | yes |
 | `CMS-079` | Rendition Processing & Delivery Readiness | Media Library | 3 | 1 | yes |
 | `CMS-080` | AI Quality, Intelligence Review & Recommendations | Media Library | 3 | 1 | yes |
-| `CMS-081` | DAM Governance & Rights Command Center | Media Library | 3 | 2 | yes |
-| `CMS-082` | Asset Ownership & Responsibility Management | Media Library | 3 | 2 | yes |
+| `CMS-081` | DAM Governance & Rights Command Center | Media Library | 3 | 1 | yes |
+| `CMS-082` | Asset Ownership & Responsibility Management | Media Library | 3 | 1 | yes |
 | `CMS-083` | Rights, License & Usage Policy Management | Media Library | 3 | 1 | yes |
 | `CMS-084` | Asset Approval Workflow Management | Media Library | 3 | 1 | yes |
 | `CMS-085` | Publication Eligibility & Governance Validation | Media Library | 3 | 1 | yes |
 | `CMS-086` | Role-Based Asset Access & Permission Management | Media Library | 3 | 3 | yes |
 | `CMS-087` | Secure Internal & External Sharing | Media Library | 3 | 1 | yes |
-| `CMS-088` | Rights Expiry, Renewal & Usage Impact | Media Library | 3 | 2 | yes |
+| `CMS-088` | Rights Expiry, Renewal & Usage Impact | Media Library | 3 | 1 | yes |
 | `CMS-089` | Governance Audit Trail & Compliance Evidence | Media Library | 3 | 1 | yes |
 | `CMS-090` | Governance Risk, Compliance & AI Recommendations | Media Library | 3 | 1 | yes |
 | `CMS-091` | Asset Distribution & Delivery Command Center | Media Library | 3 | 1 | yes |
 | `CMS-092` | Asset Usage & Distribution Map | Media Library | 3 | 1 | yes |
 | `CMS-093` | Channel & Distribution Configuration | Media Library | 3 | 1 | yes |
-| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | Media Library | 3 | 2 | yes |
-| `CMS-095` | Asset Replacement & Propagation Management | Media Library | 3 | 2 | yes |
+| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | Media Library | 3 | 1 | yes |
+| `CMS-095` | Asset Replacement & Propagation Management | Media Library | 3 | 1 | yes |
 | `CMS-096` | Fallback, Expiry & Distribution Continuity | Media Library | 3 | 1 | yes |
 | `CMS-097` | DAM API & Integration Hub | Media Library | 3 | 1 | yes |
 | `CMS-098` | Delivery Monitoring & Integration Health | Media Library | 3 | 1 | yes |

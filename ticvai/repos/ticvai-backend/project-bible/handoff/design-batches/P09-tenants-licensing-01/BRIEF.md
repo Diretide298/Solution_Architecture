@@ -1,6 +1,6 @@
 # P09-tenants-licensing-01 — P09 · Tenants & Licensing
 
-**9 screens · 38 operations · 41 schemas · 14 permissions**
+**9 screens · 37 operations · 40 schemas · 14 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-005` | Tenant Directory | A | 57 | 48 | 7 | 17 | 0 | 0 | — | notStarted (generated) |
+| `ADM-005` | Tenant Directory | A | 56 | 48 | 7 | 17 | 0 | 0 | — | notStarted (generated) |
 | `ADM-006` | Tenant Hierarchy Explorer | B | 16 | 45 | 7 | 15 | 0 | 0 | — | notStarted (generated) |
 | `ADM-007` | Module & Feature Entitlement | B | 12 | 42 | 6 | 14 | 0 | 0 | — | notStarted (generated) |
 | `ADM-008` | Subscription & Plan Management | A | 83 | 57 | 6 | 24 | 0 | 0 | — | notStarted (generated) |

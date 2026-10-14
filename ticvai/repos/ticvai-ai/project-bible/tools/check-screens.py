@@ -168,6 +168,8 @@ OP_CONTRACT: dict = {}
 # consent questions live in marketing-crm, but a venue without the marketing licence must still ask
 # a guest "can you swim?". `x-ticvai-requires-module` on the operation overrides CONTRACT_MODULE.
 OP_MODULE: dict = {}
+# The body fields of each create-or-replace PUT (CHG-SHP-003): the key a screen sends in the body it composes.
+OP_PUT_BODY_KEYS: dict = {}
 CONTRACT_MODULE = {
     "orders": "ticketing", "catalogue": "ticketing", "promotions": "ticketing",
     "access": "access", "fnb": "fnb", "retail": "retail", "inventory": "inventory",
@@ -917,6 +919,14 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
                 collection = path.split("/{" + param + "}")[0]
                 if collection and collection in screen_paths:
                     continue
+                # **A create-or-replace PUT addressed by the key its body carries** (14 October 2026, CHG-SHP-003):
+                # 123 writes moved from `PUT /badges` to `PUT /badges/{badgeId}`. The screen composing the body holds
+                # the key it sends, the client UUIDv7 of a new item (ADR-0056) or the item it edits, so the key is
+                # not something it must be handed on entry.
+                body_keys = OP_PUT_BODY_KEYS.get(api.get("operationId"))
+                if body_keys is not None and path.endswith("/{" + param + "}") and (param in body_keys
+                                                                                     or "id" in body_keys):
+                    continue
                 needed.add(param)
         entry = s.get("entryState") or {}
         declared = {p.get("name") for p in (entry.get("params") or [])}
@@ -1099,10 +1109,25 @@ def main() -> int:
             OP_PATHS[oid] = v.get("path", "")
             OP_CONTRACT[oid] = v.get("contract", "")
     for cf in sorted((ROOT / "contracts").glob("*/*.yaml")):
-        for item in ((yaml.safe_load(cf.read_text(encoding="utf-8")) or {}).get("paths") or {}).values():
-            for op in (item or {}).values():
+        cdoc = yaml.safe_load(cf.read_text(encoding="utf-8")) or {}
+        cschemas = (cdoc.get("components") or {}).get("schemas") or {}
+        for item in (cdoc.get("paths") or {}).values():
+            for verb, op in (item or {}).items():
                 if isinstance(op, dict) and op.get("x-ticvai-requires-module"):
                     OP_MODULE[op.get("operationId")] = op["x-ticvai-requires-module"]
+                if verb == "put" and isinstance(op, dict) and op.get("operationId"):
+                    body = ((((op.get("requestBody") or {}).get("content") or {}).get("application/json") or {})
+                            .get("schema") or {})
+                    ref = str(body.get("$ref") or "")
+                    if ref.startswith("#/components/schemas/"):
+                        body = cschemas.get(ref.rsplit("/", 1)[-1]) or {}
+                    keys = set((body.get("properties") or {}) if isinstance(body, dict) else ())
+                    for part in (body.get("allOf") or []) if isinstance(body, dict) else []:
+                        pref = str((part or {}).get("$ref") or "")
+                        if pref.startswith("#/"):
+                            part = cschemas.get(pref.rsplit("/", 1)[-1]) or {}
+                        keys |= set((part or {}).get("properties") or {})
+                    OP_PUT_BODY_KEYS[op["operationId"]] = keys
     all_ids = {s["id"] for f in files for s in yaml.safe_load(f.read_text(encoding="utf-8"))["screens"]}
     # Anchors a `to` may point into: the rendering states a screen declares, and its overlays.
     for f in files:

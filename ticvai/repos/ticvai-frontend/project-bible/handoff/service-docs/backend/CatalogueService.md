@@ -45,12 +45,12 @@
 | catalogue | [`joinWaitlist`](#joinwaitlist) | POST | `/waitlist-entries` | core | 1 | GST-007, WEB-006 |
 | catalogue | [`leaveWaitlist`](#leavewaitlist) | DELETE | `/waitlist-entries/{entryId}` | core | 1 | GST-007, WEB-006 |
 | catalogue | [`listProductCategories`](#listproductcategories) | GET | `/product-categories` | core | 1 | BO-048, BO-115, CMS-101, CMS-103, GST-001, GST-002 … |
-| catalogue | [`searchCatalogue`](#searchcatalogue) | GET | `/search` | core | 1 | GST-001, GST-002, GST-003, GST-063, WEB-002, WEB-003 |
-| catalogue | [`setChannelConnectionConfiguration`](#setchannelconnectionconfiguration) | PUT | `/channel-connections` | setup | 1 | ADM-269 |
+| catalogue | [`searchCatalogue`](#searchcatalogue) | GET | `/search` | core | 1 | GST-001, GST-002, GST-003, GST-063, WEB-001, WEB-002 … |
+| catalogue | [`setChannelConnectionConfiguration`](#setchannelconnectionconfiguration) | PUT | `/channel-connections/{connectionId}` | setup | 1 | ADM-269 |
 | catalogue | [`setChannelSalesRule`](#setchannelsalesrule) | PUT | `/channel-sales-rules/{ruleId}` | setup | 1 | ADM-263, ADM-264, ADM-265 |
 | catalogue | [`setDynamicPriceRule`](#setdynamicpricerule) | PUT | `/pricing/dynamic-rules/{ruleId}` | setup | 1 | BO-009, BO-443 |
 | catalogue | [`setDynamicPricingGuardrailPolicy`](#setdynamicpricingguardrailpolicy) | PUT | `/dynamic-pricing-controls` | setup | 1 | ADM-095, ADM-096, ADM-114 |
-| catalogue | [`setFeeDefinition`](#setfeedefinition) | PUT | `/fees` | setup | 1 | ADM-071 |
+| catalogue | [`setFeeDefinition`](#setfeedefinition) | PUT | `/fees/{feeId}` | setup | 1 | ADM-071 |
 | catalogue | [`setPriceLadderMatrix`](#setpriceladdermatrix) | PUT | `/dynamic-pricing-strategies/{strategyId}/price-ladder` | setup | 1 | ADM-094 |
 | catalogue | [`setProductCategories`](#setproductcategories) | PUT | `/product-categories` | core | 1 | BO-115, CMS-103 |
 | catalogue | [`transitionDynamicPricingStrategy`](#transitiondynamicpricingstrategy) | POST | `/dynamic-pricing-strategies/{strategyId}/lifecycle` | setup | 1 | ADM-088, ADM-089 |
@@ -365,6 +365,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | 201 |  | Created |
 | 422 |  | A fnbMenuItem component with no menuItemId, or whose menu item does not sell the component's variantId (MOB-4, 29 September). |
 | 400 |  | Allocation does not sum to 100 per cent, or fixed amounts do not sum to the bundle price. |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getBundle
@@ -1202,13 +1203,13 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | Read routing | replica |
 | Reads | `catalogue.event`, `catalogue.product`, `catalogue.product_eligibility_rule`, `catalogue.product_media`, `catalogue.variant`, `whitelabel.guided_choice_answer` |
 | Writes | - |
-| Called by | GST-001, GST-002, GST-003, GST-063, WEB-002, WEB-003 |
+| Called by | GST-001, GST-002, GST-003, GST-063, WEB-001, WEB-002, WEB-003 |
 
 **Parameters**
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
-| q | query | yes | string |  |
+| q | query | yes | string | Keywords matched case-insensitively against the product's name and summary, in the requested language and in English; every word must match. |
 | venueId | query |  | string (uuid) |  |
 | kind | query |  | enum (product, event, attraction, bundle, membership, merchandise, menuItem) |  |
 | guidedAnswerIds | query |  | array of string (uuid) | Help me choose answers, as filters (decided 29 September, W4). |
@@ -1224,7 +1225,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 ### setChannelConnectionConfiguration
 
-**`PUT /channel-connections`**: Create or update a channel connection
+**`PUT /channel-connections/{connectionId}`**: Create or update a channel connection
 
 **How TICVAI reaches one channel, per environment** (29 September, writers pass). Creates or updates a `catalogue.channel_connection`, keyed by `salesChannelId`, `connectorName` and `environment`. **Credentials are never sent or stored here**: `credentialsReference` and `certificateReference` name secrets in the vault (`422` `secretNotReference` if a value looks like a secret). A new or changed connection is saved `notTested`; `testChannelConnection` moves it to `connected` or `degraded`/`offline`. `disabled` switches it off. An existing OTA adapter is enabled for a venue by naming its `adapterId`, with no rebuild (MoM 31 Aug 2026 §4.3). Written to `catalogue.audit_entry` (`domain: channel`).
 
@@ -1246,6 +1247,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| connectionId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `ChannelConnection`
@@ -1713,7 +1715,7 @@ Rules: `effectiveTo` before `effectiveFrom`, or `minimumQuantity` above `maximum
 
 ### setFeeDefinition
 
-**`PUT /fees`**: Create or update a fee or surcharge
+**`PUT /fees/{feeId}`**: Create or update a fee or surcharge
 
 **The fee and surcharge library** (29 September, writers pass). Creates or updates a `catalogue.fee`, keyed by `code`: what the fee is and how it computes. When it applies is a `catalogue.fee_rule` (`setFeeApplicabilityCharging`). Distinct from a provider's processing cost (`payments.fee_rule`) and from a fee as charged on an order (`orders.order_fee`).
 
@@ -1737,6 +1739,7 @@ Rules: `fixedAmount` needs `amount`, `percentage` needs `percentage`, `tiered` n
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| feeId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `PricingFee`
@@ -2087,6 +2090,7 @@ Rules: bands must ascend and include `baseBandCode` (`422` `invalidBands`); a ba
 | displayColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | rank | integer |  | Ordering for best-seat assignment. |
 | priceBands | array of SeatPriceBand |  | The category's price bands (decided 28 September, audit R275 (d)). |
+| priceBands[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | priceBands[].id | string (uuid) |  | (read-only) |
 | priceBands[].seatCategoryId | string (uuid) |  | (read-only) |
 | priceBands[].code | string | yes | Unique within the category. (max length 64) |
@@ -2113,6 +2117,7 @@ Rules: bands must ascend and include `baseBandCode` (`422` `invalidBands`); a ba
 | rank | integer | yes | Ordering for best-seat assignment. |
 | seatCount | integer |  |  |
 | priceBands | array of SeatPriceBand |  | What a seat in this category costs, by band (decided 28 September, audit R275 (d), from the BO-1045 pack). |
+| priceBands[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | priceBands[].id | string (uuid) |  | (read-only) |
 | priceBands[].seatCategoryId | string (uuid) |  | (read-only) |
 | priceBands[].code | string | yes | Unique within the category. (max length 64) |
@@ -2133,6 +2138,7 @@ Rules: bands must ascend and include `baseBandCode` (`422` `invalidBands`); a ba
 |---|---|---|
 | 200 |  | Validate-only: the would-be result, nothing written |
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateSeatCategory
@@ -2170,6 +2176,7 @@ Added with `SeatCategory.priceBands` (decided 28 September, audit R275 (d)), so 
 | displayColour | string |  | (pattern ^#[0-9A-Fa-f]{6}$) |
 | rank | integer |  |  |
 | priceBands | array of SeatPriceBand |  |  |
+| priceBands[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | priceBands[].id | string (uuid) |  | (read-only) |
 | priceBands[].seatCategoryId | string (uuid) |  | (read-only) |
 | priceBands[].code | string | yes | Unique within the category. (max length 64) |
@@ -2196,6 +2203,7 @@ Added with `SeatCategory.priceBands` (decided 28 September, audit R275 (d)), so 
 | rank | integer | yes | Ordering for best-seat assignment. |
 | seatCount | integer |  |  |
 | priceBands | array of SeatPriceBand |  | What a seat in this category costs, by band (decided 28 September, audit R275 (d), from the BO-1045 pack). |
+| priceBands[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | priceBands[].id | string (uuid) |  | (read-only) |
 | priceBands[].seatCategoryId | string (uuid) |  | (read-only) |
 | priceBands[].code | string | yes | Unique within the category. (max length 64) |
@@ -2375,6 +2383,7 @@ Creates the coupon campaign (`promotions.coupon_campaign`). **Writes `promotions
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### generateCouponCodes
@@ -3912,6 +3921,7 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setEntitlementTemplateBlackoutDates
@@ -3930,7 +3940,7 @@ The resolution method defaults to `highestPriorityWins`; lowest-price-wins is ne
 | Config scope | venue |
 | Conflict policy | serverWins |
 | Reads | `catalogue.entitlement_template` |
-| Writes | `catalogue.entitlement_template` |
+| Writes | `catalogue.audit_entry`, `catalogue.entitlement_template` |
 | Called by | **no screen**: no screen lists it in its apis, so it is reachable only by API or import until one does (README, Known gaps) |
 
 **Parameters**
@@ -4402,6 +4412,8 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 **`GET /events`**: List events
 
+**Order.** Sorted by `name` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -4452,6 +4464,8 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 **`GET /events/{eventId}/performances`**: List performances of an event
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published performances, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Order.** Soonest first, by `startsAt` ascending, then by `id`.
+**Statuses.** Every `status` is returned, ended ones included (`cancelled`); a screen that shows only live rows filters on `status` itself.
 
 |  |  |
 |---|---|
@@ -5086,6 +5100,9 @@ A `venueEdge` workstation acquires through its edge node, which holds the venue 
 
 Back-office monitoring. Surfaces stranded leases — capacity held by a terminal that died and will not return it until TTL expiry. At a gate during peak that is visible to a queue.
 
+
+**Order.** Soonest first, by `expiresAt` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -5321,6 +5338,7 @@ Next season's prices from this season's, uplifted by a percentage. The alternati
 | 200 |  | Validate-only: the would-be result, nothing written |
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### setPrices
@@ -5764,6 +5782,8 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 
 **`GET /group-packages`**: The school-trip formats or party packages on offer
 
+**Order.** Sorted by `id` descending (a UUIDv7, so newest first).
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -5817,6 +5837,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 **`GET /products/{productId}/variants`**: List generated variants
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the published variants of a published product, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Order.** Sorted by `name` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -5875,6 +5896,9 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 **Help me choose filters the list** (decided 29 September, W4). `guidedAnswerIds` applies the filter of each chosen answer on the server; the guest screen offers *Show everything*, which is the same call without it. **A partner caller reads here** what is assigned to its channel (M17-04): partners never write products, prices or performances.
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets products that are published and on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
+
+**Order.** Sorted by `displayOrder` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -5888,7 +5912,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.product`, `catalogue.product_category`, `catalogue.product_eligibility_rule`, `catalogue.product_media`, `whitelabel.guided_choice_answer` |
 | Writes | - |
-| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-048, BO-094, BO-125, BO-877, CMS-101, CMS-103, EMP-034, GST-001, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-051, GST-052, GST-053, GST-075, KSK-001, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048, WEB-050 |
+| Called by | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-048, BO-094, BO-125, BO-877, CMS-101, CMS-103, EMP-034, GST-001, GST-002, GST-003, GST-005, GST-007, GST-008, GST-015, GST-021, GST-038, GST-044, GST-050, GST-051, GST-052, GST-075, KSK-001, KSK-003, KSK-015, POS-002, POS-003, PTR-006, WEB-001, WEB-002, WEB-003, WEB-005, WEB-022, WEB-035, WEB-048, WEB-050 |
 
 **Parameters**
 
@@ -6056,6 +6080,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | codes | array of AlternativeCode | yes |  |
+| codes[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | codes[].code | string | yes | (max length 128) |
 | codes[].partnerId | string (uuid) | yes |  |
 | codes[].partnerName | string |  |  |
@@ -6744,6 +6769,7 @@ Also the enforcement surface for budget caps — a promotion may be configured t
 **`GET /promotions`**: List promotions
 
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets live, published promotions, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRICE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Order.** Newest first, by `publishedAt` descending, then by `id`.
 
 |  |  |
 |---|---|
@@ -7107,6 +7133,7 @@ BL-114. **Split by a stable hash of the subject, not at random per request** —
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | variants | array of PromotionVariant | yes | (min items 2; max items 4) |
+| variants[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | variants[].id | string (uuid) |  | (read-only) |
 | variants[].promotionId | string (uuid) |  | Taken from the path. (read-only) |
 | variants[].label | string | yes |  |
@@ -7119,6 +7146,7 @@ BL-114. **Split by a stable hash of the subject, not at random per request** —
 |---|---|---|---|
 | promotionId | string (uuid) | yes |  |
 | variants | array of PromotionVariant | yes |  |
+| variants[].scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | variants[].id | string (uuid) |  | (read-only) |
 | variants[].promotionId | string (uuid) |  | Taken from the path. (read-only) |
 | variants[].label | string | yes |  |
@@ -7424,6 +7452,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | code | text | yes |  |
 | partner_id | uuid | yes |  |
 | partner_name | text | no |  |
@@ -7521,6 +7550,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | leased_units | integer | no | Held by terminals on this channel but not yet sold. |
 | remaining_units | integer | no |  |
 | release_at | timestamptz | no | Unsold units return to the general pool at this time. |
+| channel_capacity_id | uuid | no | The capacity envelope this allocation draws from (catalogue.channel_capacity), from the path of setChannelAllocations. |
 | sales_channel_id | uuid | no | The channel profile (catalogue.sales_channel) this allocation serves (29 September, data model DM3). |
 | envelope_type | text | no | How the allocation is sized (29 September, data model DM3); the allocation rule of ADM-262 lives on this row. |
 | minimum_units | integer | no |  |
@@ -7532,7 +7562,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | contractual_units | integer | no | Units a partner agreement guarantees; rebalancing never goes below it. |
 | minimum_guaranteed_units | integer | no |  |
 | is_frozen | boolean | no | Excluded from rebalancing. |
-| envelope_id | uuid | yes | Points at catalogue.channel_capacity. |
 
 ### `catalogue.channel_sales_rule`
 
@@ -7655,7 +7684,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | no_change_windows | jsonb | no | [{anchor, minutesBefore, minutesAfter, clockFrom, clockTo}]. |
 | circuit_breakers | jsonb | no | [{trigger, threshold, enabled, tripped}]. |
 | require_guardrails_passed | boolean | no |  |
-| exclude_protected_rates | boolean | no |  |
+| excludes_protected_rates | boolean | no |  |
 | require_healthy_forecast_data | boolean | no |  |
 | safe_failure_behavior | text | no |  |
 | active_override | jsonb | no | {user, reason, overridePrice, start, expiry, returnBehavior}. |
@@ -7713,6 +7742,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | expiry_notice_days | integer | no | How many days before validTo access raises entitlement.expiringSoon for an entitlement of this template still issued or partiallyConsumed (29 September, build pass, group G2; 5.5.30). |
 | carries_stored_value | boolean | no | BL-033. |
 | included_value | numeric(18,4) | no |  |
+| valid_time_windows | jsonb | no | BL-036, 1.1.81 and 1.1.83. |
 | blackout_dates | text[] | no | Calendar exceptions on the entitlement. |
 | fast_track_tier | text | no | 19.2.20, BL-015. |
 | entries_allowed | integer | no | Null means unlimited. |
@@ -7772,7 +7802,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | event_id | uuid | no |  |
 | is_required | boolean | no |  |
 | form_id | uuid | no |  |
-| capture_per_attendee | boolean | no |  |
+| captures_per_attendee | boolean | no |  |
+| participant_categories | jsonb | no |  |
 | admission_policy | jsonb | no |  |
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
@@ -7782,6 +7813,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | event_id | uuid | no |  |
+| requirements | jsonb | no |  |
+| contractors | jsonb | no |  |
 | readiness | text | no |  |
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
@@ -7791,9 +7824,10 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | event_id | uuid | no |  |
-| duration_is_dynamic | boolean | no |  |
+| performances | jsonb | no |  |
+| is_duration_dynamic | boolean | no |  |
 | maximum_overrun_minutes | integer | no |  |
-| cascade_overrun | boolean | no | Whether a late finish moves everything after it, which is the honest behaviour and the one venues forget to ask for until the first time it happens. |
+| cascades_overrun | boolean | no | Whether a late finish moves everything after it, which is the honest behaviour and the one venues forget to ask for until the first time it happens. |
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
@@ -7847,6 +7881,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | parsed_count | integer | yes |  |
 | create_count | integer | no |  |
 | update_count | integer | no |  |
+| findings | jsonb | no | What an operator sees before committing — missing prices, duplicate codes, unknown categories, codes that do not match the tenant's schema. |
 | scope_path | text | no | The partition key (ADR-0005). |
 | job_kind | text | no | One job table for every catalogue bulk operation (29 September, data model DM3): product import (the original use), environment transfer (ADM-124) and bulk pricing update or import (ADM-080). |
 | direction | text | no |  |
@@ -7965,7 +8000,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | execution_source | text | yes |  |
 | trigger | text | no |  |
 | channel_deployments | jsonb | no | [{channel, price, consistent, deploymentStatus}]. |
-| price_inconsistency | boolean | no |  |
+| has_price_inconsistency | boolean | no |  |
 | ai_confidence | numeric | no |  |
 | status | text | yes |  |
 | scheduled_for | timestamptz | no |  |
@@ -8194,12 +8229,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 | code_schema | text | no | 7.3.4 specifies [ParkCode]-[ProductType]-[Variant]. |
 | channels | text[] | no |  |
 | entitlement_template_id | uuid | no | What the buyer receives. |
-| blocked_offline | boolean | no | True for seated and retail. |
+| is_blocked_offline | boolean | no | True for seated and retail. |
 | data_mask_values | jsonb | no | Custom fields. |
 | guest_listing | text | no |  |
 | not_bookable_label | jsonb | no | The label a guest reads on an infoOnly product, e.g. |
 | sales_contact | jsonb | no | Who a guest contacts to book a view-only product (decided 29 September, W3), e.g. |
 | booking_flow_id | uuid | no | The booking flow this product is sold through (decided 29 September, W8 and W12): a white-label BookingFlow of the venue, which orders the guest's steps (for a workshop, the product first and then th… |
+| display_tags | jsonb | no | Short facts a guest reads on the ticket card and under *Read more*: *2 Hours*, *Min 1.10 m*, *Free adult entry*, *Valid 90 days*, *Emirates ID* (decided 29 September, 23SEP-3). |
 | consent_question_ids | text[] | no | The consent questions a guest answers when booking this product, in the order they are asked (decided 29 September, rev 3 REV3-26): *Are you able to swim?*, *Do you hold a scuba certification?*, *I a… |
 | requires_time_window | boolean | no | True for a space sold by the hour, e.g. |
 | product_owner_principal_id | uuid | no | The product owner (29 September, data model DM3), set with setProductContextOwnership. |
@@ -8269,7 +8305,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | guardian_signature_age_to | integer | no | Ages needing a guardian's signature, e.g. |
 | is_waiver_required | boolean | no |  |
 | swim_ability | text | no | Superseded for the guest's answer (decided 29 September, rev 3 REV3-26): the swim question is a consent, not a data field. |
-| refundable_if_ineligible_at_gate | boolean | no |  |
+| is_refundable_if_ineligible_at_gate | boolean | no |  |
 | required_certification_code | text | no | A certification the participant must hold (decided 29 September, W4; added 30 September), e.g. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
@@ -8715,6 +8751,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | promotion_id | uuid | no | Taken from the path. |
 | label | text | yes |  |
@@ -8726,6 +8763,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | seat_map_id | uuid | no |  |
+| spaces | jsonb | no |  |
 | eligibility | text | no | Contested in both directions. |
 | minimum_provision_percent | numeric | no |  |
 | scope_path | text | no |  |
@@ -8737,8 +8775,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | seat_map_id | uuid | no |  |
 | performance_id | uuid | no |  |
-| reverse_row_order | boolean | no | Last-row-is-best against first-row-is-best, which the minute names as the worked example and which differs by venue sightline. |
-| explain_to_guest | boolean | no |  |
+| profiles | jsonb | no |  |
+| reverses_row_order | boolean | no | Last-row-is-best against first-row-is-best, which the minute names as the worked example and which differs by venue sightline. |
+| explains_to_guest | boolean | no |  |
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
@@ -8746,6 +8785,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes | Stable for the life of the seat. |
 | section_code | text | yes |  |
 | row_label | text | yes |  |
@@ -8800,6 +8840,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | seat_category_id | uuid | no |  |
 | code | text | yes | Unique within the category. |
@@ -8846,6 +8887,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | name | text | yes |  |
 | row_count | integer | yes |  |
 | seat_count | integer | yes |  |
+| boundary | jsonb | no | Polygon for rendering. |
 | view_asset_id | uuid | no | The view of the stage from this section, as a photo, uploaded through assets like any other media (decided 29 September, rev 3 23SEP-14). |
 | scope_path | text | no | The partition key (ADR-0005). |
 | id | uuid | yes | Synthesised key. |

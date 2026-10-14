@@ -5,6 +5,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_CELL_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",
@@ -210,6 +211,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",
@@ -301,6 +303,7 @@
        "derived": true,
        "impliedBy": "createOrgUnit",
        "label": "Create org unit",
+       "operation": "createOrgUnit",
        "notes": "The act the screen exists for."
       },
       {
@@ -452,6 +455,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",
@@ -704,6 +708,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",
@@ -775,36 +780,42 @@
       {
        "kind": "progressIndicator",
        "label": "Administrator Account Created",
+       "operation": "getTenantLicences",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
        "notes": "A progress output of initialisation, not an input."
       },
       {
        "kind": "progressIndicator",
        "label": "Email Verified",
+       "operation": "getTenantLicences",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
        "notes": "A progress output of initialisation, not an input."
       },
       {
        "kind": "progressIndicator",
        "label": "Tenant Access Assigned",
+       "operation": "getTenantLicences",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
        "notes": "A progress output of initialisation, not an input."
       },
       {
        "kind": "progressIndicator",
        "label": "Default Role Applied",
+       "operation": "getTenantLicences",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
        "notes": "A progress output of initialisation, not an input."
       },
       {
        "kind": "progressIndicator",
        "label": "Security Policy Applied",
+       "operation": "getTenantLicences",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
        "notes": "A progress output of initialisation, not an input."
       },
       {
        "kind": "progressIndicator",
        "label": "Audit Logging Enabled",
+       "operation": "getTenantLicences",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup",
        "notes": "A progress output of initialisation, not an input."
       },
@@ -873,13 +884,6 @@
     "contract": "subscription",
     "purpose": "Licence and entitlement activation",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "addLicenceAddOn",
-    "contract": "subscription",
-    "purpose": "Activate an add-on",
-    "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
    },
    {
@@ -1004,6 +1008,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",
@@ -1056,6 +1061,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listModuleCatalogue",
        "derived": true,
        "impliedBy": "listModuleCatalogue",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -1116,6 +1122,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",
@@ -1385,6 +1392,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "TENANT_CONFIGURE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",
@@ -1599,6 +1607,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",
@@ -1670,56 +1679,67 @@
       {
        "kind": "selectField",
        "label": "Currency",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as"
       },
       {
        "kind": "selectField",
        "label": "Time Zone",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as"
       },
       {
        "kind": "selectField",
        "label": "Language",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as"
       },
       {
        "kind": "selectField",
        "label": "Venue Type",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as"
       },
       {
        "kind": "selectField",
        "label": "Ticket prices",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
       },
       {
        "kind": "selectField",
        "label": "Tax",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
       },
       {
        "kind": "selectField",
        "label": "Refund policy",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
       },
       {
        "kind": "selectField",
        "label": "Payment rules",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
       },
       {
        "kind": "selectField",
        "label": "Access rules",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
       },
       {
        "kind": "selectField",
        "label": "Settlement",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
       },
       {
        "kind": "selectField",
        "label": "Capacity",
+       "operation": "runGoLiveValidation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings such as"
       },
       {
@@ -1930,6 +1950,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",

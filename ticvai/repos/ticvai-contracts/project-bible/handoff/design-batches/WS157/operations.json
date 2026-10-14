@@ -523,7 +523,7 @@
  },
  "setIntegrationSource": {
   "method": "PUT",
-  "path": "/integration-sources",
+  "path": "/integration-sources/{sourceId}",
   "contract": "workforce",
   "summary": "Connect or reconfigure an external workforce system",
   "permission": "WORKFORCE_MANAGE",
@@ -531,6 +531,11 @@
   "conflictPolicy": null,
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "sourceId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -542,7 +547,7 @@
  },
  "setLeaveType": {
   "method": "PUT",
-  "path": "/leave-types",
+  "path": "/leave-types/{leaveTypeId}",
   "contract": "workforce",
   "summary": "Define a leave type",
   "permission": "WORKFORCE_MANAGE",
@@ -550,6 +555,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "leaveTypeId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -604,7 +614,7 @@
  },
  "setShiftPattern": {
   "method": "PUT",
-  "path": "/shift-patterns",
+  "path": "/shift-patterns/{shiftPatternId}",
   "contract": "workforce",
   "summary": "Define a shift pattern and its break",
   "permission": "WORKFORCE_MANAGE",
@@ -612,6 +622,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "shiftPatternId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -623,7 +638,7 @@
  },
  "setShiftTemplate": {
   "method": "PUT",
-  "path": "/shift-templates",
+  "path": "/shift-templates/{shiftTemplateId}",
   "contract": "workforce",
   "summary": "Define a shift pattern, its breaks and its qualifications",
   "permission": "WORKFORCE_MANAGE",
@@ -631,6 +646,11 @@
   "conflictPolicy": null,
   "scopeLevel": "venue",
   "parameters": [
+   {
+    "name": "shiftTemplateId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

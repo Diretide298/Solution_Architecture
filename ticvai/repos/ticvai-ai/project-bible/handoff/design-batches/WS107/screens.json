@@ -5,6 +5,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "10",
@@ -111,57 +112,67 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "Current Billing Period",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Current Charge",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs"
       },
       {
        "kind": "metricTile",
        "label": "MRR / Monthly Equivalent",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs"
       },
       {
        "kind": "metricTile",
        "label": "ACV",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs"
       },
       {
        "kind": "metricTile",
        "label": "YTD Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Outstanding Balance",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Next Invoice",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Minimum Guarantee",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Variable Consumption",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Payment Status",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Financial KPIs"
       }
      ]
@@ -185,7 +196,7 @@
         "Tax"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listSubscriptionInvoices",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Show"
       }
      ]
@@ -198,6 +209,7 @@
        "kind": "detailPanel",
        "label": "The selected billing commercial",
        "bindsTo": null,
+       "operation": "listSubscriptionInvoices",
        "columns": [
         "Platform Fee",
         "Module Fees",
@@ -230,6 +242,13 @@
     "purpose": "Billing at a glance",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getCommercialMetrics",
+    "contract": "subscription",
+    "purpose": "The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)"
    }
   ],
   "entryState": {
@@ -284,6 +303,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "10",
@@ -498,6 +518,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "10",
@@ -624,6 +645,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "10",
@@ -682,6 +704,7 @@
       },
       {
        "kind": "dataTable",
+       "operation": "listSubscriptionInvoices",
        "derived": true,
        "impliedBy": "listSubscriptionInvoices",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -724,13 +747,6 @@
     "contract": "subscription",
     "purpose": "Issue a full or partial credit note",
     "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listCreditNotes",
-    "contract": "subscription",
-    "purpose": "Credit notes issued",
-    "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    }
   ],
@@ -784,6 +800,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "10",
@@ -884,13 +901,6 @@
     "purpose": "Model a change",
     "trigger": "onAction",
     "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "setSubscription",
-    "contract": "subscription",
-    "purpose": "Apply it",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
    }
   ],
   "entryState": {
@@ -945,6 +955,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "10",
@@ -1005,42 +1016,49 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "Renewals Due",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Renewal ARR / Contract Value",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Renewal Rate",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs"
       },
       {
        "kind": "metricTile",
        "label": "At-Risk Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Auto-Renew Value",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Expansion Opportunity",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Cost Optimization Opportunity",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 129 §Renewal KPIs"
       }
      ]
@@ -1104,7 +1122,15 @@
    "emptyNoResults": "The filter narrowed it and the renewal are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getCommercialMetrics",
+    "contract": "subscription",
+    "purpose": "The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Renewals Due",
@@ -1151,6 +1177,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "10",
@@ -1277,6 +1304,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "10",
@@ -1319,46 +1347,55 @@
       {
        "kind": "metricTile",
        "label": "Customer Cost",
+       "operation": "simulateCommercialPackage",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics"
       },
       {
        "kind": "metricTile",
        "label": "TICVAI Revenue",
+       "operation": "simulateCommercialPackage",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Minimum Revenue Protection",
+       "operation": "simulateCommercialPackage",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Variable Revenue Exposure",
+       "operation": "simulateCommercialPackage",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Margin",
+       "operation": "simulateCommercialPackage",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Expected Overage",
+       "operation": "simulateCommercialPackage",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Customer Saving/Increase",
+       "operation": "simulateCommercialPackage",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Contract Predictability",
+       "operation": "simulateCommercialPackage",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Revenue Growth/Contraction",
+       "operation": "simulateCommercialPackage",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 131 §Comparison Metrics"
       }
      ]
@@ -1427,6 +1464,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "10",
@@ -1529,20 +1567,6 @@
   },
   "apis": [
    {
-    "operationId": "cancelInvoice",
-    "contract": "subscription",
-    "purpose": "Credit or cancel",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "disputeInvoice",
-    "contract": "subscription",
-    "purpose": "Raise a dispute",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
     "operationId": "issueCreditNote",
     "contract": "subscription",
     "purpose": "Credit an invoice in full or in part",
@@ -1555,6 +1579,20 @@
     "purpose": "Credits against the tenant's invoices",
     "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "cancelInvoice",
+    "contract": "subscription",
+    "purpose": "Credit or cancel",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "disputeInvoice",
+    "contract": "subscription",
+    "purpose": "Raise a dispute",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026"
    }
   ],
   "wireframe": {
@@ -1607,6 +1645,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "10",

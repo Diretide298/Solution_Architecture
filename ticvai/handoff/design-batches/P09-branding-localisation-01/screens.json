@@ -5,6 +5,7 @@
   "module": "Branding & Localisation",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C57",
   "implementation": {
    "app": "ticvai-web",
@@ -633,6 +634,7 @@
   "module": "Branding & Localisation",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -993,6 +995,7 @@
   "module": "Branding & Localisation",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_TENANT_VIEW",
   "capability": "C57",
   "implementation": {
    "app": "ticvai-web",
@@ -1284,6 +1287,7 @@
   "module": "Branding & Localisation",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "TENANT_VIEW",
   "capability": "C95",
   "implementation": {
    "app": "ticvai-web",

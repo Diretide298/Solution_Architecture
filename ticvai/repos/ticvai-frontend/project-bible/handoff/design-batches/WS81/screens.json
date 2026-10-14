@@ -5,6 +5,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/gameplay-validation-command-center-bo-424",
-   "component": "apps/venue-management-web/src/routes/games-rides/GameplayValidationCommandCenter.tsx",
+   "component": "src/routes/games-rides/GameplayValidationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -96,7 +97,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -236,6 +237,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "4",
@@ -245,7 +247,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/gameplay-validation-rule-configuration-bo-425",
-   "component": "apps/venue-management-web/src/routes/games-rides/GameplayValidationRuleConfiguration.tsx",
+   "component": "src/routes/games-rides/GameplayValidationRuleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -374,6 +376,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "4",
@@ -383,7 +386,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/deduction-priority-funding-source-rules-bo-426",
-   "component": "apps/venue-management-web/src/routes/games-rides/DeductionPriorityFundingSourceRules.tsx",
+   "component": "src/routes/games-rides/DeductionPriorityFundingSourceRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -497,6 +500,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "4",
@@ -506,7 +510,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/all-games-rides-pass-configuration-bo-427",
-   "component": "apps/venue-management-web/src/routes/games-rides/AllGamesRidesPassConfiguration.tsx",
+   "component": "src/routes/games-rides/AllGamesRidesPassConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -527,6 +531,7 @@
   },
   "density": "compact",
   "purposeNote": "A valid all-games ticket allows access to all applicable attractions without requiring individual paid-wallet deductions.",
+  "division": "Shares `createGameEntitlement`, `listGameEntitlements` with BO-421, BO-430; this screen is All Games & Rides Pass Configuration (pack Game_and_Ride_Module.pdf, board 4.4, page 36): configure a ticket/product that permits the guest to play all games/rides in the amusement park. This directly represents requirement 10.2.8.",
   "pattern": "configEditor",
   "patternReason": "the pack gives this screen a configuration directory (§Pass Setup; Options) and no display directory — it is settings, not a population",
   "purpose": "Configure a ticket/product that permits the guest to play all games/rides in the amusement park. This directly represents requirement 10.2.8.",
@@ -673,6 +678,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "4",
@@ -682,7 +688,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/specific-game-ride-unlimited-entitlement-bo-428",
-   "component": "apps/venue-management-web/src/routes/games-rides/SpecificGameRideUnlimitedEntitlement.tsx",
+   "component": "src/routes/games-rides/SpecificGameRideUnlimitedEntitlement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -816,6 +822,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "4",
@@ -825,7 +832,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/specific-game-ride-limited-entitlement-bo-429",
-   "component": "apps/venue-management-web/src/routes/games-rides/SpecificGameRideLimitedEntitlement.tsx",
+   "component": "src/routes/games-rides/SpecificGameRideLimitedEntitlement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -866,7 +873,8 @@
        "derived": true,
        "impliedBy": "createGameEntitlement",
        "label": "Create game entitlement",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "createGameEntitlement"
       },
       {
        "kind": "secondaryButton",
@@ -933,6 +941,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "4",
@@ -942,7 +951,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/game-package-builder-bo-430",
-   "component": "apps/venue-management-web/src/routes/games-rides/GamePackageBuilder.tsx",
+   "component": "src/routes/games-rides/GamePackageBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -963,6 +972,7 @@
   },
   "density": "compact",
   "purposeNote": "Administrators can create reusable packages containing selected games/rides with different usage allowances.",
+  "division": "Shares `createGameEntitlement`, `listGameEntitlements` with BO-421, BO-427; this screen is Game Package Builder (pack Game_and_Ride_Module.pdf, board 4.7, page 38): create a package containing a specific collection of games/rides. Requirement 10.2.7 explicitly requires: Create a package with specific games. Define validity for the game entitlement.",
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Create a package containing a specific collection of games/rides. Requirement 10.2.7 explicitly requires: Create a package with specific games. Define validity for the game entitlement.",
@@ -1000,7 +1010,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listGameEntitlements",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listGameEntitlements"
       },
       {
        "kind": "secondaryButton",
@@ -1074,6 +1085,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "4",
@@ -1083,7 +1095,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/entitlement-validity-activation-rules-bo-431",
-   "component": "apps/venue-management-web/src/routes/games-rides/EntitlementValidityActivationRules.tsx",
+   "component": "src/routes/games-rides/EntitlementValidityActivationRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1206,7 +1218,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/real-time-gameplay-authorization-bo-432",
-   "component": "apps/venue-management-web/src/routes/games-rides/RealTimeGameplayAuthorization.tsx",
+   "component": "src/routes/games-rides/RealTimeGameplayAuthorization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1305,6 +1317,7 @@
   "module": "Games & Rides",
   "requiresModule": "games",
   "wave": 3,
+  "permission": "PRODUCT_CONFIGURE",
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "4",
@@ -1314,7 +1327,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/games-rides/validation-simulator-exception-analysis-bo-433",
-   "component": "apps/venue-management-web/src/routes/games-rides/ValidationSimulatorExceptionAnalysis.tsx",
+   "component": "src/routes/games-rides/ValidationSimulatorExceptionAnalysis.tsx",
    "status": "notStarted"
   },
   "navigation": {

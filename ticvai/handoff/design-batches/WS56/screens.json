@@ -5,6 +5,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/workflow-operations-command-center-adm-248",
-   "component": "apps/venue-management-web/src/routes/platform/WorkflowOperationsCommandCenter.tsx",
+   "component": "src/routes/platform/WorkflowOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -124,7 +125,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -329,7 +330,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/unified-approval-inbox-decision-workspace-adm-249",
-   "component": "apps/venue-management-web/src/routes/platform/UnifiedApprovalInboxDecisionWorkspace.tsx",
+   "component": "src/routes/platform/UnifiedApprovalInboxDecisionWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -496,6 +497,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "board": "2",
@@ -505,7 +507,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/workflow-instance-monitor-process-timeline-adm-250",
-   "component": "apps/venue-management-web/src/routes/platform/WorkflowInstanceMonitorProcessTimeline.tsx",
+   "component": "src/routes/platform/WorkflowInstanceMonitorProcessTimeline.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -536,7 +538,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -770,6 +772,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "board": "2",
@@ -779,7 +782,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/workflow-exception-failure-recovery-center-adm-251",
-   "component": "apps/venue-management-web/src/routes/platform/WorkflowExceptionFailureRecoveryCenter.tsx",
+   "component": "src/routes/platform/WorkflowExceptionFailureRecoveryCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1005,7 +1008,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/sla-escalation-bottleneck-monitor-adm-252",
-   "component": "apps/venue-management-web/src/routes/platform/SlaEscalationBottleneckMonitor.tsx",
+   "component": "src/routes/platform/SlaEscalationBottleneckMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1044,7 +1047,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1243,6 +1246,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "board": "2",
@@ -1252,7 +1256,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/automation-execution-autonomous-action-monitor-adm-253",
-   "component": "apps/venue-management-web/src/routes/platform/AutomationExecutionAutonomousActionMonitor.tsx",
+   "component": "src/routes/platform/AutomationExecutionAutonomousActionMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1427,6 +1431,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "board": "2",
@@ -1436,7 +1441,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/cross-module-orchestration-monitor-adm-254",
-   "component": "apps/venue-management-web/src/routes/platform/CrossModuleOrchestrationMonitor.tsx",
+   "component": "src/routes/platform/CrossModuleOrchestrationMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1547,6 +1552,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "board": "2",
@@ -1556,7 +1562,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/workflow-analytics-process-performance-adm-255",
-   "component": "apps/venue-management-web/src/routes/platform/WorkflowAnalyticsProcessPerformance.tsx",
+   "component": "src/routes/platform/WorkflowAnalyticsProcessPerformance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1587,7 +1593,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -1758,6 +1764,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "board": "2",
@@ -1767,7 +1774,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/process-optimization-automation-opportunity-center-adm-256",
-   "component": "apps/venue-management-web/src/routes/platform/ProcessOptimizationAutomationOpportunityCenter.tsx",
+   "component": "src/routes/platform/ProcessOptimizationAutomationOpportunityCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1900,6 +1907,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "board": "2",
@@ -1909,7 +1917,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/ai-workflow-intelligence-autonomous-governance-center-adm-257",
-   "component": "apps/venue-management-web/src/routes/platform/AiWorkflowIntelligenceAutonomousGovernanceCenter.tsx",
+   "component": "src/routes/platform/AiWorkflowIntelligenceAutonomousGovernanceCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {

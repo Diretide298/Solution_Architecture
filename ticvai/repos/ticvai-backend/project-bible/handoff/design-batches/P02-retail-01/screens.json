@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/general/retail-merchandise",
-   "component": "apps/guest-app/src/routes/general/RetailMerchandiseDetail.tsx",
+   "component": "src/screens/general/RetailMerchandiseDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

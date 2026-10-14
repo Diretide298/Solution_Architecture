@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 78 of 291 |
+| Operations in the slice | 77 of 291 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -31,13 +31,13 @@
 |---|---|---|---|---|---|---|
 | asset | [`deleteMediaAsset`](#deletemediaasset) | DELETE | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075 |
 | asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | CMS-010, CMS-068, CMS-082 |
-| asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 1 | CMS-010, CMS-076, CMS-095 |
+| asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 1 | CMS-010, CMS-076 |
 | asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 1 | ADM-016, BO-008, BO-094, CMS-004, CMS-010, CMS-061 … |
-| asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075, CMS-082 |
+| asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075 |
 | card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 1 | BO-454, BO-455, BO-457, BO-462, BO-486, GST-011 … |
 | card | [`issueGameCard`](#issuegamecard) | POST | `/game-cards` | core | 1 | POS-002 |
 | collection | [`createCollection`](#createcollection) | POST | `/media/collections` | core | 1 | CMS-010, CMS-064 |
-| collection | [`listCollections`](#listcollections) | GET | `/media/collections` | core | 1 | CMS-010, CMS-062, CMS-064 |
+| collection | [`listCollections`](#listcollections) | GET | `/media/collections` | core | 1 | CMS-010, CMS-064 |
 | departure | [`getNextTransportDeparture`](#getnexttransportdeparture) | GET | `/transport/departures/next` | core | 1 | GST-076, WEB-049 |
 | departure | [`searchTransportDepartures`](#searchtransportdepartures) | GET | `/transport/departures` | core | 1 | GST-076, WEB-049 |
 | departure | [`updateTransportDeparture`](#updatetransportdeparture) | PATCH | `/transport/departures/{departureId}` | setup | 1 | BO-1187 |
@@ -79,7 +79,6 @@
 | resources | [`updateResourcePackage`](#updateresourcepackage) | PUT | `/resource-packages/{packageId}` | setup | 1 | BO-861, BO-895, BO-918 |
 | rights | [`getExpiringRights`](#getexpiringrights) | GET | `/media/rights-expiring` | core | 1 | CMS-010, CMS-081, CMS-088, CMS-090 |
 | route | [`createTransportRoute`](#createtransportroute) | POST | `/transport/routes` | setup | 1 | BO-1184 |
-| route | [`getTransportRoute`](#gettransportroute) | GET | `/transport/routes/{routeId}` | core | 1 | BO-1184, GST-077, WEB-049 |
 | route | [`getTransportRouteMap`](#gettransportroutemap) | GET | `/transport/routes/{routeId}/map` | core | 1 | GST-077, WEB-049 |
 | route | [`listTransportRoutes`](#listtransportroutes) | GET | `/transport/routes` | core | 1 | BO-1184, BO-1185, BO-1186, BO-1187, BO-1188, GST-076 … |
 | route | [`setTransportRouteStatus`](#settransportroutestatus) | PUT | `/transport/routes/{routeId}/status` | setup | 1 | BO-1184 |
@@ -258,7 +257,7 @@ Derivatives regenerate. The previous version is retained for rollback.
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `cache:idempotency` |
 | Writes | `assets.asset_version`, `assets.media_asset`, `assets.media_fingerprint`, `cache:idempotency` |
-| Called by | CMS-010, CMS-076, CMS-095 |
+| Called by | CMS-010, CMS-076 |
 
 **Parameters**
 
@@ -333,6 +332,8 @@ Derivatives regenerate. The previous version is retained for rollback.
 **`GET /media`**: Search the asset library
 
 Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets nothing references — the working set for a library clear-out.
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+**Statuses.** Every `status` is returned, ended ones included (`archived`, `failed`); a screen that shows only live rows filters on `status` itself.
 
 |  |  |
 |---|---|
@@ -343,7 +344,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
-| Reads | `assets.media_asset` |
+| Reads | `assets.media_asset`, `assets.media_collection_member` |
 | Writes | - |
 | Called by | ADM-016, BO-008, BO-094, CMS-004, CMS-010, CMS-061, CMS-062, CMS-067, CMS-073 |
 
@@ -432,7 +433,7 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `assets.media_collection`, `assets.media_usage`, `cache:idempotency` |
 | Writes | `assets.media_asset`, `assets.media_collection_member`, `cache:idempotency` |
-| Called by | CMS-010, CMS-075, CMS-082 |
+| Called by | CMS-010, CMS-075 |
 | State model | Media asset ([states/media.yaml](../../../states/media.yaml)): moves `quarantined` -> `ready`, `ready` -> `archived`, `archived` -> `ready` |
 
 **Parameters**
@@ -525,15 +526,18 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 
 The reader path. Offline-capable so a machine can validate a card during a network blip — the balance may be stale, which is why spend is reconciled on sync.
 
+**Staff read a card here too** (Block A audit, 14 October 2026, CHG-SCR-015; the contract gap CHG-WIR-004 recorded): the back office's card lifecycle, profile, activity, balance and identification screens (BO-454, BO-455, BO-457, BO-462, BO-486) need `WALLET_VIEW`, a card's credits being stored value. A guest calls it in its own session without a permission (`x-ticvai-guest-callable`), as before.
+
 |  |  |
 |---|---|
-| Permission | `None` |
+| Permission | `WALLET_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
+| Guest callable | True |
 | Reads | `games.card`, `games.credit_ledger` |
 | Writes | - |
 | Called by | BO-454, BO-455, BO-457, BO-462, BO-486, GST-011, WEB-021 |
@@ -708,7 +712,7 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 | Read routing | replica |
 | Reads | `assets.media_collection`, `assets.media_collection_member` |
 | Writes | - |
-| Called by | CMS-010, CMS-062, CMS-064 |
+| Called by | CMS-010, CMS-064 |
 
 **Responses**
 
@@ -787,6 +791,7 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 The departure cards (decided 29 September, rev 3 REV3-21): departure and arrival time at the chosen stops, duration, seats left and fare. **`periodCounts` carries the number of departures in each time period** for the period buttons, whatever `period` filters the items to.
 **Time periods, proposed, client to correct (rev 3 REV3-21):** `morning` 05:00–11:59, `afternoon` 12:00–16:59, `evening` 17:00–20:59, `night` 21:00–04:59, by departure time at the boarding stop, venue local time.
 Only departures `onSale` and before the route's booking cut-off are returned; a `soldOut` departure is returned with `seatsLeft` 0 so the card can say so. With `passengers`, a departure with fewer seats left than the party is marked `fitsParty: false` and the fares are totalled for the party.
+**Order.** Sorted by `departureId` descending (a UUIDv7, so newest first).
 
 |  |  |
 |---|---|
@@ -1396,6 +1401,7 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 **`GET /transport/favourite-routes`**: The caller's saved routes
 
 The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of stations with its current adult fare and **Book this route**, which fills the one-way search. Scoped to the caller; newest first.
+**Order.** Newest first, by `createdAt` descending, then by `id`.
 
 |  |  |
 |---|---|
@@ -1515,7 +1521,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 
 **`GET /transport/departures/{departureId}`**: One departure, as a guest books it
 
-**Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.** GST-077 is opened on a departure (`departureId` from GST-076) and never read it: the r1 gate found the trip page showing a departure it had no read of. Published network data, as `getNextTransportDeparture` is. Returns what the write stores, in the write's own shape.
+**Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.** GST-077 is opened on a departure (`departureId` from GST-076) and never read it: the r1 gate found the trip page showing a departure it had no read of. Published network data, as `getNextTransportDeparture` is. Returns what the write stores, in the write's own shape. **Readable without a session** (Block A audit, 14 October 2026, CHG-SCG-006): GST-077 loads it before the guest signs in, like `searchTransportDepartures` and `getTransportRoute`, whose audience it shares.
 
 |  |  |
 |---|---|
@@ -1601,7 +1607,7 @@ Items may be marked safety-critical. **A failed safety-critical item blocks the 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | instructions | string |  | The procedure itself. |
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) |  | (nullable) |
@@ -1625,7 +1631,7 @@ Items may be marked safety-critical. **A failed safety-critical item blocks the 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | instructions | string |  | The procedure itself. |
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
 | venueId | string (uuid) |  | (nullable) |
@@ -1649,6 +1655,7 @@ Items may be marked safety-critical. **A failed safety-critical item blocks the 
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -1869,6 +1876,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 **`GET /transport/pass-offers`**: Multi-trip passes for a pair of stations, priced, with the saving
 
 The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip cards and weekly and monthly unlimited, for the chosen route, each with its price and what it saves against single adult trips. A pass bought here is a catalogue `openDated` product (`catalogueProductId`) added to the cart with `attributes.transport` naming the stations.
+**Order.** Sorted by `name` ascending, then by `catalogueProductId`.
 
 |  |  |
 |---|---|
@@ -2110,6 +2118,7 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 |---|---|---|
 | 201 |  | Created |
 | 400 | BadRequest | Validation failed |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listQueues
@@ -2118,6 +2127,8 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 
 Guest-facing when called with a guest token — returns only queues that are open and visible.
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets queues that are open and visible, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `QUEUE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+**Order.** Sorted by `name` ascending, then by `id`.
+**Statuses.** Every `status` is returned, ended ones included (`closed`); a screen that shows only live rows filters on `status` itself.
 
 |  |  |
 |---|---|
@@ -2131,7 +2142,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Guest callable | True |
 | Reads | `queue.queue`, `queue.queue_operating_window` |
 | Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, BO-221, EMP-031, GST-023, WEB-039 |
+| Called by | BO-001, BO-002, BO-004, BO-005, BO-221, EMP-031, GST-023, WEB-039, WEB-040 |
 
 **Parameters**
 
@@ -2368,7 +2379,7 @@ Clone copies configuration and never copies identity: code, serial and barcode a
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes |  |
 | name | string | yes |  |
 | kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | yes | BL-135. |
@@ -2393,12 +2404,17 @@ Clone copies configuration and never copies identity: code, serial and barcode a
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
 | resourceTypeId | string (uuid) |  | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). (nullable) |
+| lifecycleState | object |  | The lifecycle state setResourceLifecycleState set. (read-only; nullable) |
+| lifecycleEffectiveFrom | string (date-time) |  | When the lifecycle state takes effect (setResourceLifecycleState). (read-only; nullable) |
+| lifecycleReason | string |  | Why the lifecycle state changed (setResourceLifecycleState). (read-only; nullable) |
+| replacementResourceId | string (uuid) |  | The resource that replaces this one, where it was retired for a replacement. (read-only; nullable) |
+| disposal | object |  | How a disposed resource left (setResourceLifecycleState), as given. (read-only; nullable) |
 
 **Response**: `Resource`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes |  |
 | name | string | yes |  |
 | kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | yes | BL-135. |
@@ -2423,6 +2439,11 @@ Clone copies configuration and never copies identity: code, serial and barcode a
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
 | resourceTypeId | string (uuid) |  | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). (nullable) |
+| lifecycleState | object |  | The lifecycle state setResourceLifecycleState set. (read-only; nullable) |
+| lifecycleEffectiveFrom | string (date-time) |  | When the lifecycle state takes effect (setResourceLifecycleState). (read-only; nullable) |
+| lifecycleReason | string |  | Why the lifecycle state changed (setResourceLifecycleState). (read-only; nullable) |
+| replacementResourceId | string (uuid) |  | The resource that replaces this one, where it was retired for a replacement. (read-only; nullable) |
+| disposal | object |  | How a disposed resource left (setResourceLifecycleState), as given. (read-only; nullable) |
 
 **Responses**
 
@@ -2430,6 +2451,7 @@ Clone copies configuration and never copies identity: code, serial and barcode a
 |---|---|---|
 | 201 |  | Created |
 | 422 |  | A cleaningPolicy with timesPerDay and no cleaningsPerDay, or whose window ends before it starts (W10, 29 September). |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### createResourceBlock
@@ -2662,6 +2684,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### extendResourceHold
@@ -2907,6 +2930,9 @@ The countdown's source of truth, as `seating.getSeatHold`.
 Start times fall on `stepMinutes` from the venue's opening on that date, and a window must end by its close. The chosen start becomes the cart line's `bookedWindow`; `allocateResources` picks the room at checkout. **Display only**, like any availability read: the cart line is what holds.
 **Date, start and duration are checked together** (decided 29 September, W9 and W10). A start is offered only when a room is free for the whole of `startsAt` to `startsAt + durationMinutes`, plus its setup, teardown and `cleaningPolicy`: an `afterEveryBooking` buffer must fit after the window, and with `timesPerDay` every cleaning of the date must still be placeable once the window is taken. `freeCount` counts only rooms that pass all three.
 
+
+**Order.** Soonest first, by `startsAt` ascending.
+
 |  |  |
 |---|---|
 | Permission | `RESOURCE_VIEW` |
@@ -3109,7 +3135,7 @@ Board 1.10. **One operation, not seven.** Draft, pending approval, approved, act
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes |  |
 | name | string | yes |  |
 | kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | yes | BL-135. |
@@ -3134,6 +3160,11 @@ Board 1.10. **One operation, not seven.** Draft, pending approval, approved, act
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
 | resourceTypeId | string (uuid) |  | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). (nullable) |
+| lifecycleState | object |  | The lifecycle state setResourceLifecycleState set. (read-only; nullable) |
+| lifecycleEffectiveFrom | string (date-time) |  | When the lifecycle state takes effect (setResourceLifecycleState). (read-only; nullable) |
+| lifecycleReason | string |  | Why the lifecycle state changed (setResourceLifecycleState). (read-only; nullable) |
+| replacementResourceId | string (uuid) |  | The resource that replaces this one, where it was retired for a replacement. (read-only; nullable) |
+| disposal | object |  | How a disposed resource left (setResourceLifecycleState), as given. (read-only; nullable) |
 
 **Responses**
 
@@ -3251,7 +3282,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes |  |
 | name | string | yes |  |
 | kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | yes | BL-135. |
@@ -3276,12 +3307,17 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
 | resourceTypeId | string (uuid) |  | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). (nullable) |
+| lifecycleState | object |  | The lifecycle state setResourceLifecycleState set. (read-only; nullable) |
+| lifecycleEffectiveFrom | string (date-time) |  | When the lifecycle state takes effect (setResourceLifecycleState). (read-only; nullable) |
+| lifecycleReason | string |  | Why the lifecycle state changed (setResourceLifecycleState). (read-only; nullable) |
+| replacementResourceId | string (uuid) |  | The resource that replaces this one, where it was retired for a replacement. (read-only; nullable) |
+| disposal | object |  | How a disposed resource left (setResourceLifecycleState), as given. (read-only; nullable) |
 
 **Response**: `Resource`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| id | string (uuid) | yes |  |
+| id | string (uuid) | yes | (read-only) |
 | code | string | yes |  |
 | name | string | yes |  |
 | kind | ResourceKind: enum (cabana, lounger, locker, wheelchair, stroller, equipment, room, auditorium, …) | yes | BL-135. |
@@ -3306,6 +3342,11 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | status | enum (available, booked, checkedOut, maintenance, retired) |  |  |
 | isActive | boolean |  | (default True) |
 | resourceTypeId | string (uuid) |  | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). (nullable) |
+| lifecycleState | object |  | The lifecycle state setResourceLifecycleState set. (read-only; nullable) |
+| lifecycleEffectiveFrom | string (date-time) |  | When the lifecycle state takes effect (setResourceLifecycleState). (read-only; nullable) |
+| lifecycleReason | string |  | Why the lifecycle state changed (setResourceLifecycleState). (read-only; nullable) |
+| replacementResourceId | string (uuid) |  | The resource that replaces this one, where it was retired for a replacement. (read-only; nullable) |
+| disposal | object |  | How a disposed resource left (setResourceLifecycleState), as given. (read-only; nullable) |
 
 **Responses**
 
@@ -3313,6 +3354,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 |---|---|---|
 | 200 |  | Updated |
 | 422 |  | A cleaningPolicy with timesPerDay and no cleaningsPerDay, or whose window ends before it starts (W10, 29 September). |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### updateResourcePackage
@@ -3411,6 +3453,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -3531,6 +3574,7 @@ owns those tables); their ids are stored on `transport.route`. This operation wr
 | totalMinutes | integer |  | The last stop's offset. (read-only) |
 | catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
 | catalogueProductId | string (uuid) |  | The one-way trip product (kind timedAdmission); one variant per passenger type. (read-only) |
+| statusReason | string |  | Why the route's status last changed (setTransportRouteStatus). (max length 500; read-only; nullable) |
 
 **Responses**
 
@@ -3541,72 +3585,6 @@ owns those tables); their ids are stored on `transport.route`. This operation wr
 | 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 422 |  | Fewer than two stops, a station repeated, a station that is inactive or not in this venue, or offsets that do not start at 0 and strictly increase. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-
-### getTransportRoute
-
-**`GET /transport/routes/{routeId}`**: A route with its stops
-
-The stop list from origin to end. A guest or public caller gets 404 for a route that is not `active`.
-
-|  |  |
-|---|---|
-| Permission | `None` |
-| Scope level | venue |
-| Part of slice | core |
-| Wave | 1 |
-| Offline | yes |
-| Conflict policy | serverWins |
-| Read routing | replica |
-| Reads | `transport.route`, `transport.route_stop`, `transport.station` |
-| Writes | - |
-| Called by | BO-1184, GST-077, WEB-049 |
-
-**Parameters**
-
-| Name | In | Required | Type | Notes |
-|---|---|---|---|---|
-| routeId | path | yes | string (uuid) |  |
-
-**Response**: `TransportRoute`
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| venueId | string (uuid) | yes |  |
-| code | string | yes | The line and direction, e.g. (max length 32) |
-| lineCode | string |  | The public line number shared by both directions, e.g. (max length 16) |
-| name | LocalisedText | yes |  |
-| colour | string |  | (pattern ^#[0-9a-fA-F]{6}$) |
-| pairedRouteId | string (uuid) |  | The same line run the other way. (nullable) |
-| bookingCutoffMinutes | integer |  | How long before a departure leaves the boarding stop that online sale stops. (min 0; max 1440; default 5) |
-| stops | array of RouteStop | yes |  |
-| stops[].stationId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
-| stops[].offsetMinutes | integer | yes | Minutes after the departure from the first stop that the coach leaves this one. (min 0; max 1440) |
-| stops[].boardingAllowed | boolean |  | (default True) |
-| stops[].alightingAllowed | boolean |  | (default True) |
-| stops[].id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
-| stops[].sequence | integer | yes | 1 for the origin. (min 1) |
-| stops[].station | Station |  |  |
-| stops[].station.venueId | string (uuid) | yes |  |
-| stops[].station.code | string | yes | Short operator code, e.g. (max length 32) |
-| stops[].station.name | LocalisedText | yes |  |
-| stops[].station.shortName | LocalisedText |  | The label on the route diagram and the map pin (Union Sq, MoE). |
-| stops[].station.latitude | number |  | (min -90; max 90; nullable) |
-| stops[].station.longitude | number |  | (min -180; max 180; nullable) |
-| stops[].station.id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
-| stops[].station.active | boolean | yes | (default True) |
-| id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
-| status | TransportRouteStatus: enum (draft, active, suspended, retired) | yes |  |
-| totalMinutes | integer |  | The last stop's offset. (read-only) |
-| catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
-| catalogueProductId | string (uuid) |  | The one-way trip product (kind timedAdmission); one variant per passenger type. (read-only) |
-
-**Responses**
-
-| Code | Shape | Meaning |
-|---|---|---|
-| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
-| 200 |  | Route |
-| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 
 ### getTransportRouteMap
 
@@ -3676,6 +3654,7 @@ The stop list from departure to arrival and the street map beside it (decided 29
 
 With `fromStationId` and `toStationId`, returns the active routes on which the first station comes **before** the second — the direction of travel. A line run both ways is two routes (`E101` outbound and inbound) paired by `pairedRouteId`, so the swap button on the search row lands on the paired route (decided 29 September, rev 3 REV3-21).
 A guest or public caller sees `active` routes only; `status` is honoured only for a caller holding `TRANSPORT_VIEW`.
+**Order.** Sorted by `sequence` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -3726,6 +3705,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | items[].totalMinutes | integer |  | The last stop's offset. (read-only) |
 | items[].catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
 | items[].catalogueProductId | string (uuid) |  | The one-way trip product (kind timedAdmission); one variant per passenger type. (read-only) |
+| items[].statusReason | string |  | Why the route's status last changed (setTransportRouteStatus). (max length 500; read-only; nullable) |
 | nextCursor | string |  |  |
 | hasMore | boolean | yes |  |
 
@@ -3802,6 +3782,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | totalMinutes | integer |  | The last stop's offset. (read-only) |
 | catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
 | catalogueProductId | string (uuid) |  | The one-way trip product (kind timedAdmission); one variant per passenger type. (read-only) |
+| statusReason | string |  | Why the route's status last changed (setTransportRouteStatus). (max length 500; read-only; nullable) |
 
 **Responses**
 
@@ -3883,6 +3864,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | totalMinutes | integer |  | The last stop's offset. (read-only) |
 | catalogueEventId | string (uuid) |  | The catalogue event its departures are performances of. (read-only) |
 | catalogueProductId | string (uuid) |  | The one-way trip product (kind timedAdmission); one variant per passenger type. (read-only) |
+| statusReason | string |  | Why the route's status last changed (setTransportRouteStatus). (max length 500; read-only; nullable) |
 
 **Responses**
 
@@ -4648,6 +4630,9 @@ A venue may have several — **a park map and a floor plan per building are diff
 | paths[].isIndoor | boolean |  | (default False) |
 | paths[].restrictedByPointId | string (uuid) |  | Where a path is one-way, it is because of a thing on it — not because of the path. (nullable) |
 | paths[].closedReason | string |  | Set by setPathClosure during works or an incident, never by sending it here. (read-only; nullable) |
+| paths[].isClosed | boolean |  | Closed by setPathClosure; routing does not use a closed path. (default False; read-only) |
+| paths[].expectedReopenAt | string (date-time) |  | When a closed path is expected to reopen (setPathClosure). (read-only; nullable) |
+| paths[].closedNote | string |  | The free text with an other closure reason (setPathClosure; audit R222). (max length 500; read-only; nullable) |
 | resources | array of PlacedResource |  | The bookable resources placed on this version of the map (rev 3 REV3-15). |
 | resources[].id | string (uuid) | yes | (read-only) |
 | resources[].mapId | string (uuid) | yes | From the path of the operation that writes it. (read-only) |
@@ -4851,6 +4836,7 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | mapId | string (uuid) |  |  |
 | status | enum (parsing, previewReady, committed, failed) | yes |  |
@@ -4910,6 +4896,7 @@ Carries every lesson CF-122 taught on the seat importer, because it is the same 
 |---|---|---|
 | 202 |  | Accepted and parsing. |
 | 422 |  | Refused before any parsing (3 October 2026, r1 additions): glbModel with no navigationFileRef (navigationFileMissing), a sourceRef whose asset kind does not fit the format (formatMismatch: a GLB sent… |
+| 409 |  | The map is archived; an archived map takes no import. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listBookableVenueMaps
@@ -5648,6 +5635,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 
 **The swap sheet** (29 September, MOB-6): points and performances the whole party is eligible for that fit the item's slot, best first by interest match, then by the time lost to walking and the expected wait. Each carries why it was offered, so the sheet can say *"Same thrill level, 4 minutes closer"*. Computed on read, never stored; choosing one is an `updateVisitPlan` `swap`.
 **Only from the item's day venue** (30 September client meeting, MoM 4.7): alternatives are points on that venue's published map and performances dated there, never another venue of the tenant, so a swap cannot move a meal or a shop to a park the party is not in that day. `kind=shop` returns the venue's retail points, shops and retail kiosks alike; `kind=meal` its dining points, food kiosks included.
+**Order.** Best first, by `matchedInterests` descending, then by `walkMinutes` ascending.
 
 |  |  |
 |---|---|
@@ -5849,7 +5837,7 @@ A guest who waits forty minutes for a fifteen-minute estimate deserves a system 
 | Read routing | replica |
 | Reads | `queue.entry`, `queue.queue`, `queue.reading` |
 | Writes | - |
-| Called by | BO-001, BO-002, BO-004, BO-005, EMP-031, EMP-032, GST-003, GST-004, GST-021, GST-022, GST-023, GST-038, GST-051, GST-053, GST-054, GST-059, WEB-002, WEB-004, WEB-039, WEB-040 |
+| Called by | BO-001, BO-002, BO-004, BO-005, EMP-031, EMP-032, GST-003, GST-004, GST-021, GST-022, GST-023, GST-038, GST-053, GST-054, GST-059, WEB-002, WEB-004, WEB-039, WEB-040 |
 
 **Parameters**
 
@@ -5944,7 +5932,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | media_asset_id | uuid | yes | One fingerprint per asset. |
 | perceptual_hash | text | no |  |
-| embedding | text[] | no |  |
+| embedding | numeric[] | no |  |
 | model_version | text | yes | Only fingerprints of the same model version are compared. |
 | computed_at | timestamptz | yes |  |
 | scope_path | text | no | The partition key (ADR-0005), written at venue scope. |
@@ -6088,6 +6076,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | resolution | text | no |  |
 | resolution_code | text | no |  |
 | attachment_refs | text[] | no |  |
+| time_entries | jsonb | no |  |
+| parts | jsonb | no |  |
 | labour_cost | numeric(18,4) | no |  |
 | parts_cost | numeric(18,4) | no |  |
 | net_cost_amount | numeric(18,4) | no |  |
@@ -6159,7 +6149,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | height_requirement_cm | integer | no |  |
 | fast_pass_allocation_percent | numeric | no | Share of each cycle reserved for Fast Pass holders. |
 | zone | text | no |  |
-| fast_pass_id | uuid | no | The lane's Fast Pass block (decided 29 September, VM close-out). |
 | id | uuid | yes |  |
 | status | text | yes |  |
 | status_reason | text | no |  |
@@ -6178,7 +6167,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | entitlement_product_ids | text[] | yes | Catalogue products whose entitlement admits to this lane. |
 | loyalty_tier_ids | text[] | no | 5.6.7 and 5.6.34 (decided 29 September, build pass). |
 | promotion_ids | text[] | no | 5.6.34 (decided 29 September, build pass). |
-| accessibility_priority | boolean | no | 5.6.7 (decided 29 September, build pass). |
+| has_accessibility_priority | boolean | no | 5.6.7 (decided 29 September, build pass). |
 | return_window_minutes | integer | no | How long after the booked return time a Fast Pass holder may still enter. |
 | max_per_guest_per_day | integer | no | Fast Pass redemptions one guest may make on this lane per day; null is no cap. |
 | allowed_access_point_ids | text[] | no | Access points that redeem Fast Pass for this lane; empty is the queue's own. |
@@ -6227,6 +6216,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | condition_out | text | no |  |
 | condition_in | text | no |  |
 | synced_at | timestamptz | no | When the latest offline check-out or check-in write reached the server. |
+| change_reason | text | no | Why the booking was last changed (updateResourceBooking). |
 
 ### `resources.resource`
 
@@ -6249,6 +6239,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 | status | text | no |  |
 | is_active | boolean | no |  |
 | resource_type_id | uuid | no | The configurable resource type (resources.resource_type, 4 October 2026, CHG-FXC-003). |
+| lifecycle_state | text | no | The lifecycle state setResourceLifecycleState set. |
+| lifecycle_effective_from | timestamptz | no | When the lifecycle state takes effect (setResourceLifecycleState). |
+| lifecycle_reason | text | no | Why the lifecycle state changed (setResourceLifecycleState). |
+| replacement_resource_id | uuid | no | The resource that replaces this one, where it was retired for a replacement. |
+| disposal | jsonb | no | How a disposed resource left (setResourceLifecycleState), as given. |
 
 ### `resources.resource_block`
 
@@ -6324,10 +6319,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | resource_id | uuid | no |  |
 | availability_mode | text | no |  |
+| windows | jsonb | no |  |
 | slot_minutes | integer | no | How finely this resource's time can be cut, which is a property of the resource and not of the product sold against it. |
 | minimum_booking_minutes | integer | no |  |
 | maximum_booking_minutes | integer | no |  |
 | advance_booking_days | integer | no |  |
+| exceptions | jsonb | no |  |
 | scope_path | text | no |  |
 | id | uuid | yes | Synthesised key. |
 
@@ -6408,6 +6405,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | source_ref | uuid | yes |  |
 | status | text | yes |  |
 | preview | jsonb | no | What applying would write. |
+| findings | jsonb | no |  |
 | created_by | uuid | no |  |
 | created_at | timestamptz | no |  |
 | applied_by | uuid | no |  |
@@ -6448,6 +6446,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | total_minutes | integer | no | The last stop's offset. |
 | catalogue_event_id | uuid | no | The catalogue event its departures are performances of. |
 | catalogue_product_id | uuid | no | The one-way trip product (kind timedAdmission); one variant per passenger type. |
+| status_reason | text | no | Why the route's status last changed (setTransportRouteStatus). |
 
 ### `transport.route_stop`
 
@@ -6504,6 +6503,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | map_id | uuid | no |  |
 | status | text | yes |  |
@@ -6515,6 +6515,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | resources_found | integer | no | Bookable resource shapes found on the resource layer (rev 3 REV3-15). |
 | resource_rows_joined | integer | no | Resource manifest rows that joined a shape and a resources.Resource. |
 | manifest_rows_joined | integer | no | The number to check against your own count. |
+| findings | jsonb | no | Named against the spec, so a finding maps to a section of handoff/venue-map-input-spec.md rather than to a stack trace. |
 | ocr | jsonb | no | What the OCR step read off a scanned PDF or a raster (3 October 2026, r1 additions). |
 | hand_marked_paths | jsonb | no | The hand-marked strokes the import found on a raster plan sent with handMarkedPaths (3 October 2026, r1 additions). |
 | model | jsonb | no | The GLB and navigation file, measured (glbModel and navigationFile imports; ADR-0069 sections 1, 2, 3 and 6; 3 October 2026). |
@@ -6572,6 +6573,9 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_indoor | boolean | no |  |
 | restricted_by_point_id | uuid | no | Where a path is one-way, it is because of a thing on it — not because of the path. |
 | closed_reason | text | no | Set by setPathClosure during works or an incident, never by sending it here. |
+| is_closed | boolean | no | Closed by setPathClosure; routing does not use a closed path. |
+| expected_reopen_at | timestamptz | no | When a closed path is expected to reopen (setPathClosure). |
+| closed_note | text | no | The free text with an other closure reason (setPathClosure; audit R222). |
 
 ### `venuemap.placed_resource`
 
@@ -6587,6 +6591,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | price_band_code | text | yes | The band it sells in, e.g. |
 | variant_id | uuid | no | Resolved from the price band. |
 | position | jsonb | yes | Drawing coordinates of its label anchor, as on VenuePoint. |
+| boundary | jsonb | no | The shape drawn, as a polygon in drawing coordinates. |
 | is_bookable | boolean | no | False keeps it on the map and off sale, e.g. |
 
 ### `venuemap.point`
@@ -6609,6 +6614,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_navigable | boolean | no | Whether a route may pass through it. |
 | is_destination | boolean | no | Whether a guest may be routed *to* it, and whether it appears in a list of places. |
 | description | jsonb | no | What the guest reads on Item Detail (29 September, MOB-4). |
+| media | jsonb | no | The gallery on Item Detail (29 September, MOB-4): images and short clips from the asset library, first isPrimary shown on the map card. |
 | featured_offer | jsonb | no | The product card on Item Detail, for every kind of point (29 September, MOB-4). |
 | typical_duration_minutes | integer | no | How long a visit to this point usually takes, ride time and queue excluded (29 September, MOB-6). |
 | interest_tags | text[] | no | What a guest who says they like this would like here (29 September, MOB-6): the planner matches the guest's interests against these. |
@@ -6631,6 +6637,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | inputs | jsonb | no |  |
 | map_version | integer | no | The published map version the plan was laid out on. |
 | cart_id | uuid | no | The cart bookVisitPlan filled. |
+| excluded | jsonb | no | What was left out and why, e.g. |
 | created_at | timestamptz | no |  |
 | updated_at | timestamptz | no |  |
 
@@ -6660,7 +6667,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-213 operations, added to this service in later releases without changing any of the above.
+214 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -6683,6 +6690,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | queue | `getQueue`, `setQueueStatus` |
 | rental | `assessRentalDamage`, `assignRentalEquipment`, `checkOutRental`, `createRentalAgreement`, `createRentalBlackout`, `createRentalBooking`, `createRentalCategory`, `createRentalPricingProfile`, `createRentalProduct`, `explainRentalPrice`, `extendRental`, `getRentalAgreement`, `getRentalAvailability`, `getRentalBooking`, `getRentalProduct`, `importRentalCatalogue`, `listOverdueRentals`, `listRentalAgreements`, `listRentalBookings`, `listRentalCategories`, `listRentalPricingProfiles`, `listRentalProducts`, `publishRentalProduct`, `quoteRentalPrice`, `recordRentalInspection`, `reportRentalIncident`, `requestRentalCommercialOverride`, `returnRental`, `setRentalAgreementRequirements`, `setRentalAvailabilityRules`, `setRentalDepositPolicy`, `setRentalDurationRules`, `setRentalFeePolicy`, `setRentalInventoryModel`, `setRentalOperationalRules`, `setRentalProductLocations`, `signRentalAgreement`, `simulateRentalPricing`, `swapRentalEquipment`, `updateRentalBooking`, `updateRentalPricingProfile`, `updateRentalProduct`, `validateRentalProduct` |
 | resources | `allocateResources`, `bookResource`, `cancelResourceBooking`, `checkInResource`, `checkOutResource`, `createResourceAttribute`, `createResourceCategory`, `createResourceCost`, `createResourceType`, `deleteResourceCost`, `getExperienceResourceRequirements`, `getPerformanceManifest`, `getResource`, `getResourceAllocationPolicy`, `getResourceAuditTrail`, `getResourceBooking`, `getResourceCalendar`, `getResourceCostAnalytics`, `getResourceDependencies`, `getResourceHierarchy`, `getResourceQualifications`, `getResourceSchedule`, `getResourceUtilisation`, `listResourceAttributes`, `listResourceBlocks`, `listResourceBookings`, `listResourceCategories`, `listResourceCosts`, `listResourcePackages`, `listResourceTypes`, `listResources`, `raiseResourceRequest`, `reorderPerformanceManifest`, `replaceResourceAllocation`, `setResourceAllocationPolicy`, `setResourceBookingProgress`, `setResourceDependencies`, `setResourceHierarchy`, `setResourceQualifications`, `setResourceSelectionPolicy`, `setResourceVenueAssignment`, `suggestResources`, `updateResourceBooking`, `updateResourceCategory`, `updateResourceType` |
+| route | `getTransportRoute` |
 | signage | `getSignageQueueBoard`, `getSignageQueueCalls` |
 | timetable | `listTransportTimetables`, `updateTransportTimetable` |
 | venueMap | `acceptVenueLabelProposals`, `acceptWalkwayProposals`, `getVenueMapImportJob`, `getVenueMapLive`, `getVenueNavigationFile`, `listVenueMaps`, `setPathClosure`, `validateVenueMapGraph` |

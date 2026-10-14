@@ -1,5 +1,6 @@
 {
  "AccessHardwareModel": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "access.hardware_model",
   "description": "One hardware model in the reusable library, independent of deployed devices: manufacturer, model, category and type, supported technologies, connectivity, capability flags and firmware information (declared 29 September, data-model close-out DM1)",
@@ -13,6 +14,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -78,7 +80,8 @@
    },
    "scopePath": {
     "type": "string",
-    "description": "ltree of the owning scope node (ADR-0005)"
+    "description": "ltree of the owning scope node (ADR-0005)",
+    "readOnly": true
    },
    "createdAt": {
     "type": "string",
@@ -201,6 +204,7 @@
   ],
   "properties": {
    "deviceId": {
+    "x-ticvai-references": "platform.device",
     "type": "string",
     "format": "uuid",
     "description": "`tenancy.RegisteredDevice`. **Enrolment, firmware and tamper state live there.**\n"
@@ -289,6 +293,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },

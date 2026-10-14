@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1139` | Digital Key & Wallet Authentication Policy | C | 15 | 0 | 6 | 1 | 0 | 6 | — | notStarted (—) |
 | `BO-1140` | Offline Wallet & Degraded Mode Configuration | C | 20 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1141` | Device, Terminal & Acceptance Point Mapping | C | 14 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1142` | Wallet Transaction Simulator, Monitoring & Channel Audit | C | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
+| `BO-1142` | Wallet Transaction Simulator, Monitoring & Channel Audit | C | 0 | 14 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

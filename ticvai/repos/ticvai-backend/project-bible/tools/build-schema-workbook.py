@@ -556,6 +556,32 @@ for t_ in ['Blue rows are the eight stored procedures. Amber were hand-mapped be
            'read also touches org_unit, and listing that on 755 rows would say nothing.']:
     ws.cell(r,1,t_).font=B; r+=1
 
+# ---- Read views
+# **The views the lineage reads are in the schema reference** (14 October 2026, CHG-GTE-001, tracker F27). DB-READ-VIEWS
+# (#27654) publishes one view per (reader module, owned table), `<table>_for_<reader>`, for bulk reads within one
+# deployable (ADR-0055 rule 2), and the lineage names such a read by the view (publishBundle reads
+# platform.sale_board_for_catalogue, CHG-R6G-007). The Tables sheet had no such name, so check-package failed the read
+# and a developer meeting the name in the lineage had nowhere to look it up. Derived from the lineage
+# (audit_guard.read_views), never typed: a view no operation reads is not listed. check-package reads column A.
+import sys as _sys
+_sys.path.insert(0, str(_P(__file__).resolve().parent))
+from audit_guard import read_views as _read_views
+_VIEWS=_read_views(LIN, {t for t in set(cols)|set(storage) if '.' in t and ':' not in t})
+ws=wb.create_sheet('Read views')
+ws.cell(1,1,'Read views (DB-READ-VIEWS)').font=T
+ws.cell(2,1,f'{len(_VIEWS)} view(s) the lineage reads. A view is read, never written; row-level security is evaluated '
+            'on the table beneath it.').font=SUB
+hdr(ws,['View','Table','For module','Read by','Columns'],[44,32,16,40,60])
+r=5
+for v_ in sorted(_VIEWS):
+    x_=_VIEWS[v_]
+    cs_=', '.join(sorted(x_['columns'])) if x_['columns'] and not x_['every'] else 'every column (no readColumns)'
+    for i,val in enumerate([v_,x_['table'],x_['reader'],', '.join(sorted(x_['operations'])),cs_],1):
+        c=ws.cell(r,i,val); c.font=M if i<=2 else B; c.border=BOX
+        if i in (4,5): c.alignment=Alignment(wrap_text=True,vertical='top')
+    r+=1
+if _VIEWS: ws.auto_filter.ref=f"A4:E{r-1}"
+
 
 # **Both tracked copies are written from this one build, to absolute paths.**
 #

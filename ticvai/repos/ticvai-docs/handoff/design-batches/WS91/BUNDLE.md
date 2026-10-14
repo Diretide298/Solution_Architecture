@@ -133,7 +133,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-524` | Rental Pricing Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-524` | Rental Pricing Command Center | D | 36 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-525` | Pricing Profile Builder | D | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-526` | Duration & Tiered Pricing Configuration | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-527` | Calendar, Peak & Seasonal Pricing | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -192,6 +192,45 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Product | picker: choose a product | — | — | `listRentalPricingProfiles` ?productId |
 | Unpriced only | toggle | — | — | `listRentalPricingProfiles` ?unpricedOnly |
 
+**Sent by *+ Create Pricing Profile*** (`createRentalPricingProfile`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| ID `id` | picker: choose an id | optional | — | — | shows names, sends the id | — | `createRentalPricingProfile` body |
+| Code `code` | text field | required | — | — | — | — | `createRentalPricingProfile` body |
+| Name `name` | text field | required | — | — | — | — | `createRentalPricingProfile` body |
+| Product `productId` | picker: choose a product | optional | — | — | shows names, sends the id | — | `createRentalPricingProfile` body |
+| Venue `venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | — | `createRentalPricingProfile` body |
+| Locations `locationIds` | multi-picker: choose locations | optional | — | — | — | — | `createRentalPricingProfile` body |
+| Currency `currency` | text field | optional | — | pattern `^[A-Z]{3}$`; Region-scoped and not overridable below it, so a row in a UAE region is AED and cannot be anything else. | — | Resolved from the region, not stored (ADR-0018). Region-scoped and not overridable below it, so a row in a UAE region is AED and cannot be anything else. | `createRentalPricingProfile` body |
+| Sales channel `salesChannel` | text field | optional | — | — | — | — | `createRentalPricingProfile` body |
+| Customer segment `customerSegmentId` | picker: choose a customer segment | optional | — | — | shows names, sends the id | — | `createRentalPricingProfile` body |
+| Model `model` | select | required | — | Flat · Duration based · Tiered · Peak off peak · Weekend · Seasonal · Dynamic · Hybrid | — | — | `createRentalPricingProfile` body |
+| Base price `basePrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createRentalPricingProfile` body |
+| Duration tiers `durationTiers` | repeatable rows | optional | — | — | — | Board 4.3. | `createRentalPricingProfile` body |
+| Minutes `durationTiers[].minutes` | number field | optional | — | — | — | — | `createRentalPricingProfile` body |
+| Price `durationTiers[].price` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createRentalPricingProfile` body |
+| Minimum charge `minimumCharge` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createRentalPricingProfile` body |
+| Billing increment minutes `billingIncrementMinutes` | number field (minutes) | optional | — | — | — | — | `createRentalPricingProfile` body |
+| Additional increment price `additionalIncrementPrice` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createRentalPricingProfile` body |
+| Rounding `rounding` | radio group | optional | Exact usage | Exact usage · Round up15 · Round up30 · Round up hour | — | — | `createRentalPricingProfile` body |
+| Calendar rules `calendarRules` | repeatable rows | optional | — | — | — | Board 4.4. | `createRentalPricingProfile` body |
+| Kind `calendarRules[].kind` | radio group | optional | — | Peak · Off peak · Weekend · Seasonal · Special | — | — | `createRentalPricingProfile` body |
+| From `calendarRules[].from` | text field | optional | — | — | — | — | `createRentalPricingProfile` body |
+| To `calendarRules[].to` | text field | optional | — | — | — | — | `createRentalPricingProfile` body |
+| Date from `calendarRules[].dateFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `createRentalPricingProfile` body |
+| Date to `calendarRules[].dateTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `createRentalPricingProfile` body |
+| Adjustment percent `calendarRules[].adjustmentPercent` | number field | optional | — | — | — | — | `createRentalPricingProfile` body |
+| Price `calendarRules[].price` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `createRentalPricingProfile` body |
+| Dynamic enabled `dynamicEnabled` | toggle | optional | off | — | — | — | `createRentalPricingProfile` body |
+| Dynamic max increase percent `dynamicMaxIncreasePercent` | number field | optional | 25 | — | — | — | `createRentalPricingProfile` body |
+| Dynamic max decrease percent `dynamicMaxDecreasePercent` | number field | optional | 15 | — | — | — | `createRentalPricingProfile` body |
+| Priority `priority` | number field | optional | 0 | — | — | — | `createRentalPricingProfile` body |
+| Effective from `effectiveFrom` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `createRentalPricingProfile` body |
+| Effective to `effectiveTo` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `createRentalPricingProfile` body |
+| Status `status` | radio group | optional | — | Draft · Pending approval · Active · Scheduled · Expired | — | — | `createRentalPricingProfile` body |
+| Scope path `scopePath` | text field | optional | — | — | — | — | `createRentalPricingProfile` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -216,7 +255,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| + Create Pricing Profile (primary button) | navigation or local | — | — | — | — |
+| + Create Pricing Profile (primary button) | `createRentalPricingProfile` POST `/rental-pricing-profiles` | RentalPricingProfile | RentalPricingProfile | 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … | — |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -247,6 +286,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the rental pricing are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -262,6 +302,8 @@ profile: Bicycle standard · City Bicycle · Duration tiers · AED 35 / 30 min �
 - `createRentalPricingProfile` → `RENTAL_PRICE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_VIEW`
 
 #### Requirements it meets
 
@@ -303,7 +345,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (36), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-524?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: + Create Pricing Profile.
@@ -374,6 +416,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -389,6 +432,8 @@ profile: Kayak weekend · tiered · AED 90 first hour · channels online and POS
 - `updateRentalPricingProfile` → `RENTAL_PRICE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_PRICE`
 
 #### Requirements it meets
 
@@ -415,7 +460,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (8), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-525?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -483,6 +528,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -497,6 +543,8 @@ example: Minimum AED 40 · increment 15 min at AED 10 · 75 min rounds up to 90 
 - `updateRentalPricingProfile` → `RENTAL_PRICE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_PRICE`
 
 #### Requirements it meets
 
@@ -523,7 +571,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (7), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (7), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-526?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -586,6 +634,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the calendar peak seasonal are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
 #### Sample data for the mock-up
 
@@ -600,6 +649,8 @@ rules: Weekend +20% · 16:00–18:00 peak +AED 10 · Winter season Nov–Mar
 - `updateRentalPricingProfile` → `RENTAL_PRICE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_PRICE`
 
 #### Requirements it meets
 
@@ -626,7 +677,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-527?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save, Cancel.
@@ -807,6 +858,8 @@ policy: City Bicycle · AED 200 fixed · card hold or cash · released on return
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_PRICE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -914,6 +967,8 @@ rule: Auto-release 0 h after inspection · partial capture allowed · supervisor
 - `setRentalDepositPolicy` → `RENTAL_PRICE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_PRICE`
 
 #### Requirements it meets
 
@@ -1023,6 +1078,8 @@ example: Grace 10 min · AED 15 per 30 min after · capped AED 150/day · not re
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_PRICE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1130,6 +1187,8 @@ override: Late fee waiver · AED 45 → 0 · 'brake failure, not guest fault' ·
 - `requestRentalCommercialOverride` → `RENTAL_OVERRIDE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_OVERRIDE`
 
 #### Requirements it meets
 
@@ -1239,6 +1298,8 @@ result: Double Kayak · Sat 2 h · online → base AED 90 + 1 h AED 60 + weekend
 - `explainRentalPrice` → `RENTAL_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_PRICE`
 
 #### Requirements it meets
 
@@ -1387,11 +1448,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "RentalConfigurationFinding": {"type":"object","description":"Boards 1.10 and 4.10. **Severity travels with the finding**, so the publish gate can distinguish a missing turnaround buffer from a missing price.\n","properties":{"code":{"type":"string"},"severity":{"type":"string","enum":["blocking","warning","advisory"]},"message":{"type":"string"},"field":{"type":"string","nullable":true},"source":{"type":"string","enum":["validation","ai"],"default":"validation","description":"**AI findings are advisory unless the client configures otherwise** (board 1.10), so the origin is on the record rather than assumed by the reader.\n"}}},
 "RentalDepositPolicy": {"type":"object","x-ticvai-persistence":"rental.deposit_policy","description":"Boards 4.6 and 4.7. **Held, not taken**, and settled against an inspection.","properties":{"id":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid","nullable":true},"categoryId":{"type":"string","format":"uuid","nullable":true},"required":{"type":"boolean","default":true},"basis":{"type":"string","enum":["fixed","percentage","riskBased"]},"fixedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"percentage":{"type":"number","nullable":true},"minimumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"maximumAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"instruments":{"type":"array","items":{"type":"string","enum":["cardPreAuthorisation","cardCharge","cash","wallet"]}},"autoRelease":{"type":"boolean","default":true},"inspectionRequiredBeforeRelease":{"type":"boolean","default":false},"autoReleaseDelayHours":{"type":"integer","default":0},"partialCapturePermitted":{"type":"boolean","default":true},"supervisorApprovalThreshold":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"waiverEligible":{"type":"boolean","default":false},"scopePath":{"type":"string"}}},
-"RentalFeePolicy": {"type":"object","x-ticvai-persistence":"rental.fee_policy","description":"Board 4.8. **Extension is priced below late return on purpose** — *\"this encourages customers to extend properly rather than returning late.\"*\n","properties":{"id":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid","nullable":true},"gracePeriodMinutes":{"type":"integer","default":0},"lateFeeBasis":{"type":"string","enum":["fixed","perMinute","per15Minutes","per30Minutes","perHour","tiered"]},"lateFeeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lateFeeTiers":{"type":"array","items":{"type":"object","properties":{"afterMinutes":{"type":"integer"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"maximumDailyCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"extensionPricePerIncrement":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"extensionIncrementMinutes":{"type":"integer","default":30},"notReturnedAfterHours":{"type":"integer","nullable":true,"description":"**When a late rental becomes a lost one.** The deposit is captured in full and the asset retired; without a threshold the fee accrues forever and nobody decides.\n"},"damageFeeMaximum":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"**A ceiling, not a rate.** Added 22 September: `rental.settlement.damage_fee` was stored with nothing bounding it. **A dent is assessed, not tabulated** — the amount is entered per incident against the actual damage, so the control is how high an operator may go, the same shape `maximumDailyCharge` already gives the late fee.\n"},"damageFeeApprovalAbove":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"**Above this, a second person signs it off.** A damage fee is the one charge on a settlement that a single operator decides alone, and the one a guest is most likely to dispute. The shape is `orders.RefundPolicy.requiresApprovalAbove`, applied to the other direction of money.\n"},"missingItemFeeBasis":{"type":"string","enum":["replacementCost","fixedAmount"],"description":"**What an unreturned item costs.** `replacementCost` reads the item's own replacement value, which is what the fee usually is; `fixedAmount` uses `missingItemFeeAmount`. Added 22 September — `rental.settlement.missing_item_fee` was stored with no source.\n"},"missingItemFeeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Used when `missingItemFeeBasis` is `fixedAmount`."},"scopePath":{"type":"string"}}},
+"RentalFeePolicy": {"type":"object","x-ticvai-persistence":"rental.fee_policy","description":"Board 4.8. **Extension is priced below late return on purpose** — *\"this encourages customers to extend properly rather than returning late.\"*\n","properties":{"id":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid","nullable":true},"gracePeriodMinutes":{"type":"integer","default":0},"lateFeeBasis":{"type":"string","enum":["fixed","perMinute","per15Minutes","per30Minutes","perHour","tiered"]},"lateFeeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lateFeeTiers":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"afterMinutes":{"type":"integer"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"maximumDailyCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"extensionPricePerIncrement":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"extensionIncrementMinutes":{"type":"integer","default":30},"notReturnedAfterHours":{"type":"integer","nullable":true,"description":"**When a late rental becomes a lost one.** The deposit is captured in full and the asset retired; without a threshold the fee accrues forever and nobody decides.\n"},"damageFeeMaximum":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"**A ceiling, not a rate.** Added 22 September: `rental.settlement.damage_fee` was stored with nothing bounding it. **A dent is assessed, not tabulated** — the amount is entered per incident against the actual damage, so the control is how high an operator may go, the same shape `maximumDailyCharge` already gives the late fee.\n"},"damageFeeApprovalAbove":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"**Above this, a second person signs it off.** A damage fee is the one charge on a settlement that a single operator decides alone, and the one a guest is most likely to dispute. The shape is `orders.RefundPolicy.requiresApprovalAbove`, applied to the other direction of money.\n"},"missingItemFeeBasis":{"type":"string","enum":["replacementCost","fixedAmount"],"description":"**What an unreturned item costs.** `replacementCost` reads the item's own replacement value, which is what the fee usually is; `fixedAmount` uses `missingItemFeeAmount`. Added 22 September — `rental.settlement.missing_item_fee` was stored with no source.\n"},"missingItemFeeAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Used when `missingItemFeeBasis` is `fixedAmount`."},"scopePath":{"type":"string"}}},
 "RentalOverride": {"type":"object","x-ticvai-persistence":"rental.override","description":"Board 4.9. **The original amount is recorded as well as the adjusted one.**","required":["kind","reason"],"properties":{"id":{"type":"string","format":"uuid"},"bookingId":{"type":"string","format":"uuid","nullable":true},"kind":{"type":"string","enum":["priceOverride","complimentary","depositWaiver","depositReduction","lateFeeWaiver","damageFeeWaiver","extensionFeeWaiver","manualRefund","goodwill"]},"originalAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"adjustedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"reason":{"type":"string"},"requestedBy":{"type":"string","format":"uuid"},"approvedBy":{"type":"string","format":"uuid","nullable":true},"approvalRequestId":{"type":"string","format":"uuid","nullable":true},"at":{"type":"string","format":"date-time"},"scopePath":{"type":"string"}}},
 "RentalPriceExplanation": {"type":"object","description":"Board 4.10 — *\"show why the price was calculated.\"* **The ordered trace, including the rules that did not apply**, because *\"why is it not the peak price\"* is asked as often as *\"why is it\"*.\n","properties":{"quote":{"$ref":"#/components/schemas/RentalQuote"},"steps":{"type":"array","items":{"type":"object","properties":{"order":{"type":"integer"},"stage":{"type":"string","enum":["basePrice","locationRule","calendarRule","dynamicPricing","channelEligibility","promotion","manualOverride","tax"]},"ruleId":{"type":"string","format":"uuid","nullable":true},"ruleName":{"type":"string","nullable":true},"applied":{"type":"boolean"},"skippedBecause":{"type":"string","nullable":true},"amountBefore":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"amountAfter":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}}}},
-"RentalPricingProfile": {"type":"object","x-ticvai-persistence":"rental.pricing_profile","description":"Board 4.2. **Several will apply at once**, and the precedence is configurable and auditable (board 4.10).\n","required":["code","name","model"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"productId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid","nullable":true},"locationIds":{"type":"array","items":{"type":"string","format":"uuid"}},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018). Region-scoped and not overridable below it, so a row in a UAE region is AED and cannot be anything else. Kept on the wire, removed from the table.\n"},"salesChannel":{"type":"string","nullable":true},"customerSegmentId":{"type":"string","format":"uuid","nullable":true},"model":{"type":"string","enum":["flat","durationBased","tiered","peakOffPeak","weekend","seasonal","dynamic","hybrid"]},"basePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"durationTiers":{"type":"array","description":"Board 4.3. *30 min AED 40, 60 min AED 60, 90 min AED 80, 120 min AED 95.*","items":{"type":"object","properties":{"minutes":{"type":"integer"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"minimumCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"billingIncrementMinutes":{"type":"integer","nullable":true},"additionalIncrementPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"rounding":{"type":"string","enum":["exactUsage","roundUp15","roundUp30","roundUpHour"],"default":"exactUsage"},"calendarRules":{"type":"array","description":"Board 4.4. *Peak 16:00–20:00 AED 90/hr; off-peak 09:00–12:00 AED 50/hr; peak season 1 Nov – 31 Mar.*\n","items":{"type":"object","properties":{"kind":{"type":"string","enum":["peak","offPeak","weekend","seasonal","special"]},"from":{"type":"string","nullable":true},"to":{"type":"string","nullable":true},"dateFrom":{"type":"string","format":"date","nullable":true},"dateTo":{"type":"string","format":"date","nullable":true},"adjustmentPercent":{"type":"number","nullable":true},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"dynamicEnabled":{"type":"boolean","default":false},"dynamicMaxIncreasePercent":{"type":"number","default":25},"dynamicMaxDecreasePercent":{"type":"number","default":15},"priority":{"type":"integer","default":0},"effectiveFrom":{"type":"string","format":"date","nullable":true},"effectiveTo":{"type":"string","format":"date","nullable":true},"status":{"type":"string","enum":["draft","pendingApproval","active","scheduled","expired"]},"scopePath":{"type":"string"}}},
-"RentalQuote": {"type":"object","x-ticvai-persistence":"rental.quote","description":"Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n**Consumed by `acceptedQuoteId`** on `createRentalBooking` and the extension. A quote is not deleted when it is used or expires: a nightly job removes quotes 30 days past `expiresAt` that no booking references, so a booking can always show the quote it was priced at (decided 29 September, writers pass; DM4).\n","required":["quoteId","productId","from","to","rentalAmount","depositAmount"],"properties":{"quoteId":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid","description":"The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted."},"locationId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer","default":1},"customerId":{"type":"string","format":"uuid","nullable":true},"rentalAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"addOnAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discountAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalPayable":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"depositAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"depositInstrument":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005), written at `venue` scope."}}},
+"RentalPricingProfile": {"type":"object","x-ticvai-persistence":"rental.pricing_profile","description":"Board 4.2. **Several will apply at once**, and the precedence is configurable and auditable (board 4.10).\n","required":["code","name","model"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"productId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid","nullable":true},"locationIds":{"type":"array","items":{"type":"string","format":"uuid"}},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018). Region-scoped and not overridable below it, so a row in a UAE region is AED and cannot be anything else. Kept on the wire, removed from the table.\n"},"salesChannel":{"type":"string","nullable":true},"customerSegmentId":{"type":"string","format":"uuid","nullable":true},"model":{"type":"string","enum":["flat","durationBased","tiered","peakOffPeak","weekend","seasonal","dynamic","hybrid"]},"basePrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"durationTiers":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"Board 4.3. *30 min AED 40, 60 min AED 60, 90 min AED 80, 120 min AED 95.*","items":{"type":"object","properties":{"minutes":{"type":"integer"},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"minimumCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"billingIncrementMinutes":{"type":"integer","nullable":true},"additionalIncrementPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"rounding":{"type":"string","enum":["exactUsage","roundUp15","roundUp30","roundUpHour"],"default":"exactUsage"},"calendarRules":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","description":"Board 4.4. *Peak 16:00–20:00 AED 90/hr; off-peak 09:00–12:00 AED 50/hr; peak season 1 Nov – 31 Mar.*\n","items":{"type":"object","properties":{"kind":{"type":"string","enum":["peak","offPeak","weekend","seasonal","special"]},"from":{"type":"string","nullable":true},"to":{"type":"string","nullable":true},"dateFrom":{"type":"string","format":"date","nullable":true},"dateTo":{"type":"string","format":"date","nullable":true},"adjustmentPercent":{"type":"number","nullable":true},"price":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"dynamicEnabled":{"type":"boolean","default":false},"dynamicMaxIncreasePercent":{"type":"number","default":25},"dynamicMaxDecreasePercent":{"type":"number","default":15},"priority":{"type":"integer","default":0},"effectiveFrom":{"type":"string","format":"date","nullable":true},"effectiveTo":{"type":"string","format":"date","nullable":true},"status":{"type":"string","enum":["draft","pendingApproval","active","scheduled","expired"]},"scopePath":{"type":"string"}}},
+"RentalQuote": {"type":"object","x-ticvai-persistence":"rental.quote","description":"Board 4.10. **Rental amount and deposit are returned apart, because the deposit is not revenue.**\n**A quote `quoteRentalPrice` issues is stored until `expiresAt`**, with what was asked, so the figures it gave can be held to and checked later. `explainRentalPrice` and `simulateRentalPricing` return the same shape and store nothing (decided 29 September, data model DM4).\n**Consumed by `acceptedQuoteId`** on `createRentalBooking` and the extension. A quote is not deleted when it is used or expires: a nightly job removes quotes 30 days past `expiresAt` that no booking references, so a booking can always show the quote it was priced at (decided 29 September, writers pass; DM4).\n","required":["quoteId","productId","from","to","rentalAmount","depositAmount"],"properties":{"quoteId":{"type":"string","format":"uuid"},"productId":{"x-ticvai-references":"rental.product","type":"string","format":"uuid","description":"The request's product; with `locationId`, `from`, `to` and `quantity`, what was quoted."},"locationId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer","default":1},"customerId":{"type":"string","format":"uuid","nullable":true},"rentalAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"addOnAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discountAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalPayable":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"depositAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"depositInstrument":{"type":"string","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005), written at `venue` scope."}}},
 "RentalQuoteRequest": {"type":"object","required":["productId","from","to"],"properties":{"productId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer","default":1},"salesChannel":{"type":"string","nullable":true},"customerId":{"type":"string","format":"uuid","nullable":true},"promotionCode":{"type":"string","nullable":true}}}
 }
 ```

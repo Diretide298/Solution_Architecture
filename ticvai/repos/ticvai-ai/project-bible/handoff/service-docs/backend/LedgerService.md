@@ -28,17 +28,17 @@
 |---|---|---|---|---|---|---|
 | finance | [`ingestFxRates`](#ingestfxrates) | POST | `/fx-rates/ingest` | setup | 1 | BO-077 |
 | finance | [`setFxProvider`](#setfxprovider) | PUT | `/fx-rates/providers` | setup | 1 |  |
-| fiscal | [`createLegalEntity`](#createlegalentity) | POST | `/legal-entities` | setup | 1 | ADM-411, BO-074 |
+| fiscal | [`createLegalEntity`](#createlegalentity) | POST | `/legal-entities` | setup | 1 | BO-074 |
 | ledger | [`listFxRates`](#listfxrates) | GET | `/fx-rates` | core | 1 | BO-077, GST-044, WEB-035 |
-| ledger | [`setFxRate`](#setfxrate) | PUT | `/fx-rates` | setup | 1 | BO-077 |
+| ledger | [`setFxRate`](#setfxrate) | PUT | `/fx-rates/{rateId}` | setup | 1 | BO-077 |
 | tax | [`createTaxCode`](#createtaxcode) | POST | `/tax-codes` | setup | 1 | BO-075 |
 | tax | [`getTaxDocumentRendition`](#gettaxdocumentrendition) | GET | `/tax-documents/{documentId}/rendition` | core | 1 | BO-022, BO-023, GST-019, POS-026, POS-030, WEB-019 |
 | tax | [`getTaxInvoice`](#gettaxinvoice) | GET | `/tax-invoices/{invoiceId}` | core | 1 | BO-022, GST-019, POS-026, WEB-019 |
 | tax | [`issueCreditMemo`](#issuecreditmemo) | POST | `/tax-invoices/{invoiceId}/credit-memos` | core | 1 | BO-022, BO-023, POS-011 |
 | tax | [`issueTaxInvoice`](#issuetaxinvoice) | POST | `/tax-invoices` | core | 1 | BO-022, GST-019, POS-026, POS-030, WEB-019 |
 | tax | [`listCreditMemos`](#listcreditmemos) | GET | `/credit-memos` | core | 1 | ANL-072, BO-023, BO-1081, GST-019, WEB-019 |
-| tax | [`listTaxInvoices`](#listtaxinvoices) | GET | `/tax-invoices` | core | 1 | ADM-068, ANL-072, BO-022, BO-1081, GST-019, POS-026 … |
-| tax | [`setEInvoicingProvider`](#seteinvoicingprovider) | PUT | `/e-invoicing/providers` | setup | 1 | ADM-069 |
+| tax | [`listTaxInvoices`](#listtaxinvoices) | GET | `/tax-invoices` | core | 1 | ANL-072, BO-022, BO-1081, GST-019, POS-026, WEB-019 |
+| tax | [`setEInvoicingProvider`](#seteinvoicingprovider) | PUT | `/e-invoicing/providers/{providerId}` | setup | 1 | ADM-069 |
 | tax | [`transmitEInvoices`](#transmiteinvoices) | POST | `/e-invoicing/transmissions` | setup | 1 | ADM-077 |
 | tax | [`updateTaxCode`](#updatetaxcode) | PATCH | `/tax-codes/{taxCodeId}` | setup | 1 | BO-075 |
 
@@ -178,7 +178,7 @@
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `ledger.legal_entity` |
 | Writes | `cache:idempotency`, `ledger.legal_entity` |
-| Called by | ADM-411, BO-074 |
+| Called by | BO-074 |
 
 **Parameters**
 
@@ -223,6 +223,7 @@
 | Code | Shape | Meaning |
 |---|---|---|
 | 201 |  | Created |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -238,6 +239,9 @@ The consequence is that most of the questions FX usually raises do not arise. Th
 **Rates are set per region; each venue picks which currencies it shows** (decided 28 September, audit R120 (a)). A guest screen passes `venueId` and gets the region's rates narrowed to the currencies that venue has chosen to display (`tenancy.VenueSettings.displayCurrencies`); the rate itself is never set per venue.
 **Superseded in part, 2 October 2026 (Chinmay; CHG-FIN-001): the guest may now pay in a currency they select.** The ledger still holds base currency only, but a guest-selected currency is charged at the gateway at the region's `tender` rate, locked on the order (`orders.Order.chargeFxRate`), and a refund goes back in the currency paid at the sale rate, so the venue never refunds at today's rate. The quotation above (Allam, 10 August) describes the display-only option this replaces for card and wallet; it still holds for foreign cash at a till (DI-282). `chargeable=true` with `venueId` narrows the list to the currencies the venue lets a guest pay in (`tenancy.VenueSettings.chargeCurrencies`); each rate says `chargeable`.
 **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the published rates in force, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `LEDGER_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
+
+**Order.** Soonest first, by `effectiveFrom` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -294,7 +298,7 @@ The consequence is that most of the questions FX usually raises do not arise. Th
 
 ### setFxRate
 
-**`PUT /fx-rates`**: Set a rate
+**`PUT /fx-rates/{rateId}`**: Set a rate
 
 Rates are **configured, not fetched live**. A published market rate moving mid-shift would mean two guests paying different dirham amounts for the same product minutes apart, and a cashier unable to explain either.
 A rate change is a new row with its own effective window; the old one's rate is never edited. A transaction posted last Tuesday must still reconcile at last Tuesday's rate.
@@ -320,6 +324,7 @@ The server sets `source` to `manual` and `setByPrincipalId` to the caller; `fetc
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| rateId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FxRate`
@@ -411,6 +416,7 @@ Supports compound tax — a code may apply on top of another code's result rathe
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
@@ -430,6 +436,7 @@ Supports compound tax — a code may apply on top of another code's result rathe
 |---|---|---|
 | 201 |  | Created |
 | 400 |  | Compound reference is circular or crosses countries |
+| 409 | DuplicateCode | A business code the request names is already used within its uniqueness scope (the scope the property's x-ticvai-unique names; decided 28 September, audit R108). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getTaxDocumentRendition
@@ -1050,7 +1057,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 | Read routing | replica |
 | Reads | `ledger.tax_invoice`, `ledger.tax_invoice_line` |
 | Writes | - |
-| Called by | ADM-068, ANL-072, BO-022, BO-1081, GST-019, POS-026, WEB-019 |
+| Called by | ANL-072, BO-022, BO-1081, GST-019, POS-026, WEB-019 |
 
 **Parameters**
 
@@ -1166,7 +1173,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 
 ### setEInvoicingProvider
 
-**`PUT /e-invoicing/providers`**: Connect a legal entity to its accredited e-invoicing service provider
+**`PUT /e-invoicing/providers/{providerId}`**: Connect a legal entity to its accredited e-invoicing service provider
 
 6.1.1. **UAE e-invoicing runs through an accredited service provider** on the Peppol network (PINT AE), which passes the document to the buyer's provider and reports it to the FTA. This holds the connection per legal entity: the provider, its endpoint, the credential reference (a secret in the vault, never the secret), the entity's participant identifier, and the mode (`disabled`, `test`, `live`). Keyed by legal entity; a second call replaces the first. `live` is refused until a `test` transmission has been accepted.
 
@@ -1187,6 +1194,7 @@ Ordered by `issuedAt` descending, `id` as the tiebreak.
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| providerId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `FinEInvoicingProvider`
@@ -1351,6 +1359,7 @@ Rate changes are versioned with an effective date, never applied retrospectively
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
+| scopePath | string | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. (read-only) |
 | id | string (uuid) | yes |  |
 | code | string | yes | (max length 64) |
 | name | string | yes | (max length 200) |
@@ -1516,6 +1525,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
+| scope_path | text | yes | Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. |
 | id | uuid | yes |  |
 | code | text | yes |  |
 | name | text | yes |  |

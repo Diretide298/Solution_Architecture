@@ -170,6 +170,7 @@
   ]
  },
  "ConsentPurposeConfig": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.consent_purpose + marketing.consent_purpose_channel",
   "type": "object",
   "required": [
@@ -289,6 +290,8 @@
     "description": "The privacy request (`setPrivacyRequest`); the natural key."
    },
    "identifiers": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Extra identifiers to search by; the request's subject is always included.",
     "items": {
@@ -412,6 +415,8 @@
     }
    },
    "corrections": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Correction requests to route to the system of record.",
     "items": {
@@ -450,6 +455,7 @@
   ],
   "properties": {
    "requestId": {
+    "x-ticvai-references": "marketing.privacy_request",
     "type": "string",
     "format": "uuid"
    },
@@ -459,6 +465,8 @@
     "readOnly": true
    },
    "results": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "Record counts per source; the records themselves go only into the export package.",
     "items": {
@@ -545,6 +553,8 @@
     }
    },
    "corrections": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "readOnly": true,
     "items": {
@@ -613,6 +623,7 @@
     "readOnly": true
    },
    "subjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid",
     "description": "The person the request is about."
@@ -837,6 +848,8 @@
     }
    },
    "conflicts": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1140,6 +1153,8 @@
   "description": "Board 2.2. **Three thresholds, and the middle band is the point.**",
   "properties": {
    "matchers": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1184,6 +1199,8 @@
     "type": "number"
    },
    "survivorship": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -1318,6 +1335,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -1601,6 +1619,7 @@
   }
  },
  "PrivacyAuditEvidenceComplianceReportingView": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "marketing.privacy_audit_event",
   "description": "One privacy audit event (pack 17.2.9 Audit Fields). Append-only; written by the operation that performed the event, never through an API.",
@@ -1710,6 +1729,7 @@
   }
  },
  "PrivacyIncident": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "marketing.privacy_incident",
   "description": "BL-176. **A personal-data breach has a regulator clock**, and UAE PDPL gives 72 hours from discovery. Nothing in the package recorded one.\n**Modelled on the maintenance incident pattern**, because the shape is the same — discovery, assessment, containment, notification, closure — and **the field that matters is the one that starts the clock.**\n",
@@ -1785,6 +1805,7 @@
     "nullable": true
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "enum": [
      "open",

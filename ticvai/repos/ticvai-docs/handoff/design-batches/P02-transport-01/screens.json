@@ -8,7 +8,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/transport/route-and-schedule",
-   "component": "apps/guest-app/src/routes/transport/RouteAndScheduleList.tsx",
+   "component": "src/screens/transport/RouteAndScheduleList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -243,7 +243,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/transport/route-and-passengers",
-   "component": "apps/guest-app/src/routes/transport/RouteAndPassengersDetail.tsx",
+   "component": "src/screens/transport/RouteAndPassengersDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -387,12 +387,6 @@
   },
   "apis": [
    {
-    "operationId": "getTransportRoute",
-    "contract": "transport",
-    "purpose": "The route and its stops",
-    "trigger": "onLoad"
-   },
-   {
     "operationId": "getTransportRouteMap",
     "contract": "transport",
     "purpose": "Stop list, line and bounds for the map",
@@ -464,6 +458,14 @@
    }
   },
   "apisNote": "Authored 29 September 2026 from the rev 3 decisions and the client prototype view named in `wireframe.prototype`; every operation exists in the contracts (decided 29 September, rev 3).",
+  "gaps": [
+   {
+    "operation": "getTransportRoute",
+    "removed": true,
+    "why": "Nothing on the client-approved screen shows it: the stops and the map come from getTransportRouteMap.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   }
+  ],
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -504,7 +506,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/transport/multi-trip-passes",
-   "component": "apps/guest-app/src/routes/transport/MultiTripPassesList.tsx",
+   "component": "src/screens/transport/MultiTripPassesList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -688,7 +690,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/transport/favourite-routes",
-   "component": "apps/guest-app/src/routes/transport/FavouriteRoutesList.tsx",
+   "component": "src/screens/transport/FavouriteRoutesList.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "6",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/hold-command-center-bo-1003",
-   "component": "apps/venue-management-web/src/routes/access-venue/HoldCommandCenter.tsx",
+   "component": "src/routes/access-venue/HoldCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -119,7 +120,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatHoldPools",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatHoldPools"
       }
      ]
     }
@@ -176,6 +178,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "6",
@@ -185,7 +188,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/hold-type-master-bo-1004",
-   "component": "apps/venue-management-web/src/routes/access-venue/HoldTypeMaster.tsx",
+   "component": "src/routes/access-venue/HoldTypeMaster.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -208,6 +211,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure reusable hold categories and their default behavior. Maintain VIP, Sponsor, Artist, Media, Corporate, Internal and custom types with code, color and description. Set default duration, priority, approval, reminder, maximum quantity, permitted channels and auto-release policy. Map type to stakeholder classes, contract requirements, reporting dimensions and permitted roles. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `listSeatHoldTypes`, `setSeatHoldType` with BO-1006, BO-1007; this screen is Hold Type Master (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.02, page 26): configure reusable hold categories and their default behavior. Maintain VIP, Sponsor, Artist, Media, Corporate, Internal and custom types with code, color and description. Set default duration, priority, approval, reminder, maximum quantity, permitted channels and auto-release policy. Map type to stakeholder classes, contract requirements, reporting dimensions and permitted roles. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -230,7 +234,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatHoldTypes",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatHoldTypes"
       },
       {
        "kind": "primaryButton",
@@ -282,6 +287,16 @@
    "workshopBoard": "wireframes/WS145 Seat Management Venue Mapping Reference v1.0 Board 6.dc.html#bo-1004"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 26. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "holdTypeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listSeatHoldTypes`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -311,6 +326,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "6",
@@ -320,7 +336,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/hold-pool-creation-bo-1005",
-   "component": "apps/venue-management-web/src/routes/access-venue/HoldPoolCreation.tsx",
+   "component": "src/routes/access-venue/HoldPoolCreation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -343,6 +359,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Select and create an explicit pool of held seats or capacity. Choose inventory by map, section, row, seat list, zone quantity or uploaded allocation with current-state validation. Capture event/performance, type, owner, stakeholder, value, purpose, effective time, expiry and notes. Preview available, already held, reserved, sold, blocked and inaccessible inventory before submission. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 26",
+  "division": "Shares `createSeatHoldPool`, `listSeatHoldPools` with BO-979; this screen is Hold Pool Creation (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.03, page 26): select and create an explicit pool of held seats or capacity. Choose inventory by map, section, row, seat list, zone quantity or uploaded allocation with current-state validation. Capture event/performance, type, owner, stakeholder, value, purpose, effective time, expiry and notes. Preview available, already held, reserved, sold, blocked and inaccessible inventory before submission. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 26.",
   "gaps": [
    {
     "operation": null,
@@ -455,6 +472,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "6",
@@ -464,7 +482,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/hold-rule-assignment-bo-1006",
-   "component": "apps/venue-management-web/src/routes/access-venue/HoldRuleAssignment.tsx",
+   "component": "src/routes/access-venue/HoldRuleAssignment.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -487,6 +505,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Automatically apply approved hold policies to eligible performances. Build conditions by tenant, venue, event, product, date, performance, section, category, stakeholder and channel. Define seat set or quantity, type, owner, priority, duration, release rule and exception behavior. Simulate upcoming performances, detect rule collisions and version every activated rule. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `listSeatHoldTypes`, `setSeatHoldType` with BO-1004, BO-1007; this screen is Hold Rule Assignment (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.04, page 27): automatically apply approved hold policies to eligible performances. Build conditions by tenant, venue, event, product, date, performance, section, category, stakeholder and channel. Define seat set or quantity, type, owner, priority, duration, release rule and exception behavior. Simulate upcoming performances, detect rule collisions and version every activated rule. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -562,7 +581,16 @@
    "workshopBoard": "wireframes/WS145 Seat Management Venue Mapping Reference v1.0 Board 6.dc.html#bo-1006"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "holdTypeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listSeatHoldTypes`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -592,6 +620,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "6",
@@ -601,7 +630,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/expiration-rules-bo-1007",
-   "component": "apps/venue-management-web/src/routes/access-venue/ExpirationRules.tsx",
+   "component": "src/routes/access-venue/ExpirationRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -624,6 +653,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control when held inventory must be reviewed or released. Set fixed timestamp, time-before-performance, contract milestone, payment condition or manual approval expiry. Configure reminder sequence, grace period, escalation, extension eligibility and maximum extension. Respect venue timezone and daylight-saving behavior and preserve the rule/version applied to each hold. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `listSeatHoldTypes`, `setSeatHoldType` with BO-1004, BO-1006; this screen is Expiration Rules (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.05, page 27): control when held inventory must be reviewed or released. Set fixed timestamp, time-before-performance, contract milestone, payment condition or manual approval expiry. Configure reminder sequence, grace period, escalation, extension eligibility and maximum extension. Respect venue timezone and daylight-saving behavior and preserve the rule/version applied to each hold. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -699,7 +729,16 @@
    "workshopBoard": "wireframes/WS145 Seat Management Venue Mapping Reference v1.0 Board 6.dc.html#bo-1007"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 27. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "holdTypeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listSeatHoldTypes`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -729,6 +768,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "6",
@@ -738,7 +778,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/automatic-hold-release-bo-1008",
-   "component": "apps/venue-management-web/src/routes/access-venue/AutomaticHoldRelease.tsx",
+   "component": "src/routes/access-venue/AutomaticHoldRelease.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -761,6 +801,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Release eligible held inventory reliably and in controlled batches. Schedule releases by type, rule, event, performance, stakeholder, age and remaining time. Preview seats, price bands, channel availability, sold-out status and exceptions before execution. Use idempotent processing, partial-failure handling, retry, reconciliation and stakeholder notification. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `listSeatHoldPools`, `releaseSeatHoldPool` with BO-1009; this screen is Automatic Hold Release (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.06, page 27): release eligible held inventory reliably and in controlled batches. Schedule releases by type, rule, event, performance, stakeholder, age and remaining time. Preview seats, price bands, channel availability, sold-out status and exceptions before execution. Use idempotent processing, partial-failure handling, retry, reconciliation and stakeholder notification. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -883,6 +924,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "6",
@@ -892,7 +934,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/release-convert-reassign-bo-1009",
-   "component": "apps/venue-management-web/src/routes/access-venue/ReleaseConvertReassign.tsx",
+   "component": "src/routes/access-venue/ReleaseConvertReassign.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -915,6 +957,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Allow authorized users to change the outcome of an active hold. Release all or selected inventory, convert it to reservation/order, reassign owner/stakeholder or extend expiry. Revalidate state, price, eligibility, payment or contract condition before committing the action. Require reason, supporting notes and approval when value, timing or policy threshold is exceeded. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `listSeatHoldPools`, `releaseSeatHoldPool` with BO-1008; this screen is Release, Convert & Reassign (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 6.07, page 27): allow authorized users to change the outcome of an active hold. Release all or selected inventory, convert it to reservation/order, reassign owner/stakeholder or extend expiry. Revalidate state, price, eligibility, payment or contract condition before committing the action. Require reason, supporting notes and approval when value, timing or policy threshold is exceeded. Hold creation and release shall be atomic, reason-coded and approval-controlled by value, quantity, type and timing; overlapping holds require explicit priority resolution. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -1037,6 +1080,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "6",
@@ -1046,7 +1090,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/hold-approval-workflow-bo-1010",
-   "component": "apps/venue-management-web/src/routes/access-venue/HoldApprovalWorkflow.tsx",
+   "component": "src/routes/access-venue/HoldApprovalWorkflow.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1098,7 +1142,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatHoldPools",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatHoldPools"
       },
       {
        "kind": "secondaryButton",
@@ -1169,6 +1214,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "6",
@@ -1178,7 +1224,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/priority-conflict-resolution-bo-1011",
-   "component": "apps/venue-management-web/src/routes/access-venue/PriorityConflictResolution.tsx",
+   "component": "src/routes/access-venue/PriorityConflictResolution.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1223,7 +1269,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatHoldPools",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatHoldPools"
       },
       {
        "kind": "primaryButton",
@@ -1275,6 +1322,16 @@
    "workshopBoard": "wireframes/WS145 Seat Management Venue Mapping Reference v1.0 Board 6.dc.html#bo-1011"
   },
   "apisNote": "Regenerated 9 September 2026 from Seat_Management_Venue_Mapping_Reference v1.0.pdf page 28. 0 of 0 labels bound to a contract property; 0 of 8 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
+  "entryState": {
+   "params": [
+    {
+     "name": "holdTypeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listSeatHoldPools`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1304,6 +1361,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "6",
@@ -1313,7 +1371,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/hold-utilization-audit-bo-1012",
-   "component": "apps/venue-management-web/src/routes/access-venue/HoldUtilizationAudit.tsx",
+   "component": "src/routes/access-venue/HoldUtilizationAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1358,7 +1416,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listSeatHoldPools",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listSeatHoldPools"
       }
      ]
     }

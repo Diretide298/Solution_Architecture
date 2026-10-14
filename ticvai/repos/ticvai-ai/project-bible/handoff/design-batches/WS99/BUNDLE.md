@@ -131,13 +131,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-379` | Welcome & Start Your TICVAI Journey | B | 4 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `ADM-380` | Customer & Organization Registration | B | 35 | 0 | 6 | 14 | 1 | 0 | — | notStarted (—) |
+| `ADM-380` | Customer & Organization Registration | B | 33 | 0 | 6 | 14 | 1 | 0 | — | notStarted (—) |
 | `ADM-381` | Venue Type & Business Profile | B | 1 | 12 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-382` | Visitor, Capacity & Operational Scale | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-383` | Sales Channel Assessment | B | 11 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-384` | Ticketing & Product Requirements | B | 15 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-385` | Access, Queue & Visitor Experience Assessment | B | 0 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
-| `ADM-386` | Additional Business Module Assessment | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-386` | Additional Business Module Assessment | B | 0 | 14 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-387` | Integration, Payment & Technical Readiness | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 | `ADM-388` | AI Assessment Summary & Handoff | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 
@@ -336,14 +336,12 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `submitOnboardingApplication` body |
 | Company name `companyName` | text field | required | — | — | — | — | `submitOnboardingApplication` body |
 | Contact email `contactEmail` | email field | required | — | — | name@example.ae | — | `submitOnboardingApplication` body |
 | Contact phone `contactPhone` | phone field | optional | — | — | +971 5X XXX XXXX (E.164) | — | `submitOnboardingApplication` body |
 | Country code `countryCode` | text field | optional | — | — | — | — | `submitOnboardingApplication` body |
 | Venue type template `venueTypeTemplateId` | picker: choose a venue type template | optional | — | — | shows names, sends the id | A water park and a theatre need different defaults, and asking a prospect to configure 300 settings from empty is asking them to leave. | `submitOnboardingApplication` body |
 | Requested plan `requestedPlanId` | picker: choose a requested plan | optional | — | — | shows names, sends the id | — | `submitOnboardingApplication` body |
-| Status `status` | select | required | — | Submitted · Verifying · Approved · Provisioning · Active · Rejected · Abandoned | — | — | `submitOnboardingApplication` body |
 | Trial ends at `trialEndsAt` | date and time picker | optional | — | — | 1 Oct 2026, 14:30 (venue time zone) | Trial is a state, not a plan. A tenant on trial has the plan they will pay for and a date by which they must — modelling it as a separate plan means migrating them at conversion … | `submitOnboardingApplication` body |
 | Rejection reason `rejectionReason` | text field | optional | — | — | — | — | `submitOnboardingApplication` body |
 | Provisioned tenant `provisionedTenantId` | picker: choose a provisioned tenant | optional | — | — | shows names, sends the id | — | `submitOnboardingApplication` body |
@@ -402,11 +400,13 @@ contact: aisha@marinaleisure.ae
 
 #### Permissions
 
-- `submitOnboardingApplication` → `TENANT_CONFIGURE` (configure) · public, prospect
+- `submitOnboardingApplication` → `TENANT_CONFIGURE` (configure) · staff, prospect
 - `startProspectSignup` → no permission · public, prospect
 - `verifyProspectSignupCode` → no permission · public, prospect
 
 **A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `submitOnboardingApplication` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `TENANT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -449,7 +449,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 404, 409, 422).
+- [ ] Every input above is drawn (33), with its required mark, default, format and its error state (400, 404, 409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-380?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Send code, Verify code, Submit, Cancel.
@@ -573,6 +573,8 @@ Every venue type business:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -683,6 +685,8 @@ venues: 3
 - `scoreVsiAssessment` → `PLATFORM_PLAN_MANAGE` (configure) · staff, guest, prospect
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_PLAN_MANAGE`
 
 #### Requirements it meets
 
@@ -802,6 +806,8 @@ answers:
 - `scoreVsiAssessment` → `PLATFORM_PLAN_MANAGE` (configure) · staff, guest, prospect
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_PLAN_MANAGE`
 
 #### Requirements it meets
 
@@ -935,6 +941,8 @@ form example:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1047,6 +1055,8 @@ rfidWristbands: true
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1123,7 +1133,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listModuleCatalogue`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Module code | text | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
+| Name | text | — |
+| Description | text | — |
+| Category | text | — |
+| Requires modules | list or chips (count when long) | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
+| Incompatible with modules | list or chips (count when long) | Values are `ModuleKey`s (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of `white-label.ModuleEnablement.moduleKey`, so a dependency … |
+| Included in tiers | list or chips (count when long) | — |
+| Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Pricing basis | chip: Included, Flat fee, Per venue, Per unit, Revenue share, Metered | — |
+| Metered metric | chip: Venues, Workstations, Active users, Devices, Branded apps, AI tokens… | For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise. |
+| Metered unit size | 1,234 | For `metered`, how many units `price` buys (e.g. 1000 tokens). |
+| Provisioning minutes | 1,234 | — |
+| Requires professional services | yes / no (icon or chip) | — |
+| Status | chip: Available, Beta, Deprecated, Withdrawn | — |
 
 **Actions and what each produces**
 
@@ -1174,6 +1201,8 @@ listModuleCatalogue (ModuleListing):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_PLAN_MANAGE`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1205,7 +1234,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-386?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `ADM-379`.
@@ -1285,6 +1314,8 @@ hosting: cloud
 - `scoreVsiAssessment` → `PLATFORM_PLAN_MANAGE` (configure) · staff, guest, prospect
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_PLAN_MANAGE`
 
 #### Requirements it meets
 
@@ -1401,6 +1432,8 @@ modules:
 - `scoreVsiAssessment` → `PLATFORM_PLAN_MANAGE` (configure) · staff, guest, prospect
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_PLAN_MANAGE`
 
 #### Requirements it meets
 
@@ -1532,7 +1565,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "BillingEntity": {"type":"object","x-ticvai-persistence":"control.billing_entity","description":"**The company TICVAI invoices for a tenant, with its trade licence and VAT certificate** (Chinmay, 2 October, workbook Q209: \"a new billing-entity record in the subscription contract\"; DI-830; CHG-CSA-030). One per tenant, mastered in the control plane. `legalName` and `countryCode` are required on save (400 otherwise); they are not marked required here so the record can ride, optional, on an onboarding application. **Documents** (workbook Q210, the default): a trade licence always; a VAT certificate when a `trn` is entered. Which documents a country requires is configurable per country (tenancy `RegionSettings`); the default is that rule.","properties":{"id":{"type":"string","format":"uuid","readOnly":true},"tenantId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Null while it rides on an onboarding application."},"legalName":{"type":"string","maxLength":300},"tradeLicenceNumber":{"type":"string","maxLength":100,"nullable":true},"trn":{"type":"string","maxLength":30,"nullable":true,"description":"The tax registration number; entering one makes the VAT certificate required."},"countryCode":{"type":"string","minLength":2,"maxLength":2},"address":{"type":"string","maxLength":1000,"nullable":true},"invoiceEmail":{"type":"string","format":"email","nullable":true},"documents":{"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","type":"array","description":"The trade licence and, where a TRN is entered, the VAT certificate, each a stored file with its verification.","items":{"type":"object","properties":{"documentType":{"type":"string","enum":["tradeLicence","vatCertificate"]},"fileRef":{"type":"string","nullable":true},"expiryDate":{"type":"string","format":"date","nullable":true},"verificationStatus":{"type":"string","enum":["missing","uploaded","verified","rejected","expired"]}}}},"missingDocuments":{"type":"array","readOnly":true,"description":"The documents the country's rule requires that are not yet uploaded and verified.","items":{"type":"string"}},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "ModuleListing": {"type":"object","x-ticvai-persistence":"subscription.module_listing","description":"Board 4.6. **A marketplace without a dependency graph sells combinations that cannot be provisioned.**\n**TICVAI configures each module's price here, and tenants are billed per module (decided 29 September, Chinmay).** A usage-priced module (the AI module's tokens) has `pricingBasis` `metered`: `price` is then per `meteredUnitSize` units of `meteredMetric`, and the invoice carries it as a `metered` line.\n","required":["moduleCode"],"properties":{"moduleCode":{"type":"string","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches."},"name":{"type":"string"},"description":{"type":"string","nullable":true},"category":{"type":"string","nullable":true},"requiresModules":{"type":"array","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.","items":{"type":"string"}},"incompatibleWithModules":{"type":"array","description":"**Values are `ModuleKey`s** (4 October 2026, CHG-FXC-010; ADM-424): the vocabulary of\n`white-label.ModuleEnablement.moduleKey`, so a dependency is checked against what `setModuleEnablement` switches.","items":{"type":"string"}},"includedInTiers":{"type":"array","items":{"type":"string"}},"price":{"x-ticvai-column":"list_price","$ref":"../shared/common.yaml#/components/schemas/Money"},"pricingBasis":{"type":"string","enum":["included","flatFee","perVenue","perUnit","revenueShare","metered"]},"meteredMetric":{"allOf":[{"$ref":"#/components/schemas/UsageMetric"}],"nullable":true,"description":"For `metered`, what is counted (`aiTokens` for the AI module). Null otherwise."},"meteredUnitSize":{"type":"integer","minimum":1,"nullable":true,"description":"For `metered`, how many units `price` buys (e.g. 1000 tokens). Null otherwise."},"provisioningMinutes":{"type":"integer","nullable":true},"requiresProfessionalServices":{"type":"boolean","default":false},"status":{"type":"string","enum":["available","beta","deprecated","withdrawn"]}}},
-"OnboardingApplication": {"type":"object","x-ticvai-persistence":"control.onboarding_application","description":"BL-165. **`subscription` handles the operator-led path well and has no prospect-led one.** `createTenant` and `provisionCell` assume somebody at Softlabs decided this tenant exists.\nA prospect signing themselves up is a different shape: **nothing is provisioned until they are verified**, because an unverified application that provisions a cell is a cell somebody has to clean up.\n","required":["id","companyName","contactEmail","status"],"properties":{"id":{"type":"string","format":"uuid"},"companyName":{"type":"string"},"contactEmail":{"type":"string","format":"email"},"contactPhone":{"type":"string","nullable":true},"countryCode":{"type":"string"},"venueTypeTemplateId":{"type":"string","format":"uuid","nullable":true,"description":"**A water park and a theatre need different defaults**, and asking a prospect to configure 300 settings from empty is asking them to leave.\n"},"requestedPlanId":{"type":"string","format":"uuid"},"status":{"type":"string","enum":["submitted","verifying","approved","provisioning","active","rejected","abandoned"]},"trialEndsAt":{"type":"string","format":"date-time","nullable":true,"description":"**Trial is a state, not a plan.** A tenant on trial has the plan they will pay for and a date by which they must — modelling it as a separate plan means migrating them at conversion, which is the moment least worth adding risk to.\n"},"rejectionReason":{"type":"string","nullable":true},"provisionedTenantId":{"type":"string","format":"uuid","nullable":true},"billingEntity":{"$ref":"#/components/schemas/BillingEntity","description":"**The company to be invoiced, saved on the application before verification** (Chinmay, 2 October, workbook Q209 and Q223; CHG-CSA-030). Nothing is provisioned until the application is verified; on provisioning it becomes the tenant's billing entity (`getBillingEntity`)."}}},
+"OnboardingApplication": {"type":"object","x-ticvai-persistence":"control.onboarding_application","description":"BL-165. **`subscription` handles the operator-led path well and has no prospect-led one.** `createTenant` and `provisionCell` assume somebody at Softlabs decided this tenant exists.\nA prospect signing themselves up is a different shape: **nothing is provisioned until they are verified**, because an unverified application that provisions a cell is a cell somebody has to clean up.\n","required":["id","companyName","contactEmail","status"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"companyName":{"type":"string"},"contactEmail":{"type":"string","format":"email"},"contactPhone":{"type":"string","nullable":true},"countryCode":{"type":"string"},"venueTypeTemplateId":{"type":"string","format":"uuid","nullable":true,"description":"**A water park and a theatre need different defaults**, and asking a prospect to configure 300 settings from empty is asking them to leave.\n"},"requestedPlanId":{"type":"string","format":"uuid"},"status":{"readOnly":true,"type":"string","enum":["submitted","verifying","approved","provisioning","active","rejected","abandoned"]},"trialEndsAt":{"type":"string","format":"date-time","nullable":true,"description":"**Trial is a state, not a plan.** A tenant on trial has the plan they will pay for and a date by which they must — modelling it as a separate plan means migrating them at conversion, which is the moment least worth adding risk to.\n"},"rejectionReason":{"type":"string","nullable":true},"provisionedTenantId":{"type":"string","format":"uuid","nullable":true},"billingEntity":{"$ref":"#/components/schemas/BillingEntity","description":"**The company to be invoiced, saved on the application before verification** (Chinmay, 2 October, workbook Q209 and Q223; CHG-CSA-030). Nothing is provisioned until the application is verified; on provisioning it becomes the tenant's billing entity (`getBillingEntity`)."}}},
 "ProspectSignupChallenge": {"type":"object","x-ticvai-persistence":"none — the challenge is held by identity for its lifetime (CHG-CLN-019)","required":["challengeId","expiresInSeconds"],"properties":{"challengeId":{"type":"string","format":"uuid"},"expiresInSeconds":{"type":"integer"},"resendAfterSeconds":{"type":"integer"}}},
 "ProspectSignupSession": {"type":"object","x-ticvai-persistence":"none — a session token, not a table the package reads (CHG-CLN-019)","required":["token","expiresAt","resumed"],"properties":{"token":{"type":"string","description":"The `prospectAuth` bearer token, scoped to one onboarding application."},"expiresAt":{"type":"string","format":"date-time"},"onboardingApplicationId":{"type":"string","format":"uuid","nullable":true,"description":"The application in progress for this email, or null until the first `submitOnboardingApplication`."},"resumed":{"type":"boolean","description":"True when the email already had an application in progress (\"Continue saved setup\")."}}},
 "StartProspectSignupRequest": {"type":"object","x-ticvai-persistence":"none — request only (DEC-167; CHG-CLN-019)","required":["email"],"properties":{"email":{"type":"string","format":"email","maxLength":256,"description":"The prospect's work email; the one-time code goes here."},"locale":{"type":"string","maxLength":16,"nullable":true,"description":"The language the code message is written in (BCP 47), default English."}}},

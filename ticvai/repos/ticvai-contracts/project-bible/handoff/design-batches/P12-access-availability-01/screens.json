@@ -373,6 +373,7 @@
   "module": "Access & Availability",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "CASE_MANAGE",
   "implementation": {
    "app": "venue-support-web",
    "route": "/general/availability-and-routing-settings",

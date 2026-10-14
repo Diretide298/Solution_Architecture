@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "6",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-checkout-command-center-bo-544",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalCheckoutCommandCenter.tsx",
+   "component": "src/routes/rentals/RentalCheckoutCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -122,7 +123,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -256,6 +257,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "6",
@@ -265,7 +267,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/voucher-scan-reservation-retrieval-bo-545",
-   "component": "apps/venue-management-web/src/routes/rentals/VoucherScanReservationRetrieval.tsx",
+   "component": "src/routes/rentals/VoucherScanReservationRetrieval.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -310,7 +312,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getRentalBooking",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getRentalBooking"
       }
      ]
     }
@@ -377,6 +380,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "6",
@@ -386,7 +390,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/checkout-readiness-validation-bo-546",
-   "component": "apps/venue-management-web/src/routes/rentals/CheckoutReadinessValidation.tsx",
+   "component": "src/routes/rentals/CheckoutReadinessValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -431,7 +435,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getRentalBooking",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getRentalBooking"
       }
      ]
     }
@@ -498,6 +503,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "6",
@@ -507,7 +513,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/equipment-assignment-workspace-bo-547",
-   "component": "apps/venue-management-web/src/routes/rentals/EquipmentAssignmentWorkspace.tsx",
+   "component": "src/routes/rentals/EquipmentAssignmentWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -644,6 +650,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "6",
@@ -653,7 +660,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/equipment-scan-validation-bo-548",
-   "component": "apps/venue-management-web/src/routes/rentals/EquipmentScanValidation.tsx",
+   "component": "src/routes/rentals/EquipmentScanValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -699,14 +706,16 @@
        "derived": true,
        "impliedBy": "assignRentalEquipment",
        "label": "Assign rental equipment",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "assignRentalEquipment"
       },
       {
        "kind": "searchField",
        "derived": true,
        "impliedBy": "lookupAsset",
        "label": "Search",
-       "notes": "Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run."
+       "notes": "Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run.",
+       "operation": "lookupAsset"
       },
       {
        "kind": "secondaryButton",
@@ -790,6 +799,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "6",
@@ -799,7 +809,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/pre-rental-condition-inspection-bo-549",
-   "component": "apps/venue-management-web/src/routes/rentals/PreRentalConditionInspection.tsx",
+   "component": "src/routes/rentals/PreRentalConditionInspection.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -928,6 +938,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "6",
@@ -937,7 +948,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/safety-handover-checklist-bo-550",
-   "component": "apps/venue-management-web/src/routes/rentals/SafetyHandoverChecklist.tsx",
+   "component": "src/routes/rentals/SafetyHandoverChecklist.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1061,6 +1072,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "6",
@@ -1070,7 +1082,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/deposit-financial-handover-validation-bo-551",
-   "component": "apps/venue-management-web/src/routes/rentals/DepositFinancialHandoverValidation.tsx",
+   "component": "src/routes/rentals/DepositFinancialHandoverValidation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1194,6 +1206,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "6",
@@ -1203,7 +1216,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/group-multi-item-checkout-bo-552",
-   "component": "apps/venue-management-web/src/routes/rentals/GroupMultiItemCheckout.tsx",
+   "component": "src/routes/rentals/GroupMultiItemCheckout.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1326,6 +1339,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "6",
@@ -1335,7 +1349,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/checkout-confirmation-rental-activation-bo-553",
-   "component": "apps/venue-management-web/src/routes/rentals/CheckoutConfirmationRentalActivation.tsx",
+   "component": "src/routes/rentals/CheckoutConfirmationRentalActivation.tsx",
    "status": "notStarted"
   },
   "navigation": {

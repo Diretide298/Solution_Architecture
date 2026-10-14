@@ -5,6 +5,7 @@
   "module": "Inventory & Pricing",
   "requiresModule": "partner",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "capability": "C103",
   "implementation": {
    "app": "partner-web",
@@ -51,7 +52,7 @@
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act",
-  "purpose": "See inventory & allocation view for this venue.",
+  "purpose": "A partner sees the capacity allocated to its channel for each performance and the orders sold against it, and returns unsold allocation to the general pool.",
   "layout": {
    "template": "split",
    "regions": [
@@ -426,6 +427,7 @@
   "module": "Inventory & Pricing",
   "requiresModule": "partner",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "capability": "C85",
   "implementation": {
    "app": "partner-web",
@@ -732,6 +734,7 @@
   "module": "Inventory & Pricing",
   "requiresModule": "partner",
   "wave": 2,
+  "permission": "PRODUCT_VIEW",
   "capability": "C81",
   "implementation": {
    "app": "partner-web",

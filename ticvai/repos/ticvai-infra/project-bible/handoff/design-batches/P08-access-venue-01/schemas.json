@@ -1,5 +1,8 @@
 {
  "AccessEntryRulePoint": {
+  "x-ticvai-retired-columns": [
+   "admission_profile_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "access.entry_rule_point",
   "description": "**Taken from the backend workbook, 20 September.** Maps the access points that are allowed for an admission profile.",
@@ -11,11 +14,14 @@
   ],
   "properties": {
    "admissionProfileId": {
+    "x-ticvai-references": "access.admission_rules",
+    "x-ticvai-column": "admission_rules_id",
     "type": "string",
     "format": "uuid",
     "readOnly": true
    },
    "accessPointId": {
+    "x-ticvai-references": "access.access_point",
     "type": "string",
     "format": "uuid"
    },
@@ -52,6 +58,7 @@
     "description": "**Server-assigned.** Ignored in a `createAdmissionRules` or `updateAdmissionRules` body; on update the profile is the one the path names.\n"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },
@@ -511,7 +518,8 @@
   "properties": {
    "code": {
     "type": "string",
-    "maxLength": 64
+    "maxLength": 64,
+    "x-ticvai-unique": "venue"
    },
    "name": {
     "$ref": "#/components/schemas/queue::LocalisedText"
@@ -648,6 +656,7 @@
     "nullable": true
    },
    "fastPass": {
+    "x-ticvai-persisted": false,
     "allOf": [
      {
       "$ref": "#/components/schemas/QueueFastPass"
@@ -1150,7 +1159,8 @@
   "properties": {
    "id": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "readOnly": true
    },
    "queueId": {
     "type": "string",
@@ -1886,6 +1896,8 @@
       }
      },
      "timeEntries": {
+      "x-ticvai-persistence-column": "jsonb",
+      "x-ticvai-persistence-kind": "valueObject",
       "type": "array",
       "items": {
        "type": "object",
@@ -1909,6 +1921,8 @@
       }
      },
      "parts": {
+      "x-ticvai-persistence-column": "jsonb",
+      "x-ticvai-persistence-kind": "valueObject",
       "type": "array",
       "items": {
        "type": "object",

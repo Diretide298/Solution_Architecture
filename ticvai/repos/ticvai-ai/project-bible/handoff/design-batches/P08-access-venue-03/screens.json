@@ -5,10 +5,11 @@
   "module": "Access & Venue",
   "requiresModule": "resources",
   "wave": 1,
+  "permission": "RESOURCE_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/resources/calendar",
-   "component": "apps/venue-management-web/src/routes/resources/ResourceCalendar.tsx",
+   "component": "src/routes/resources/ResourceCalendar.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -184,10 +185,11 @@
   "module": "Access & Venue",
   "requiresModule": "resources",
   "wave": 1,
+  "permission": "RENTAL_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/resources/check-out",
-   "component": "apps/venue-management-web/src/routes/resources/ResourceCheckOutForm.tsx",
+   "component": "src/routes/resources/ResourceCheckOutForm.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -486,10 +488,11 @@
   "module": "Access & Venue",
   "requiresModule": "resources",
   "wave": 2,
+  "permission": "RESOURCE_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/resources/qualifications",
-   "component": "apps/venue-management-web/src/routes/resources/QualificationList.tsx",
+   "component": "src/routes/resources/QualificationList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -507,6 +510,7 @@
   "pattern": "configEditor",
   "patternReason": "the screen declares only writes (`setResourceQualifications`) and no read of a population — it is settings, not a list",
   "purpose": "What a person is certified to do, and until when.",
+  "division": "Shares `getResourceQualifications`, `setResourceQualifications` with BO-875; this screen is Qualifications: what a person is certified to do, and until when.",
   "layout": {
    "template": "form",
    "regions": [
@@ -655,10 +659,11 @@
   "module": "Access & Venue",
   "requiresModule": "resources",
   "wave": 2,
+  "permission": "RESOURCE_VIEW",
   "implementation": {
    "app": "venue-management-web",
    "route": "/resources/session-manifest",
-   "component": "apps/venue-management-web/src/routes/resources/SessionManifest.tsx",
+   "component": "src/routes/resources/SessionManifest.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -831,10 +836,11 @@
   "module": "Access & Venue",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "REPORT_VIEW_VENUE",
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue",
-   "component": "apps/venue-management-web/src/routes/home/AccessVenueList.tsx",
+   "component": "src/routes/home/AccessVenueList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -897,7 +903,7 @@
     {
      "to": "BO-003",
      "trigger": "Queue Integration Setup",
-     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-103 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-003 finds feedId (configureQueueFeed) itself, and BO-003 opens on its own"
+     "provenance": "derived — BO-003 declares entryState.params feedId, orderId and BO-103 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-003 finds feedId (listQueueFeeds) itself, and BO-003 opens on its own"
     },
     {
      "to": "BO-004",

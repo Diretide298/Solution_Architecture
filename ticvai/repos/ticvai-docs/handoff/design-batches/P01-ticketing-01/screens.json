@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/ticket-transfer",
-   "component": "apps/guest-web/src/routes/TicketTransfer.tsx",
+   "component": "src/routes/TicketTransfer.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -259,7 +259,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/my-reservations",
-   "component": "apps/guest-web/src/routes/MyReservations.tsx",
+   "component": "src/routes/MyReservations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -668,7 +668,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/multi-currency-pricing",
-   "component": "apps/guest-web/src/routes/MulticurrencyPricing.tsx",
+   "component": "src/routes/MulticurrencyPricing.tsx",
    "status": "notStarted"
   },
   "navigation": {

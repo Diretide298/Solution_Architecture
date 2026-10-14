@@ -180,6 +180,7 @@
   ],
   "properties": {
    "menuItemId": {
+    "x-ticvai-references": "fnb.menu_item",
     "type": "string",
     "format": "uuid"
    },
@@ -405,6 +406,9 @@
   ]
  },
  "ChannelAllocation": {
+  "x-ticvai-retired-columns": [
+   "envelope_id"
+  ],
   "x-ticvai-persistence": "catalogue.channel_envelope",
   "type": "object",
   "required": [
@@ -443,6 +447,13 @@
     "format": "date-time",
     "nullable": true,
     "description": "Unsold units return to the general pool at this time. How distribution holds are freed close to a performance without someone remembering to do it.\n"
+   },
+   "channelCapacityId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true,
+    "x-ticvai-references": "catalogue.channel_capacity",
+    "description": "The capacity envelope this allocation draws from (`catalogue.channel_capacity`), from the path of `setChannelAllocations`."
    },
    "salesChannelId": {
     "type": "string",
@@ -714,11 +725,13 @@
     "description": "Null for an anonymous sale. Identity and entitlement are separate."
    },
    "guestLinkId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "nullable": true,
     "description": "Present where the guest is linked across cells."
    },
    "catalogueBundleVersion": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "description": "The bundle the client priced from. Lets the server explain a variance rather than merely report one.\n"
    },
@@ -775,17 +788,20 @@
     "description": "**What the guest handed over**, in `tenderCurrency` — becomes `Payment.tenderAmount`, one name for one concept (renamed from `tenderedAmount` on 26 September). For cash, change is the difference.\n"
    },
    "walletAuthorisationId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "nullable": true,
     "description": "Cross-cell wallet hold, where the guest's home cell is elsewhere."
    },
    "walletHoldId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "format": "uuid",
     "nullable": true,
     "description": "For a `wallet` tender, the hold `wallet.holdWalletFunds` placed (SD-027). Capture debits it; the order service writes no wallet table."
    },
    "returnUrl": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "format": "uri",
     "nullable": true,
@@ -798,6 +814,7 @@
     "description": "The card terminal to instruct, for a card payment at a till (ECR flow, SD-034)."
    },
    "deviceId": {
+    "x-ticvai-persisted": false,
     "type": "string",
     "format": "uuid",
     "nullable": true
@@ -1065,10 +1082,12 @@
     "format": "uuid"
    },
    "fromInventoryItemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid"
    },
    "toInventoryItemId": {
+    "x-ticvai-references": "inventory.inventory_item",
     "type": "string",
     "format": "uuid"
    },
@@ -1240,6 +1259,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string",
     "maxLength": 64
    },
@@ -1322,7 +1342,8 @@
    "productVariantId",
    "name",
    "price",
-   "isAvailable"
+   "isAvailable",
+   "menuSectionId"
   ],
   "properties": {
    "id": {
@@ -1375,9 +1396,9 @@
     "nullable": true
    },
    "menuSectionId": {
+    "x-ticvai-references": "fnb.menu_section",
     "type": "string",
     "format": "uuid",
-    "nullable": true,
     "readOnly": true,
     "description": "The section the item sits in, set by `setMenuSections` and `applyMenuActions` (`moveSection`)."
    },
@@ -1407,6 +1428,13 @@
     "items": {
      "$ref": "#/components/schemas/AllergenCode"
     }
+   },
+   "unavailableNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The free text with an `other` unavailable reason (`setItemAvailability`); reviewed quarterly so the common ones become reasons (audit R222)."
    }
   }
  },
@@ -1484,6 +1512,7 @@
     "readOnly": true
    },
    "scopePath": {
+    "readOnly": true,
     "type": "string",
     "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)*$",
     "description": "**The node this policy is for, and the key `setOfflinePolicy` upserts on.** The body names its target here, because the path does not.\n"
@@ -2080,6 +2109,7 @@
   }
  },
  "ProductionPlan": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "fnb.production_plan + fnb.production_plan_line",
   "description": "Board 2M. **Forecast demand against recipes, producing a prep list.** Built from `requestSuggestion(kind=prepPlan)` and then edited — **a forecast a chef cannot overrule is a forecast a chef ignores.**\n**A plan is not a production run and the separation is deliberate.** A plan is drafted, argued over and edited; releasing it creates the runs. **A plan that creates runs as it is drafted creates runs nobody asked for.**\n",
@@ -2087,10 +2117,17 @@
    "id",
    "forDate",
    "status",
-   "lines"
+   "lines",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -2104,6 +2141,7 @@
     "description": "The trading day this prep list is for, in the Region's time zone; a business date, closing at the venue's `businessDayCutoff` (tenancy `VenueSettings`, default 00:00; CHG-R6-032)."
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "enum": [
      "draft",
@@ -2128,6 +2166,7 @@
      ],
      "properties": {
       "itemId": {
+       "x-ticvai-references": "fnb.menu_item",
        "type": "string",
        "format": "uuid"
       },
@@ -2171,6 +2210,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -2216,6 +2256,7 @@
     "format": "date-time"
    },
    "status": {
+    "readOnly": true,
     "type": "string",
     "enum": [
      "planned",
@@ -2709,10 +2750,12 @@
     "type": "string"
    },
    "fromLocationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
    "toLocationId": {
+    "x-ticvai-references": "inventory.location",
     "type": "string",
     "format": "uuid"
    },
@@ -2844,15 +2887,18 @@
     "format": "uuid"
    },
    "recipeId": {
+    "x-ticvai-references": "fnb.recipe",
     "type": "string",
     "format": "uuid",
     "description": "**The recipe the rule applies to** (decided 28 September, audit R125 (10)). Not a menu item and not the whole venue: a swap that is safe in one dish is not safe in another.\n"
    },
    "fromIngredientId": {
+    "x-ticvai-references": "fnb.recipe_ingredient",
     "type": "string",
     "format": "uuid"
    },
    "toIngredientId": {
+    "x-ticvai-references": "fnb.recipe_ingredient",
     "type": "string",
     "format": "uuid"
    },
@@ -3030,6 +3076,7 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
@@ -3162,10 +3209,33 @@
     "nullable": true,
     "readOnly": true,
     "description": "Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"
+   },
+   "isClosed": {
+    "type": "boolean",
+    "readOnly": true,
+    "default": false,
+    "description": "Closed by `setPathClosure`; routing does not use a closed path."
+   },
+   "expectedReopenAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "readOnly": true,
+    "description": "When a closed path is expected to reopen (`setPathClosure`)."
+   },
+   "closedNote": {
+    "type": "string",
+    "maxLength": 500,
+    "nullable": true,
+    "readOnly": true,
+    "description": "The free text with an `other` closure reason (`setPathClosure`; audit R222)."
    }
   }
  },
  "VenueSettings": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "platform.venue_settings",
   "description": "**Venue-level operational configuration that no other level can answer.**\nRegion owns currency, tax regime and fiscal year (ADR-0011). Venue owns the things that vary between two venues in one region — **opening hours, support hours, and what the local law requires of the gate.**\n**And the configured limits** (decided 28 September, audit R094): every limit the contracts call *configured* is a field here, from `displayCurrencies` and `cartLeaseSeconds` down to the grouped `catalogue`, `inventory`, `seating`, `promotions`, `fnb`, `queue`, `reporting`, `marketing` and `identity` settings. **Each has a tenant-level default**: the tenant sets it once with `setVenueSettingsDefaults`, a venue overrides it within the field's bounds, and a null field here inherits it. Each field's `default` is the proposed tenant default, marked proposed, client to correct (audit R094); `docs/active/configured-limits-proposal.md` is the sheet the client corrects, and where the two differ this contract is what runs.\n",
@@ -3894,6 +3964,9 @@
   ]
  },
  "Workstation": {
+  "x-ticvai-retired-columns": [
+   "org_unit_id"
+  ],
   "x-ticvai-persistence": "platform.workstation",
   "type": "object",
   "required": [

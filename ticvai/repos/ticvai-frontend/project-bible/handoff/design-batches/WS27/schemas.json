@@ -9,6 +9,7 @@
   ],
   "properties": {
    "groupQuoteId": {
+    "x-ticvai-persisted": false,
     "x-ticvai-references": "orders.group_quote",
     "type": "string",
     "format": "uuid",
@@ -182,6 +183,7 @@
     "format": "uuid"
    },
    "leaderSubjectId": {
+    "x-ticvai-references": "pii.subject",
     "type": "string",
     "format": "uuid"
    },
@@ -1118,6 +1120,7 @@
   }
  },
  "GroupEnquiryOpportunityView": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "object",
   "x-ticvai-persistence": "orders.group_enquiry",
   "description": "**One captured group enquiry.** Written by `createGroupEnquiry` (decided 29 September, readiness close-out); `listGroupEnquiryOpportunity` is the screen's projection over these.\n",
@@ -1126,9 +1129,15 @@
    "source",
    "contact",
    "groupSize",
-   "createdAt"
+   "createdAt",
+   "scopePath"
   ],
   "properties": {
+   "scopePath": {
+    "type": "string",
+    "readOnly": true,
+    "description": "Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."
+   },
    "id": {
     "type": "string",
     "format": "uuid",

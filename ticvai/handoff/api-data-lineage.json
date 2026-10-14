@@ -31,7 +31,6 @@
    "catalogue.product": [
     "approved_by_principal_id",
     "attraction_id",
-    "blocked_offline",
     "booking_flow_id",
     "brand_id",
     "business_unit_id",
@@ -44,12 +43,14 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_tags",
     "entitlement_template_id",
     "event_id",
     "family_key",
     "guest_listing",
     "has_variants",
     "id",
+    "is_blocked_offline",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -127,7 +128,6 @@
    "catalogue.product": [
     "approved_by_principal_id",
     "attraction_id",
-    "blocked_offline",
     "booking_flow_id",
     "brand_id",
     "business_unit_id",
@@ -140,12 +140,14 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_tags",
     "entitlement_template_id",
     "event_id",
     "family_key",
     "guest_listing",
     "has_variants",
     "id",
+    "is_blocked_offline",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -216,7 +218,6 @@
    "catalogue.product": [
     "approved_by_principal_id",
     "attraction_id",
-    "blocked_offline",
     "booking_flow_id",
     "brand_id",
     "business_unit_id",
@@ -229,12 +230,14 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_tags",
     "entitlement_template_id",
     "event_id",
     "family_key",
     "guest_listing",
     "has_variants",
     "id",
+    "is_blocked_offline",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -305,7 +308,6 @@
    "catalogue.product": [
     "approved_by_principal_id",
     "attraction_id",
-    "blocked_offline",
     "booking_flow_id",
     "brand_id",
     "business_unit_id",
@@ -318,12 +320,14 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_tags",
     "entitlement_template_id",
     "event_id",
     "family_key",
     "guest_listing",
     "has_variants",
     "id",
+    "is_blocked_offline",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -902,6 +906,7 @@
    "catalogue.channel_envelope": [
     "allocated_units",
     "channel",
+    "channel_capacity_id",
     "contractual_units",
     "envelope_type",
     "id",
@@ -952,6 +957,7 @@
    "catalogue.channel_envelope": [
     "allocated_units",
     "channel",
+    "channel_capacity_id",
     "contractual_units",
     "envelope_type",
     "id",
@@ -1377,7 +1383,6 @@
    "catalogue.product": [
     "approved_by_principal_id",
     "attraction_id",
-    "blocked_offline",
     "booking_flow_id",
     "brand_id",
     "business_unit_id",
@@ -1390,12 +1395,14 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_tags",
     "entitlement_template_id",
     "event_id",
     "family_key",
     "guest_listing",
     "has_variants",
     "id",
+    "is_blocked_offline",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -1468,6 +1475,7 @@
     "partner_id",
     "partner_name",
     "product_id",
+    "scope_path",
     "variant_id"
    ]
   }
@@ -1507,6 +1515,7 @@
     "partner_id",
     "partner_name",
     "product_id",
+    "scope_path",
     "variant_id"
    ]
   }
@@ -2014,6 +2023,7 @@
     "transport_restriction",
     "valid_for_days",
     "valid_from_offset_days",
+    "valid_time_windows",
     "validity_kind"
    ]
   }
@@ -2077,6 +2087,7 @@
     "transport_restriction",
     "valid_for_days",
     "valid_from_offset_days",
+    "valid_time_windows",
     "validity_kind"
    ]
   }
@@ -3034,6 +3045,7 @@
     "push_token",
     "retired_at",
     "scanner_health",
+    "scope_path",
     "serial_number",
     "status",
     "tested_by_principal_id",
@@ -3103,6 +3115,7 @@
     "push_token",
     "retired_at",
     "scanner_health",
+    "scope_path",
     "serial_number",
     "status",
     "tested_by_principal_id",
@@ -3248,9 +3261,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -3375,9 +3388,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -3503,9 +3516,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -3638,9 +3651,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -3766,9 +3779,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -3895,9 +3908,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -4623,9 +4636,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -4861,9 +4874,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -5055,9 +5068,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -5978,6 +5991,7 @@
     "dynamic_policy_id",
     "dynamic_policy_result",
     "dynamic_policy_version",
+    "entitlement_id",
     "id",
     "local_sequence",
     "media_code",
@@ -5991,7 +6005,6 @@
     "recorded_at",
     "scope_path",
     "synced_at",
-    "ticket_id",
     "venue_id"
    ]
   }
@@ -6097,8 +6110,11 @@
   "lineageNote": "writes one access.gate_mode_change per call (applied, or pending with a future effectiveAt, 202); enforces access.gate_mode_policy; opens an access_incident where the policy says createsIncident; not logged in configuration_change (operational)",
   "readColumns": {
    "access.access_point": [
+    "captures_vehicle_location",
     "code",
     "direction",
+    "direction_change_reason",
+    "direction_effective_at",
     "driver",
     "external_credential_sources",
     "geofence",
@@ -6113,7 +6129,6 @@
     "scan_anomaly_rules",
     "scope_path",
     "temporary_closure",
-    "vehicle_location_capture",
     "venue_id"
    ],
    "access.gate_mode_change": [
@@ -6156,8 +6171,11 @@
   ],
   "readColumns": {
    "access.access_point": [
+    "captures_vehicle_location",
     "code",
     "direction",
+    "direction_change_reason",
+    "direction_effective_at",
     "driver",
     "external_credential_sources",
     "geofence",
@@ -6172,7 +6190,6 @@
     "scan_anomaly_rules",
     "scope_path",
     "temporary_closure",
-    "vehicle_location_capture",
     "venue_id"
    ]
   }
@@ -6207,8 +6224,11 @@
   "lineageNote": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention)",
   "readColumns": {
    "access.access_point": [
+    "captures_vehicle_location",
     "code",
     "direction",
+    "direction_change_reason",
+    "direction_effective_at",
     "driver",
     "external_credential_sources",
     "geofence",
@@ -6223,7 +6243,6 @@
     "scan_anomaly_rules",
     "scope_path",
     "temporary_closure",
-    "vehicle_location_capture",
     "venue_id"
    ]
   }
@@ -6251,8 +6270,11 @@
   ],
   "readColumns": {
    "access.access_point": [
+    "captures_vehicle_location",
     "code",
     "direction",
+    "direction_change_reason",
+    "direction_effective_at",
     "driver",
     "external_credential_sources",
     "geofence",
@@ -6267,7 +6289,6 @@
     "scan_anomaly_rules",
     "scope_path",
     "temporary_closure",
-    "vehicle_location_capture",
     "venue_id"
    ]
   }
@@ -6302,8 +6323,11 @@
   "lineageNote": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention)",
   "readColumns": {
    "access.access_point": [
+    "captures_vehicle_location",
     "code",
     "direction",
+    "direction_change_reason",
+    "direction_effective_at",
     "driver",
     "external_credential_sources",
     "geofence",
@@ -6318,7 +6342,6 @@
     "scan_anomaly_rules",
     "scope_path",
     "temporary_closure",
-    "vehicle_location_capture",
     "venue_id"
    ]
   }
@@ -6354,6 +6377,7 @@
     "entry_limit",
     "exit_scan",
     "id",
+    "is_same_day_only",
     "max_duration_minutes",
     "max_exits",
     "max_reentries",
@@ -6364,7 +6388,6 @@
     "re_entry_window_minutes",
     "requires_exit_before_reentry",
     "rule_conditions",
-    "same_day_only",
     "scope_path",
     "validity"
    ]
@@ -6408,6 +6431,7 @@
     "entry_limit",
     "exit_scan",
     "id",
+    "is_same_day_only",
     "max_duration_minutes",
     "max_exits",
     "max_reentries",
@@ -6418,7 +6442,6 @@
     "re_entry_window_minutes",
     "requires_exit_before_reentry",
     "rule_conditions",
-    "same_day_only",
     "scope_path",
     "validity"
    ]
@@ -6462,6 +6485,7 @@
     "entry_limit",
     "exit_scan",
     "id",
+    "is_same_day_only",
     "max_duration_minutes",
     "max_exits",
     "max_reentries",
@@ -6472,7 +6496,6 @@
     "re_entry_window_minutes",
     "requires_exit_before_reentry",
     "rule_conditions",
-    "same_day_only",
     "scope_path",
     "validity"
    ]
@@ -6652,8 +6675,11 @@
   "lineageNote": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention)",
   "readColumns": {
    "access.access_point": [
+    "captures_vehicle_location",
     "code",
     "direction",
+    "direction_change_reason",
+    "direction_effective_at",
     "driver",
     "external_credential_sources",
     "geofence",
@@ -6668,7 +6694,6 @@
     "scan_anomaly_rules",
     "scope_path",
     "temporary_closure",
-    "vehicle_location_capture",
     "venue_id"
    ]
   }
@@ -7724,6 +7749,8 @@
     "guest_link_id",
     "home_cell_name",
     "linked_at",
+    "linked_cells",
+    "local_subject_id",
     "revoked_at"
    ]
   }
@@ -7756,6 +7783,8 @@
     "guest_link_id",
     "home_cell_name",
     "linked_at",
+    "linked_cells",
+    "local_subject_id",
     "revoked_at"
    ]
   }
@@ -7816,6 +7845,8 @@
     "guest_link_id",
     "home_cell_name",
     "linked_at",
+    "linked_cells",
+    "local_subject_id",
     "revoked_at"
    ]
   }
@@ -7851,6 +7882,7 @@
    "sync.cross_region_entitlement": [
     "admission_rules_id",
     "consuming_cell_name",
+    "entitlement_id",
     "entries_allowed",
     "entries_consumed",
     "guest_link_id",
@@ -7861,7 +7893,6 @@
     "media_codes",
     "right_id",
     "status",
-    "ticket_id",
     "valid_from",
     "valid_to",
     "venue_id"
@@ -7894,6 +7925,7 @@
    "sync.cross_region_entitlement": [
     "admission_rules_id",
     "consuming_cell_name",
+    "entitlement_id",
     "entries_allowed",
     "entries_consumed",
     "guest_link_id",
@@ -7904,7 +7936,6 @@
     "media_codes",
     "right_id",
     "status",
-    "ticket_id",
     "valid_from",
     "valid_to",
     "venue_id"
@@ -7970,6 +8001,7 @@
    "sync.cross_region_entitlement": [
     "admission_rules_id",
     "consuming_cell_name",
+    "entitlement_id",
     "entries_allowed",
     "entries_consumed",
     "guest_link_id",
@@ -7980,7 +8012,6 @@
     "media_codes",
     "right_id",
     "status",
-    "ticket_id",
     "valid_from",
     "valid_to",
     "venue_id"
@@ -8163,7 +8194,8 @@
     "guest_link_id",
     "id",
     "last_topped_up_at",
-    "mode"
+    "mode",
+    "share_percentage"
    ]
   }
  },
@@ -8203,7 +8235,8 @@
     "guest_link_id",
     "id",
     "last_topped_up_at",
-    "mode"
+    "mode",
+    "share_percentage"
    ]
   }
  },
@@ -8236,6 +8269,7 @@
   "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)",
   "readColumns": {
    "sync.dsar_request": [
+    "cell_results",
     "completed_at",
     "created_at",
     "guest_link_id",
@@ -8270,6 +8304,7 @@
   "fixNote": "14 October 2026: CHG-XDW-001: CrossRegionService's records moved from platform to sync (XDW-001 to XDW-011 removed)",
   "readColumns": {
    "sync.dsar_request": [
+    "cell_results",
     "completed_at",
     "created_at",
     "guest_link_id",
@@ -10162,7 +10197,8 @@
     "is_active",
     "is_inclusive",
     "name",
-    "rate"
+    "rate",
+    "scope_path"
    ]
   }
  },
@@ -10205,7 +10241,8 @@
     "is_active",
     "is_inclusive",
     "name",
-    "rate"
+    "rate",
+    "scope_path"
    ]
   }
  },
@@ -10248,7 +10285,8 @@
     "is_active",
     "is_inclusive",
     "name",
-    "rate"
+    "rate",
+    "scope_path"
    ]
   }
  },
@@ -10276,11 +10314,12 @@
   "readColumns": {
    "ledger.tax_exemption": [
     "certificate_reference",
-    "evidence_document_id",
+    "evidence_asset_id",
     "exemption_type",
     "id",
     "reason",
     "scope",
+    "scope_path",
     "scope_ref",
     "tax_code_id",
     "valid_from",
@@ -10321,11 +10360,12 @@
   "readColumns": {
    "ledger.tax_exemption": [
     "certificate_reference",
-    "evidence_document_id",
+    "evidence_asset_id",
     "exemption_type",
     "id",
     "reason",
     "scope",
+    "scope_path",
     "scope_ref",
     "tax_code_id",
     "valid_from",
@@ -10417,7 +10457,8 @@
     "product_kinds",
     "recognised_account_id",
     "recognition_site",
-    "revalidate_on_validity_change"
+    "revalidates_on_validity_change",
+    "scope_path"
    ]
   }
  },
@@ -10463,7 +10504,8 @@
     "product_kinds",
     "recognised_account_id",
     "recognition_site",
-    "revalidate_on_validity_change"
+    "revalidates_on_validity_change",
+    "scope_path"
    ]
   }
  },
@@ -10567,6 +10609,7 @@
     "id",
     "posted_at",
     "posted_by_principal_id",
+    "posting_date",
     "reference",
     "rejected_at",
     "rejected_by_principal_id",
@@ -10631,6 +10674,7 @@
     "id",
     "posted_at",
     "posted_by_principal_id",
+    "posting_date",
     "reference",
     "rejected_at",
     "rejected_by_principal_id",
@@ -10689,6 +10733,7 @@
     "id",
     "posted_at",
     "posted_by_principal_id",
+    "posting_date",
     "reference",
     "rejected_at",
     "rejected_by_principal_id",
@@ -10753,6 +10798,7 @@
     "id",
     "posted_at",
     "posted_by_principal_id",
+    "posting_date",
     "reference",
     "rejected_at",
     "rejected_by_principal_id",
@@ -10816,6 +10862,7 @@
     "id",
     "posted_at",
     "posted_by_principal_id",
+    "posting_date",
     "reference",
     "rejected_at",
     "rejected_by_principal_id",
@@ -10880,6 +10927,7 @@
     "id",
     "posted_at",
     "posted_by_principal_id",
+    "posting_date",
     "reference",
     "rejected_at",
     "rejected_by_principal_id",
@@ -12911,7 +12959,7 @@
     "kind",
     "launched_at",
     "name",
-    "optimise_channel",
+    "optimises_channel",
     "scheduled_for",
     "segment_id",
     "send_time_mode",
@@ -12988,7 +13036,7 @@
     "kind",
     "launched_at",
     "name",
-    "optimise_channel",
+    "optimises_channel",
     "scheduled_for",
     "segment_id",
     "send_time_mode",
@@ -13058,7 +13106,7 @@
     "kind",
     "launched_at",
     "name",
-    "optimise_channel",
+    "optimises_channel",
     "scheduled_for",
     "segment_id",
     "send_time_mode",
@@ -13135,7 +13183,7 @@
     "kind",
     "launched_at",
     "name",
-    "optimise_channel",
+    "optimises_channel",
     "scheduled_for",
     "segment_id",
     "send_time_mode",
@@ -13267,7 +13315,7 @@
     "kind",
     "launched_at",
     "name",
-    "optimise_channel",
+    "optimises_channel",
     "scheduled_for",
     "segment_id",
     "send_time_mode",
@@ -13341,7 +13389,7 @@
     "kind",
     "launched_at",
     "name",
-    "optimise_channel",
+    "optimises_channel",
     "scheduled_for",
     "segment_id",
     "send_time_mode",
@@ -13416,7 +13464,7 @@
     "kind",
     "launched_at",
     "name",
-    "optimise_channel",
+    "optimises_channel",
     "scheduled_for",
     "segment_id",
     "send_time_mode",
@@ -13821,6 +13869,7 @@
     "is_internal",
     "recorded_at",
     "resolution",
+    "scope_path",
     "synced_at"
    ]
   }
@@ -13917,6 +13966,7 @@
     "is_internal",
     "recorded_at",
     "resolution",
+    "scope_path",
     "synced_at"
    ]
   }
@@ -14228,6 +14278,7 @@
     "program_id",
     "reason",
     "reversed_loyalty_points_id",
+    "scope_path",
     "source_reference_id",
     "source_type",
     "transaction_type"
@@ -14275,13 +14326,13 @@
     "aspects",
     "body",
     "id",
+    "is_response_public",
     "opened_case_id",
     "rating",
     "recorded_at",
     "related_order_id",
     "responded_by_principal_id",
     "response",
-    "response_is_public",
     "status",
     "subject_id",
     "venue_id"
@@ -14322,13 +14373,13 @@
     "aspects",
     "body",
     "id",
+    "is_response_public",
     "opened_case_id",
     "rating",
     "recorded_at",
     "related_order_id",
     "responded_by_principal_id",
     "response",
-    "response_is_public",
     "status",
     "subject_id",
     "venue_id"
@@ -14367,13 +14418,13 @@
     "aspects",
     "body",
     "id",
+    "is_response_public",
     "opened_case_id",
     "rating",
     "recorded_at",
     "related_order_id",
     "responded_by_principal_id",
     "response",
-    "response_is_public",
     "status",
     "subject_id",
     "venue_id"
@@ -15556,9 +15607,9 @@
   ],
   "readColumns": {
    "control.cell_cluster": [
-    "accepting_new_tenants",
     "cell_ids",
     "id",
+    "is_accepting_new_tenants",
     "kind",
     "modelled_on_cell_id",
     "name",
@@ -15598,9 +15649,9 @@
   ],
   "readColumns": {
    "control.cell_cluster": [
-    "accepting_new_tenants",
     "cell_ids",
     "id",
+    "is_accepting_new_tenants",
     "kind",
     "modelled_on_cell_id",
     "name",
@@ -15717,6 +15768,7 @@
   ],
   "readColumns": {
    "control.tenant_migration_plan": [
+    "blockers",
     "can_proceed",
     "computed_at",
     "cross_region_links_to_repoint",
@@ -16260,8 +16312,8 @@
   "readColumns": {
    "fnb.location_session": [
     "expires_at",
+    "has_joined_existing_visit",
     "id",
-    "joined_existing_visit",
     "kind",
     "label",
     "location_id",
@@ -16347,8 +16399,8 @@
   "readColumns": {
    "fnb.table_session": [
     "expires_at",
+    "has_joined_existing_visit",
     "id",
-    "joined_existing_visit",
     "outlet_id",
     "outlet_name",
     "subject_id",
@@ -16530,6 +16582,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ],
    "fnb.menu_section": [
@@ -16599,6 +16652,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ],
    "fnb.menu_section": [
@@ -16661,6 +16715,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ],
    "fnb.menu_section": [
@@ -16730,6 +16785,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ],
    "fnb.menu_section": [
@@ -16799,6 +16855,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ],
    "fnb.menu_section": [
@@ -16854,6 +16911,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ]
   }
@@ -17591,6 +17649,7 @@
     "label",
     "outlet_id",
     "position",
+    "scope_path",
     "shape",
     "zone"
    ]
@@ -17633,6 +17692,7 @@
     "label",
     "outlet_id",
     "position",
+    "scope_path",
     "shape",
     "zone"
    ]
@@ -17744,6 +17804,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -17857,6 +17918,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -17976,6 +18038,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -18095,6 +18158,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -18292,6 +18356,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -18349,6 +18414,7 @@
     "is_out_of_service",
     "label",
     "position",
+    "scope_path",
     "shape",
     "zone"
    ]
@@ -18574,6 +18640,7 @@
     "name",
     "outlet_id",
     "printer_device_ids",
+    "scope_path",
     "serves_outlet_ids"
    ]
   }
@@ -18615,6 +18682,7 @@
     "name",
     "outlet_id",
     "printer_device_ids",
+    "scope_path",
     "serves_outlet_ids"
    ]
   },
@@ -18838,6 +18906,7 @@
     "view_box"
    ],
    "seating.section": [
+    "boundary",
     "code",
     "id",
     "name",
@@ -18886,6 +18955,7 @@
     "view_box"
    ],
    "seating.section": [
+    "boundary",
     "code",
     "id",
     "name",
@@ -18941,6 +19011,7 @@
     "view_box"
    ],
    "seating.section": [
+    "boundary",
     "code",
     "id",
     "name",
@@ -18997,6 +19068,7 @@
     "view_box"
    ],
    "seating.section": [
+    "boundary",
     "code",
     "id",
     "name",
@@ -19051,6 +19123,7 @@
     "view_box"
    ],
    "seating.section": [
+    "boundary",
     "code",
     "id",
     "name",
@@ -19092,6 +19165,7 @@
     "is_active",
     "position",
     "row_label",
+    "scope_path",
     "seat_map_id",
     "seat_number",
     "section_code"
@@ -19428,6 +19502,7 @@
     "effective_to",
     "id",
     "list_price",
+    "scope_path",
     "seat_category_id"
    ]
   }
@@ -19480,6 +19555,7 @@
     "effective_to",
     "id",
     "list_price",
+    "scope_path",
     "seat_category_id"
    ]
   }
@@ -19788,7 +19864,7 @@
     "buffer_seats",
     "id",
     "max_party_size",
-    "prevent_orphan_seats",
+    "prevents_orphan_seats",
     "require_contiguous",
     "seat_map_id"
    ]
@@ -19828,7 +19904,7 @@
     "buffer_seats",
     "id",
     "max_party_size",
-    "prevent_orphan_seats",
+    "prevents_orphan_seats",
     "require_contiguous",
     "seat_map_id"
    ]
@@ -21362,6 +21438,7 @@
     "contact_email",
     "contact_name",
     "contact_phone",
+    "contacts",
     "currency",
     "id",
     "is_active",
@@ -21409,6 +21486,7 @@
     "contact_email",
     "contact_name",
     "contact_phone",
+    "contacts",
     "currency",
     "id",
     "is_active",
@@ -23273,7 +23351,7 @@
     "collect_by",
     "collected_at",
     "collected_by_principal_id",
-    "collection_point_id",
+    "collection_location_id",
     "collection_point_name",
     "drop_reference",
     "dropped_at",
@@ -23324,7 +23402,7 @@
     "collect_by",
     "collected_at",
     "collected_by_principal_id",
-    "collection_point_id",
+    "collection_location_id",
     "collection_point_name",
     "drop_reference",
     "dropped_at",
@@ -23379,7 +23457,7 @@
     "collect_by",
     "collected_at",
     "collected_by_principal_id",
-    "collection_point_id",
+    "collection_location_id",
     "collection_point_name",
     "drop_reference",
     "dropped_at",
@@ -24140,6 +24218,7 @@
     "labour_cost",
     "location_description",
     "net_cost_amount",
+    "parts",
     "parts_cost",
     "priority",
     "priority_score",
@@ -24158,6 +24237,7 @@
     "status",
     "superseded_by_work_order_id",
     "synced_at",
+    "time_entries",
     "title",
     "venue_id",
     "verification_note",
@@ -24359,6 +24439,7 @@
     "labour_cost",
     "location_description",
     "net_cost_amount",
+    "parts",
     "parts_cost",
     "priority",
     "priority_score",
@@ -24377,6 +24458,7 @@
     "status",
     "superseded_by_work_order_id",
     "synced_at",
+    "time_entries",
     "title",
     "venue_id",
     "verification_note",
@@ -25079,7 +25161,6 @@
     "corrective_work_order_id",
     "description",
     "escalation",
-    "first_aid_given",
     "id",
     "incident_number",
     "investigation_note",
@@ -25098,6 +25179,7 @@
     "status",
     "synced_at",
     "venue_id",
+    "was_first_aid_given",
     "witness_count"
    ],
    "maintenance.incident_authority_notification": [
@@ -26315,7 +26397,7 @@
     "owner_principal_id",
     "parameters",
     "report_id",
-    "skip_if_empty"
+    "skips_if_empty"
    ],
    "reporting.schedule_recipient": [
     "address",
@@ -26370,7 +26452,7 @@
     "owner_principal_id",
     "parameters",
     "report_id",
-    "skip_if_empty"
+    "skips_if_empty"
    ],
    "reporting.schedule_recipient": [
     "address",
@@ -26425,7 +26507,7 @@
     "owner_principal_id",
     "parameters",
     "report_id",
-    "skip_if_empty"
+    "skips_if_empty"
    ],
    "reporting.schedule_recipient": [
     "address",
@@ -27873,8 +27955,8 @@
   "readColumns": {
    "control.upgrade_schedule": [
     "deferral_reason",
-    "deferred_by_tenant",
     "id",
+    "is_deferred_by_tenant",
     "max_deferral_until",
     "notified_at",
     "release_version",
@@ -27913,8 +27995,8 @@
   "readColumns": {
    "control.upgrade_schedule": [
     "deferral_reason",
-    "deferred_by_tenant",
     "id",
+    "is_deferred_by_tenant",
     "max_deferral_until",
     "notified_at",
     "release_version",
@@ -29596,6 +29678,7 @@
     "trace_id"
    ],
    "ai.proposed_action": [
+    "activity_id",
     "approval_level",
     "approval_request_id",
     "change_set_hash",
@@ -29604,7 +29687,6 @@
     "decision_reason",
     "expires_at",
     "id",
-    "interaction_id",
     "kind",
     "payload",
     "plan_id",
@@ -30071,6 +30153,7 @@
   ],
   "readColumns": {
    "ai.proposed_action": [
+    "activity_id",
     "approval_level",
     "approval_request_id",
     "change_set_hash",
@@ -30079,7 +30162,6 @@
     "decision_reason",
     "expires_at",
     "id",
-    "interaction_id",
     "kind",
     "payload",
     "plan_id",
@@ -30127,6 +30209,7 @@
   "lineageNote": "Tier 2 and matrix-caught actions call approvals.evaluateApprovalRequirement and approvals.createApprovalRequest through the API.",
   "readColumns": {
    "ai.proposed_action": [
+    "activity_id",
     "approval_level",
     "approval_request_id",
     "change_set_hash",
@@ -30135,7 +30218,6 @@
     "decision_reason",
     "expires_at",
     "id",
-    "interaction_id",
     "kind",
     "payload",
     "plan_id",
@@ -30202,9 +30284,10 @@
     "credential_hint",
     "credential_ref",
     "credential_rotated_at",
-    "degrade_gracefully",
+    "degrades_gracefully",
     "endpoint",
     "failover_provider_id",
+    "fitness_warnings",
     "id",
     "is_active",
     "is_stateless_only",
@@ -30266,9 +30349,10 @@
     "credential_hint",
     "credential_ref",
     "credential_rotated_at",
-    "degrade_gracefully",
+    "degrades_gracefully",
     "endpoint",
     "failover_provider_id",
+    "fitness_warnings",
     "id",
     "is_active",
     "is_stateless_only",
@@ -30314,8 +30398,8 @@
    "ai.policy": [
     "allowed_role_ids",
     "autonomy_overrides",
-    "cache_answers",
     "cache_ttl_minutes",
+    "caches_answers",
     "cascade",
     "ceiling_behaviour",
     "ceiling_behaviour_by_capability",
@@ -30324,8 +30408,8 @@
     "enabled_capabilities",
     "fallback_provider_id",
     "global_endpoint_exclusions",
-    "guardrail_short_circuit",
     "guest_capability_scope",
+    "has_guardrail_short_circuit",
     "hnsw",
     "id",
     "masked_fields",
@@ -30376,8 +30460,8 @@
    "ai.policy": [
     "allowed_role_ids",
     "autonomy_overrides",
-    "cache_answers",
     "cache_ttl_minutes",
+    "caches_answers",
     "cascade",
     "ceiling_behaviour",
     "ceiling_behaviour_by_capability",
@@ -30386,8 +30470,8 @@
     "enabled_capabilities",
     "fallback_provider_id",
     "global_endpoint_exclusions",
-    "guardrail_short_circuit",
     "guest_capability_scope",
+    "has_guardrail_short_circuit",
     "hnsw",
     "id",
     "masked_fields",
@@ -30434,7 +30518,6 @@
   "readColumns": {
    "queue.queue": [
     "access_point_id",
-    "accessibility_priority",
     "allowed_access_point_ids",
     "asset_id",
     "attraction_product_id",
@@ -30445,7 +30528,7 @@
     "entitlement_product_ids",
     "expected_reopen_at",
     "fast_pass_allocation_percent",
-    "fast_pass_id",
+    "has_accessibility_priority",
     "height_requirement_cm",
     "id",
     "is_in_queue_offer_enabled",
@@ -30511,7 +30594,6 @@
   "readColumns": {
    "queue.queue": [
     "access_point_id",
-    "accessibility_priority",
     "allowed_access_point_ids",
     "asset_id",
     "attraction_product_id",
@@ -30522,7 +30604,7 @@
     "entitlement_product_ids",
     "expected_reopen_at",
     "fast_pass_allocation_percent",
-    "fast_pass_id",
+    "has_accessibility_priority",
     "height_requirement_cm",
     "id",
     "is_in_queue_offer_enabled",
@@ -30582,7 +30664,6 @@
   "readColumns": {
    "queue.queue": [
     "access_point_id",
-    "accessibility_priority",
     "allowed_access_point_ids",
     "asset_id",
     "attraction_product_id",
@@ -30593,7 +30674,7 @@
     "entitlement_product_ids",
     "expected_reopen_at",
     "fast_pass_allocation_percent",
-    "fast_pass_id",
+    "has_accessibility_priority",
     "height_requirement_cm",
     "id",
     "is_in_queue_offer_enabled",
@@ -30662,7 +30743,6 @@
   "readColumns": {
    "queue.queue": [
     "access_point_id",
-    "accessibility_priority",
     "allowed_access_point_ids",
     "asset_id",
     "attraction_product_id",
@@ -30673,7 +30753,7 @@
     "entitlement_product_ids",
     "expected_reopen_at",
     "fast_pass_allocation_percent",
-    "fast_pass_id",
+    "has_accessibility_priority",
     "height_requirement_cm",
     "id",
     "is_in_queue_offer_enabled",
@@ -30738,7 +30818,6 @@
   "readColumns": {
    "queue.queue": [
     "access_point_id",
-    "accessibility_priority",
     "allowed_access_point_ids",
     "asset_id",
     "attraction_product_id",
@@ -30749,7 +30828,7 @@
     "entitlement_product_ids",
     "expected_reopen_at",
     "fast_pass_allocation_percent",
-    "fast_pass_id",
+    "has_accessibility_priority",
     "height_requirement_cm",
     "id",
     "is_in_queue_offer_enabled",
@@ -31714,6 +31793,7 @@
     "points_awarded",
     "points_balance",
     "recorded_at",
+    "scope_path",
     "synced_at"
    ]
   }
@@ -32005,6 +32085,7 @@
     "id",
     "is_enabled",
     "requirement",
+    "scope_path",
     "settings",
     "sort_order",
     "step_key"
@@ -33562,6 +33643,7 @@
     "id",
     "is_current",
     "note",
+    "pending_build_time_changes",
     "published_at",
     "published_by_name",
     "published_by_principal_id",
@@ -33601,6 +33683,7 @@
     "id",
     "is_current",
     "note",
+    "pending_build_time_changes",
     "published_at",
     "published_by_name",
     "published_by_principal_id",
@@ -33682,6 +33765,7 @@
     "id",
     "is_enabled",
     "requirement",
+    "scope_path",
     "settings",
     "sort_order",
     "step_key"
@@ -34116,6 +34200,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -34123,8 +34208,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -34158,7 +34242,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -34210,6 +34294,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -34217,8 +34302,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -34252,7 +34336,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -34411,6 +34495,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -34418,8 +34503,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -34453,7 +34537,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -34507,6 +34591,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -34514,8 +34599,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -34549,7 +34633,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -34600,6 +34684,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -34607,8 +34692,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -34642,7 +34726,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -34690,6 +34774,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -34697,8 +34782,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -34732,7 +34816,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -36896,9 +36980,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -37035,6 +37119,7 @@
     "beneficiary",
     "channels",
     "description",
+    "fixed_amounts",
     "id",
     "is_active",
     "liability_account_id",
@@ -37081,6 +37166,7 @@
     "beneficiary",
     "channels",
     "description",
+    "fixed_amounts",
     "id",
     "is_active",
     "liability_account_id",
@@ -37133,6 +37219,7 @@
     "beneficiary",
     "channels",
     "description",
+    "fixed_amounts",
     "id",
     "is_active",
     "liability_account_id",
@@ -37804,9 +37891,9 @@
     "rate_mode",
     "refund_conditions",
     "renewal_notice_days",
-    "renewal_requires_approval",
     "renewal_type",
     "requires_approval_above_value",
+    "requires_renewal_approval",
     "sales_target",
     "scope_path",
     "segment_tier",
@@ -37900,9 +37987,9 @@
     "rate_mode",
     "refund_conditions",
     "renewal_notice_days",
-    "renewal_requires_approval",
     "renewal_type",
     "requires_approval_above_value",
+    "requires_renewal_approval",
     "sales_target",
     "scope_path",
     "segment_tier",
@@ -37999,9 +38086,9 @@
     "rate_mode",
     "refund_conditions",
     "renewal_notice_days",
-    "renewal_requires_approval",
     "renewal_type",
     "requires_approval_above_value",
+    "requires_renewal_approval",
     "sales_target",
     "scope_path",
     "segment_tier",
@@ -38571,6 +38658,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -38840,7 +38928,26 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "readColumns": {
+   "retail.reservation": [
+    "collected_at",
+    "collection_note",
+    "expires_at",
+    "id",
+    "outlet_id",
+    "reservation_number",
+    "status",
+    "subject_id"
+   ],
+   "retail.reservation_line": [
+    "id",
+    "merchandise_id",
+    "name",
+    "quantity",
+    "reservation_id"
+   ]
+  }
  },
  "cancelMerchandiseReservation": {
   "contract": "retail",
@@ -38870,7 +38977,26 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "readColumns": {
+   "retail.reservation": [
+    "collected_at",
+    "collection_note",
+    "expires_at",
+    "id",
+    "outlet_id",
+    "reservation_number",
+    "status",
+    "subject_id"
+   ],
+   "retail.reservation_line": [
+    "id",
+    "merchandise_id",
+    "name",
+    "quantity",
+    "reservation_id"
+   ]
+  }
  },
  "disposeShopAndDrop": {
   "contract": "retail",
@@ -38898,7 +39024,34 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "readColumns": {
+   "retail.shop_and_drop": [
+    "collect_by",
+    "collected_at",
+    "collected_by_principal_id",
+    "collection_location_id",
+    "collection_point_name",
+    "drop_reference",
+    "dropped_at",
+    "entitlement_id",
+    "id",
+    "order_id",
+    "sale_id",
+    "status",
+    "subject_id",
+    "verified_by"
+   ],
+   "retail.shop_and_drop_line": [
+    "collected_quantity",
+    "id",
+    "line_id",
+    "merchandise_id",
+    "name",
+    "quantity",
+    "shop_and_drop_id"
+   ]
+  }
  },
  "skipRolloutCell": {
   "contract": "platform-ops",
@@ -38927,7 +39080,25 @@
   ],
   "audience": [
    "staff"
-  ]
+  ],
+  "readColumns": {
+   "control.rollout_cell": [
+    "cell_id",
+    "cell_name",
+    "completed_at",
+    "country_code",
+    "error",
+    "from_version",
+    "id",
+    "is_canary",
+    "region_name",
+    "rollout_id",
+    "started_at",
+    "status",
+    "to_version",
+    "wave"
+   ]
+  }
  },
  "voidVoucher": {
   "contract": "promotions",
@@ -39002,6 +39173,7 @@
     "expected_amount",
     "id",
     "opening_float",
+    "recorded_at",
     "shift_id",
     "status",
     "variance_amount",
@@ -39077,6 +39249,7 @@
     "expected_amount",
     "id",
     "opening_float",
+    "recorded_at",
     "shift_id",
     "status",
     "variance_amount",
@@ -39153,6 +39326,7 @@
     "expected_amount",
     "id",
     "opening_float",
+    "recorded_at",
     "shift_id",
     "status",
     "variance_amount",
@@ -39226,6 +39400,7 @@
     "expected_amount",
     "id",
     "opening_float",
+    "recorded_at",
     "shift_id",
     "status",
     "variance_amount",
@@ -39293,6 +39468,7 @@
     "expected_amount",
     "id",
     "opening_float",
+    "recorded_at",
     "shift_id",
     "status",
     "variance_amount",
@@ -39402,9 +39578,10 @@
     "credential_hint",
     "credential_ref",
     "credential_rotated_at",
-    "degrade_gracefully",
+    "degrades_gracefully",
     "endpoint",
     "failover_provider_id",
+    "fitness_warnings",
     "id",
     "is_active",
     "is_stateless_only",
@@ -39503,7 +39680,7 @@
     "venue_id"
    ],
    "marketing.conversation_message": [
-    "ai_interaction_id",
+    "ai_activity_id",
     "body",
     "conversation_id",
     "id",
@@ -39576,7 +39753,7 @@
     "venue_id"
    ],
    "marketing.conversation_message": [
-    "ai_interaction_id",
+    "ai_activity_id",
     "body",
     "conversation_id",
     "id",
@@ -39636,7 +39813,7 @@
   ],
   "readColumns": {
    "marketing.conversation_message": [
-    "ai_interaction_id",
+    "ai_activity_id",
     "body",
     "conversation_id",
     "id",
@@ -39708,7 +39885,7 @@
     "venue_id"
    ],
    "marketing.conversation_message": [
-    "ai_interaction_id",
+    "ai_activity_id",
     "body",
     "conversation_id",
     "id",
@@ -39779,7 +39956,7 @@
     "venue_id"
    ],
    "marketing.conversation_message": [
-    "ai_interaction_id",
+    "ai_activity_id",
     "body",
     "conversation_id",
     "id",
@@ -39850,7 +40027,7 @@
     "venue_id"
    ],
    "marketing.conversation_message": [
-    "ai_interaction_id",
+    "ai_activity_id",
     "body",
     "conversation_id",
     "id",
@@ -39928,7 +40105,7 @@
     "venue_id"
    ],
    "marketing.conversation_message": [
-    "ai_interaction_id",
+    "ai_activity_id",
     "body",
     "conversation_id",
     "id",
@@ -40021,6 +40198,7 @@
   ],
   "readColumns": {
    "marketing.kiosk_assist_session": [
+    "actions_taken",
     "cart_id",
     "device_id",
     "ended_at",
@@ -40074,6 +40252,7 @@
   ],
   "readColumns": {
    "marketing.kiosk_assist_session": [
+    "actions_taken",
     "cart_id",
     "device_id",
     "ended_at",
@@ -40474,7 +40653,6 @@
    "catalogue.product": [
     "approved_by_principal_id",
     "attraction_id",
-    "blocked_offline",
     "booking_flow_id",
     "brand_id",
     "business_unit_id",
@@ -40487,12 +40665,14 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_tags",
     "entitlement_template_id",
     "event_id",
     "family_key",
     "guest_listing",
     "has_variants",
     "id",
+    "is_blocked_offline",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -40702,7 +40882,6 @@
    "catalogue.product": [
     "approved_by_principal_id",
     "attraction_id",
-    "blocked_offline",
     "booking_flow_id",
     "brand_id",
     "business_unit_id",
@@ -40715,12 +40894,14 @@
     "data_mask_values",
     "description",
     "description_localised",
+    "display_tags",
     "entitlement_template_id",
     "event_id",
     "family_key",
     "guest_listing",
     "has_variants",
     "id",
+    "is_blocked_offline",
     "is_sellable",
     "is_stock_tracked",
     "kind",
@@ -40938,6 +41119,7 @@
     "direction",
     "error_count",
     "file_id",
+    "findings",
     "id",
     "job_kind",
     "missing_references",
@@ -41003,6 +41185,7 @@
     "direction",
     "error_count",
     "file_id",
+    "findings",
     "id",
     "job_kind",
     "missing_references",
@@ -41426,7 +41609,24 @@
     "route": "in-process",
     "for": "its read of identity.principal, Identity's data (CHG-MOD-001)"
    }
-  ]
+  ],
+  "readColumns": {
+   "orders.invitation": [
+    "cost_center_id",
+    "entitlement_ids",
+    "id",
+    "issued_at",
+    "issued_by_principal_id",
+    "offered_by_principal_id",
+    "performance_id",
+    "product_id",
+    "quantity",
+    "reason",
+    "recipient_email",
+    "recipient_name",
+    "scope_path"
+   ]
+  }
  },
  "listInvitationAllowances": {
   "contract": "orders",
@@ -41459,6 +41659,7 @@
     "remaining",
     "requires_approval_above",
     "role_id",
+    "scope_path",
     "used"
    ]
   },
@@ -41816,11 +42017,14 @@
     "venue_id"
    ],
    "venuemap.path": [
+    "closed_note",
     "closed_reason",
     "distance_metres",
+    "expected_reopen_at",
     "from_point_id",
     "geometry",
     "id",
+    "is_closed",
     "is_indoor",
     "is_step_free",
     "map_id",
@@ -41828,6 +42032,7 @@
     "to_point_id"
    ],
    "venuemap.placed_resource": [
+    "boundary",
     "capacity",
     "id",
     "is_bookable",
@@ -41854,6 +42059,7 @@
     "is_step_free",
     "kind",
     "map_id",
+    "media",
     "name",
     "name_localised",
     "opening_hours",
@@ -41896,6 +42102,7 @@
   ],
   "readColumns": {
    "venuemap.import_job": [
+    "findings",
     "hand_marked_paths",
     "id",
     "layers_found",
@@ -41907,6 +42114,7 @@
     "outcome",
     "resource_rows_joined",
     "resources_found",
+    "scope_path",
     "shapes_found",
     "status",
     "unmapped_layers"
@@ -42007,6 +42215,7 @@
     "is_step_free",
     "kind",
     "map_id",
+    "media",
     "name",
     "name_localised",
     "opening_hours",
@@ -42190,6 +42399,7 @@
     "is_step_free",
     "kind",
     "map_id",
+    "media",
     "name",
     "name_localised",
     "opening_hours",
@@ -42314,11 +42524,14 @@
   },
   "readColumns": {
    "venuemap.path": [
+    "closed_note",
     "closed_reason",
     "distance_metres",
+    "expected_reopen_at",
     "from_point_id",
     "geometry",
     "id",
+    "is_closed",
     "is_indoor",
     "is_step_free",
     "map_id",
@@ -42591,12 +42804,17 @@
     "cleaning_policy",
     "code",
     "deposit_amount",
+    "disposal",
     "id",
     "is_active",
     "kind",
+    "lifecycle_effective_from",
+    "lifecycle_reason",
+    "lifecycle_state",
     "name",
     "parent_resource_id",
     "principal_id",
+    "replacement_resource_id",
     "requires_qualification",
     "resource_type_id",
     "scope_path",
@@ -42640,12 +42858,17 @@
     "cleaning_policy",
     "code",
     "deposit_amount",
+    "disposal",
     "id",
     "is_active",
     "kind",
+    "lifecycle_effective_from",
+    "lifecycle_reason",
+    "lifecycle_state",
     "name",
     "parent_resource_id",
     "principal_id",
+    "replacement_resource_id",
     "requires_qualification",
     "resource_type_id",
     "scope_path",
@@ -42719,6 +42942,7 @@
   "lineageNote": "adds resources.selection_policy: with orderId, the order line ticket type's policy decides whether a named resourceId is honoured (guestMayChoose) or ignored (autoAssign); resource_hold read as the live-hold conflict the description already states (amend by hand)",
   "readColumns": {
    "resources.booking": [
+    "change_reason",
     "checked_out_at",
     "condition_in",
     "condition_out",
@@ -42779,6 +43003,7 @@
     "id"
    ],
    "resources.booking": [
+    "change_reason",
     "checked_out_at",
     "condition_in",
     "condition_out",
@@ -42842,6 +43067,7 @@
   ],
   "readColumns": {
    "resources.booking": [
+    "change_reason",
     "checked_out_at",
     "condition_in",
     "condition_out",
@@ -43175,7 +43401,7 @@
     "scope_path",
     "supported_currencies",
     "supported_methods",
-    "supports3ds",
+    "supports_3ds",
     "supports_partial_capture",
     "supports_tokenisation",
     "terminal"
@@ -43222,7 +43448,7 @@
     "scope_path",
     "supported_currencies",
     "supported_methods",
-    "supports3ds",
+    "supports_3ds",
     "supports_partial_capture",
     "supports_tokenisation",
     "terminal"
@@ -43369,7 +43595,7 @@
     "issued_by_principal_id",
     "order_id",
     "paid_at",
-    "release_hold_on_expiry",
+    "releases_reservation_on_expiry",
     "resend_count",
     "reservation_id",
     "scope_path",
@@ -44489,6 +44715,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -44603,6 +44830,7 @@
     "id",
     "posted_at",
     "posted_by_principal_id",
+    "posting_date",
     "reference",
     "rejected_at",
     "rejected_by_principal_id",
@@ -45449,10 +45677,10 @@
     "hreflang",
     "id",
     "is_auto_generated",
+    "is_excluded_from_index",
     "keywords",
     "locale",
     "meta_description",
-    "no_index",
     "open_graph",
     "schema_org_type",
     "scope_path",
@@ -45893,7 +46121,7 @@
   "readColumns": {
    "identity.password_policy": [
     "device_restriction",
-    "force_change_on_first_logon",
+    "forces_change_on_first_logon",
     "id",
     "lockout_after_attempts",
     "lockout_minutes",
@@ -45942,12 +46170,12 @@
    "identity.segregation_rule": [
     "allow_with_compensating_control",
     "id",
+    "is_scope_sensitive",
     "name",
     "permission_a",
     "permission_b",
     "rationale",
     "scope_path",
-    "scope_sensitive",
     "severity"
    ]
   }
@@ -46078,6 +46306,7 @@
     "id",
     "label",
     "promotion_id",
+    "scope_path",
     "traffic_percent"
    ]
   }
@@ -46383,7 +46612,8 @@
     "last_used_at",
     "name",
     "scopes",
-    "status"
+    "status",
+    "status_reason"
    ]
   }
  },
@@ -46433,7 +46663,8 @@
     "last_used_at",
     "name",
     "scopes",
-    "status"
+    "status",
+    "status_reason"
    ]
   }
  },
@@ -46883,6 +47114,7 @@
   "readColumns": {
    "control.api_version": [
     "active_client_count",
+    "changes",
     "deprecated_at",
     "id",
     "migration_guide_url",
@@ -46925,6 +47157,7 @@
   "readColumns": {
    "control.api_version": [
     "active_client_count",
+    "changes",
     "deprecated_at",
     "id",
     "migration_guide_url",
@@ -47304,9 +47537,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -47504,10 +47737,16 @@
   "guestCallable": true,
   "readColumns": {
    "marketing.invitation": [
+    "campaign_id",
     "entitlement_ids",
     "id",
+    "plus_ones",
     "recipient_email",
-    "scope_path"
+    "responded_at",
+    "scope_path",
+    "status",
+    "subject_id",
+    "token"
    ]
   },
   "readVia": [
@@ -48063,16 +48302,16 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
    "orders.payment_link": [
     "expires_at",
     "id",
-    "release_hold_on_expiry",
+    "releases_reservation_on_expiry",
     "status",
     "token"
    ]
@@ -48163,7 +48402,7 @@
     "issued_by_principal_id",
     "order_id",
     "paid_at",
-    "release_hold_on_expiry",
+    "releases_reservation_on_expiry",
     "resend_count",
     "reservation_id",
     "scope_path",
@@ -48720,6 +48959,7 @@
     "id",
     "is_active",
     "kind",
+    "scope_path",
     "sort_order"
    ]
   },
@@ -48792,6 +49032,7 @@
     "outcome",
     "recorded_at",
     "recorded_by_principal_id",
+    "scope_path",
     "value_celsius"
    ]
   }
@@ -48832,6 +49073,7 @@
     "id",
     "is_supplier_claim_raised",
     "recorded_at",
+    "scope_path",
     "threshold_celsius",
     "transfer_id",
     "value_celsius"
@@ -49028,6 +49270,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -49147,6 +49390,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -49279,6 +49523,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -49811,6 +50056,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ],
    "fnb.menu_section": [
@@ -49896,6 +50142,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ],
    "fnb.menu_section": [
@@ -50114,6 +50361,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -50269,6 +50517,7 @@
     "id",
     "merged_from_visit_ids",
     "merged_into_visit_id",
+    "note",
     "opened_at",
     "outlet_id",
     "running_total",
@@ -50391,6 +50640,7 @@
     "outlet_id",
     "raised_at",
     "raised_by_principal_id",
+    "scope_path",
     "station_id",
     "ticket_id"
    ]
@@ -50824,7 +51074,8 @@
     "list_price",
     "name",
     "name_localised",
-    "outlet_id"
+    "outlet_id",
+    "scope_path"
    ],
    "fnb.combo_slot": [
     "combo_id",
@@ -50832,6 +51083,7 @@
     "max_select",
     "min_select",
     "name",
+    "scope_path",
     "sort_order"
    ],
    "fnb.combo_slot_option": [
@@ -50888,7 +51140,8 @@
     "list_price",
     "name",
     "name_localised",
-    "outlet_id"
+    "outlet_id",
+    "scope_path"
    ],
    "fnb.combo_slot": [
     "combo_id",
@@ -50896,6 +51149,7 @@
     "max_select",
     "min_select",
     "name",
+    "scope_path",
     "sort_order"
    ],
    "fnb.combo_slot_option": [
@@ -50964,6 +51218,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ]
   }
@@ -51086,12 +51341,12 @@
     "author_principal_id",
     "id",
     "is_allergy",
+    "is_visible_to_server",
     "kind",
     "recorded_at",
     "subject_id",
     "synced_at",
-    "text",
-    "visible_to_server"
+    "text"
    ]
   }
  },
@@ -51182,6 +51437,7 @@
     "is_out_of_service",
     "label",
     "position",
+    "scope_path",
     "shape",
     "zone"
    ]
@@ -51233,6 +51489,7 @@
     "is_out_of_service",
     "label",
     "position",
+    "scope_path",
     "shape",
     "zone"
    ]
@@ -51896,6 +52153,7 @@
     "id",
     "outlet_id",
     "released_run_ids",
+    "scope_path",
     "status"
    ],
    "fnb.production_plan_line": [
@@ -51951,6 +52209,7 @@
     "id",
     "outlet_id",
     "released_run_ids",
+    "scope_path",
     "status"
    ],
    "fnb.production_plan_line": [
@@ -52115,6 +52374,7 @@
     "contact_email",
     "contact_name",
     "contact_phone",
+    "contacts",
     "currency",
     "id",
     "is_active",
@@ -52369,6 +52629,7 @@
     "is_internal",
     "recorded_at",
     "resolution",
+    "scope_path",
     "synced_at"
    ]
   }
@@ -52584,9 +52845,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -52915,6 +53176,7 @@
     "view_box"
    ],
    "seating.section": [
+    "boundary",
     "code",
     "id",
     "name",
@@ -53643,6 +53905,7 @@
     "id",
     "issued_at",
     "revoked_reason",
+    "scope_path",
     "state",
     "zones"
    ]
@@ -53678,6 +53941,7 @@
     "id",
     "issued_at",
     "revoked_reason",
+    "scope_path",
     "state",
     "zones"
    ]
@@ -54988,6 +55252,7 @@
     "approval_request_id",
     "change_set_id",
     "id",
+    "items",
     "publish_at",
     "published_at",
     "scope_path",
@@ -55218,6 +55483,7 @@
     "effective_to",
     "form_id",
     "form_version",
+    "history",
     "id",
     "is_suspended",
     "lifecycle_status",
@@ -58674,7 +58940,6 @@
     "channel",
     "communication_id",
     "decision",
-    "email_preference",
     "evaluated_at",
     "id",
     "is_contact_restricted",
@@ -58682,13 +58947,14 @@
     "language",
     "marketing_consent",
     "message_class",
-    "push_preference",
+    "prefers_email",
+    "prefers_push",
+    "prefers_sms",
+    "prefers_whatsapp",
     "reasons",
     "rerouted_to_channel",
-    "sms_preference",
     "subject_id",
-    "suppression_reason",
-    "whatsapp_preference"
+    "suppression_reason"
    ]
   }
  },
@@ -58761,7 +59027,7 @@
     "exception_queue_id",
     "executions_last30_days",
     "id",
-    "kill_switch",
+    "is_kill_switch_engaged",
     "last_simulation",
     "level",
     "name",
@@ -58826,16 +59092,19 @@
    "marketing.cookie_banner_design": [
     "body",
     "brand_id",
+    "buttons",
+    "categories",
     "channel",
     "id",
     "inherits_from_id",
+    "is_reject_one_click",
     "languages",
+    "links",
     "logo_asset_id",
     "notice_version",
     "position",
-    "record_ip_address",
+    "records_ip_address",
     "regulatory_regimes",
-    "reject_is_one_click",
     "scope_path",
     "status",
     "theme_id",
@@ -60052,13 +60321,13 @@
   ],
   "readColumns": {
    "marketing.privacy_request": [
-    "at_risk",
     "case_id",
     "completed_at",
     "days_remaining",
     "dsar_request_id",
     "due_at",
     "id",
+    "is_at_risk",
     "is_deadline_configured",
     "is_escalated",
     "jurisdiction",
@@ -60123,6 +60392,7 @@
     "scope_path",
     "status",
     "subject_id",
+    "system_results",
     "updated_at"
    ]
   }
@@ -60906,13 +61176,7 @@
    "postgres",
    "redis"
   ],
-  "lineageNote": "one row per access.edge_package version; devices count is the length of deviceIds",
-  "readColumns": {
-   "access.edge_package": [
-    "id",
-    "package_complete"
-   ]
-  }
+  "lineageNote": "one row per access.edge_package version; devices count is the length of deviceIds"
  },
  "listEdgeSecurityDeployment": {
   "contract": "access",
@@ -66971,18 +67235,21 @@
     "acknowledged_at",
     "agent_comment",
     "agent_principal_id",
+    "ai_findings",
     "case_id",
+    "coaching_actions",
     "conversation_id",
+    "criteria",
     "critical_failures",
     "evaluated_at",
     "evaluated_by",
     "evaluator_principal_id",
     "feedback",
     "id",
+    "is_sla_met",
     "overall_score",
     "resolution_seconds",
     "scope_path",
-    "sla_met",
     "source_type",
     "status",
     "updated_at"
@@ -68275,15 +68542,16 @@
     "brand_id",
     "channel",
     "channel_fallback",
-    "cost_aware",
     "country",
     "id",
     "is_active",
+    "is_cost_aware",
     "message_class",
     "priority_class",
+    "providers",
     "recipient_type",
     "scope_path",
-    "skip_unhealthy_providers",
+    "skips_unhealthy_providers",
     "throttle",
     "updated_at"
    ]
@@ -68678,6 +68946,13 @@
     "updated_at",
     "used_at",
     "valid_until"
+   ],
+   "marketing.waiver_requirement": [
+    "group_booking_id",
+    "id",
+    "order_id",
+    "participant_subject_id",
+    "ticket_id"
    ]
   }
  },
@@ -69806,6 +70081,7 @@
     "id"
    ],
    "marketing.waiver_signature": [
+    "form_definition_id",
     "id",
     "status"
    ],
@@ -70318,10 +70594,12 @@
    "marketing.waiver_trigger_rule": [
     "allow_staff_override",
     "completion_deadline",
+    "eligibility",
     "enforcement",
     "form_id",
     "id",
     "name",
+    "reminders",
     "scope_path",
     "status",
     "trigger_point",
@@ -71008,8 +71286,8 @@
     "rate_mode",
     "refund_conditions",
     "renewal_notice_days",
-    "renewal_requires_approval",
     "renewal_type",
+    "requires_renewal_approval",
     "sales_target",
     "settlement_currency",
     "settlement_terms",
@@ -71603,8 +71881,9 @@
     "languages",
     "publication_status",
     "scope_path",
-    "skip_if_current_version_accepted",
+    "skips_if_current_version_accepted",
     "status",
+    "steps",
     "updated_at",
     "version"
    ]
@@ -71719,7 +71998,7 @@
     "is_enabled",
     "knowledge_collection_ids",
     "pattern_detection",
-    "reply_in_customer_language",
+    "replies_in_customer_language",
     "scope_level",
     "scope_path",
     "updated_at"
@@ -71752,10 +72031,12 @@
   ],
   "readColumns": {
    "marketing.privacy_export_package": [
+    "corrections",
     "discovered_at",
     "export_package",
     "id",
     "request_id",
+    "results",
     "scope_path",
     "updated_at"
    ]
@@ -71923,6 +72204,7 @@
     "form_version",
     "id",
     "scope_path",
+    "sections",
     "status",
     "updated_at"
    ]
@@ -72514,6 +72796,7 @@
    "marketing.case_routing_rule": [
     "code",
     "fallback_queue_id",
+    "has_sticky_ownership",
     "id",
     "is_active",
     "match",
@@ -72523,9 +72806,8 @@
     "rank",
     "require_language_match",
     "required_skills",
-    "respect_sla_capability",
+    "respects_sla_capability",
     "scope_path",
-    "sticky_ownership",
     "sticky_window_hours",
     "strategy",
     "updated_at"
@@ -72592,6 +72874,7 @@
     "form_id",
     "form_version",
     "id",
+    "languages",
     "scope_path",
     "source_language",
     "updated_at"
@@ -72864,10 +73147,10 @@
     "guardian_verification_methods",
     "id",
     "minor_below_age",
-    "restrict_marketing",
-    "restrict_personalisation",
-    "restrict_tracking",
     "restricted_processing_purpose_codes",
+    "restricts_marketing",
+    "restricts_personalisation",
+    "restricts_tracking",
     "scope_path",
     "updated_at",
     "version"
@@ -73187,10 +73470,10 @@
     "event_portfolio",
     "id",
     "is_authorized",
+    "is_seasonal_scope",
     "market",
     "partner_id",
     "scope_exclusions",
-    "seasonal_scope",
     "start_date",
     "venue_id"
    ]
@@ -73309,6 +73592,7 @@
     "event_id",
     "id",
     "is_manual_override_allowed",
+    "is_seasonal_rate",
     "margin_floor",
     "market",
     "max_discount_percent",
@@ -73321,7 +73605,6 @@
     "pricing_profile_id",
     "product_family",
     "product_id",
-    "seasonal_rate",
     "ticket_type",
     "venue_id"
    ]
@@ -73387,8 +73670,8 @@
     "agreement_id",
     "allowed_payment_methods",
     "billing_contact_id",
-    "consolidated_billing",
     "finance_email",
+    "has_consolidated_billing",
     "id",
     "invoice_frequency",
     "invoice_grouping",
@@ -74232,13 +74515,13 @@
    "marketing.waiver_signatory_rule": [
     "acceptance_method",
     "allowed_signatories",
-    "capture_relationship",
+    "captures_relationship",
     "co_signature",
     "form_id",
     "form_version",
     "group_signing_modes",
-    "guardian_signs_for_each_minor",
     "guardian_threshold_age",
+    "guardian_threshold_by_country",
     "id",
     "identity_verification",
     "is_initials_required",
@@ -74248,6 +74531,7 @@
     "primary_signatory",
     "recorded_evidence",
     "requires_guardian_for_minors",
+    "requires_guardian_signature_per_minor",
     "scope_path",
     "updated_at"
    ]
@@ -75631,6 +75915,7 @@
    "catalogue.channel_envelope": [
     "allocated_units",
     "channel",
+    "channel_capacity_id",
     "contractual_units",
     "envelope_type",
     "id",
@@ -75716,7 +76001,7 @@
     "approval_request_id",
     "destination",
     "destination_reference",
-    "enforce_consent",
+    "enforces_consent",
     "expires_at",
     "frequency_cap_per_week",
     "id",
@@ -75846,6 +76131,7 @@
   ],
   "readColumns": {
    "resources.booking": [
+    "change_reason",
     "checked_out_at",
     "condition_in",
     "condition_out",
@@ -75944,6 +76230,7 @@
     "approved_by",
     "assessed_by",
     "asset_id",
+    "booking_id",
     "customer_acknowledgement",
     "description",
     "id",
@@ -75980,8 +76267,9 @@
    "rental.equipment_assignment": [
     "asset_id",
     "assigned_at",
-    "assigned_manually",
+    "booking_id",
     "id",
+    "is_assigned_manually",
     "returned_at",
     "scanned_code",
     "scope_path",
@@ -76025,7 +76313,6 @@
    "games.authorisation": [
     "amount",
     "charged_from",
-    "decided_offline",
     "decision",
     "entitlement_id",
     "guest_message",
@@ -76033,7 +76320,9 @@
     "reason",
     "remaining_balance",
     "remaining_plays",
-    "scope_path"
+    "scope_path",
+    "trace",
+    "was_decided_offline"
    ]
   }
  },
@@ -76096,6 +76385,7 @@
   "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
   "readColumns": {
    "resources.booking": [
+    "change_reason",
     "checked_out_at",
     "condition_in",
     "condition_out",
@@ -76143,6 +76433,7 @@
   "readColumns": {
    "rental.booking": [
     "accrued_late_fee",
+    "change_reason",
     "checked_out_at",
     "customer_id",
     "deposit_authorisation_id",
@@ -76169,7 +76460,8 @@
     "id",
     "id_number",
     "is_primary_renter",
-    "name"
+    "name",
+    "scope_path"
    ]
   }
  },
@@ -76288,12 +76580,17 @@
     "cleaning_policy",
     "code",
     "deposit_amount",
+    "disposal",
     "id",
     "is_active",
     "kind",
+    "lifecycle_effective_from",
+    "lifecycle_reason",
+    "lifecycle_state",
     "name",
     "parent_resource_id",
     "principal_id",
+    "replacement_resource_id",
     "requires_qualification",
     "resource_type_id",
     "scope_path",
@@ -76343,6 +76640,7 @@
     "scope_path",
     "started_at",
     "status",
+    "variants",
     "winning_variant"
    ]
   }
@@ -76389,6 +76687,7 @@
     "priority",
     "scope_path",
     "status",
+    "status_reason",
     "version"
    ]
   }
@@ -76477,6 +76776,7 @@
     "applications_close_at",
     "applications_open_at",
     "approval_workflow_id",
+    "categories",
     "code",
     "event_ids",
     "face_matching",
@@ -76562,10 +76862,10 @@
     "available_credit",
     "credit_limit",
     "id",
+    "is_over_limit",
     "organisation_id",
     "outstanding_invoiced",
     "outstanding_unbilled",
-    "over_limit",
     "scope_path",
     "status"
    ]
@@ -76598,6 +76898,7 @@
    "accreditation.print_job": [
     "credential_ids",
     "failed",
+    "failures",
     "id",
     "printed",
     "printer_device_id",
@@ -76812,9 +77113,9 @@
     "description",
     "domain",
     "formula",
-    "higher_is_better",
     "id",
     "is_active",
+    "is_higher_better",
     "name",
     "owner",
     "scope_path",
@@ -76984,6 +77285,7 @@
     "scope_path",
     "started_at",
     "status",
+    "variants",
     "winning_variant"
    ]
   }
@@ -77022,7 +77324,7 @@
     "code",
     "effective_from",
     "effective_to",
-    "exclude_in_basket",
+    "excludes_in_basket",
     "guardrails",
     "id",
     "item_kinds",
@@ -77107,6 +77409,7 @@
   "readColumns": {
    "rental.booking": [
     "accrued_late_fee",
+    "change_reason",
     "checked_out_at",
     "customer_id",
     "deposit_authorisation_id",
@@ -77133,7 +77436,8 @@
     "id",
     "id_number",
     "is_primary_renter",
-    "name"
+    "name",
+    "scope_path"
    ]
   }
  },
@@ -77207,8 +77511,10 @@
     "additional_increment_price",
     "base_price",
     "billing_increment_minutes",
+    "calendar_rules",
     "code",
     "customer_segment_id",
+    "duration_tiers",
     "dynamic_max_decrease_percent",
     "dynamic_max_increase_percent",
     "effective_from",
@@ -77308,6 +77614,7 @@
     "id",
     "includes_personal_data",
     "is_active",
+    "recipients",
     "report_id",
     "runs_as_principal_id",
     "schedule_id",
@@ -77668,10 +77975,10 @@
     "conditions",
     "id",
     "is_combinable",
+    "is_single_use",
     "issue_limit",
     "name",
     "scope_path",
-    "single_use",
     "valid_from",
     "valid_to"
    ]
@@ -77704,29 +78011,29 @@
    "wallet.wallet_type": [
     "allow_negative_balance",
     "allowed_credit_type_ids",
+    "can_holder_differ_from_owner",
     "code",
-    "gift_card_support",
-    "holder_may_differ_from_owner",
     "id",
     "is_active",
     "is_auto_reload_allowed",
     "is_shared_structure_allowed",
     "lifecycle_states",
     "maximum_balance",
-    "membership_credit_support",
     "name",
     "numbering_pattern",
     "owner_kind",
     "preset_name",
-    "refund_capability",
     "requires_identification",
     "scope_path",
-    "stored_value_capability",
-    "top_up_capability",
-    "transfer_capability",
-    "usage_channels",
-    "voucher_support",
-    "wearable_support"
+    "supports_gift_card",
+    "supports_membership_credit",
+    "supports_refund",
+    "supports_stored_value",
+    "supports_top_up",
+    "supports_transfer",
+    "supports_voucher",
+    "supports_wearable",
+    "usage_channels"
    ]
   }
  },
@@ -77815,6 +78122,7 @@
   "readColumns": {
    "marketing.duplicate_candidate": [
     "band",
+    "conflicts",
     "decided_at",
     "decided_by",
     "id",
@@ -77861,6 +78169,7 @@
     "failure_reason",
     "id",
     "reader_id",
+    "scope_path",
     "status"
    ]
   }
@@ -77929,6 +78238,7 @@
     "push_token",
     "retired_at",
     "scanner_health",
+    "scope_path",
     "serial_number",
     "status",
     "tested_by_principal_id",
@@ -77967,6 +78277,7 @@
     "effect",
     "id",
     "latency_ms",
+    "matched_policies",
     "observed_attributes",
     "override_id",
     "permission",
@@ -78124,6 +78435,7 @@
   "readColumns": {
    "rental.booking": [
     "accrued_late_fee",
+    "change_reason",
     "checked_out_at",
     "customer_id",
     "deposit_authorisation_id",
@@ -78150,7 +78462,8 @@
     "id",
     "id_number",
     "is_primary_renter",
-    "name"
+    "name",
+    "scope_path"
    ]
   }
  },
@@ -78221,6 +78534,7 @@
     "priority",
     "scope_path",
     "status",
+    "status_reason",
     "version"
    ]
   }
@@ -78265,6 +78579,7 @@
     "priority",
     "scope_path",
     "status",
+    "status_reason",
     "version"
    ]
   }
@@ -78297,7 +78612,8 @@
     "id",
     "minimum_provision_percent",
     "scope_path",
-    "seat_map_id"
+    "seat_map_id",
+    "spaces"
    ]
   }
  },
@@ -78340,6 +78656,8 @@
     "programme_id",
     "scope_path",
     "status",
+    "status_effective_from",
+    "status_review_at",
     "subject_id",
     "valid_from",
     "valid_to"
@@ -78444,6 +78762,7 @@
     "id",
     "integrity",
     "payload_hash",
+    "policy_versions",
     "previous_record_hash",
     "record_hash",
     "recorded_at",
@@ -78619,9 +78938,11 @@
   ],
   "readColumns": {
    "catalogue.event_resource_plan": [
+    "contractors",
     "event_id",
     "id",
     "readiness",
+    "requirements",
     "scope_path"
    ]
   }
@@ -78814,6 +79135,7 @@
   "readColumns": {
    "subscription.go_live_readiness": [
     "blockers",
+    "groups",
     "id",
     "run_at",
     "signed_off_at",
@@ -78848,7 +79170,10 @@
   ],
   "readColumns": {
    "marketing.guest_attribute_model": [
+    "attributes",
+    "field_groups",
     "id",
+    "identifiers",
     "published_at",
     "scope_path",
     "version"
@@ -78917,12 +79242,12 @@
     "authorities",
     "effective_from",
     "effective_to",
+    "has_shared_benefits",
     "id",
     "kind",
     "organisation_id",
     "related_subject_id",
     "scope_path",
-    "shared_benefits",
     "verified_at"
    ]
   }
@@ -79002,8 +79327,10 @@
     "is_auto_merge_allowed",
     "jurisdiction_restrictions",
     "match_threshold",
+    "matchers",
     "possible_match_threshold",
-    "scope_path"
+    "scope_path",
+    "survivorship"
    ]
   }
  },
@@ -79169,7 +79496,10 @@
   ],
   "readColumns": {
    "assets.taxonomy": [
+    "categories",
+    "fields",
     "id",
+    "keyword_vocabularies",
     "scope_path"
    ]
   }
@@ -79225,6 +79555,7 @@
   ],
   "readColumns": {
    "payments.mixed_tender_rules": [
+    "allowed_combinations",
     "id",
     "is_partial_payment_allowed",
     "is_split_payment_allowed",
@@ -79451,6 +79782,7 @@
   "readColumns": {
    "rental.booking": [
     "accrued_late_fee",
+    "change_reason",
     "checked_out_at",
     "customer_id",
     "deposit_authorisation_id",
@@ -79477,7 +79809,8 @@
     "id",
     "id_number",
     "is_primary_renter",
-    "name"
+    "name",
+    "scope_path"
    ]
   }
  },
@@ -79553,12 +79886,17 @@
     "cleaning_policy",
     "code",
     "deposit_amount",
+    "disposal",
     "id",
     "is_active",
     "kind",
+    "lifecycle_effective_from",
+    "lifecycle_reason",
+    "lifecycle_state",
     "name",
     "parent_resource_id",
     "principal_id",
+    "replacement_resource_id",
     "requires_qualification",
     "resource_type_id",
     "scope_path",
@@ -79595,7 +79933,7 @@
    "resources.allocation_policy": [
     "allow_partial_allocation",
     "id",
-    "respect_resource_priority",
+    "respects_resource_priority",
     "scope_path",
     "scoring_weights",
     "strategy"
@@ -79778,12 +80116,14 @@
    "resources.resource_schedule": [
     "advance_booking_days",
     "availability_mode",
+    "exceptions",
     "id",
     "maximum_booking_minutes",
     "minimum_booking_minutes",
     "resource_id",
     "scope_path",
-    "slot_minutes"
+    "slot_minutes",
+    "windows"
    ]
   }
  },
@@ -79873,10 +80213,11 @@
   ],
   "readColumns": {
    "seating.recommendation_rule": [
-    "explain_to_guest",
+    "explains_to_guest",
     "id",
     "performance_id",
-    "reverse_row_order",
+    "profiles",
+    "reverses_row_order",
     "scope_path",
     "seat_map_id"
    ]
@@ -79970,8 +80311,10 @@
   ],
   "readColumns": {
    "reporting.semantic_model": [
+    "domains",
     "id",
     "published_at",
+    "relationships",
     "scope_path",
     "version"
    ]
@@ -80032,8 +80375,10 @@
   ],
   "readColumns": {
    "subscription.vsi_model": [
+    "factors",
     "id",
     "published_at",
+    "tiers",
     "version"
    ]
   }
@@ -80065,9 +80410,11 @@
     "allowed_funding_sources",
     "approval_above_amount",
     "auto_reload",
+    "bonus_rules",
     "id",
     "maximum_top_up",
     "minimum_top_up",
+    "preset_amounts",
     "recurring_funding",
     "scope_path",
     "velocity_limits",
@@ -80347,6 +80694,7 @@
     "identifier",
     "kind",
     "linked_at",
+    "recorded_at",
     "replaced_by_credential_id",
     "scope_path",
     "status",
@@ -80385,6 +80733,7 @@
     "effect",
     "id",
     "latency_ms",
+    "matched_policies",
     "observed_attributes",
     "override_id",
     "permission",
@@ -80434,6 +80783,7 @@
     "priority",
     "scope_path",
     "status",
+    "status_reason",
     "version"
    ]
   }
@@ -80479,6 +80829,7 @@
     "priority",
     "scope_path",
     "status",
+    "status_reason",
     "version"
    ],
    "identity.authorisation_policy_version": [
@@ -80535,6 +80886,7 @@
     "priority",
     "scope_path",
     "status",
+    "status_reason",
     "version"
    ]
   }
@@ -80764,6 +81116,8 @@
     "programme_id",
     "scope_path",
     "status",
+    "status_effective_from",
+    "status_review_at",
     "subject_id",
     "valid_from",
     "valid_to"
@@ -80797,7 +81151,7 @@
   "readColumns": {
    "accreditation.identity_conflict": [
     "detected_at",
-    "differing_access",
+    "has_differing_access",
     "holder_ids",
     "id",
     "matched_on",
@@ -80838,6 +81192,7 @@
     "applications_close_at",
     "applications_open_at",
     "approval_workflow_id",
+    "categories",
     "code",
     "event_ids",
     "face_matching",
@@ -80881,6 +81236,7 @@
    "reporting.anomaly": [
     "acknowledged_at",
     "acknowledged_by",
+    "candidate_causes",
     "detected_at",
     "deviation_sigma",
     "expected",
@@ -81039,7 +81395,7 @@
     "approval_request_id",
     "destination",
     "destination_reference",
-    "enforce_consent",
+    "enforces_consent",
     "expires_at",
     "frequency_cap_per_week",
     "id",
@@ -81126,10 +81482,10 @@
     "available_credit",
     "credit_limit",
     "id",
+    "is_over_limit",
     "organisation_id",
     "outstanding_invoiced",
     "outstanding_unbilled",
-    "over_limit",
     "scope_path",
     "status"
    ]
@@ -81160,6 +81516,7 @@
    "accreditation.print_job": [
     "credential_ids",
     "failed",
+    "failures",
     "id",
     "printed",
     "printer_device_id",
@@ -81397,6 +81754,7 @@
     "id",
     "is_device_trusted",
     "kind",
+    "recorded_at",
     "resolution",
     "resolved_at",
     "resolved_by",
@@ -81429,6 +81787,7 @@
   "readColumns": {
    "marketing.duplicate_candidate": [
     "band",
+    "conflicts",
     "decided_at",
     "decided_by",
     "id",
@@ -81470,13 +81829,13 @@
     "default_lifecycle",
     "has_performances",
     "id",
-    "multi_day",
+    "is_multi_day",
+    "is_ticket_dated",
     "name",
     "requires_accreditation",
     "requires_registration",
     "scope_path",
-    "seating_modes_allowed",
-    "ticket_names_date"
+    "seating_modes_allowed"
    ]
   }
  },
@@ -81551,7 +81910,6 @@
     "at",
     "card_id",
     "charged_from",
-    "decided_offline",
     "entitlement_id",
     "game_id",
     "id",
@@ -81560,7 +81918,8 @@
     "reason",
     "scope_path",
     "synced_at",
-    "tickets_earned"
+    "tickets_earned",
+    "was_decided_offline"
    ]
   }
  },
@@ -81637,9 +81996,9 @@
     "description",
     "domain",
     "formula",
-    "higher_is_better",
     "id",
     "is_active",
+    "is_higher_better",
     "name",
     "owner",
     "scope_path",
@@ -81672,8 +82031,8 @@
   "readColumns": {
    "workforce.leave_request": [
     "approval_request_id",
-    "half_day",
     "id",
+    "is_half_day",
     "kind",
     "principal_id",
     "reason",
@@ -81718,6 +82077,7 @@
     "minimum_guarantee_period",
     "name",
     "on_below_minimum",
+    "overage_pricing",
     "revenue_share_percent",
     "tier_code",
     "unit_price"
@@ -81821,6 +82181,7 @@
   ],
   "readColumns": {
    "assets.rendition": [
+    "asset_id",
     "failure_reason",
     "format",
     "height",
@@ -81980,6 +82341,7 @@
   "readColumns": {
    "rental.booking": [
     "accrued_late_fee",
+    "change_reason",
     "checked_out_at",
     "customer_id",
     "deposit_authorisation_id",
@@ -82006,7 +82368,8 @@
     "id",
     "id_number",
     "is_primary_renter",
-    "name"
+    "name",
+    "scope_path"
    ]
   }
  },
@@ -82119,7 +82482,8 @@
     "is_active",
     "priority",
     "scope_path",
-    "strategy"
+    "strategy",
+    "targets"
    ]
   }
  },
@@ -82274,6 +82638,7 @@
     "scope_path",
     "started_at",
     "status",
+    "variants",
     "winning_variant"
    ]
   }
@@ -82306,7 +82671,7 @@
     "code",
     "effective_from",
     "effective_to",
-    "exclude_in_basket",
+    "excludes_in_basket",
     "guardrails",
     "id",
     "item_kinds",
@@ -82346,7 +82711,7 @@
   ],
   "readColumns": {
    "payments.reconciliation_source": [
-    "alert_if_missing",
+    "alerts_if_missing",
     "code",
     "connection_id",
     "expected_by_time",
@@ -82384,6 +82749,7 @@
   "readColumns": {
    "rental.booking": [
     "accrued_late_fee",
+    "change_reason",
     "checked_out_at",
     "customer_id",
     "deposit_authorisation_id",
@@ -82410,7 +82776,8 @@
     "id",
     "id_number",
     "is_primary_renter",
-    "name"
+    "name",
+    "scope_path"
    ]
   }
  },
@@ -82480,8 +82847,10 @@
     "additional_increment_price",
     "base_price",
     "billing_increment_minutes",
+    "calendar_rules",
     "code",
     "customer_segment_id",
+    "duration_tiers",
     "dynamic_max_decrease_percent",
     "dynamic_max_increase_percent",
     "effective_from",
@@ -82574,7 +82943,7 @@
   "readColumns": {
    "reporting.delivery": [
     "attempted_at",
-    "contained_personal_data",
+    "did_contain_personal_data",
     "failure_reason",
     "id",
     "recipient_count",
@@ -82617,6 +82986,7 @@
     "id",
     "includes_personal_data",
     "is_active",
+    "recipients",
     "report_id",
     "runs_as_principal_id",
     "schedule_id",
@@ -82724,6 +83094,7 @@
   ],
   "readColumns": {
    "resources.booking": [
+    "change_reason",
     "checked_out_at",
     "condition_in",
     "condition_out",
@@ -82952,14 +83323,14 @@
     "code",
     "counts_against_capacity",
     "id",
+    "is_visible_to_guest",
     "name",
     "owner_role",
     "purpose",
     "release_hours_before",
     "release_rule",
     "release_to",
-    "scope_path",
-    "visible_to_guest"
+    "scope_path"
    ]
   }
  },
@@ -83035,6 +83406,7 @@
   ],
   "readColumns": {
    "workforce.shift_template": [
+    "breaks",
     "code",
     "cost_centre",
     "ends_at",
@@ -83155,10 +83527,10 @@
     "conditions",
     "id",
     "is_combinable",
+    "is_single_use",
     "issue_limit",
     "name",
     "scope_path",
-    "single_use",
     "valid_from",
     "valid_to"
    ]
@@ -83230,29 +83602,29 @@
    "wallet.wallet_type": [
     "allow_negative_balance",
     "allowed_credit_type_ids",
+    "can_holder_differ_from_owner",
     "code",
-    "gift_card_support",
-    "holder_may_differ_from_owner",
     "id",
     "is_active",
     "is_auto_reload_allowed",
     "is_shared_structure_allowed",
     "lifecycle_states",
     "maximum_balance",
-    "membership_credit_support",
     "name",
     "numbering_pattern",
     "owner_kind",
     "preset_name",
-    "refund_capability",
     "requires_identification",
     "scope_path",
-    "stored_value_capability",
-    "top_up_capability",
-    "transfer_capability",
-    "usage_channels",
-    "voucher_support",
-    "wearable_support"
+    "supports_gift_card",
+    "supports_membership_credit",
+    "supports_refund",
+    "supports_stored_value",
+    "supports_top_up",
+    "supports_transfer",
+    "supports_voucher",
+    "supports_wearable",
+    "usage_channels"
    ]
   }
  },
@@ -83366,6 +83738,7 @@
   "lineageNote": "not in L3; current derived lineage writes nothing. mode=publish inserts configuration_version and one configuration_version_snapshot row per area, read from the area tables; validateOnly writes only the idempotency cache",
   "readColumns": {
    "wallet.configuration_version": [
+    "findings",
     "id",
     "note",
     "published_at",
@@ -83504,11 +83877,11 @@
     "from_seat_ids",
     "guest_notified_at",
     "id",
+    "is_refund_issued",
     "order_id",
     "performed_by",
     "price_difference",
     "reason",
-    "refund_issued",
     "scope_path",
     "to_seat_ids"
    ]
@@ -83549,6 +83922,7 @@
     "id",
     "is_device_trusted",
     "kind",
+    "recorded_at",
     "resolution",
     "resolved_at",
     "resolved_by",
@@ -83607,6 +83981,8 @@
   "readColumns": {
    "rental.inspection": [
     "asset_id",
+    "booking_id",
+    "checklist",
     "condition",
     "id",
     "inspected_at",
@@ -83614,6 +83990,7 @@
     "note",
     "phase",
     "photo_asset_ids",
+    "recorded_at",
     "scope_path"
    ]
   }
@@ -83762,6 +84139,7 @@
   "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
   "readColumns": {
    "resources.booking": [
+    "change_reason",
     "checked_out_at",
     "condition_in",
     "condition_out",
@@ -83813,6 +84191,7 @@
     "is_authority_notified",
     "kind",
     "photo_asset_ids",
+    "recorded_at",
     "reported_at",
     "reported_by",
     "scope_path",
@@ -83848,8 +84227,8 @@
   "readColumns": {
    "workforce.leave_request": [
     "approval_request_id",
-    "half_day",
     "id",
+    "is_half_day",
     "kind",
     "principal_id",
     "reason",
@@ -83886,6 +84265,7 @@
   ],
   "readColumns": {
    "assets.rendition": [
+    "asset_id",
     "failure_reason",
     "format",
     "height",
@@ -83975,7 +84355,7 @@
     "notify_guests",
     "performance_ids",
     "reason",
-    "refund_fees",
+    "refunds_fees",
     "scope_path",
     "ticket_treatment"
    ]
@@ -84132,7 +84512,8 @@
     "status",
     "succeeded_count",
     "target_device_ids",
-    "target_scope_path"
+    "target_scope_path",
+    "waves"
    ]
   }
  },
@@ -84211,6 +84592,7 @@
   "readColumns": {
    "subscription.go_live_readiness": [
     "blockers",
+    "groups",
     "id",
     "run_at",
     "signed_off_at",
@@ -84289,6 +84671,7 @@
     "priority",
     "scope_path",
     "status",
+    "status_reason",
     "version"
    ]
   }
@@ -84361,7 +84744,8 @@
     "id",
     "minimum_provision_percent",
     "scope_path",
-    "seat_map_id"
+    "seat_map_id",
+    "spaces"
    ]
   }
  },
@@ -84392,6 +84776,7 @@
    "accreditation.notification_rules": [
     "id",
     "programme_id",
+    "rules",
     "scope_path"
    ]
   }
@@ -84423,6 +84808,7 @@
    "accreditation.requirements": [
     "id",
     "programme_id",
+    "rows",
     "scope_path"
    ]
   }
@@ -84475,6 +84861,8 @@
     "programme_id",
     "scope_path",
     "status",
+    "status_effective_from",
+    "status_review_at",
     "subject_id",
     "valid_from",
     "valid_to"
@@ -84510,8 +84898,8 @@
     "id",
     "on_expiry",
     "programme_id",
-    "renewal_requires_reverification",
     "renewal_window_days",
+    "requires_renewal_reverification",
     "scope_path",
     "validity_kind",
     "validity_months"
@@ -84594,9 +84982,9 @@
     "legal_basis",
     "on_expiry",
     "overrides_privacy_deletion",
-    "retain_attachments",
-    "retain_signatures",
     "retain_years",
+    "retains_attachments",
+    "retains_signatures",
     "scope_path"
    ]
   }
@@ -84628,7 +85016,6 @@
   "readColumns": {
    "approvals.sla_policy": [
     "applies_to_request_kinds",
-    "business_hours_only",
     "calendar_id",
     "code",
     "escalate_at_percent",
@@ -84636,7 +85023,9 @@
     "first_reminder_at_percent",
     "id",
     "is_auto_action_allowed",
+    "is_business_hours_only",
     "on_breach",
+    "reminders",
     "scope_path",
     "second_reminder_at_percent",
     "target_minutes"
@@ -85070,11 +85459,12 @@
   "readColumns": {
    "catalogue.event_registration": [
     "admission_policy",
-    "capture_per_attendee",
+    "captures_per_attendee",
     "event_id",
     "form_id",
     "id",
     "is_required",
+    "participant_categories",
     "scope_path"
    ]
   }
@@ -85105,9 +85495,11 @@
   ],
   "readColumns": {
    "catalogue.event_resource_plan": [
+    "contractors",
     "event_id",
     "id",
     "readiness",
+    "requirements",
     "scope_path"
    ]
   }
@@ -85138,11 +85530,12 @@
   ],
   "readColumns": {
    "catalogue.event_schedule": [
-    "cascade_overrun",
-    "duration_is_dynamic",
+    "cascades_overrun",
     "event_id",
     "id",
+    "is_duration_dynamic",
     "maximum_overrun_minutes",
+    "performances",
     "scope_path"
    ]
   }
@@ -85178,13 +85571,13 @@
     "default_lifecycle",
     "has_performances",
     "id",
-    "multi_day",
+    "is_multi_day",
+    "is_ticket_dated",
     "name",
     "requires_accreditation",
     "requires_registration",
     "scope_path",
-    "seating_modes_allowed",
-    "ticket_names_date"
+    "seating_modes_allowed"
    ]
   }
  },
@@ -85256,7 +85649,7 @@
   "readColumns": {
    "games.card_expiry_rules": [
     "basis",
-    "extend_on_recharge",
+    "extends_on_recharge",
     "hold_for_claim_days",
     "id",
     "on_expiry",
@@ -85382,6 +85775,7 @@
     "maximum_height_cm",
     "minimum_age",
     "minimum_height_cm",
+    "operating_hours",
     "rider_capacity",
     "scope_path",
     "staff_positions",
@@ -85421,8 +85815,11 @@
   "lineageNote": "not in L3; writer of games.pricing_exception: groupPricing/peakPricing/calendarExceptions replaced as rows. Current derived lineage has only games.pricing and no cache:idempotency although the op takes IdempotencyKey",
   "readColumns": {
    "games.pricing": [
+    "calendar_exceptions",
     "game_id",
+    "group_pricing",
     "id",
+    "peak_pricing",
     "priority",
     "retry_offer_lead_seconds",
     "retry_price",
@@ -85497,6 +85894,7 @@
    "wallet.gift_card_product": [
     "code",
     "credit_type_id",
+    "denominations",
     "id",
     "is_activation_required",
     "is_open_amount_allowed",
@@ -85566,7 +85964,10 @@
   ],
   "readColumns": {
    "marketing.guest_attribute_model": [
+    "attributes",
+    "field_groups",
     "id",
+    "identifiers",
     "published_at",
     "scope_path",
     "version"
@@ -85602,12 +86003,12 @@
     "authorities",
     "effective_from",
     "effective_to",
+    "has_shared_benefits",
     "id",
     "kind",
     "organisation_id",
     "related_subject_id",
     "scope_path",
-    "shared_benefits",
     "verified_at"
    ]
   }
@@ -85714,8 +86115,10 @@
     "is_auto_merge_allowed",
     "jurisdiction_restrictions",
     "match_threshold",
+    "matchers",
     "possible_match_threshold",
-    "scope_path"
+    "scope_path",
+    "survivorship"
    ]
   }
  },
@@ -85787,7 +86190,8 @@
    "subscription.enforcement_policy": [
     "grace_days",
     "id",
-    "is_hard_stop_allowed"
+    "is_hard_stop_allowed",
+    "thresholds"
    ]
   }
  },
@@ -85827,6 +86231,7 @@
     "minimum_guarantee_period",
     "name",
     "on_below_minimum",
+    "overage_pricing",
     "revenue_share_percent",
     "tier_code",
     "unit_price"
@@ -85972,7 +86377,7 @@
     "on_rights_expiry",
     "scope_path",
     "signed_url_ttl_seconds",
-    "signed_urls"
+    "uses_signed_urls"
    ]
   }
  },
@@ -86002,7 +86407,10 @@
   ],
   "readColumns": {
    "assets.taxonomy": [
+    "categories",
+    "fields",
     "id",
+    "keyword_vocabularies",
     "scope_path"
    ]
   }
@@ -86068,6 +86476,7 @@
   ],
   "readColumns": {
    "payments.mixed_tender_rules": [
+    "allowed_combinations",
     "id",
     "is_partial_payment_allowed",
     "is_split_payment_allowed",
@@ -86187,7 +86596,7 @@
    "payments.failover_policy": [
     "backoff_ms",
     "circuit_breaker",
-    "failover_to_next_provider",
+    "fails_over_to_next_provider",
     "id",
     "max_attempts",
     "retryable_outcomes",
@@ -86221,6 +86630,8 @@
   "readColumns": {
    "payments.risk_rules": [
     "id",
+    "lists",
+    "rules",
     "scope_path"
    ]
   }
@@ -86256,7 +86667,8 @@
     "is_active",
     "priority",
     "scope_path",
-    "strategy"
+    "strategy",
+    "targets"
    ]
   }
  },
@@ -86333,17 +86745,17 @@
   "readColumns": {
    "catalogue.prepaid_minutes": [
     "applicable_space_ids",
-    "band_multipliers_apply",
+    "applies_band_multipliers",
     "code",
     "credit_type_id",
     "id",
+    "is_transferable_within_household",
     "list_price",
     "minimum_draw_minutes",
     "minutes",
     "name",
     "rounding_minutes",
     "scope_path",
-    "transferable_within_household",
     "validity_months"
    ]
   }
@@ -86497,6 +86909,7 @@
    "promotions.recommendation_suppression": [
     "cooldown_after_accept_days",
     "cooldown_after_dismiss_days",
+    "hard_exclusions",
     "id",
     "max_impressions_per_guest_per_session",
     "max_impressions_per_product_per_day",
@@ -86534,7 +86947,7 @@
     "date_window_days",
     "fallback_keys",
     "id",
-    "net_of_fees",
+    "is_net_of_fees",
     "primary_key",
     "scope_path"
    ]
@@ -86565,7 +86978,7 @@
   ],
   "readColumns": {
    "payments.reconciliation_source": [
-    "alert_if_missing",
+    "alerts_if_missing",
     "code",
     "connection_id",
     "expected_by_time",
@@ -86605,13 +87018,14 @@
   "readColumns": {
    "games.redemption_rules": [
     "counter_approval_above_tickets",
+    "earn_rules",
+    "has_expiring_tickets",
     "id",
     "is_ticket_eater_enabled",
     "is_ticketless_enabled",
     "scope_path",
     "ticket_credit_type_id",
-    "ticket_validity_days",
-    "tickets_expire"
+    "ticket_validity_days"
    ]
   }
  },
@@ -86643,11 +87057,12 @@
     "agreement_version",
     "customer_fields",
     "group_waiver_mode",
-    "guardian_signature_for_minor",
     "id",
     "is_agreement_required",
     "is_e_signature_required",
     "is_liability_waiver_required",
+    "product_id",
+    "requires_guardian_signature_for_minor",
     "scope_path",
     "terms_document_asset_id"
    ]
@@ -86680,8 +87095,10 @@
    "rental.availability_rules": [
     "hold_minutes",
     "id",
+    "operating_windows",
     "overbook_percent",
-    "release_on_payment_failure",
+    "product_id",
+    "releases_on_payment_failure",
     "scope_path",
     "slot_minutes"
    ]
@@ -86717,7 +87134,6 @@
     "category_id",
     "fixed_amount",
     "id",
-    "inspection_required_before_release",
     "instruments",
     "is_auto_release",
     "is_partial_capture_permitted",
@@ -86727,6 +87143,7 @@
     "minimum_amount",
     "percentage",
     "product_id",
+    "requires_inspection_before_release",
     "scope_path",
     "supervisor_approval_threshold"
    ]
@@ -86766,6 +87183,7 @@
     "maximum_extension_minutes",
     "maximum_minutes",
     "minimum_minutes",
+    "product_id",
     "scope_path",
     "turnaround_minutes"
    ]
@@ -86804,6 +87222,7 @@
     "id",
     "late_fee_amount",
     "late_fee_basis",
+    "late_fee_tiers",
     "maximum_daily_charge",
     "missing_item_fee_amount",
     "missing_item_fee_basis",
@@ -86841,10 +87260,12 @@
     "allow_equipment_swap",
     "allow_manual_assignment",
     "allow_substitution",
-    "assignment_required_at_checkout",
+    "components",
     "id",
     "inventory_unit",
     "is_scan_required",
+    "product_id",
+    "requires_assignment_at_checkout",
     "scope_path",
     "total_quantity",
     "tracking_model"
@@ -86893,6 +87314,7 @@
     "minimum_height_cm",
     "photo_at_checkout_required",
     "photo_at_return_required",
+    "product_id",
     "return_scan_required",
     "safety_briefing_required",
     "scope_path"
@@ -86933,6 +87355,7 @@
     "is_return_allowed",
     "location_id",
     "operating_hours",
+    "product_id",
     "scope_path"
    ]
   }
@@ -86965,7 +87388,7 @@
    "resources.allocation_policy": [
     "allow_partial_allocation",
     "id",
-    "respect_resource_priority",
+    "respects_resource_priority",
     "scope_path",
     "scoring_weights",
     "strategy"
@@ -87079,12 +87502,17 @@
     "cleaning_policy",
     "code",
     "deposit_amount",
+    "disposal",
     "id",
     "is_active",
     "kind",
+    "lifecycle_effective_from",
+    "lifecycle_reason",
+    "lifecycle_state",
     "name",
     "parent_resource_id",
     "principal_id",
+    "replacement_resource_id",
     "requires_qualification",
     "resource_type_id",
     "scope_path",
@@ -87123,12 +87551,14 @@
    "resources.resource_schedule": [
     "advance_booking_days",
     "availability_mode",
+    "exceptions",
     "id",
     "maximum_booking_minutes",
     "minimum_booking_minutes",
     "resource_id",
     "scope_path",
-    "slot_minutes"
+    "slot_minutes",
+    "windows"
    ]
   }
  },
@@ -87191,11 +87621,12 @@
     "effective_to",
     "id",
     "is_cross_venue_booking_allowed",
+    "is_shared_across_venues",
     "is_transfer_required",
     "primary_venue_id",
+    "resource_id",
     "scope_path",
     "secondary_venue_ids",
-    "shared_pool",
     "travel_buffer_minutes"
    ]
   }
@@ -87229,14 +87660,14 @@
     "code",
     "counts_against_capacity",
     "id",
+    "is_visible_to_guest",
     "name",
     "owner_role",
     "purpose",
     "release_hours_before",
     "release_rule",
     "release_to",
-    "scope_path",
-    "visible_to_guest"
+    "scope_path"
    ]
   }
  },
@@ -87266,10 +87697,11 @@
   ],
   "readColumns": {
    "seating.recommendation_rule": [
-    "explain_to_guest",
+    "explains_to_guest",
     "id",
     "performance_id",
-    "reverse_row_order",
+    "profiles",
+    "reverses_row_order",
     "scope_path",
     "seat_map_id"
    ]
@@ -87340,8 +87772,10 @@
   ],
   "readColumns": {
    "reporting.semantic_model": [
+    "domains",
     "id",
     "published_at",
+    "relationships",
     "scope_path",
     "version"
    ]
@@ -87413,6 +87847,7 @@
   ],
   "readColumns": {
    "workforce.shift_template": [
+    "breaks",
     "code",
     "cost_centre",
     "ends_at",
@@ -87562,7 +87997,7 @@
     "included_modules",
     "notice_days_before_expiry",
     "on_expiry",
-    "payment_method_required_up_front",
+    "requires_payment_method_up_front",
     "retain_data_days",
     "tier_code",
     "usage_caps"
@@ -87596,8 +88031,10 @@
   ],
   "readColumns": {
    "subscription.vsi_model": [
+    "factors",
     "id",
     "published_at",
+    "tiers",
     "version"
    ]
   }
@@ -87629,6 +88066,7 @@
    "wallet.accounting_mapping": [
     "breakage_policy",
     "id",
+    "mappings",
     "scope_path"
    ]
   }
@@ -87700,9 +88138,11 @@
     "allowed_funding_sources",
     "approval_above_amount",
     "auto_reload",
+    "bonus_rules",
     "id",
     "maximum_top_up",
     "minimum_top_up",
+    "preset_amounts",
     "recurring_funding",
     "scope_path",
     "velocity_limits",
@@ -87738,8 +88178,8 @@
     "default_destination",
     "destinations_by_source",
     "id",
-    "restore_original_expiry",
-    "restore_to_original_lots",
+    "restores_original_expiry",
+    "restores_to_original_lots",
     "scope_path",
     "wallet_refund_bonus_percent",
     "wallet_refund_credit_type_id"
@@ -87859,11 +88299,11 @@
     "id",
     "is_both_parties_identified",
     "is_peer_to_peer_allowed",
+    "is_within_shared_wallet_only",
     "maximum_per_day",
     "maximum_per_transfer",
     "scope_path",
-    "transferable_credit_type_ids",
-    "within_shared_wallet_only"
+    "transferable_credit_type_ids"
    ]
   }
  },
@@ -87978,6 +88418,7 @@
     "effect",
     "id",
     "latency_ms",
+    "matched_policies",
     "observed_attributes",
     "override_id",
     "permission",
@@ -88088,7 +88529,6 @@
    "games.authorisation": [
     "amount",
     "charged_from",
-    "decided_offline",
     "decision",
     "entitlement_id",
     "guest_message",
@@ -88096,7 +88536,9 @@
     "reason",
     "remaining_balance",
     "remaining_plays",
-    "scope_path"
+    "scope_path",
+    "trace",
+    "was_decided_offline"
    ]
   }
  },
@@ -88290,7 +88732,8 @@
     "status",
     "succeeded_count",
     "target_device_ids",
-    "target_scope_path"
+    "target_scope_path",
+    "waves"
    ]
   }
  },
@@ -88362,6 +88805,7 @@
    "payments.chargeback_evidence": [
     "chargeback_id",
     "deadline_at",
+    "documents",
     "id",
     "narrative",
     "outcome",
@@ -88402,12 +88846,17 @@
     "cleaning_policy",
     "code",
     "deposit_amount",
+    "disposal",
     "id",
     "is_active",
     "kind",
+    "lifecycle_effective_from",
+    "lifecycle_reason",
+    "lifecycle_state",
     "name",
     "parent_resource_id",
     "principal_id",
+    "replacement_resource_id",
     "requires_qualification",
     "resource_type_id",
     "scope_path",
@@ -88446,6 +88895,7 @@
   "readColumns": {
    "rental.booking": [
     "accrued_late_fee",
+    "change_reason",
     "checked_out_at",
     "customer_id",
     "deposit_authorisation_id",
@@ -88472,7 +88922,8 @@
     "id",
     "id_number",
     "is_primary_renter",
-    "name"
+    "name",
+    "scope_path"
    ]
   }
  },
@@ -88577,6 +89028,7 @@
     "priority",
     "scope_path",
     "status",
+    "status_reason",
     "version"
    ]
   }
@@ -88622,6 +89074,8 @@
     "programme_id",
     "scope_path",
     "status",
+    "status_effective_from",
+    "status_review_at",
     "subject_id",
     "valid_from",
     "valid_to"
@@ -88749,7 +89203,7 @@
     "code",
     "effective_from",
     "effective_to",
-    "exclude_in_basket",
+    "excludes_in_basket",
     "guardrails",
     "id",
     "item_kinds",
@@ -88794,6 +89248,7 @@
   "readColumns": {
    "rental.booking": [
     "accrued_late_fee",
+    "change_reason",
     "checked_out_at",
     "customer_id",
     "deposit_authorisation_id",
@@ -88820,7 +89275,8 @@
     "id",
     "id_number",
     "is_primary_renter",
-    "name"
+    "name",
+    "scope_path"
    ]
   }
  },
@@ -88852,8 +89308,10 @@
     "additional_increment_price",
     "base_price",
     "billing_increment_minutes",
+    "calendar_rules",
     "code",
     "customer_segment_id",
+    "duration_tiers",
     "dynamic_max_decrease_percent",
     "dynamic_max_increase_percent",
     "effective_from",
@@ -88950,12 +89408,17 @@
     "cleaning_policy",
     "code",
     "deposit_amount",
+    "disposal",
     "id",
     "is_active",
     "kind",
+    "lifecycle_effective_from",
+    "lifecycle_reason",
+    "lifecycle_state",
     "name",
     "parent_resource_id",
     "principal_id",
+    "replacement_resource_id",
     "requires_qualification",
     "resource_type_id",
     "scope_path",
@@ -88993,6 +89456,7 @@
   "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
   "readColumns": {
    "resources.booking": [
+    "change_reason",
     "checked_out_at",
     "condition_in",
     "condition_out",
@@ -89188,29 +89652,29 @@
    "wallet.wallet_type": [
     "allow_negative_balance",
     "allowed_credit_type_ids",
+    "can_holder_differ_from_owner",
     "code",
-    "gift_card_support",
-    "holder_may_differ_from_owner",
     "id",
     "is_active",
     "is_auto_reload_allowed",
     "is_shared_structure_allowed",
     "lifecycle_states",
     "maximum_balance",
-    "membership_credit_support",
     "name",
     "numbering_pattern",
     "owner_kind",
     "preset_name",
-    "refund_capability",
     "requires_identification",
     "scope_path",
-    "stored_value_capability",
-    "top_up_capability",
-    "transfer_capability",
-    "usage_channels",
-    "voucher_support",
-    "wearable_support"
+    "supports_gift_card",
+    "supports_membership_credit",
+    "supports_refund",
+    "supports_stored_value",
+    "supports_top_up",
+    "supports_transfer",
+    "supports_voucher",
+    "supports_wearable",
+    "usage_channels"
    ]
   }
  },
@@ -90147,6 +90611,7 @@
     "product_id",
     "redemption_type",
     "required",
+    "scope_path",
     "valid_from",
     "valid_to"
    ],
@@ -90237,6 +90702,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "type",
     "updated_at"
    ]
@@ -90311,6 +90777,7 @@
     "is_active",
     "name",
     "program_id",
+    "scope_path",
     "start_at"
    ]
   }
@@ -90350,6 +90817,7 @@
     "program_id",
     "reason",
     "reversed_loyalty_points_id",
+    "scope_path",
     "source_reference_id",
     "source_type",
     "transaction_type"
@@ -90427,6 +90895,7 @@
     "name",
     "points_cost",
     "product_id",
+    "scope_path",
     "type",
     "validity_days"
    ]
@@ -90465,6 +90934,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "type",
     "updated_at"
    ]
@@ -90504,6 +90974,7 @@
     "is_active",
     "name",
     "program_id",
+    "scope_path",
     "start_at"
    ]
   }
@@ -90560,6 +91031,7 @@
     "product_id",
     "redemption_type",
     "required",
+    "scope_path",
     "valid_from",
     "valid_to"
    ],
@@ -90619,6 +91091,7 @@
     "name",
     "points_cost",
     "product_id",
+    "scope_path",
     "type",
     "validity_days"
    ]
@@ -90731,6 +91204,7 @@
     "membership_benefit_id",
     "notes",
     "quantity",
+    "recorded_at",
     "remaining_quantity",
     "source_order_id",
     "source_type",
@@ -90882,6 +91356,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "type",
     "unit",
     "value"
@@ -90920,6 +91395,7 @@
     "program_code",
     "program_id",
     "program_name",
+    "scope_path",
     "updated_at"
    ]
   }
@@ -90994,6 +91470,7 @@
     "membership_benefit_id",
     "notes",
     "quantity",
+    "recorded_at",
     "remaining_quantity",
     "source_order_id",
     "source_type",
@@ -91075,6 +91552,7 @@
     "id",
     "is_active",
     "name",
+    "scope_path",
     "type",
     "unit",
     "value"
@@ -91114,6 +91592,7 @@
     "program_code",
     "program_id",
     "program_name",
+    "scope_path",
     "updated_at"
    ]
   }
@@ -91392,6 +91871,7 @@
     "field_id",
     "field_value",
     "id",
+    "scope_path",
     "updated_at"
    ]
   }
@@ -91465,6 +91945,7 @@
     "payment_method_id",
     "payment_policy_id",
     "provider_id",
+    "scope_path",
     "updated_at",
     "value"
    ]
@@ -91504,7 +91985,7 @@
     "limit_value",
     "name",
     "period",
-    "tier_id",
+    "plan_id",
     "updated_at"
    ],
    "subscription.tier_module": [
@@ -91514,7 +91995,7 @@
     "is_active",
     "is_included",
     "notes",
-    "tier_id",
+    "plan_id",
     "updated_at"
    ]
   }
@@ -91643,8 +92124,8 @@
     "changed_at",
     "changed_by_principal_id",
     "id",
-    "new_access_id",
-    "old_access_id",
+    "new_entitlement_id",
+    "old_entitlement_id",
     "order_id",
     "reason",
     "type",
@@ -91797,6 +92278,7 @@
     "occurred_at",
     "payment_id",
     "reason",
+    "scope_path",
     "type"
    ]
   }
@@ -91917,7 +92399,7 @@
   "readColumns": {
    "access.entry_rule_point": [
     "access_point_id",
-    "admission_profile_id",
+    "admission_rules_id",
     "created_at",
     "id",
     "is_active"
@@ -92010,7 +92492,8 @@
     "field_id",
     "id",
     "is_active",
-    "name"
+    "name",
+    "scope_path"
    ]
   }
  },
@@ -92237,13 +92720,13 @@
   ],
   "readColumns": {
    "marketing.sla_policy": [
-    "business_hours_only",
     "code",
     "created_at",
     "escalation_minutes",
     "first_response_minutes",
     "id",
     "is_active",
+    "is_business_hours_only",
     "name",
     "priority",
     "resolution_minutes",
@@ -92360,6 +92843,7 @@
     "data_reference",
     "device_info",
     "document_hash",
+    "form_definition_id",
     "guardian_name",
     "id",
     "ip_address",
@@ -92369,8 +92853,7 @@
     "source_reference_id",
     "source_type",
     "status",
-    "subject_name",
-    "template_id"
+    "subject_name"
    ]
   }
  },
@@ -92445,6 +92928,7 @@
     "occurred_at",
     "payment_id",
     "reason",
+    "scope_path",
     "type"
    ]
   }
@@ -92551,7 +93035,7 @@
   "readColumns": {
    "access.entry_rule_point": [
     "access_point_id",
-    "admission_profile_id",
+    "admission_rules_id",
     "created_at",
     "id",
     "is_active"
@@ -92601,7 +93085,8 @@
     "field_id",
     "id",
     "is_active",
-    "name"
+    "name",
+    "scope_path"
    ]
   }
  },
@@ -92636,6 +93121,7 @@
     "field_id",
     "field_value",
     "id",
+    "scope_path",
     "updated_at"
    ]
   }
@@ -92757,6 +93243,7 @@
     "payment_method_id",
     "payment_policy_id",
     "provider_id",
+    "scope_path",
     "updated_at",
     "value"
    ]
@@ -92799,7 +93286,7 @@
     "limit_value",
     "name",
     "period",
-    "tier_id",
+    "plan_id",
     "updated_at"
    ],
    "subscription.tier_module": [
@@ -92809,7 +93296,7 @@
     "is_active",
     "is_included",
     "notes",
-    "tier_id",
+    "plan_id",
     "updated_at"
    ]
   }
@@ -92840,13 +93327,13 @@
   ],
   "readColumns": {
    "marketing.sla_policy": [
-    "business_hours_only",
     "code",
     "created_at",
     "escalation_minutes",
     "first_response_minutes",
     "id",
     "is_active",
+    "is_business_hours_only",
     "name",
     "priority",
     "resolution_minutes",
@@ -93193,12 +93680,12 @@
    "identity.segregation_rule": [
     "allow_with_compensating_control",
     "id",
+    "is_scope_sensitive",
     "name",
     "permission_a",
     "permission_b",
     "rationale",
     "scope_path",
-    "scope_sensitive",
     "severity"
    ]
   }
@@ -93585,14 +94072,14 @@
     "effective_from",
     "effective_to",
     "id",
-    "included_in_display_price",
     "is_discretionary",
+    "is_included_in_display_price",
+    "is_shown_separately",
     "is_taxable",
     "minimum_party_size",
     "rate_percent",
     "scope_path",
     "service_types",
-    "shown_separately",
     "staff_pool_percent"
    ]
   }
@@ -93631,14 +94118,14 @@
     "effective_from",
     "effective_to",
     "id",
-    "included_in_display_price",
     "is_discretionary",
+    "is_included_in_display_price",
+    "is_shown_separately",
     "is_taxable",
     "minimum_party_size",
     "rate_percent",
     "scope_path",
     "service_types",
-    "shown_separately",
     "staff_pool_percent"
    ]
   }
@@ -93671,14 +94158,14 @@
     "effective_from",
     "effective_to",
     "event_id",
-    "fees_shown_to_seller",
     "id",
     "is_active",
     "minimum_ask_price",
     "price_cap_percent",
     "product_id",
     "scope_path",
-    "seller_fee_percent"
+    "seller_fee_percent",
+    "shows_fees_to_seller"
    ]
   }
  },
@@ -93751,14 +94238,14 @@
     "effective_from",
     "effective_to",
     "event_id",
-    "fees_shown_to_seller",
     "id",
     "is_active",
     "minimum_ask_price",
     "price_cap_percent",
     "product_id",
     "scope_path",
-    "seller_fee_percent"
+    "seller_fee_percent",
+    "shows_fees_to_seller"
    ]
   }
  },
@@ -93886,7 +94373,8 @@
     "outlet_id",
     "reserved_lead_minutes",
     "scope_path",
-    "seating_buffer_minutes"
+    "seating_buffer_minutes",
+    "turn_time_bands"
    ]
   }
  },
@@ -93925,7 +94413,8 @@
     "outlet_id",
     "reserved_lead_minutes",
     "scope_path",
-    "seating_buffer_minutes"
+    "seating_buffer_minutes",
+    "turn_time_bands"
    ]
   }
  },
@@ -94070,6 +94559,7 @@
     "media_type",
     "name",
     "recycle_after_days",
+    "scope_path",
     "selection_priority"
    ],
    "orders.ticket_template_channel": [
@@ -94113,6 +94603,7 @@
     "media_type",
     "name",
     "recycle_after_days",
+    "scope_path",
     "selection_priority"
    ],
    "orders.ticket_template_channel": [
@@ -94191,6 +94682,7 @@
     "id",
     "is_active",
     "kind",
+    "scope_path",
     "sort_order"
    ]
   },
@@ -94303,6 +94795,7 @@
     "media_type",
     "name",
     "recycle_after_days",
+    "scope_path",
     "selection_priority"
    ],
    "orders.ticket_template_channel": [
@@ -94613,12 +95106,12 @@
     "asap_delivery_minutes",
     "collection_hold_minutes",
     "collection_point",
-    "cutlery_opt_in",
     "delivery_fee",
     "emirates_served",
     "free_delivery_above",
     "id",
     "is_collection_enabled",
+    "is_cutlery_opted_in",
     "is_delivery_enabled",
     "minimum_order",
     "outlet_id",
@@ -94693,7 +95186,7 @@
    "marketing.guest_match_policy": [
     "id",
     "match_by",
-    "offer_at_checkout",
+    "offers_at_checkout",
     "scope_path"
    ]
   }
@@ -94728,13 +95221,13 @@
     "guardian_signature_age_to",
     "height_bands_cm",
     "id",
+    "is_refundable_if_ineligible_at_gate",
     "is_waiver_required",
     "max_age_years",
     "max_height_cm",
     "min_age_years",
     "min_height_cm",
     "product_id",
-    "refundable_if_ineligible_at_gate",
     "required_certification_code",
     "scope_path",
     "swim_ability"
@@ -95078,12 +95571,12 @@
     "asap_delivery_minutes",
     "collection_hold_minutes",
     "collection_point",
-    "cutlery_opt_in",
     "delivery_fee",
     "emirates_served",
     "free_delivery_above",
     "id",
     "is_collection_enabled",
+    "is_cutlery_opted_in",
     "is_delivery_enabled",
     "minimum_order",
     "outlet_id",
@@ -95161,7 +95654,7 @@
    "marketing.guest_match_policy": [
     "id",
     "match_by",
-    "offer_at_checkout",
+    "offers_at_checkout",
     "scope_path"
    ]
   }
@@ -95197,13 +95690,13 @@
     "guardian_signature_age_to",
     "height_bands_cm",
     "id",
+    "is_refundable_if_ineligible_at_gate",
     "is_waiver_required",
     "max_age_years",
     "max_height_cm",
     "min_age_years",
     "min_height_cm",
     "product_id",
-    "refundable_if_ineligible_at_gate",
     "required_certification_code",
     "scope_path",
     "swim_ability"
@@ -95324,6 +95817,7 @@
     "direction",
     "error_count",
     "file_id",
+    "findings",
     "id",
     "job_kind",
     "missing_references",
@@ -95510,6 +96004,7 @@
     "push_token",
     "retired_at",
     "scanner_health",
+    "scope_path",
     "serial_number",
     "status",
     "tested_by_principal_id",
@@ -95783,10 +96278,10 @@
     "hreflang",
     "id",
     "is_auto_generated",
+    "is_excluded_from_index",
     "keywords",
     "locale",
     "meta_description",
-    "no_index",
     "open_graph",
     "schema_org_type",
     "scope_path",
@@ -95826,6 +96321,7 @@
   ],
   "readColumns": {
    "venuemap.import_job": [
+    "findings",
     "hand_marked_paths",
     "id",
     "layers_found",
@@ -95837,6 +96333,7 @@
     "outcome",
     "resource_rows_joined",
     "resources_found",
+    "scope_path",
     "shapes_found",
     "status",
     "unmapped_layers"
@@ -96018,6 +96515,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ],
    "fnb.menu_section": [
@@ -96482,7 +96980,7 @@
   "readColumns": {
    "identity.password_policy": [
     "device_restriction",
-    "force_change_on_first_logon",
+    "forces_change_on_first_logon",
     "id",
     "lockout_after_attempts",
     "lockout_minutes",
@@ -96706,6 +97204,7 @@
   ],
   "readColumns": {
    "catalogue.performance_template": [
+    "bands",
     "code",
     "concurrent_capacity",
     "id",
@@ -96819,6 +97318,7 @@
   ],
   "readColumns": {
    "catalogue.performance_template": [
+    "bands",
     "code",
     "concurrent_capacity",
     "id",
@@ -96928,6 +97428,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -96935,8 +97436,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -96970,7 +97470,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -97028,6 +97528,7 @@
     "effective_to",
     "id",
     "list_price",
+    "scope_path",
     "seat_category_id"
    ]
   }
@@ -97107,6 +97608,7 @@
     "applied_by",
     "created_at",
     "created_by",
+    "findings",
     "format",
     "id",
     "preview",
@@ -97295,6 +97797,7 @@
     "media_type",
     "name",
     "recycle_after_days",
+    "scope_path",
     "selection_priority"
    ],
    "orders.ticket_template_channel": [
@@ -97387,6 +97890,7 @@
     "probability",
     "requirements",
     "sales_owner_principal_id",
+    "scope_path",
     "source"
    ]
   }
@@ -97495,7 +97999,8 @@
     "quantity",
     "reason",
     "recorded_at",
-    "recorded_by"
+    "recorded_by",
+    "scope_path"
    ]
   }
  },
@@ -97633,6 +98138,7 @@
     "name",
     "paired_route_id",
     "status",
+    "status_reason",
     "total_minutes",
     "venue_id"
    ],
@@ -98085,9 +98591,9 @@
   ],
   "readColumns": {
    "access.credential_issuance_retry_policy": [
-    "automatic_retry",
     "backoff_minutes",
     "escalate_after_attempts",
+    "has_automatic_retry",
     "id",
     "max_attempts",
     "scope_path",
@@ -98124,6 +98630,7 @@
     "form_version",
     "id",
     "scope_path",
+    "sections",
     "status",
     "updated_at"
    ]
@@ -98158,6 +98665,7 @@
     "form_id",
     "form_version",
     "id",
+    "languages",
     "scope_path",
     "source_language",
     "updated_at"
@@ -98403,13 +98911,13 @@
    "marketing.waiver_signatory_rule": [
     "acceptance_method",
     "allowed_signatories",
-    "capture_relationship",
+    "captures_relationship",
     "co_signature",
     "form_id",
     "form_version",
     "group_signing_modes",
-    "guardian_signs_for_each_minor",
     "guardian_threshold_age",
+    "guardian_threshold_by_country",
     "id",
     "identity_verification",
     "is_initials_required",
@@ -98419,6 +98927,7 @@
     "primary_signatory",
     "recorded_evidence",
     "requires_guardian_for_minors",
+    "requires_guardian_signature_per_minor",
     "scope_path",
     "updated_at"
    ]
@@ -98503,6 +99012,7 @@
     "applied_by",
     "created_at",
     "created_by",
+    "findings",
     "format",
     "id",
     "preview",
@@ -98550,6 +99060,7 @@
     "name",
     "paired_route_id",
     "status",
+    "status_reason",
     "total_minutes",
     "venue_id"
    ],
@@ -98632,6 +99143,7 @@
     "effective_to",
     "form_id",
     "form_version",
+    "history",
     "id",
     "is_suspended",
     "lifecycle_status",
@@ -98682,6 +99194,7 @@
     "media_type",
     "name",
     "recycle_after_days",
+    "scope_path",
     "selection_priority"
    ],
    "orders.ticket_template_channel": [
@@ -98721,6 +99234,7 @@
     "applied_by",
     "created_at",
     "created_by",
+    "findings",
     "format",
     "id",
     "preview",
@@ -98973,6 +99487,7 @@
    "marketing.case_routing_rule": [
     "code",
     "fallback_queue_id",
+    "has_sticky_ownership",
     "id",
     "is_active",
     "match",
@@ -98982,9 +99497,8 @@
     "rank",
     "require_language_match",
     "required_skills",
-    "respect_sla_capability",
+    "respects_sla_capability",
     "scope_path",
-    "sticky_ownership",
     "sticky_window_hours",
     "strategy",
     "updated_at"
@@ -99359,6 +99873,7 @@
     "name",
     "paired_route_id",
     "status",
+    "status_reason",
     "total_minutes",
     "venue_id"
    ],
@@ -99510,6 +100025,7 @@
     "status"
    ],
    "marketing.waiver_signature": [
+    "form_definition_id",
     "id",
     "status"
    ],
@@ -99557,6 +100073,7 @@
   ],
   "readColumns": {
    "wallet.configuration_version": [
+    "findings",
     "id",
     "note",
     "published_at",
@@ -99666,10 +100183,11 @@
     "effective_timing",
     "from_product_id",
     "id",
+    "is_pro_rata",
     "membership_id",
     "order_id",
-    "pro_rata",
     "pro_rata_amount",
+    "scope_path",
     "status",
     "target_product_id"
    ]
@@ -100330,6 +100848,7 @@
   "lineageNote": "not in L3; current derived lineage reads configuration_version only. Copies the chosen version's snapshot values back into the area tables as the working draft",
   "readColumns": {
    "wallet.configuration_version": [
+    "findings",
     "id",
     "note",
     "published_at",
@@ -100608,7 +101127,8 @@
     "last_used_at",
     "name",
     "scopes",
-    "status"
+    "status",
+    "status_reason"
    ]
   }
  },
@@ -100852,15 +101372,16 @@
     "brand_id",
     "channel",
     "channel_fallback",
-    "cost_aware",
     "country",
     "id",
     "is_active",
+    "is_cost_aware",
     "message_class",
     "priority_class",
+    "providers",
     "recipient_type",
     "scope_path",
-    "skip_unhealthy_providers",
+    "skips_unhealthy_providers",
     "throttle",
     "updated_at"
    ]
@@ -100902,7 +101423,7 @@
     "exception_queue_id",
     "executions_last30_days",
     "id",
-    "kill_switch",
+    "is_kill_switch_engaged",
     "last_simulation",
     "level",
     "name",
@@ -100945,16 +101466,19 @@
    "marketing.cookie_banner_design": [
     "body",
     "brand_id",
+    "buttons",
+    "categories",
     "channel",
     "id",
     "inherits_from_id",
+    "is_reject_one_click",
     "languages",
+    "links",
     "logo_asset_id",
     "notice_version",
     "position",
-    "record_ip_address",
+    "records_ip_address",
     "regulatory_regimes",
-    "reject_is_one_click",
     "scope_path",
     "status",
     "theme_id",
@@ -101021,9 +101545,9 @@
   "lineageNote": "x-ticvai-config-change-log: also appends access.configuration_change (writers pass convention)",
   "readColumns": {
    "access.credential_issuance_retry_policy": [
-    "automatic_retry",
     "backoff_minutes",
     "escalate_after_attempts",
+    "has_automatic_retry",
     "id",
     "max_attempts",
     "scope_path",
@@ -101375,9 +101899,9 @@
     "allocation_mode",
     "group_booking_id",
     "id",
-    "keep_group_together",
-    "updated_at",
-    "vip_allocation"
+    "is_vip",
+    "keeps_group_together",
+    "updated_at"
    ],
    "orders.group_ticket_allocation_line": [
     "group_ticket_allocation_id",
@@ -101745,6 +102269,7 @@
   ],
   "readColumns": {
    "venuemap.placed_resource": [
+    "boundary",
     "capacity",
     "id",
     "is_bookable",
@@ -101830,6 +102355,7 @@
     "scope_path",
     "status",
     "subject_id",
+    "system_results",
     "updated_at"
    ]
   }
@@ -101860,13 +102386,13 @@
   ],
   "readColumns": {
    "marketing.privacy_request": [
-    "at_risk",
     "case_id",
     "completed_at",
     "days_remaining",
     "dsar_request_id",
     "due_at",
     "id",
+    "is_at_risk",
     "is_deadline_configured",
     "is_escalated",
     "jurisdiction",
@@ -101936,6 +102462,7 @@
     "kind",
     "name",
     "scope_path",
+    "stages",
     "status",
     "updated_at",
     "verification_methods"
@@ -101971,18 +102498,21 @@
     "acknowledged_at",
     "agent_comment",
     "agent_principal_id",
+    "ai_findings",
     "case_id",
+    "coaching_actions",
     "conversation_id",
+    "criteria",
     "critical_failures",
     "evaluated_at",
     "evaluated_by",
     "evaluator_principal_id",
     "feedback",
     "id",
+    "is_sla_met",
     "overall_score",
     "resolution_seconds",
     "scope_path",
-    "sla_met",
     "source_type",
     "status",
     "updated_at"
@@ -102022,6 +102552,7 @@
     "refund_destinations",
     "refund_types",
     "scope",
+    "scope_path",
     "updated_at"
    ]
   }
@@ -102053,6 +102584,7 @@
   "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
   "readColumns": {
    "resources.booking": [
+    "change_reason",
     "checked_out_at",
     "condition_in",
     "condition_out",
@@ -102267,6 +102799,7 @@
     "name",
     "paired_route_id",
     "status",
+    "status_reason",
     "total_minutes",
     "venue_id"
    ],
@@ -102483,10 +103016,12 @@
    "marketing.waiver_trigger_rule": [
     "allow_staff_override",
     "completion_deadline",
+    "eligibility",
     "enforcement",
     "form_id",
     "id",
     "name",
+    "reminders",
     "scope_path",
     "status",
     "trigger_point",
@@ -102521,7 +103056,8 @@
   "readColumns": {
    "wallet.authentication_policy": [
     "id",
-    "scope_path"
+    "scope_path",
+    "tiers"
    ]
   }
  },
@@ -102590,7 +103126,8 @@
   "readColumns": {
    "wallet.reconciliation_source": [
     "id",
-    "scope_path"
+    "scope_path",
+    "sources"
    ]
   }
  },
@@ -103173,6 +103710,7 @@
     "name",
     "paired_route_id",
     "status",
+    "status_reason",
     "total_minutes",
     "venue_id"
    ],
@@ -103344,11 +103882,12 @@
   "readColumns": {
    "ledger.tax_exemption": [
     "certificate_reference",
-    "evidence_document_id",
+    "evidence_asset_id",
     "exemption_type",
     "id",
     "reason",
     "scope",
+    "scope_path",
     "scope_ref",
     "tax_code_id",
     "valid_from",
@@ -104746,6 +105285,7 @@
     "authentication_method",
     "branding",
     "buyer_terms",
+    "can_seller_edit_price",
     "cancellation_fee",
     "checkout_hold_minutes",
     "created_at",
@@ -104771,7 +105311,6 @@
     "resale_ticket_label",
     "review_triggers",
     "scope_path",
-    "seller_can_edit_price",
     "seller_terms",
     "settlement_delay_days",
     "settlement_timing",
@@ -105361,9 +105900,9 @@
    "orders.order_line_eligibility": [
     "age_band",
     "age_years",
-    "confident_swimmer",
     "height_band_index",
     "id",
+    "is_confident_swimmer",
     "is_guardian_signed",
     "order_line_id"
    ],
@@ -105906,7 +106445,7 @@
   "readColumns": {
    "accreditation.identity_conflict": [
     "detected_at",
-    "differing_access",
+    "has_differing_access",
     "holder_ids",
     "id",
     "matched_on",
@@ -105965,6 +106504,7 @@
     "owner_principal_id",
     "partner",
     "product_id",
+    "resolution_note",
     "resolved_at",
     "response_excerpt",
     "retry_count",
@@ -106698,7 +107238,6 @@
     "activation_triggers",
     "active_display",
     "before_activation_display",
-    "before_first_validation_only",
     "concurrent_sessions",
     "consumption_model",
     "created_at",
@@ -106707,6 +107246,7 @@
     "holder_assignment_requirements",
     "id",
     "id_generation_pattern",
+    "is_before_first_validation_only",
     "is_cancel_pending_allowed",
     "is_transfer_allowed",
     "is_transfer_audit_required",
@@ -106718,7 +107258,7 @@
     "require_acceptance",
     "require_otp",
     "require_recipient_account",
-    "return_to_sender",
+    "returns_to_sender",
     "scope_path",
     "ticket_classification",
     "ticket_ownership_model",
@@ -106773,7 +107313,7 @@
     "effective_from",
     "effective_to",
     "evaluation_frequency_minutes",
-    "exclude_protected_rates",
+    "excludes_protected_rates",
     "execution_frequency_minutes",
     "id",
     "is_frozen",
@@ -106839,9 +107379,9 @@
     "created_at",
     "eligible_attraction_categories",
     "id",
+    "is_one_per_ride",
     "is_unlimited",
     "name",
-    "one_per_ride",
     "scope_path",
     "total_uses",
     "updated_at",
@@ -106933,10 +107473,10 @@
   "readColumns": {
    "access.gate_mode_policy": [
     "access_point_group_id",
-    "automatic_notification",
     "created_at",
     "creates_incident",
     "emergency_code",
+    "has_automatic_notification",
     "id",
     "is_reason_required",
     "mode",
@@ -106983,16 +107523,16 @@
     "firmware_software_information",
     "hardware_type",
     "id",
-    "light_capability",
     "manufacturer",
     "model",
-    "offline_capability",
-    "payment_capability",
-    "relay_controller_support",
     "scope_path",
-    "screen_capability",
-    "sound_capability",
     "supported_technologies",
+    "supports_light",
+    "supports_offline",
+    "supports_payment",
+    "supports_relay_controller",
+    "supports_screen",
+    "supports_sound",
     "updated_at"
    ]
   }
@@ -107358,7 +107898,6 @@
   "readColumns": {
    "access.operating_calendar_entry": [
     "admission_type",
-    "attraction_validation",
     "created_at",
     "day_type",
     "ends_at",
@@ -107368,6 +107907,7 @@
     "is_venue_closed",
     "name",
     "priority",
+    "requires_attraction_validation",
     "scope_path",
     "starts_at",
     "updated_at",
@@ -108474,7 +109014,7 @@
     "created_at",
     "id",
     "is_enabled",
-    "offline_availability",
+    "is_offline_available",
     "relationship_responses",
     "relationship_rule_type",
     "relationship_type",
@@ -108520,6 +109060,7 @@
     "authentication_method",
     "branding",
     "buyer_terms",
+    "can_seller_edit_price",
     "cancellation_fee",
     "checkout_hold_minutes",
     "created_at",
@@ -108545,7 +109086,6 @@
     "resale_ticket_label",
     "review_triggers",
     "scope_path",
-    "seller_can_edit_price",
     "seller_terms",
     "settlement_delay_days",
     "settlement_timing",
@@ -108816,7 +109356,7 @@
     "created_at",
     "credential_format_override",
     "id",
-    "lock_on_first_successful_access",
+    "locks_on_first_successful_access",
     "product_id",
     "reason_codes",
     "scope_path",
@@ -109086,6 +109626,7 @@
     "owner_principal_id",
     "partner",
     "product_id",
+    "resolution_note",
     "resolved_at",
     "response_excerpt",
     "retry_count",
@@ -109203,6 +109744,7 @@
     "face_reenrolment_attempt_id",
     "fraud_rule_id",
     "id",
+    "note",
     "scope_path",
     "security_investigation_id",
     "severity",
@@ -109243,10 +109785,10 @@
   "readColumns": {
    "access.offline_policy": [
     "after_threshold_behavior",
-    "automatic_switch",
     "central_unavailable_after_seconds",
     "created_at",
     "edge_unavailable_after_seconds",
+    "has_automatic_switch",
     "id",
     "max_offline_duration_hours",
     "offline_checks",
@@ -109471,6 +110013,7 @@
     "id",
     "note",
     "page_count",
+    "scope_path",
     "session_id",
     "source_kind",
     "status",
@@ -109735,6 +110278,7 @@
     "applications_close_at",
     "applications_open_at",
     "approval_workflow_id",
+    "categories",
     "code",
     "event_ids",
     "face_matching",
@@ -109784,6 +110328,7 @@
     "capability_keys",
     "closed_at",
     "contained_at",
+    "containment",
     "control_failure",
     "id",
     "impact",
@@ -109842,6 +110387,7 @@
     "closed_at",
     "closed_by_principal_id",
     "closure_note",
+    "entities",
     "id",
     "opened_at",
     "opened_by_principal_id",
@@ -109888,6 +110434,7 @@
   "readColumns": {
    "ai.forecast_scenario": [
     "base_version_id",
+    "changes",
     "created_at",
     "created_by_principal_id",
     "id",
@@ -110132,6 +110679,7 @@
     "is_decline_governed",
     "is_model_enabled",
     "mode",
+    "outcome_map",
     "published_at",
     "published_by_principal_id",
     "scope_path",
@@ -110182,6 +110730,7 @@
     "capability_keys",
     "closed_at",
     "contained_at",
+    "containment",
     "control_failure",
     "id",
     "impact",
@@ -110246,7 +110795,7 @@
     "item_count",
     "lookback_days",
     "name",
-    "prefill_from_findings",
+    "prefills_from_findings",
     "recurrence",
     "reviewer_mode",
     "reviewer_principal_ids",
@@ -110514,6 +111063,7 @@
   "readColumns": {
    "ai.forecast_scenario": [
     "base_version_id",
+    "changes",
     "created_at",
     "created_by_principal_id",
     "id",
@@ -110632,6 +111182,7 @@
     "closed_at",
     "closed_by_principal_id",
     "closure_note",
+    "entities",
     "id",
     "opened_at",
     "opened_by_principal_id",
@@ -111812,6 +112363,7 @@
     "trace_id"
    ],
    "ai.decision_record": [
+    "annotations",
     "approvals",
     "capability_key",
     "created_at",
@@ -111889,6 +112441,7 @@
     "risk_score",
     "scope_path",
     "scored_at",
+    "signals",
     "trigger"
    ]
   }
@@ -112032,16 +112585,19 @@
    "marketing.cookie_banner_design": [
     "body",
     "brand_id",
+    "buttons",
+    "categories",
     "channel",
     "id",
     "inherits_from_id",
+    "is_reject_one_click",
     "languages",
+    "links",
     "logo_asset_id",
     "notice_version",
     "position",
-    "record_ip_address",
+    "records_ip_address",
     "regulatory_regimes",
-    "reject_is_one_click",
     "scope_path",
     "status",
     "theme_id",
@@ -112060,7 +112616,7 @@
     "country",
     "decided_at",
     "expires_at",
-    "global_privacy_control",
+    "honours_global_privacy_control",
     "id",
     "language",
     "notice_version",
@@ -112179,7 +112735,7 @@
     "country",
     "decided_at",
     "expires_at",
-    "global_privacy_control",
+    "honours_global_privacy_control",
     "id",
     "language",
     "notice_version",
@@ -112462,6 +113018,7 @@
   "readColumns": {
    "identity.guest_verification_policy": [
     "accepted_document_kinds",
+    "accepts_uae_pass_as_id_document",
     "document_image_retention",
     "id",
     "id_document_required_for",
@@ -112471,7 +113028,6 @@
     "registration_requires",
     "review_mode",
     "scope_path",
-    "uae_pass_satisfies_id_document",
     "updated_at",
     "verification_provider",
     "wallet_top_up_limit"
@@ -112511,6 +113067,7 @@
     "model_version",
     "product_count",
     "prompt_template_version",
+    "questions",
     "scope_path",
     "status",
     "trigger",
@@ -112750,6 +113307,7 @@
     "closed_at",
     "closed_by_principal_id",
     "closure_note",
+    "entities",
     "id",
     "opened_at",
     "opened_by_principal_id",
@@ -113391,7 +113949,7 @@
     "item_count",
     "lookback_days",
     "name",
-    "prefill_from_findings",
+    "prefills_from_findings",
     "recurrence",
     "reviewer_mode",
     "reviewer_principal_ids",
@@ -113778,6 +114336,7 @@
     "capability_keys",
     "closed_at",
     "contained_at",
+    "containment",
     "control_failure",
     "id",
     "impact",
@@ -113889,8 +114448,9 @@
     "residency",
     "residency_classes",
     "scope_path",
-    "structured_output",
-    "tool_calling",
+    "supports_structured_output",
+    "supports_tool_calling",
+    "task_fitness",
     "vendor"
    ]
   }
@@ -113971,6 +114531,7 @@
     "id",
     "is_idempotent",
     "is_reversible",
+    "is_validation_only",
     "permission",
     "risk_class",
     "scope_path",
@@ -113978,8 +114539,7 @@
     "target_contract",
     "target_operation",
     "timeout_ms",
-    "tool_key",
-    "validate_only"
+    "tool_key"
    ]
   }
  },
@@ -114271,6 +114831,7 @@
     "id",
     "note",
     "page_count",
+    "scope_path",
     "session_id",
     "source_kind",
     "status",
@@ -114551,7 +115112,7 @@
     "country",
     "decided_at",
     "expires_at",
-    "global_privacy_control",
+    "honours_global_privacy_control",
     "id",
     "language",
     "notice_version",
@@ -115680,6 +116241,7 @@
     "capability_keys",
     "closed_at",
     "contained_at",
+    "containment",
     "control_failure",
     "id",
     "impact",
@@ -116684,7 +117246,7 @@
     "country",
     "decided_at",
     "expires_at",
-    "global_privacy_control",
+    "honours_global_privacy_control",
     "id",
     "language",
     "notice_version",
@@ -116790,6 +117352,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -116797,8 +117360,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -116832,7 +117394,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -117096,6 +117658,7 @@
     "priority",
     "scope_path",
     "status",
+    "status_reason",
     "version"
    ]
   }
@@ -117770,6 +118333,7 @@
     "risk_score",
     "scope_path",
     "scored_at",
+    "signals",
     "trigger"
    ]
   },
@@ -117852,6 +118416,7 @@
   ],
   "readColumns": {
    "ai.decision_record": [
+    "annotations",
     "approvals",
     "capability_key",
     "created_at",
@@ -118014,8 +118579,9 @@
     "residency",
     "residency_classes",
     "scope_path",
-    "structured_output",
-    "tool_calling",
+    "supports_structured_output",
+    "supports_tool_calling",
+    "task_fitness",
     "vendor"
    ]
   }
@@ -118104,6 +118670,7 @@
     "id",
     "is_idempotent",
     "is_reversible",
+    "is_validation_only",
     "permission",
     "risk_class",
     "scope_path",
@@ -118111,8 +118678,7 @@
     "target_contract",
     "target_operation",
     "timeout_ms",
-    "tool_key",
-    "validate_only"
+    "tool_key"
    ]
   }
  },
@@ -118557,6 +119123,7 @@
   "readColumns": {
    "identity.guest_verification_policy": [
     "accepted_document_kinds",
+    "accepts_uae_pass_as_id_document",
     "document_image_retention",
     "id",
     "id_document_required_for",
@@ -118566,7 +119133,6 @@
     "registration_requires",
     "review_mode",
     "scope_path",
-    "uae_pass_satisfies_id_document",
     "updated_at",
     "verification_provider",
     "wallet_top_up_limit"
@@ -119205,6 +119771,7 @@
     "model_version",
     "product_count",
     "prompt_template_version",
+    "questions",
     "scope_path",
     "status",
     "trigger",
@@ -119417,6 +119984,7 @@
     "applications_close_at",
     "applications_open_at",
     "approval_workflow_id",
+    "categories",
     "code",
     "event_ids",
     "face_matching",
@@ -119859,6 +120427,7 @@
     "id",
     "is_enabled",
     "requirement",
+    "scope_path",
     "settings",
     "sort_order",
     "step_key"
@@ -120096,6 +120665,7 @@
    "venuemap.visit_plan": [
     "cart_id",
     "created_at",
+    "excluded",
     "id",
     "inputs",
     "map_version",
@@ -120185,6 +120755,7 @@
     "fnb_attach_rate",
     "id",
     "is_outdoor",
+    "opening_hours",
     "peak_months",
     "scope_path",
     "staff_productivity",
@@ -120234,7 +120805,7 @@
     "scope_path",
     "status",
     "store_account_id",
-    "submit_to_store",
+    "submits_to_store",
     "version_name"
    ]
   }
@@ -120280,6 +120851,7 @@
     "id",
     "is_enabled",
     "requirement",
+    "scope_path",
     "settings",
     "sort_order",
     "step_key"
@@ -120331,6 +120903,7 @@
     "id",
     "is_enabled",
     "requirement",
+    "scope_path",
     "settings",
     "sort_order",
     "step_key"
@@ -120379,7 +120952,7 @@
    "whitelabel.site_setup_progress": [
     "current_step",
     "id",
-    "minimum_path_done",
+    "is_minimum_path_done",
     "preset_key",
     "scope_path",
     "steps",
@@ -120463,8 +121036,9 @@
     "completed_at",
     "created_at",
     "data_kind",
-    "dry_run",
+    "findings",
     "id",
+    "is_dry_run",
     "months_covered",
     "period_from",
     "period_to",
@@ -120506,6 +121080,7 @@
    "venuemap.visit_plan": [
     "cart_id",
     "created_at",
+    "excluded",
     "id",
     "inputs",
     "map_version",
@@ -120566,6 +121141,7 @@
   ],
   "readColumns": {
    "maintenance.priority_scoring_model": [
+    "bands",
     "id",
     "updated_at",
     "updated_by_principal_id",
@@ -120660,8 +121236,9 @@
     "completed_at",
     "created_at",
     "data_kind",
-    "dry_run",
+    "findings",
     "id",
+    "is_dry_run",
     "months_covered",
     "period_from",
     "period_to",
@@ -120997,7 +121574,7 @@
     "scope_path",
     "status",
     "store_account_id",
-    "submit_to_store",
+    "submits_to_store",
     "version_name"
    ]
   }
@@ -121064,6 +121641,7 @@
     "id",
     "is_enabled",
     "requirement",
+    "scope_path",
     "settings",
     "sort_order",
     "step_key"
@@ -121184,8 +121762,9 @@
     "completed_at",
     "created_at",
     "data_kind",
-    "dry_run",
+    "findings",
     "id",
+    "is_dry_run",
     "months_covered",
     "period_from",
     "period_to",
@@ -121291,6 +121870,7 @@
     "id",
     "posted_at",
     "posted_by_principal_id",
+    "posting_date",
     "reference",
     "rejected_at",
     "rejected_by_principal_id",
@@ -121512,7 +122092,7 @@
     "scope_path",
     "status",
     "store_account_id",
-    "submit_to_store",
+    "submits_to_store",
     "version_name"
    ]
   }
@@ -121647,6 +122227,7 @@
     "fnb_attach_rate",
     "id",
     "is_outdoor",
+    "opening_hours",
     "peak_months",
     "scope_path",
     "staff_productivity",
@@ -121732,7 +122313,7 @@
    "whitelabel.site_setup_progress": [
     "current_step",
     "id",
-    "minimum_path_done",
+    "is_minimum_path_done",
     "preset_key",
     "scope_path",
     "steps",
@@ -121876,6 +122457,7 @@
   "note": "config scope venue",
   "readColumns": {
    "maintenance.priority_scoring_model": [
+    "bands",
     "id",
     "updated_at",
     "updated_by_principal_id",
@@ -121963,6 +122545,7 @@
     "id",
     "is_enabled",
     "requirement",
+    "scope_path",
     "settings",
     "sort_order",
     "step_key"
@@ -122052,6 +122635,7 @@
    "venuemap.visit_plan": [
     "cart_id",
     "created_at",
+    "excluded",
     "id",
     "inputs",
     "map_version",
@@ -122917,6 +123501,7 @@
     "push_token",
     "retired_at",
     "scanner_health",
+    "scope_path",
     "serial_number",
     "status",
     "tested_by_principal_id",
@@ -122957,6 +123542,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -122964,8 +123550,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -122999,7 +123584,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -123091,6 +123676,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -123098,8 +123684,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -123133,7 +123718,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -124695,6 +125280,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -124702,8 +125288,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -124737,7 +125322,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -124780,8 +125365,11 @@
   "writesNote": "writes added 3 October 2026 (CHG-R1S-005): the HLD/LLD cross-check found it wrote no table",
   "readColumns": {
    "access.access_point": [
+    "captures_vehicle_location",
     "code",
     "direction",
+    "direction_change_reason",
+    "direction_effective_at",
     "driver",
     "external_credential_sources",
     "geofence",
@@ -124796,7 +125384,6 @@
     "scan_anomaly_rules",
     "scope_path",
     "temporary_closure",
-    "vehicle_location_capture",
     "venue_id"
    ],
    "access.gate_mode_change": [
@@ -124991,6 +125578,7 @@
     "transport_restriction",
     "valid_for_days",
     "valid_from_offset_days",
+    "valid_time_windows",
     "validity_kind"
    ]
   }
@@ -125155,6 +125743,7 @@
     "restore_at",
     "sort_order",
     "station_id",
+    "unavailable_note",
     "unavailable_reason"
    ]
   }
@@ -125618,7 +126207,7 @@
     "issued_by_principal_id",
     "order_id",
     "paid_at",
-    "release_hold_on_expiry",
+    "releases_reservation_on_expiry",
     "resend_count",
     "reservation_id",
     "scope_path",
@@ -125891,7 +126480,7 @@
     "is_enabled",
     "knowledge_collection_ids",
     "pattern_detection",
-    "reply_in_customer_language",
+    "replies_in_customer_language",
     "scope_level",
     "scope_path",
     "updated_at"
@@ -126128,7 +126717,8 @@
     "code",
     "id",
     "name",
-    "product_id"
+    "product_id",
+    "values"
    ]
   }
  },
@@ -126374,7 +126964,8 @@
     "list_price",
     "name",
     "name_localised",
-    "outlet_id"
+    "outlet_id",
+    "scope_path"
    ],
    "fnb.combo_slot": [
     "combo_id",
@@ -126382,6 +126973,7 @@
     "max_select",
     "min_select",
     "name",
+    "scope_path",
     "sort_order"
    ],
    "fnb.combo_slot_option": [
@@ -126573,8 +127165,8 @@
     "default_destination",
     "destinations_by_source",
     "id",
-    "restore_original_expiry",
-    "restore_to_original_lots",
+    "restores_original_expiry",
+    "restores_to_original_lots",
     "scope_path",
     "wallet_refund_bonus_percent",
     "wallet_refund_credit_type_id"
@@ -126773,8 +127365,8 @@
     "id",
     "on_expiry",
     "programme_id",
-    "renewal_requires_reverification",
     "renewal_window_days",
+    "requires_renewal_reverification",
     "scope_path",
     "validity_kind",
     "validity_months"
@@ -126811,6 +127403,7 @@
     "decided_at",
     "decision",
     "delegated_from",
+    "did_use_mfa",
     "display_name",
     "id",
     "is_delegate",
@@ -126818,8 +127411,7 @@
     "principal_id",
     "reason",
     "request_id",
-    "signature_ref",
-    "used_mfa"
+    "signature_ref"
    ],
    "approvals.escalation": [
     "added_approver_principal_id",
@@ -126853,7 +127445,7 @@
     "reopened_from_id",
     "requested_at",
     "requested_by_principal_id",
-    "reroute_on_no_approver",
+    "reroutes_on_no_approver",
     "resubmitted_from_id",
     "scope_path",
     "sla_due_at",
@@ -126890,6 +127482,7 @@
   ],
   "readColumns": {
    "resources.booking": [
+    "change_reason",
     "checked_out_at",
     "condition_in",
     "condition_out",
@@ -127171,6 +127764,7 @@
     "id",
     "outlet_id",
     "released_run_ids",
+    "scope_path",
     "status"
    ],
    "fnb.production_plan_line": [
@@ -128170,7 +128764,7 @@
     "scope_path",
     "security_classification",
     "security_classification_level",
-    "support_multi_park_environments",
+    "supports_multi_park_environments",
     "time_zone",
     "updated_at",
     "venue_id",
@@ -128235,6 +128829,7 @@
     "transport_restriction",
     "valid_for_days",
     "valid_from_offset_days",
+    "valid_time_windows",
     "validity_kind"
    ]
   }
@@ -128294,6 +128889,7 @@
     "transport_restriction",
     "valid_for_days",
     "valid_from_offset_days",
+    "valid_time_windows",
     "validity_kind"
    ]
   }
@@ -128355,6 +128951,7 @@
     "transport_restriction",
     "valid_for_days",
     "valid_from_offset_days",
+    "valid_time_windows",
     "validity_kind"
    ]
   }

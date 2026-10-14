@@ -520,10 +520,12 @@
     "readOnly": true
    },
    "workflowDefinitionId": {
+    "x-ticvai-references": "approvals.workflow_definition",
     "type": "string",
     "format": "uuid"
    },
    "workflowVersionId": {
+    "x-ticvai-references": "approvals.workflow_version",
     "type": "string",
     "format": "uuid",
     "description": "The version the instance started on; never changes"
@@ -563,6 +565,7 @@
     "nullable": true
    },
    "currentNodeId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "nullable": true,
     "description": "The node of the version's graph the instance is at"

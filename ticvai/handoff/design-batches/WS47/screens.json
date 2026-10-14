@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/coupon-promo-code-command-center-adm-158",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
+   "component": "src/routes/venue-operations/PromotionsCouponsDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-010"
   },
@@ -132,7 +133,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -331,6 +332,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",
@@ -340,7 +342,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/coupon-promo-code-builder-adm-159",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
+   "component": "src/routes/venue-operations/PromotionsCouponsDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-010"
   },
@@ -504,6 +506,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",
@@ -513,7 +516,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/unique-code-generation-batch-manager-adm-160",
-   "component": "apps/venue-management-web/src/routes/commercial/UniqueCodeGenerationBatchManager.tsx",
+   "component": "src/routes/commercial/UniqueCodeGenerationBatchManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -719,6 +722,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",
@@ -728,7 +732,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/code-eligibility-restriction-manager-adm-161",
-   "component": "apps/venue-management-web/src/routes/commercial/CodeEligibilityRestrictionManager.tsx",
+   "component": "src/routes/commercial/CodeEligibilityRestrictionManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -785,7 +789,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listCodeEligibilityRestriction",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listCodeEligibilityRestriction"
       }
      ]
     }
@@ -847,6 +852,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",
@@ -856,7 +862,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/usage-capacity-frequency-control-adm-162",
-   "component": "apps/venue-management-web/src/routes/commercial/UsageCapacityFrequencyControl.tsx",
+   "component": "src/routes/commercial/UsageCapacityFrequencyControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -990,6 +996,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",
@@ -999,7 +1006,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/validity-date-time-control-adm-163",
-   "component": "apps/venue-management-web/src/routes/commercial/ValidityDateTimeControl.tsx",
+   "component": "src/routes/commercial/ValidityDateTimeControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1051,7 +1058,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listValidityDateTime",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listValidityDateTime"
       }
      ]
     }
@@ -1115,6 +1123,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 1,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",
@@ -1124,7 +1133,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/code-distribution-assignment-manager-adm-164",
-   "component": "apps/venue-management-web/src/routes/commercial/CodeDistributionAssignmentManager.tsx",
+   "component": "src/routes/commercial/CodeDistributionAssignmentManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1344,6 +1353,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",
@@ -1353,7 +1363,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/redemption-monitor-code-lookup-adm-165",
-   "component": "apps/venue-management-web/src/routes/commercial/RedemptionMonitorCodeLookup.tsx",
+   "component": "src/routes/commercial/RedemptionMonitorCodeLookup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1504,6 +1514,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",
@@ -1513,7 +1524,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/code-security-fraud-exception-center-adm-166",
-   "component": "apps/venue-management-web/src/routes/commercial/CodeSecurityFraudExceptionCenter.tsx",
+   "component": "src/routes/commercial/CodeSecurityFraudExceptionCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1643,6 +1654,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",
@@ -1652,7 +1664,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/redemption-analytics-audit-ai-optimization-adm-167",
-   "component": "apps/venue-management-web/src/routes/commercial/RedemptionAnalyticsAuditAiOptimization.tsx",
+   "component": "src/routes/commercial/RedemptionAnalyticsAuditAiOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1682,7 +1694,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {

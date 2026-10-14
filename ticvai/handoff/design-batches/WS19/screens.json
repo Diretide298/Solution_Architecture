@@ -5,6 +5,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "7",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approval-integration-command-center-adm-349",
-   "component": "apps/venue-management-web/src/routes/platform/ApprovalIntegrationCommandCenter.tsx",
+   "component": "src/routes/platform/ApprovalIntegrationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -218,6 +219,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "7",
@@ -227,7 +229,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/module-integration-registry-adm-350",
-   "component": "apps/venue-management-web/src/routes/platform/ModuleIntegrationRegistry.tsx",
+   "component": "src/routes/platform/ModuleIntegrationRegistry.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -273,7 +275,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listCrossModuleOrchestration",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listCrossModuleOrchestration"
       }
      ]
     }
@@ -331,6 +334,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "7",
@@ -340,7 +344,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/approval-api-management-adm-351",
-   "component": "apps/venue-management-web/src/routes/platform/ApprovalApiManagement.tsx",
+   "component": "src/routes/platform/ApprovalApiManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -513,6 +517,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "7",
@@ -522,7 +527,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/workflow-event-framework-adm-352",
-   "component": "apps/venue-management-web/src/routes/platform/WorkflowEventFramework.tsx",
+   "component": "src/routes/platform/WorkflowEventFramework.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -653,7 +658,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/webhook-configuration-subscription-manager-adm-353",
-   "component": "apps/venue-management-web/src/routes/platform/WebhookConfigurationSubscriptionManager.tsx",
+   "component": "src/routes/platform/WebhookConfigurationSubscriptionManager.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -769,6 +774,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "7",
@@ -778,7 +784,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/external-workflow-system-integration-adm-354",
-   "component": "apps/venue-management-web/src/routes/platform/ExternalWorkflowSystemIntegration.tsx",
+   "component": "src/routes/platform/ExternalWorkflowSystemIntegration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -902,7 +908,16 @@
    "workshopBoard": "wireframes/WS36 Approval Workflows and Governance Board 7.dc.html#adm-354"
   },
   "apisNote": "Regenerated 9 September 2026 from Approval_Workflows_and_Governance_Reference.pdf page 65. 0 of 0 labels bound to a contract property; 8 of 21 pack bullets carried onto the screen — the rest are acceptance prose, worked examples and AI narrative, which belong to the matrix and the contracts rather than here.",
-  "entryState": {},
+  "entryState": {
+   "params": [
+    {
+     "name": "externalProviderId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listApprovalExternalProviders`."
+    }
+   ]
+  },
   "gaps": [
    {
     "operation": "listApiClients",
@@ -975,6 +990,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "7",
@@ -984,7 +1000,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/data-workflow-mapping-studio-adm-355",
-   "component": "apps/venue-management-web/src/routes/platform/DataWorkflowMappingStudio.tsx",
+   "component": "src/routes/platform/DataWorkflowMappingStudio.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1104,6 +1120,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PERMISSION_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "7",
@@ -1113,7 +1130,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/integration-security-access-control-adm-356",
-   "component": "apps/venue-management-web/src/routes/platform/IntegrationSecurityAccessControl.tsx",
+   "component": "src/routes/platform/IntegrationSecurityAccessControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1282,6 +1299,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "7",
@@ -1291,7 +1309,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/integration-monitoring-error-retry-center-adm-357",
-   "component": "apps/venue-management-web/src/routes/platform/IntegrationMonitoringErrorRetryCenter.tsx",
+   "component": "src/routes/platform/IntegrationMonitoringErrorRetryCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1337,7 +1355,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listWorkflowExceptionFailure",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listWorkflowExceptionFailure"
       }
      ]
     }
@@ -1402,6 +1421,7 @@
   "module": "Platform",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "7",
@@ -1411,7 +1431,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/platform/integration-analytics-ai-health-advisor-adm-358",
-   "component": "apps/venue-management-web/src/routes/platform/IntegrationAnalyticsAiHealthAdvisor.tsx",
+   "component": "src/routes/platform/IntegrationAnalyticsAiHealthAdvisor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1457,7 +1477,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listWorkflowProcessPerformance",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listWorkflowProcessPerformance"
       }
      ]
     }

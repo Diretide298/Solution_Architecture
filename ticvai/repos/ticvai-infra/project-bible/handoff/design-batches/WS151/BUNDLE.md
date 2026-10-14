@@ -108,7 +108,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-599` | Mixed Tender & Credit Command Center | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-600` | Mixed Tender Rule & Combination Builder | C | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-601` | Split Payment & Tender Allocation Manager | C | 4 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-601` | Split Payment & Tender Allocation Manager | C | 12 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-602` | B2B Credit Account & Limit Manager | C | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | A | 10 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | C | 11 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
@@ -226,6 +226,8 @@ rule: Gift card, then TICVAI wallet, then card
 - `getMixedTenderRules` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -375,6 +377,8 @@ forbidden:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -447,6 +451,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Product id | picker: choose a product (drawn as a picker, not a text box) | optional | — | — | shows names, sends the id | Sends `?productId=` to `listPaymentAllocationRules`. | `listPaymentAllocationRules` ?productId |
 | Is active | toggle | optional | on | — | — | Sends `?isActive=` to `listPaymentAllocationRules`. | `listPaymentAllocationRules` ?isActive |
 
+**Sent by *Save multi payment split*** (`setMultiPaymentSplit`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Channel `channel` | text field | optional | — | — | — | Channel | `setMultiPaymentSplit` body |
+| Venue `venue` | text field | optional | — | — | — | Venue | `setMultiPaymentSplit` body |
+| Terminal `terminal` | text field | optional | — | — | — | Terminal | `setMultiPaymentSplit` body |
+| Product `product` | text field | optional | — | — | — | Product | `setMultiPaymentSplit` body |
+| Order type `orderType` | text field | optional | — | — | — | Order Type | `setMultiPaymentSplit` body |
+| Customer type `customerType` | text field | optional | — | — | — | Customer Type | `setMultiPaymentSplit` body |
+| Allocation level `allocationLevel` | select | optional | — | Order level · Order line level · Product level · Tax fee component · Specific ticket · Deposit | — | What a payment is allocated against. | `setMultiPaymentSplit` body |
+| Is active `isActive` | toggle | optional | on | — | — | False retires the rule for this match key (decided 29 September, writers pass). | `setMultiPaymentSplit` body |
+
 **Rules for these inputs** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
 - **sequence**: Ordered tenders; restrictions per tender. *(source: contracts/satellite/payments.yaml#setMixedTenderRules / contracts/spine/orders.yaml#setMultiPaymentSplit)*
@@ -469,7 +486,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save multi payment split (primary button) | navigation or local | — | — | — | — |
+| Save multi payment split (primary button) | `setMultiPaymentSplit` PUT `/multi-payment-split` | MultiPaymentSplitTenderPaymentAllocationConfiguratioInput | MultiPaymentSplitTenderPaymentAllocationConfiguratioView | 412 The row changed since the `If-Match` version was read (SD-013). Re-read and retry. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Data it reads**: `listPaymentAllocationRules` (onLoad, The venue's split-tender allocation rules)
@@ -508,6 +525,8 @@ sequence:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -531,7 +550,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (4), with its required mark, default, format and its error state (403, 412).
+- [ ] Every input above is drawn (12), with its required mark, default, format and its error state (403, 412).
 - [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-601?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save multi payment split, Cancel.
@@ -635,6 +654,8 @@ account:
 - `createB2bCreditAccount` → `CREDIT_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -789,6 +810,8 @@ instalments:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -906,6 +929,8 @@ order:
 - `getCreditConsumptionPolicy` → `WALLET_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `WALLET_VIEW`
 
 #### Requirements it meets
 
@@ -1054,6 +1079,8 @@ rule: Gift cards cannot pay for gift cards
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1129,14 +1156,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every partial payment failure** (data table)
+**Every partial payment failure** (data table, from `listDunningCases`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | AED 200 ✓ | text | not in the schema: `AED 200 ✓` |
 | AED 800 ✕ | text | not in the schema: `AED 800 ✕` |
 
-**The selected partial payment failure** (detail panel): The pack groups this record's detail under its own headings: “AED 200 successfully consumed”, “Partial Payment States”, “Timeout”, “Partially Paid”.
+**The selected partial payment failure** (detail panel, from `getDunningPolicy`): The pack groups this record's detail under its own headings: “AED 200 successfully consumed”, “Partial Payment States”, “Timeout”, “Partially Paid”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1185,6 +1212,8 @@ case:
 - `resolveDunningCase` → `PAYMENT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_CONFIGURE`
 
 #### Requirements it meets
 
@@ -1309,6 +1338,8 @@ trace:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `ORDER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1386,7 +1417,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every mixed tender simulator** (data table)
+**Every mixed tender simulator** (data table, from `listB2bCreditAccounts`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1458,6 +1489,8 @@ result:
 - `listB2bCreditAccounts` → `PAYMENT_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -1617,12 +1650,12 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "DunningCase": {"x-ticvai-persistence":"payments.dunning_case","type":"object","description":"BL-100. **One recurring charge being chased**, and the row a venue works from.\n","required":["id","state","attemptsMade","firstFailedAt"],"properties":{"id":{"type":"string","format":"uuid"},"subjectId":{"type":"string","format":"uuid"},"orderId":{"type":"string","description":"The order whose renewal failed."},"amount":{"x-ticvai-column":"overdue_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"state":{"$ref":"#/components/schemas/DunningState"},"declineClass":{"allOf":[{"$ref":"#/components/schemas/DeclineClass"}],"description":"**From the most recent attempt.** A case that begins `soft` and turns `hard` stops immediately rather than finishing its schedule — the card changed underneath it.\n"},"attemptsMade":{"type":"integer"},"nextAttemptAt":{"type":"string","format":"date-time","nullable":true,"description":"**Null where the case has ended or the decline is hard.** A scheduled time on a case nothing will act on is the field that makes a queue untrustworthy.\n"},"firstFailedAt":{"type":"string","format":"date-time"},"resolvedAt":{"type":"string","format":"date-time","nullable":true},"resolution":{"type":"string","nullable":true,"enum":["paidByOtherMeans","cardReplaced","writeOff","cancelledByGuest",null]},"resolutionNote":{"type":"string","nullable":true,"maxLength":500,"description":"**What `resolveDunningCase` was told, which had nowhere to land until now.** The enum above tells `writeOff` from `cardReplaced`; **which invoice, whose phone call and on what authority is the sentence beside it**, and the operation's own reasoning — that these reasons must be told apart afterwards — only works if the sentence survives.\n**Same shape as `marketing.case.resolution_note`**, which is a RAG source for exactly this reason: a resolution note is the most useful free text a support record holds.\n"},"resolvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Who closed it.** A write-off with no name against it is the one resolution nobody can follow up, and it is also the one that moves money.\n"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Written at `venue` scope.\n"}}},
 "DunningPolicy": {"x-ticvai-persistence":"payments.dunning_policy","type":"object","description":"2.14.19-2.14.23, BL-100. **How a failed recurring charge is chased, as a tenant policy rather than a platform constant.** A season pass at AED 300 a month and a locker subscription at AED 15 do not deserve the same number of attempts.\n","required":["maxAttempts","terminalAction"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"maxAttempts":{"type":"integer","minimum":1,"maximum":8,"default":4,"description":"**Capped at eight and defaulted to four.** The ceiling is not arbitrary: past a handful of attempts the recovery rate is close to nothing and the cost is a guest watching their bank app light up repeatedly for a charge they already know failed.\n"},"attemptOffsetDays":{"type":"array","items":{"type":"integer","minimum":0},"default":[0,3,7,14],"description":"**Days after the first failure, and the spacing is the part that matters.** Retrying at the same hour each day hits the same daily limit on the same card and tells the venue nothing it did not already know — **attempts spaced across the month straddle a payday**, which is the single thing that changes the answer for a soft decline.\n**Must be non-decreasing and no longer than `maxAttempts`**, enforced with 422 rather than by silently truncating a list somebody meant.\n"},"minimumHoursBetweenAttempts":{"type":"integer","default":24,"description":"**A floor under the offsets, because a schedule is edited by hand.** Two offsets on the same day are a typo that reads as a policy.\n"},"retryableDeclineClasses":{"type":"array","items":{"$ref":"#/components/schemas/DeclineClass"},"default":["soft"],"description":"**`soft` alone, and widening it is a deliberate act.** The field exists rather than being implied so that a venue that adds `unknown` has chosen to, and so an auditor can see that it did.\n"},"notifyGuestOnEachAttempt":{"type":"boolean","default":false,"description":"**False by default.** A guest told four times about one failed renewal reads it as four failures. The first and the last are the ones that mean something — the first because they can fix it, the last because their pass is about to change.\n"},"terminalAction":{"type":"string","enum":["suspendBilling","cancelRenewal"],"default":"suspendBilling","description":"**What happens when the attempts run out, and it deliberately stops short of admission.** `suspendBilling` stops charging and leaves the entitlement as it is; `cancelRenewal` also stops the next term. **Neither revokes entry.**\n`graceDays` on the renewal model already governs how long a pass keeps working, and the failure this separation prevents is concrete: **a guest at a gate on a family day out, refused because a card expired and a retry ran at 3am.** Ending somebody's access stays a staff decision with a name on it.\n"},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Written at `tenant` scope.\n"}}},
 "DunningState": {"type":"string","enum":["scheduled","inProgress","exhausted","recovered","resolvedManually"],"description":"BL-100. **`exhausted` and `recovered` are both endings and only one of them is a failure.** A schedule with a single terminal state cannot tell a venue whether dunning is working, which is the only question a venue asks of it.\n"},
-"MixedTenderRules": {"type":"object","x-ticvai-persistence":"payments.mixed_tender_rules","description":"Boards 5.2 and 5.7. **Sequence is not cosmetic.**","properties":{"splitPaymentAllowed":{"type":"boolean","default":true},"maximumTenders":{"type":"integer","default":3},"tenderOrder":{"type":"array","items":{"type":"string"},"description":"**Across tender kinds.** `wallet` decides the order within stored value."},"allowedCombinations":{"type":"array","items":{"type":"object","properties":{"methodKinds":{"type":"array","items":{"type":"string"}},"allowed":{"type":"boolean"},"reason":{"type":"string","nullable":true}}}},"partialPaymentAllowed":{"type":"boolean","default":false},"onPartialFailure":{"type":"string","enum":["reverseAll","keepAndRetry","keepAndHold"],"default":"reverseAll","description":"**Three tenders in, the fourth fails.** Reversing all of it is the only answer that leaves the guest and the ledger in a state anybody can explain.\n"},"scopePath":{"type":"string"}}},
+"MixedTenderRules": {"type":"object","x-ticvai-persistence":"payments.mixed_tender_rules","description":"Boards 5.2 and 5.7. **Sequence is not cosmetic.**","properties":{"splitPaymentAllowed":{"type":"boolean","default":true},"maximumTenders":{"type":"integer","default":3},"tenderOrder":{"type":"array","items":{"type":"string"},"description":"**Across tender kinds.** `wallet` decides the order within stored value."},"allowedCombinations":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"methodKinds":{"type":"array","items":{"type":"string"}},"allowed":{"type":"boolean"},"reason":{"type":"string","nullable":true}}}},"partialPaymentAllowed":{"type":"boolean","default":false},"onPartialFailure":{"type":"string","enum":["reverseAll","keepAndRetry","keepAndHold"],"default":"reverseAll","description":"**Three tenders in, the fourth fails.** Reversing all of it is the only answer that leaves the guest and the ledger in a state anybody can explain.\n"},"scopePath":{"type":"string"}}},
 "MultiPaymentSplitTenderPaymentAllocationConfiguratioInput": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — request only; lands in `orders.payment_allocation_rule` (DM5, 29 September)","description":"**What Multi-Payment, Split Tender & Payment Allocation Configuration submits.** The configurable fields from the pack's directory for this screen; the metrics the screen displays are deliberately absent, because a figure the system computed is not a figure a client may send back.","properties":{"channel":{"type":"string","description":"Channel"},"venue":{"type":"string","description":"Venue"},"terminal":{"type":"string","description":"Terminal"},"product":{"type":"string","description":"Product"},"orderType":{"type":"string","description":"Order Type"},"customerType":{"type":"string","description":"Customer Type"},"allocationLevel":{"type":"string","enum":["orderLevel","orderLineLevel","productLevel","taxFeeComponent","specificTicket","deposit"],"description":"What a payment is allocated against."},"isActive":{"type":"boolean","default":true,"description":"False retires the rule for this match key (decided 29 September, writers pass)."}}},
 "MultiPaymentSplitTenderPaymentAllocationConfiguratioView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Multi-Payment, Split Tender & Payment Allocation Configuration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"channel":{"type":"string","description":"Channel"},"venue":{"type":"string","description":"Venue"},"terminal":{"type":"string","description":"Terminal"},"product":{"type":"string","description":"Product"},"orderType":{"type":"string","description":"Order Type"},"customerType":{"type":"string","description":"Customer Type"},"allocationLevel":{"type":"string","enum":["orderLevel","orderLineLevel","productLevel","taxFeeComponent","specificTicket","deposit"],"description":"What a payment is allocated against."}}},
 "OrderPaymentDetailTransactionLedgerView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Order Payment Detail & Transaction Ledger displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"orderNumber":{"type":"string","description":"Order Number"},"customer":{"type":"string","description":"Customer"},"orderTotal":{"type":"string","description":"Order Total"},"currency":{"type":"string","description":"Currency"},"paid":{"type":"string","description":"Paid"},"refunded":{"type":"string","description":"Refunded"},"outstanding":{"type":"string","description":"Outstanding"},"creditApplied":{"type":"string","description":"Credit Applied"},"paymentStatus":{"type":"integer","description":"Payment Status"},"settlementStatus":{"type":"integer","description":"Settlement Status"},"transactions":{"type":"array","description":"Every financial transaction on the order, one entry each","items":{"type":"object","properties":{"type":{"type":"string","enum":["authorization","capture","payment","deposit","additionalCollection","partialRefund","reversal","walletCredit","voucher","creditNote","adjustment"],"description":"Transaction type"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Amount"},"status":{"type":"string","description":"Status"},"gateway":{"type":"string","description":"Gateway"},"merchant":{"type":"string","description":"Merchant"},"terminal":{"type":"string","description":"Terminal"},"authorizationCode":{"type":"string","description":"Authorization code"},"gatewayTransactionId":{"type":"string","description":"Gateway transaction ID"},"settlementReference":{"type":"string","description":"Settlement reference"},"externalReference":{"type":"string","description":"External reference"},"occurredAt":{"type":"string","format":"date-time","description":"When"}}}}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"PayInstalmentPolicy": {"type":"object","x-ticvai-persistence":"payments.instalment_policy","description":"4.2.17, 2.14.19. Also the `setInstalmentPolicy` body.","properties":{"enabled":{"type":"boolean","default":false},"eligibleProductKinds":{"type":"array","items":{"type":"string","enum":["membership","annualPass","seasonPass","groupBooking","event"]}},"minimumOrderValue":{"x-ticvai-column":"minimum_order_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"allowedFrequencies":{"type":"array","items":{"type":"string","enum":["monthly","quarterly","custom"]}},"maximumInstalments":{"type":"integer","minimum":2},"dueAtPurchasePercent":{"type":"number","minimum":0,"maximum":100},"instalmentFee":{"x-ticvai-column":"instalment_fee_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"requireStoredCard":{"type":"boolean","default":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `tenant` scope."}}},
+"PayInstalmentPolicy": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"payments.instalment_policy","description":"4.2.17, 2.14.19. Also the `setInstalmentPolicy` body.","properties":{"enabled":{"type":"boolean","default":false},"eligibleProductKinds":{"type":"array","items":{"type":"string","enum":["membership","annualPass","seasonPass","groupBooking","event"]}},"minimumOrderValue":{"x-ticvai-column":"minimum_order_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"allowedFrequencies":{"type":"array","items":{"type":"string","enum":["monthly","quarterly","custom"]}},"maximumInstalments":{"type":"integer","minimum":2},"dueAtPurchasePercent":{"type":"number","minimum":0,"maximum":100},"instalmentFee":{"x-ticvai-column":"instalment_fee_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"requireStoredCard":{"type":"boolean","default":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `tenant` scope."}}},
 "PaymentAllocationRule": {"type":"object","x-ticvai-persistence":"orders.payment_allocation_rule","description":"**At what level a split-tender payment is allocated, per channel, terminal, product, order type or customer type** (DM5, 29 September: data model for the agreed operations; written by `setMultiPaymentSplit`). The tender limits themselves stay in `payments.mixed_tender_rules`; this row says what each tender is allocated against. Narrowest match wins; a row naming nothing is the venue default.","required":["id","allocationLevel","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"channel":{"type":"string","maxLength":40,"nullable":true},"terminalId":{"type":"string","format":"uuid","nullable":true},"productId":{"type":"string","format":"uuid","nullable":true},"orderType":{"type":"string","maxLength":40,"nullable":true},"customerType":{"type":"string","maxLength":40,"nullable":true},"allocationLevel":{"type":"string","enum":["orderLevel","orderLineLevel","productLevel","taxFeeComponent","specificTicket","deposit"]},"isActive":{"type":"boolean"},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `venue` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
 "PaymentConfigurationSimulation": {"type":"object","description":"Boards 1.10 and 5.10. **Eight boards of configuration that compose, silently.**","properties":{"offeredMethods":{"type":"array","items":{"type":"object","properties":{"methodId":{"type":"string","format":"uuid"},"name":{"type":"string"},"routesTo":{"type":"string","nullable":true},"estimatedCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"surcharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"suppressedMethods":{"type":"array","items":{"type":"object","properties":{"methodId":{"type":"string","format":"uuid"},"reason":{"type":"string"}}}},"findings":{"type":"array","items":{"type":"object","properties":{"severity":{"type":"string","enum":["blocking","warning"]},"message":{"type":"string"}}}}}},
 "RoutingContext": {"type":"object","required":["amount"],"properties":{"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"methodId":{"type":"string","format":"uuid","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"channel":{"type":"string","nullable":true},"cardScheme":{"type":"string","nullable":true},"cardIssuerCountry":{"type":"string","nullable":true},"cardPresent":{"type":"boolean","default":false},"customerId":{"type":"string","format":"uuid","nullable":true}}}

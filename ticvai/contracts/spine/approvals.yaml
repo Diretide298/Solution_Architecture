@@ -243,10 +243,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createApprovalRequest
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: in-process
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-020 Shift Exceptions & Alerts"
@@ -262,6 +258,10 @@ paths:
         - "P08 BO-718 Event Change Request Configuration"
         - "P08 BO-771 Budget, Goals & Forecast"
         - "P08 BO-922 Event Resource Approval & Readiness Gate"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Raise a request
@@ -412,15 +412,15 @@ paths:
   /approval-requests/evaluate:
     post:
       operationId: evaluateApprovalRequirement
-      x-ticvai-read-via:
-      - query: identity#delegatedAccessRecords
-        route: in-process
-        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P08 ADM-337 Routing Simulator & Conflict Detection"
         - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
         - "P09 ADM-532 Conditional Approval & Approval Conditions"
+      x-ticvai-read-via:
+      - query: identity#delegatedAccessRecords
+        route: in-process
+        for: 'its read of identity.delegated_access, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Does this need approval, and from whom
@@ -482,10 +482,6 @@ paths:
         format: uuid
     post:
       operationId: decideApprovalRequest
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: in-process
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P04 POS-020 Shift Exceptions & Alerts"
         - "P08 ADM-145 Promotion Approval Inbox"
@@ -497,6 +493,10 @@ paths:
         - "P08 BO-377 Approve & Sensitive Action Confirmation"
         - "P08 BO-378 Reject / Return / Request Information"
         - "P08 BO-940 Manager Mobile Approval Center"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: control.partner_agreement
         event: approval.granted
@@ -1178,10 +1178,6 @@ paths:
   /delegations:
     get:
       operationId: listApprovalDelegations
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: in-process
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-243 Roles, Authority, Delegation & Approval Limits"
         - "P08 BO-087 Approval Delegations"
@@ -1189,6 +1185,10 @@ paths:
         - "P08 BO-385 Delegation Management"
         - "P08 BO-386 Temporary Delegation & Availability Calendar"
         - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Who is standing in for whom
@@ -1213,6 +1213,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createApprovalDelegation
+      x-ticvai-consumed-by:
+        - "P08 ADM-243 Roles, Authority, Delegation & Approval Limits"
+        - "P08 BO-087 Approval Delegations"
+        - "P08 BO-385 Delegation Management"
+        - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
       x-ticvai-read-via:
       - query: identity#delegatedAccessRecords
         route: in-process
@@ -1220,11 +1225,6 @@ paths:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 ADM-243 Roles, Authority, Delegation & Approval Limits"
-        - "P08 BO-087 Approval Delegations"
-        - "P08 BO-385 Delegation Management"
-        - "P09 ADM-534 Escalation, Delegation & Approval SLA Management"
       x-ticvai-audience:
       - staff
       summary: Delegate approval authority
@@ -1539,11 +1539,11 @@ paths:
   /visual-business-rule:
     put:
       operationId: setVisualBusinessRule
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per business rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-239 Visual Business Rule Builder"
         - "P08 ADM-323 Condition & Decision Rule Builder"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per business rule, the one the body''s `ruleId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.2 p.6-7; MoM 10 Aug §5.5 (builder configures who approves
@@ -1641,8 +1641,6 @@ paths:
   /visual-workflow:
     put:
       operationId: setVisualWorkflow
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-241 Visual Workflow Designer"
         - "P08 ADM-320 Create Approval Workflow"
@@ -1652,6 +1650,8 @@ paths:
         - "P08 BO-1067 Seat Approval Workflows"
         - "P08 BO-638 Approval Rules & Conditions"
         - "P08 BO-643 Approval Policy Validation & Publication"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per venue, the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.4 p.10; MoM 10 Aug §5.5 (multi-step chain initiator to publish);
@@ -1891,13 +1891,13 @@ paths:
   /trigger-action-cross:
     put:
       operationId: setTriggerActionCross
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-245 Trigger, Action & Cross-Module Orchestration Configuration"
         - "P08 ADM-325 Workflow Outcome & Action Configuration"
         - "P08 ADM-352 Workflow Event Framework"
         - "P08 ADM-355 Data & Workflow Mapping Studio"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.8 p.16-17; MoM 8 Sep (API/webhook/external workflow integration
@@ -1951,14 +1951,14 @@ paths:
   /workflow-testing-impact:
     put:
       operationId: simulateWorkflowTestingImpact
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-246 Workflow Testing, Simulation & Impact Analysis"
         - "P08 ADM-326 Workflow Validation & Simulation"
         - "P08 ADM-337 Routing Simulator & Conflict Detection"
         - "P08 ADM-367 AI Optimization & What-If Simulator"
         - "P08 BO-643 Approval Policy Validation & Publication"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.9 p.18; MoM 8 Sep (builder); our build plan'
@@ -2010,10 +2010,10 @@ paths:
   /versioning-governance:
     put:
       operationId: approveVersioningGovernance
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-247 Versioning, Governance, Approval & Publication"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per workflow, the one the body''s `workflowId` names, within the caller''s venue: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.1.10 p.19-20; MoM 8 Sep (governance, audit, AI analytics only);
@@ -2075,13 +2075,13 @@ paths:
   /workflow:
     get:
       operationId: listWorkflow
+      x-ticvai-consumed-by:
+        - "P08 ADM-248 Workflow Operations Command Center"
+        - "P08 BO-643 Approval Policy Validation & Publication"
       x-ticvai-read-via:
       - query: identity#principalRecords
         route: in-process
         for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 ADM-248 Workflow Operations Command Center"
-        - "P08 BO-643 Approval Policy Validation & Publication"
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.2.1 p.23; MoM 8 Sep (command centre, AI analytics only); our
@@ -2246,14 +2246,14 @@ paths:
   /workflow-instance-process:
     get:
       operationId: listWorkflowInstanceProcess
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: in-process
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-250 Workflow Instance Monitor & Process Timeline"
         - "P08 BO-373 Approval Activity & Notification Center"
         - "P08 BO-382 Approved Action Execution & Status"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.2.3 p.27; MoM 8 Sep (approval timeline and trail of who approved
@@ -2409,15 +2409,15 @@ paths:
   /sla-escalation-bottleneck:
     get:
       operationId: listSlaEscalationBottleneck
-      x-ticvai-read-via:
-      - query: identity#principalRecords
-        route: in-process
-        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-consumed-by:
         - "P08 ADM-362 Bottleneck Analysis & Heatmap"
         - "P08 BO-370 Escalated Approval Center"
         - "P08 BO-384 Delegation & Escalation Command Center"
         - "P08 BO-391 Live Escalation Operations Center"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: in-process
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack 13.2.5 p.30; MoM 8 Sep (overdue escalates, workload view per approver,
@@ -2901,11 +2901,11 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setStepUpPolicy
-      x-ticvai-singleton: true
-      x-ticvai-singleton-note: 'One per operation, the one the body''s `operationId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-consumed-by:
         - "P08 ADM-342 Authentication & MFA Policy Manager"
         - "P08 ADM-343 Sensitive Action Confirmation"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per operation, the one the body''s `operationId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       summary: Raise what needs a second factor
@@ -3816,12 +3816,12 @@ paths:
   /approval-external-providers/{externalProviderId}:
     put:
       operationId: setApprovalExternalProvider
+      x-ticvai-consumed-by:
+        - "P08 ADM-354 External Workflow System Integration"
       x-ticvai-read-via:
       - query: public-api#apiClientRecords
         route: service
         for: 'its read of control.api_client, Platform''s data (CHG-MOD-001)'
-      x-ticvai-consumed-by:
-        - "P08 ADM-354 External Workflow System Integration"
       x-ticvai-agreed: '29 September: re-trace 11.1.65 (external workflow connector: endpoint, mapping,
         callback into the decision); MoM 8 Sep (external workflow integration with data mapping and retry);
         our build plan; shape follows setApprovalSlaPolicy'

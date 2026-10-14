@@ -1,6 +1,6 @@
 # WS23 — B2B, Reseller & OTA Partner Management board 3
 
-**8 screens · 12 operations · 18 schemas · 3 permissions**
+**8 screens · 11 operations · 16 schemas · 3 permissions**
 
 Platform P10 Partner Web · ships as **ticvai-control** ·
 partner audience · web ·
@@ -96,11 +96,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-042` | Partner Operations Command Center | B | 2 | 28 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-042` | Partner Operations Command Center | B | 2 | 268 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `PTR-043` | Partner Orders & Booking Management | B | 2 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `PTR-044` | Reservations, Holds & Release Management | B | 0 | 160 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `PTR-045` | Partner Cancellations, Refunds & Amendments | B | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-046` | Partner Statement & Account Activity | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-046` | Partner Statement & Account Activity | B | 0 | 94 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-049` | Partner Disputes, Cases & Service Management | B | 21 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-050` | Partner Performance Scorecard & Risk Monitoring | B | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `PTR-051` | Partner AI Intelligence & Relationship Optimization | B | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -159,40 +159,310 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Account manager | text field | — | — | `listPartner2` ?accountManager |
 | Operational status | radio group | — | Normal · Attention · Restricted · Suspended | `listPartner2` ?operationalStatus |
 | Risk | radio group | — | Low · Medium · High · Critical | `listPartner2` ?risk |
-| Brand | text field | — | — | `listPartner` ?brand |
-| Venue | text field | — | — | `listPartner` ?venue |
-| Account manager | text field | — | — | `listPartner` ?accountManager |
-| Status | select | — | Lead · Applicant · Under review · Approved · Configuration · Active · Restricted · Suspended · Terminated · Archived | `listPartner` ?status |
-| Risk | radio group | — | Low · Medium · High · Critical | `listPartner` ?risk |
-| … 7 more | | | | `operations.json` |
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Partner Sales Today** (metric tile)
+**Partner Sales Today** (metric tile, from `listPartner2`)
 
-**Partner Sales MTD** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
 
-**Active Partner Orders** (metric tile)
+**Partner Sales MTD** (metric tile, from `listPartner2`)
 
-**Active Reservations/Holds** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
 
-**Tickets Sold** (metric tile)
+**Active Partner Orders** (metric tile, from `listPartner2`)
 
-**Cancellations** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
 
-**Refunds** (metric tile)
+**Active Reservations/Holds** (metric tile, from `listPartner2`)
 
-**Outstanding Receivables** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
 
-**Commission Payable** (metric tile)
+**Tickets Sold** (metric tile, from `listPartner2`)
 
-**Pending Settlements** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
 
-**Operational Exceptions** (metric tile)
+**Cancellations** (metric tile, from `listPartner2`)
 
-**Partners Requiring Attention** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
+
+**Refunds** (metric tile, from `listPartner2`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
+
+**Outstanding Receivables** (metric tile, from `listPartner2`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
+
+**Commission Payable** (metric tile, from `listPartner2`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
+
+**Pending Settlements** (metric tile, from `listPartner2`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
+
+**Operational Exceptions** (metric tile, from `listPartner2`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
+
+**Partners Requiring Attention** (metric tile, from `listPartner2`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Partner | text | Partner trading name |
+| Partner type | text | Partner Type code |
+| Account manager | text | Account Manager |
+| Orders | 1,234 | Orders |
+| Tickets | 1,234 | Tickets |
+| Gross sales | AED 1,234.50 | Gross Sales |
+| Net sales | AED 1,234.50 | Net Sales |
+| Commission | AED 1,234.50 | Commission |
+| Outstanding balance | AED 1,234.50 | Outstanding Balance |
+| Credit utilization | 1,234.5 | Credit Utilization, percent |
+| Allocation utilization | 1,234.5 | Allocation Utilization, percent |
+| Cancellation rate | 12.5% | Cancellation Rate, percent |
+| Operational status | text | Operational Status: normal, attention, restricted, suspended |
+| Risk | chip: Low, Medium, High, Critical | Risk |
+| Partner | the name it points at, never the id | Partner |
+| AI insights | list or chips (count when long) | Advisory AI attention flags for this partner |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Operations Command Center. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
 
 **Every partner operations** (data table, from `listPartner2`)
 
@@ -213,7 +483,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Operational status | text | Operational Status: normal, attention, restricted, suspended |
 | Risk | chip: Low, Medium, High, Critical | Risk |
 
-**The selected partner operations** (detail panel)
+**The selected partner operations** (detail panel, from `listPartner2`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -236,7 +506,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 - **Money columns (commission, outstandingBalance)**: Money in the region's currency and scale, never a bare number: AED to 2 decimals, OMR/BHD/KWD to 3, the third decimal never rounded away (2.013 stays 2.013); the currency code is shown with the figure. Across tenants or regions figures in different currencies are never summed into one total; group by currency, or label the converted figure with its rate and time. *(source: ADR-0008; ADR-0011; DI-306)*
 
-**Data it reads**: `listPartner2` (onLoad, Partner Operations Command Center); `listPartner` (onLoad, Partner Management Command Center)
+**Data it reads**: `listPartner2` (onLoad, Partner Operations Command Center)
 
 **Where the user goes next**
 
@@ -280,9 +550,10 @@ metric tiles:
 #### Permissions
 
 - `listPartner2` → `PLATFORM_TENANT_VIEW` (read) · partner
-- `listPartner` → `PLATFORM_TENANT_VIEW` (read) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -319,7 +590,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (268 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-042?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-043`, `PTR-044`, `PTR-045`, `PTR-046`, `PTR-049`, `PTR-050`, `PTR-051`.
@@ -468,6 +739,8 @@ Every partner orders booking:
 - `listPartnerOrderBooking` → `PLATFORM_TENANT_VIEW` (read) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -789,6 +1062,8 @@ metric tiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -926,6 +1201,8 @@ refund: AED 1,050.00
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1028,13 +1305,105 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Current** (metric tile)
 
-**1–30 Days** (metric tile)
+**1–30 Days** (metric tile, from `listPartnerStatementAccount`)
 
-**31–60 Days** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Date | 1 Oct 2026 | Date |
+| Transaction type | chip: Booking, Invoice, Payment, Refund, Credit note, Commission… | Transaction Type |
+| Reference | text | Reference |
+| Order invoice | text | Order/Invoice number |
+| Debit | AED 1,234.50 | Debit |
+| Credit | AED 1,234.50 | Credit |
+| Running balance | AED 1,234.50 | Running Balance |
+| Due date | 1 Oct 2026 | Due Date |
+| Status | text | Status: open, partiallyPaid, paid, overdue or void |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Statement & Account Activity. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
+| Opening balance | AED 1,234.50 | Opening Balance |
+| Sales | AED 1,234.50 | Sales |
+| Payments | AED 1,234.50 | Payments |
+| Credits | AED 1,234.50 | Credits |
+| Refunds | AED 1,234.50 | Refunds |
+| Commission | AED 1,234.50 | Commission |
+| Adjustments | AED 1,234.50 | Adjustments |
 
-**61–90 Days** (metric tile)
+**31–60 Days** (metric tile, from `listPartnerStatementAccount`)
 
-**90+ Days** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Date | 1 Oct 2026 | Date |
+| Transaction type | chip: Booking, Invoice, Payment, Refund, Credit note, Commission… | Transaction Type |
+| Reference | text | Reference |
+| Order invoice | text | Order/Invoice number |
+| Debit | AED 1,234.50 | Debit |
+| Credit | AED 1,234.50 | Credit |
+| Running balance | AED 1,234.50 | Running Balance |
+| Due date | 1 Oct 2026 | Due Date |
+| Status | text | Status: open, partiallyPaid, paid, overdue or void |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Statement & Account Activity. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
+| Opening balance | AED 1,234.50 | Opening Balance |
+| Sales | AED 1,234.50 | Sales |
+| Payments | AED 1,234.50 | Payments |
+| Credits | AED 1,234.50 | Credits |
+| Refunds | AED 1,234.50 | Refunds |
+| Commission | AED 1,234.50 | Commission |
+| Adjustments | AED 1,234.50 | Adjustments |
+
+**61–90 Days** (metric tile, from `listPartnerStatementAccount`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Date | 1 Oct 2026 | Date |
+| Transaction type | chip: Booking, Invoice, Payment, Refund, Credit note, Commission… | Transaction Type |
+| Reference | text | Reference |
+| Order invoice | text | Order/Invoice number |
+| Debit | AED 1,234.50 | Debit |
+| Credit | AED 1,234.50 | Credit |
+| Running balance | AED 1,234.50 | Running Balance |
+| Due date | 1 Oct 2026 | Due Date |
+| Status | text | Status: open, partiallyPaid, paid, overdue or void |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Statement & Account Activity. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
+| Opening balance | AED 1,234.50 | Opening Balance |
+| Sales | AED 1,234.50 | Sales |
+| Payments | AED 1,234.50 | Payments |
+| Credits | AED 1,234.50 | Credits |
+| Refunds | AED 1,234.50 | Refunds |
+| Commission | AED 1,234.50 | Commission |
+| Adjustments | AED 1,234.50 | Adjustments |
+
+**90+ Days** (metric tile, from `listPartnerStatementAccount`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Date | 1 Oct 2026 | Date |
+| Transaction type | chip: Booking, Invoice, Payment, Refund, Credit note, Commission… | Transaction Type |
+| Reference | text | Reference |
+| Order invoice | text | Order/Invoice number |
+| Debit | AED 1,234.50 | Debit |
+| Credit | AED 1,234.50 | Credit |
+| Running balance | AED 1,234.50 | Running Balance |
+| Due date | 1 Oct 2026 | Due Date |
+| Status | text | Status: open, partiallyPaid, paid, overdue or void |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Summary | grouped details | The headline figures on Partner Statement & Account Activity. The pack's KPI cards, split out of the row (decided 29 September, readiness … |
+| Opening balance | AED 1,234.50 | Opening Balance |
+| Sales | AED 1,234.50 | Sales |
+| Payments | AED 1,234.50 | Payments |
+| Credits | AED 1,234.50 | Credits |
+| Refunds | AED 1,234.50 | Refunds |
+| Commission | AED 1,234.50 | Commission |
+| Adjustments | AED 1,234.50 | Adjustments |
 
 **Every partner statement account** (data table, from `listPartnerStatementAccount`)
 
@@ -1106,6 +1475,8 @@ metric tiles:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1132,7 +1503,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (94 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-046?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-042`.
@@ -1295,6 +1666,8 @@ status: open
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1424,6 +1797,8 @@ listPartnerPerformanceScorecard (PartnerPerformanceScorecardRiskMonitoringView):
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PLATFORM_TENANT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1541,6 +1916,8 @@ listPartnerRelationship (PartnerAiIntelligenceRelationshipOptimizationView):
 - `listPartnerRelationship` → `PLATFORM_TENANT_VIEW` (read) · partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -1667,7 +2044,6 @@ Method, path, parameters, request and response for every operation these screens
 "actOnPartnerCase": {"method":"POST","path":"/partner-cases/{caseId}/actions","contract":"subscription","summary":"Work a partner case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PartnerCase"},
 "createPartnerCase": {"method":"POST","path":"/partner-cases","contract":"subscription","summary":"Open a partner dispute or service case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"PartnerCase","responds":"PartnerCase"},
 "createPartnerChangeRequest": {"method":"POST","path":"/partner-change-requests","contract":"subscription","summary":"A partner asks to cancel or amend a booking","permission":"ORDER_MODIFY","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":"dryRun","in":"query","required":false}],"requestBody":"PartnerChangeRequestInput","responds":"PartnerChangeRequest"},
-"listPartner": {"method":"GET","path":"/partner","contract":"subscription","summary":"Partner Management Command Center","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"brand","in":"query","required":false},{"name":"venue","in":"query","required":false},{"name":"accountManager","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"risk","in":"query","required":false},{"name":"integrationType","in":"query","required":false},{"name":"partnerType","in":"query","required":false},{"name":"country","in":"query","required":false},{"name":"territory","in":"query","required":false},{"name":"agreementStatus","in":"query","required":false},{"name":"creditStatus","in":"query","required":false},{"name":"search","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPartner2": {"method":"GET","path":"/partner-2","contract":"subscription","summary":"Partner Operations Command Center","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"venue","in":"query","required":false},{"name":"event","in":"query","required":false},{"name":"market","in":"query","required":false},{"name":"channel","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":"partnerId","in":"query","required":false},{"name":"partnerType","in":"query","required":false},{"name":"accountManager","in":"query","required":false},{"name":"operationalStatus","in":"query","required":false},{"name":"risk","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPartnerCancellationRefund": {"method":"GET","path":"/partner-cancellation-refund","contract":"subscription","summary":"Partner Cancellations, Refunds & Amendments","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"partnerId","in":"query","required":false},{"name":"requestType","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"from","in":"query","required":false},{"name":"to","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listPartnerDisputeCase": {"method":"GET","path":"/partner-dispute-case","contract":"subscription","summary":"Partner Disputes, Cases & Service Management","permission":"PLATFORM_TENANT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"partnerId","in":"query","required":false},{"name":"category","in":"query","required":false},{"name":"status","in":"query","required":false},{"name":"priority","in":"query","required":false},{"name":"owner","in":"query","required":false},{"name":"slaBreach","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -1689,12 +2065,10 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "PartnerAgreementStatus": {"type":"string","enum":["pendingApproval","active","expiringSoon","expired","suspended","terminated"]},
 "PartnerAiIntelligenceRelationshipOptimizationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Partner AI Intelligence & Relationship Optimization displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"recommendation":{"type":"string","description":"Recommendation"},"reason":{"type":"string","description":"Reason"},"expectedImpact":{"type":"string","description":"Expected Impact"},"confidence":{"type":"number","description":"Confidence, 0-1"},"risks":{"type":"array","items":{"type":"string"},"description":"Risks"},"supportingMetrics":{"type":"array","description":"Supporting Metrics","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}},"recommendationId":{"type":"string","format":"uuid","description":"Recommendation id"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"partner":{"type":"string","description":"Partner trading name"},"category":{"type":"string","enum":["commercial","allocation","credit","risk","growth"],"description":"Recommendation category"},"opportunityClass":{"type":"string","enum":["grow","maintain","review","restrict"],"description":"Partner Opportunity Matrix class, from configurable business criteria"},"inputsConsidered":{"type":"array","items":{"type":"string","enum":["partnerProfile","territory","agreements","rates","commission","credit","paymentBehavior","allocation","orders","cancellations","settlement","cases","channelPerformance","historicalTrends"]},"description":"AI Inputs the recommendation drew on"},"scenarioEstimate":{"type":"object","nullable":true,"description":"Scenario Simulation estimate, where the recommendation carries one","properties":{"additionalSales":{"type":"integer"},"revenue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"margin":{"type":"number"},"creditExposure":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"inventoryRisk":{"type":"string"}}},"status":{"type":"string","description":"Recommendation status: open, accepted, modified, rejected, assigned"},"createdAt":{"type":"string","format":"date-time","description":"Generated at"}}},
 "PartnerCancellationsRefundsAmendmentsView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner_change_request (PartnerChangeRequest) and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Cancellations, Refunds & Amendments displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"originalState":{"type":"string","description":"Audit: original state of the booking (summary)"},"newState":{"type":"string","description":"Audit: new state of the booking (summary)","nullable":true},"requestedBy":{"type":"string","description":"Audit: requesting user"},"reason":{"type":"string","description":"Reason"},"financialImpact":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Financial impact (net change to the partner account)"},"approvedBy":{"type":"string","description":"Approved by","nullable":true},"requestId":{"type":"string","format":"uuid","description":"Amendment request id"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"partner":{"type":"string","description":"Partner trading name"},"orderId":{"type":"string","format":"uuid","description":"Order"},"orderNumber":{"type":"string","description":"Order number"},"requestType":{"type":"string","enum":["fullCancellation","partialCancellation","dateChange","performanceChange","quantityReduction","productChange","ticketReissue","customerNameChange","refundRequest"],"description":"Request type"},"quantity":{"type":"integer","description":"Tickets affected","nullable":true},"originalValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Original Value"},"cancellationAllowed":{"type":"boolean","description":"Cancellation/change allowed under the evaluated policy"},"cancellationFee":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Cancellation Fee"},"refundOrCredit":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Refund/Credit to the partner"},"allocationImpact":{"type":"integer","description":"Allocation impact, units returned (+) or taken (-)"},"commissionAdjustment":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission Adjustment"},"approvalReasons":{"type":"array","items":{"type":"string","enum":["transactionValue","eventProximity","cancellationPercentage","partnerStatus","exceptionRequest"]},"description":"Why approval is required; empty when none"},"status":{"type":"string","description":"Status: requested, pendingApproval, approved, rejected, processed"},"requestedAt":{"type":"string","format":"date-time","description":"Requested at"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Advisory AI unusual-cancellation-pattern flags"}}},
-"PartnerCase": {"type":"object","x-ticvai-persistence":"control.partner_case","description":"A partner dispute or service case: category, priority, what it relates to, the amount in dispute, the evidence, the owner and the SLA. Partner cases stay apart from `marketing.case`, which is a guest's service case with a guest lifecycle (decided 29 September, data model DM4)\n\n**Written by** createPartnerCase and actOnPartnerCase (assign, investigate, wait on the partner or a team, propose, accept or reject a resolution, reopen, close) (decided 29 September, writers pass; DM4).","required":["id","partnerId","category","priority","description","status","resolutionTargetAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"partnerId":{"type":"string","format":"uuid","description":"The partner (control.partner)."},"contactId":{"type":"string","format":"uuid","nullable":true,"description":"Partner contact (control.partner_contact)."},"category":{"type":"string","enum":["bookingDispute","pricingDispute","commissionDispute","creditDispute","invoiceDispute","cancellationDispute","ticketIssue","allocationIssue","apiIssue","settlementDispute"],"description":"Category."},"priority":{"type":"string","enum":["low","medium","high","urgent"],"description":"Priority (decided 29 September, readiness close-out)."},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"Related order (orders.sales_order)."},"invoiceReference":{"type":"string","nullable":true,"description":"Related invoice number."},"settlementBatchId":{"type":"string","format":"uuid","nullable":true,"description":"Related settlement (control.partner_settlement_batch)."},"amountInDispute":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Amount in dispute."},"description":{"type":"string","description":"Description."},"evidence":{"type":"array","items":{"type":"string"},"description":"Evidence: attachment references."},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Owner, a staff principal."},"slaPolicyId":{"x-ticvai-references":"approvals.sla_policy","type":"string","format":"uuid","nullable":true,"description":"The SLA policy applied (approvals.sla_policy, the approvals engine's ApprovalSlaPolicy), which sets the first-response and resolution targets and the reminder/breach behaviour; `resolutionTargetAt` is computed from it when the case is opened. Replaces the free-text `slaPolicy` (decided 29 September, writers pass; DM4)"},"status":{"type":"string","enum":["open","assigned","investigating","waitingPartner","waitingInternal","resolutionProposed","resolved","closed"],"default":"open","readOnly":true,"description":"Status (states/partner-case.yaml). Created `open` by createPartnerCase and moved only by actOnPartnerCase (decided 29 September, writers pass; DM4)"},"firstResponseAt":{"type":"string","format":"date-time","nullable":true,"description":"First response at."},"resolutionTargetAt":{"type":"string","format":"date-time","readOnly":true,"description":"Resolution target, computed from the SLA policy (`slaPolicyId`) when the case is opened; time in `waitingPartner` extends it (decided 29 September, writers pass; DM4)"},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"description":"Resolved at."},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `tenant` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
-"PartnerChangeRequest": {"type":"object","x-ticvai-persistence":"control.partner_change_request","description":"A partner's request to cancel or amend a booking, with the outcome the policy evaluated: whether it is allowed, the fee, the refund or credit, and the allocation and commission impact. A refund it produces is an `orders.refund`; this row is the request and its evaluation (decided 29 September, data model DM4)\n\n**Written by** createPartnerChangeRequest, which creates the row and evaluates it against policy in the same call; approval, where needed, is decided in approvals and the order change is carried out in orders (decided 29 September, writers pass; DM4).","required":["id","partnerId","orderId","requestType","status","requestedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"partnerId":{"type":"string","format":"uuid","description":"The partner (control.partner)."},"orderId":{"type":"string","format":"uuid","description":"Order (orders.sales_order)."},"requestType":{"type":"string","enum":["fullCancellation","partialCancellation","dateChange","performanceChange","quantityReduction","productChange","ticketReissue","customerNameChange","refundRequest"],"description":"Request type."},"quantity":{"type":"integer","minimum":0,"nullable":true,"description":"Tickets affected."},"reason":{"type":"string","nullable":true,"description":"Reason."},"originalState":{"type":"string","description":"Audit: original state of the booking (summary)."},"newState":{"type":"string","nullable":true,"description":"Audit: new state of the booking (summary)."},"originalValue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Original value."},"cancellationAllowed":{"type":"boolean","description":"Cancellation/change allowed under the evaluated policy."},"cancellationFee":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Cancellation fee."},"refundOrCredit":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Refund/credit to the partner."},"financialImpact":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Net change to the partner account."},"allocationImpact":{"type":"integer","nullable":true,"description":"Allocation impact, units returned (+) or taken (-)."},"commissionAdjustment":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Commission adjustment."},"approvalReasons":{"type":"array","items":{"type":"string","enum":["transactionValue","eventProximity","cancellationPercentage","partnerStatus","exceptionRequest"]},"description":"Why approval is required; empty when none."},"status":{"type":"string","enum":["requested","pendingApproval","approved","rejected","processed"],"default":"requested","description":"Status."},"requestedByPrincipalId":{"type":"string","format":"uuid","description":"Requesting user."},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Approver."},"approvalRequestId":{"type":"string","nullable":true,"readOnly":true,"description":"Approval request, when one was needed."},"refundId":{"type":"string","format":"uuid","nullable":true,"description":"The refund it produced (orders.refund), once processed."},"requestedAt":{"type":"string","format":"date-time","description":"Requested at."},"targetPerformanceId":{"type":"string","format":"uuid","nullable":true,"description":"The performance (catalogue.performance) asked for, for dateChange and performanceChange (decided 29 September, writers pass; DM4)"},"targetProductId":{"type":"string","format":"uuid","nullable":true,"description":"The product (catalogue.product) asked for, for productChange (decided 29 September, writers pass; DM4)"},"newCustomerName":{"type":"string","nullable":true,"description":"The name asked for, for customerNameChange (decided 29 September, writers pass; DM4)"},"feeWaiverRequested":{"type":"boolean","default":false,"description":"The partner asks for the cancellation fee to be waived; a waiver always needs approval (`approvalReasons` gains exceptionRequest) (decided 29 September, writers pass; DM4)"},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `tenant` scope."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"PartnerCase": {"type":"object","x-ticvai-persistence":"control.partner_case","description":"A partner dispute or service case: category, priority, what it relates to, the amount in dispute, the evidence, the owner and the SLA. Partner cases stay apart from `marketing.case`, which is a guest's service case with a guest lifecycle (decided 29 September, data model DM4)\n\n**Written by** createPartnerCase and actOnPartnerCase (assign, investigate, wait on the partner or a team, propose, accept or reject a resolution, reopen, close) (decided 29 September, writers pass; DM4).","required":["id","partnerId","category","priority","description","status","resolutionTargetAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"partnerId":{"x-ticvai-references":"control.partner","type":"string","format":"uuid","description":"The partner (control.partner)."},"contactId":{"type":"string","format":"uuid","nullable":true,"description":"Partner contact (control.partner_contact)."},"category":{"type":"string","enum":["bookingDispute","pricingDispute","commissionDispute","creditDispute","invoiceDispute","cancellationDispute","ticketIssue","allocationIssue","apiIssue","settlementDispute"],"description":"Category."},"priority":{"type":"string","enum":["low","medium","high","urgent"],"description":"Priority (decided 29 September, readiness close-out)."},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"Related order (orders.sales_order)."},"invoiceReference":{"type":"string","nullable":true,"description":"Related invoice number."},"settlementBatchId":{"type":"string","format":"uuid","nullable":true,"description":"Related settlement (control.partner_settlement_batch)."},"amountInDispute":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Amount in dispute."},"description":{"type":"string","description":"Description."},"evidence":{"type":"array","items":{"type":"string"},"description":"Evidence: attachment references."},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Owner, a staff principal."},"slaPolicyId":{"x-ticvai-references":"approvals.sla_policy","type":"string","format":"uuid","nullable":true,"description":"The SLA policy applied (approvals.sla_policy, the approvals engine's ApprovalSlaPolicy), which sets the first-response and resolution targets and the reminder/breach behaviour; `resolutionTargetAt` is computed from it when the case is opened. Replaces the free-text `slaPolicy` (decided 29 September, writers pass; DM4)"},"status":{"type":"string","enum":["open","assigned","investigating","waitingPartner","waitingInternal","resolutionProposed","resolved","closed"],"default":"open","readOnly":true,"description":"Status (states/partner-case.yaml). Created `open` by createPartnerCase and moved only by actOnPartnerCase (decided 29 September, writers pass; DM4)"},"firstResponseAt":{"type":"string","format":"date-time","nullable":true,"description":"First response at."},"resolutionTargetAt":{"type":"string","format":"date-time","readOnly":true,"description":"Resolution target, computed from the SLA policy (`slaPolicyId`) when the case is opened; time in `waitingPartner` extends it (decided 29 September, writers pass; DM4)"},"resolvedAt":{"type":"string","format":"date-time","nullable":true,"description":"Resolved at."},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `tenant` scope."},"createdAt":{"type":"string","format":"date-time","readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"PartnerChangeRequest": {"type":"object","x-ticvai-persistence":"control.partner_change_request","description":"A partner's request to cancel or amend a booking, with the outcome the policy evaluated: whether it is allowed, the fee, the refund or credit, and the allocation and commission impact. A refund it produces is an `orders.refund`; this row is the request and its evaluation (decided 29 September, data model DM4)\n\n**Written by** createPartnerChangeRequest, which creates the row and evaluates it against policy in the same call; approval, where needed, is decided in approvals and the order change is carried out in orders (decided 29 September, writers pass; DM4).","required":["id","partnerId","orderId","requestType","status","requestedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"partnerId":{"x-ticvai-references":"control.partner","type":"string","format":"uuid","description":"The partner (control.partner)."},"orderId":{"type":"string","format":"uuid","description":"Order (orders.sales_order)."},"requestType":{"type":"string","enum":["fullCancellation","partialCancellation","dateChange","performanceChange","quantityReduction","productChange","ticketReissue","customerNameChange","refundRequest"],"description":"Request type."},"quantity":{"type":"integer","minimum":0,"nullable":true,"description":"Tickets affected."},"reason":{"type":"string","nullable":true,"description":"Reason."},"originalState":{"type":"string","description":"Audit: original state of the booking (summary)."},"newState":{"type":"string","nullable":true,"description":"Audit: new state of the booking (summary)."},"originalValue":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Original value."},"cancellationAllowed":{"type":"boolean","description":"Cancellation/change allowed under the evaluated policy."},"cancellationFee":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Cancellation fee."},"refundOrCredit":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Refund/credit to the partner."},"financialImpact":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Net change to the partner account."},"allocationImpact":{"type":"integer","nullable":true,"description":"Allocation impact, units returned (+) or taken (-)."},"commissionAdjustment":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"Commission adjustment."},"approvalReasons":{"type":"array","items":{"type":"string","enum":["transactionValue","eventProximity","cancellationPercentage","partnerStatus","exceptionRequest"]},"description":"Why approval is required; empty when none."},"status":{"type":"string","enum":["requested","pendingApproval","approved","rejected","processed"],"default":"requested","description":"Status."},"requestedByPrincipalId":{"type":"string","format":"uuid","description":"Requesting user."},"approvedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Approver."},"approvalRequestId":{"type":"string","nullable":true,"readOnly":true,"description":"Approval request, when one was needed."},"refundId":{"type":"string","format":"uuid","nullable":true,"description":"The refund it produced (orders.refund), once processed."},"requestedAt":{"type":"string","format":"date-time","description":"Requested at."},"targetPerformanceId":{"type":"string","format":"uuid","nullable":true,"description":"The performance (catalogue.performance) asked for, for dateChange and performanceChange (decided 29 September, writers pass; DM4)"},"targetProductId":{"type":"string","format":"uuid","nullable":true,"description":"The product (catalogue.product) asked for, for productChange (decided 29 September, writers pass; DM4)"},"newCustomerName":{"type":"string","nullable":true,"description":"The name asked for, for customerNameChange (decided 29 September, writers pass; DM4)"},"feeWaiverRequested":{"type":"boolean","default":false,"description":"The partner asks for the cancellation fee to be waived; a waiver always needs approval (`approvalReasons` gains exceptionRequest) (decided 29 September, writers pass; DM4)"},"scopePath":{"type":"string","description":"The partition key (ADR-0005), written at `tenant` scope."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "PartnerChangeRequestInput": {"type":"object","x-ticvai-persistence":"none — request only; stored as control.partner_change_request (PartnerChangeRequest) with its evaluation (decided 29 September, writers pass; DM4)","description":"What a partner sends to cancel or amend a booking (createPartnerChangeRequest). The evaluation (allowed, fee, refund, impacts, status) is computed, never sent (decided 29 September, writers pass; DM4)","required":["orderId","requestType"],"properties":{"orderId":{"type":"string","format":"uuid","description":"The partner's order (orders.sales_order)"},"requestType":{"type":"string","enum":["fullCancellation","partialCancellation","dateChange","performanceChange","quantityReduction","productChange","ticketReissue","customerNameChange","refundRequest"]},"quantity":{"type":"integer","minimum":1,"nullable":true,"description":"Tickets affected; required for partialCancellation and quantityReduction"},"targetPerformanceId":{"type":"string","format":"uuid","nullable":true,"description":"Required for dateChange and performanceChange"},"targetProductId":{"type":"string","format":"uuid","nullable":true,"description":"Required for productChange"},"newCustomerName":{"type":"string","nullable":true,"description":"Required for customerNameChange"},"feeWaiverRequested":{"type":"boolean","default":false},"reason":{"type":"string","nullable":true}}},
 "PartnerDisputesCasesServiceManagementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner_case (PartnerCase) and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Disputes, Cases & Service Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"caseId":{"type":"string","description":"Case ID"},"partner":{"type":"string","description":"Partner trading name"},"contact":{"type":"string","description":"Partner contact","nullable":true},"category":{"type":"string","enum":["bookingDispute","pricingDispute","commissionDispute","creditDispute","invoiceDispute","cancellationDispute","ticketIssue","allocationIssue","apiIssue","settlementDispute"],"description":"Category (Case Types)"},"priority":{"type":"string","enum":["low","medium","high","urgent"],"description":"Priority (decided 29 September, readiness close-out)"},"relatedOrder":{"type":"string","description":"Related Order","nullable":true},"relatedInvoice":{"type":"string","description":"Related Invoice","nullable":true},"relatedSettlement":{"type":"string","description":"Related Settlement","nullable":true},"amountInDispute":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Amount in Dispute"},"description":{"type":"string","description":"Description"},"evidence":{"type":"array","items":{"type":"string"},"description":"Evidence: attachment references"},"owner":{"type":"string","description":"Owner","nullable":true},"sla":{"type":"string","description":"SLA policy applied"},"status":{"type":"string","description":"Status: open, assigned, investigating, waitingPartner, waitingInternal, resolutionProposed, resolved, closed"},"firstResponse":{"type":"string","format":"date-time","description":"First Response at","nullable":true},"resolutionTarget":{"type":"string","format":"date-time","description":"Resolution Target"},"timeOpen":{"type":"integer","description":"Time Open, hours"},"slaBreach":{"type":"boolean","description":"SLA Breach"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"aiSummary":{"type":"string","description":"Advisory AI case summary","nullable":true}}},
-"PartnerManagementCommandCenterSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Partner Management Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"totalPartners":{"type":"integer","description":"Total Partners"},"activePartners":{"type":"integer","description":"Active Partners"},"pendingOnboarding":{"type":"integer","description":"Pending Onboarding"},"pendingApproval":{"type":"integer","description":"Pending Approval"},"suspendedPartners":{"type":"integer","description":"Suspended Partners"},"expiringAgreements":{"type":"integer","description":"Expiring Agreements: partners whose active agreement ends within its expiryAlertDays (default 30) (decided 29 September, readiness close-out)"},"documentationIssues":{"type":"integer","description":"Documentation Issues: partners with a mandatory document missing, rejected, expiring or expired"},"partnersWithCreditHolds":{"type":"integer","description":"Partners With Credit Holds: partners whose credit status is onHold or blocked"},"connectedOtaApiPartners":{"type":"integer","description":"Connected OTA/API Partners"},"partnerSalesYtd":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner Sales YTD: gross value of partner orders this calendar year (decided 29 September, readiness close-out)"},"partnerRevenueYtd":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner Revenue YTD: partner sales net of commission this calendar year (decided 29 September, readiness close-out)"},"highRiskPartners":{"type":"integer","description":"High-Risk Partners"}}},
-"PartnerManagementCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over control.partner (Partner), control.partner_credit_profile, control.partner_application, control.partner_scope_assignment and control.partner_distribution_right and the existing subscription state, assembled at read time (data model DM4)","description":"**What Partner Management Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partnerId":{"type":"string","format":"uuid","description":"Partner ID"},"tradingName":{"type":"string","description":"Trading Name"},"legalEntity":{"type":"string","description":"Legal Entity"},"partnerType":{"type":"string","description":"Partner type code from the tenant's configurable partner-type list (MoM 31 Aug 4.3: configurable category/type), seeded with the pack's p.7 list: b2bReseller, travelAgent, tourOperator, ota, corporateCustomer, hotelConcierge, destinationManagementCompany, affiliate, wholesaler, distributor, governmentPartner, schoolInstitution, apiPartner, internalGroupCompany"},"country":{"type":"string","description":"Country, ISO 3166-1 alpha-2"},"territory":{"type":"string","description":"Territory: summary of the authorised markets (listTerritoryMarketDistribution)"},"assignedBrands":{"type":"array","items":{"type":"string"},"description":"Assigned Brand/Venue: brand names in the partner's business scope (setPartnerBrandVenue)"},"assignedVenues":{"type":"array","items":{"type":"string"},"description":"Assigned Brand/Venue: venue names in the partner's business scope (setPartnerBrandVenue)"},"commercialOwner":{"type":"string","description":"Commercial Owner: staff display name of the account manager"},"distributionChannel":{"type":"array","items":{"type":"string","enum":["b2bPortal","api","otaConnection","agentPortal","affiliateLink","voucherDistribution","bulkTicketExport","other"]},"description":"Distribution Channel: Distribution methods: b2bPortal (the TICVAI B2B portal), api (partner consumes the TICVAI API), otaConnection (TICVAI integrates into the OTA, either direction per MoM 31 Aug 4.3), agentPortal, affiliateLink, voucherDistribution, bulkTicketExport (pre-generated QR tickets as CSV, MoM 5 Aug option 3), other"},"accountStatus":{"type":"string","description":"Account Status: lead, applicant, underReview, approved, configuration, active, restricted, suspended, terminated or archived (pack p.6 and p.18 merged with MoM 31 Aug 4.3 lead -> submitted -> active -> suspended; \"submitted\" is applicant)"},"onboardingStatus":{"type":"string","description":"Onboarding Status: the application stage (application, businessVerification, documentation, commercialReview, financeReview, technicalReview, approval, configuration, activation) or complete"},"agreementStatus":{"allOf":[{"$ref":"#/components/schemas/PartnerAgreementStatus"}],"nullable":true,"description":"Agreement Status of the partner's current agreement; empty when none"},"creditStatus":{"type":"string","description":"Credit Status: notEnabled, withinLimit, warning (at the warning threshold), highRisk, onHold or blocked (decided 29 September, readiness close-out)"},"integrationStatus":{"type":"string","enum":["none","testing","connected","degraded","disconnected"],"x-ticvai-persisted":false,"description":"Integration Status: none, testing, connected, degraded or disconnected (decided 29 September, readiness close-out). **Derived at read time, not a column** (decided 29 September, writers pass; DM4), from the partner's OTA/API channel listings (control.channel_listing) and the health of its API clients (control.api_client, with webhook deliveries in control.webhook_delivery), first match wins: `none` when the partner has no channel listing and no API client; `disconnected` when every listing is `paused` or `delisted` or every production API client is `suspended` or `revoked`; `degraded` when a `live` listing's `lastPushedAt` is older than twice its `pushIntervalMinutes`, or webhook deliveries to the partner failed in the last hour; `connected` when a `live` listing or an `active` production client exists and none of the above holds; otherwise `testing` (only `draft` listings or only sandbox clients). The thresholds are proposed, the venue may correct them."},"lastActivity":{"type":"string","format":"date-time","description":"Last Activity"},"riskRating":{"type":"string","enum":["low","medium","high","critical"],"description":"Risk rating, Low / Medium / High / Critical (pack p.58); drives the Risk filter and the High-Risk Partners KPI"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Partner Attention Required: advisory AI flags such as an agreement expiring against forward bookings (pack p.6)"}}},
 "PartnerOperationsCommandCenterSummary": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection; the headline tiles over the list, computed at read time for the filters in force","description":"**The headline figures on Partner Operations Command Center.** The pack's KPI cards, split out of the row (decided 29 September, readiness close-out): a count describes the list, not each item in it.","properties":{"partnerSalesToday":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner Sales Today"},"partnerSalesMtd":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner Sales MTD"},"activePartnerOrders":{"type":"integer","description":"Active Partner Orders"},"activeReservations":{"type":"integer","description":"Active Reservations"},"activeHolds":{"type":"integer","description":"Active Holds"},"ticketsSold":{"type":"integer","description":"Tickets Sold"},"cancellations":{"type":"integer","description":"Cancellations"},"refunds":{"type":"integer","description":"Refunds"},"outstandingReceivables":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Outstanding Receivables"},"commissionPayable":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission Payable"},"pendingSettlements":{"type":"integer","description":"Pending Settlements"},"operationalExceptions":{"type":"integer","description":"Operational Exceptions"},"partnersRequiringAttention":{"type":"integer","description":"Partners Requiring Attention"},"activityFeed":{"type":"array","description":"Activity Feed: recent partner events, newest first","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"partnerId":{"type":"string","format":"uuid"},"message":{"type":"string"}}}}}},
 "PartnerOperationsCommandCenterView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Partner Operations Command Center displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partner":{"type":"string","description":"Partner trading name"},"partnerType":{"type":"string","description":"Partner Type code"},"accountManager":{"type":"string","description":"Account Manager"},"orders":{"type":"integer","description":"Orders"},"tickets":{"type":"integer","description":"Tickets"},"grossSales":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Gross Sales"},"netSales":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Net Sales"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission"},"outstandingBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Outstanding Balance"},"creditUtilization":{"type":"number","description":"Credit Utilization, percent"},"allocationUtilization":{"type":"number","description":"Allocation Utilization, percent"},"cancellationRate":{"type":"number","description":"Cancellation Rate, percent"},"operationalStatus":{"type":"string","description":"Operational Status: normal, attention, restricted, suspended"},"risk":{"type":"string","enum":["low","medium","high","critical"],"description":"Risk"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"aiInsights":{"type":"array","items":{"type":"string"},"description":"Advisory AI attention flags for this partner"}}},
 "PartnerOrdersBookingManagementView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over subscription state, assembled at read time from tables that already exist","description":"**What Partner Orders & Booking Management displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"partnerReference":{"type":"string","description":"Partner Reference"},"agentUser":{"type":"string","description":"Agent/User"},"customerName":{"type":"string","description":"Customer/Guest where applicable","nullable":true},"products":{"type":"array","items":{"type":"string"},"description":"Products"},"quantity":{"type":"integer","description":"Quantity"},"grossValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Gross Value"},"partnerRate":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Partner Rate applied"},"commission":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Commission"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Net Amount"},"paymentMethod":{"type":"string","enum":["creditAccount","prepaid","card"],"description":"Payment Method (the three payment models)"},"billingStatus":{"type":"string","description":"Billing Status: unbilled, invoiced, paid, overdue or credited"},"fulfillmentStatus":{"type":"string","description":"Fulfillment Status: pending, partiallyIssued, issued or delivered"},"orderId":{"type":"string","format":"uuid","description":"TICVAI Order ID"},"orderNumber":{"type":"string","description":"TICVAI order number"},"partnerId":{"type":"string","format":"uuid","description":"Partner"},"partnerName":{"type":"string","description":"Partner"},"bookingDate":{"type":"string","format":"date-time","description":"Booking Date"},"event":{"type":"string","description":"Event","nullable":true},"visitDate":{"type":"string","format":"date","description":"Visit/Event Date","nullable":true},"orderStatus":{"type":"string","description":"Order status: draft, held, confirmed, partiallyFulfilled, fulfilled, cancelled, refunded, failed"},"salesChannel":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel","description":"Channel"}}},

@@ -71,6 +71,7 @@
     "description": "A UUIDv7, matching `TicketStatus.ticketId` — **stable for the life of the ticket and independent of the media carrying it.** A guest whose wristband broke keeps the same entitlement with a new `mediaCode`.\n**This is the ticket id.** Wherever an operation takes a `ticketId` or `ticketIds` — `lookupTicket`, `listScans`, `ScanEvent`, the offline package and `transferOrderTickets` — it is this value. An order line's `entitlementIds` are the ticket ids of that line.\n"
    },
    "templateId": {
+    "x-ticvai-references": "catalogue.entitlement_template",
     "type": "string",
     "format": "uuid",
     "description": "The definition it was issued against. **Pinned at issue** — a template edited next month must not change what this guest bought.\n"
@@ -420,10 +421,12 @@
   ],
   "properties": {
    "id": {
+    "readOnly": true,
     "type": "string",
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "venue",
     "type": "string"
    },
    "name": {
@@ -501,6 +504,9 @@
   }
  },
  "ShopAndDrop": {
+  "x-ticvai-retired-columns": [
+   "collection_point_id"
+  ],
   "type": "object",
   "x-ticvai-persistence": "retail.shop_and_drop + retail.shop_and_drop_line",
   "required": [
@@ -541,7 +547,9 @@
    },
    "collectionPointId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-column": "collection_location_id",
+    "x-ticvai-references": "fnb.delivery_location"
    },
    "collectionPointName": {
     "type": "string"

@@ -5,6 +5,7 @@
   "module": "Releases & Environments",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "PLATFORM_RELEASE_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -359,6 +360,7 @@
   "module": "Releases & Environments",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "PLATFORM_RELEASE_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -668,6 +670,7 @@
   "module": "Releases & Environments",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_RELEASE_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -900,6 +903,7 @@
   "module": "Releases & Environments",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "PLATFORM_RELEASE_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -1091,6 +1095,7 @@
   "module": "Releases & Environments",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_RELEASE_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -1416,6 +1421,7 @@
   "module": "Releases & Environments",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "PLATFORM_MIGRATION_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -1740,6 +1746,7 @@
   "module": "Releases & Environments",
   "requiresModule": "core",
   "wave": 2,
+  "permission": "PLATFORM_RELEASE_VIEW",
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",

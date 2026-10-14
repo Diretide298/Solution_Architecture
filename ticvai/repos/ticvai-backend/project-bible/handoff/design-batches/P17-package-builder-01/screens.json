@@ -5,6 +5,7 @@
   "module": "Package Builder",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "sameAs": "ADM-399",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
@@ -174,6 +175,7 @@
   "module": "Package Builder",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "sameAs": "ADM-400",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
@@ -204,6 +206,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listPlans",
        "derived": true,
        "impliedBy": "listPlans",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -307,6 +310,7 @@
   "module": "Package Builder",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "sameAs": "ADM-401",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
@@ -351,7 +355,7 @@
         "Trial Availability"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listModuleCatalogue",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 46 §Each module displays"
       }
      ]
@@ -364,6 +368,7 @@
        "kind": "detailPanel",
        "label": "The selected module marketplace",
        "bindsTo": null,
+       "operation": "listModuleCatalogue",
        "columns": [
         "Module Name",
         "Description",
@@ -462,6 +467,7 @@
   "module": "Package Builder",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "sameAs": "ADM-402",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
@@ -504,7 +510,7 @@
         "Reason"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listModuleCatalogue",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 48 §Each recommendation shows"
       }
      ]
@@ -517,6 +523,7 @@
        "kind": "detailPanel",
        "label": "The selected module package recommendations",
        "bindsTo": null,
+       "operation": "listModuleCatalogue",
        "columns": [
         "Additional Monthly Cost",
         "Annual Cost",
@@ -613,6 +620,7 @@
   "module": "Package Builder",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "sameAs": "ADM-403",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
@@ -643,6 +651,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listModuleCatalogue",
        "derived": true,
        "impliedBy": "listModuleCatalogue",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -726,6 +735,7 @@
   "module": "Package Builder",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_PLAN_MANAGE",
   "source": {
    "sameAs": "ADM-404",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",
@@ -756,6 +766,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listModuleCatalogue",
        "derived": true,
        "impliedBy": "listModuleCatalogue",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -850,6 +861,7 @@
   "module": "Package Builder",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_MANAGE",
   "source": {
    "sameAs": "ADM-405",
    "book": "Subscription_Licensing_AI_Self_Service.pdf",

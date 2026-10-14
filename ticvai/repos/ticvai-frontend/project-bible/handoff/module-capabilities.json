@@ -1232,8 +1232,8 @@
   },
   "games": {
    "title": "10 — Games & F&B Integration",
-   "capabilityCount": 10,
-   "unguardedOperations": 4,
+   "capabilityCount": 11,
+   "unguardedOperations": 3,
    "capabilities": [
     {
      "key": "ACCESS_VALIDATE",
@@ -1358,13 +1358,24 @@
      ],
      "elevated": false,
      "segregationConstrained": false
+    },
+    {
+     "key": "WALLET_VIEW",
+     "label": "balances, lots, liability, disputes",
+     "group": "Wallet and stored value",
+     "operationCount": 1,
+     "operations": [
+      "getGameCard"
+     ],
+     "elevated": false,
+     "segregationConstrained": false
     }
    ]
   },
   "identity": {
    "title": "19 — Guest Mobile App & Branding (auth) + cross-cutting staff auth",
    "capabilityCount": 12,
-   "unguardedOperations": 34,
+   "unguardedOperations": 35,
    "capabilities": [
     {
      "key": "AUDIT_VIEW",
@@ -3555,14 +3566,14 @@
      "key": "PLATFORM_BILLING_VIEW",
      "label": null,
      "group": "Control Plane",
-     "operationCount": 6,
+     "operationCount": 7,
      "operations": [
       "getBillingEntity",
       "getBillingReconciliation",
+      "getCommercialMetrics",
       "getLicenceEnforcement",
       "getPlanRecommendations",
-      "listCreditNotes",
-      "listSubscriptionInvoices"
+      "listCreditNotes"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -4357,8 +4368,8 @@
    "PLATFORM_BILLING_VIEW": [
     "getBillingEntity",
     "getBillingReconciliation",
-    "getLicenceEnforcement",
-    "getPlanRecommendations"
+    "getCommercialMetrics",
+    "getLicenceEnforcement"
    ],
    "PLATFORM_CELL_MANAGE": [
     "approveBookingLimitCommercial",

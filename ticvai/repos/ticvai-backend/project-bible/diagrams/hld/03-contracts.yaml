@@ -104,11 +104,11 @@ contracts:
   ref: diagrams/lld/contracts/orders.yaml
 - contract: subscription
   tier: satellite
-  operations: 152
+  operations: 153
   holds: null
   service: PlatformService
   verbs:
-    GET: 70
+    GET: 71
     POST: 45
     PUT: 33
     PATCH: 3
@@ -192,11 +192,11 @@ contracts:
   ref: diagrams/lld/contracts/white-label.yaml
 - contract: identity
   tier: spine
-  operations: 97
+  operations: 98
   holds: null
   service: IdentityService
   verbs:
-    POST: 44
+    POST: 45
     GET: 39
     PUT: 7
     DELETE: 4

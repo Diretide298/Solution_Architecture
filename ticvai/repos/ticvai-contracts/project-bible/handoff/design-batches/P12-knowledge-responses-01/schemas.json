@@ -149,6 +149,7 @@
   }
  },
  "MessageChannel": {
+  "x-ticvai-rls": "grant-holder-read",
   "type": "string",
   "enum": [
    "email",
@@ -160,6 +161,7 @@
   ]
  },
  "MessageTemplate": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "marketing.message_template",
   "type": "object",
   "required": [
@@ -176,6 +178,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string",
     "maxLength": 64
    },

@@ -391,6 +391,7 @@ operations:
   - staff
   offline: false
   reads:
+  - inventory.location
   - inventory.requisition
   writes: []
 - operation: listExpiringBatches

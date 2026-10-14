@@ -72,6 +72,7 @@
     "readOnly": true
    },
    "venueId": {
+    "x-ticvai-references": "platform.scope",
     "type": "string",
     "format": "uuid"
    },
@@ -147,6 +148,8 @@
     "readOnly": true
    },
    "findings": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "readOnly": true,
     "items": {
@@ -328,6 +331,8 @@
     "nullable": true
    },
    "openingHours": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "description": "The usual week. Exceptions come from the venue calendar.",
     "items": {
@@ -434,6 +439,7 @@
     "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
    },
    "taxInvoiceId": {
+    "x-ticvai-references": "ledger.tax_invoice",
     "type": "string",
     "format": "uuid"
    },
@@ -470,6 +476,7 @@
     "nullable": true
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -659,6 +666,7 @@
     "type": "string"
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -781,6 +789,7 @@
     "$ref": "#/components/schemas/FinTaxInvoiceStatus"
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },

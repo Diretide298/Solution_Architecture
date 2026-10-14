@@ -117,6 +117,7 @@
     "description": "Server-assigned from the legal entity's credit memo series, in sequence without gaps."
    },
    "taxInvoiceId": {
+    "x-ticvai-references": "ledger.tax_invoice",
     "type": "string",
     "format": "uuid"
    },
@@ -153,6 +154,7 @@
     "nullable": true
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -342,6 +344,7 @@
     "type": "string"
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },
@@ -464,6 +467,7 @@
     "$ref": "#/components/schemas/FinTaxInvoiceStatus"
    },
    "legalEntityId": {
+    "x-ticvai-references": "ledger.legal_entity",
     "type": "string",
     "format": "uuid"
    },

@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/advanced-offer-command-center-adm-168",
-   "component": "apps/venue-management-web/src/routes/commercial/AdvancedOfferCommandCenter.tsx",
+   "component": "src/routes/commercial/AdvancedOfferCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -107,7 +108,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -293,7 +294,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/buy-x-get-y-bogo-rule-builder-adm-169",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
+   "component": "src/routes/venue-operations/PromotionsCouponsDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-010"
   },
@@ -465,6 +466,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "4",
@@ -474,7 +476,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/multi-buy-quantity-offer-configurator-adm-170",
-   "component": "apps/venue-management-web/src/routes/commercial/MultiBuyQuantityOfferConfigurator.tsx",
+   "component": "src/routes/commercial/MultiBuyQuantityOfferConfigurator.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -588,6 +590,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "4",
@@ -597,7 +600,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/cheapest-lowest-value-item-promotion-adm-171",
-   "component": "apps/venue-management-web/src/routes/commercial/CheapestLowestValueItemPromotion.tsx",
+   "component": "src/routes/commercial/CheapestLowestValueItemPromotion.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -744,7 +747,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/fixed-price-n-for-x-offer-builder-adm-172",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
+   "component": "src/routes/venue-operations/PromotionsCouponsDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-010"
   },
@@ -890,7 +893,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/gift-free-product-added-value-offer-builder-adm-173",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
+   "component": "src/routes/venue-operations/PromotionsCouponsDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-010"
   },
@@ -1021,7 +1024,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/cross-category-promotion-builder-adm-174",
-   "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
+   "component": "src/routes/venue-operations/PromotionsCouponsDetail.tsx",
    "status": "notStarted",
    "sectionOf": "BO-010"
   },
@@ -1137,6 +1140,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "4",
@@ -1146,7 +1150,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/reward-selection-substitution-customer-choice-adm-175",
-   "component": "apps/venue-management-web/src/routes/commercial/RewardSelectionSubstitutionCustomerChoice.tsx",
+   "component": "src/routes/commercial/RewardSelectionSubstitutionCustomerChoice.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1254,6 +1258,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "4",
@@ -1263,7 +1268,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/advanced-offer-guardrails-conflict-controls-adm-176",
-   "component": "apps/venue-management-web/src/routes/commercial/AdvancedOfferGuardrailsConflictControls.tsx",
+   "component": "src/routes/commercial/AdvancedOfferGuardrailsConflictControls.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1387,6 +1392,7 @@
   "module": "Commercial",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "4",
@@ -1396,7 +1402,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/offer-simulation-basket-trace-ai-optimization-adm-177",
-   "component": "apps/venue-management-web/src/routes/commercial/OfferSimulationBasketTraceAiOptimization.tsx",
+   "component": "src/routes/commercial/OfferSimulationBasketTraceAiOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {

@@ -21,6 +21,7 @@ is not `readOnly` must be one of:
     schema-reference `source` is that field, or the same words with plurals ignored (`paymentTermDays` and
     `payment_terms_days`);
   * an array held as rows of a written child table named for it (`openingHours` in `outlet_opening_hours`);
+  * marked `x-ticvai-stored-as: <schema>.<table>.<column>`, a column of a table it writes (CHG-STO-017);
   * marked `x-ticvai-persisted: false`: a field that travels and is not stored, said so where it is declared.
 
 RF-REQUEST-NOT-STORED is that rule. RF-READONLY-REQUEST: a `readOnly` field on a request-only schema, which no
@@ -178,6 +179,12 @@ def main() -> int:
                         if s.get("x-ticvai-column"):
                             cand.add(s["x-ticvai-column"])
                     if cand & tcols or p in tsrc or words(p) in twords or words(base) in twords:
+                        continue
+                    # **`x-ticvai-stored-as: <table>.<column>` names the column**, as check-stored-request-fields reads
+                    # it (CHG-STO-017): a column of a table the resource persists to or the operation writes.
+                    sa = str(spec.get("x-ticvai-stored-as") or "")
+                    st, _, sc = sa.rpartition(".")
+                    if sa and st in tables and sc in cols.get(st, set()):
                         continue
                     # a column that qualifies a field of two words or more: `expiresAt` as `credential_expires_at`
                     wp = words(p)

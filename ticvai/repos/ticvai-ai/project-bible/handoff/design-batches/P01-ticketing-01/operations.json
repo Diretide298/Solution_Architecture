@@ -399,7 +399,7 @@
     "required": null
    }
   ],
-  "requestBody": "TableReservation",
+  "requestBody": "UpdateTableReservationRequest",
   "responds": "TableReservation"
  }
 }

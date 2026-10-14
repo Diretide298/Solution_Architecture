@@ -329,35 +329,6 @@
   "requestBody": null,
   "responds": "ApiClient"
  },
- "listCreditNotes": {
-  "method": "GET",
-  "path": "/tenants/{tenantId}/credit-notes",
-  "contract": "subscription",
-  "summary": "List a tenant's credit notes",
-  "permission": "PLATFORM_BILLING_VIEW",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "tenant",
-  "parameters": [
-   {
-    "name": "invoiceId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listOrgUnits": {
   "method": "GET",
   "path": "/org-units",
@@ -652,7 +623,7 @@
  },
  "setApiAnomalyRule": {
   "method": "PUT",
-  "path": "/api-anomaly-rules",
+  "path": "/api-anomaly-rules/{anomalyRuleId}",
   "contract": "public-api",
   "summary": "When API traffic is flagged as abnormal",
   "permission": "DEVELOPER_ADMIN",
@@ -660,6 +631,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "anomalyRuleId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,
@@ -671,7 +647,7 @@
  },
  "setApiQuota": {
   "method": "PUT",
-  "path": "/api-quotas",
+  "path": "/api-quotas/{quotaId}",
   "contract": "public-api",
   "summary": "Rate limits and throttling per client",
   "permission": "DEVELOPER_ADMIN",
@@ -679,6 +655,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "quotaId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

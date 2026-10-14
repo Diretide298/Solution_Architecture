@@ -5,6 +5,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "5",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/journey-automation-center-bo-774",
-   "component": "apps/venue-management-web/src/routes/engagement-support/JourneyAutomationCenter.tsx",
+   "component": "src/routes/engagement-support/JourneyAutomationCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -100,6 +101,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Monitor the health and value of automated customer journeys. Show active journeys, enrolled guests, conversions, recovered revenue, exits, errors and upcoming actions. Compare journey performance by objective, lifecycle, brand, venue, audience, channel and owner. Surface paused nodes, delivery failures, SLA risk and data or consent problems requiring intervention. Provide drill-down and explainable optimization opportunities without automatically changing live flows. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "division": "Shares `getJourneyPerformance`, `listJourneys` with BO-783; this screen is Journey Automation Center (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 5.01, page 26): monitor the health and value of automated customer journeys. Show active journeys, enrolled guests, conversions, recovered revenue, exits, errors and upcoming actions. Compare journey performance by objective, lifecycle, brand, venue, audience, channel and owner. Surface paused nodes, delivery failures, SLA risk and data or consent problems requiring intervention. Provide drill-down and explainable optimization opportunities without automatically changing live flows. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
   "gaps": [
    {
     "operation": null,
@@ -122,7 +124,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listJourneys",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listJourneys"
       },
       {
        "kind": "detailPanel",
@@ -203,6 +206,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "5",
@@ -212,7 +216,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/visual-journey-builder-bo-775",
-   "component": "apps/venue-management-web/src/routes/engagement-support/VisualJourneyBuilder.tsx",
+   "component": "src/routes/engagement-support/VisualJourneyBuilder.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -351,6 +355,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "5",
@@ -360,7 +365,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/trigger-event-catalog-bo-776",
-   "component": "apps/venue-management-web/src/routes/engagement-support/TriggerEventCatalog.tsx",
+   "component": "src/routes/engagement-support/TriggerEventCatalog.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -405,7 +410,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listMessageTriggers",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listMessageTriggers"
       },
       {
        "kind": "primaryButton",
@@ -483,6 +489,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "5",
@@ -492,7 +499,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/decision-logic-timing-bo-777",
-   "component": "apps/venue-management-web/src/routes/engagement-support/DecisionLogicTiming.tsx",
+   "component": "src/routes/engagement-support/DecisionLogicTiming.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -518,6 +525,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Control journey branching, timing and re-entry. Build nested AND/OR conditions using guest, event, segment, transaction, product, channel and engagement data. Configure waits, dates, timezones, send windows, blackout periods, frequency limits and expiry. Define re-entry, concurrency, suppression, exit and goal conditions and behavior when data is missing. Simulate paths for representative guests and block publication when a branch has no safe outcome. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
+  "division": "Shares `createJourney`, `listJourneys` with BO-120; this screen is Decision Logic & Timing (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 5.04, page 27): control journey branching, timing and re-entry. Build nested AND/OR conditions using guest, event, segment, transaction, product, channel and engagement data. Configure waits, dates, timezones, send windows, blackout periods, frequency limits and expiry. Define re-entry, concurrency, suppression, exit and goal conditions and behavior when data is missing. Simulate paths for representative guests and block publication when a branch has no safe outcome. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history.",
   "gaps": [
    {
     "operation": null,
@@ -624,6 +632,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "5",
@@ -633,7 +642,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/abandoned-cart-recovery-bo-778",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AbandonedCartRecovery.tsx",
+   "component": "src/routes/engagement-support/AbandonedCartRecovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -678,7 +687,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAbandonedCarts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAbandonedCarts"
       }
      ]
     }
@@ -734,6 +744,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_MANAGE",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "5",
@@ -743,7 +754,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/lifecycle-journeys-bo-779",
-   "component": "apps/venue-management-web/src/routes/engagement-support/LifecycleJourneys.tsx",
+   "component": "src/routes/engagement-support/LifecycleJourneys.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -856,6 +867,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "5",
@@ -865,7 +877,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/guest-engagement-journeys-bo-780",
-   "component": "apps/venue-management-web/src/routes/engagement-support/GuestEngagementJourneys.tsx",
+   "component": "src/routes/engagement-support/GuestEngagementJourneys.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -972,6 +984,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "5",
@@ -981,7 +994,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/cross-sell-service-recovery-bo-781",
-   "component": "apps/venue-management-web/src/routes/engagement-support/CrossSellServiceRecovery.tsx",
+   "component": "src/routes/engagement-support/CrossSellServiceRecovery.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1029,7 +1042,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getJourneyPerformance",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getJourneyPerformance"
       }
      ]
     }
@@ -1094,6 +1108,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "5",
@@ -1103,7 +1118,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/ai-journey-optimization-bo-782",
-   "component": "apps/venue-management-web/src/routes/engagement-support/AiJourneyOptimization.tsx",
+   "component": "src/routes/engagement-support/AiJourneyOptimization.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1151,7 +1166,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listJourneys",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listJourneys"
       },
       {
        "kind": "primaryButton",
@@ -1251,6 +1267,7 @@
   "module": "Engagement & Support",
   "requiresModule": "marketing",
   "wave": 3,
+  "permission": "MARKETING_VIEW",
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "5",
@@ -1260,7 +1277,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/engagement-support/journey-analytics-audit-bo-783",
-   "component": "apps/venue-management-web/src/routes/engagement-support/JourneyAnalyticsAudit.tsx",
+   "component": "src/routes/engagement-support/JourneyAnalyticsAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1286,6 +1303,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Measure journey behavior at node and end-goal level. Show triggered, eligible, enrolled, reached, clicked, converted, exited and failed stages. Analyze node drop-off, branch performance, time-to-conversion, revenue, attribution and cost. Provide error log, delivery trace, suppression reason, version comparison and guest-level path where authorized. Audit creation, edits, approvals, publication, pauses, AI recommendations and administrative actions. Configuration Scope of Work | Version 1.0 28 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 29 Board 6 - Newsletter, Notifications & Message Delivery Figure 6. High-definition configuration board with all 10 screens. Configuration Scope of Work | Version 1.0 30",
+  "division": "Shares `getJourneyPerformance`, `listJourneys` with BO-774; this screen is Journey Analytics & Audit (pack Marketing_CRM_Configuration_Reference v1.0.pdf, board 5.10, page 28): measure journey behavior at node and end-goal level. Show triggered, eligible, enrolled, reached, clicked, converted, exited and failed stages. Analyze node drop-off, branch performance, time-to-conversion, revenue, attribution and cost. Provide error log, delivery trace, suppression reason, version comparison and guest-level path where authorized. Audit creation, edits, approvals, publication, pauses, AI recommendations and administrative actions. Configuration Scope of Work | Version 1.0 28 Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the audit history. Configuration Scope of Work | Version 1.0 29 Board 6 - Newsletter, Notifications & Message Delivery Figure 6. High-definition configuration board with all 10 screens. Configuration Scope of Work | Version 1.0 30.",
   "gaps": [
    {
     "operation": null,
@@ -1308,7 +1326,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listJourneys",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listJourneys"
       },
       {
        "kind": "detailPanel",

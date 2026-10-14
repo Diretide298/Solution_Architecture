@@ -574,7 +574,7 @@
  },
  "setSignalRegistryPolicy": {
   "method": "PUT",
-  "path": "/signal-registry",
+  "path": "/signal-registry/{signalId}",
   "contract": "catalogue",
   "summary": "Register a signal or model and set how far AI may trust it",
   "permission": "AI_CONFIGURE",
@@ -582,6 +582,11 @@
   "conflictPolicy": "serverWins",
   "scopeLevel": "tenant",
   "parameters": [
+   {
+    "name": "signalId",
+    "in": "path",
+    "required": true
+   },
    {
     "name": null,
     "in": null,

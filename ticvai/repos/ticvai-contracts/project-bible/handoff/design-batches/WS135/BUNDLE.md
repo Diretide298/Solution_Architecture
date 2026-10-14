@@ -127,14 +127,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-734` | CRM Command Center | D | 1 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-735` | Guest Directory | D | 13 | 18 | 6 | 16 | 1 | 0 | — | notStarted (—) |
+| `BO-734` | CRM Command Center | D | 1 | 20 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-735` | Guest Directory | D | 13 | 38 | 6 | 16 | 1 | 0 | — | notStarted (—) |
 | `BO-736` | Guest Master Configuration | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-737` | Customer 360 Profile | D | 0 | 70 | 6 | 12 | 3 | 0 | — | notStarted (—) |
-| `BO-738` | Activity Timeline | D | 0 | 11 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-739` | Contact & Preferences | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-740` | Family & Guardians | D | 11 | 9 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `BO-741` | Corporate & Groups | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `BO-737` | Customer 360 Profile | D | 0 | 90 | 6 | 12 | 3 | 0 | — | notStarted (—) |
+| `BO-738` | Activity Timeline | D | 0 | 31 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `BO-739` | Contact & Preferences | B | 0 | 27 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-740` | Family & Guardians | D | 11 | 29 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `BO-741` | Corporate & Groups | D | 0 | 9 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-742` | Commerce & Documents | D | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-743` | AI Guest Intelligence | D | 0 | 20 | 6 | 9 | 0 | 0 | — | notStarted (—) |
 
@@ -178,7 +178,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Search | search field | — | — | — | — | A search that returns nothing must say so differently from a search not yet run. | — |
+| Search | search field | — | — | — | — | A search that returns nothing must say so differently from a search not yet run. | `searchGuests` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -193,7 +193,30 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listSegments`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Name | text | — |
+| Description | text | — |
+| Venue | the name it points at, never the id | — |
+| Match | chip: All, Any | — |
+| Criteria | list or chips (count when long) | — |
+| Attribute | text | Behavioural or profile attribute — visit count, last visit, lifetime value, product purchased, membership tier, venue visited, language. |
+| Operator | chip: Equals, Not equals, Greater than, Less than, Between, In… | — |
+| Value | text | — |
+| Values | list or chips (count when long) | — |
+| Exclude segments | list or chips (count when long) | — |
+| Rule groups | list or chips (count when long) | Nested AND / OR / NOT groups (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by … |
+| Operator | chip: And, Or, Not | — |
+| Criteria | list or chips (count when long) | Each entry has the shape of `SegmentCriterion` (`attribute`, `operator`, `value`). |
+| Groups | list or chips (count when long) | — |
+| Effective from | 1 Oct 2026, 14:30 | The segment is evaluated for sends only from this time. |
+| Effective to | 1 Oct 2026, 14:30 | — |
+| Owner principal | the name it points at, never the id | Who answers for the segment; defaults to its creator. |
+| Requires approval | yes / no (icon or chip) | Where true, a campaign may use the segment only after an `approvals` request on it is approved. |
+| ID | the name it points at, never the id | — |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -264,6 +287,8 @@ ltv: AED 1,240.00 average lifetime value
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -304,7 +329,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-734?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-735`, `BO-736`, `BO-737`, `BO-738`, `BO-739`, `BO-740`, `BO-741`, `BO-742`, `BO-743`.
@@ -348,7 +373,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Search | search field | — | — | — | — | A search that returns nothing must say so differently from a search not yet run. | — |
+| Search | search field | — | — | — | — | A search that returns nothing must say so differently from a search not yet run. | `searchGuests` |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
 
@@ -402,7 +427,30 @@ Errors to draw in the form: 409 The entry being reversed is already reversed (`a
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getGuestProfile`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Subject | the name it points at, never the id | Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger. |
+| Display name | text | — |
+| Email | text | — |
+| Phone | +971 50 123 4567 | — |
+| Preferred language | text | — |
+| Preferred channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Guest link | text | Present where the guest is linked across cells. Marketing acts locally. |
+| Tags | list or chips (count when long) | — |
+| Engagement score | 1,234 | 22.2.20 and 22.2.21. `lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not. |
+| Engagement tier | chip: New, Active, Occasional, Lapsing, Lapsed, Dormant | 5.3.19. Automatic classification, computed rather than assigned. |
+| Lifetime value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Visit count | 1,234 | — |
+| Last visit at | 1 Oct 2026, 14:30 | — |
+| Is active | yes / no (icon or chip) | — |
+| Merged into subject | the name it points at, never the id | Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`, which retain it as a redirect rather than deleting it. |
+| Merged at | 1 Oct 2026, 14:30 | — |
+| Consents | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Purposes | list or chips (count when long) | — |
 
 **The loyalty position** (detail panel, from `getGuestLoyalty`)
 
@@ -514,6 +562,8 @@ adjustment: Goodwill +500 points - slide closed during visit, case CA-1019
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 16 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -556,7 +606,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (13), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-735?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Adjust loyalty points, Merge guest profiles, Save guest profile.
 - [ ] Every transition is wired: `BO-734`.
@@ -651,6 +701,8 @@ version: Model v6 - 30 Sep 2026 - added "Preferred park area"
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -727,7 +779,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listCustomerServiceProfile`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Customer | the name it points at, never the id | The guest's `subjectId`. |
+| Customer name | text | Null unless the caller holds GUEST_VIEW_PII. |
+| Customer type | chip: Individual, Member, Group organiser, Corporate, Partner | — |
+| Membership status | chip: None, Active, Expiring, Lapsed | — |
+| Loyalty tier | text | — |
+| Preferred language | text | — |
+| Country | text | — |
+| Contact details | grouped details | Masked (e.g. `j*@example.com`, `+971 * 4821`) unless the caller holds GUEST_VIEW_PII. |
+| Email | text | — |
+| Phone | +971 50 123 4567 | — |
+| Customer since | 1 Oct 2026, 14:30 | — |
+| Customer value | AED 1,234.50 | Lifetime net spend across the tenant. |
+| Open cases | 1,234 | — |
+| Risk attention indicator | chip: None, Attention, Risk | `attention` with an open complaint or an unresolved refund case; `risk` with a breached SLA or a repeat contact on the same issue. |
+| Upcoming tickets | 1,234 | — |
+| Active membership | grouped details | — |
+| Membership | text | — |
+| Plan name | text | — |
+| Expires at | 1 Oct 2026, 14:30 | — |
+| Wallet balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Profile** (detail panel, from `getGuestProfile`)
 
@@ -889,6 +964,8 @@ waivers:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `CASE_VIEW`
+
 #### Requirements it meets
 
 12 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -934,7 +1011,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (70 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (90 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-737?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-734`.
@@ -985,7 +1062,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getGuestProfile`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Subject | the name it points at, never the id | Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger. |
+| Display name | text | — |
+| Email | text | — |
+| Phone | +971 50 123 4567 | — |
+| Preferred language | text | — |
+| Preferred channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Guest link | text | Present where the guest is linked across cells. Marketing acts locally. |
+| Tags | list or chips (count when long) | — |
+| Engagement score | 1,234 | 22.2.20 and 22.2.21. `lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not. |
+| Engagement tier | chip: New, Active, Occasional, Lapsing, Lapsed, Dormant | 5.3.19. Automatic classification, computed rather than assigned. |
+| Lifetime value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Visit count | 1,234 | — |
+| Last visit at | 1 Oct 2026, 14:30 | — |
+| Is active | yes / no (icon or chip) | — |
+| Merged into subject | the name it points at, never the id | Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`, which retain it as a redirect rather than deleting it. |
+| Merged at | 1 Oct 2026, 14:30 | — |
+| Consents | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Purposes | list or chips (count when long) | — |
 
 **Activity timeline** (data table, from `getGuestTimeline`)
 
@@ -1044,6 +1144,8 @@ entries:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1074,7 +1176,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-738?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-734`.
@@ -1121,9 +1223,42 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getGuestTimeline`): One record, read-only.
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| At | 1 Oct 2026, 14:30 | — |
+| Kind | chip: Purchase, Ticket used, Reservation, Visit, Membership change, Loyalty… | — |
+| Nature | chip: Operational fact, User note, AI derived | A prediction and a gate scan are both useful and only one happened. |
+| Summary | text | — |
+| Channel | text | — |
+| Venue | the name it points at, never the id | — |
+| Source contract | text | — |
+| Source reference | the name it points at, never the id | — |
+| Value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Outcome | text | — |
+
+**Data table** (data table, from `listGuestIdentityVerifications`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Subject document | the name it points at, never the id | The `pii.subject_document` row submitted. |
+| Document kind | chip: Passport, Emirates ID, National ID, Driving licence, Residence permit, Other | — |
+| Document number last4 | text | — |
+| Reason | chip: Policy required, Age restricted purchase, Resident pricing, Account recovery | — |
+| Status | chip: Pending, Verified, Rejected, Resubmission requested | — |
+| Method | chip: Manual review, Document scanner, Provider | — |
+| Decision reason | text | — |
+| Decided by principal | the name it points at, never the id | — |
+| Submitted at | 1 Oct 2026, 14:30 | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Document image deleted at | 1 Oct 2026, 14:30 | When the scan (and any selfie) was deleted under the policy's retention. |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1178,6 +1313,8 @@ guest:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW_PII`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1202,7 +1339,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-739?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-734`.
@@ -1265,7 +1402,30 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getGuestProfile`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
+| Subject | the name it points at, never the id | Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger. |
+| Display name | text | — |
+| Email | text | — |
+| Phone | +971 50 123 4567 | — |
+| Preferred language | text | — |
+| Preferred channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
+| Guest link | text | Present where the guest is linked across cells. Marketing acts locally. |
+| Tags | list or chips (count when long) | — |
+| Engagement score | 1,234 | 22.2.20 and 22.2.21. `lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not. |
+| Engagement tier | chip: New, Active, Occasional, Lapsing, Lapsed, Dormant | 5.3.19. Automatic classification, computed rather than assigned. |
+| Lifetime value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Visit count | 1,234 | — |
+| Last visit at | 1 Oct 2026, 14:30 | — |
+| Is active | yes / no (icon or chip) | — |
+| Merged into subject | the name it points at, never the id | Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`, which retain it as a redirect rather than deleting it. |
+| Merged at | 1 Oct 2026, 14:30 | — |
+| Consents | grouped details | — |
+| Subject | the name it points at, never the id | — |
+| Purposes | list or chips (count when long) | — |
 
 **Family and guardians** (data table, from `getGuestRelationships`)
 
@@ -1331,6 +1491,8 @@ members:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1363,7 +1525,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-740?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save guest preferences, Cancel, Save links.
 - [ ] Every transition is wired: `BO-734`.
@@ -1406,7 +1568,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getGuestRelationships`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Related subject | the name it points at, never the id | — |
+| Organisation | the name it points at, never the id | — |
+| Kind | chip: Parent, Guardian, Spouse, Dependant, Household member, Employee… | — |
+| Authorities | list or chips (count when long) | Four different permissions, not one relationship. A guardianship granting all of them forever survives the child becoming an adult. |
+| Effective from | 1 Oct 2026 | — |
+| Effective to | 1 Oct 2026 | — |
+| Shared benefits | yes / no (icon or chip) | — |
+| Verified at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -1458,6 +1632,8 @@ links:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `GUEST_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1485,7 +1661,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-741?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save guest relationships, Cancel.
 - [ ] Every transition is wired: `BO-734`.
@@ -1588,6 +1764,8 @@ documents:
 - `getGuestTimeline` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `GUEST_VIEW`
 
 #### Requirements it meets
 
@@ -1722,6 +1900,8 @@ nextAction: Offer pass renewal with 10% member discount on WhatsApp (consent giv
 - `getGuestIntelligence` → `GUEST_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `GUEST_VIEW`
 
 #### Requirements it meets
 
@@ -1893,26 +2073,26 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AdjustLoyaltyPointsRequest": {"type":"object","x-ticvai-persistence":"none — writes marketing.loyalty_points","description":"**A correction is a new entry, never an edit.** Reversing an entry writes a row pointing at it through `reversedLoyaltyPointsId`; granting goodwill writes a row with no reversal target. Either way the movement has a reason and an author, and the history stays walkable.\n","required":["programmeId","points","reason"],"properties":{"programmeId":{"type":"string","format":"uuid"},"points":{"type":"integer","description":"Signed. Negative removes points, and the balance may not go below zero."},"reason":{"type":"string","description":"**Goodwill, correction or expiry reversal, and nothing else (decided 28 September, audit R149).** A service-recovery grant is `goodwill`, a fraud or migration fix is `correction`, and returning points that expired in error is `expiryReversal`. None of them moves the tier or `lifetimePoints`.\n","enum":["goodwill","correction","expiryReversal"]},"reversedLoyaltyPointsId":{"type":"string","format":"uuid","nullable":true,"description":"The entry this reverses, when it is a reversal. **Set it and the sign is checked against the original** — a reversal that does not cancel what it names is a second grant wearing a correction's label.\n"},"notes":{"type":"string","maxLength":1000,"nullable":true}}},
 "ConsentDecision": {"type":"string","enum":["granted","withdrawn","notAsked"]},
 "ConsentPurpose": {"type":"string","enum":["marketing","personalisation","profiling","thirdPartySharing","aiProcessing","transactional"]},
-"ConsentRecord": {"x-ticvai-persistence":"marketing.consent_record + marketing.consent_record_channel","allOf":[{"$ref":"#/components/schemas/RecordConsentRequest"},{"type":"object","required":["id","subjectId"],"properties":{"id":{"type":"string"},"subjectId":{"type":"string","format":"uuid"},"recordedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"The order whose checkout carried the opt-in (source `checkout`, M18-15): the UUIDv7 of orders.sales_order. Null for every other source.","x-ticvai-references":"orders.sales_order"},"verifiedContactRef":{"type":"string","nullable":true,"maxLength":128,"description":"The verified contact the checkout opt-in was given against (ADR-0045), as the keyed hash the guest match policy uses; never the raw address. It is how a checkout consent given without an account is attached to the profile when the contact later matches one."},"supersededAt":{"type":"string","format":"date-time","nullable":true}}}]},
+"ConsentRecord": {"x-ticvai-rls":"grant-holder-read","x-ticvai-persistence":"marketing.consent_record + marketing.consent_record_channel","allOf":[{"$ref":"#/components/schemas/RecordConsentRequest"},{"type":"object","required":["id","subjectId"],"properties":{"id":{"type":"string"},"subjectId":{"type":"string","format":"uuid"},"recordedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true,"description":"The order whose checkout carried the opt-in (source `checkout`, M18-15): the UUIDv7 of orders.sales_order. Null for every other source.","x-ticvai-references":"orders.sales_order"},"verifiedContactRef":{"type":"string","nullable":true,"maxLength":128,"description":"The verified contact the checkout opt-in was given against (ADR-0045), as the keyed hash the guest match policy uses; never the raw address. It is how a checkout consent given without an account is attached to the profile when the contact later matches one."},"supersededAt":{"type":"string","format":"date-time","nullable":true}}}]},
 "ConsentState": {"x-ticvai-persistence":"none — projection over consent_record","type":"object","required":["subjectId","purposes"],"properties":{"subjectId":{"type":"string","format":"uuid"},"purposes":{"type":"array","items":{"type":"object","required":["purpose","decision","requiresRenewal"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"decision":{"$ref":"#/components/schemas/ConsentDecision"},"channels":{"type":"array","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string","nullable":true},"requiresRenewal":{"type":"boolean","description":"True where the notice has been superseded since consent was given."},"decidedAt":{"type":"string","format":"date-time","nullable":true}}}}}},
 "CreateSegmentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["name","criteria"],"properties":{"name":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":1000},"venueId":{"type":"string","format":"uuid"},"match":{"type":"string","enum":["all","any"],"default":"all"},"criteria":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/SegmentCriterion"}},"excludeSegmentIds":{"type":"array","items":{"type":"string","format":"uuid"}},"ruleGroups":{"x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","type":"array","description":"**Nested AND / OR / NOT groups** (contract gap CHG-WIR-007, BO-755; CHG-CSA-045). Where present, the segment matches `criteria` (combined by `match`) AND every group here. Absent keeps the flat list.","items":{"$ref":"#/components/schemas/SegmentRuleGroup"}},"effectiveFrom":{"type":"string","format":"date-time","nullable":true,"description":"The segment is evaluated for sends only from this time."},"effectiveTo":{"type":"string","format":"date-time","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who answers for the segment; defaults to its creator."},"requiresApproval":{"type":"boolean","default":false,"description":"Where true, a campaign may use the segment only after an `approvals` request on it is approved."}}},
 "Customer360ServiceProfileView": {"type":"object","x-ticvai-persistence":"none — projection over marketing.guest_profile, pii.subject, pii.subject_contact, marketing.loyalty_position, marketing.guest_preference, marketing.consent_record, marketing.suppression, marketing.case, orders.sales_order, orders.reservation, orders.group_booking, access.entitlement and wallet.balance","description":"The service view of one guest. Fields the caller may not see are null, never omitted.","required":["customerId","customerSince","openCases","serviceAlerts"],"properties":{"customerId":{"type":"string","format":"uuid","description":"The guest's `subjectId`."},"customerName":{"type":"string","nullable":true,"description":"Null unless the caller holds GUEST_VIEW_PII."},"customerType":{"type":"string","enum":["individual","member","groupOrganiser","corporate","partner"]},"membershipStatus":{"type":"string","enum":["none","active","expiring","lapsed"]},"loyaltyTier":{"type":"string","nullable":true},"preferredLanguage":{"type":"string","maxLength":10,"nullable":true},"country":{"type":"string","pattern":"^[A-Z]{2}$","nullable":true},"contactDetails":{"type":"object","description":"Masked (e.g. `j***@example.com`, `+971 ** *** 4821`) unless the caller holds GUEST_VIEW_PII.","properties":{"email":{"type":"string","nullable":true},"phone":{"type":"string","nullable":true}}},"customerSince":{"type":"string","format":"date-time"},"customerValue":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"Lifetime net spend across the tenant."},"openCases":{"type":"integer","minimum":0},"riskAttentionIndicator":{"type":"string","enum":["none","attention","risk"],"description":"`attention` with an open complaint or an unresolved refund case; `risk` with a breached SLA or a repeat contact on the same issue."},"upcomingTickets":{"type":"integer","minimum":0},"activeMembership":{"type":"object","nullable":true,"properties":{"membershipId":{"type":"string"},"planName":{"type":"string"},"expiresAt":{"type":"string","format":"date-time","nullable":true}}},"walletBalance":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"activeReservations":{"type":"integer","minimum":0},"futureGroupBookings":{"type":"integer","minimum":0},"openOrders":{"type":"integer","minimum":0},"serviceAlerts":{"type":"array","maxItems":20,"items":{"type":"object","required":["kind","message"],"properties":{"kind":{"type":"string","enum":["eventSoon","unresolvedRefundCase","membershipExpiring","openComplaint","communicationRestricted"]},"message":{"type":"string"},"referenceId":{"type":"string","nullable":true}}}},"preferredCommunicationChannel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"nullable":true},"marketingConsent":{"$ref":"#/components/schemas/ConsentDecision"},"accessibilityRequirements":{"type":"array","nullable":true,"description":"Null unless the caller holds GUEST_VIEW_PII.","items":{"type":"string"}},"communicationRestrictions":{"type":"array","description":"Channels the guest must not be contacted on (`getSuppressionList`).","items":{"$ref":"#/components/schemas/MessageChannel"}},"aiSummary":{"type":"object","nullable":true,"description":"Where the AI policy enables `summarise`. AI-derived and labelled as such.","properties":{"text":{"type":"string","maxLength":2000},"generatedAt":{"type":"string","format":"date-time"}}}}},
-"GuestAttributeModel": {"type":"object","x-ticvai-persistence":"marketing.guest_attribute_model","description":"Board 1.3. **Visibility by jurisdiction is what makes this a model and not a form.**","properties":{"version":{"type":"integer"},"fieldGroups":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"displayOrder":{"type":"integer"}}}},"attributes":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"groupCode":{"type":"string"},"dataType":{"type":"string"},"standard":{"type":"boolean","default":false},"mandatory":{"type":"boolean","default":false},"defaultValue":{"nullable":true},"allowedValues":{"type":"array","items":{"type":"string"}},"validationExpression":{"type":"string","nullable":true},"sensitive":{"type":"boolean","default":false},"visibleToRoles":{"type":"array","items":{"type":"string"}},"editableByRoles":{"type":"array","items":{"type":"string"}},"lawfulInJurisdictions":{"type":"array","items":{"type":"string"},"description":"**Empty means everywhere.** A nationality field lawful in one jurisdiction and not another cannot be a column somebody ships.\n"},"countsTowardCompleteness":{"type":"boolean","default":false}}}},"identifiers":{"type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"primary":{"type":"boolean","default":false},"sourceSystem":{"type":"string","nullable":true},"sourcePriority":{"type":"integer"}}}},"publishedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
+"GuestAttributeModel": {"type":"object","x-ticvai-persistence":"marketing.guest_attribute_model","description":"Board 1.3. **Visibility by jurisdiction is what makes this a model and not a form.**","properties":{"version":{"type":"integer"},"fieldGroups":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"displayOrder":{"type":"integer"}}}},"attributes":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"label":{"type":"string"},"groupCode":{"type":"string"},"dataType":{"type":"string"},"standard":{"type":"boolean","default":false},"mandatory":{"type":"boolean","default":false},"defaultValue":{"nullable":true},"allowedValues":{"type":"array","items":{"type":"string"}},"validationExpression":{"type":"string","nullable":true},"sensitive":{"type":"boolean","default":false},"visibleToRoles":{"type":"array","items":{"type":"string"}},"editableByRoles":{"type":"array","items":{"type":"string"}},"lawfulInJurisdictions":{"type":"array","items":{"type":"string"},"description":"**Empty means everywhere.** A nationality field lawful in one jurisdiction and not another cannot be a column somebody ships.\n"},"countsTowardCompleteness":{"type":"boolean","default":false}}}},"identifiers":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"code":{"type":"string"},"primary":{"type":"boolean","default":false},"sourceSystem":{"type":"string","nullable":true},"sourcePriority":{"type":"integer"}}}},"publishedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
 "GuestExtraFieldDefinition": {"type":"object","x-ticvai-persistence":"none — composed from a field and its options","description":"**A select with no options is not a field**, so the options come back with the definition rather than from a second call.\n","required":["field"],"properties":{"field":{"$ref":"#/components/schemas/MarketingGuestExtraField"},"options":{"type":"array","items":{"$ref":"#/components/schemas/MarketingGuestExtraOption"}}}},
 "GuestIntelligence": {"type":"object","description":"Board 1.10. **Explainable, or an agent will ignore it or over-trust it.**","properties":{"subjectId":{"type":"string","format":"uuid"},"scores":{"type":"array","items":{"type":"object","properties":{"kind":{"type":"string","enum":["historicalLtv","predictedLtv","engagement","churnRisk","inactivityRisk","cancellationRisk","upgradePropensity","nextPurchasePropensity"]},"value":{"type":"number"},"band":{"type":"string","nullable":true},"confidence":{"type":"number","nullable":true},"modelId":{"type":"string","nullable":true},"modelVersion":{"type":"string","nullable":true},"computedAt":{"type":"string","format":"date-time"},"factors":{"type":"array","items":{"type":"object","properties":{"factor":{"type":"string"},"contribution":{"type":"number"}}}},"limitations":{"type":"array","items":{"type":"string"},"description":"**Policy and data limitations travel with the score**, so the rule that prediction never overrides consent cannot be forgotten downstream.\n"}}}},"affinities":{"type":"array","items":{"type":"object","properties":{"productCategoryId":{"type":"string","format":"uuid"},"label":{"type":"string"},"strength":{"type":"number"}}}},"nextBestActions":{"type":"array","items":{"type":"object","properties":{"action":{"type":"string"},"expectedImpact":{"type":"string","nullable":true},"confidence":{"type":"number","nullable":true}}}}}},
-"GuestPreferences": {"type":"object","x-ticvai-persistence":"marketing.guest_preference","description":"**What the guest likes, kept apart from what they permit** (consent) and from who they are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as tags because BL-134 gives them their own consent purpose and retention.\n","properties":{"id":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid","readOnly":true},"seatingPreference":{"type":"string","nullable":true,"maxLength":200},"drinkPreferences":{"type":"array","items":{"type":"string"}},"dietary":{"type":"array","description":"Also written by `updateMyProfile`.","items":{"type":"string"}},"accessibility":{"type":"array","description":"Also written by `updateMyProfile`.","items":{"type":"string"}},"preferredChannel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"x-ticvai-persisted":false,"description":"**Stored on the profile** (`GuestProfile.preferredChannel`) — carried here because the preference screen edits it beside the rest.\n"},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
+"GuestPreferences": {"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"marketing.guest_preference","description":"**What the guest likes, kept apart from what they permit** (consent) and from who they are (the profile). One row per subject. `dietary` and `accessibility` are here rather than as tags because BL-134 gives them their own consent purpose and retention.\n","properties":{"id":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid","readOnly":true},"seatingPreference":{"type":"string","nullable":true,"maxLength":200},"drinkPreferences":{"type":"array","items":{"type":"string"}},"dietary":{"type":"array","description":"Also written by `updateMyProfile`.","items":{"type":"string"}},"accessibility":{"type":"array","description":"Also written by `updateMyProfile`.","items":{"type":"string"}},"preferredChannel":{"allOf":[{"$ref":"#/components/schemas/MessageChannel"}],"x-ticvai-persisted":false,"description":"**Stored on the profile** (`GuestProfile.preferredChannel`) — carried here because the preference screen edits it beside the rest.\n"},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "GuestProfile": {"x-ticvai-persistence":"marketing.guest_profile","type":"object","required":["subjectId","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid","description":"Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"},"displayName":{"type":"string","nullable":true},"email":{"type":"string","nullable":true},"phone":{"type":"string","nullable":true},"preferredLanguage":{"type":"string","nullable":true},"preferredChannel":{"$ref":"#/components/schemas/MessageChannel"},"guestLinkId":{"type":"string","nullable":true,"description":"Present where the guest is linked across cells. Marketing acts locally."},"tags":{"type":"array","items":{"type":"string"}},"engagementScore":{"type":"integer","nullable":true,"minimum":0,"maximum":100,"description":"22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"},"engagementTier":{"type":"string","nullable":true,"enum":["new","active","occasional","lapsing","lapsed","dormant"],"description":"5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"},"lifetimeValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"visitCount":{"type":"integer"},"lastVisitAt":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean"},"mergedIntoSubjectId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"},"mergedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
 "GuestProfileDetail": {"x-ticvai-persistence":"marketing.guest_profile","allOf":[{"$ref":"#/components/schemas/GuestProfile"},{"type":"object","properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"consents":{"$ref":"#/components/schemas/ConsentState"},"loyalty":{"$ref":"#/components/schemas/LoyaltyPosition"},"openCaseCount":{"type":"integer"},"recentOrderIds":{"type":"array","items":{"type":"string"}},"membershipIds":{"type":"array","items":{"type":"string","format":"uuid"}},"notes":{"type":"string","nullable":true}}}]},
 "GuestRelationship": {"type":"object","x-ticvai-persistence":"marketing.guest_relationship","x-ticvai-retired-columns":["related_guest_id"],"description":"Boards 1.7 and 1.8. **Links people without merging them**, which is the whole design.\n","required":["relatedSubjectId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"relatedSubjectId":{"type":"string","format":"uuid","nullable":true},"organisationId":{"type":"string","format":"uuid","nullable":true},"kind":{"type":"string","enum":["parent","guardian","spouse","dependant","householdMember","employee","student","groupLeader","travelAgent","reseller"]},"authorities":{"type":"array","items":{"type":"string","enum":["purchaseFor","bookFor","manageProfile","signWaiver","viewHistory","receiveCommunications"]},"description":"**Four different permissions, not one relationship.** A guardianship granting all of them forever survives the child becoming an adult.\n"},"effectiveFrom":{"type":"string","format":"date","nullable":true},"effectiveTo":{"type":"string","format":"date","nullable":true},"sharedBenefits":{"type":"boolean","default":false},"verifiedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string"}}},
 "GuestTimelineEvent": {"type":"object","description":"Board 1.5. **Facts, notes and predictions distinguished on the row.**","properties":{"id":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"kind":{"type":"string","enum":["purchase","ticketUsed","reservation","visit","membershipChange","loyalty","wallet","campaign","message","case","survey","waiver","note","prediction"]},"nature":{"type":"string","enum":["operationalFact","userNote","aiDerived"],"description":"**A prediction and a gate scan are both useful and only one happened.**"},"summary":{"type":"string"},"channel":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"sourceContract":{"type":"string","nullable":true},"sourceReferenceId":{"type":"string","format":"uuid","nullable":true},"value":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"outcome":{"type":"string","nullable":true}}},
-"IdentityGuestVerification": {"type":"object","x-ticvai-persistence":"identity.guest_identity_verification","description":"**One guest identity-document verification** (5.3.21; decided 29 September, build pass): the document it checks, its status, the method and who decided. The document itself is `pii.subject_document`; this row holds no document number.","required":["id","subjectId","status","submittedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"type":"string","format":"uuid"},"subjectDocumentId":{"type":"string","format":"uuid","description":"The `pii.subject_document` row submitted."},"documentKind":{"type":"string","enum":["passport","emiratesId","nationalId","drivingLicence","residencePermit","other"]},"documentNumberLast4":{"type":"string","maxLength":4,"nullable":true,"readOnly":true},"reason":{"type":"string","enum":["policyRequired","ageRestrictedPurchase","residentPricing","accountRecovery"]},"status":{"type":"string","enum":["pending","verified","rejected","resubmissionRequested"],"readOnly":true},"method":{"type":"string","enum":["manualReview","documentScanner","provider"],"nullable":true,"readOnly":true},"decisionReason":{"type":"string","maxLength":300,"nullable":true,"readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"submittedAt":{"type":"string","format":"date-time","readOnly":true},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"documentImageDeletedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the scan (and any selfie) was deleted under the policy's retention."}}},
+"IdentityGuestVerification": {"type":"object","x-ticvai-persistence":"identity.guest_identity_verification","description":"**One guest identity-document verification** (5.3.21; decided 29 September, build pass): the document it checks, its status, the method and who decided. The document itself is `pii.subject_document`; this row holds no document number.","required":["id","subjectId","status","submittedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"subjectId":{"x-ticvai-references":"pii.subject","type":"string","format":"uuid"},"subjectDocumentId":{"type":"string","format":"uuid","description":"The `pii.subject_document` row submitted."},"documentKind":{"type":"string","enum":["passport","emiratesId","nationalId","drivingLicence","residencePermit","other"]},"documentNumberLast4":{"type":"string","maxLength":4,"nullable":true,"readOnly":true},"reason":{"type":"string","enum":["policyRequired","ageRestrictedPurchase","residentPricing","accountRecovery"]},"status":{"type":"string","enum":["pending","verified","rejected","resubmissionRequested"],"readOnly":true},"method":{"type":"string","enum":["manualReview","documentScanner","provider"],"nullable":true,"readOnly":true},"decisionReason":{"type":"string","maxLength":300,"nullable":true,"readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"submittedAt":{"type":"string","format":"date-time","readOnly":true},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"documentImageDeletedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the scan (and any selfie) was deleted under the policy's retention."}}},
 "LoyaltyAdjustmentResult": {"type":"object","x-ticvai-persistence":"none — composed from the entry posted and the resulting position","description":"**Both halves of an adjustment, because returning only the balance is the defect decision 8 named.** Until 20 September this operation moved `marketing.loyalty_position` and returned it, and posted nothing to `marketing.loyalty_points` — so a manual adjustment was the one movement in the system that could not be walked back to a reason.\n","required":["entry","position"],"properties":{"entry":{"$ref":"#/components/schemas/MarketingLoyaltyPoints"},"position":{"$ref":"#/components/schemas/LoyaltyPosition"}}},
 "LoyaltyPosition": {"x-ticvai-persistence":"marketing.loyalty_position","type":"object","required":["subjectId","programmeId","pointsBalance","tierCode"],"properties":{"leaderboardNickname":{"type":"string","nullable":true,"maxLength":24,"description":"BL-173. **The name shown on a leaderboard, chosen by the guest.** Offered whenever they reach the board and changeable afterwards; `setLeaderboardNickname` is the only thing that writes it.\n**Null means the guest has not chosen one yet, and the board shows a generated `Player-4821` in its place** — never `pii.subject.display_name`, which would disclose silently on the day a guest first placed and is the case this field exists to prevent.\n**The generated name is computed at read time and not stored here.** Writing it would make *\"has this guest chosen a name\"* unanswerable, and that flag is what the prompt-on-reaching-the-board depends on.\n"},"subjectId":{"type":"string","format":"uuid"},"programmeId":{"type":"string","format":"uuid"},"pointsBalance":{"type":"integer"},"lifetimePoints":{"type":"integer"},"tierId":{"type":"string","format":"uuid","nullable":true,"description":"**The tier this row's `tierCode` and `tierName` are a copy of.** Added 20 September with `marketing.programme_tier`: the two strings were a cache of something that did not exist, and a cache with no source cannot be rebuilt or audited.\n"},"tierCode":{"type":"string"},"tierName":{"type":"string"},"pointsToNextTier":{"type":"integer","nullable":true},"nextExpiryPoints":{"type":"integer","nullable":true},"nextExpiryAt":{"type":"string","format":"date-time","nullable":true}}},
-"MarketingGuestExtraField": {"type":"object","x-ticvai-persistence":"marketing.guest_extra_field","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Defines an extra field that Admin wants to add to the customer form, such as Date of Birth, Emergency Contact, or Jersey Size.","required":["tenantId","name","type","isRequired","displayOrder","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"tenantId":{"type":"string","format":"uuid"},"name":{"type":"string","maxLength":150},"type":{"type":"string","maxLength":30},"isRequired":{"type":"boolean"},"displayOrder":{"type":"integer"},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
-"MarketingGuestExtraOption": {"type":"object","x-ticvai-persistence":"marketing.guest_extra_option","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Stores dropdown choices only when an extra field uses SELECT type, for example Language = English, Hindi, Marathi.","required":["fieldId","name","displayOrder","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"fieldId":{"type":"string","format":"uuid"},"name":{"type":"string","maxLength":150},"displayOrder":{"type":"integer"},"isActive":{"type":"boolean"}}},
-"MarketingLoyaltyPoints": {"type":"object","x-ticvai-persistence":"marketing.loyalty_points","description":"**Taken from the backend workbook, 20 September.** Stores every loyalty point earn, redeem, expire, adjustment, or reversal transaction for a customer.","required":["programId","customerId","transactionType","points","balanceAfter","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"programId":{"type":"string","format":"uuid"},"customerId":{"type":"string","format":"uuid"},"transactionType":{"type":"string","maxLength":30},"points":{"type":"number"},"balanceAfter":{"type":"number"},"sourceType":{"type":"string","maxLength":50,"nullable":true},"sourceReferenceId":{"type":"string","format":"uuid","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"reversedLoyaltyPointsId":{"type":"string","format":"uuid","nullable":true},"notes":{"type":"string","maxLength":500,"nullable":true},"reason":{"type":"string","nullable":true,"description":"For a manual movement, `AdjustLoyaltyPointsRequest.reason`. Null for an accrual, a redemption or an expiry, whose `transactionType` and source already say why. The three manual types are the only ones (audit R149).","enum":["goodwill","correction","expiryReversal"]},"authorPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who posted a manual movement. Null where the platform posted it."},"createdAt":{"type":"string","format":"date-time"}}},
+"MarketingGuestExtraField": {"type":"object","x-ticvai-persistence":"marketing.guest_extra_field","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Defines an extra field that Admin wants to add to the customer form, such as Date of Birth, Emergency Contact, or Jersey Size.","required":["tenantId","name","type","isRequired","displayOrder","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"tenantId":{"x-ticvai-references":"none","type":"string","format":"uuid"},"name":{"type":"string","maxLength":150},"type":{"type":"string","maxLength":30},"isRequired":{"type":"boolean"},"displayOrder":{"type":"integer"},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"MarketingGuestExtraOption": {"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"marketing.guest_extra_option","description":"**Taken from the backend workbook, 20 September.** NEW TABLE. Stores dropdown choices only when an extra field uses SELECT type, for example Language = English, Hindi, Marathi.","required":["fieldId","name","displayOrder","isActive","scopePath"],"properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid"},"fieldId":{"type":"string","format":"uuid"},"name":{"type":"string","maxLength":150},"displayOrder":{"type":"integer"},"isActive":{"type":"boolean"}}},
+"MarketingLoyaltyPoints": {"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"marketing.loyalty_points","description":"**Taken from the backend workbook, 20 September.** Stores every loyalty point earn, redeem, expire, adjustment, or reversal transaction for a customer.","required":["programId","customerId","transactionType","points","balanceAfter","createdAt","scopePath"],"properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid"},"programId":{"type":"string","format":"uuid"},"customerId":{"type":"string","format":"uuid"},"transactionType":{"type":"string","maxLength":30},"points":{"type":"number"},"balanceAfter":{"type":"number"},"sourceType":{"type":"string","maxLength":50,"nullable":true},"sourceReferenceId":{"type":"string","format":"uuid","nullable":true},"expiresAt":{"type":"string","format":"date-time","nullable":true},"reversedLoyaltyPointsId":{"type":"string","format":"uuid","nullable":true},"notes":{"type":"string","maxLength":500,"nullable":true},"reason":{"type":"string","nullable":true,"description":"For a manual movement, `AdjustLoyaltyPointsRequest.reason`. Null for an accrual, a redemption or an expiry, whose `transactionType` and source already say why. The three manual types are the only ones (audit R149).","enum":["goodwill","correction","expiryReversal"]},"authorPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who posted a manual movement. Null where the platform posted it."},"createdAt":{"type":"string","format":"date-time"}}},
 "MergeResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["survivingSubjectId","absorbedSubjectId","transferred"],"properties":{"survivingSubjectId":{"type":"string","format":"uuid"},"absorbedSubjectId":{"type":"string","format":"uuid"},"transferred":{"type":"object","properties":{"orders":{"type":"integer"},"cases":{"type":"integer"},"loyaltyPoints":{"type":"integer","description":"The total points moved across every programme. The per-programme outcome is `loyaltyProgrammes`."}}},"loyaltyProgrammes":{"type":"array","description":"**One entry per loyalty programme either record belonged to (decided 28 September, audit R149).** Points are added and the higher tier is kept, per programme — a single points number cannot say which programme it belongs to.\n","items":{"type":"object","required":["programmeId","pointsAdded","resultingPoints"],"properties":{"programmeId":{"type":"string","format":"uuid"},"pointsAdded":{"type":"integer","description":"The absorbed record's balance in this programme, added to the survivor's."},"resultingPoints":{"type":"integer"},"tierKept":{"type":"string","nullable":true,"description":"The higher of the two records' tiers in this programme."}}}},"consentOutcome":{"type":"array","description":"Per purpose, the resulting position. Where the two profiles disagreed, the more restrictive position won.\n","items":{"type":"object","properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"result":{"$ref":"#/components/schemas/ConsentDecision"},"wasRestricted":{"type":"boolean"}}}}}},
-"MessageChannel": {"type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
+"MessageChannel": {"x-ticvai-rls":"grant-holder-read","type":"string","enum":["email","sms","whatsapp","push","inApp","post"]},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "RecordConsentRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["purpose","decision","noticeVersion","source","recordedAt"],"properties":{"purpose":{"$ref":"#/components/schemas/ConsentPurpose"},"decision":{"$ref":"#/components/schemas/ConsentDecision"},"channels":{"type":"array","description":"Omit to apply to every channel the purpose covers.","items":{"$ref":"#/components/schemas/MessageChannel"}},"noticeVersion":{"type":"string"},"source":{"$ref":"#/components/schemas/ConsentSource"},"recordedAt":{"type":"string","format":"date-time"}}},
 "Segment": {"x-ticvai-persistence":"marketing.segment + marketing.segment_criterion","allOf":[{"$ref":"#/components/schemas/CreateSegmentRequest"},{"type":"object","required":["id","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"lastEvaluatedSize":{"type":"integer","nullable":true},"lastEvaluatedAt":{"type":"string","format":"date-time","nullable":true},"createdAt":{"type":"string","format":"date-time"}}}]}

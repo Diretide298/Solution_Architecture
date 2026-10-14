@@ -47,6 +47,6 @@
 | `KIT-006` | Expeditor & Order Assembly | Kitchen | 1 | 6 | yes |
 | `KIT-007` | Guest Collection, Buzzer & Digital Notification | Kitchen | 1 | 1 | yes |
 | `KIT-008` | Exceptions, Re-Fire & Unavailable Items | Kitchen | 1 | 5 | yes |
-| `KIT-009` | SLA, Priority & Service Rules | Kitchen | 1 | 3 | yes |
+| `KIT-009` | SLA, Priority & Service Rules | Kitchen | 1 | 4 | yes |
 | `KIT-010` | Kitchen Performance, AI & Operational Optimization | Kitchen | 1 | 4 | yes |
 

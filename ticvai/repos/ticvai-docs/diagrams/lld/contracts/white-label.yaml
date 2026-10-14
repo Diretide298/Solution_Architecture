@@ -177,6 +177,7 @@ operations:
   - whitelabel.tenant_config
   writes:
   - cache:idempotency
+  - whitelabel.banner
   - whitelabel.tenant_config
 - operation: deleteBookingFlow
   verb: DELETE
@@ -207,6 +208,7 @@ operations:
   - whitelabel.tenant_config
   writes:
   - cache:idempotency
+  - whitelabel.content_page
   - whitelabel.tenant_config
 - operation: deleteGuidedChoice
   verb: DELETE
@@ -1043,7 +1045,7 @@ operations:
   - whitelabel.kiosk_config_start_tile
 - operation: setAnalyticsProvider
   verb: PUT
-  path: /tenant-config/analytics-providers
+  path: /tenant-config/analytics-providers/{analyticsProviderId}
   scope: venue
   permission: TENANT_CONFIGURE
   audience:

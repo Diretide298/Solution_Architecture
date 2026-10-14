@@ -1,6 +1,6 @@
 # WS153 — Payment Payment Orchestration board 7
 
-**9 screens · 12 operations · 13 schemas · 6 permissions**
+**9 screens · 13 operations · 13 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·

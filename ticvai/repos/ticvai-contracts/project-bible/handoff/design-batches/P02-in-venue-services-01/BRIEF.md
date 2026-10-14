@@ -1,6 +1,6 @@
 # P02-in-venue-services-01 — P02 · In-venue Services
 
-**10 screens · 31 operations · 76 schemas · 6 permissions**
+**10 screens · 31 operations · 77 schemas · 6 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -185,7 +185,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `GST-028` | Parking – Reservation Confirmed | A | 0 | 8 | 6 | 9 | 1 | 2 | guest | notStarted (client-verified) |
 | `GST-029` | Venue Info & Services | A | 2 | 25 | 5 | 0 | 0 | 0 | guest | notStarted (client-verified) |
 | `GST-038` | At the Venue | A | 1 | 39 | 8 | 16 | 3 | 0 | guest | notStarted (client-verified) |
-| `GST-070` | Reserve a Table | A | 44 | 20 | 6 | 15 | 7 | 1 | guest | notStarted (client-verified) |
+| `GST-070` | Reserve a Table | A | 42 | 20 | 6 | 15 | 7 | 1 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 

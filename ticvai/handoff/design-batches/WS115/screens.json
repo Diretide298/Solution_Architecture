@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-executive-dashboard-bo-684",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationExecutiveDashboard.tsx",
+   "component": "src/routes/access-venue/AccreditationExecutiveDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -91,6 +92,7 @@
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Dashboard filters shall include) and no metric row",
   "purpose": "Provide management with a real-time overview of the complete accreditation operation.",
+  "division": "Shares `getKpiValues`, `listAccreditationHolders` with BO-685; this screen is Accreditation Executive Dashboard (pack ACCREDITATION.pdf, board 8.1, page 65): provide management with a real-time overview of the complete accreditation operation.",
   "gaps": [
    {
     "operation": null,
@@ -118,7 +120,7 @@
         "Date range"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAccreditationHolders",
        "provenance": "pack ACCREDITATION.pdf, page 65 §Dashboard filters shall include"
       }
      ]
@@ -141,7 +143,8 @@
         "Date range"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Scope of Work”, “Visualizations should include”, “Key requirements”.",
-       "provenance": "pack ACCREDITATION.pdf, page 65 §Dashboard filters shall include"
+       "provenance": "pack ACCREDITATION.pdf, page 65 §Dashboard filters shall include",
+       "operation": "getKpiValues"
       }
      ]
     }
@@ -215,6 +218,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "8",
@@ -224,7 +228,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-status-portfolio-reporting-bo-685",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationStatusPortfolioReporting.tsx",
+   "component": "src/routes/access-venue/AccreditationStatusPortfolioReporting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -247,6 +251,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Report on active, expired, suspended and revoked accreditation records.",
+  "division": "Shares `getKpiValues`, `listAccreditationHolders` with BO-684; this screen is Accreditation Status & Portfolio Reporting (pack ACCREDITATION.pdf, board 8.2, page 66): report on active, expired, suspended and revoked accreditation records.",
   "gaps": [
    {
     "operation": null,
@@ -269,7 +274,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAccreditationHolders",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAccreditationHolders"
       }
      ]
     }
@@ -333,6 +339,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "8",
@@ -342,7 +349,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-utilization-analytics-bo-686",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationUtilizationAnalytics.tsx",
+   "component": "src/routes/access-venue/AccreditationUtilizationAnalytics.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -396,7 +403,7 @@
         "Utilization by event"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listAccreditationAccessActivity",
        "provenance": "pack ACCREDITATION.pdf, page 67 §Metrics shall include"
       }
      ]
@@ -490,6 +497,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "8",
@@ -499,7 +507,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-access-activity-reporting-bo-687",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationAccessActivityReporting.tsx",
+   "component": "src/routes/access-venue/AccreditationAccessActivityReporting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -544,7 +552,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAccreditationAccessActivity",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAccreditationAccessActivity"
       }
      ]
     }
@@ -601,6 +610,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "8",
@@ -610,7 +620,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-trend-comparative-analysis-bo-688",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationTrendComparativeAnalysis.tsx",
+   "component": "src/routes/access-venue/AccreditationTrendComparativeAnalysis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -678,7 +688,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -796,6 +806,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "8",
@@ -805,7 +816,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-audit-reporting-bo-689",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationAuditReporting.tsx",
+   "component": "src/routes/access-venue/AccreditationAuditReporting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -850,7 +861,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAccreditationAudit",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAccreditationAudit"
       }
      ]
     }
@@ -907,6 +919,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "8",
@@ -916,7 +929,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/immutable-accreditation-audit-log-bo-690",
-   "component": "apps/venue-management-web/src/routes/access-venue/ImmutableAccreditationAuditLog.tsx",
+   "component": "src/routes/access-venue/ImmutableAccreditationAuditLog.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1071,6 +1084,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "8",
@@ -1080,7 +1094,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-api-management-bo-691",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationApiManagement.tsx",
+   "component": "src/routes/access-venue/AccreditationApiManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1125,7 +1139,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listApiClients",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listApiClients"
       }
      ]
     }
@@ -1182,6 +1197,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "DEVELOPER_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "8",
@@ -1191,7 +1207,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accreditation-webhook-management-bo-692",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccreditationWebhookManagement.tsx",
+   "component": "src/routes/access-venue/AccreditationWebhookManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1349,6 +1365,7 @@
   "module": "Access & Venue",
   "requiresModule": "accreditation",
   "wave": 3,
+  "permission": "ACCREDITATION_VIEW",
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "8",
@@ -1358,7 +1375,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/integration-data-exchange-monitor-bo-693",
-   "component": "apps/venue-management-web/src/routes/access-venue/IntegrationDataExchangeMonitor.tsx",
+   "component": "src/routes/access-venue/IntegrationDataExchangeMonitor.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1403,7 +1420,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listAccreditationAudit",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listAccreditationAudit"
       }
      ]
     }

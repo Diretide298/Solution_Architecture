@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "7",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/active-rental-operations-command-center-bo-554",
-   "component": "apps/venue-management-web/src/routes/rentals/ActiveRentalOperationsCommandCenter.tsx",
+   "component": "src/routes/rentals/ActiveRentalOperationsCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -107,7 +108,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -249,6 +250,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "7",
@@ -258,7 +260,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/active-rental-detail-live-timeline-bo-555",
-   "component": "apps/venue-management-web/src/routes/rentals/ActiveRentalDetailLiveTimeline.tsx",
+   "component": "src/routes/rentals/ActiveRentalDetailLiveTimeline.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -303,7 +305,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getRentalBooking",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getRentalBooking"
       }
      ]
     }
@@ -370,6 +373,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "7",
@@ -379,7 +383,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-extension-request-bo-556",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalExtensionRequest.tsx",
+   "component": "src/routes/rentals/RentalExtensionRequest.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -430,7 +434,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyFields",
      "slot": "fields",
      "components": [
       {
@@ -541,6 +545,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "7",
@@ -550,7 +555,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/extension-pricing-confirmation-bo-557",
-   "component": "apps/venue-management-web/src/routes/rentals/ExtensionPricingConfirmation.tsx",
+   "component": "src/routes/rentals/ExtensionPricingConfirmation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -680,6 +685,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "7",
@@ -689,7 +695,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/equipment-swap-replacement-bo-558",
-   "component": "apps/venue-management-web/src/routes/rentals/EquipmentSwapReplacement.tsx",
+   "component": "src/routes/rentals/EquipmentSwapReplacement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -811,6 +817,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_OPERATE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "7",
@@ -820,7 +827,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/rental-incident-operational-exception-bo-559",
-   "component": "apps/venue-management-web/src/routes/rentals/RentalIncidentOperationalException.tsx",
+   "component": "src/routes/rentals/RentalIncidentOperationalException.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -932,6 +939,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "7",
@@ -941,7 +949,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/due-soon-customer-notification-management-bo-560",
-   "component": "apps/venue-management-web/src/routes/rentals/DueSoonCustomerNotificationManagement.tsx",
+   "component": "src/routes/rentals/DueSoonCustomerNotificationManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -986,7 +994,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listOverdueRentals",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listOverdueRentals"
       }
      ]
     }
@@ -1043,6 +1052,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "7",
@@ -1052,7 +1062,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/overdue-rental-management-bo-561",
-   "component": "apps/venue-management-web/src/routes/rentals/OverdueRentalManagement.tsx",
+   "component": "src/routes/rentals/OverdueRentalManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1108,7 +1118,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listOverdueRentals",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listOverdueRentals"
       }
      ]
     }
@@ -1165,6 +1176,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "7",
@@ -1174,7 +1186,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/active-group-rental-management-bo-562",
-   "component": "apps/venue-management-web/src/routes/rentals/ActiveGroupRentalManagement.tsx",
+   "component": "src/routes/rentals/ActiveGroupRentalManagement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1219,7 +1231,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getRentalBooking",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getRentalBooking"
       }
      ]
     }
@@ -1286,6 +1299,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "7",
@@ -1295,7 +1309,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/active-rental-intelligence-operational-alerts-bo-563",
-   "component": "apps/venue-management-web/src/routes/rentals/ActiveRentalIntelligenceOperationalAlerts.tsx",
+   "component": "src/routes/rentals/ActiveRentalIntelligenceOperationalAlerts.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1339,7 +1353,7 @@
        ],
        "kind": "dataTable",
        "label": "Every active rental intelligence",
-       "operation": null,
+       "operation": "listOverdueRentals",
        "provenance": "pack Rental_Management.pdf, page 87 §Display"
       }
      ],

@@ -86,6 +86,7 @@
     "description": "Required by `abandonPeriodClose` and `reopenPeriod`; null for the other steps."
    },
    "principalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "description": "Who took the step."
@@ -357,6 +358,7 @@
   }
  },
  "Wallet": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "wallet.wallet + wallet.credit_lot",
   "type": "object",
   "required": [
@@ -463,11 +465,14 @@
   }
  },
  "WalletAccountingMapping": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "wallet.accounting_mapping",
   "description": "Boards 9.2 and 9.3. **Different credit types are different liabilities.**",
   "properties": {
    "mappings": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -689,6 +694,8 @@
   ],
   "properties": {
    "sources": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "minItems": 1,
     "items": {

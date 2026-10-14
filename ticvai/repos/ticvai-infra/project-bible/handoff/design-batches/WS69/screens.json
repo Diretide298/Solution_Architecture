@@ -5,6 +5,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "4",
@@ -133,7 +134,7 @@
         "Scheduled-report changes"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listReportDeliveries",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 40 §Display"
       }
      ]
@@ -181,13 +182,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "listReportSchedules",
-    "contract": "reporting",
-    "purpose": "What runs when",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "listReportDeliveries",
     "contract": "reporting",
@@ -241,6 +235,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "4",
@@ -284,116 +279,139 @@
       {
        "kind": "selectField",
        "label": "Schedule Name",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Report",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Report Version",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Owner",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Start Date",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "End Date",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Time",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Time Zone",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Frequency",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Run immediately",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Retry on failure",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Maximum retries",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Timeout",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "textField",
        "label": "Skip if source data is stale",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "textField",
        "label": "Wait for source refresh",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Once",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency Options"
       },
       {
        "kind": "selectField",
        "label": "Hourly",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency Options"
       },
       {
        "kind": "selectField",
        "label": "Daily",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency Options"
       },
       {
        "kind": "selectField",
        "label": "Weekly",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency Options"
       },
       {
        "kind": "selectField",
        "label": "Monthly",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency Options"
       },
       {
        "kind": "selectField",
        "label": "Quarterly",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency Options"
       },
       {
        "kind": "selectField",
        "label": "Yearly",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency Options"
       },
       {
        "kind": "selectField",
        "label": "Custom",
+       "operation": "createReportSchedule",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency Options"
       }
      ]
@@ -460,6 +478,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "4",
@@ -518,6 +537,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listReportSubscriptions",
        "derived": true,
        "impliedBy": "listReportSubscriptions",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -601,6 +621,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_SCHEDULE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "4",
@@ -650,71 +671,85 @@
       {
        "kind": "selectField",
        "label": "Destination",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define"
       },
       {
        "kind": "selectField",
        "label": "Recipient",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define"
       },
       {
        "kind": "selectField",
        "label": "Format",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define"
       },
       {
        "kind": "selectField",
        "label": "Language",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define"
       },
       {
        "kind": "selectField",
        "label": "Time Zone",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define"
       },
       {
        "kind": "selectField",
        "label": "File Naming",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define"
       },
       {
        "kind": "selectField",
        "label": "Password/Security Policy",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define"
       },
       {
        "kind": "selectField",
        "label": "Expiration",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define"
       },
       {
        "kind": "selectField",
        "label": "Delivery Priority",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define"
       },
       {
        "kind": "selectField",
        "label": "Email Subject",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Email Body Template",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Attachment",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Secure Link",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure"
       },
       {
        "kind": "selectField",
        "label": "Branding",
+       "operation": "createReportSubscription",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure"
       }
      ]
@@ -800,6 +835,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_EXPORT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "4",
@@ -864,7 +900,7 @@
         "Expiration"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getReportExport",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 45 §Display"
       }
      ]
@@ -877,6 +913,7 @@
        "kind": "detailPanel",
        "label": "The selected export download",
        "bindsTo": null,
+       "operation": "getReportExport",
        "columns": [
         "Export ID",
         "Report",
@@ -905,13 +942,6 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
-   {
-    "operationId": "exportReportResult",
-    "contract": "reporting",
-    "purpose": "Export",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
-   },
    {
     "operationId": "getReportExport",
     "contract": "reporting",
@@ -979,6 +1009,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_VENUE",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "4",
@@ -1413,6 +1444,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "4",
@@ -1481,7 +1513,7 @@
         "Retry Count"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listReportDeliveries",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 48 §Display"
       }
      ]
@@ -1494,6 +1526,7 @@
        "kind": "detailPanel",
        "label": "The selected delivery monitoring failure",
        "bindsTo": null,
+       "operation": "listReportDeliveries",
        "columns": [
         "Job ID",
         "Report",
@@ -1619,6 +1652,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "REPORT_VIEW_TENANT",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "4",
@@ -1656,7 +1690,7 @@
    "template": "form",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -1811,6 +1845,7 @@
   "module": "Analytics",
   "requiresModule": "analytics",
   "wave": 3,
+  "permission": "TENANT_VIEW",
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "4",
@@ -1854,71 +1889,85 @@
       {
        "kind": "selectField",
        "label": "Report Definitions",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure retention separately for"
       },
       {
        "kind": "selectField",
        "label": "Dashboard Versions",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure retention separately for"
       },
       {
        "kind": "selectField",
        "label": "Generated Reports",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure retention separately for"
       },
       {
        "kind": "selectField",
        "label": "Export Files",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure retention separately for"
       },
       {
        "kind": "selectField",
        "label": "Audit Logs",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure retention separately for"
       },
       {
        "kind": "selectField",
        "label": "Schedule History",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure retention separately for"
       },
       {
        "kind": "selectField",
        "label": "API Logs",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure retention separately for"
       },
       {
        "kind": "selectField",
        "label": "Historical Analytics",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure retention separately for"
       },
       {
        "kind": "selectField",
        "label": "Retention Period",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define"
       },
       {
        "kind": "selectField",
        "label": "Archive After",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define"
       },
       {
        "kind": "selectField",
        "label": "Delete After",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define"
       },
       {
        "kind": "selectField",
        "label": "Legal/Compliance Hold",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define"
       },
       {
        "kind": "selectField",
        "label": "Storage Location",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define"
       },
       {
        "kind": "selectField",
        "label": "Retrieval Rules",
+       "operation": "setDataRetentionSetting",
        "provenance": "pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define"
       }
      ]

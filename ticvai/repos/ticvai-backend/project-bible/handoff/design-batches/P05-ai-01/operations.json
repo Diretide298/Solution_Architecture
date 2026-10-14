@@ -3,7 +3,7 @@
   "method": "POST",
   "path": "/carts/{cartId}/lines",
   "contract": "orders",
-  "summary": "Add something",
+  "summary": "Add a line to the cart",
   "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -168,25 +168,6 @@
   ],
   "requestBody": null,
   "responds": "Page"
- },
- "recordAnswerFeedback": {
-  "method": "POST",
-  "path": "/messages/{messageId}/feedback",
-  "contract": "ai",
-  "summary": "Say whether an answer helped",
-  "permission": "AI_USE",
-  "offlineCapable": false,
-  "conflictPolicy": "lastWriterWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AiAnswerFeedback"
  },
  "sendAiMessage": {
   "method": "POST",

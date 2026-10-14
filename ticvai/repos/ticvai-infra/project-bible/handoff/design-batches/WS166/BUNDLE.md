@@ -129,16 +129,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-963` | Import Command Center | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-964` | PDF & Image Import | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-965` | SVG & CAD Import | C | 0 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `BO-966` | CSV & Excel Import | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-967` | AI Section Recognition | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-968` | AI Row & Seat Recognition | C | 0 | 0 | 6 | 6 | 2 | 6 | — | notStarted (—) |
-| `BO-969` | AI Aisle, VIP & Accessibility | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-970` | AI Numbering & Labeling | D | 0 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-971` | Validation & Correction | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-972` | AI Venue Designer & Publish | C | 0 | 38 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-963` | Import Command Center | C | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-964` | PDF & Image Import | C | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-965` | SVG & CAD Import | C | 0 | 18 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-966` | CSV & Excel Import | C | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-967` | AI Section Recognition | C | 0 | 9 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-968` | AI Row & Seat Recognition | C | 0 | 9 | 6 | 6 | 2 | 6 | — | notStarted (—) |
+| `BO-969` | AI Aisle, VIP & Accessibility | C | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-970` | AI Numbering & Labeling | D | 0 | 20 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-971` | Validation & Correction | C | 0 | 9 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-972` | AI Venue Designer & Publish | C | 1 | 38 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -178,7 +178,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSeatMapImport`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Status | chip: Queued, Reading, Proposed, Accepted, Rejected, Failed | — |
+| Source | chip: Pdf, Image, Excel, Csv | — |
+| Seat map | the name it points at, never the id | The draft it produced, once it has one. |
+| Seats detected | 1,234 | — |
+| Sections detected | 1,234 | — |
+| Confidence | 1,234.5 | — |
+| Unreadable | list or chips (count when long) | What it could not read, named. A blank list and a low confidence are different problems: the first is a bad scan, the second is a plan it … |
+| Basis | chip: Heuristic, Model | ADR-0020 — the same abstraction as every other suggestion. |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -227,6 +239,8 @@ job:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -261,7 +275,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-963?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-964`, `BO-965`, `BO-966`, `BO-967`, `BO-968`, `BO-969`, `BO-970`, `BO-971`, `BO-972`.
@@ -303,7 +317,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getImportJob`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Seat map | the name it points at, never the id | — |
+| Kind | chip: Manifest, Geometry | — |
+| Status | chip: Parsing, Preview ready, Committing, Committed, Failed | — |
+| Parsed seat count | 1,234 | — |
+| Matched seat count | 1,234 | Geometry imports — seats successfully joined to the manifest. |
+| Unmatched seat count | 1,234 | Present in one source but not the other. A seat in the plan with no manifest entry is a finding, not a seat. |
+| Outcome | chip: Parsed, Parsed with findings, No seats found, No layers matched, Unreadable | All four CF-122 defects failed silently — an import that found nothing reported success. |
+| Layers found | list or chips (count when long) | Every layer name in the source, decoded. Shown whether or not extraction worked, so an operator can map a role by reading rather than by … |
+| Findings | list or chips (count when long) | — |
+| Kind | chip: Duplicate seat number, Gap in row, Missing geometry, Seat outside section … | — |
+| Severity | chip: Error, Warning, Info | — |
+| Message | text | — |
+| Section code | text | — |
+| Row label | text | — |
+| Seat numbers | list or chips (count when long) | — |
+| Affected count | 1,234 | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -344,6 +379,8 @@ import:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -371,7 +408,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-964?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Import seat map, Cancel.
 - [ ] Every transition is wired: `BO-963`.
@@ -413,7 +450,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getImportJob`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Seat map | the name it points at, never the id | — |
+| Kind | chip: Manifest, Geometry | — |
+| Status | chip: Parsing, Preview ready, Committing, Committed, Failed | — |
+| Parsed seat count | 1,234 | — |
+| Matched seat count | 1,234 | Geometry imports — seats successfully joined to the manifest. |
+| Unmatched seat count | 1,234 | Present in one source but not the other. A seat in the plan with no manifest entry is a finding, not a seat. |
+| Outcome | chip: Parsed, Parsed with findings, No seats found, No layers matched, Unreadable | All four CF-122 defects failed silently — an import that found nothing reported success. |
+| Layers found | list or chips (count when long) | Every layer name in the source, decoded. Shown whether or not extraction worked, so an operator can map a role by reading rather than by … |
+| Findings | list or chips (count when long) | — |
+| Kind | chip: Duplicate seat number, Gap in row, Missing geometry, Seat outside section … | — |
+| Severity | chip: Error, Warning, Info | — |
+| Message | text | — |
+| Section code | text | — |
+| Row label | text | — |
+| Seat numbers | list or chips (count when long) | — |
+| Affected count | 1,234 | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -455,6 +513,8 @@ layers:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -486,7 +546,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-965?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Import seat geometry, Cancel.
 - [ ] Every transition is wired: `BO-963`.
@@ -528,7 +588,28 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getImportJob`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Seat map | the name it points at, never the id | — |
+| Kind | chip: Manifest, Geometry | — |
+| Status | chip: Parsing, Preview ready, Committing, Committed, Failed | — |
+| Parsed seat count | 1,234 | — |
+| Matched seat count | 1,234 | Geometry imports — seats successfully joined to the manifest. |
+| Unmatched seat count | 1,234 | Present in one source but not the other. A seat in the plan with no manifest entry is a finding, not a seat. |
+| Outcome | chip: Parsed, Parsed with findings, No seats found, No layers matched, Unreadable | All four CF-122 defects failed silently — an import that found nothing reported success. |
+| Layers found | list or chips (count when long) | Every layer name in the source, decoded. Shown whether or not extraction worked, so an operator can map a role by reading rather than by … |
+| Findings | list or chips (count when long) | — |
+| Kind | chip: Duplicate seat number, Gap in row, Missing geometry, Seat outside section … | — |
+| Severity | chip: Error, Warning, Info | — |
+| Message | text | — |
+| Section code | text | — |
+| Row label | text | — |
+| Seat numbers | list or chips (count when long) | — |
+| Affected count | 1,234 | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -570,6 +651,8 @@ manifest:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -596,7 +679,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-966?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Import seat manifest, Cancel.
 - [ ] Every transition is wired: `BO-963`.
@@ -634,13 +717,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSeatMapImport`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Status | chip: Queued, Reading, Proposed, Accepted, Rejected, Failed | — |
+| Source | chip: Pdf, Image, Excel, Csv | — |
+| Seat map | the name it points at, never the id | The draft it produced, once it has one. |
+| Seats detected | 1,234 | — |
+| Sections detected | 1,234 | — |
+| Confidence | 1,234.5 | — |
+| Unreadable | list or chips (count when long) | What it could not read, named. A blank list and a low confidence are different problems: the first is a bad scan, the second is a plan it … |
+| Basis | chip: Heuristic, Model | ADR-0020 — the same abstraction as every other suggestion. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `validateSeatMap` POST `/seat-maps/{seatMapId}/validate` | — | ValidationReport | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -679,6 +774,8 @@ detected:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -705,7 +802,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-967?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-963`.
@@ -743,7 +840,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSeatMapImport`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Status | chip: Queued, Reading, Proposed, Accepted, Rejected, Failed | — |
+| Source | chip: Pdf, Image, Excel, Csv | — |
+| Seat map | the name it points at, never the id | The draft it produced, once it has one. |
+| Seats detected | 1,234 | — |
+| Sections detected | 1,234 | — |
+| Confidence | 1,234.5 | — |
+| Unreadable | list or chips (count when long) | What it could not read, named. A blank list and a low confidence are different problems: the first is a bad scan, the second is a plan it … |
+| Basis | chip: Heuristic, Model | ADR-0020 — the same abstraction as every other suggestion. |
 
 **Actions and what each produces**
 
@@ -789,6 +898,8 @@ rows:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -830,7 +941,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-968?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save seats, Cancel.
 - [ ] Every transition is wired: `BO-963`.
@@ -868,7 +979,19 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSeatMapImport`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Status | chip: Queued, Reading, Proposed, Accepted, Rejected, Failed | — |
+| Source | chip: Pdf, Image, Excel, Csv | — |
+| Seat map | the name it points at, never the id | The draft it produced, once it has one. |
+| Seats detected | 1,234 | — |
+| Sections detected | 1,234 | — |
+| Confidence | 1,234.5 | — |
+| Unreadable | list or chips (count when long) | What it could not read, named. A blank list and a low confidence are different problems: the first is a bad scan, the second is a plan it … |
+| Basis | chip: Heuristic, Model | ADR-0020 — the same abstraction as every other suggestion. |
 
 **Actions and what each produces**
 
@@ -913,6 +1036,8 @@ detected:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -937,7 +1062,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-969?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save map zones, Cancel.
 - [ ] Every transition is wired: `BO-963`.
@@ -977,7 +1102,30 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getActionPlan`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Plan | grouped details | A plan: plan, validate, simulate, approve, execute, with rollback (design 2.2 D, 3.8; AIC-086..107). |
+| ID | the name it points at, never the id | — |
+| Origin | chip: Configuration session, Generate configuration, Assistant, Risk case, Operational … | — |
+| Origin ref | text | — |
+| Summary | text | — |
+| Status | chip: Draft, Validated, Simulated, Awaiting approval, Approved, Executing… | — |
+| Autonomy level | 1,234 | One autonomy scale for every capability (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). |
+| Approval tier | 1,234 | The approval tier (1 or 2), the floor the approvals matrix adds to (design 3.8). |
+| Approval request | the name it points at, never the id | The `approvals` request, where tier 2 or the matrix caught the plan. |
+| Proposed action | the name it points at, never the id | The `ai.proposed_action` the plan is presented as for a decision. |
+| Change set hash | text | — |
+| Governance outcome | chip: Allow, Allow with conditions, Prepare only, Approval required, Escalate, Block | What the governance decision point returns (design 3.8, AIC-166). Conflicts resolve to the more restrictive (AIC-161). |
+| Policy version ref | text | The governance policy version that decided it. |
+| Simulation | grouped details | Current versus proposed state, channels, future orders and issued tickets affected (flow D step 4). |
+| Partial completion allowed | yes / no (icon or chip) | Where governance allows a partial completion; otherwise a failure compensates in reverse dependency order (AIC-098, AIC-134). |
+| Rollback of plan | the name it points at, never the id | — |
+| Requested by principal | the name it points at, never the id | — |
+| Completed at | 1 Oct 2026, 14:30 | — |
+| Steps | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -1025,6 +1173,8 @@ proposal:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1058,7 +1208,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-970?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-963`.
@@ -1096,13 +1246,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Detail panel** (detail panel): One record, read-only.
+**Detail panel** (detail panel, from `getSeatMapImport`): One record, read-only.
+
+| Shows | Format | Notes |
+|---|---|---|
+| ID | the name it points at, never the id | — |
+| Status | chip: Queued, Reading, Proposed, Accepted, Rejected, Failed | — |
+| Source | chip: Pdf, Image, Excel, Csv | — |
+| Seat map | the name it points at, never the id | The draft it produced, once it has one. |
+| Seats detected | 1,234 | — |
+| Sections detected | 1,234 | — |
+| Confidence | 1,234.5 | — |
+| Unreadable | list or chips (count when long) | What it could not read, named. A blank list and a low confidence are different problems: the first is a bad scan, the second is a plan it … |
+| Basis | chip: Heuristic, Model | ADR-0020 — the same abstraction as every other suggestion. |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `validateSeatMap` POST `/seat-maps/{seatMapId}/validate` | — | ValidationReport | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
@@ -1141,6 +1303,8 @@ issue:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1167,7 +1331,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-971?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel.
 - [ ] Every transition is wired: `BO-963`.
@@ -1201,7 +1365,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Inputs: what the user enters or picks
 
-Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
+**Sent by **** (`commitImportJob`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Ignore warnings `ignoreWarnings` | toggle | optional | off | — | — | — | `commitImportJob` body |
 
 #### Outputs: what the screen shows and produces
 
@@ -1259,9 +1427,9 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `commitImportJob` POST `/seat-maps/{seatMapId}/import/{jobId}` | inline | ImportJob | 409 Job has errors, or has already been committed (ValidationProblem) | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
-| What publishing changes (publish gate) | navigation or local | — | — | — | — |
+| What publishing changes (publish gate) | `publishSeatMap` POST `/seat-maps/{seatMapId}/publish` | — | SeatMap | 409 Validation failed. (ValidationProblem) | — |
 
 **What each action does** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -1302,6 +1470,8 @@ brief: 3,000-seat amphitheatre, end stage, 12 sections, 16 wheelchair positions
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1331,7 +1501,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
+- [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404, 409).
 - [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-972?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Cancel, What publishing changes.
@@ -1467,17 +1637,17 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiSeatMapProposal": {"type":"object","x-ticvai-persistence":"none — the plan is ai.action_plan and ai.action_step, presented as one ai.proposed_action; the findings are the evidence of its decision record","description":"What `proposeSeatMapChanges` proposed: findings with the seats they concern, and except for `consistency` the plan a person approves (1.4.23, 1.4.25, 1.4.26, 1.4.29).","required":["kind","findings"],"properties":{"kind":{"type":"string","enum":["categories","numbering","stageVariant","consistency"]},"seatMapId":{"type":"string","format":"uuid"},"planId":{"type":"string","format":"uuid","nullable":true,"description":"The `ai.action_plan`, readable with `getActionPlan`. Null for `consistency`."},"proposedActionId":{"type":"string","format":"uuid","nullable":true,"description":"The `ai.proposed_action` a person decides. Null for `consistency`."},"summary":{"type":"object","additionalProperties":true,"description":"Counts: seats re-categorised or relabelled, seats blocked, capacity by category before and after."},"findings":{"type":"array","items":{"type":"object","required":["code","severity"],"properties":{"code":{"type":"string","description":"e.g. `accessibleSeatWithoutAccessiblePrice`, `restrictedViewInPremium`, `companionWithoutWheelchairSpace`, `sightLineLost`, `behindStage`, `numberingGap`, `duplicateLabel`, `categoryChange`, `labelChange`."},"severity":{"type":"string","enum":["blocking","warning","info"]},"seatIds":{"type":"array","items":{"type":"string","format":"uuid"}},"sectionId":{"type":"string","format":"uuid","nullable":true},"current":{"type":"string","nullable":true},"proposed":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true}}}},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"decisionRecordId":{"type":"string","format":"uuid"}}},
 "BulkUpdateSeatsRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["selection"],"properties":{"selection":{"type":"object","description":"Seats to amend. Combine filters; an empty selection is rejected.","properties":{"seatIds":{"type":"array","items":{"type":"string"}},"sectionCodes":{"type":"array","items":{"type":"string"}},"rowLabels":{"type":"array","items":{"type":"string"}}}},"categoryId":{"type":"string","format":"uuid"},"attribute":{"$ref":"#/components/schemas/SeatAttribute"},"isActive":{"type":"boolean"}}},
 "ImportGeometryRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["fileReference","format"],"properties":{"fileReference":{"type":"string"},"format":{"type":"string","enum":["svgPlan","pdfPlan"]},"layerMapping":{"type":"object","description":"Named layers in the source. Layer-aware extraction is far more reliable than shape recognition, so it is preferred wherever the source supports it — **and the client's amphitheatre file confirms the bet**: `VC-Seats`, `VC-wheelchairseating` and `VC-Steps` map straight onto the three roles below.\n**Each role takes a list, not a name** (CF-122). The same file carries two distinct layers both named `Layer 1`, steps drawn on both `steps` and `VC-Steps`, and AutoCAD's default `0`. A single string silently kept one and dropped the rest.\n**Names are decoded before matching.** PDF layer names arrive UTF-16BE and read as mojibake if taken as bytes, so a role that looks unmatched may simply be undecoded.\n","properties":{"seatsLayer":{"type":"array","items":{"type":"string"}},"accessibleSeatsLayer":{"type":"array","items":{"type":"string"}},"sectionBoundaryLayer":{"type":"array","items":{"type":"string"}},"stepsLayer":{"type":"array","items":{"type":"string"}},"stageLayer":{"type":"array","items":{"type":"string"}},"unmappedLayers":{"type":"array","readOnly":true,"description":"Layers found in the source and claimed by no role. **Reported rather than ignored** — a plan with an unmapped layer is a plan where something was not extracted, and the operator is the only one who knows whether it mattered.\n","items":{"type":"string"}}}},"digitNormalisation":{"type":"boolean","default":true,"description":"**Section codes carrying Arabic-Indic digits never join to the manifest** (CF-122). `A١` and `A1` are the same section to a person and two sections to a string comparison, and the failure is silent — the row simply does not match.\nNormalised before the join. Disable only where a venue genuinely uses both forms as distinct codes, which would be its own problem.\n"},"joinOn":{"type":"string","enum":["sectionAndRow","labelText","ordinal"],"default":"sectionAndRow","description":"How plan geometry is matched to manifest seats."}}},
-"ImportJob": {"x-ticvai-persistence":"seating.import_job","type":"object","required":["id","seatMapId","kind","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["manifest","geometry"]},"status":{"$ref":"#/components/schemas/ImportJobStatus"},"parsedSeatCount":{"type":"integer"},"matchedSeatCount":{"type":"integer","description":"Geometry imports — seats successfully joined to the manifest."},"unmatchedSeatCount":{"type":"integer","description":"Present in one source but not the other. A seat in the plan with no manifest entry is a finding, not a seat.\n"},"outcome":{"type":"string","readOnly":true,"enum":["parsed","parsedWithFindings","noSeatsFound","noLayersMatched","unreadable"],"description":"**All four CF-122 defects failed silently — an import that found nothing reported success.** A job that parses zero seats is not a parsed job, and the operator was left to notice an empty seat map later.\n`noLayersMatched` is the specific one worth separating: **the file was readable and no role claimed a layer**, which almost always means the names needed decoding or a role needed a second entry rather than that the file was wrong.\n"},"layersFound":{"type":"array","readOnly":true,"description":"Every layer name in the source, decoded. **Shown whether or not extraction worked**, so an operator can map a role by reading rather than by guessing.\n","items":{"type":"string"}},"findings":{"type":"array","items":{"$ref":"#/components/schemas/ValidationFinding"}},"createdAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true}}},
+"ImportJob": {"x-ticvai-persistence":"seating.import_job","type":"object","required":["id","seatMapId","kind","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["manifest","geometry"]},"status":{"$ref":"#/components/schemas/ImportJobStatus"},"parsedSeatCount":{"type":"integer"},"matchedSeatCount":{"type":"integer","description":"Geometry imports — seats successfully joined to the manifest."},"unmatchedSeatCount":{"type":"integer","description":"Present in one source but not the other. A seat in the plan with no manifest entry is a finding, not a seat.\n"},"outcome":{"type":"string","readOnly":true,"enum":["parsed","parsedWithFindings","noSeatsFound","noLayersMatched","unreadable"],"description":"**All four CF-122 defects failed silently — an import that found nothing reported success.** A job that parses zero seats is not a parsed job, and the operator was left to notice an empty seat map later.\n`noLayersMatched` is the specific one worth separating: **the file was readable and no role claimed a layer**, which almost always means the names needed decoding or a role needed a second entry rather than that the file was wrong.\n"},"layersFound":{"type":"array","readOnly":true,"description":"Every layer name in the source, decoded. **Shown whether or not extraction worked**, so an operator can map a role by reading rather than by guessing.\n","items":{"type":"string"}},"findings":{"x-ticvai-persisted":false,"type":"array","items":{"$ref":"#/components/schemas/ValidationFinding"}},"createdAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true}}},
 "ImportJobStatus": {"type":"string","enum":["parsing","previewReady","committing","committed","failed"]},
 "ImportManifestRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["fileReference","format","columnMapping"],"properties":{"fileReference":{"type":"string","description":"Object storage reference. The file is not posted through this API."},"format":{"type":"string","enum":["csvManifest","xlsxManifest"]},"sheetName":{"type":"string","description":"Spreadsheets only. Trailing spaces in sheet names are common — quote exactly."},"headerRow":{"type":"integer","default":1},"columnMapping":{"type":"object","description":"Which column holds what. Required because manifests arrive with different headings from every venue.\n","required":["sectionColumn","rowColumn","seatColumn"],"properties":{"sectionColumn":{"type":"string"},"rowColumn":{"type":"string"},"seatColumn":{"type":"string"},"categoryColumn":{"type":"string"},"attributeColumn":{"type":"string"}}},"replaceExisting":{"type":"boolean","default":false,"description":"False merges. True replaces, and is refused where tickets are sold against the map.\n"}}},
 "MapZone": {"type":"object","x-ticvai-persistence":"seating.zone","description":"BL-166. **`seating` is strong on everything that is a seat and the map itself was only seats.**\n**A standing area is a capacity without individual seats**, and modelling it as seats means inventing seat numbers nobody prints and a guest cannot find. A suite is the opposite — one sellable unit containing many seats, sold whole.\nNon-sellable zones matter too: **a stage, an entry and a sightline obstruction are not inventory and they change what the seats beside them are worth.**\n","required":["id","seatMapId","kind","name"],"properties":{"id":{"type":"string","format":"uuid"},"seatMapId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["standing","suite","box","lounge","accessiblePlatform","stage","entry","exit","concourse","obstruction","camera","aisle"]},"name":{"type":"string"},"capacity":{"type":"integer","nullable":true,"description":"**For a standing zone this is the inventory** — sold as a count rather than as seats. Null for a stage or an obstruction, which sell nothing.\n"},"seatCategoryId":{"type":"string","format":"uuid","nullable":true},"containsSeatIds":{"type":"array","description":"For a suite or box. **Sold whole, so the seats inside are held together** — selling one seat of a suite is not a thing a venue does.\n","items":{"type":"string","format":"uuid"}},"obstructsZoneIds":{"type":"array","description":"What this blocks the view of. **A pillar is not inventory and it decides what the seats behind it are worth**, which is the only reason to draw it.\n","items":{"type":"string","format":"uuid"}},"geometry":{"type":"string","nullable":true}}},
 "Point": {"type":"object","required":["x","y"],"properties":{"x":{"type":"number"},"y":{"type":"number"}}},
-"ProposedAction": {"type":"object","x-ticvai-persistence":"ai.proposed_action","required":["id","kind","targetContract","targetOperation","payload","status"],"properties":{"id":{"type":"string","format":"uuid"},"interactionId":{"type":"string","format":"uuid"},"translationJobId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."},"kind":{"type":"string","enum":["pricing","promotion","operational","financial","configuration","content","audience"],"description":"`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."},"targetContract":{"type":"string","description":"Which contract would perform it. The assistant never performs it itself."},"targetOperation":{"type":"string"},"payload":{"type":"object","additionalProperties":true,"description":"The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"},"summary":{"type":"string"},"status":{"type":"string","description":"**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n","enum":["proposed","approved","rejected","applied","expired"]},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."},"approvalLevel":{"type":"integer","minimum":1,"maximum":2,"description":"8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"decisionReason":{"type":"string","nullable":true,"description":"Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"},"proposedAt":{"type":"string","format":"date-time"},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan","description":"The plan this action presents for a decision (AI design 2.2 D, 3.8)."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."},"changeSetHash":{"type":"string","nullable":true,"readOnly":true,"description":"Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."}}},
+"ProposedAction": {"x-ticvai-retired-columns":["interaction_id"],"type":"object","x-ticvai-persistence":"ai.proposed_action","required":["id","kind","targetContract","targetOperation","payload","status"],"properties":{"id":{"type":"string","format":"uuid"},"interactionId":{"x-ticvai-references":"ai.activity","x-ticvai-column":"activity_id","type":"string","format":"uuid"},"translationJobId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a job's rows by it. Null on every other proposal (CHG-RFM-004)."},"kind":{"type":"string","enum":["pricing","promotion","operational","financial","configuration","content","audience"],"description":"`content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from `proposeLookalikeSegment`) added 29 September (build); both are applied by a person in the owning screen."},"targetContract":{"type":"string","description":"Which contract would perform it. The assistant never performs it itself."},"targetOperation":{"type":"string"},"payload":{"type":"object","additionalProperties":true,"description":"The request body a person would submit, ready to review. **Open on purpose: its shape is the request body of `targetOperation` in `targetContract`**, and it is validated against that operation, not restated here.\n"},"summary":{"type":"string"},"status":{"type":"string","description":"**Expiry (decided 28 September, audit R213)**: a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires 24 hours after `decidedAt`. Both are proposed values, client to correct, and `expiresAt` carries the one that applies.\n","enum":["proposed","approved","rejected","applied","expired"]},"expiresAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"When the expiry timer moves this action to `expired` — `proposedAt` plus 7 days while `proposed`, `decidedAt` plus 24 hours once `approved`, null once `rejected`, `applied` or `expired` (audit R213)."},"approvalLevel":{"type":"integer","minimum":1,"maximum":2,"description":"8.3.65. Multi-level, because a discount and a pricing change differ in authority. **Two levels (decided 28 September, audit R213)**: `2` for anything touching prices or permissions (every `pricing` and `promotion` action, and any other whose payload sets a price, a discount, a role or a permission grant), which needs a manager other than the requester; `1` for everything else, which the requester approves themselves.\n"},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"decisionReason":{"type":"string","nullable":true,"description":"Required on rejection. **The only signal the assistant is proposing badly**, and without it a poor model degrades silently.\n"},"proposedAt":{"type":"string","format":"date-time"},"decidedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**Added 29 September (AI design 3.1):** `ai.proposed_action` had no policy — its only references were nullable. The scope it was proposed at, and the partition key row-level security reads.\n"},"planId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.action_plan","description":"The plan this action presents for a decision (AI design 2.2 D, 3.8)."},"approvalRequestId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `approvals` request deciding a tier 2 or matrix-caught action (AI design 2.3)."},"changeSetHash":{"type":"string","nullable":true,"readOnly":true,"description":"Hash of the change set approved; execution refuses a plan whose hash differs (AIC-181)."}}},
 "SeatAttribute": {"type":"string","description":"BL-168. **Extended from eight values on 18 August.** Amenity and view filters needed attributes the original set did not carry, and a guest filtering for *aisle seat with power* was filtering on something the model could not express.\n","enum":["standard","accessible","companion","obstructedView","restrictedLegroom","premium","houseSeat","buffer","aisle","endOfRow","extraLegroom","powerOutlet","tableService","shaded","covered","nearExit","nearAccessibleWc","wheelchairTransfer","limitedRecline","sofa","beanbag"]},
 "SeatMap": {"x-ticvai-persistence":"seating.seat_map","allOf":[{"$ref":"#/components/schemas/SeatMapSummary"},{"type":"object","required":["sections"],"properties":{"description":{"type":"string","nullable":true},"viewBox":{"type":"object","description":"Coordinate space for rendering. Absent when there is no geometry.","nullable":true,"properties":{"width":{"type":"number"},"height":{"type":"number"}}},"stagePosition":{"$ref":"#/components/schemas/Point"},"sections":{"type":"array","items":{"$ref":"#/components/schemas/Section"}},"isActive":{"type":"boolean"}}}]},
 "SeatMapImportJob": {"type":"object","description":"**AI-assisted import from a PDF, an image or a spreadsheet** (21 August decision). A venue arriving with a printed plan and a seat manifest should not rebuild 396 rows by hand.\n\n**It proposes and a person accepts — it never publishes.** ADR-0020: a suggestion proposes, a person decides. An imported map lands as a draft with its confidence and whatever it could not read, because **a seat map wrong by two rows is worse than one that took an afternoon.**","required":["id","status","source"],"properties":{"id":{"type":"string","format":"uuid"},"status":{"type":"string","enum":["queued","reading","proposed","accepted","rejected","failed"]},"source":{"type":"string","enum":["pdf","image","excel","csv"]},"seatMapId":{"type":"string","format":"uuid","nullable":true,"description":"The draft it produced, once it has one."},"seatsDetected":{"type":"integer","nullable":true},"sectionsDetected":{"type":"integer","nullable":true},"confidence":{"type":"number","nullable":true,"minimum":0,"maximum":1},"unreadable":{"type":"array","items":{"type":"string"},"description":"**What it could not read, named.** A blank list and a low confidence are different problems: the first is a bad scan, the second is a plan it half-understood."},"basis":{"type":"string","enum":["heuristic","model"],"description":"ADR-0020 — the same abstraction as every other suggestion."}}},
 "SeatMapSummary": {"x-ticvai-persistence":"seating.seat_map","type":"object","required":["id","name","venueId","status","seatCount"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"status":{"$ref":"#/components/schemas/SeatMapStatus"},"seatCount":{"type":"integer"},"sectionCount":{"type":"integer"},"hasGeometry":{"type":"boolean","description":"False when only a manifest has been imported. Such a map can be sold from a list but not rendered.\n"},"publishedAt":{"type":"string","format":"date-time","nullable":true}}},
-"Section": {"x-ticvai-persistence":"seating.section","type":"object","required":["code","name","rowCount","seatCount"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"rowCount":{"type":"integer"},"seatCount":{"type":"integer"},"boundary":{"type":"array","items":{"$ref":"#/components/schemas/Point"},"description":"Polygon for rendering. Absent without geometry."},"viewAssetId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"assets.MediaAsset","description":"**The view of the stage from this section, as a photo**, uploaded through `assets` like any other media (decided 29 September, rev 3 23SEP-14). Optional: where it is null the client renders the view from the imported geometry (the section `boundary`, the map's `stagePosition` and the seat positions), so a closer section shows a larger stage and fewer rows ahead. Set with `updateSeatMap` `sectionViews`, which is allowed on a published map because a photo does not change the map's shape.\n"},"rows":{"type":"array","items":{"type":"object","required":["label","seatCount"],"properties":{"label":{"type":"string"},"seatCount":{"type":"integer"},"numberingDirection":{"type":"string","enum":["leftToRight","rightToLeft"],"description":"Which end row numbering starts from. Not recoverable from a manifest and must be stated — it determines whether a guest finds their seat.\n"}}}},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"Section": {"x-ticvai-persistence":"seating.section","type":"object","required":["code","name","rowCount","seatCount"],"properties":{"code":{"type":"string"},"name":{"type":"string"},"rowCount":{"type":"integer"},"seatCount":{"type":"integer"},"boundary":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"$ref":"#/components/schemas/Point"},"description":"Polygon for rendering. Absent without geometry."},"viewAssetId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"assets.MediaAsset","description":"**The view of the stage from this section, as a photo**, uploaded through `assets` like any other media (decided 29 September, rev 3 23SEP-14). Optional: where it is null the client renders the view from the imported geometry (the section `boundary`, the map's `stagePosition` and the seat positions), so a closer section shows a larger stage and fewer rows ahead. Set with `updateSeatMap` `sectionViews`, which is allowed on a published map because a photo does not change the map's shape.\n"},"rows":{"type":"array","items":{"type":"object","required":["label","seatCount"],"properties":{"label":{"type":"string"},"seatCount":{"type":"integer"},"numberingDirection":{"type":"string","enum":["leftToRight","rightToLeft"],"description":"Which end row numbering starts from. Not recoverable from a manifest and must be stated — it determines whether a guest finds their seat.\n"}}}},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
 "SuggestionBasis": {"type":"string","description":"**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n","enum":["heuristic","statistical","model","hybrid","manual"]},
 "ValidationFinding": {"x-ticvai-persistence":"none — computed","type":"object","required":["kind","severity","message"],"properties":{"kind":{"$ref":"#/components/schemas/ValidationFindingKind"},"severity":{"$ref":"#/components/schemas/ValidationSeverity"},"message":{"type":"string"},"sectionCode":{"type":"string","nullable":true},"rowLabel":{"type":"string","nullable":true},"seatNumbers":{"type":"array","items":{"type":"string"}},"affectedCount":{"type":"integer"}}},
 "ValidationReport": {"x-ticvai-persistence":"none — computed","type":"object","required":["seatMapId","passed","errorCount","warningCount","findings"],"properties":{"seatMapId":{"type":"string","format":"uuid"},"passed":{"type":"boolean","description":"False when any finding has severity `error`."},"errorCount":{"type":"integer"},"warningCount":{"type":"integer"},"findings":{"type":"array","items":{"$ref":"#/components/schemas/ValidationFinding"}}}}

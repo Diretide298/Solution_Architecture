@@ -1,6 +1,6 @@
 # P08-access-venue-02 — P08 · Access & Venue (2 of 3)
 
-**10 screens · 47 operations · 67 schemas · 19 permissions**
+**10 screens · 47 operations · 68 schemas · 19 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -135,12 +135,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-035` | Override Audit | C | 7 | 17 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 | `BO-038` | Reconciliation Queue | C | 3 | 20 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-069` | Asset Register | A | 42 | 22 | 6 | 23 | 3 | 0 | — | notStarted (generated) |
-| `BO-071` | Planned Maintenance | D | 21 | 21 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
+| `BO-071` | Planned Maintenance | D | 20 | 21 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
 | `BO-072` | Incident Log | D | 35 | 22 | 6 | 10 | 0 | 0 | — | notStarted (generated) |
 | `BO-092` | Venue Maps | A | 14 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-093` | Map Import & Labelling | A | 89 | 57 | 6 | 6 | 3 | 0 | — | notStarted (generated) |
 | `BO-094` | Map Editor & Publish | A | 67 | 49 | 5 | 14 | 3 | 0 | — | notStarted (generated) |
-| `BO-095` | Resources | D | 27 | 13 | 6 | 19 | 1 | 0 | — | notStarted (generated) |
+| `BO-095` | Resources | D | 26 | 13 | 6 | 19 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

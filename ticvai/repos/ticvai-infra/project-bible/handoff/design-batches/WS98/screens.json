@@ -5,6 +5,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "1",
@@ -101,61 +102,73 @@
       {
        "kind": "metricTile",
        "label": "Total Active Customers",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Active Subscriptions",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Active Trials",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "MRR / Monthly Equivalent Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "ARR / Annualized Contract Value",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "New Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Expansion Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Contraction Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Churned Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Renewal Rate",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Trial-to-Paid Conversion",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Average Revenue per Customer",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 6 §Primary KPIs"
       }
      ]
@@ -171,18 +184,11 @@
   },
   "apis": [
    {
-    "operationId": "listTenants",
+    "operationId": "getCommercialMetrics",
     "contract": "subscription",
-    "purpose": "The commercial portfolio",
+    "purpose": "The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "getSubscription",
-    "contract": "subscription",
-    "purpose": "One customer",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)"
    }
   ],
   "wireframe": {
@@ -229,6 +235,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "1",
@@ -272,7 +279,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "filters",
      "slot": "filters",
      "components": [
       {
@@ -329,7 +336,7 @@
         "Commercial Health"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listTenants",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 8 §Table Columns"
       }
      ]
@@ -342,6 +349,7 @@
        "kind": "detailPanel",
        "label": "The selected customer subscription commercial",
        "bindsTo": null,
+       "operation": "listTenants",
        "columns": [
         "Customer",
         "Venue / Group",
@@ -430,6 +438,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_TENANT_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "1",
@@ -482,6 +491,7 @@
      "components": [
       {
        "kind": "detailPanel",
+       "operation": "getSubscription",
        "derived": true,
        "impliedBy": "getSubscription",
        "notes": "One record, read-only."
@@ -502,13 +512,6 @@
     "operationId": "getSubscription",
     "contract": "subscription",
     "purpose": "Commercial 360",
-    "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
-   },
-   {
-    "operationId": "getEntitlementUsage",
-    "contract": "subscription",
-    "purpose": "What they consume",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
    }
@@ -557,6 +560,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "1",
@@ -599,41 +603,49 @@
       {
        "kind": "metricTile",
        "label": "Customers by VSI",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Customers by Operational Profile",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Customers by Commercial Model",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Average VSI",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Profile Misalignment",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Commercial Model Optimization Candidates",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Upgrade Candidates",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Downgrade Candidates",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 10 §KPIs"
       }
      ]
@@ -648,6 +660,13 @@
    "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
   },
   "apis": [
+   {
+    "operationId": "getCommercialMetrics",
+    "contract": "subscription",
+    "purpose": "The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)"
+   },
    {
     "operationId": "scoreVsiAssessment",
     "contract": "subscription",
@@ -702,6 +721,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "1",
@@ -745,52 +765,61 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "MRR / Monthly Equivalent",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "ARR / ACV",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "New Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Expansion Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Contraction Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Churned Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "NRR",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "ARPC",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Growth %",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §KPIs"
       }
      ]
@@ -810,7 +839,7 @@
         "Contracts at Guarantee"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getBillingReconciliation",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §Show"
       }
      ]
@@ -823,6 +852,7 @@
        "kind": "detailPanel",
        "label": "The selected revenue commercial model",
        "bindsTo": null,
+       "operation": "getBillingReconciliation",
        "columns": [
         "Guaranteed Revenue",
         "Actual Variable Revenue",
@@ -851,6 +881,13 @@
     "purpose": "Revenue against metering",
     "trigger": "onLoad",
     "provenance": "board reading, 19 September 2026"
+   },
+   {
+    "operationId": "getCommercialMetrics",
+    "contract": "subscription",
+    "purpose": "The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)"
    }
   ],
   "entryState": {
@@ -899,6 +936,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "1",
@@ -941,41 +979,49 @@
       {
        "kind": "metricTile",
        "label": "Active Trials",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "New Trials",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Expiring Trials",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Trial-to-Paid %",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Average Trial Duration",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Setup Completion",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Go-Live Readiness",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Estimated Conversion Value",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 12 §KPIs"
       }
      ]
@@ -991,11 +1037,11 @@
   },
   "apis": [
    {
-    "operationId": "listTenants",
+    "operationId": "getCommercialMetrics",
     "contract": "subscription",
-    "purpose": "Trials running",
+    "purpose": "The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)"
    }
   ],
   "wireframe": {
@@ -1042,6 +1088,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "1",
@@ -1096,52 +1143,61 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "Renewals Next 30 Days",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Next 60 Days",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Next 90 Days",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Renewal Value",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Renewal Rate",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "At-Risk Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Auto-Renew Value",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Expansion Opportunity",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Optimization Opportunity",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 13 §KPIs"
       }
      ]
@@ -1207,7 +1263,15 @@
    "emptyNoResults": "The filter narrowed it and the renewal retention are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getCommercialMetrics",
+    "contract": "subscription",
+    "purpose": "The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)"
+   }
+  ],
   "wireframe": {
    "status": "notStarted",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-375",
@@ -1244,6 +1308,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "1",
@@ -1298,37 +1363,43 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "headline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "Total Opportunities",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Potential Expansion Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Potential Retention Value",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Model Optimization Opportunities",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Module Opportunities",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Cost Optimization Opportunities",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 14 §Opportunity KPIs"
       }
      ]
@@ -1384,7 +1455,15 @@
    "emptyNoResults": "The filter narrowed it and the commercial optimization expansion are still there. Names the active filter and offers to clear it.",
    "emptyNoAccess": "Not shown: nothing on this screen needs a permission of its own; the app's sign-in decides access."
   },
-  "apis": [],
+  "apis": [
+   {
+    "operationId": "getCommercialMetrics",
+    "contract": "subscription",
+    "purpose": "The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)",
+    "trigger": "onLoad",
+    "provenance": "audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)"
+   }
+  ],
   "entryState": {
    "preloaded": [
     "Total Opportunities",
@@ -1431,6 +1510,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "1",
@@ -1565,6 +1645,7 @@
   "module": "Tenants & Licensing",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PLATFORM_BILLING_VIEW",
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "1",
@@ -1614,171 +1695,205 @@
       {
        "kind": "metricTile",
        "label": "Active Customers",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics"
       },
       {
        "kind": "metricTile",
        "label": "New Customers",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Churned Customers",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Trials",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Conversion",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Customer Metrics"
       },
       {
        "kind": "metricTile",
        "label": "MRR / Monthly Equivalent Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
       },
       {
        "kind": "metricTile",
        "label": "ARR / ACV",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
       },
       {
        "kind": "metricTile",
        "label": "New Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Expansion",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Contraction",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Churn",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
       },
       {
        "kind": "metricTile",
        "label": "NRR",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
       },
       {
        "kind": "metricTile",
        "label": "ARPC",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Revenue Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Billable Tickets",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Billable Transactions",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Eligible Transaction Value",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Variable Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Minimum Guaranteed Revenue",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Guarantee Utilization",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Revenue Above Guarantee",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Variable Commercial Metrics"
       },
       {
        "kind": "metricTile",
        "label": "VSI",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Operational Profile",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
       },
       {
        "kind": "metricTile",
        "label": "POS Utilization",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Access Utilization",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
       },
       {
        "kind": "metricTile",
        "label": "User Utilization",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
       },
       {
        "kind": "metricTile",
        "label": "API",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Storage",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Admissions",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Operational Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Renewal Risk",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Expansion Probability",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Model Optimization Opportunity",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Cost Optimization",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Upgrade/Downgrade Probability",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
       },
       {
        "kind": "metricTile",
        "label": "Commercial Health",
+       "operation": "getCommercialMetrics",
        "provenance": "pack Subscription_Licensing_AI_Self_Service.pdf, page 17 §Commercial Intelligence Metrics"
       }
      ]
@@ -1805,11 +1920,11 @@
   },
   "apis": [
    {
-    "operationId": "getLicenceEnforcement",
+    "operationId": "getCommercialMetrics",
     "contract": "subscription",
-    "purpose": "Exceptions and overage",
+    "purpose": "The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)",
     "trigger": "onLoad",
-    "provenance": "board reading, 19 September 2026"
+    "provenance": "audit fix S-METRIC-NO-OP, 14 October 2026 (CHG-SCO-006)"
    },
    {
     "operationId": "getPlanRecommendations",

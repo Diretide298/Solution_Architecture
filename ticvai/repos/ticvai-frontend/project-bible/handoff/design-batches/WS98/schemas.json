@@ -54,55 +54,84 @@
    }
   }
  },
- "EntitlementUsage": {
-  "x-ticvai-persistence": "none — aggregated from usage_record",
+ "CommercialMetric": {
   "type": "object",
+  "description": "One commercial figure. Money-valued codes carry a `Money`; counts, rates and days a number (naming-and-style 5.1: money is never a float).",
   "required": [
-   "tenantId",
-   "metrics"
+   "code",
+   "value"
   ],
+  "properties": {
+   "code": {
+    "type": "string"
+   },
+   "groupKey": {
+    "type": "string",
+    "nullable": true,
+    "description": "The band, profile or model this row is for, on a code split by one; null otherwise."
+   },
+   "unit": {
+    "type": "string",
+    "enum": [
+     "count",
+     "currency",
+     "percent",
+     "days"
+    ]
+   },
+   "value": {
+    "oneOf": [
+     {
+      "type": "number"
+     },
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ]
+   },
+   "comparison": {
+    "nullable": true,
+    "oneOf": [
+     {
+      "type": "number"
+     },
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ]
+   },
+   "direction": {
+    "type": "string",
+    "enum": [
+     "up",
+     "down",
+     "flat"
+    ]
+   }
+  }
+ },
+ "CommercialMetricSet": {
+  "type": "object",
+  "description": "The commercial command centres' figures, one row per metric code (getCommercialMetrics).",
   "properties": {
    "tenantId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "The customer the figures are for; null for the whole portfolio."
+   },
+   "period": {
+    "type": "string"
+   },
+   "asOf": {
+    "type": "string",
+    "format": "date-time"
    },
    "metrics": {
     "type": "array",
     "items": {
-     "type": "object",
-     "required": [
-      "metric",
-      "current",
-      "isNearLimit"
-     ],
-     "properties": {
-      "metric": {
-       "$ref": "#/components/schemas/UsageMetric"
-      },
-      "current": {
-       "type": "integer"
-      },
-      "limit": {
-       "type": "integer",
-       "nullable": true
-      },
-      "percentUsed": {
-       "type": "number",
-       "nullable": true
-      },
-      "isNearLimit": {
-       "type": "boolean",
-       "description": "Approaching a limit is an account conversation. Hitting one silently at a gate is an incident.\n"
-      },
-      "isExceeded": {
-       "type": "boolean"
-      }
-     }
+     "$ref": "#/components/schemas/CommercialMetric"
     }
-   },
-   "asAt": {
-    "type": "string",
-    "format": "date-time"
    }
   }
  },
@@ -563,6 +592,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {
@@ -665,21 +695,6 @@
    "suspended",
    "terminating",
    "terminated"
-  ]
- },
- "UsageMetric": {
-  "type": "string",
-  "enum": [
-   "venues",
-   "workstations",
-   "activeUsers",
-   "devices",
-   "brandedApps",
-   "aiTokens",
-   "apiCalls",
-   "storageGb",
-   "transactions",
-   "guestProfiles"
   ]
  },
  "VsiAssessment": {

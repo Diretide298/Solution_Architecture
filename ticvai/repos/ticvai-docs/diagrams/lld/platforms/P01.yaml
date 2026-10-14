@@ -43,27 +43,27 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 62
+  operationCalls: 57
 - service: OrderService
-  operationCalls: 56
+  operationCalls: 55
 - service: CatalogueService
-  operationCalls: 46
+  operationCalls: 47
 - service: VenueOpsService
   operationCalls: 39
-- service: IdentityService
-  operationCalls: 25
 - service: WhiteLabelService
   operationCalls: 23
+- service: IdentityService
+  operationCalls: 20
 - service: FnbService
   operationCalls: 19
 - service: AccessService
   operationCalls: 13
 - service: AiService
-  operationCalls: 11
-- service: WalletService
-  operationCalls: 9
+  operationCalls: 7
 - service: LedgerService
   operationCalls: 6
+- service: WalletService
+  operationCalls: 5
 - service: RetailService
   operationCalls: 4
 coverage:
@@ -80,15 +80,13 @@ screens:
   wave: 1
   density: compact
   operations:
-  - decideRecommendations
   - getCookieConsentRuntime
   - getPublishedTenantConfig
   - getTenantAppStatus
   - listMyEntitlements
   - listProducts
-  - recordDeviceConsent
-  - recordRecommendationEvents
   - recordStorefrontSessionEvents
+  - searchCatalogue
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -704,6 +702,7 @@ screens:
   - issueWalletPass
   - listEntitlements
   - listMyEntitlements
+  - listTicketTransfers
   - shareEntitlement
   - transferOrderTickets
   states:
@@ -770,11 +769,9 @@ screens:
   density: compact
   operations:
   - getGuestConsents
-  - getMyIdentityVerification
   - getMyProfile
   - listConsentPurposes
   - recordConsent
-  - submitGuestIdentityDocument
   - updateGuestPreferences
   - updateMyProfile
   - verifyGuestEmail
@@ -806,12 +803,8 @@ screens:
   - getGameCard
   - getGiftCard
   - getWallet
-  - getWalletAutoReloadSetting
-  - getWalletExitBalance
   - listPaymentTokens
   - listWalletTransactions
-  - setWalletAutoReloadSetting
-  - settleWalletAtExit
   - storePaymentToken
   - transferWalletBalance
   states:
@@ -869,11 +862,9 @@ screens:
   wave: 1
   density: compact
   operations:
-  - createInstalmentPlan
   - getBillingStatement
   - getMyMemberships
   - listBillingStatements
-  - listInstalmentPlans
   - listMyPaymentIssues
   - retryMyDunningPayment
   states:
@@ -905,10 +896,7 @@ screens:
   density: compact
   operations:
   - deleteGuestAccount
-  - enrolMfaMethod
   - exportSubjectData
-  - getCookieConsentRuntime
-  - getDeviceConsentHistory
   - getFacePassEnrolment
   - getGuestConsents
   - getWaiverStatus
@@ -918,13 +906,9 @@ screens:
   - listGuestDevices
   - listMfaMethods
   - listMyEntitlements
-  - listPublishedTrackingTechnologies
   - recordConsent
-  - recordDeviceConsent
-  - removeMfaMethod
   - revokeFacePass
   - revokeGuestDevice
-  - verifyMfaEnrolment
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1044,7 +1028,7 @@ screens:
   wave: 1
   density: compact
   operations:
-  - getPublishedTenantConfig
+  - getTenantAppStatus
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1391,6 +1375,7 @@ screens:
   - getWaitingGuest
   - joinQueue
   - leaveQueue
+  - listQueues
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1471,14 +1456,12 @@ screens:
   density: compact
   operations:
   - createReferral
-  - decideRecommendations
   - getLoyaltyPosition
   - listCustomerBadges
   - listLeaderboard
   - listLoyaltyProgrammes
   - listPromotions
   - listRewards
-  - recordRecommendationEvents
   - redeemLoyaltyPoints
   - setLeaderboardNickname
   states:
@@ -1654,7 +1637,6 @@ screens:
   - deleteFavouriteRoute
   - getNextTransportDeparture
   - getTransportFareTable
-  - getTransportRoute
   - getTransportRouteMap
   - listMyFavouriteRoutes
   - listTransportPassOffers

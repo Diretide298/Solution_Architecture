@@ -1,6 +1,6 @@
 # WS119 — AI Forecasting and Predictive Intelligence board 1
 
-**10 screens · 18 operations · 20 schemas · 4 permissions**
+**10 screens · 15 operations · 16 schemas · 4 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -95,15 +95,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-499` | Forecasting Command Center | D | 6 | 6 | 7 | 39 | 0 | 0 | — | notStarted (—) |
+| `ADM-499` | Forecasting Command Center | D | 6 | 186 | 7 | 39 | 0 | 0 | — | notStarted (—) |
 | `ADM-500` | Forecast Configuration & Forecasting Strategy | A | 39 | 6 | 7 | 10 | 1 | 0 | — | notStarted (—) |
-| `ADM-501` | Forecast Data & Signal Configuration | D | 6 | 6 | 7 | 9 | 0 | 0 | — | notStarted (—) |
-| `ADM-502` | Attendance & Visitation Forecast | D | 6 | 6 | 7 | 43 | 0 | 0 | — | notStarted (—) |
+| `ADM-501` | Forecast Data & Signal Configuration | D | 26 | 18 | 7 | 9 | 0 | 0 | — | notStarted (—) |
+| `ADM-502` | Attendance & Visitation Forecast | D | 27 | 21 | 7 | 42 | 0 | 0 | — | notStarted (—) |
 | `ADM-503` | Ticket, Product & Timeslot Demand Forecast | B | 9 | 26 | 7 | 44 | 1 | 0 | — | notStarted (—) |
 | `ADM-504` | Channel & Booking Pace Forecast | B | 9 | 22 | 7 | 41 | 0 | 6 | — | notStarted (—) |
 | `ADM-505` | Revenue & Commercial Forecast | B | 14 | 26 | 7 | 42 | 0 | 0 | — | notStarted (—) |
 | `ADM-506` | Forecast Drivers, Confidence & Explainability | A | 14 | 36 | 7 | 46 | 0 | 0 | — | notStarted (—) |
-| `ADM-507` | Forecast Scenario & What-If Simulator | D | 6 | 20 | 7 | 40 | 0 | 0 | — | notStarted (—) |
+| `ADM-507` | Forecast Scenario & What-If Simulator | D | 6 | 20 | 7 | 39 | 0 | 0 | — | notStarted (—) |
 | `ADM-508` | Forecast Accuracy, Review & Publication Center | A | 13 | 24 | 7 | 6 | 0 | 0 | — | notStarted (—) |
 
 ---
@@ -188,29 +188,245 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Forecast Attendance Today** (metric tile)
+**Forecast Attendance Today** (metric tile, from `getForecast`)
 
-**Forecast Attendance Tomorrow** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
 
-**Forecast Attendance Next 7 Days** (metric tile)
+**Forecast Attendance Tomorrow** (metric tile, from `getForecast`)
 
-**Forecast Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
 
-**Current Bookings** (metric tile)
+**Forecast Attendance Next 7 Days** (metric tile, from `getForecast`)
 
-**Expected Walk-In** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
 
-**Forecast Occupancy** (metric tile)
+**Forecast Revenue** (metric tile, from `getForecast`)
 
-**Demand Index** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
 
-**Forecast Confidence** (metric tile)
+**Current Bookings** (metric tile, from `getForecast`)
 
-**Forecast vs Actual** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
 
-**Revenue Forecast Accuracy** (metric tile)
+**Expected Walk-In** (metric tile, from `getForecast`)
 
-**Active Forecast Alerts** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
+
+**Forecast Occupancy** (metric tile, from `getForecast`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
+
+**Demand Index** (metric tile, from `getForecast`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
+
+**Forecast Confidence** (metric tile, from `getForecast`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
+
+**Forecast vs Actual** (metric tile, from `getForecast`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
+
+**Revenue Forecast Accuracy** (metric tile, from `getForecast`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
+
+**Active Forecast Alerts** (metric tile, from `getForecast`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -287,6 +503,8 @@ bookingsOnHand: 6420
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 39 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -337,7 +555,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (186 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-499?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-002`, `ADM-500`, `ADM-501`, `ADM-502`, `ADM-503`, `ADM-504`, `ADM-505`, `ADM-506`, `ADM-507`, `ADM-508`.
@@ -519,6 +737,8 @@ definition:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 10 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -625,6 +845,31 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by *Save forecast definition*** (`setForecastDefinition`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Definition key `definitionKey` | text field | required | — | — | — | — | `setForecastDefinition` body |
+| Name `name` | text field | optional | — | — | — | — | `setForecastDefinition` body |
+| Subject `subject` | select | required | — | Attendance · Arrival pattern · Product demand · Timeslot demand · Channel pace · Revenue · Occupancy · Attraction utilisation · Queue · Entry flow · Staffing · POS demand … | — | — | `setForecastDefinition` body |
+| Module `module` | select | optional | — | Core · Ticketing · Access · Fnb · Retail · Inventory · Seating · Membership · Marketing · Resources · Queue · Transport … | — | Whose AI this forecast is, and so who publishes it (Chinmay, 2 October, workbook Q3: "the permission holder for that module's AI"; CHG-FUP-004). | `setForecastDefinition` body |
+| Grain `grain` | radio group | required | — | Hour · Day · Week · Month | — | — | `setForecastDefinition` body |
+| Dimensions `dimensions` | list of values (chips) | optional | — | Any other key is accepted and forecast only where the snapshot carries it. | — | Breakdowns forecast directly or reconciled to. Documented keys (29 September, build; 8.2.12, 8.2.14, 8.2.27): `product`, `channel`, `timeslot`, `gate`, `outlet`, `customerSegment` … | `setForecastDefinition` body |
+| Segments `segmentIds` | multi-picker: choose segments | optional | — | — | — | The marketing-crm segments `customerSegment` breaks down by, in priority order where a guest is in several. | `setForecastDefinition` body |
+| Horizon days `horizonDays` | number field (days) | required | — | min 1; max 730 | — | — | `setForecastDefinition` body |
+| Refresh cadence `refreshCadence` | segmented control | optional | — | Hourly · Daily · Weekly | — | — | `setForecastDefinition` body |
+| Producer `producer` | radio group | required | — | Rule · Statistical · Model · Ensemble | — | Which producer is live (design 3.10). A model is promoted only through `promoteAiRelease`. | `setForecastDefinition` body |
+| History window months `historyWindowMonths` | stepper or slider | optional | 36 | min 1; max 60 | — | How much of the venue's own history the statistical producer reads (18 September minutes, M18-16: "36 months of history"). | `setForecastDefinition` body |
+| Cold start `coldStart` | group | optional | — | — | — | What the forecast stands on before the venue has history (29 September, AI functions review; forecasting book p.27 "New Venue / New Product Problem"). | `setForecastDefinition` body |
+| Strategy `coldStart.strategy` | radio group | optional | Venue settings | Venue settings · Starting pattern · Sister venue · Category baseline · Imported history | — | `venueSettings` uses the onboarding figures with the venue-type pattern; `sisterVenue` a venue of the same tenant; `categoryBaseline` a product category's own history … | `setForecastDefinition` body |
+| Sister venue `coldStart.sisterVenueId` | picker: choose a sister venue | optional | — | — | shows names, sends the id | For `sisterVenue`. Same tenant only (no data is pooled across tenants, AIP-149). | `setForecastDefinition` body |
+| Prior weight observations `coldStart.priorWeightObservations` | stepper or slider | optional | 4 | min 1; max 52 | — | `k`: how many own observations the prior is worth (4 same weekdays by default). | `setForecastDefinition` body |
+| Starting band percent `coldStart.startingBandPercent` | stepper or slider | optional | 40 | min 5; max 80 | — | The width of the range while the prior carries most of the weight (about +/-40%). | `setForecastDefinition` body |
+| Auto publish `autoPublish` | toggle | optional | off | — | — | Publish without approval when the quality gates pass (autonomy L4, design 3.8). Otherwise an `AI_APPROVE` holder publishes. | `setForecastDefinition` body |
+| Quality gates `qualityGates` | key and value settings | optional | — | — | — | Completeness, blocking signals and accuracy-regression thresholds a version must pass to publish. | `setForecastDefinition` body |
+| Signal keys `signalKeys` | list of values (chips) | optional | — | — | — | Signal sources this definition may use (ADM-501). | `setForecastDefinition` body |
+| Is active `isActive` | toggle | optional | on | — | — | — | `setForecastDefinition` body |
+
 **Rules for these inputs** (from the AI & Intelligence process; these refine the tables above and win where they differ)
 
 - **signal source**: Kind, provider, credential reference (never a secret), refresh cadence (hourly, daily, weekly, manual), active. The weather provider carries a cost (agreed). *(source: contracts/satellite/ai.yaml#configureForecastSignalSource / ADR-0051 (AI-D10 weather API with its cost))*
@@ -645,14 +890,29 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listForecastSignals`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Signal key | text | — |
+| Kind | chip: Weather, Public holiday, School calendar, Religious calendar, Event, Marketing… | — |
+| Provider | text | — |
+| Credential ref | text | A key-vault reference for a paid API, never the key. |
+| Refresh cadence | chip: Hourly, Daily, Weekly, Manual | — |
+| Coverage | 1,234.5 | — |
+| Fresh at | 1 Oct 2026, 14:30 | — |
+| Is active | yes / no (icon or chip) | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-| Save forecast definition (primary button) | navigation or local | — | — | — | — |
+| Save forecast definition (primary button) | `setForecastDefinition` PUT `/forecast-definitions/{definitionKey}` | AiForecastDefinition | AiForecastDefinition | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 A `model` producer was requested directly; models are promoted, not set (`model-needs-promotion`). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
@@ -704,12 +964,14 @@ signals:
 
 - `setForecastDefinition` → `AI_CONFIGURE` (configure) · staff
 - `listForecastSignals` → `AI_USE` (operate) · staff
-- `configureForecastSignalSource` → `AI_CONFIGURE` (configure) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `configureForecastSignalSource` → `AI_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -746,8 +1008,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (26), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-501?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, Save forecast definition, Cancel.
 - [ ] Every transition is wired: `ADM-499`.
@@ -802,10 +1064,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | To | date and time picker | — | — | `getForecast` ?to |
 | Dimension key | text field | — | — | `getForecast` ?dimensionKey |
 | Scenario | picker: choose a scenario | — | — | `getForecast` ?scenarioId |
-| Status | select | — | New · Reviewed · Accepted · Rejected · Actioned · Measured | `listAiInsights` ?status |
-| Kind | select | — | Anomaly · Forecast deviation · Trend · Opportunity · Executive summary · Root cause · Forecast threshold · Marketing recommendation | `listAiInsights` ?kind |
-| Priority | radio group | — | Low · Medium · High · Critical | `listAiInsights` ?priority |
-| From | date and time picker | — | — | `listAiInsights` ?from |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
 
@@ -823,6 +1081,32 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`configureAnomalyDetector`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Detector key `detectorKey` | text field | required | — | — | — | — | `configureAnomalyDetector` body |
+| Source `source` | segmented control | optional | Metric | Metric · Forecast · Device health | — | What is watched (29 September, build): a semantic-layer KPI, a published forecast (8.2.20, 8.2.41), or device status events (8.9.9). | `configureAnomalyDetector` body |
+| Metric key `metricKey` | text field | optional | — | — | — | A metric of the semantic layer (Reporting KPI). Required where `source` is `metric`. | `configureAnomalyDetector` body |
+| Forecast source `forecastSource` | group | optional | — | — | — | Required where `source` is `forecast`; `method` is then `threshold`. | `configureAnomalyDetector` body |
+| Definition key `forecastSource.definitionKey` | text field | required | — | — | — | — | `configureAnomalyDetector` body |
+| Dimension key `forecastSource.dimensionKey` | text field | optional | — | — | — | — | `configureAnomalyDetector` body |
+| Percentile `forecastSource.percentile` | segmented control | optional | P50 | P10 · P50 · P90 | — | — | `configureAnomalyDetector` body |
+| Comparator `forecastSource.comparator` | radio group | required | — | Above · At or above · Below · At or below | — | — | `configureAnomalyDetector` body |
+| Threshold `forecastSource.threshold` | number field | required | — | — | — | — | `configureAnomalyDetector` body |
+| Threshold kind `forecastSource.thresholdKind` | segmented control | optional | Absolute | Absolute · Percent of capacity | — | `percentOfCapacity` compares with the period's capacity (occupancy, 8.2.41). | `configureAnomalyDetector` body |
+| Horizon days `forecastSource.horizonDays` | number field (days) | optional | — | min 1; max 365 | — | Only points this many days ahead are compared. Null means the whole horizon. | `configureAnomalyDetector` body |
+| Device health source `deviceHealthSource` | group | optional | — | — | — | Required where `source` is `deviceHealth`. | `configureAnomalyDetector` body |
+| Device kinds `deviceHealthSource.deviceKinds` | list of values (chips) | optional | — | — | — | DeviceKind values; empty means every kind. | `configureAnomalyDetector` body |
+| Failure rate percent `deviceHealthSource.failureRatePercent` | stepper or slider | optional | — | min 0; max 100 | — | — | `configureAnomalyDetector` body |
+| Window minutes `deviceHealthSource.windowMinutes` | number field (minutes) | optional | 60 | min 5; max 1440 | — | — | `configureAnomalyDetector` body |
+| Method `method` | radio group | required | — | Threshold · Seasonal robust z · Peer comparison · Model | — | — | `configureAnomalyDetector` body |
+| Thresholds `thresholds` | key and value settings | optional | — | — | — | — | `configureAnomalyDetector` body |
+| Sensitivity `sensitivity` | segmented control | optional | Medium | Low · Medium · High | — | — | `configureAnomalyDetector` body |
+| Dimensions `dimensions` | list of values (chips) | optional | — | — | — | — | `configureAnomalyDetector` body |
+| Cadence `cadence` | segmented control | optional | — | Hourly · Daily | — | — | `configureAnomalyDetector` body |
+| Is active `isActive` | toggle | optional | on | — | — | — | `configureAnomalyDetector` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -838,14 +1122,32 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `getForecast`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Version | the name it points at, never the id | — |
+| Scenario | the name it points at, never the id | Set where the point belongs to a what-if scenario rather than the version itself. |
+| Target start | 1 Oct 2026, 14:30 | — |
+| Target end | 1 Oct 2026, 14:30 | — |
+| Dimension key | text | Canonical key of the breakdown, e.g. `product=…;channel=web`. |
+| P10 | 1,234.5 | — |
+| P50 | 1,234.5 | — |
+| P90 | 1,234.5 | — |
+| Unit | text | — |
+| Drivers | grouped details | Component decomposition or SHAP contributions, largest first (ADM-506). |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+| Stale | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `configureAnomalyDetector` PUT `/anomaly-detectors/{detectorKey}` | AiAnomalyDetector | AiAnomalyDetector | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
@@ -853,7 +1155,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 - **attendance chart**: Band (P10-P90), P50 line, actuals; bookings on hand as a floor line; weekends (Sat-Sun) and holidays marked. *(source: contracts/satellite/ai.yaml#getForecast / ADR-0051)*
 - **alerts**: Attendance below the forecast's low end raises an insight; the detector on the forecast can be set up from here. *(source: contracts/satellite/ai.yaml#configureAnomalyDetector (source forecast) / ADR-0051 (AI functions review 30 Sep §4 Anomaly detection))*
 
-**Data it reads**: `getForecast` (onLoad, Forecast values); `listAiInsights` (onLoad, Forecast threshold alerts (kind forecastThreshold)); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `getForecast` (onLoad, Forecast values); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
 
 **Where the user goes next**
 
@@ -894,16 +1196,17 @@ stage: Learning
 
 - `getForecast` → `AI_USE` (operate) · staff
 - `configureAnomalyDetector` → `AI_CONFIGURE` (configure) · staff
-- `listAiInsights` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
-43 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+42 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -919,7 +1222,7 @@ stage: Learning
 | 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
-| … 31 more | | | | `traceability.json` |
+| … 30 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -940,8 +1243,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (27), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-502?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-499`.
@@ -1127,6 +1430,8 @@ slot:
 - `getForecastAccuracy` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` …
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1343,6 +1648,8 @@ rows:
 - `listForecastDefinitions` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` …
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1579,6 +1886,8 @@ next7:
 - `explainMetricChange` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Shown when the caller lacks `AI_USE`, which `getForecast` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` …
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1854,6 +2163,8 @@ narrative: Booking pace is above the usual Saturday pattern and the weather fore
 
 **A refused user sees:** Shown when the caller lacks `AI_USE`, which `listForecastVersions` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` …
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 46 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1986,7 +2297,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Every forecast scenario what-if** (data table)
+**Every forecast scenario what-if** (data table, from `getForecast`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1998,7 +2309,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Confidence | text | not in the schema: `Confidence` |
 | Operational implications | text | not in the schema: `Operational Implications` |
 
-**The selected forecast scenario what-if** (detail panel): The pack groups this record's detail under its own headings: “Attendance”, “Simulation”, “Important Boundary”, “If management chooses a scenario”.
+**The selected forecast scenario what-if** (detail panel, from `getForecast`): The pack groups this record's detail under its own headings: “Attendance”, “Simulation”, “Important Boundary”, “If management chooses a scenario”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -2053,17 +2364,17 @@ scenario:
 #### Permissions
 
 - `getForecast` → `AI_USE` (operate) · staff
-- `createForecastScenario` → `AI_USE` (operate) · staff
-- `compareForecastScenarios` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
-40 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+39 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
@@ -2079,7 +2390,7 @@ scenario:
 | 8.2.7 | System shall forecast attendance by day of week. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.8 | System shall forecast attendance by month. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
 | 8.2.9 | System shall forecast attendance by season. | Unified Operations Dashboard | CONTRACTED | `getForecast` |
-| … 28 more | | | | `traceability.json` |
+| … 27 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -2345,6 +2656,8 @@ accuracy:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -2464,15 +2777,12 @@ Method, path, parameters, request and response for every operation these screens
 
 ```json
 {
-"compareForecastScenarios": {"method":"POST","path":"/forecast-scenarios/compare","contract":"ai","summary":"Compare scenarios","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiScenarioComparison"},
 "configureAnomalyDetector": {"method":"PUT","path":"/anomaly-detectors/{detectorKey}","contract":"ai","summary":"Set up anomaly detection on a KPI","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AiAnomalyDetector","responds":"AiAnomalyDetector"},
 "configureForecastSignalSource": {"method":"PUT","path":"/forecast-signals/{signalKey}","contract":"ai","summary":"Set up a forecast signal","permission":"AI_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AiSignalSource","responds":"AiSignalSource"},
-"createForecastScenario": {"method":"POST","path":"/forecast-scenarios","contract":"ai","summary":"Run a what-if","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AiForecastScenario","responds":null},
 "explainMetricChange": {"method":"POST","path":"/insights/explain-metric-change","contract":"ai","summary":"Why did this metric change","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AiMetricChangeExplanation"},
 "exportForecastVersion": {"method":"POST","path":"/forecast-versions/{versionId}/exports","contract":"ai","summary":"Export a forecast version as a file","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "getForecast": {"method":"GET","path":"/forecasts","contract":"ai","summary":"Forecast values","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"definitionKey","in":"query","required":true},{"name":"versionId","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null},{"name":"dimensionKey","in":"query","required":null},{"name":"scenarioId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "getForecastAccuracy": {"method":"GET","path":"/forecast-accuracy","contract":"ai","summary":"Measured forecast accuracy","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"definitionKey","in":"query","required":true},{"name":"horizonDays","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listAiInsights": {"method":"GET","path":"/insights","contract":"ai","summary":"Insights and anomalies","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"priority","in":"query","required":null},{"name":"from","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listForecastDefinitions": {"method":"GET","path":"/forecast-definitions","contract":"ai","summary":"What is forecast","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"subject","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listForecastSignals": {"method":"GET","path":"/forecast-signals","contract":"ai","summary":"Forecast signals and their freshness","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"kind","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listForecastVersions": {"method":"GET","path":"/forecast-versions","contract":"ai","summary":"Forecast versions","permission":"AI_USE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"definitionKey","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -2493,23 +2803,19 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 {
 "AiAnomalyDetector": {"type":"object","x-ticvai-persistence":"ai.anomaly_detector","description":"**An anomaly detector on one KPI** (C9, AIP-080..095). Configured thresholds on day one; a seasonal robust baseline (median/MAD) and peer comparison across venues as history builds. Detects **aggregate** deviations; actor-level patterns belong to risk, and both share one correlation key (AIP-090).","required":["detectorKey","method"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"detectorKey":{"type":"string"},"source":{"type":"string","enum":["metric","forecast","deviceHealth"],"default":"metric","description":"What is watched (29 September, build): a semantic-layer KPI, a published forecast (8.2.20, 8.2.41), or device status events (8.9.9)."},"metricKey":{"type":"string","nullable":true,"description":"A metric of the semantic layer (Reporting KPI). Required where `source` is `metric`."},"forecastSource":{"type":"object","nullable":true,"description":"Required where `source` is `forecast`; `method` is then `threshold`.","required":["definitionKey","comparator","threshold"],"properties":{"definitionKey":{"type":"string"},"dimensionKey":{"type":"string","nullable":true},"percentile":{"type":"string","enum":["p10","p50","p90"],"default":"p50"},"comparator":{"type":"string","enum":["above","atOrAbove","below","atOrBelow"]},"threshold":{"type":"number"},"thresholdKind":{"type":"string","enum":["absolute","percentOfCapacity"],"default":"absolute","description":"`percentOfCapacity` compares with the period's capacity (occupancy, 8.2.41)."},"horizonDays":{"type":"integer","minimum":1,"maximum":365,"nullable":true,"description":"Only points this many days ahead are compared. Null means the whole horizon."}}},"deviceHealthSource":{"type":"object","nullable":true,"description":"Required where `source` is `deviceHealth`.","properties":{"deviceKinds":{"type":"array","items":{"type":"string"},"description":"DeviceKind values; empty means every kind."},"failureRatePercent":{"type":"number","minimum":0,"maximum":100},"windowMinutes":{"type":"integer","minimum":5,"maximum":1440,"default":60}}},"method":{"type":"string","enum":["threshold","seasonalRobustZ","peerComparison","model"]},"thresholds":{"type":"object","additionalProperties":true,"nullable":true},"sensitivity":{"type":"string","enum":["low","medium","high"],"default":"medium"},"dimensions":{"type":"array","items":{"type":"string"}},"cadence":{"type":"string","enum":["hourly","daily"]},"isActive":{"type":"boolean","default":true},"falseAlarmRate":{"type":"number","nullable":true,"readOnly":true,"description":"Share of its insights rejected over 90 days. The number that decides whether a model is worth it."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiEvidenceItem": {"type":"object","x-ticvai-persistence":"none — held in jsonb on ai.decision_record.evidence, through AiEvidenceItemList","description":"One piece of evidence behind a decision, **labelled by origin** (AIC-197): read from a source system, derived by a rule or feature, or inferred by a model. An explanation is built from these, never from a model's chain of thought (AIC-192).","required":["label","kind"],"properties":{"label":{"type":"string","enum":["source","derived","modelInferred"]},"kind":{"type":"string","description":"What it is: `feature`, `rule`, `document`, `metric`, `transaction`, `candidateSet`."},"ref":{"type":"string","nullable":true,"description":"Where it came from: a table and id, a document chunk, a metric key."},"name":{"type":"string"},"value":{"type":"object","additionalProperties":true,"nullable":true},"observedAt":{"type":"string","format":"date-time","nullable":true}}},
-"AiEvidenceItemList": {"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"The evidence of one decision record, stored with it.","items":{"$ref":"#/components/schemas/AiEvidenceItem"}},
 "AiForecastAccuracy": {"type":"object","x-ticvai-persistence":"ai.forecast_accuracy","description":"**Measured accuracy by horizon** (AIP-044, ADM-508), labelled measured: WAPE, bias and interval coverage against the baseline rule. These are the numbers the promotion gate reads (design 3.5).","required":["definitionId","horizonDays","periodStart"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"definitionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_definition"},"versionId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.forecast_version"},"producerRef":{"type":"string"},"horizonDays":{"type":"integer","minimum":0},"periodStart":{"type":"string","format":"date-time"},"periodEnd":{"type":"string","format":"date-time"},"wape":{"type":"number","nullable":true},"bias":{"type":"number","nullable":true},"intervalCoverage":{"type":"number","minimum":0,"maximum":1,"nullable":true,"description":"Share of actuals inside the 10th-90th percentile band."},"baselineWape":{"type":"number","nullable":true},"measuredAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiForecastDefinition": {"type":"object","x-ticvai-persistence":"ai.forecast_definition","description":"**What is forecast, at what grain, for what horizon, how often and by which producer** (design 3.1 Forecast, 5.2; ADM-500). One forecasting service for the platform: BI's extra subjects are definitions here, not a second forecaster (AIP-036, AIP-037).","required":["definitionKey","subject","grain","horizonDays","producer"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"definitionKey":{"type":"string"},"name":{"type":"string"},"subject":{"type":"string","enum":["attendance","arrivalPattern","productDemand","timeslotDemand","channelPace","revenue","occupancy","attractionUtilisation","queue","entryFlow","staffing","posDemand","fnbDemand","retailDemand","stockDemand","resourceDemand","refunds","cashCollection","membershipRenewals","churn"]},"module":{"allOf":[{"$ref":"#/components/schemas/common::ModuleKey"}],"description":"**Whose AI this forecast is, and so who publishes it** (Chinmay, 2 October, workbook Q3: \"the permission holder for that module's AI\"; CHG-FUP-004). `publishForecastVersion` requires the permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this module. Absent on a write, the server takes it from `subject`: ticketing for `attendance`, `arrivalPattern`, `productDemand`, `timeslotDemand`, `channelPace`, `occupancy` and `refunds`; access for `entryFlow` and `attractionUtilisation`; queue for `queue`; fnb for `fnbDemand`; retail for `retailDemand`; inventory for `stockDemand`; resources for `resourceDemand`; membership for `membershipRenewals` and `churn`; core for `revenue`, `staffing`, `posDemand` and `cashCollection`. Proposed, client to correct; a venue may name the module itself. Always present on a read."},"grain":{"type":"string","enum":["hour","day","week","month"]},"dimensions":{"type":"array","items":{"type":"string"},"description":"Breakdowns forecast directly or reconciled to. **Documented keys (29 September, build; 8.2.12, 8.2.14, 8.2.27):** `product`, `channel`, `timeslot`, `gate`, `outlet`, `customerSegment` and `originCountry`. `customerSegment` is the marketing-crm segment (of those in `segmentIds`, else the membership tier) the guest belonged to on the day of the booking; `originCountry` is the guest profile's country, else the order's billing country, else the channel's market, recorded as `unknown` rather than guessed. **The nightly snapshot (design 2.2 C step 1) carries both for every booking and admission**, so a definition that names them is forecast and reconciled by them. Any other key is accepted and forecast only where the snapshot carries it."},"segmentIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"The marketing-crm segments `customerSegment` breaks down by, in priority order where a guest is in several. Empty means membership tiers."},"horizonDays":{"type":"integer","minimum":1,"maximum":730},"refreshCadence":{"type":"string","enum":["hourly","daily","weekly"]},"producer":{"type":"string","enum":["rule","statistical","model","ensemble"],"description":"Which producer is live (design 3.10). A model is promoted only through `promoteAiRelease`. **`ensemble`** (18 September minutes, M18-16): a weighted blend of the rule and statistical producers, and of a promoted model where one exists; the weights are recorded on each version. Setting `ensemble` never brings in an unpromoted model."},"historyWindowMonths":{"type":"integer","minimum":1,"maximum":60,"default":36,"description":"How much of the venue's own history the statistical producer reads (18 September minutes, M18-16: \"36 months of history\"). Imported history (`importVenueHistory`) counts. Less than the window is not an error: the cold-start setting fills the gap."},"coldStart":{"type":"object","description":"**What the forecast stands on before the venue has history** (29 September, AI functions review; forecasting book p.27 \"New Venue / New Product Problem\"). Day one is never empty: the prior is the venue AI settings (typical weekday and weekend attendance, capacity, opening hours) x the starting pattern for the venue type x the UAE calendar x weather, with bookings on hand as a floor. The statistical producer blends own data in as `(k x prior + n x own) / (k + n)`, with `k` = `priorWeightObservations`. The version's `maturity` says which stage it reached.","properties":{"strategy":{"type":"string","enum":["venueSettings","startingPattern","sisterVenue","categoryBaseline","importedHistory"],"default":"venueSettings","description":"`venueSettings` uses the onboarding figures with the venue-type pattern; `sisterVenue` a venue of the same tenant; `categoryBaseline` a product category's own history; `importedHistory` means an import covers the window and the prior only fills unseen holidays."},"sisterVenueId":{"type":"string","format":"uuid","nullable":true,"description":"For `sisterVenue`. Same tenant only (no data is pooled across tenants, AIP-149)."},"priorWeightObservations":{"type":"integer","minimum":1,"maximum":52,"default":4,"description":"`k`: how many own observations the prior is worth (4 same weekdays by default)."},"startingBandPercent":{"type":"integer","minimum":5,"maximum":80,"default":40,"description":"The width of the range while the prior carries most of the weight (about +/-40%)."}}},"producerRef":{"type":"string","readOnly":true},"shadowProducerRef":{"type":"string","nullable":true,"readOnly":true,"description":"Runs alongside and is recorded, never shown (design 3.5)."},"autoPublish":{"type":"boolean","default":false,"description":"Publish without approval when the quality gates pass (autonomy L4, design 3.8). Otherwise an `AI_APPROVE` holder publishes."},"qualityGates":{"type":"object","additionalProperties":true,"nullable":true,"description":"Completeness, blocking signals and accuracy-regression thresholds a version must pass to publish."},"signalKeys":{"type":"array","items":{"type":"string"},"description":"Signal sources this definition may use (ADM-501)."},"isActive":{"type":"boolean","default":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiForecastPoint": {"type":"object","x-ticvai-persistence":"ai.forecast_point","description":"One forecast value with its interval: 10th, 50th and 90th percentile (design 5.6: a range, never a bare percentage). Partitioned by target month. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.","required":["versionId","targetStart","p50"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"versionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_version"},"scenarioId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.forecast_scenario","description":"Set where the point belongs to a what-if scenario rather than the version itself."},"targetStart":{"type":"string","format":"date-time"},"targetEnd":{"type":"string","format":"date-time"},"dimensionKey":{"type":"string","nullable":true,"description":"Canonical key of the breakdown, e.g. `product=…;channel=web`."},"p10":{"type":"number","nullable":true},"p50":{"type":"number"},"p90":{"type":"number","nullable":true},"unit":{"type":"string"},"drivers":{"type":"object","additionalProperties":true,"nullable":true,"description":"Component decomposition or SHAP contributions, largest first (ADM-506)."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
-"AiForecastScenario": {"type":"object","x-ticvai-persistence":"ai.forecast_scenario","description":"**A what-if against a published version** (ADM-507, ADM-517, BO-931). Changes nothing in production; its points are written with `scenarioId`.","required":["baseVersionId","changes"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"name":{"type":"string"},"baseVersionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_version"},"changes":{"type":"array","items":{"type":"object","required":["lever"],"properties":{"lever":{"type":"string","enum":["price","capacity","openingHours","weather","event","marketing","staffing","closure"]},"target":{"type":"string","nullable":true},"value":{"type":"object","additionalProperties":true,"nullable":true}}},"minItems":1},"status":{"type":"string","enum":["computing","ready","failed"],"readOnly":true},"result":{"type":"object","additionalProperties":true,"nullable":true,"readOnly":true,"description":"Deltas against the base version by subject and period."},"createdByPrincipalId":{"type":"string","format":"uuid","readOnly":true,"x-ticvai-references":"identity.principal"},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiForecastVersion": {"type":"object","x-ticvai-persistence":"ai.forecast_version","description":"**An immutable forecast version** (AIP-032): producer, model version, data cut-off, horizon and status. Nothing is overwritten; yesterday's actuals are scored against every earlier version.","required":["definitionId","versionNumber","status","basis"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"definitionId":{"type":"string","format":"uuid","x-ticvai-references":"ai.forecast_definition"},"versionNumber":{"type":"integer","minimum":1},"module":{"allOf":[{"$ref":"#/components/schemas/common::ModuleKey"}],"readOnly":true,"description":"The module of the version's definition (`AiForecastDefinition.module`), copied when the version is produced; the module whose AI publish permission `publishForecastVersion` requires (CHG-FUP-004)."},"status":{"type":"string","enum":["running","draft","awaitingApproval","published","superseded","rejected","failed"],"readOnly":true},"basis":{"$ref":"#/components/schemas/SuggestionBasis"},"maturity":{"$ref":"#/components/schemas/AiMaturity"},"producerRef":{"type":"string"},"modelVersion":{"type":"string","nullable":true},"dataCutoffAt":{"type":"string","format":"date-time","description":"The analytical replica watermark the snapshot was taken at."},"horizonStart":{"type":"string","format":"date-time"},"horizonEnd":{"type":"string","format":"date-time"},"qualityChecks":{"type":"object","additionalProperties":true,"readOnly":true,"description":"Each gate and whether it passed."},"publishedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal","description":"Null where the definition auto-published."},"publishedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"decisionRecordId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
-"AiInsight": {"type":"object","x-ticvai-persistence":"ai.insight","description":"**An insight with a lifecycle** (AIP-181): new, reviewed, accepted or rejected, actioned, measured. Anomalies, forecast deviations, trends and opportunities land here; the narrative binds numbers to results, so a figure can only come from a query (design 8, 5.10).","required":["kind","title","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["anomaly","forecastDeviation","trend","opportunity","executiveSummary","rootCause","forecastThreshold","marketingRecommendation"]},"detectorId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.anomaly_detector"},"metricKey":{"type":"string","nullable":true},"subjectKind":{"type":"string","nullable":true,"enum":["campaign","journey","forecastDefinition","venue"],"description":"What the insight is about where it is not a KPI (29 September, build): a marketing-crm campaign or journey for `marketingRecommendation`, a forecast definition for `forecastThreshold`."},"subjectRef":{"type":"string","nullable":true},"recommendedAction":{"type":"object","additionalProperties":true,"nullable":true,"description":"For `marketingRecommendation`: `{recommendation, parameters}` as `AiMarketingRecommendation`. Applied by a person in the owning module, never here."},"expectedImpact":{"type":"object","additionalProperties":true,"nullable":true,"description":"A range on a named metric (`metric`, `low`, `high`), never a single number (design 5.6)."},"title":{"type":"string"},"narrative":{"type":"string","nullable":true},"evidence":{"$ref":"#/components/schemas/AiEvidenceItemList"},"magnitude":{"type":"number","nullable":true},"priority":{"type":"string","enum":["low","medium","high","critical"]},"correlationKey":{"type":"string","nullable":true},"status":{"type":"string","enum":["new","reviewed","accepted","rejected","actioned","measured"],"readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"actionRef":{"type":"string","nullable":true},"measuredImpact":{"type":"object","additionalProperties":true,"nullable":true,"readOnly":true},"decisionRecordId":{"type":"string","format":"uuid","nullable":true,"readOnly":true},"detectedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiMaturity": {"type":"object","x-ticvai-persistence":"none — embedded as jsonb on ai.suggestion and ai.forecast_version","description":"**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.","required":["stage","basedOn"],"properties":{"stage":{"type":"string","enum":["starting","learning","established","learned"],"description":"`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."},"basedOn":{"type":"string","description":"The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."},"sources":{"type":"array","items":{"type":"object","required":["source"],"properties":{"source":{"type":"string","enum":["venueSettings","startingPattern","calendar","weather","bookingsOnHand","ownHistory","importedHistory","configuration","trainedModel"]},"detail":{"type":"string","nullable":true,"description":"e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."},"observations":{"type":"integer","nullable":true}}}},"ownDataShare":{"type":"number","minimum":0,"maximum":1,"description":"The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."},"limitedHistory":{"type":"boolean"},"nextStage":{"type":"object","nullable":true,"description":"What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.","properties":{"stage":{"type":"string","enum":["learning","established","learned"]},"needs":{"type":"string"},"expectedBy":{"type":"string","format":"date","nullable":true}}}}},
 "AiMetricChangeExplanation": {"type":"object","x-ticvai-persistence":"none — computed; written as an ai.insight of kind rootCause when kept","description":"**Why a metric changed** (AIP-176..180, ANL-056): drivers with their contribution, computed from the semantic layer. The narrative binds every figure to a result placeholder (design 8, 5.10).","required":["metricKey","change","drivers"],"properties":{"metricKey":{"type":"string"},"period":{"type":"string"},"comparison":{"type":"string"},"change":{"type":"number"},"changePercent":{"type":"number","nullable":true},"drivers":{"type":"array","items":{"type":"object","properties":{"dimension":{"type":"string"},"member":{"type":"string"},"contribution":{"type":"number"},"evidence":{"$ref":"#/components/schemas/AiEvidenceItem"}}}},"narrative":{"type":"string","nullable":true},"reliability":{"type":"string","enum":["grounded","partial","conflictingSources","insufficientEvidence"]},"dataAsOf":{"type":"string","format":"date-time"}}},
-"AiScenarioComparison": {"type":"object","x-ticvai-persistence":"none — computed from ai.forecast_point","description":"Scenarios side by side against their base version.","required":["scenarios"],"properties":{"scenarios":{"type":"array","items":{"$ref":"#/components/schemas/AiForecastScenario"}},"rows":{"type":"array","items":{"type":"object","properties":{"subject":{"type":"string"},"periodStart":{"type":"string","format":"date-time"},"base":{"type":"number"},"values":{"type":"object","additionalProperties":true,"description":"Scenario id to value."}}}}}},
 "AiSignalSource": {"type":"object","x-ticvai-persistence":"ai.signal_source","description":"**A forecast signal** (AIP-199..203, ADM-501): weather (a commercial API, decided 29 September), holidays, calendar, events. Freshness and coverage are recorded; **missing data is stored as unavailable, never defaulted** (AIP-203).","required":["signalKey","kind"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"signalKey":{"type":"string"},"kind":{"type":"string","enum":["weather","publicHoliday","schoolCalendar","religiousCalendar","event","marketing","internal"]},"provider":{"type":"string","nullable":true},"credentialRef":{"type":"string","nullable":true,"description":"A key-vault reference for a paid API, never the key."},"refreshCadence":{"type":"string","enum":["hourly","daily","weekly","manual"]},"coverage":{"type":"number","minimum":0,"maximum":1,"readOnly":true},"freshAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"isActive":{"type":"boolean","default":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Permission": {"type":"string","enum":["SESSION_FORCE_LOGOUT","USER_MANAGE","ROLE_MANAGE","PERMISSION_GRANT","PERMISSION_VIEW","PERMISSION_MANAGE","PLATFORM_TENANT_VIEW","PLATFORM_TENANT_MANAGE","PLATFORM_TENANT_TERMINATE","PLATFORM_PLAN_MANAGE","PLATFORM_CELL_VIEW","PLATFORM_CELL_MANAGE","PLATFORM_BILLING_VIEW","PLATFORM_AI_MANAGE","PLATFORM_BILLING_MANAGE","PLATFORM_RELEASE_VIEW","PLATFORM_RELEASE_MANAGE","PLATFORM_RELEASE_PROMOTE","PLATFORM_MIGRATION_VIEW","PLATFORM_MIGRATION_APPLY","PLATFORM_TENANT_ACCESS","TENANT_CONFIGURE","TENANT_VIEW","TENANT_PUBLISH","SCOPE_VIEW","SCOPE_MANAGE","REGION_CONFIGURE","WORKSTATION_CONFIGURE","PRODUCT_VIEW","PRODUCT_CONFIGURE","PRODUCT_APPROVE","PRODUCT_PUBLISH","PRICE_VIEW","PRICE_CONFIGURE","EVENT_CONFIGURE","PERFORMANCE_CONFIGURE","CAPACITY_CONFIGURE","ORDER_VIEW","ORDER_VIEW_OTHER","ORDER_CREATE","ORDER_MODIFY","ORDER_DISCOUNT","ORDER_CANCEL","ORDER_VOID","ORDER_REFUND","ORDER_REFUND_APPROVE","ORDER_REFUND_BULK","ORDER_EXCHANGE","ORDER_RESCHEDULE","ORDER_REPRINT","PRICE_OVERRIDE","DISCOUNT_APPLY","CREDIT_MANAGE","CREDIT_OVERRIDE","WALLET_VIEW","WALLET_OPERATE","WALLET_CONFIGURE","PAYMENT_VIEW","PAYMENT_CONFIGURE","PAYMENT_PROVIDER_MANAGE","PAYMENT_DISPUTE","SHIFT_OPEN","SHIFT_CLOSE","SHIFT_SUSPEND","SHIFT_CLOSE_OTHER","SHIFT_APPROVE_OPEN","SHIFT_APPROVE_CLOSE","SHIFT_REOPEN","CASH_LIFT","CASH_ADD","CASH_NO_SALE","DEPOSIT_BOX_MODIFY_OWN","DEPOSIT_BOX_MODIFY_OTHER","OVERSHORT_ACCEPT","ACCESS_VALIDATE","ACCESS_OVERRIDE","ACCESS_POINT_CONFIGURE","TURNSTILE_MODE_SET","TICKET_LOOKUP","ACCREDITATION_VIEW","ACCREDITATION_APPLY","ACCREDITATION_APPROVE","ACCREDITATION_ISSUE","ACCREDITATION_MANAGE","ACCREDITATION_CONFIGURE","REPORT_VIEW_OWN","REPORT_VIEW_WORKSTATION","REPORT_VIEW_VENUE","REPORT_VIEW_REGION","REPORT_VIEW_TENANT","REPORT_EXPORT","REPORT_EXPORT_PII","REPORT_MANAGE","REPORT_SCHEDULE","LEDGER_VIEW","LEDGER_POST","LEDGER_APPROVE","TAX_CONFIGURE","ACCOUNT_CONFIGURE","SETTLEMENT_VIEW","SETTLEMENT_RECONCILE","GUEST_VIEW","GUEST_VIEW_PII","GUEST_MANAGE","VENUE_MAP_VIEW","VENUE_MAP_MANAGE","VENUE_MAP_PUBLISH","RESOURCE_VIEW","RESOURCE_BOOK","RESOURCE_MANAGE","RESOURCE_CONFIGURE","RENTAL_VIEW","RENTAL_BOOK","RENTAL_OPERATE","RENTAL_MANAGE","RENTAL_CONFIGURE","RENTAL_PRICE","RENTAL_APPROVE","RENTAL_OVERRIDE","DEVELOPER_VIEW","DEVELOPER_MANAGE","DEVELOPER_ADMIN","LOYALTY_ACCRUE","LOYALTY_REDEEM","LOYALTY_ADJUST","MARKETING_VIEW","MARKETING_MANAGE","MARKETING_SEND","CASE_VIEW","CASE_MANAGE","ASSET_LIBRARY_VIEW","ASSET_LIBRARY_MANAGE","ASSET_LIBRARY_APPROVE","ASSET_LIBRARY_SHARE","QUEUE_VIEW","QUEUE_MANAGE","QUEUE_REDEEM","QUEUE_OVERRIDE","TRANSPORT_VIEW","TRANSPORT_MANAGE","TRANSPORT_PRICE","ASSET_VIEW","ASSET_MANAGE","WORK_ORDER_VIEW","WORK_ORDER_MANAGE","WORK_ORDER_VERIFY","INSPECTION_VIEW","INSPECTION_SUBMIT","INSPECTION_MANAGE","INCIDENT_REPORT","INCIDENT_VIEW","INCIDENT_MANAGE","KIOSK_ATTEND","DEVICE_VIEW","DEVICE_CONFIGURE","DEVICE_MANAGE","APPROVAL_ACT","APPROVAL_DELEGATE","AI_USE","AI_CONFIGURE","AI_APPROVE","AI_AUDIT_VIEW","RISK_REVIEW","RISK_INVESTIGATE","AUDIT_VIEW","APPROVAL_VIEW","APPROVAL_REQUEST","APPROVAL_DECIDE","APPROVAL_CONFIGURE","MAINTENANCE_EXECUTE","MAINTENANCE_APPROVE","WORKFORCE_VIEW","WORKFORCE_MANAGE","ATTENDANCE_RECORD","ANNOUNCEMENT_PUBLISH","ANNOUNCEMENT_EMERGENCY","PARTNER_VIEW","PARTNER_MANAGE","PARKING_CONFIGURE","PAYMENT_VOID","PROCUREMENT_VIEW","PROCUREMENT_REQUEST","PROCUREMENT_MANAGE","PROCUREMENT_RECEIVE","CORE_AI_PUBLISH","TICKETING_AI_PUBLISH","ACCESS_AI_PUBLISH","FNB_AI_PUBLISH","RETAIL_AI_PUBLISH","INVENTORY_AI_PUBLISH","SEATING_AI_PUBLISH","MEMBERSHIP_AI_PUBLISH","MARKETING_AI_PUBLISH","RESOURCES_AI_PUBLISH","QUEUE_AI_PUBLISH","TRANSPORT_AI_PUBLISH","GAMES_AI_PUBLISH","MAINTENANCE_AI_PUBLISH","ACCREDITATION_AI_PUBLISH","PARTNER_AI_PUBLISH","ANALYTICS_AI_PUBLISH","BIOMETRIC_IMAGE_VIEW","ACCESS_DIRECTION_SET","REPORT_GOVERNANCE_MANAGE"]},
-"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
+"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"x-ticvai-references":"identity.principal","type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
 "SuggestionBasis": {"type":"string","description":"**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n","enum":["heuristic","statistical","model","hybrid","manual"]},
 "SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
-"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "TenantStatus": {"type":"string","enum":["onboarding","active","suspended","terminating","terminated"]}
 }
 ```

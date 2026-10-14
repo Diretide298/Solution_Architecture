@@ -1,6 +1,6 @@
 # WS122 — AI Governance board 2
 
-**10 screens · 29 operations · 39 schemas · 10 permissions**
+**10 screens · 25 operations · 32 schemas · 10 permissions**
 
 Platform P09 TICVAI Web · ships as **ticvai-control** ·
 platformAdmin audience · web ·
@@ -119,11 +119,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-529` | AI Human Oversight Command Center | D | 8 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-529` | AI Human Oversight Command Center | D | 8 | 186 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-530` | AI Approval Requirement & Routing Configuration | D | 42 | 26 | 7 | 56 | 1 | 3 | — | notStarted (—) |
-| `ADM-531` | AI Approval Review Workspace | D | 8 | 6 | 7 | 2 | 2 | 3 | — | notStarted (—) |
-| `ADM-532` | Conditional Approval & Approval Conditions | D | 6 | 66 | 7 | 8 | 2 | 3 | — | notStarted (—) |
-| `ADM-533` | Human Review, Challenge & AI Clarification Workspace | D | 6 | 22 | 7 | 12 | 1 | 0 | — | notStarted (—) |
+| `ADM-531` | AI Approval Review Workspace | D | 8 | 6 | 7 | 1 | 2 | 3 | — | notStarted (—) |
+| `ADM-532` | Conditional Approval & Approval Conditions | D | 8 | 66 | 7 | 8 | 2 | 3 | — | notStarted (—) |
+| `ADM-533` | Human Review, Challenge & AI Clarification Workspace | D | 6 | 22 | 7 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-534` | Escalation, Delegation & Approval SLA Management | B | 34 | 56 | 7 | 5 | 2 | 3 | — | notStarted (—) |
 | `ADM-535` | Live AI Execution Oversight & Human Intervention | D | 11 | 26 | 7 | 1 | 3 | 0 | — | notStarted (—) |
 | `ADM-536` | Human Override & Manual Control Center | D | 12 | 38 | 7 | 5 | 1 | 0 | — | notStarted (—) |

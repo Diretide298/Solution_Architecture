@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "2",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-rule-command-center-adm-058",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingRuleCommandCenter.tsx",
+   "component": "src/routes/commercial/PricingRuleCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -104,6 +105,7 @@
   "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "Administrators can identify, search, and manage all contextual pricing rules from one workspace.",
+  "division": "Shares `listPricingRule`, `listPricingRulePriority`, `testPricingRule` with ADM-067; this screen is Pricing Rule Command Center (pack Pricing___Revenue_Management_Reference.pdf, board 2.10.2.1, page 23): provide administrators with a centralized workspace for all pricing eligibility and contextual pricing rules.",
   "pattern": "commandCentre",
   "patternReason": "the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each rule should show) — counts over a population, then the population",
   "purpose": "Provide administrators with a centralized workspace for all pricing eligibility and contextual pricing rules.",
@@ -118,7 +120,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -376,6 +378,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "2",
@@ -385,7 +388,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/customer-segment-profile-pricing-rules-adm-059",
-   "component": "apps/venue-management-web/src/routes/commercial/CustomerSegmentProfilePricingRules.tsx",
+   "component": "src/routes/commercial/CustomerSegmentProfilePricingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -568,6 +571,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "2",
@@ -577,7 +581,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/membership-loyalty-pricing-rules-adm-060",
-   "component": "apps/venue-management-web/src/routes/commercial/MembershipLoyaltyPricingRules.tsx",
+   "component": "src/routes/commercial/MembershipLoyaltyPricingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -736,6 +740,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "2",
@@ -745,7 +750,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/residency-nationality-market-pricing-rules-adm-061",
-   "component": "apps/venue-management-web/src/routes/commercial/ResidencyNationalityMarketPricingRules.tsx",
+   "component": "src/routes/commercial/ResidencyNationalityMarketPricingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -908,6 +913,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "2",
@@ -917,7 +923,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/channel-based-pricing-rules-adm-062",
-   "component": "apps/venue-management-web/src/routes/commercial/ChannelBasedPricingRules.tsx",
+   "component": "src/routes/commercial/ChannelBasedPricingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1030,6 +1036,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "2",
@@ -1039,7 +1046,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/location-venue-event-pricing-rules-adm-063",
-   "component": "apps/venue-management-web/src/routes/commercial/LocationVenueEventPricingRules.tsx",
+   "component": "src/routes/commercial/LocationVenueEventPricingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1213,6 +1220,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "2",
@@ -1222,7 +1230,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/quantity-group-volume-pricing-rules-adm-064",
-   "component": "apps/venue-management-web/src/routes/commercial/QuantityGroupVolumePricingRules.tsx",
+   "component": "src/routes/commercial/QuantityGroupVolumePricingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1354,6 +1362,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "2",
@@ -1363,7 +1372,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/effective-date-season-day-based-pricing-rules-adm-065",
-   "component": "apps/venue-management-web/src/routes/commercial/EffectiveDateSeasonDayBasedPricingRules.tsx",
+   "component": "src/routes/commercial/EffectiveDateSeasonDayBasedPricingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1501,6 +1510,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "2",
@@ -1510,7 +1520,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/timeslot-performance-time-of-day-pricing-rules-adm-066",
-   "component": "apps/venue-management-web/src/routes/commercial/TimeslotPerformanceTimeOfDayPricingRules.tsx",
+   "component": "src/routes/commercial/TimeslotPerformanceTimeOfDayPricingRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1640,6 +1650,7 @@
   "module": "Commercial",
   "requiresModule": "ticketing",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "2",
@@ -1649,7 +1660,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/pricing-rule-priority-conflict-resolution-testing-adm-067",
-   "component": "apps/venue-management-web/src/routes/commercial/PricingRulePriorityConflictResolutionTesting.tsx",
+   "component": "src/routes/commercial/PricingRulePriorityConflictResolutionTesting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1675,6 +1686,7 @@
   "notes": "**Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: \"they are venue screens\"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.",
   "density": "compact",
   "purposeNote": "For any commercial transaction, TICVAI can deterministically resolve and explain exactly why a specific rate was selected. Board 2 — Final Screen Register",
+  "division": "Shares `listPricingRule`, `listPricingRulePriority`, `testPricingRule` with ADM-058; this screen is Pricing Rule Priority, Conflict Resolution & Testing (pack Pricing___Revenue_Management_Reference.pdf, board 2.10.2.10, page 34): define how TICVAI decides the final applicable rate when multiple pricing rules match. This is the critical control screen for Board 2. Board 1 established what commercial prices exist. Board 2 determines which commercial rate applies to a transaction.",
   "pattern": "listDetail",
   "patternReason": "the pack gives this screen a display directory (§Identify; Show) and no metric row",
   "purpose": "Define how TICVAI decides the final applicable rate when multiple pricing rules match. This is the critical control screen for Board 2. Board 1 established what commercial prices exist. Board 2 determines which commercial rate applies to a transaction.",

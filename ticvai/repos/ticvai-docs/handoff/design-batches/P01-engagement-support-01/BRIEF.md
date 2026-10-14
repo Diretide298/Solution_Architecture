@@ -1,6 +1,6 @@
 # P01-engagement-support-01 — P01 · Engagement & Support
 
-**6 screens · 26 operations · 66 schemas · 4 permissions**
+**6 screens · 25 operations · 53 schemas · 4 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·

@@ -5,6 +5,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "3",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/availability-command-center-bo-514",
-   "component": "apps/venue-management-web/src/routes/rentals/AvailabilityCommandCenter.tsx",
+   "component": "src/routes/rentals/AvailabilityCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -110,7 +111,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -245,6 +246,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_CONFIGURE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "3",
@@ -254,7 +256,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/availability-rule-configuration-bo-515",
-   "component": "apps/venue-management-web/src/routes/rentals/AvailabilityRuleConfiguration.tsx",
+   "component": "src/routes/rentals/AvailabilityRuleConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -400,6 +402,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_CONFIGURE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "3",
@@ -409,7 +412,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/operating-hours-rental-windows-bo-516",
-   "component": "apps/venue-management-web/src/routes/rentals/OperatingHoursRentalWindows.tsx",
+   "component": "src/routes/rentals/OperatingHoursRentalWindows.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -530,6 +533,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_CONFIGURE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "3",
@@ -539,7 +543,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/timeslot-duration-availability-setup-bo-517",
-   "component": "apps/venue-management-web/src/routes/rentals/TimeslotDurationAvailabilitySetup.tsx",
+   "component": "src/routes/rentals/TimeslotDurationAvailabilitySetup.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -678,6 +682,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "PRICE_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "3",
@@ -687,7 +692,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/real-time-availability-calendar-bo-518",
-   "component": "apps/venue-management-web/src/routes/rentals/RealTimeAvailabilityCalendar.tsx",
+   "component": "src/routes/rentals/RealTimeAvailabilityCalendar.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -802,6 +807,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RESOURCE_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "3",
@@ -811,7 +817,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/resource-equipment-calendar-bo-519",
-   "component": "apps/venue-management-web/src/routes/rentals/ResourceEquipmentCalendar.tsx",
+   "component": "src/routes/rentals/ResourceEquipmentCalendar.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -992,6 +998,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "3",
@@ -1001,7 +1008,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/blackout-closure-capacity-blocking-bo-520",
-   "component": "apps/venue-management-web/src/routes/rentals/BlackoutClosureCapacityBlocking.tsx",
+   "component": "src/routes/rentals/BlackoutClosureCapacityBlocking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1139,6 +1146,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "3",
@@ -1148,7 +1156,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/overlap-conflict-engine-bo-521",
-   "component": "apps/venue-management-web/src/routes/rentals/OverlapConflictEngine.tsx",
+   "component": "src/routes/rentals/OverlapConflictEngine.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1223,7 +1231,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -1369,6 +1377,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_CONFIGURE",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "3",
@@ -1378,7 +1387,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/inventory-holds-buffers-release-rules-bo-522",
-   "component": "apps/venue-management-web/src/routes/rentals/InventoryHoldsBuffersReleaseRules.tsx",
+   "component": "src/routes/rentals/InventoryHoldsBuffersReleaseRules.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1499,6 +1508,7 @@
   "module": "Rentals",
   "requiresModule": "resources",
   "wave": 3,
+  "permission": "RENTAL_VIEW",
   "source": {
    "pack": "Rental_Management.pdf",
    "board": "3",
@@ -1508,7 +1518,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/rentals/availability-intelligence-ai-forecasting-bo-523",
-   "component": "apps/venue-management-web/src/routes/rentals/AvailabilityIntelligenceAiForecasting.tsx",
+   "component": "src/routes/rentals/AvailabilityIntelligenceAiForecasting.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1583,7 +1593,8 @@
         "Expected Late Returns"
        ],
        "notes": "The pack groups this record's detail under its own headings: “North Station”, “Important Availability Formula”, “Allocated Physical Inventory”.",
-       "provenance": "pack Rental_Management.pdf, page 34 §Display"
+       "provenance": "pack Rental_Management.pdf, page 34 §Display",
+       "operation": "getRentalAvailability"
       }
      ]
     }

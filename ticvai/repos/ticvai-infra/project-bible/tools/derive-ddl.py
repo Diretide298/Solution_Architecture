@@ -302,6 +302,28 @@ ROW_OWNER = {
     # (subject policy, as at r1); `provider_id` names who issued it and must not make it the provider's row.
     "venuemap.placed_resource": "map_id",         # CHG-DDL-004
     "payments.token": "subject_id",               # CHG-DDL-004: no protected owner, so the subject rule applies
+    # CHG-MOD-007 (MOD audit, 14 October 2026): giving fnb.dining_table a scope_path gave a table visit and a table
+    # session a second protected owner (`table_id`). They stay the outlet's, as at r1: the table names where the
+    # party sits, the outlet owns the service.
+    "fnb.table_visit": "outlet_id",               # CHG-MOD-007
+    "fnb.table_session": "outlet_id",             # CHG-MOD-007
+    # CHG-STO-001 (Block A storage audit, 14 October 2026): declaring every NOT NULL key (SP-KEY-UNDECLARED) gave these
+    # a second protected candidate, and the rule picked the one protected first, which is not the row's owner: a line,
+    # a cell, a point or an option is its parent's (the table it is the rows of); the other key names what it is about.
+    "access.entry_rule_point": "admission_rules_id",          # a rule's points; the access point is where
+    "assets.media_collection_member": "collection_id",        # a collection's member rows; the asset is what is in it
+    "fnb.menu_item": "menu_section_id",                       # CHG-STO-004: the section's item; the variant is reported as
+    "fnb.menu_item_modifier": "item_id",                      # a menu item's attachment of a (tenant) modifier group
+    "fnb.substitution_rule": "recipe_id",                     # a recipe's rule; the ingredients are what it swaps
+    "fnb.sub_bill": "bill_split_id",                          # a split's sub-bill, as at r1; the visit is what it bills
+    "marketing.wishlist_item": "subject_id",                  # the guest's own row, as at r1 (the subject rule applies)
+    "orders.group_ticket_allocation_line": "group_ticket_allocation_id",   # the allocation's line; the product sold
+    "orders.membership_renewal": "customer_membership_id",    # the membership renewed; the template it renews to
+    "orders.upgrade": "order_id",                             # the order upgraded, as at r1; the line it replaced
+    "promotions.bundle_choice_option": "bundle_choice_group_id",   # the group's option, as at r1; the variant offered
+    "transport.departure": "timetable_id",                    # the timetable's departure; route and performance named
+    "transport.fare_matrix_cell": "fare_table_id",            # the fare table's cell; the stations are its axes
+    "transport.route_stop": "route_id",                       # the route's stop, as at r1; the station is where
 }
 
 # --- the machinery layer, folded in from V0001__baseline.sql on 21 September -------------------
@@ -650,6 +672,20 @@ SPLIT_CHILDREN = {
     "identity.role_permission": "role_id",   # CHG-GEN-005 (CR-076)
 }
 
+# **The same marks for a table no contract schema describes** (MOD audit, 14 October 2026, CHG-MOD-007). `pii.subject`
+# and `pii.subject_contact` are storage-only (Identity's PII store), and two tables are derived from an array or a
+# relationship rather than a schema of their own, so `x-ticvai-rls` has nowhere to be written. Every one is read by
+# staff operations below the tenant (check-rls-scope-fit RF-TENANT-ROOT): a venue's guest lookup read no guest at all.
+TABLE_RLS = {
+    "pii.subject": "grant-holder-read",
+    "pii.subject_contact": "grant-holder-read",
+    "fnb.delivery_location_outlet": "grant-holder-read",
+    "whitelabel.homepage_section": "grant-holder-read",
+    # The balances closeFiscalPeriod (region) reads through Wallet's periodCloseChecks (CHG-FIN-012). Batch STO declares
+    # wallet_id, after which the table follows wallet.wallet (opened the same way) and this line is moot.
+    "wallet.balance": "grant-holder-read",
+}
+
 RLS_SPLIT = """
 -- **Read beneath the owner, read by any grant holder** (CHG-GEN-005): SELECT opened, writes unchanged.
 -- A staff connection holding a grant: scope paths set and no guest subject (a guest's session names its
@@ -715,6 +751,19 @@ CREATE OR REPLACE FUNCTION platform.apply_grant_holder_read_rls(target regclass,
 AS $$
 BEGIN
     PERFORM platform.apply_split_rls(target, 'platform.grant_holder()', write_check);
+END
+$$;
+
+-- `x-ticvai-rls: grant-holder-read` on a table owned by subject (CHG-MOD-007): any staff grant reads and the guest
+-- still reads its own rows; written only by that guest or the tenant root, as apply_subject_rls writes.
+CREATE OR REPLACE FUNCTION platform.apply_grant_holder_subject_read_rls(target regclass)
+    RETURNS void
+    LANGUAGE plpgsql
+AS $$
+BEGIN
+    PERFORM platform.apply_split_rls(target,
+        'platform.grant_holder() OR platform.subject_in_scope(subject_id)',
+        'platform.subject_in_scope(subject_id)');
 END
 $$;
 
@@ -2129,7 +2178,7 @@ def main() -> int:
     split_depth: dict = {}
     parent_of = {p[0]: p for p in by_parent}
     for t in sorted(real):
-        mark = (marks.get(t) or {}).get("rls")
+        mark = (marks.get(t) or {}).get("rls") or TABLE_RLS.get(t)
         if not mark:
             continue
         if mark not in RLS_MARKS:
@@ -2157,10 +2206,16 @@ def main() -> int:
                       "use grant-holder-read, or give the schema a scopePath. The base rule stands")
                 continue
             call = f"SELECT platform.apply_read_beneath_rls('{tq(t)}'::regclass);"
+        elif base == "subject":
+            # **A guest still reads its own rows** (MOD audit, 14 October 2026, CHG-MOD-007): opening a subject-owned
+            # table to staff grants must not close it to the guest it belongs to, which the grant-holder check
+            # alone would (it requires no guest subject on the session).
+            call = f"SELECT platform.apply_grant_holder_subject_read_rls('{tq(t)}'::regclass);"
         else:
             call = (f"SELECT platform.apply_grant_holder_read_rls('{tq(t)}'::regclass, "
                     f"{sql_literal(write.format(a=''))});")
-        split_calls[t] = (call, f"x-ticvai-rls: {mark}, written by {base} ({(marks.get(t) or {}).get('schema')})")
+        split_calls[t] = (call, f"x-ticvai-rls: {mark}, written by {base} "
+                                f"({(marks.get(t) or {}).get('schema') or 'TABLE_RLS'})")
         split_write[t] = write.format(a="{a}.")
         split_depth[t] = 0
     # A child the parent rule would not pick, because its split parent sits at the tenant root (SPLIT_CHILDREN).

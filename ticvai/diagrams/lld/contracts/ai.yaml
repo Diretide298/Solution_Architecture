@@ -2020,7 +2020,7 @@ operations:
   - cache:idempotency
 - operation: setAiProvider
   verb: PUT
-  path: /providers
+  path: /providers/{providerId}
   scope: region
   permission: AI_CONFIGURE
   audience:
@@ -2104,7 +2104,7 @@ operations:
   - cache:idempotency
 - operation: setIndexSource
   verb: PUT
-  path: /index-sources
+  path: /index-sources/{sourceId}
   scope: tenant
   permission: AI_CONFIGURE
   audience:

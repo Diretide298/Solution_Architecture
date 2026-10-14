@@ -77,7 +77,8 @@ def kind(ps: dict, by: dict, stem: str) -> str:
             return "enum"
         return "obj" if tgt.get("properties") or tgt.get("allOf") else (tgt.get("type") or "obj")
     if ps.get("enum"):
-        return "enum"
+        # an enum of numbers stored as a number (`x-ticvai-persistence-column: integer`, CHG-CRD-002) is an int
+        return "int" if ps.get("type") == "integer" and ps.get("x-ticvai-persistence-column") else "enum"
     t = ps.get("type")
     if isinstance(t, list):
         t = next((x for x in t if x != "null"), None)
@@ -118,6 +119,38 @@ def singular(w: str) -> str:
     return w
 
 
+_GEN: dict = {}
+
+
+def bool_column(sn: str) -> str:
+    """The column derive-schema names a boolean property (`conventional_name`, CHG-STO-009: `offline_capability` is
+    stored as `supports_offline`), read from the generator so this check cannot disagree with it."""
+    if "conv" not in _GEN:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("derive_schema", str(g.ROOT / "tools" / "derive-schema.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        _GEN["conv"] = mod.conventional_name
+    return _GEN["conv"](sn, "boolean", None)
+
+
+def required_of(schema: dict, stem: str, by: dict, depth=0) -> set:
+    """The names a schema requires, through `allOf` and local `$ref`s, as derive-schema reads them (CHG-STO-012: a
+    schema built as `allOf: [Create...Request, {required: [...]}]` was read as requiring nothing)."""
+    out = set()
+    if not isinstance(schema, dict) or depth > 4:
+        return out
+    if "$ref" in schema:
+        ref = schema["$ref"]
+        if ref.startswith("#/components/schemas/"):
+            return required_of(by.get((stem, g.ref_name(ref))) or {}, stem, by, depth + 1)
+        return out
+    out |= set(schema.get("required") or [])
+    for sub in schema.get("allOf") or []:
+        out |= required_of(sub, stem, by, depth + 1)
+    return out
+
+
 def props_of(schema: dict, stem: str, by: dict, depth=0) -> dict:
     out = {}
     if not isinstance(schema, dict) or depth > 4:
@@ -149,6 +182,21 @@ def main() -> int:
     by, _ = g.schemas()
     all_tables = set(cols)
     lines = ddl_lines()
+    # **A column whose fix is the migration owner's is waiting, not wrong** (CHG-STO-013, as D-SCOPE-NOTNULL reads a
+    # scope_path on its way to NOT NULL): ST-TYPE-MISMATCH, ST-ENUM-CHECK and ST-REQUIRED-MISMATCH read the frozen r1
+    # DDL, which only a forward migration changes. Where the generator's DDL already agrees with the contract and
+    # handoff/migration-review.md lists the column's change ("column changed", "not null"), it is a note.
+    pending = set()
+    review = g.ROOT / "handoff" / "migration-review.md"
+    if review.exists():
+        pending = set(re.findall(r"^\| (?:column changed|not null) \| \w+ \| `([a-z_]+\.[a-z_0-9]+\.[a-z_0-9]+)` \|",
+                                 review.read_text(encoding="utf-8"), re.M))
+
+    def add_or_note(rule, key, msg, col_key):
+        if col_key in pending:
+            guard.note(f"{msg}: its change is listed in handoff/migration-review.md for the migration owner")
+        else:
+            guard.add(rule, key, msg)
 
     written_offline = {}
     for oid, f in g.operations().items():
@@ -189,6 +237,8 @@ def main() -> int:
                                                       re.sub(r"_id$", "", sn) + "_id"}
             if col:
                 cands.add(str(col))
+            elif kind(ps, by, stem) == "bool":
+                cands.add(bool_column(sn))        # the generator names a boolean as an assertion (CHG-STO-009)
             hit = cands & have
             if hit:
                 col_name = str(col) if col and str(col) in have else (sn if sn in have else sorted(hit)[0])
@@ -198,26 +248,40 @@ def main() -> int:
                     ctype = line.split()[1] if len(line.split()) > 1 else ""
                     k = kind(ps, by, stem)
                     if ctype and not compatible(k, ctype):
-                        guard.add("ST-TYPE-MISMATCH", f"{stem}.{name}.{p}",
-                                  f"{stem}.{name}.{p} is {k}, column {t}.{col_name} is {ctype}")
+                        add_or_note("ST-TYPE-MISMATCH", f"{stem}.{name}.{p}",
+                                    f"{stem}.{name}.{p} is {k}, column {t}.{col_name} is {ctype}", f"{t}.{col_name}")
                     if k == "enum" and ctype.lower().startswith("text") and " CHECK " not in line.upper()                             and "_chk" not in line:
-                        guard.add("ST-ENUM-CHECK", f"{t}.{col_name}",
-                                  f"{t}.{col_name} holds {stem}.{name}.{p}, an enum, as text with no CHECK")
-                    required = p in set(s.get("required") or [])
+                        add_or_note("ST-ENUM-CHECK", f"{t}.{col_name}",
+                                    f"{t}.{col_name} holds {stem}.{name}.{p}, an enum, as text with no CHECK",
+                                    f"{t}.{col_name}")
+                    required = p in required_of(s, stem, by)
                     notnull = "NOT NULL" in line.upper()
                     # Only against the schema the table was derived from: a Summary or a request
                     # shape may leave out what the row requires.
                     origin = str((ref.get("origin") or {}).get(t) or "")
                     if col_name not in SERVER_SET and not ps.get("readOnly") and len(present) == 1                             and origin.split(".")[-1] == name:
                         if required and not notnull and not ps.get("nullable"):
-                            guard.add("ST-REQUIRED-MISMATCH", f"{t}.{col_name}",
-                                      f"{stem}.{name}.{p} is required; {t}.{col_name} is nullable")
+                            add_or_note("ST-REQUIRED-MISMATCH", f"{t}.{col_name}",
+                                        f"{stem}.{name}.{p} is required; {t}.{col_name} is nullable",
+                                        f"{t}.{col_name}")
                         elif notnull and not required and "DEFAULT" not in line.upper():
-                            guard.add("ST-REQUIRED-MISMATCH", f"{t}.{col_name}",
-                                      f"{stem}.{name}.{p} is optional; {t}.{col_name} is NOT NULL with no default")
+                            add_or_note("ST-REQUIRED-MISMATCH", f"{t}.{col_name}",
+                                        f"{stem}.{name}.{p} is optional; {t}.{col_name} is NOT NULL with no default",
+                                        f"{t}.{col_name}")
                 continue
             if any(f"{stem}.{name}.{p}" == src or src.endswith(f".{name}.{p}") for src in sources
                    if src.endswith("." + p)):
+                continue
+            # **The same storage SP-ARRAY-NOWHERE and derive-schema see** (CHG-STO-011): a child table whose columns
+            # come from this array (`<Schema>.<prop>[].<field>` sources), items that are rows of a table of their own
+            # (`MenuSection.items` are `fnb.menu_item` rows), or a `$ref` to a shape the contract says is computed on
+            # read (`none — computed`), which derive-schema gives no column on purpose.
+            if any(f".{name}.{p}[]" in src for src in sources):
+                continue
+            tgt = by.get((stem, target)) if target else None
+            ttag = str((tgt or {}).get("x-ticvai-persistence") or "").strip() if isinstance(tgt, dict) else ""
+            if ttag and (NOT_STORED.search(ttag) or (not ttag.lower().startswith("none") and "." in ttag
+                                                     and "—" not in ttag)):
                 continue
             child = {f"{t}_{singular(sn)}" for t in present} | {f"{t.split('.')[0]}.{singular(sn)}" for t in present} \
                 | {f"{t}_{sn}" for t in present}
@@ -234,6 +298,9 @@ def main() -> int:
     return guard.finish()
 
 
+# derive-schema.py `_NOT_STORED`: a shape worked out on read gets no column (audit R111)
+NOT_STORED = re.compile(r"^none\b.*\b(computed|projection|union|aggregated|composed|derived|response shape|transient)\b",
+                        re.I | re.S)
 MONEY_REF = re.compile(r"(^|/)Money$")
 SECRET_WORDS = re.compile(r"token|secret|credential|password|\bpin\b|apiKey|private", re.I)
 SECRET_FORMS = {"vault-reference", "field-encrypted", "blind-index", "argon2id-phc"}

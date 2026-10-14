@@ -188,6 +188,8 @@
     "default": true
    },
    "participantCategories": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",

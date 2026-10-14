@@ -1,6 +1,6 @@
 # WS153 — Payment Payment Orchestration board 7
 
-**9 screens · 12 operations · 13 schemas · 6 permissions**
+**9 screens · 13 operations · 13 schemas · 6 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -165,11 +165,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
 | Block | Block C · task VM-ADM-620 |
-| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`, `SETTLEMENT_RECONCILE` (1 configure, 1 read, 1 operate); in the flows as platform admin |
+| Who uses it | venue staff holding `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`, `SETTLEMENT_RECONCILE`, `SETTLEMENT_VIEW` (1 configure, 2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `settlementId` (navigation), `sourceId` (navigation) |
 | Route | `/commercial/reconciliation-source-import-manager-t141-adm-620` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
@@ -218,7 +218,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - **Ingest file**: Step one of five (ingest, parse, match, classify, auto-resolve). *(source: contracts/spine/finance.yaml#ingestSettlementFile / contracts/satellite/payments.yaml#setReconciliationSource)*
 
-**Data it reads**: `listReconciliationSources` (onLoad, The files and feeds reconciliation is run against)
+**Data it reads**: `listReconciliationSources` (onLoad, The files and feeds reconciliation is run against); `getSettlement` (onInterval, Follows ingestSettlementFile (202) until what it started …)
 
 **Where the user goes next**
 
@@ -253,8 +253,11 @@ feed:
 - `setReconciliationSource` → `PAYMENT_CONFIGURE` (configure) · staff
 - `ingestSettlementFile` → `SETTLEMENT_RECONCILE` (operate) · staff, partner
 - `listReconciliationSources` → `PAYMENT_VIEW` (read) · staff
+- `getSettlement` → `SETTLEMENT_VIEW` (read) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -279,12 +282,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 412).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 404, 412).
 - [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-620?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Scheduled report imports, Cancel.
 - [ ] Every transition is wired: `ADM-619`, `BO-100`.
-- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`, `SETTLEMENT_RECONCILE`.
+- [ ] Every gated control is gated: `PAYMENT_CONFIGURE`, `PAYMENT_VIEW`, `SETTLEMENT_RECONCILE`, `SETTLEMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -371,6 +374,8 @@ rule:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_CONFIGURE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -446,7 +451,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every reconciliation exception investigation** (data table)
+**Every reconciliation exception investigation** (data table, from `listSettlementExceptions`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -529,6 +534,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `SETTLEMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -606,7 +613,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Shown**
 
-**Every settlement payout \t144** (data table)
+**Every settlement payout \t144** (data table, from `listSettlements`)
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -694,6 +701,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `listSettlements` → `SETTLEMENT_VIEW` (read) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `SETTLEMENT_VIEW`
 
 #### Requirements it meets
 
@@ -784,7 +793,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Variance | text | not in the schema: `Variance` |
 | FX | text | not in the schema: `FX` |
 
-**The selected fees commission settlement** (detail panel): The pack groups this record's detail under its own headings: “Provider Fee”, “Where currencies differ, show”, “Important Boundary”.
+**The selected fees commission settlement** (detail panel, from `getPaymentProviderEconomics`): The pack groups this record's detail under its own headings: “Provider Fee”, “Where currencies differ, show”, “Important Boundary”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -846,6 +855,8 @@ settlement:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PAYMENT_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -897,7 +908,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row Rendered on the calendar template (M17-03, 29 September). |
 | Offline | online only |
-| Opens with | nothing: it opens on its own |
+| Opens with | `merchantAccountId` (navigation) |
 | Route | `/commercial/merchant-account-settlement-calendar-manager-t146-adm-625` |
 
 **What the spec says about it.** **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys. Its board's hub ADM-619 stays on the console (DEC-211 (Chinmay, 2 October, batch 6): a cross-tenant view of TICVAI's payment operations); this screen keeps that edge and is also reached from BO-100 Venue Home.
@@ -994,6 +1005,8 @@ account:
 - `setMerchantAccount` → `PAYMENT_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PAYMENT_VIEW`
 
 #### Requirements it meets
 
@@ -1119,6 +1132,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `recordSettlement` → `LEDGER_POST` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `LEDGER_POST`
 
 #### Requirements it meets
 
@@ -1246,6 +1261,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `LEDGER_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1340,7 +1357,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Currency conversion | text | not in the schema: `Currency conversion` |
 | Merchant account payout | text | not in the schema: `Merchant account payout` |
 
-**The selected reconciliation simulator forecast** (detail panel): The pack groups this record's detail under its own headings: “Chargebacks”, “Expected Settlement Date”, “Date”, “Sep 04AED 980K”, “Sep 06AED 760K”, “Refund”.
+**The selected reconciliation simulator forecast** (detail panel, from `getUnifiedReconciliation`): The pack groups this record's detail under its own headings: “Chargebacks”, “Expected Settlement Date”, “Date”, “Sep 04AED 980K”, “Sep 06AED 760K”, “Refund”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1393,6 +1410,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `getUnifiedReconciliation` → `LEDGER_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `LEDGER_VIEW`
 
 #### Requirements it meets
 
@@ -1524,6 +1543,7 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "getPaymentProviderEconomics": {"method":"GET","path":"/payment-providers/economics","contract":"payments","summary":"What each provider actually costs","permission":"PAYMENT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[{"name":"from","in":"query","required":null},{"name":"to","in":"query","required":null}],"requestBody":null,"responds":"ProviderEconomics"},
+"getSettlement": {"method":"GET","path":"/settlements/{settlementId}","contract":"finance","summary":"Settlement detail with match results","permission":"SETTLEMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[],"requestBody":null,"responds":"Settlement"},
 "getUnifiedReconciliation": {"method":"GET","path":"/reconciliation/unified","contract":"finance","summary":"Every money source against the ledger, in one view","permission":"LEDGER_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"from","in":"query","required":true},{"name":"to","in":"query","required":true}],"requestBody":null,"responds":"UnifiedReconciliation"},
 "ingestSettlementFile": {"method":"POST","path":"/settlements","contract":"finance","summary":"Ingest a provider settlement file","permission":"SETTLEMENT_RECONCILE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "listMerchantAccounts": {"method":"GET","path":"/merchant-accounts","contract":"payments","summary":"Merchant accounts, settlement calendars and payout routing","permission":"PAYMENT_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"tenant","parameters":[],"requestBody":null,"responds":"MerchantAccount"},
@@ -1532,9 +1552,9 @@ Method, path, parameters, request and response for every operation these screens
 "listSettlements": {"method":"GET","path":"/settlements","contract":"finance","summary":"List settlement batches","permission":"SETTLEMENT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":"providerName","in":"query","required":null},{"name":"venueId","in":"query","required":null},{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "recordSettlement": {"method":"POST","path":"/inter-entity-obligations/{obligationId}/settle","contract":"finance","summary":"One entity paid another","permission":"LEDGER_POST","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"InterEntityObligation"},
 "resolveSettlementException": {"method":"POST","path":"/settlements/{settlementId}/exceptions","contract":"finance","summary":"Resolve a settlement exception","permission":"SETTLEMENT_RECONCILE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"region","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"SettlementException"},
-"setMerchantAccount": {"method":"PUT","path":"/merchant-accounts","contract":"payments","summary":"Bind a merchant account to entities, venues and a calendar","permission":"PAYMENT_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"MerchantAccount","responds":"MerchantAccount"},
+"setMerchantAccount": {"method":"PUT","path":"/merchant-accounts/{merchantAccountId}","contract":"payments","summary":"Bind a merchant account to entities, venues and a calendar","permission":"PAYMENT_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"merchantAccountId","in":"path","required":true},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"MerchantAccount","responds":"MerchantAccount"},
 "setReconciliationMatchingRules": {"method":"PUT","path":"/reconciliation-rules","contract":"payments","summary":"How a platform transaction is matched to a settled one","permission":"PAYMENT_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"ReconciliationMatchingRules","responds":"ReconciliationMatchingRules"},
-"setReconciliationSource": {"method":"PUT","path":"/reconciliation-sources","contract":"payments","summary":"Define a settlement or statement feed","permission":"PAYMENT_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"ReconciliationSource","responds":"ReconciliationSource"}
+"setReconciliationSource": {"method":"PUT","path":"/reconciliation-sources/{sourceId}","contract":"payments","summary":"Define a settlement or statement feed","permission":"PAYMENT_CONFIGURE","offlineCapable":null,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"sourceId","in":"path","required":true},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":"ReconciliationSource","responds":"ReconciliationSource"}
 }
 ```
 
@@ -1545,7 +1565,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 ```json
 {
 "FxRateValue": {"x-ticvai-persistence-column":"numeric(18,6)","type":"string","pattern":"^\\d+(\\.\\d{1,6})?$","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one (naming-and-style 5.1). Up to six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly — and stored as `numeric(18,6)` so the six places the wire carries survive the database.\n"},
-"InterEntityObligation": {"type":"object","x-ticvai-persistence":"ledger.inter_entity_obligation","required":["id","fromLegalEntityId","toLegalEntityId","arisingAmount","arisingAt","status"],"properties":{"id":{"type":"string","format":"uuid","description":"Server-created when the obligation arises, so a UUID, as the `obligationId` path parameter types it."},"fromLegalEntityId":{"type":"string","format":"uuid","description":"The selling entity. Holds the liability, and therefore the FX exposure."},"toLegalEntityId":{"type":"string","format":"uuid","description":"The consuming entity, which provided the service at redemption."},"entitlementId":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"arisingAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"In the **consuming** entity's base currency, at the rate in force on the redemption date. Neither entity ever holds a balance in a currency that is not its own.\n"},"rateApplied":{"allOf":[{"$ref":"#/components/schemas/FxRateValue"}]},"arisingAt":{"type":"string","format":"date-time","description":"Redemption. Not sale — the obligation exists when the service is given."},"status":{"type":"string","enum":["outstanding","settled","disputed"]},"settledAt":{"type":"string","format":"date-time","nullable":true},"settlementRate":{"allOf":[{"$ref":"#/components/schemas/FxRateValue"}],"nullable":true},"fxMovement":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Rate movement between arising and settling. Posts to FX gain and loss on the selling entity, which carried the balance.\n"},"agreedAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"readOnly":true,"description":"**The figure a dispute was resolved at** (4 October 2026, CHG-FXC-003): written by `resolveObligationDispute`, which returns the obligation to `outstanding`. `arisingAmount` keeps the original, so the difference stays auditable; settlement settles `agreedAmount` where it is set and `arisingAmount` otherwise. Null until a dispute is resolved."},"disputeNote":{"type":"string","nullable":true,"readOnly":true,"description":"The `note` of the last `disputeObligation` or `resolveObligationDispute`."}}},
+"InterEntityObligation": {"type":"object","x-ticvai-persistence":"ledger.inter_entity_obligation","required":["id","fromLegalEntityId","toLegalEntityId","arisingAmount","arisingAt","status"],"properties":{"id":{"type":"string","format":"uuid","description":"Server-created when the obligation arises, so a UUID, as the `obligationId` path parameter types it."},"fromLegalEntityId":{"x-ticvai-references":"ledger.legal_entity","type":"string","format":"uuid","description":"The selling entity. Holds the liability, and therefore the FX exposure."},"toLegalEntityId":{"x-ticvai-references":"ledger.legal_entity","type":"string","format":"uuid","description":"The consuming entity, which provided the service at redemption."},"entitlementId":{"type":"string","format":"uuid"},"orderId":{"type":"string","format":"uuid"},"arisingAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"In the **consuming** entity's base currency, at the rate in force on the redemption date. Neither entity ever holds a balance in a currency that is not its own.\n"},"rateApplied":{"allOf":[{"$ref":"#/components/schemas/FxRateValue"}]},"arisingAt":{"type":"string","format":"date-time","description":"Redemption. Not sale — the obligation exists when the service is given."},"status":{"type":"string","enum":["outstanding","settled","disputed"]},"settledAt":{"type":"string","format":"date-time","nullable":true},"settlementRate":{"allOf":[{"$ref":"#/components/schemas/FxRateValue"}],"nullable":true},"fxMovement":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Rate movement between arising and settling. Posts to FX gain and loss on the selling entity, which carried the balance.\n"},"agreedAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"readOnly":true,"description":"**The figure a dispute was resolved at** (4 October 2026, CHG-FXC-003): written by `resolveObligationDispute`, which returns the obligation to `outstanding`. `arisingAmount` keeps the original, so the difference stays auditable; settlement settles `agreedAmount` where it is set and `arisingAmount` otherwise. Null until a dispute is resolved."},"disputeNote":{"type":"string","nullable":true,"readOnly":true,"description":"The `note` of the last `disputeObligation` or `resolveObligationDispute`."}}},
 "MerchantAccount": {"type":"object","x-ticvai-persistence":"payments.merchant_account","description":"Board 7.7. **Which legal entity gets the money, and when.**","required":["code"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"legalEntityId":{"type":"string","format":"uuid"},"venueIds":{"type":"array","items":{"type":"string","format":"uuid"}},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018). Region-scoped and not overridable below it, so a row in a UAE region is AED and cannot be anything else. Kept on the wire, removed from the table.\n"},"settlementCalendar":{"type":"string","enum":["daily","weekly","monthly","custom"]},"settlementDelayDays":{"type":"integer","default":1},"bankAccountReference":{"type":"string","nullable":true},"scopePath":{"type":"string"}}},
 "Money": {"type":"object","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,4)","description":"**On the wire this is three fields; in the database it is one column.**\n24 August. Every column typed `Money` was landing as `jsonb` — 129 of them, including `orders.shift.opening_float`, `inventory.purchase_order.total` and `promotions.voucher.balance`. **`orders.cash_movement.amount` was `numeric(18,4)` because somebody hand-typed that one**, and the inconsistency is what made it visible.\n**A jsonb price cannot be summed in SQL.** Every total, variance and reconciliation moves into application code — and a shift variance computed in .NET against a ledger computed in Postgres is two answers to one question. That is F13 month-end and F98 takings-to-ledger, both walked, both assuming the arithmetic is in the database.\n**`currency` and `scale` are not stored per row.** ADR-0018 makes them region-scoped and not overridable below, so they resolve from the scope walk — storing AED against nine million rows in a UAE region is nine million copies of a fact that cannot differ. A row that needed its own currency would be a row in the wrong region.\n**They stay on the wire** because a client reading a figure should not have to walk a hierarchy to know what it means.\n","required":["amount","currency","scale"],"properties":{"amount":{"type":"string","description":"Decimal string, never a float. Up to 4 decimal places. **Persisted as `numeric(18,4)`** — the string is a transport choice, so a JavaScript client cannot round a fare in transit.\n","pattern":"^-?\\d+(\\.\\d{1,4})?$"},"currency":{"type":"string","description":"**Resolved from the region, not stored on the row** (ADR-0018). OMR uses 3 decimal places and AED uses 2 — a venue on a different scale from its region is a ledger that cannot consolidate.\n","pattern":"^[A-Z]{3}$"},"scale":{"type":"integer","description":"Resolved from the region alongside `currency`.","minimum":0,"maximum":4}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},

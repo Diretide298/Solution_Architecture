@@ -5,6 +5,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/approval-decision-workspace-bo-374",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ApprovalDecisionWorkspace.tsx",
+   "component": "src/routes/venue-operations/ApprovalDecisionWorkspace.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -109,6 +110,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Provide the approver with one comprehensive workspace to evaluate and action a request.",
+  "division": "Shares `decideApprovalRequest`, `listApprovalRequests` with BO-940; this screen is Approval Decision Workspace (pack Approval_Workflows_and_Governance_Reference.pdf, board 4.1, page 31): provide the approver with one comprehensive workspace to evaluate and action a request.",
   "gaps": [
    {
     "operation": null,
@@ -238,6 +240,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "4",
@@ -247,7 +250,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/business-context-evidence-viewer-bo-375",
-   "component": "apps/venue-management-web/src/routes/venue-operations/BusinessContextEvidenceViewer.tsx",
+   "component": "src/routes/venue-operations/BusinessContextEvidenceViewer.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -397,6 +400,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "4",
@@ -406,7 +410,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/approval-timeline-decision-chain-bo-376",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ApprovalTimelineDecisionChain.tsx",
+   "component": "src/routes/venue-operations/ApprovalTimelineDecisionChain.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -529,6 +533,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_CONFIGURE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "4",
@@ -538,7 +543,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/approve-sensitive-action-confirmation-bo-377",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ApproveSensitiveActionConfirmation.tsx",
+   "component": "src/routes/venue-operations/ApproveSensitiveActionConfirmation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -592,7 +597,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listStepUpPolicies",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listStepUpPolicies"
       },
       {
        "kind": "secondaryButton",
@@ -686,6 +692,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_DECIDE",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "4",
@@ -695,7 +702,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/reject-return-request-information-bo-378",
-   "component": "apps/venue-management-web/src/routes/venue-operations/RejectReturnRequestInformation.tsx",
+   "component": "src/routes/venue-operations/RejectReturnRequestInformation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -835,6 +842,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_REQUEST",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "4",
@@ -844,7 +852,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/requester-modification-resubmission-bo-379",
-   "component": "apps/venue-management-web/src/routes/venue-operations/RequesterModificationResubmission.tsx",
+   "component": "src/routes/venue-operations/RequesterModificationResubmission.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -967,6 +975,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_REQUEST",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "4",
@@ -976,7 +985,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/withdrawal-cancellation-expiration-reopening-bo-380",
-   "component": "apps/venue-management-web/src/routes/venue-operations/WithdrawalCancellationExpirationReopening.tsx",
+   "component": "src/routes/venue-operations/WithdrawalCancellationExpirationReopening.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1029,7 +1038,8 @@
        "kind": "primaryButton",
        "derived": true,
        "impliedBy": "withdrawApprovalRequest",
-       "notes": "The act the screen exists for."
+       "notes": "The act the screen exists for.",
+       "operation": "withdrawApprovalRequest"
       },
       {
        "kind": "secondaryButton",
@@ -1104,6 +1114,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "4",
@@ -1113,7 +1124,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/segregation-of-duties-four-eyes-control-bo-381",
-   "component": "apps/venue-management-web/src/routes/venue-operations/SegregationOfDutiesFourEyesControl.tsx",
+   "component": "src/routes/venue-operations/SegregationOfDutiesFourEyesControl.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1158,7 +1169,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listApprovalControlPolicies",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listApprovalControlPolicies"
       }
      ]
     }
@@ -1215,6 +1227,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "4",
@@ -1224,7 +1237,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/approved-action-execution-status-bo-382",
-   "component": "apps/venue-management-web/src/routes/venue-operations/ApprovedActionExecutionStatus.tsx",
+   "component": "src/routes/venue-operations/ApprovedActionExecutionStatus.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1296,7 +1309,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listWorkflowInstanceProcess",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listWorkflowInstanceProcess"
       }
      ]
     }
@@ -1396,6 +1410,7 @@
   "module": "Venue Operations",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "APPROVAL_VIEW",
   "source": {
    "pack": "Approval_Workflows_and_Governance_Reference.pdf",
    "board": "4",
@@ -1405,7 +1420,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-operations/decision-record-immutable-audit-view-bo-383",
-   "component": "apps/venue-management-web/src/routes/venue-operations/DecisionRecordImmutableAuditView.tsx",
+   "component": "src/routes/venue-operations/DecisionRecordImmutableAuditView.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1453,7 +1468,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getApprovalRecord",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getApprovalRecord"
       }
      ]
     }

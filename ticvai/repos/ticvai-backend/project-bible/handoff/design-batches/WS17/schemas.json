@@ -318,6 +318,7 @@
     "type": "integer"
    },
    "pendingApprovers": {
+    "x-ticvai-persisted": false,
     "type": "array",
     "items": {
      "type": "object",
@@ -518,6 +519,7 @@
   }
  },
  "ApprovalSlaPolicy": {
+  "x-ticvai-rls": "read-beneath",
   "type": "object",
   "x-ticvai-persistence": "approvals.sla_policy",
   "description": "Approvals boards 5.5 and 5.6. **A target with no consequence is a number in a table**, so the reminder and breach behaviour are part of the policy.\n",
@@ -552,6 +554,8 @@
     "nullable": true
    },
    "reminders": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "items": {
      "type": "object",
@@ -826,10 +830,12 @@
     "readOnly": true
    },
    "workflowDefinitionId": {
+    "x-ticvai-references": "approvals.workflow_definition",
     "type": "string",
     "format": "uuid"
    },
    "workflowVersionId": {
+    "x-ticvai-references": "approvals.workflow_version",
     "type": "string",
     "format": "uuid",
     "description": "The version the instance started on; never changes"
@@ -869,6 +875,7 @@
     "nullable": true
    },
    "currentNodeId": {
+    "x-ticvai-references": "none",
     "type": "string",
     "nullable": true,
     "description": "The node of the version's graph the instance is at"

@@ -5,6 +5,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "8",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-risk-fraud-command-center-t166-adm-629",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentRiskFraudCommandCenterT166.tsx",
+   "component": "src/routes/commercial/PaymentRiskFraudCommandCenterT166.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -103,7 +104,7 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -212,7 +213,8 @@
         "False positives"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Breakdown”.",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §Show"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 165 §Show",
+       "operation": "getPaymentPerformance"
       }
      ]
     }
@@ -269,6 +271,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "8",
@@ -278,7 +281,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-risk-rule-decision-engine-t167-adm-630",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentRiskRuleDecisionEngineT167.tsx",
+   "component": "src/routes/commercial/PaymentRiskRuleDecisionEngineT167.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -429,6 +432,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_CONFIGURE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "8",
@@ -438,7 +442,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/velocity-behavioral-transaction-risk-controls-t168-adm-631",
-   "component": "apps/venue-management-web/src/routes/commercial/VelocityBehavioralTransactionRiskControlsT168.tsx",
+   "component": "src/routes/commercial/VelocityBehavioralTransactionRiskControlsT168.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -575,6 +579,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_CONFIGURE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "8",
@@ -584,7 +589,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/risk-lists-signals-payment-control-center-t169-adm-632",
-   "component": "apps/venue-management-web/src/routes/commercial/RiskListsSignalsPaymentControlCenterT169.tsx",
+   "component": "src/routes/commercial/RiskListsSignalsPaymentControlCenterT169.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -716,6 +721,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_REFUND_APPROVE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "8",
@@ -725,7 +731,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/fraud-alert-investigation-case-management-t170-adm-633",
-   "component": "apps/venue-management-web/src/routes/commercial/FraudAlertInvestigationCaseManagementT170.tsx",
+   "component": "src/routes/commercial/FraudAlertInvestigationCaseManagementT170.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1017,6 +1023,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_REFUND_APPROVE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "8",
@@ -1026,7 +1033,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/chargeback-dispute-command-center-t172-adm-634",
-   "component": "apps/venue-management-web/src/routes/commercial/ChargebackDisputeCommandCenterT172.tsx",
+   "component": "src/routes/commercial/ChargebackDisputeCommandCenterT172.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1061,13 +1068,15 @@
    "template": "dashboard",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
        "kind": "metricTile",
        "label": "New Chargebacks",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards",
+       "operation": "getChargebackAnalytics",
+       "bindsTo": "OrdChargebackAnalytics.totals.chargebackCount"
       },
       {
        "kind": "metricTile",
@@ -1077,12 +1086,16 @@
       {
        "kind": "metricTile",
        "label": "Chargeback Value",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards",
+       "operation": "getChargebackAnalytics",
+       "bindsTo": "OrdChargebackAnalytics.totals.chargebackRateByValue"
       },
       {
        "kind": "metricTile",
        "label": "Chargeback Rate",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards",
+       "operation": "getChargebackAnalytics",
+       "bindsTo": "OrdChargebackAnalytics.totals.chargebackRateByCount"
       },
       {
        "kind": "metricTile",
@@ -1092,17 +1105,23 @@
       {
        "kind": "metricTile",
        "label": "Won",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards",
+       "operation": "getChargebackAnalytics",
+       "bindsTo": "OrdChargebackAnalytics.totals.wonCount"
       },
       {
        "kind": "metricTile",
        "label": "Lost",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards",
+       "operation": "getChargebackAnalytics",
+       "bindsTo": "OrdChargebackAnalytics.totals.lostCount"
       },
       {
        "kind": "metricTile",
        "label": "Accepted",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §KPI Cards",
+       "operation": "getChargebackAnalytics",
+       "bindsTo": "OrdChargebackAnalytics.totals.acceptedCount"
       },
       {
        "kind": "metricTile",
@@ -1139,7 +1158,7 @@
         "Status"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "listChargebacks",
        "provenance": "pack Payment_Payment_Orchestration.pdf, page 171 §Display"
       }
      ]
@@ -1277,6 +1296,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ORDER_REFUND_APPROVE",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "8",
@@ -1286,7 +1306,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/chargeback-evidence-representment-workspace-t173-adm-635",
-   "component": "apps/venue-management-web/src/routes/commercial/ChargebackEvidenceRepresentmentWorkspaceT173.tsx",
+   "component": "src/routes/commercial/ChargebackEvidenceRepresentmentWorkspaceT173.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1423,6 +1443,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "8",
@@ -1432,7 +1453,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-performance-conversion-analytics-t174-adm-636",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentPerformanceConversionAnalyticsT174.tsx",
+   "component": "src/routes/commercial/PaymentPerformanceConversionAnalyticsT174.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1460,7 +1481,7 @@
    "template": "form",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -1553,6 +1574,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "8",
@@ -1562,7 +1584,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/ai-fraud-anomaly-payment-intelligence-center-t175-adm-637",
-   "component": "apps/venue-management-web/src/routes/commercial/AiFraudAnomalyPaymentIntelligenceCenterT175.tsx",
+   "component": "src/routes/commercial/AiFraudAnomalyPaymentIntelligenceCenterT175.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1608,7 +1630,8 @@
        "kind": "detailPanel",
        "derived": true,
        "impliedBy": "getEntityRisk",
-       "notes": "One record, read-only."
+       "notes": "One record, read-only.",
+       "operation": "getEntityRisk"
       },
       {
        "kind": "primaryButton",
@@ -1620,7 +1643,8 @@
        "kind": "dataTable",
        "derived": true,
        "impliedBy": "listRiskAlerts",
-       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
+       "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.",
+       "operation": "listRiskAlerts"
       },
       {
        "kind": "secondaryButton",
@@ -1728,6 +1752,7 @@
   "module": "Commercial",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "PAYMENT_VIEW",
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "8",
@@ -1737,7 +1762,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/commercial/payment-executive-intelligence-risk-simulator-ai-advisor-adm-638",
-   "component": "apps/venue-management-web/src/routes/commercial/PaymentExecutiveIntelligenceRiskSimulatorAiAdvis.tsx",
+   "component": "src/routes/commercial/PaymentExecutiveIntelligenceRiskSimulatorAiAdvis.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1781,7 +1806,9 @@
       {
        "kind": "metricTile",
        "label": "Authorization Rate",
-       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show"
+       "provenance": "pack Payment_Payment_Orchestration.pdf, page 175 §Show",
+       "operation": "getPaymentPerformance",
+       "bindsTo": "PaymentPerformanceRow.authorisationRate"
       },
       {
        "kind": "metricTile",

@@ -95,6 +95,7 @@ def main() -> int:
     lin = g.load_json(g.ROOT / "handoff" / "api-data-lineage.json", {}) or {}
     ref = g.load_json(g.ROOT / "handoff" / "schema-reference.json", {}) or {}
     cols = {t: v for t, v in (ref.get("cols") or {}).items()}
+    store = ref.get("store") or {}
     by, _ = g.schemas()
     for oid, o in sorted(g.operations().items()):
         op = o["op"]
@@ -110,7 +111,9 @@ def main() -> int:
             continue
         names = {t: {c.get("column") for c in cols.get(t, [])} for t in writes}
         sources = {t: {str(c.get("source") or "").rsplit(".", 1)[-1] for c in cols.get(t, [])} for t in writes}
-        stub = [t for t in writes if names[t] and all(KEY_COL.match(c or "") for c in names[t])]
+        # A Redis registry is not a table with columns (`identity.guest_session`; CHG-STO-016): only Postgres stubs.
+        stub = [t for t in writes if names[t] and all(KEY_COL.match(c or "") for c in names[t])
+                and store.get(t, "postgres") in ("postgres", "postgres-analytical")]
         stem = o["contract"]
         missing = []
         for fname, spec, owner in fields(body, by, stem):
@@ -138,6 +141,10 @@ def main() -> int:
                           f"{', '.join(writes)}" + (f" (x-ticvai-stored-as {stored_as})" if stored_as else ""))
             # A `...Ref` names a secret held elsewhere (Key Vault), not the secret itself.
             if spec.get("writeOnly") and SECRET.search(leaf) and not re.search(r"Refs?$", leaf):
+                # A credential TICVAI presents to a provider cannot be a hash: it is a Key Vault secret whose name the
+                # row keeps (ADR-0063 as amended 14 October 2026, `x-ticvai-secret: vault-reference`; CHG-STO-014).
+                if str(spec.get("x-ticvai-secret") or "") == "vault-reference":
+                    continue
                 if not (stored_as and stored_as.endswith("_hash") and reaches):
                     guard.add("SR-SECRET-UNHASHED", f"{oid}.{fname}",
                               f"{stem}.{oid}: {fname} is a writeOnly credential that is neither "

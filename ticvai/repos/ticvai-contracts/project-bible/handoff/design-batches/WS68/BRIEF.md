@@ -1,6 +1,6 @@
 # WS68 — Unified BI Reporting and AI Analytics Platform board 3
 
-**10 screens · 10 operations · 18 schemas · 3 permissions**
+**10 screens · 9 operations · 17 schemas · 3 permissions**
 
 Platform P16 Venue Analytics · ships as **venue-management** ·
 staff audience · web ·
@@ -110,8 +110,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ANL-036` | Grouping, Aggregation & Calculation Builder | D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-037` | Cross-Domain Report Composer | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-038` | Report Layout & Formatting Designer | D | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-039` | Report Preview, Test & Validation | D | 0 | 16 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `ANL-040` | Save, Run & Report Results Viewer | D | 0 | 4 | 6 | 5 | 2 | 0 | — | notStarted (—) |
+| `ANL-039` | Report Preview, Test & Validation | D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-040` | Save, Run & Report Results Viewer | D | 0 | 92 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

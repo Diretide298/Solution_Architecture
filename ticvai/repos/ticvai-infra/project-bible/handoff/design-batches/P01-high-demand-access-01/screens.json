@@ -8,7 +8,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/high-demand-access/virtual-waiting-room",
-   "component": "apps/guest-web/src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx",
+   "component": "src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

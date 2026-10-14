@@ -14,7 +14,8 @@
   "properties": {
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "platform.scope"
    },
    "code": {
     "type": "string",
@@ -83,7 +84,8 @@
   "properties": {
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "platform.scope"
    },
    "code": {
     "type": "string",
@@ -176,7 +178,8 @@
   "properties": {
    "venueId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "x-ticvai-references": "platform.scope"
    },
    "code": {
     "type": "string",
@@ -237,12 +240,15 @@
     "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
    "routeId": {
-    "$ref": "../shared/common.yaml#/components/schemas/Id"
+    "$ref": "../shared/common.yaml#/components/schemas/Id",
+    "x-ticvai-references": "transport.route"
    },
    "timetableId": {
-    "$ref": "../shared/common.yaml#/components/schemas/Id"
+    "$ref": "../shared/common.yaml#/components/schemas/Id",
+    "x-ticvai-references": "transport.timetable"
    },
    "performanceId": {
+    "x-ticvai-references": "catalogue.performance",
     "type": "string",
     "format": "uuid",
     "description": "The catalogue performance this departure is sold as. Cart lines carry it."
@@ -423,7 +429,8 @@
       "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "routeId": {
-      "$ref": "../shared/common.yaml#/components/schemas/Id"
+      "$ref": "../shared/common.yaml#/components/schemas/Id",
+      "x-ticvai-references": "transport.route"
      },
      "effectiveTo": {
       "type": "string",
@@ -756,6 +763,7 @@
   ]
  },
  "PassengerType": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "transport.fare_passenger_type",
   "type": "object",
   "required": [
@@ -888,7 +896,8 @@
   ],
   "properties": {
    "stationId": {
-    "$ref": "../shared/common.yaml#/components/schemas/Id"
+    "$ref": "../shared/common.yaml#/components/schemas/Id",
+    "x-ticvai-references": "transport.station"
    },
    "offsetMinutes": {
     "type": "integer",
@@ -938,10 +947,12 @@
      ],
      "properties": {
       "fromStationId": {
-       "$ref": "../shared/common.yaml#/components/schemas/Id"
+       "$ref": "../shared/common.yaml#/components/schemas/Id",
+       "x-ticvai-references": "transport.station"
       },
       "toStationId": {
-       "$ref": "../shared/common.yaml#/components/schemas/Id"
+       "$ref": "../shared/common.yaml#/components/schemas/Id",
+       "x-ticvai-references": "transport.station"
       },
       "fare": {
        "$ref": "../shared/common.yaml#/components/schemas/Money"
@@ -1026,7 +1037,8 @@
       "$ref": "../shared/common.yaml#/components/schemas/Id"
      },
      "routeId": {
-      "$ref": "../shared/common.yaml#/components/schemas/Id"
+      "$ref": "../shared/common.yaml#/components/schemas/Id",
+      "x-ticvai-references": "transport.route"
      },
      "status": {
       "$ref": "#/components/schemas/TransportTimetableStatus"
@@ -1055,6 +1067,7 @@
   ]
  },
  "TimetableRun": {
+  "x-ticvai-rls": "grant-holder-read",
   "x-ticvai-persistence": "transport.timetable_run",
   "type": "object",
   "required": [
@@ -1114,7 +1127,8 @@
    "venueId": {
     "type": "string",
     "format": "uuid",
-    "readOnly": true
+    "readOnly": true,
+    "x-ticvai-references": "platform.scope"
    },
    "format": {
     "type": "string",
@@ -1164,6 +1178,8 @@
     }
    },
    "findings": {
+    "x-ticvai-persistence-column": "jsonb",
+    "x-ticvai-persistence-kind": "valueObject",
     "type": "array",
     "readOnly": true,
     "maxItems": 1000,
@@ -1305,6 +1321,13 @@
       "format": "uuid",
       "readOnly": true,
       "description": "The one-way trip product (kind `timedAdmission`); one variant per passenger type. Created with the route.\n"
+     },
+     "statusReason": {
+      "type": "string",
+      "maxLength": 500,
+      "nullable": true,
+      "readOnly": true,
+      "description": "Why the route's status last changed (`setTransportRouteStatus`)."
      }
     }
    }

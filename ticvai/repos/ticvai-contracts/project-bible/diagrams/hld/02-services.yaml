@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,802 operations and 1,136 tables resolve into seventeen modules, deployed
+about: '**What ships together.** 2,804 operations and 1,133 tables resolve into seventeen modules, deployed
   as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
   its schemas; another module reads them through published views and writes them only through the owner''s
   in-process API.
@@ -18,7 +18,7 @@ tiers:
   services:
   - service: TenancyService
     operations: 213
-    tables: 107
+    tables: 106
     schemas:
     - platform
     - workforce
@@ -36,14 +36,14 @@ tiers:
     ifDown: Same as identity — nothing runs without a scope.
     ref: diagrams/lld/services/TenancyService.yaml
   - service: IdentityService
-    operations: 97
+    operations: 98
     tables: 41
     schemas:
     - identity
     - pii
     contracts:
     - identity
-    flowCoverage: 22%
+    flowCoverage: 21%
     scale: Read-heavy, latency-critical, cached hard. Every request resolves a principal.
     ifDown: '**A restart is an outage everywhere.** Deploys go out first and alone.'
     ref: diagrams/lld/services/IdentityService.yaml
@@ -69,7 +69,7 @@ tiers:
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
     operations: 299
-    tables: 116
+    tables: 115
     schemas:
     - orders
     - payments
@@ -188,7 +188,7 @@ tiers:
   services:
   - service: MarketingService
     operations: 278
-    tables: 132
+    tables: 131
     schemas:
     - marketing
     contracts:
@@ -213,7 +213,7 @@ tiers:
   meaning: Provisioning, publishing, reporting, and the one path that crosses a region.
   services:
   - service: PlatformService
-    operations: 228
+    operations: 229
     tables: 109
     schemas:
     - control
@@ -298,7 +298,7 @@ deployables:
 crossServiceWrites:
 - from: OrderService
   to: TenancyService
-  writes: 42
+  writes: 43
   reads: 11
   kind: strong
 - from: CatalogueService
@@ -381,6 +381,11 @@ crossServiceWrites:
   writes: 4
   reads: 0
   kind: ordinary
+- from: MarketingService
+  to: IdentityService
+  writes: 4
+  reads: 24
+  kind: ordinary
 - from: OrderService
   to: MarketingService
   writes: 4
@@ -400,11 +405,6 @@ crossServiceWrites:
   to: AccessService
   writes: 3
   reads: 10
-  kind: ordinary
-- from: MarketingService
-  to: IdentityService
-  writes: 3
-  reads: 24
   kind: ordinary
 - from: PlatformService
   to: OrderService
@@ -504,7 +504,7 @@ crossServiceWrites:
 - from: IdentityService
   to: MarketingService
   writes: 1
-  reads: 5
+  reads: 4
   kind: ordinary
 - from: LedgerService
   to: OrderService

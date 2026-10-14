@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/discovery-and-browse/home-landing",
-   "component": "apps/guest-web/src/routes/discovery-and-browse/HomeLandingDashboard.tsx",
+   "component": "src/routes/discovery-and-browse/HomeLandingDashboard.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -328,6 +328,7 @@
       {
        "kind": "iconButton",
        "label": "Search",
+       "operation": "searchCatalogue",
        "provenance": "carried from the previous definition"
       },
       {
@@ -383,37 +384,23 @@
    {
     "operationId": "getCookieConsentRuntime",
     "contract": "marketing-crm",
-    "purpose": "Cookie banner on first visit and what the tag loader may load",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "recordDeviceConsent",
-    "contract": "marketing-crm",
-    "purpose": "Accept all, reject non-essential or save preferences from the banner",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "decideRecommendations",
-    "contract": "ai",
-    "purpose": "Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges)",
-    "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "recordRecommendationEvents",
-    "contract": "ai",
-    "purpose": "Report impressions, clicks and declines of recommended items",
-    "trigger": "onAction",
+    "purpose": "Read by the app shell, not a control: which tracking categories this device has granted, so SDKs and the tag loader start only for those (none until granted)",
+    "trigger": "background",
     "provenance": "build, 29 September 2026"
    },
    {
     "operationId": "recordStorefrontSessionEvents",
     "contract": "white-label",
     "purpose": "Runtime-shell beacon of hashed browsing behaviour for fraud prevention (every page of the session; bound on the home screen as the shell's entry)",
-    "trigger": "onLoad",
+    "trigger": "background",
     "provenance": "build, 29 September 2026"
+   },
+   {
+    "operationId": "searchCatalogue",
+    "contract": "catalogue",
+    "purpose": "Find something by name: the header search opens the results (WEB-003) with what was typed, as GST-001's search does",
+    "trigger": "onAction",
+    "provenance": "Block A audit, 14 October 2026: N-TWIN-OPS (CHG-SCG-008)"
    }
   ],
   "entryState": {
@@ -446,6 +433,24 @@
     "removed": true,
     "why": "Replaced by `getPublishedTenantConfig`, the guest read of the same data.",
     "source": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)"
+   },
+   {
+    "operation": "decideRecommendations",
+    "removed": true,
+    "why": "The client-approved Home has no recommendation slot, so nothing shows a decision; recommendations show in the cart slot (WEB-008, GST-048).",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "recordRecommendationEvents",
+    "removed": true,
+    "why": "Goes with decideRecommendations: no recommended item is shown here to report on.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
+   },
+   {
+    "operation": "recordDeviceConsent",
+    "removed": true,
+    "why": "The client-approved UI has no tracking-consent banner or prompt, so nothing records a decision here and tracking stays off (getCookieConsentRuntime). A consent prompt needs a design the client approves.",
+    "source": "Block A audit, 14 October 2026: check-screen-wiring S-OP-UNREACHED, ruling 'wire onLoad reads to the load; otherwise remove it from the screen' (CHG-SCG-004)"
    }
   ],
   "_platform": {
@@ -489,7 +494,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/discovery-and-browse/event-and-attraction-listing",
-   "component": "apps/guest-web/src/routes/discovery-and-browse/EventAndAttractionListingList.tsx",
+   "component": "src/routes/discovery-and-browse/EventAndAttractionListingList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -738,7 +743,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/discovery-and-browse/search-results",
-   "component": "apps/guest-web/src/routes/discovery-and-browse/SearchResultsList.tsx",
+   "component": "src/routes/discovery-and-browse/SearchResultsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -906,7 +911,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/discovery-and-browse/event-attraction-detail",
-   "component": "apps/guest-web/src/routes/discovery-and-browse/EventAttractionDetail.tsx",
+   "component": "src/routes/discovery-and-browse/EventAttractionDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1236,7 +1241,7 @@
   "implementation": {
    "app": "guest-web",
    "route": "/plan-your-visit",
-   "component": "apps/guest-web/src/routes/PlanYourVisit.tsx",
+   "component": "src/routes/PlanYourVisit.tsx",
    "status": "notStarted"
   },
   "navigation": {

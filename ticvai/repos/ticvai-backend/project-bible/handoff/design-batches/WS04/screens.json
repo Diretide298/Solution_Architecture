@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "4",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/media-credential-command-center-bo-174",
-   "component": "apps/venue-management-web/src/routes/access-venue/MediaCredentialCommandCenter.tsx",
+   "component": "src/routes/access-venue/MediaCredentialCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -106,7 +107,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyFilters",
      "slot": "filters",
      "components": [
       {
@@ -126,7 +127,7 @@
      ]
     },
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -311,6 +312,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "4",
@@ -320,7 +322,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/media-type-technology-library-bo-175",
-   "component": "apps/venue-management-web/src/routes/access-venue/MediaTypeTechnologyLibrary.tsx",
+   "component": "src/routes/access-venue/MediaTypeTechnologyLibrary.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -438,6 +440,16 @@
     "source": "contracts/spine/access.yaml#listMediaTypeTechnology | contracts/spine/access.yaml#listMediaTypeCredential | contracts/spine/access.yaml#setMediaTypeTechnology"
    }
   ],
+  "entryState": {
+   "params": [
+    {
+     "name": "mediaTypeId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listMediaTypeTechnology`."
+    }
+   ]
+  },
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -467,6 +479,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "4",
@@ -476,7 +489,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/virtual-credential-media-association-bo-176",
-   "component": "apps/venue-management-web/src/routes/access-venue/VirtualCredentialMediaAssociation.tsx",
+   "component": "src/routes/access-venue/VirtualCredentialMediaAssociation.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -588,6 +601,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "4",
@@ -597,7 +611,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/verification-method-selection-locking-bo-177",
-   "component": "apps/venue-management-web/src/routes/access-venue/VerificationMethodSelectionLocking.tsx",
+   "component": "src/routes/access-venue/VerificationMethodSelectionLocking.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -757,6 +771,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "4",
@@ -766,7 +781,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/media-issuance-encoding-profile-bo-178",
-   "component": "apps/venue-management-web/src/routes/access-venue/MediaIssuanceEncodingProfile.tsx",
+   "component": "src/routes/access-venue/MediaIssuanceEncodingProfile.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -871,6 +886,14 @@
     "MediaIssuanceEncodingProfileView.identifierCollisionCheckEnabled",
     "MediaIssuanceEncodingProfileView.randomizationEnabled",
     "Duplicate Prevention — ENABLED"
+   ],
+   "params": [
+    {
+     "name": "encodingProfileId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listMediaIssuanceEncoding`."
+    }
    ]
   },
   "wireframe": {
@@ -909,6 +932,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "4",
@@ -918,7 +942,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/media-swap-replacement-bo-179",
-   "component": "apps/venue-management-web/src/routes/access-venue/MediaSwapReplacement.tsx",
+   "component": "src/routes/access-venue/MediaSwapReplacement.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1026,6 +1050,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "4",
@@ -1035,7 +1060,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/rfid-nfc-configuration-bo-180",
-   "component": "apps/venue-management-web/src/routes/access-venue/RfidNfcConfiguration.tsx",
+   "component": "src/routes/access-venue/RfidNfcConfiguration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1201,6 +1226,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "4",
@@ -1210,7 +1236,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/external-partner-credential-mapping-bo-181",
-   "component": "apps/venue-management-web/src/routes/access-venue/ExternalPartnerCredentialMapping.tsx",
+   "component": "src/routes/access-venue/ExternalPartnerCredentialMapping.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1322,6 +1348,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "SCOPE_VIEW",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "4",
@@ -1331,7 +1358,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/hotel-wallet-external-media-integration-bo-182",
-   "component": "apps/venue-management-web/src/routes/access-venue/HotelWalletExternalMediaIntegration.tsx",
+   "component": "src/routes/access-venue/HotelWalletExternalMediaIntegration.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1419,7 +1446,15 @@
    }
   ],
   "entryState": {
-   "preloaded": []
+   "preloaded": [],
+   "params": [
+    {
+     "name": "integrationId",
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional: opened without it, the screen finds it with `listHotelWalletExternal`."
+    }
+   ]
   },
   "wireframe": {
    "status": "notStarted",
@@ -1457,6 +1492,7 @@
   "module": "Access & Venue",
   "requiresModule": "access",
   "wave": 3,
+  "permission": "ACCESS_POINT_CONFIGURE",
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "4",
@@ -1466,7 +1502,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/media-compatibility-testing-publication-bo-183",
-   "component": "apps/venue-management-web/src/routes/access-venue/MediaCompatibilityTestingPublication.tsx",
+   "component": "src/routes/access-venue/MediaCompatibilityTestingPublication.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1517,7 +1553,8 @@
        "kind": "publishGate",
        "label": "What publishing changes",
        "notes": "**Names what goes live, where, and from when.** A publish with no stated consequence is one somebody presses meaning to save.",
-       "provenance": "authored — required by check-screens for publishMediaCompatibilityTesting"
+       "provenance": "authored — required by check-screens for publishMediaCompatibilityTesting",
+       "operation": "publishMediaCompatibilityTesting"
       }
      ]
     },

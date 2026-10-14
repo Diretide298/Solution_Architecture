@@ -85,7 +85,7 @@
 | `PTR-038` | Payment Terms, Billing & Account Configuration | Partners | 3 | 1 | yes |
 | `PTR-040` | Booking Limits, Commercial Exceptions & Approval | Partners | 3 | 3 | yes |
 | `PTR-041` | Commercial Agreement 360°, Health & AI Review | Partners | 3 | 1 | yes |
-| `PTR-042` | Partner Operations Command Center | Partners | 3 | 2 | yes |
+| `PTR-042` | Partner Operations Command Center | Partners | 3 | 1 | yes |
 | `PTR-043` | Partner Orders & Booking Management | Partners | 3 | 1 | yes |
 | `PTR-044` | Reservations, Holds & Release Management | Partners | 3 | 1 | yes |
 | `PTR-045` | Partner Cancellations, Refunds & Amendments | Partners | 3 | 2 | yes |

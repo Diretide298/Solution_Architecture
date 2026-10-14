@@ -15,6 +15,8 @@
 #   id                BC-001, BC-002, ... never reused
 #   contract          the contract's file name without .yaml (orders, marketing-crm, ...)
 #   operation         the operationId the change is reported against
+#   operations        optional: every operation of the contract the entry approves, when one reason covers several
+#                     (CHG-SHP-003); `operation` then names the first of them
 #   change            optional: text the reported change must contain (e.g. "is now required"); leave it
 #                     out to approve every breaking change to that operation
 #   reason            why the change cannot be made additive
@@ -586,3 +588,287 @@ changes:
     tag: r6
     producer-tickets: [SVC-MARKETING-GUEST-1]
     consumer-tickets: [APP-WEB-WEB-024, APP-MOB-GST-073]
+  # BC-340 to BC-367 (CHG-SHP-003, CHG-SHP-008): batch SHP of the 14 October Block A audit, block 340-379. One entry
+  # per contract where one reason covers several operations: `operation` names the first and `operations` lists
+  # them all (tools/check-contract-compat.py reads both). check-contract-shapes C-NO-ADDRESS: a write that replaces one
+  # item of a collection names it in the path; the item moved from the collection path to `<collection>/{key}`.
+  - id: BC-340
+    contract: access
+    operation: setAccessAttributeCatalog
+    operations: [setAccessAttributeCatalog, setAccessPointGroup, setBiometricLifecycleRetention, setCredentialActivationDisplay, setEntitlementConsumption, setFaceMatchingVerification, setFaceTagTemporaryEnrollment, setFastPassProfile, setFraudDetectionRule, setGateModePolicy, setGuestCompanionEligibility, setHardwareModel, setHotelWalletExternal, setJourneyProfile, setJourneySequenceRule, setMediaBindingRule, setMediaIssuanceEncoding, setMediaReplacementRevocation, setMediaTypeTechnology, setOperatingCalendarEntry, setParkingFacility, setPodium, setPolicyScopeHierarchy, setReasonCode]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setAccessAttributeCatalog /access-attribute-catalog -> /access-attribute-catalog/{attributeKey}; setAccessPointGroup /access-point-groups -> /access-point-groups/{groupId}; setBiometricLifecycleRetention /biometric-lifecycle-retention -> /biometric-lifecycle-retention/{retentionSettingId}; setCredentialActivationDisplay /credential-activation-display -> /credential-activation-display/{credentialPolicyId}; setEntitlementConsumption /entitlement-consumption -> /entitlement-consumption/{ruleId}; setFaceMatchingVerification /face-matching-verification -> /face-matching-verification/{profileId}; setFaceTagTemporaryEnrollment /face-tag-temporary -> /face-tag-temporary/{profileId}; setFastPassProfile /fast-pass-profiles -> /fast-pass-profiles/{fastPassProfileId}; setFraudDetectionRule /fraud-detection-rule -> /fraud-detection-rule/{ruleId}; setGateModePolicy /gate-mode-policies -> /gate-mode-policies/{gateModePolicyId}; setGuestCompanionEligibility /guest-companion-eligibility -> /guest-companion-eligibility/{ruleId}; setHardwareModel /hardware-models -> /hardware-models/{modelId}; setHotelWalletExternal /hotel-wallet-external -> /hotel-wallet-external/{integrationId}; setJourneyProfile /journey-profiles -> /journey-profiles/{journeyProfileId}; setJourneySequenceRule /journey-sequence-rules -> /journey-sequence-rules/{ruleId}; setMediaBindingRule /media-binding-rules -> /media-binding-rules/{ruleId}; setMediaIssuanceEncoding /media-issuance-encoding -> /media-issuance-encoding/{encodingProfileId}; setMediaReplacementRevocation /media-replacement-revocation -> /media-replacement-revocation/{replacementReason}; setMediaTypeTechnology /media-type-technology -> /media-type-technology/{mediaTypeId}; setOperatingCalendarEntry /operating-calendar-entries -> /operating-calendar-entries/{entryId}; setParkingFacility /parking-facilities -> /parking-facilities/{parkingFacilityId}; setPodium /podiums -> /podiums/{podiumId}; setPolicyScopeHierarchy /policy-scope-hierarchy -> /policy-scope-hierarchy/{policyId}; setReasonCode /reason-codes -> /reason-codes/{reasonCodeId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-ACCESS-ACCESS-4, SVC-ACCESS-ACCESS-5, SVC-ACCESS-ACCESS-6, TEST-AM-SETUP-VENUE-OPERATIONS-P08]
+    consumer-tickets: [APP-SETUP-BO-006, APP-SETUP-BO-006-REST, APP-SETUP-BO-151, APP-SETUP-BO-151-REST, APP-SETUP-BO-166, APP-SETUP-BO-166-REST, APP-SETUP-BO-188, APP-SETUP-BO-188-REST, APP-SETUP-BO-189, APP-SETUP-BO-189-REST, APP-SETUP-BO-201, APP-SETUP-BO-201-REST, TEST-AM-SETUP-VENUE-OPERATIONS-P08, TEST-AM-SETUP-VENUE-OPERATIONS-P08-REST]
+  - id: BC-341
+    contract: accreditation
+    operation: setAccessProfile
+    operations: [setAccessProfile, setBadgeTemplate]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setAccessProfile /accreditation-access-profiles -> /accreditation-access-profiles/{accessProfileId}; setBadgeTemplate /badge-templates -> /badge-templates/{badgeTemplateId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [none-linked]
+    consumer-tickets: [none-linked]
+  - id: BC-342
+    contract: ai
+    operation: setAiProvider
+    operations: [setAiProvider, setIndexSource]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setAiProvider /providers -> /providers/{providerId}; setIndexSource /index-sources -> /index-sources/{sourceId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [AI-ENGINE-GATEWAY, SVC-AI-RETRIEVAL-2, TEST-AM-AI-ENGINE-A]
+    consumer-tickets: [APP-SETUP-ADM-037, APP-SETUP-ADM-037-REST, TEST-AM-SETUP-AI-INTELLIGENCE-P09, TEST-AM-SETUP-AI-INTELLIGENCE-P09-REST]
+  - id: BC-343
+    contract: approvals
+    operation: setApprovalControlPolicy
+    operations: [setApprovalControlPolicy, setApprovalExternalProvider, setApprovalMatrix, setApprovalRetentionPolicy, setApprovalSlaPolicy, setApproverAvailability]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setApprovalControlPolicy /approval-control-policies -> /approval-control-policies/{controlPolicyId}; setApprovalExternalProvider /approval-external-providers -> /approval-external-providers/{externalProviderId}; setApprovalMatrix /approval-matrices -> /approval-matrices/{matrixId}; setApprovalRetentionPolicy /approval-retention -> /approval-retention/{retentionPolicyId}; setApprovalSlaPolicy /approval-sla-policies -> /approval-sla-policies/{slaPolicyId}; setApproverAvailability /approval-delegations/availability -> /approval-delegations/availability/{availabilityId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-TENANCY-APPROVALS-11, SVC-TENANCY-APPROVALS-13, SVC-TENANCY-APPROVALS-3, SVC-TENANCY-MATRIX-1, TEST-AM-APPROVALS-P08-3, TEST-AM-APPROVALS-P08-5, TEST-AM-SETUP-PLATFORM-FOUNDATION-P08, TEST-AM-TENANCY-VENUES-P08-3]
+    consumer-tickets: [APP-CONSOLE-ADM-534, APP-SETUP-ADM-354, APP-SETUP-ADM-354-REST, APP-SETUP-BO-087, APP-SETUP-BO-087-REST, TEST-AM-APPROVALS-P08, TEST-AM-APPROVALS-P08-2, TEST-AM-APPROVALS-P08-3, TEST-AM-APPROVALS-P08-5, TEST-AM-APPROVALS-P09, TEST-AM-SETUP-PLATFORM-FOUNDATION-P08, TEST-AM-SETUP-PLATFORM-FOUNDATION-P08-REST, TEST-AM-TENANCY-VENUES-P08-3, VM-ADM-330, VM-ADM-331, VM-ADM-332, VM-ADM-333, VM-ADM-334, VM-ADM-335, VM-ADM-336, VM-ADM-341, VM-ADM-346, VM-BO-086, VM-BO-386, VM-BO-387, VM-BO-388, VM-BO-639]
+  - id: BC-344
+    contract: assets
+    operation: setMediaDistributionChannels
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setMediaDistributionChannels /media-distribution/channels -> /media-distribution/channels/{code}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-VENUEOPS-ASSETS-5, TEST-AM-DIGITAL-ASSETS-P13-3]
+    consumer-tickets: [APP-CMS-CMS-093, APP-CMS-CMS-094, APP-CMS-CMS-096, TEST-AM-DIGITAL-ASSETS-P13-3]
+  - id: BC-345
+    contract: catalogue
+    operation: publishActivationScheduler
+    operations: [publishActivationScheduler, setChannelConnectionConfiguration, setConfigurationTemplate, setCurrencyRoundingRule, setEventType, setFeeDefinition, setMarketPricingConfiguration, setMembershipBenefit, setMembershipProgramme, setPerformanceTemplate, setPrepaidMinutePackage, setPriceCalculationPolicy, setPriceCategoryRateType, setPricingChangeRequest, setSignalRegistryPolicy, setSpace]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: publishActivationScheduler /activation-scheduler -> /activation-scheduler/{lifecycleActionId}; setChannelConnectionConfiguration /channel-connections -> /channel-connections/{connectionId}; setConfigurationTemplate /configuration-templates -> /configuration-templates/{configurationTemplateId}; setCurrencyRoundingRule /rounding-profiles -> /rounding-profiles/{roundingProfileId}; setEventType /event-types -> /event-types/{eventTypeId}; setFeeDefinition /fees -> /fees/{feeId}; setMarketPricingConfiguration /pricing-markets -> /pricing-markets/{marketId}; setMembershipBenefit /membership-benefits -> /membership-benefits/{benefitId}; setMembershipProgramme /membership-programmes -> /membership-programmes/{programId}; setPerformanceTemplate /performance-templates -> /performance-templates/{performanceTemplateId}; setPrepaidMinutePackage /prepaid-minute-packages -> /prepaid-minute-packages/{prepaidMinutesId}; setPriceCalculationPolicy /calculation-profiles -> /calculation-profiles/{calculationProfileId}; setPriceCategoryRateType /price-categories -> /price-categories/{priceCategoryId}; setPricingChangeRequest /pricing-change-request -> /pricing-change-request/{changeId}; setSignalRegistryPolicy /signal-registry -> /signal-registry/{signalId}; setSpace /spaces -> /spaces/{spaceId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-CATALOGUE-CATALOGUE-10, SVC-CATALOGUE-CATALOGUE-11, SVC-CATALOGUE-CATALOGUE-13, SVC-CATALOGUE-CATALOGUE-14, SVC-CATALOGUE-CATALOGUE-16, SVC-CATALOGUE-CATALOGUE-3, SVC-CATALOGUE-CATALOGUE-9, SVC-CATALOGUE-DRAFTED-10, SVC-CATALOGUE-DRAFTED-20, SVC-CATALOGUE-EVENTS-4, SVC-CATALOGUE-EVENTS-5, SVC-CATALOGUE-EVENTS-6, TEST-AM-SUBSCRIPTION-LICENSING-P08, TEST-AM-TICKETING-P08, TEST-AM-TICKETING-P08-2, TEST-AM-TICKETING-P08-3, TEST-AM-TICKETING-P08-4, TEST-AM-TICKETING-P08-6, TEST-AM-TICKETING-P08-7, TEST-AM-TICKETING-P08-8, TEST-AM-TICKETING-P08-9, VM-CATALOGUE-EVENTS-1]
+    consumer-tickets: [TEST-AM-SUBSCRIPTION-LICENSING-P08, TEST-AM-TICKETING-P08, TEST-AM-TICKETING-P08-10, TEST-AM-TICKETING-P08-2, TEST-AM-TICKETING-P08-3, TEST-AM-TICKETING-P08-4, TEST-AM-TICKETING-P08-6, TEST-AM-TICKETING-P08-7, TEST-AM-TICKETING-P08-8, TEST-AM-TICKETING-P08-9, VM-ADM-050, VM-ADM-054, VM-ADM-056, VM-ADM-071, VM-ADM-074, VM-ADM-075, VM-ADM-079, VM-ADM-107, VM-ADM-117, VM-ADM-125, VM-ADM-126, VM-ADM-269, VM-BO-016, VM-BO-285, VM-BO-288, VM-BO-695, VM-BO-701, VM-BO-702, VM-BO-721, VM-BO-722, VM-BO-723, VM-BO-724]
+  - id: BC-346
+    contract: finance
+    operation: setEInvoicingProvider
+    operations: [setEInvoicingProvider, setFxRate, setTaxInvoiceTemplate]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setEInvoicingProvider /e-invoicing/providers -> /e-invoicing/providers/{providerId}; setFxRate /fx-rates -> /fx-rates/{rateId}; setTaxInvoiceTemplate /tax-invoice-templates -> /tax-invoice-templates/{invoiceTemplateId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-LEDGER-LEDGER-1, SVC-LEDGER-TAX-2, SVC-LEDGER-TAX-6, TEST-AM-SETUP-FINANCE-INSIGHTS-P08-REST]
+    consumer-tickets: [APP-SETUP-ADM-069, APP-SETUP-ADM-069-REST, APP-SETUP-BO-077, APP-SETUP-BO-077-REST, TEST-AM-SETUP-FINANCE-INSIGHTS-P08, TEST-AM-SETUP-FINANCE-INSIGHTS-P08-REST]
+  - id: BC-347
+    contract: fnb
+    operation: setOutletTemplate
+    operations: [setOutletTemplate, setRecipe, setTemperatureCheckpoint]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setOutletTemplate /outlet-templates -> /outlet-templates/{code}; setRecipe /recipes -> /recipes/{recipeId}; setTemperatureCheckpoint /food-safety/checkpoints -> /food-safety/checkpoints/{checkpointId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-FNB-PRODUCTION-1, TEST-AM-SETUP-FOOD-BEVERAGE-RETAIL-P08]
+    consumer-tickets: [APP-SETUP-BO-111, APP-SETUP-BO-111-REST, TEST-AM-FOOD-BEVERAGE-P08-BLOCK-A, TEST-AM-SETUP-FOOD-BEVERAGE-RETAIL-P08]
+  - id: BC-348
+    contract: games
+    operation: setAttractionType
+    operations: [setAttractionType, setReaderProfile]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setAttractionType /attraction-types -> /attraction-types/{attractionTypeId}; setReaderProfile /reader-profiles -> /reader-profiles/{readerProfileId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [none-linked]
+    consumer-tickets: [none-linked]
+  - id: BC-349
+    contract: identity
+    operation: setCapabilityTemplate
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setCapabilityTemplate /capability-templates -> /capability-templates/{capabilityTemplateId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-IDENTITY-ADMINISTRATION-2]
+    consumer-tickets: [APP-SETUP-BO-054, APP-SETUP-BO-054-REST, TEST-AM-SETUP-PLATFORM-FOUNDATION-P08, TEST-AM-SETUP-PLATFORM-FOUNDATION-P08-REST]
+  - id: BC-350
+    contract: marketing-crm
+    operation: setAgentServiceProfile
+    operations: [setAgentServiceProfile, setBadge, setBusinessEventMapping, setCaseCategoryDefinition, setCaseInternalRequest, setCaseResolution, setChannelProvider, setCommunicationRoutingRule, setContactAutomation, setCookieBannerDesign, setCookieScanPolicy, setDataProcessingPurpose, setDataRetentionPolicy, setDynamicFieldQuestion, setIntelligentRoutingSkill, setLegalHold, setLoyaltyCampaign, setOrderBookingTicket, setPrivacyAction, setPrivacyComplianceException, setPrivacyNoticePolicyGovernance, setPrivacyRequest, setPrivacyRequestTypes, setQualityEvaluation, setRefundCompensationService, setReward, setSenderIdentityDomain, setServiceQueueDefinition, setSlaPolicy, setTrackingTechnology, setWaiverAssociation, setWaiverException, setWaiverTemplateMaster, setWaiverTriggerRule, setWaiverVerificationValidation]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setAgentServiceProfile /agent-workload-availability -> /agent-workload-availability/{agentServiceProfileId}; setBadge /badges -> /badges/{badgeId}; setBusinessEventMapping /business-event-notification -> /business-event-notification/{eventId}; setCaseCategoryDefinition /case-categories -> /case-categories/{caseCategoryId}; setCaseInternalRequest /escalation-collaboration-internal -> /escalation-collaboration-internal/{internalRequestId}; setCaseResolution /case-resolution-closure -> /case-resolution-closure/{caseResolutionId}; setChannelProvider /channel-provider -> /channel-provider/{communicationProviderId}; setCommunicationRoutingRule /routing-priority-throttling -> /routing-priority-throttling/{routingRuleId}; setContactAutomation /contact-automation -> /contact-automation/{automationId}; setCookieBannerDesign /cookie-banner-preference -> /cookie-banner-preference/{bannerDesignId}; setCookieScanPolicy /cookie-scan-policy -> /cookie-scan-policy/{scanPolicyId}; setDataProcessingPurpose /data-processing-purpose -> /data-processing-purpose/{purposeId}; setDataRetentionPolicy /retention-policies -> /retention-policies/{retentionPolicyId}; setDynamicFieldQuestion /dynamic-field-question -> /dynamic-field-question/{formId}/{key}; setIntelligentRoutingSkill /intelligent-routing-skill -> /intelligent-routing-skill/{routingRuleId}; setLegalHold /data-retention-expiry -> /data-retention-expiry/{holdId}; setLoyaltyCampaign /loyalty/campaigns -> /loyalty/campaigns/{loyaltyCampaignId}; setOrderBookingTicket /order-booking-ticket -> /order-booking-ticket/{serviceActionId}; setPrivacyAction /deletion-anonymization-restriction -> /deletion-anonymization-restriction/{actionId}; setPrivacyComplianceException /privacy-compliance-exception -> /privacy-compliance-exception/{exceptionId}; setPrivacyNoticePolicyGovernance /privacy-notice-policy -> /privacy-notice-policy/{governanceId}; setPrivacyRequest /data-subject-customer -> /data-subject-customer/{requestId}; setPrivacyRequestTypes /privacy -> /privacy/{requestTypeId}; setQualityEvaluation /quality-agent-evaluation -> /quality-agent-evaluation/{evaluationId}; setRefundCompensationService /refund-compensation-service -> /refund-compensation-service/{compensationRequestId}; setReward /loyalty/rewards -> /loyalty/rewards/{rewardId}; setSenderIdentityDomain /sender-identity-domain -> /sender-identity-domain/{senderIdentityId}; setServiceQueueDefinition /service-queues -> /service-queues/{queueId}; setSlaPolicy /sla-policies -> /sla-policies/{slaPolicyId}; setTrackingTechnology /cookie-tracking-digital -> /cookie-tracking-digital/{technologyId}; setWaiverAssociation /product-event-experience -> /product-event-experience/{associationId}; setWaiverException /site-waiver-exception -> /site-waiver-exception/{waiverExceptionId}; setWaiverTemplateMaster /waiver-template-master -> /waiver-template-master/{waiverId}; setWaiverTriggerRule /waiver-trigger-eligibility -> /waiver-trigger-eligibility/{triggerRuleId}; setWaiverVerificationValidation /waiver-verification-validation -> /waiver-verification-validation/{verificationId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-MARKETING-CASE-1, SVC-MARKETING-CASE-2, SVC-MARKETING-CONSENT-24, SVC-MARKETING-CONSENT-4, SVC-MARKETING-CONSENT-7, SVC-MARKETING-CONSENT-8, SVC-MARKETING-GUESTS-3, SVC-MARKETING-LOYALTY-3, SVC-MARKETING-LOYALTY-6, SVC-MARKETING-LOYALTY-7, SVC-MARKETING-MESSAGE-2, TEST-AM-SETUP-CUSTOMER-MARKETING-P08, TEST-AM-SETUP-CUSTOMER-MARKETING-P08-REST, TEST-AM-SETUP-CUSTOMER-MARKETING-P13-REST]
+    consumer-tickets: [APP-SETUP-BO-826, APP-SETUP-BO-826-REST, APP-SETUP-BO-827, APP-SETUP-BO-827-REST, APP-SETUP-BO-828, APP-SETUP-BO-828-REST, APP-SETUP-CMS-025, APP-SETUP-CMS-025-REST, APP-SETUP-CMS-026, APP-SETUP-CMS-026-REST, TEST-AM-SETUP-CUSTOMER-MARKETING-P08, TEST-AM-SETUP-CUSTOMER-MARKETING-P08-REST, TEST-AM-SETUP-CUSTOMER-MARKETING-P13, TEST-AM-SETUP-CUSTOMER-MARKETING-P13-REST]
+  - id: BC-351
+    contract: orders
+    operation: setGroupCustomerOrganization
+    operations: [setGroupCustomerOrganization, setPaymentProvider]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setGroupCustomerOrganization /group-customer-organization -> /group-customer-organization/{organisationId}; setPaymentProvider /payment-providers -> /payment-providers/{providerId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-ORDER-ORDERS-5]
+    consumer-tickets: [APP-SETUP-ADM-412, APP-SETUP-ADM-412-REST, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09, TEST-AM-SETUP-PLATFORM-FOUNDATION-P09-REST]
+  - id: BC-352
+    contract: payments
+    operation: setMerchantAccount
+    operations: [setMerchantAccount, setPaymentTerminalConfiguration, setReconciliationSource]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setMerchantAccount /merchant-accounts -> /merchant-accounts/{merchantAccountId}; setPaymentTerminalConfiguration /payment-terminals -> /payment-terminals/{deviceId}; setReconciliationSource /reconciliation-sources -> /reconciliation-sources/{sourceId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-ORDER-PAYMENTS-4, TEST-AM-TENANCY-VENUES-P08-2]
+    consumer-tickets: [TEST-AM-TENANCY-VENUES-P08-2, VM-ADM-581]
+  - id: BC-353
+    contract: platform-ops
+    operation: setWafPolicy
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setWafPolicy /waf-policies -> /waf-policies/{wafRuleId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [none-linked]
+    consumer-tickets: [none-linked]
+  - id: BC-354
+    contract: public-api
+    operation: setApiAnomalyRule
+    operations: [setApiAnomalyRule, setApiLicensing, setApiQuota]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setApiAnomalyRule /api-anomaly-rules -> /api-anomaly-rules/{anomalyRuleId}; setApiLicensing /api-licensing -> /api-licensing/{licenceId}; setApiQuota /api-quotas -> /api-quotas/{quotaId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-PLATFORM-PUBLICAPI-11, SVC-PLATFORM-PUBLICAPI-2, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14-REST]
+    consumer-tickets: [APP-CONSOLE-ADM-015, APP-SETUP-DEV-008, APP-SETUP-DEV-008-REST, TEST-AM-PUBLIC-API-P09, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14, TEST-AM-SETUP-PLATFORM-FOUNDATION-P14-REST]
+  - id: BC-355
+    contract: queue
+    operation: configureQueueFeed
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: configureQueueFeed /queue-feeds -> /queue-feeds/{feedId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [TEST-AM-SETUP-VENUE-OPERATIONS-P08-REST, VM-VENUEOPS-FEED-1]
+    consumer-tickets: [APP-SETUP-BO-001, APP-SETUP-BO-001-REST, TEST-AM-SETUP-VENUE-OPERATIONS-P08, TEST-AM-SETUP-VENUE-OPERATIONS-P08-REST]
+  - id: BC-356
+    contract: reporting
+    operation: setAlertRule
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setAlertRule /alert-rules -> /alert-rules/{alertRuleId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-REPORTING-REPORTING-1]
+    consumer-tickets: [APP-SETUP-BO-133, APP-SETUP-BO-133-REST, TEST-AM-REPORTING-P08-BLOCK-A, TEST-AM-SETUP-FINANCE-INSIGHTS-P08]
+  - id: BC-357
+    contract: retail
+    operation: setStoreRules
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setStoreRules /store-rules -> /store-rules/{storeRuleId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [none-linked]
+    consumer-tickets: [none-linked]
+  - id: BC-358
+    contract: seating
+    operation: setSeatHoldType
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setSeatHoldType /seat-hold-types -> /seat-hold-types/{holdTypeId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [none-linked]
+    consumer-tickets: [none-linked]
+  - id: BC-359
+    contract: subscription
+    operation: setChannelListing
+    operations: [setChannelListing, setLicensingModel, setModuleListing, setPartnerContact, setTrialConfiguration]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setChannelListing /channel-listings -> /channel-listings/{listingId}; setLicensingModel /licensing-models -> /licensing-models/{licensingModelId}; setModuleListing /module-catalogue -> /module-catalogue/{moduleCode}; setPartnerContact /partner-contacts -> /partner-contacts/{contactId}; setTrialConfiguration /trial-configurations -> /trial-configurations/{trialConfigurationId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-PLATFORM-SUBSCRIPTION-1, SVC-PLATFORM-SUBSCRIPTION-13, SVC-PLATFORM-SUBSCRIPTION-14, SVC-PLATFORM-SUBSCRIPTION-16, SVC-PLATFORM-SUBSCRIPTION-20, TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, TEST-AM-SUBSCRIPTION-LICENSING-P09-3, TEST-AM-SUBSCRIPTION-LICENSING-P09-4, TEST-AM-SUBSCRIPTION-LICENSING-P10]
+    consumer-tickets: [APP-CONSOLE-ADM-393, APP-CONSOLE-ADM-394, APP-CONSOLE-ADM-395, APP-CONSOLE-ADM-396, APP-CONSOLE-ADM-413, APP-PARTNER-PTR-025, APP-SETUP-BO-013, APP-SETUP-BO-013-REST, TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08, TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST, TEST-AM-SUBSCRIPTION-LICENSING-P09-3, TEST-AM-SUBSCRIPTION-LICENSING-P09-4, TEST-AM-SUBSCRIPTION-LICENSING-P10]
+  - id: BC-360
+    contract: tenancy
+    operation: setConfigurationProfile
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setConfigurationProfile /configuration-profiles -> /configuration-profiles/{profileId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [VM-TENANCY-TENANCY-2]
+    consumer-tickets: [TEST-AM-TENANCY-VENUES-P08, VM-BO-123, VM-BO-129]
+  - id: BC-361
+    contract: wallet
+    operation: setGiftCardProduct
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setGiftCardProduct /gift-card-products -> /gift-card-products/{giftCardProductId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [none-linked]
+    consumer-tickets: [none-linked]
+  - id: BC-362
+    contract: white-label
+    operation: setAnalyticsProvider
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setAnalyticsProvider /tenant-config/analytics-providers -> /tenant-config/analytics-providers/{analyticsProviderId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-WHITELABEL-OVERVIEW-2]
+    consumer-tickets: [APP-WL-CMS-016, TEST-AM-WHITE-LABEL-P13]
+  - id: BC-363
+    contract: workforce
+    operation: setIntegrationSource
+    operations: [setIntegrationSource, setJobTitle, setLabourBudget, setLeaveType, setShiftPattern, setShiftTemplate, setWorkAssignment]
+    reason: 'check-contract-shapes C-NO-ADDRESS (R162, R103; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): each of these PUTs created or replaced one item of a collection that the body named, on the collection path, so neither the route nor the contract said which row it addressed or whether it replaced or upserted. The item is now addressed in the path, and a body key, when sent, must equal it. Moves: setIntegrationSource /integration-sources -> /integration-sources/{sourceId}; setJobTitle /job-titles -> /job-titles/{jobTitleId}; setLabourBudget /labour-budgets -> /labour-budgets/{labourBudgetId}; setLeaveType /leave-types -> /leave-types/{leaveTypeId}; setShiftPattern /shift-patterns -> /shift-patterns/{shiftPatternId}; setShiftTemplate /shift-templates -> /shift-templates/{shiftTemplateId}; setWorkAssignment /work-assignments -> /work-assignments/{workAssignmentId}. A path cannot change additively.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [TEST-AM-IDENTITY-SECURITY-P08, VM-TENANCY-WORKFORCE-1]
+    consumer-tickets: [TEST-AM-IDENTITY-SECURITY-P08, VM-BO-053]
+  - id: BC-364
+    contract: catalogue
+    operation: updateDonationCampaign
+    change: "removed"
+    reason: 'check-contract-shapes C-PATCH-FULL-BODY (the ADAM CR-089 pattern; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): the PATCH body was the persisted DonationCampaign with its required list, so a partial update had to resend the whole resource. The body is now UpdateDonationCampaignRequest (minProperties 1, no required, no defaults). The server-owned fields (id, raisedTotal) leave the request; breaking in declaration only, as BC-089: there is no additionalProperties false, so a full body is still accepted and those fields ignored.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [TEST-AM-TICKETING-P08, VM-CATALOGUE-CATALOGUE-2]
+    consumer-tickets: [TEST-AM-TICKETING-P08, VM-BO-1190]
+  - id: BC-365
+    contract: subscription
+    operation: updatePartnerAgreement
+    change: "removed"
+    reason: 'check-contract-shapes C-PATCH-FULL-BODY (the ADAM CR-089 pattern; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): the PATCH body was the persisted PartnerAgreement with its required list, so a partial update had to resend the whole resource. The body is now UpdatePartnerAgreementRequest (minProperties 1, no required, no defaults). The server-owned fields (id, partnerName, version, approvalRequestId) leave the request; breaking in declaration only, as BC-089: there is no additionalProperties false, so a full body is still accepted and those fields ignored.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-PLATFORM-SUBSCRIPTION-9]
+    consumer-tickets: [none-linked]
+  - id: BC-366
+    contract: workforce
+    operation: updateRotaAssignment
+    change: "removed"
+    reason: 'check-contract-shapes C-PATCH-FULL-BODY (the ADAM CR-089 pattern; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): the PATCH body was the persisted RotaAssignment with its required list, so a partial update had to resend the whole resource. The body is now UpdateRotaAssignmentRequest (minProperties 1, no required, no defaults). The server-owned fields (overtimeMinutes, breachesWorkingHourLimit, id, displayName) leave the request; breaking in declaration only, as BC-089: there is no additionalProperties false, so a full body is still accepted and those fields ignored.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-TENANCY-ROTA-1, TEST-AM-SETUP-VENUE-OPERATIONS-P08]
+    consumer-tickets: [APP-SETUP-BO-055, APP-SETUP-BO-055-REST, TEST-AM-SETUP-VENUE-OPERATIONS-P08, TEST-AM-SETUP-VENUE-OPERATIONS-P08-REST]
+  - id: BC-367
+    contract: fnb
+    operation: updateTableReservation
+    change: "removed"
+    reason: 'check-contract-shapes C-PATCH-FULL-BODY (the ADAM CR-089 pattern; audit of 14 October 2026, docs/active/audit-runs/audit-1014/classes.json): the PATCH body was the persisted TableReservation with its required list, so a partial update had to resend the whole resource. The body is now UpdateTableReservationRequest (minProperties 1, no required, no defaults). The server-owned fields (id, takenByPrincipalId, actualPartySize, tableVisitId, createdAt) leave the request; breaking in declaration only, as BC-089: there is no additionalProperties false, so a full body is still accepted and those fields ignored.'
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-FNB-FNB-10, TEST-AM-ORDERS-RESERVATIONS-P01]
+    consumer-tickets: [APP-MOB-GST-070, APP-WEB-WEB-031, APP-WEB-WEB-036, TEST-AM-FOOD-BEVERAGE-P01, TEST-AM-FOOD-BEVERAGE-P02, TEST-AM-ORDERS-RESERVATIONS-P01]
+  # BC-280 and BC-281 (CHG-STO-015, Block A storage audit, batch STO): CookieScanPolicy.frequency listed `off` unquoted,
+  # which YAML reads as the boolean false, so the enum the wire carried was [daily, weekly, monthly, false] and
+  # derive-ddl could give the column no CHECK (ST-ENUM-CHECK). Quoted, it is the string "off" the field always meant.
+  - id: BC-280
+    contract: marketing-crm
+    operation: setCookieScanPolicy
+    change: "`frequency`"
+    reason: >-
+      The value was never the boolean false: `off` is the fourth scan frequency, and a client sending false or the
+      string "off" saw the same field; the enum now says "off". No consumer is built (APP-SETUP-CMS-025 not started).
+      Block A audit before r6, class check-contract-storage/ST-ENUM-CHECK (CHG-STO-015).
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-MARKETING-CONSENT-24]
+    consumer-tickets: [APP-SETUP-CMS-025, APP-SETUP-CMS-025-REST]
+  - id: BC-281
+    contract: marketing-crm
+    operation: listCookieScanPolicies
+    change: "`items[].frequency`"
+    reason: >-
+      As BC-280: the response's `frequency` enum is the string "off", not the boolean false (CHG-STO-015).
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-MARKETING-CONSENT-23]
+    consumer-tickets: [APP-SETUP-CMS-025, APP-SETUP-CMS-025-REST]
+  - id: BC-230
+    contract: games
+    operation: getGameCard
+    change: "x-ticvai-permission changed"
+    reason: >-
+      Block A audit, 14 October 2026 (S-STAFF-AUDIENCE, AM-STAFF-OP; the contract gap CHG-WIR-004): five back-office
+      screens (BO-454, BO-455, BO-457, BO-462, BO-486) read a game card and the operation was guest-only. Staff now call
+      it with WALLET_VIEW (a card's credits are stored value); a guest calls it in its own session as before
+      (x-ticvai-guest-callable). Breaking only for an API-key reader whose key lacks WALLET_VIEW (CHG-SCR-015).
+    approved-by: 'Chinmay Parab, 14 October 2026 (Block A audit: "go with your recommendation")'
+    tag: r6
+    producer-tickets: [SVC-VENUEOPS-CARD-1]
+    consumer-tickets: [VM-BO-454, VM-BO-455, VM-BO-457, VM-BO-462, VM-BO-486, APP-WEB-WEB-021, APP-MOB-GST-011]

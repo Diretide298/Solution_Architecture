@@ -154,14 +154,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-973` | Layout Command Center | C | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `BO-974` | Template Library | C | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `BO-975` | Event-Specific Layout | D | 0 | 0 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `BO-973` | Layout Command Center | C | 0 | 11 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `BO-974` | Template Library | C | 0 | 6 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `BO-975` | Event-Specific Layout | D | 0 | 20 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 | `BO-976` | Clone & Inheritance | C | 0 | 20 | 6 | 3 | 1 | 0 | — | notStarted (—) |
 | `BO-977` | Version Compare | C | 2 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-978` | Multi-Performance Assignment | C | 7 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-979` | Temporary Seat Blocking | C | 0 | 0 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `BO-980` | Scheduled Seat Release | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-978` | Multi-Performance Assignment | C | 7 | 11 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `BO-979` | Temporary Seat Blocking | C | 0 | 12 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-980` | Scheduled Seat Release | C | 0 | 10 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-981` | Conflict & Impact Simulation | C | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-982` | Approval, Publish & Rollback | C | 0 | 20 | 6 | 5 | 0 | 3 | — | notStarted (—) |
 

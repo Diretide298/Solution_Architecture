@@ -95,13 +95,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-549` | AI Governance Monitoring Command Center | D | 8 | 33 | 7 | 4 | 1 | 0 | — | notStarted (—) |
+| `ADM-549` | AI Governance Monitoring Command Center | D | 8 | 266 | 7 | 4 | 1 | 0 | — | notStarted (—) |
 | `ADM-550` | AI Risk Register & Risk Exposure Management | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-551` | AI Governance Control Library & Control Effectiveness | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-552` | AI Policy Compliance & Violation Monitoring | D | 6 | 20 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-553` | AI Data, Privacy & Usage Compliance Monitoring | D | 6 | 40 | 7 | 1 | 0 | 4 | — | notStarted (—) |
+| `ADM-551` | AI Governance Control Library & Control Effectiveness | D | 8 | 20 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-552` | AI Policy Compliance & Violation Monitoring | D | 6 | 132 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-553` | AI Data, Privacy & Usage Compliance Monitoring | D | 6 | 168 | 7 | 1 | 0 | 4 | — | notStarted (—) |
 | `ADM-554` | AI Quality, Behavior & Governance Drift Monitoring | A | 15 | 25 | 7 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-555` | AI Governance Alert & Detection Center | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-555` | AI Governance Alert & Detection Center | D | 9 | 22 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-556` | AI Incident & Remediation Management | A | 25 | 19 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-557` | AI Compliance, Assurance & Governance Reporting | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-558` | AI Governance Review, Action Plan & Continuous Improvement | D | 7 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
@@ -227,29 +227,298 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
 | Label | chip: Forecast | — |
 
-**Active AI Capabilities** (metric tile)
+**Active AI Capabilities** (metric tile, from `getAiUsage`)
 
-**AI Decisions Today** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
+| Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tokens | 1,234 | — |
+| Used spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Used tokens | 1,234 | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Group by | text | — |
+| Rows | list or chips (count when long) | — |
+| Key | text | — |
+| Interactions | 1,234 | — |
+| Prompt tokens | 1,234 | — |
+| Completion tokens | 1,234 | — |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| P95 latency ms | 1,234 | — |
+| Refusal rate | 12.5% | — |
+| Rejection rate | 12.5% | Proposals a person refused. The number that says whether the assistant is worth having, and the one nobody thinks to measure. |
+| Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
+| Label | chip: Forecast | — |
 
-**Governance Compliance Rate** (metric tile)
+**AI Decisions Today** (metric tile, from `getAiUsage`)
 
-**Policy Violations** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
+| Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tokens | 1,234 | — |
+| Used spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Used tokens | 1,234 | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Group by | text | — |
+| Rows | list or chips (count when long) | — |
+| Key | text | — |
+| Interactions | 1,234 | — |
+| Prompt tokens | 1,234 | — |
+| Completion tokens | 1,234 | — |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| P95 latency ms | 1,234 | — |
+| Refusal rate | 12.5% | — |
+| Rejection rate | 12.5% | Proposals a person refused. The number that says whether the assistant is worth having, and the one nobody thinks to measure. |
+| Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
+| Label | chip: Forecast | — |
 
-**High-Risk Events** (metric tile)
+**Governance Compliance Rate** (metric tile, from `getAiUsage`)
 
-**Critical AI Events** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
+| Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tokens | 1,234 | — |
+| Used spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Used tokens | 1,234 | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Group by | text | — |
+| Rows | list or chips (count when long) | — |
+| Key | text | — |
+| Interactions | 1,234 | — |
+| Prompt tokens | 1,234 | — |
+| Completion tokens | 1,234 | — |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| P95 latency ms | 1,234 | — |
+| Refusal rate | 12.5% | — |
+| Rejection rate | 12.5% | Proposals a person refused. The number that says whether the assistant is worth having, and the one nobody thinks to measure. |
+| Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
+| Label | chip: Forecast | — |
 
-**Open AI Incidents** (metric tile)
+**Policy Violations** (metric tile, from `getAiUsage`)
 
-**Active Exceptions** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
+| Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tokens | 1,234 | — |
+| Used spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Used tokens | 1,234 | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Group by | text | — |
+| Rows | list or chips (count when long) | — |
+| Key | text | — |
+| Interactions | 1,234 | — |
+| Prompt tokens | 1,234 | — |
+| Completion tokens | 1,234 | — |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| P95 latency ms | 1,234 | — |
+| Refusal rate | 12.5% | — |
+| Rejection rate | 12.5% | Proposals a person refused. The number that says whether the assistant is worth having, and the one nobody thinks to measure. |
+| Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
+| Label | chip: Forecast | — |
 
-**Controls Passing** (metric tile)
+**High-Risk Events** (metric tile, from `getAiUsage`)
 
-**Controls Failing** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
+| Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tokens | 1,234 | — |
+| Used spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Used tokens | 1,234 | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Group by | text | — |
+| Rows | list or chips (count when long) | — |
+| Key | text | — |
+| Interactions | 1,234 | — |
+| Prompt tokens | 1,234 | — |
+| Completion tokens | 1,234 | — |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| P95 latency ms | 1,234 | — |
+| Refusal rate | 12.5% | — |
+| Rejection rate | 12.5% | Proposals a person refused. The number that says whether the assistant is worth having, and the one nobody thinks to measure. |
+| Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
+| Label | chip: Forecast | — |
 
-**AI Capabilities Under Review** (metric tile)
+**Critical AI Events** (metric tile, from `getAiUsage`)
 
-**Governance Health Score** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
+| Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tokens | 1,234 | — |
+| Used spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Used tokens | 1,234 | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Group by | text | — |
+| Rows | list or chips (count when long) | — |
+| Key | text | — |
+| Interactions | 1,234 | — |
+| Prompt tokens | 1,234 | — |
+| Completion tokens | 1,234 | — |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| P95 latency ms | 1,234 | — |
+| Refusal rate | 12.5% | — |
+| Rejection rate | 12.5% | Proposals a person refused. The number that says whether the assistant is worth having, and the one nobody thinks to measure. |
+| Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
+| Label | chip: Forecast | — |
+
+**Open AI Incidents** (metric tile, from `listAiIncidents`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Reference | text | — |
+| Title | text | — |
+| Kind | chip: Governance, Operational, Both | — |
+| Severity | chip: Low, Medium, High, Critical | — |
+| Status | chip: Open, Contained, Investigating, Remediating, Closed | — |
+| Capability keys | list or chips (count when long) | — |
+| Alerts | list or chips (count when long) | — |
+| Operational incident ref | text | The linked operational incident, where both apply (AIC-250). |
+| Containment | list or chips (count when long) | — |
+| Action | text | — |
+| Target ref | text | — |
+| At | 1 Oct 2026, 14:30 | — |
+| By principal | the name it points at, never the id | — |
+| Root cause | text | — |
+| Remediation | text | — |
+| Impact | text | The post-incident review's impact (`closeAiIncident`, CHG-CSA-045). |
+| Control failure | text | — |
+| Lessons learned | text | — |
+
+**Active Exceptions** (metric tile, from `getAiUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
+| Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tokens | 1,234 | — |
+| Used spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Used tokens | 1,234 | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Group by | text | — |
+| Rows | list or chips (count when long) | — |
+| Key | text | — |
+| Interactions | 1,234 | — |
+| Prompt tokens | 1,234 | — |
+| Completion tokens | 1,234 | — |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| P95 latency ms | 1,234 | — |
+| Refusal rate | 12.5% | — |
+| Rejection rate | 12.5% | Proposals a person refused. The number that says whether the assistant is worth having, and the one nobody thinks to measure. |
+| Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
+| Label | chip: Forecast | — |
+
+**Controls Passing** (metric tile, from `getAiUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
+| Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tokens | 1,234 | — |
+| Used spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Used tokens | 1,234 | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Group by | text | — |
+| Rows | list or chips (count when long) | — |
+| Key | text | — |
+| Interactions | 1,234 | — |
+| Prompt tokens | 1,234 | — |
+| Completion tokens | 1,234 | — |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| P95 latency ms | 1,234 | — |
+| Refusal rate | 12.5% | — |
+| Rejection rate | 12.5% | Proposals a person refused. The number that says whether the assistant is worth having, and the one nobody thinks to measure. |
+| Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
+| Label | chip: Forecast | — |
+
+**Controls Failing** (metric tile, from `getAiUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
+| Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tokens | 1,234 | — |
+| Used spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Used tokens | 1,234 | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Group by | text | — |
+| Rows | list or chips (count when long) | — |
+| Key | text | — |
+| Interactions | 1,234 | — |
+| Prompt tokens | 1,234 | — |
+| Completion tokens | 1,234 | — |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| P95 latency ms | 1,234 | — |
+| Refusal rate | 12.5% | — |
+| Rejection rate | 12.5% | Proposals a person refused. The number that says whether the assistant is worth having, and the one nobody thinks to measure. |
+| Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
+| Label | chip: Forecast | — |
+
+**AI Capabilities Under Review** (metric tile, from `getAiUsage`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
+| Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
+| Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Tokens | 1,234 | — |
+| Used spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| Used tokens | 1,234 | — |
+| From | 1 Oct 2026 | — |
+| To | 1 Oct 2026 | — |
+| Group by | text | — |
+| Rows | list or chips (count when long) | — |
+| Key | text | — |
+| Interactions | 1,234 | — |
+| Prompt tokens | 1,234 | — |
+| Completion tokens | 1,234 | — |
+| Cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
+| P95 latency ms | 1,234 | — |
+| Refusal rate | 12.5% | — |
+| Rejection rate | 12.5% | Proposals a person refused. The number that says whether the assistant is worth having, and the one nobody thinks to measure. |
+| Forecast | grouped details | A month-end projection, labelled a forecast (AI design 2.3, 4.5). Present where `to` is inside the current month. |
+| Label | chip: Forecast | — |
+
+**Governance Health Score** (metric tile, from `listAiCapabilityHealth`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Capability key | text | — |
+| Availability | 1,234.5 | — |
+| P95 latency ms | 1,234 | — |
+| Latency budget ms | 1,234 | — |
+| Error rate | 12.5% | — |
+| Breaker state | chip: Closed, Half open, Open | — |
+| Degraded | yes / no (icon or chip) | Answering from its degradation mode (rules only, search only, a person). |
+| Data freshness | text | e.g. index lag, the last forecast published. |
+| Requests | 1,234 | — |
+| Measured at | 1 Oct 2026, 14:30 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -318,6 +587,8 @@ health:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 4 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -361,7 +632,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (266 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-549?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-002`, `ADM-550`, `ADM-551`, `ADM-552`, `ADM-553`, `ADM-554`, `ADM-555`, `ADM-556`, `ADM-557`, `ADM-558`.
@@ -409,10 +680,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Category | select | — | Customer · Commercial · Financial · Operational · Security · Model quality · Privacy · Compliance | `listAiRiskRegister` ?category |
-| Status | radio group | — | Open · Mitigating · Accepted · Closed | `listAiRiskRegister` ?status |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Category | select | — | Customer · Commercial · Financial · Operational · Security · Model quality · Privacy · Compliance | `listAiRiskRegister` ?category |
+| Status | radio group | — | Open · Mitigating · Accepted · Closed | `listAiRiskRegister` ?status |
 
 **Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
 
@@ -461,7 +732,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Critical (secondary button) | navigation or local | — | — | — | — |
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 
-**Data it reads**: `listAiRiskRegister` (onLoad, The AI risk register); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …); `listAiRiskRegister` (onLoad, The AI risk register)
 
 **Where the user goes next**
 
@@ -499,13 +770,15 @@ entry:
 
 #### Permissions
 
-- `listAiRiskRegister` → `AI_USE` (operate) · staff
-- `setAiRiskRegisterEntry` → `AI_CONFIGURE` (configure) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `listAiRiskRegister` → `AI_USE` (operate) · staff
+- `setAiRiskRegisterEntry` → `AI_CONFIGURE` (configure) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -598,6 +871,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`runAiControlTest`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Manual result `manualResult` | segmented control | optional | — | Pass · Fail | — | — | `runAiControlTest` body |
+| Evidence `evidence` | key and value settings | optional | — | — | — | — | `runAiControlTest` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -613,14 +893,31 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAiControls`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Control key | text | — |
+| Name | text | — |
+| Description | text | — |
+| Kind | chip: Deterministic, Manual | — |
+| Check ref | text | The registered check a deterministic control runs. Not free SQL from a request. |
+| Frequency | chip: Nightly, Weekly, Monthly, On demand | — |
+| Capability keys | list or chips (count when long) | — |
+| Owner principal | the name it points at, never the id | — |
+| Effectiveness | chip: Effective, Partially effective, Ineffective, Untested | — |
+| Last tested at | 1 Oct 2026, 14:30 | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `runAiControlTest` POST `/controls/{controlKey}/tests` | inline | AiControlTest | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
@@ -668,6 +965,8 @@ control:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -695,8 +994,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403, 404).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-551?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-549`.
@@ -715,7 +1014,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | Block D · task APP-CONSOLE-ADM-552 |
-| Who uses it | ticvai staff holding `AI_CONFIGURE`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 operate, 1 read); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Compliance KPIs) and a per-row directory (§Show) — counts over a population, then the population |
 | Offline | online only |
@@ -775,19 +1074,152 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Evaluated Actions** (metric tile)
+**Evaluated Actions** (metric tile, from `listAiGovernanceAlerts`)
 
-**Compliant** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
-**Blocked by Policy** (metric tile)
+**Compliant** (metric tile, from `listAiGovernanceAlerts`)
 
-**Policy Violations** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
-**Attempted Violations** (metric tile)
+**Blocked by Policy** (metric tile, from `listAiGovernanceAlerts`)
 
-**Exception-Based Actions** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
-**Unknown / Unclassified Actions** (metric tile)
+**Policy Violations** (metric tile, from `listAiGovernanceAlerts`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**Attempted Violations** (metric tile, from `listAiGovernanceAlerts`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**Exception-Based Actions** (metric tile, from `listAiGovernanceAlerts`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**Unknown / Unclassified Actions** (metric tile, from `listAiGovernanceAlerts`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Every policy compliance violation** (data table)
 
@@ -844,7 +1276,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The alert is already closed (`alert-not-open`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
 #### Sample data for the mock-up
 
@@ -862,12 +1294,13 @@ violation:
 #### Permissions
 
 - `listAiGovernanceAlerts` → `AI_USE` (operate) · staff
-- `decideAiGovernanceAlert` → `AI_CONFIGURE` (configure) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -896,12 +1329,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403).
+- [ ] Every output is drawn (132 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-552?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-549`.
-- [ ] Every gated control is gated: `AI_CONFIGURE`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -916,7 +1349,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
 | Block | Block D · task APP-CONSOLE-ADM-553 |
-| Who uses it | ticvai staff holding `AI_CONFIGURE`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 operate, 1 read); in the flows as platform admin |
+| Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Data Usage KPIs) and a per-row directory (§Show) — counts over a population, then the population |
 | Offline | online only |
@@ -976,21 +1409,173 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**AI Data Requests** (metric tile)
+**AI Data Requests** (metric tile, from `listAiGovernanceAlerts`)
 
-**Allowed** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
-**Conditionally Allowed** (metric tile)
+**Allowed** (metric tile, from `listAiGovernanceAlerts`)
 
-**Blocked** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
-**External Transfers** (metric tile)
+**Conditionally Allowed** (metric tile, from `listAiGovernanceAlerts`)
 
-**Masked / Redacted** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
-**Data Policy Violations** (metric tile)
+**Blocked** (metric tile, from `listAiGovernanceAlerts`)
 
-**Unknown Data Categories** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**External Transfers** (metric tile, from `listAiGovernanceAlerts`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**Masked / Redacted** (metric tile, from `listAiGovernanceAlerts`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**Data Policy Violations** (metric tile, from `listAiGovernanceAlerts`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
+
+**Unknown Data Categories** (metric tile, from `listAiGovernanceAlerts`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Every data privacy usage** (data table)
 
@@ -1063,7 +1648,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The alert is already closed (`alert-not-open`). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
 #### Sample data for the mock-up
 
@@ -1083,12 +1668,13 @@ row:
 #### Permissions
 
 - `listAiGovernanceAlerts` → `AI_USE` (operate) · staff
-- `decideAiGovernanceAlert` → `AI_CONFIGURE` (configure) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1120,12 +1706,12 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403).
+- [ ] Every output is drawn (168 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-553?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-549`.
-- [ ] Every gated control is gated: `AI_CONFIGURE`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
+- [ ] Every gated control is gated: `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
 
@@ -1371,6 +1957,8 @@ alert: Ready to promote - Attendance forecast (Coastal Aqua)
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1466,6 +2054,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope
 
+**Sent by **** (`decideAiGovernanceAlert`; no form is declared, so these are filled from the screen or collected inline)
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Decision `decision` | radio group | required | — | Acknowledge · Dismiss · Resolve · Open incident | — | — | `decideAiGovernanceAlert` body |
+| Note `note` | text area | optional | — | max length 1000 | — | — | `decideAiGovernanceAlert` body |
+| Incident `incidentId` | picker: choose an incident | optional | — | — | shows names, sends the id | — | `decideAiGovernanceAlert` body |
+
 #### Outputs: what the screen shows and produces
 
 **Shown**
@@ -1481,14 +2077,33 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
-**Data table** (data table): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+**Data table** (data table, from `listAiGovernanceAlerts`): **Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| ID | the name it points at, never the id | — |
+| Kind | chip: Policy violation, Cross scope attempt, Masking defect, Data usage, Behaviour drift … | — |
+| Severity | chip: Info, Low, Medium, High, Critical | — |
+| Capability key | text | — |
+| Release | the name it points at, never the id | For `promotionReady` and `evaluationRegression`: the release concerned. |
+| Subject ref | text | — |
+| Evidence | grouped details | — |
+| Status | chip: Open, Acknowledged, Dismissed, Resolved, Incident opened | — |
+| Incident | the name it points at, never the id | — |
+| Raised at | 1 Oct 2026, 14:30 | — |
+| Decided by principal | the name it points at, never the id | — |
+| Decided at | 1 Oct 2026, 14:30 | — |
+| Note | text | — |
+| Next cursor | text | — |
+| Has more | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
-|  (primary button) | navigation or local | — | — | — | — |
+|  (primary button) | `decideAiGovernanceAlert` POST `/governance-alerts/{alertId}/decide` | inline | AiGovernanceAlert | 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The alert is already closed (`alert-not-open`). | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
 
 **Rules for what is shown** (from the AI & Intelligence process; these refine the tables above and win where they differ)
@@ -1537,12 +2152,13 @@ alerts:
 
 - `listAiGovernanceAlerts` → `AI_USE` (operate) · staff
 - `decideAiGovernanceAlert` → `AI_CONFIGURE` (configure) · staff
-- `openAiIncident` → `AI_CONFIGURE` (configure) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `AI_USE`
 
 #### Requirements it meets
 
@@ -1571,8 +2187,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-555?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Cancel.
 - [ ] Every transition is wired: `ADM-549`.
@@ -1836,6 +2452,8 @@ correctiveActions:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `AI_USE`
+
 #### Requirements it meets
 
 1 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1913,11 +2531,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Category | select | — | Customer · Commercial · Financial · Operational · Security · Model quality · Privacy · Compliance | `listAiRiskRegister` ?category |
-| Status | radio group | — | Open · Mitigating · Accepted · Closed | `listAiRiskRegister` ?status |
-| Effectiveness | radio group | — | Effective · Partially effective · Ineffective · Untested | `listAiControls` ?effectiveness |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Category | select | — | Customer · Commercial · Financial · Operational · Security · Model quality · Privacy · Compliance | `listAiRiskRegister` ?category |
+| Status | radio group | — | Open · Mitigating · Accepted · Closed | `listAiRiskRegister` ?status |
 
 **Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
 
@@ -1966,7 +2583,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **report list**: Report, period, last generated, export (PDF/CSV/JSON). *(source: contracts/satellite/ai.yaml#exportAiEvidencePackage)*
 
-**Data it reads**: `listAiRiskRegister` (onLoad, The AI risk register); `listAiControls` (onLoad, Governance controls); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …); `listAiRiskRegister` (onLoad, The AI risk register)
 
 **Where the user goes next**
 
@@ -1997,14 +2614,15 @@ report:
 
 #### Permissions
 
-- `exportAiEvidencePackage` → `AI_AUDIT_VIEW` (read) · staff
-- `listAiRiskRegister` → `AI_USE` (operate) · staff
-- `listAiControls` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `exportAiEvidencePackage` → `AI_AUDIT_VIEW` (read) · staff
+- `listAiRiskRegister` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -2084,13 +2702,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
-| Kind | select | — | Policy violation · Cross scope attempt · Masking defect · Data usage · Behaviour drift · Input drift · Bias · Override rate shift · Control failed · Spend · Provider breaker · Evaluation regression … | `listAiGovernanceAlerts` ?kind |
-| Status | radio group | — | Open · Acknowledged · Dismissed · Resolved · Incident opened | `listAiGovernanceAlerts` ?status |
-| Severity | radio group | — | Info · Low · Medium · High · Critical | `listAiGovernanceAlerts` ?severity |
-| Category | select | — | Customer · Commercial · Financial · Operational · Security · Model quality · Privacy · Compliance | `listAiRiskRegister` ?category |
-| Status | radio group | — | Open · Mitigating · Accepted · Closed | `listAiRiskRegister` ?status |
 | Status | radio group | — | Onboarding · Active · Suspended · Terminating · Terminated | `listTenants` ?status |
 | Plan | picker: choose a plan | — | — | `listTenants` ?planId |
+| Category | select | — | Customer · Commercial · Financial · Operational · Security · Model quality · Privacy · Compliance | `listAiRiskRegister` ?category |
+| Status | radio group | — | Open · Mitigating · Accepted · Closed | `listAiRiskRegister` ?status |
 
 **Form: Open access grant** (modal, opened by *Open access grant*; *Open access grant* calls `openPlatformStaffGrant`, *Cancel* sends nothing)
 
@@ -2132,7 +2747,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - **review**: Period summary, findings, action plan rows; actions link to pause/rollback. *(source: contracts/satellite/ai.yaml#listAiGovernanceAlerts / contracts/satellite/ai.yaml#listAiRiskRegister)*
 
-**Data it reads**: `listAiGovernanceAlerts` (onLoad, Governance alerts); `listAiRiskRegister` (onLoad, The AI risk register); `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …)
+**Data it reads**: `listTenants` (onLoad, The tenant picker: the operator picks a tenant before …); `listAiRiskRegister` (onLoad, The AI risk register)
 
 **Where the user goes next**
 
@@ -2165,13 +2780,14 @@ action:
 
 #### Permissions
 
-- `listAiGovernanceAlerts` → `AI_USE` (operate) · staff
-- `listAiRiskRegister` → `AI_USE` (operate) · staff
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
+- `listAiRiskRegister` → `AI_USE` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `PLATFORM_TENANT_VIEW`
 
 #### Requirements it meets
 
@@ -2323,23 +2939,23 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiAutonomyLevel": {"type":"integer","minimum":0,"maximum":4,"description":"**One autonomy scale for every capability** (design 3.8 and 5.5, GOV 0 to 4; ADR-0050). 0 disabled; 1 advisory (explains and recommends, nothing is drafted to run); 2 prepare (drafts a proposal a person applies in the owning screen); 3 execute with approval (the plan runs after approval, through owning APIs); 4 controlled auto (runs without approval, only for listed low-risk reversible actions inside pre-approved ranges). **Not the approval tier**: `ProposedAction.approvalLevel` is the tier."},
 "AiCapabilityFamily": {"type":"string","enum":["gatewayAndModels","governance","actionPipeline","knowledgeRetrieval","assistants","analyticsInsights","configurationAssistant","forecasting","anomalyDetection","riskIntelligence","recommendations","decisionRecords","operationsEvaluation","residencyPrivacy"],"description":"The fourteen capabilities of the AI system design (section 1.1), C1 to C14 in order: gateway and model registry, governance decision point, action pipeline and human oversight, knowledge and retrieval, assistants, analytics assistant and insights, configuration assistant, forecasting and operational requirements, anomaly detection, fraud and risk intelligence, recommendation and upsell engine, decision records and audit, operations/evaluation/cost, residency/privacy/tenancy. **Every registered capability belongs to exactly one**, which is what `AiPolicy.enabledCapabilities` and the usage report group by."},
 "AiCapabilityHealth": {"type":"object","x-ticvai-persistence":"none — computed from gateway telemetry, ai.activity and the breaker state in cache","description":"How one capability is running over the last hour (21 September minutes, M21-13).","required":["capabilityKey"],"properties":{"capabilityKey":{"type":"string"},"availability":{"type":"number","minimum":0,"maximum":1},"p95LatencyMs":{"type":"integer"},"latencyBudgetMs":{"type":"integer","nullable":true},"errorRate":{"type":"number","minimum":0,"maximum":1},"breakerState":{"type":"string","enum":["closed","halfOpen","open"]},"degraded":{"type":"boolean","description":"Answering from its degradation mode (rules only, search only, a person)."},"dataFreshness":{"type":"string","nullable":true,"description":"e.g. index lag, the last forecast published."},"requests":{"type":"integer"},"measuredAt":{"type":"string","format":"date-time"}}},
-"AiCapabilityRegistration": {"type":"object","x-ticvai-persistence":"ai.capability","description":"**An entry in the capability registry** (design 3.1 Registry, AIC-144, AIC-145; ADM-520). Nothing becomes an operational AI capability without a row here: owner, function, risk class, autonomy, data categories and lifecycle per environment. `autonomyCeiling` is the platform ceiling for the tenant; a tenant or venue may lower `autonomyLevel`, never raise it (AIC-151).","required":["capabilityKey","family","riskClass","autonomyLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"capabilityKey":{"type":"string","description":"Stable key, unique per tenant: `assistant.guest`, `forecast.attendance`, `risk.transaction`, `config.assistant`, `recommend.checkout`."},"family":{"$ref":"#/components/schemas/AiCapabilityFamily"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal","description":"The accountable business owner (AIC-144)."},"businessFunction":{"type":"string","nullable":true},"riskClass":{"$ref":"#/components/schemas/AiRiskClass"},"autonomyCeiling":{"allOf":[{"$ref":"#/components/schemas/AiAutonomyLevel"}],"readOnly":true,"description":"The first-release ceiling for this capability (design 3.8 table). Read-only to a tenant."},"autonomyLevel":{"allOf":[{"$ref":"#/components/schemas/AiAutonomyLevel"}],"description":"The level in force at this scope. At most `autonomyCeiling`."},"dataCategories":{"type":"array","items":{"type":"string"},"description":"Data categories the capability reads (ADM-524)."},"lifecycle":{"type":"object","description":"Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production.","properties":{"development":{"type":"string","enum":["draft","pilot","active","retired"]},"staging":{"type":"string","enum":["draft","pilot","active","retired"]},"production":{"type":"string","enum":["draft","pilot","active","retired"]}}},"degradationMode":{"type":"string","enum":["rulesOnly","searchOnly","humanHandoff","hidden","failOpen","lastPublished"],"description":"What the capability does when its model or the service is unavailable (design 3.7, AIC-241)."},"status":{"type":"string","enum":["active","paused"],"readOnly":true,"description":"Paused by `pauseAiCapability`: the capability answers from its degradation mode until resumed."},"pausedReason":{"type":"string","nullable":true,"readOnly":true},"pausedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiCapabilityRegistration": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"ai.capability","description":"**An entry in the capability registry** (design 3.1 Registry, AIC-144, AIC-145; ADM-520). Nothing becomes an operational AI capability without a row here: owner, function, risk class, autonomy, data categories and lifecycle per environment. `autonomyCeiling` is the platform ceiling for the tenant; a tenant or venue may lower `autonomyLevel`, never raise it (AIC-151).","required":["capabilityKey","family","riskClass","autonomyLevel"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"capabilityKey":{"type":"string","description":"Stable key, unique per tenant: `assistant.guest`, `forecast.attendance`, `risk.transaction`, `config.assistant`, `recommend.checkout`."},"family":{"$ref":"#/components/schemas/AiCapabilityFamily"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal","description":"The accountable business owner (AIC-144)."},"businessFunction":{"type":"string","nullable":true},"riskClass":{"$ref":"#/components/schemas/AiRiskClass"},"autonomyCeiling":{"allOf":[{"$ref":"#/components/schemas/AiAutonomyLevel"}],"readOnly":true,"description":"The first-release ceiling for this capability (design 3.8 table). Read-only to a tenant."},"autonomyLevel":{"allOf":[{"$ref":"#/components/schemas/AiAutonomyLevel"}],"description":"The level in force at this scope. At most `autonomyCeiling`."},"dataCategories":{"type":"array","items":{"type":"string"},"description":"Data categories the capability reads (ADM-524)."},"lifecycle":{"type":"object","description":"Lifecycle per environment (AIC-145): a capability or model can be live in staging and still a draft in production.","properties":{"development":{"type":"string","enum":["draft","pilot","active","retired"]},"staging":{"type":"string","enum":["draft","pilot","active","retired"]},"production":{"type":"string","enum":["draft","pilot","active","retired"]}}},"degradationMode":{"type":"string","enum":["rulesOnly","searchOnly","humanHandoff","hidden","failOpen","lastPublished"],"description":"What the capability does when its model or the service is unavailable (design 3.7, AIC-241)."},"status":{"type":"string","enum":["active","paused"],"readOnly":true,"description":"Paused by `pauseAiCapability`: the capability answers from its degradation mode until resumed."},"pausedReason":{"type":"string","nullable":true,"readOnly":true},"pausedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiControl": {"type":"object","x-ticvai-persistence":"ai.control","description":"**A governance control** (AIC-219, ADM-551). Deterministic controls run nightly as SQL over system records (design 4.4): every applied tier-2 action has an approver other than the requester; no L3+ action executed without approval; no card field in any prompt.","required":["controlKey","name","kind"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"controlKey":{"type":"string"},"name":{"type":"string"},"description":{"type":"string","nullable":true},"kind":{"type":"string","enum":["deterministic","manual"]},"checkRef":{"type":"string","nullable":true,"description":"The registered check a deterministic control runs. Not free SQL from a request."},"frequency":{"type":"string","enum":["nightly","weekly","monthly","onDemand"]},"capabilityKeys":{"type":"array","items":{"type":"string"}},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal"},"effectiveness":{"type":"string","enum":["effective","partiallyEffective","ineffective","untested"],"readOnly":true},"lastTestedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiControlTest": {"type":"object","x-ticvai-persistence":"ai.control_test","description":"One run of a control and what it found. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.","required":["controlId","result"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"controlId":{"type":"string","format":"uuid","x-ticvai-references":"ai.control"},"result":{"type":"string","enum":["pass","fail","error"]},"exceptionsFound":{"type":"integer","minimum":0},"evidence":{"type":"object","additionalProperties":true,"nullable":true},"runByPrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal","description":"Null where the nightly job ran it."},"runAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiEvaluationRun": {"type":"object","x-ticvai-persistence":"ai.eval_run","description":"One evaluation of a candidate against its baseline: offline golden set, backtest or shadow comparison. **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.","required":["suiteId","kind","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"suiteId":{"type":"string","format":"uuid","x-ticvai-references":"ai.eval_suite"},"releaseId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.release"},"kind":{"type":"string","enum":["offline","backtest","shadow"]},"candidateRef":{"type":"string"},"baselineRef":{"type":"string","nullable":true},"status":{"type":"string","enum":["queued","running","passed","failed","error"],"readOnly":true},"metrics":{"type":"object","additionalProperties":true,"nullable":true,"readOnly":true},"gate":{"type":"object","additionalProperties":true,"nullable":true,"readOnly":true,"description":"The promotion gate thresholds (design 3.5 table) and whether each passed."},"isolationCasesPassed":{"type":"boolean","readOnly":true,"description":"False blocks release, whatever the other metrics say."},"requestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"startedAt":{"type":"string","format":"date-time","readOnly":true},"completedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiGovernanceAlert": {"type":"object","x-ticvai-persistence":"ai.governance_alert","description":"**A governance alert** (design 4.4, AIC-210..223; ADM-549..555). Kept separate from operational incidents and linked where both apply (AIC-250). **`promotionReady`** (design 3.12, decided 29 September): a shadow model passed its promotion gate; the alert names the release and waits for a person to call `promoteAiRelease`. Monitoring never switches a model (AIC-252).","required":["kind","severity","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"type":"string","enum":["policyViolation","crossScopeAttempt","maskingDefect","dataUsage","behaviourDrift","inputDrift","bias","overrideRateShift","controlFailed","spend","providerBreaker","evaluationRegression","forecastNotPublished","indexLag","promotionReady"]},"severity":{"type":"string","enum":["info","low","medium","high","critical"]},"capabilityKey":{"type":"string","nullable":true},"releaseId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.release","description":"For `promotionReady` and `evaluationRegression`: the release concerned."},"subjectRef":{"type":"string","nullable":true},"evidence":{"type":"object","additionalProperties":true,"nullable":true},"status":{"type":"string","enum":["open","acknowledged","dismissed","resolved","incidentOpened"],"readOnly":true},"incidentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"ai.incident"},"raisedAt":{"type":"string","format":"date-time","readOnly":true},"decidedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"decidedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"note":{"type":"string","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
-"AiIncident": {"type":"object","x-ticvai-persistence":"ai.incident","description":"**An AI governance incident** (ADM-556): detection, containment, investigation, remediation and closure.","required":["reference","title","severity","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"reference":{"type":"string","readOnly":true},"title":{"type":"string"},"kind":{"type":"string","enum":["governance","operational","both"]},"severity":{"type":"string","enum":["low","medium","high","critical"]},"status":{"type":"string","enum":["open","contained","investigating","remediating","closed"],"readOnly":true},"capabilityKeys":{"type":"array","items":{"type":"string"}},"alertIds":{"type":"array","items":{"type":"string","format":"uuid"}},"operationalIncidentRef":{"type":"string","nullable":true,"description":"The linked operational incident, where both apply (AIC-250)."},"containment":{"type":"array","items":{"type":"object","properties":{"action":{"type":"string"},"targetRef":{"type":"string"},"at":{"type":"string","format":"date-time"},"byPrincipalId":{"type":"string","format":"uuid"}}},"readOnly":true},"rootCause":{"type":"string","nullable":true},"remediation":{"type":"string","nullable":true},"impact":{"type":"string","nullable":true,"description":"The post-incident review's impact (`closeAiIncident`, CHG-CSA-045)."},"controlFailure":{"type":"string","nullable":true},"lessonsLearned":{"type":"string","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal"},"openedAt":{"type":"string","format":"date-time","readOnly":true},"containedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"closedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
-"AiRelease": {"type":"object","x-ticvai-persistence":"ai.release","description":"**The release pointer per capability and tenant** (design 3.5): draft, offline evaluation, shadow, canary, production, monitored. Rollback is a pointer switch. **A model goes live only when a person promotes it** (design 3.12, decided 29 September).","required":["capabilityKey","artefactKind","candidateRef","layer","stage"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"capabilityKey":{"type":"string"},"artefactKind":{"type":"string","enum":["model","prompt","routing","embedding","retrieval","rule"]},"candidateRef":{"type":"string"},"currentRef":{"type":"string","nullable":true,"description":"What production runs now: the rule, or the previously promoted artefact."},"previousRef":{"type":"string","nullable":true,"readOnly":true},"layer":{"type":"string","enum":["platform","tenant"]},"module":{"allOf":[{"$ref":"#/components/schemas/common::ModuleKey"}],"nullable":true,"description":"**Whose AI this release is, and so who promotes it** (Chinmay, 2 October, workbook Q7: \"AI release promotion goes to whoever holds it\"; CHG-FUP-004). For a tenant release, `promoteAiRelease` requires the permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this module; a tenant release with no module cannot be promoted (`409 module-required`). Set when the release is registered, from the capability's module. Null on a platform release, which `PLATFORM_AI_MANAGE` promotes."},"suggestionKind":{"allOf":[{"$ref":"#/components/schemas/SuggestionKind"}],"nullable":true,"description":"Where the capability answers a `requestSuggestion` kind: promotion rewrites that kind's assignment in `AiPolicy.suggestionProviders`."},"stage":{"type":"string","enum":["draft","offlineEval","shadow","canary","production","monitored","rolledBack","rejected"],"readOnly":true},"shadowStartedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"gatePassedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the shadow run passed its gate and `promotionReady` was raised."},"canaryScope":{"type":"object","additionalProperties":true,"nullable":true,"description":"Venues or share of traffic in canary."},"promotedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"promotedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"rolledBackByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"rolledBackAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiIncident": {"type":"object","x-ticvai-persistence":"ai.incident","description":"**An AI governance incident** (ADM-556): detection, containment, investigation, remediation and closure.","required":["reference","title","severity","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"reference":{"type":"string","readOnly":true},"title":{"type":"string"},"kind":{"type":"string","enum":["governance","operational","both"]},"severity":{"type":"string","enum":["low","medium","high","critical"]},"status":{"type":"string","enum":["open","contained","investigating","remediating","closed"],"readOnly":true},"capabilityKeys":{"type":"array","items":{"type":"string"}},"alertIds":{"type":"array","items":{"type":"string","format":"uuid"}},"operationalIncidentRef":{"type":"string","nullable":true,"description":"The linked operational incident, where both apply (AIC-250)."},"containment":{"x-ticvai-persistence-column":"jsonb","x-ticvai-persistence-kind":"valueObject","type":"array","items":{"type":"object","properties":{"action":{"type":"string"},"targetRef":{"type":"string"},"at":{"type":"string","format":"date-time"},"byPrincipalId":{"type":"string","format":"uuid"}}},"readOnly":true},"rootCause":{"type":"string","nullable":true},"remediation":{"type":"string","nullable":true},"impact":{"type":"string","nullable":true,"description":"The post-incident review's impact (`closeAiIncident`, CHG-CSA-045)."},"controlFailure":{"type":"string","nullable":true},"lessonsLearned":{"type":"string","nullable":true},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal"},"openedAt":{"type":"string","format":"date-time","readOnly":true},"containedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"closedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
+"AiRelease": {"x-ticvai-rls":"read-beneath","type":"object","x-ticvai-persistence":"ai.release","description":"**The release pointer per capability and tenant** (design 3.5): draft, offline evaluation, shadow, canary, production, monitored. Rollback is a pointer switch. **A model goes live only when a person promotes it** (design 3.12, decided 29 September).","required":["capabilityKey","artefactKind","candidateRef","layer","stage"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"capabilityKey":{"type":"string"},"artefactKind":{"type":"string","enum":["model","prompt","routing","embedding","retrieval","rule"]},"candidateRef":{"type":"string"},"currentRef":{"type":"string","nullable":true,"description":"What production runs now: the rule, or the previously promoted artefact."},"previousRef":{"type":"string","nullable":true,"readOnly":true},"layer":{"type":"string","enum":["platform","tenant"]},"module":{"allOf":[{"$ref":"#/components/schemas/common::ModuleKey"}],"nullable":true,"description":"**Whose AI this release is, and so who promotes it** (Chinmay, 2 October, workbook Q7: \"AI release promotion goes to whoever holds it\"; CHG-FUP-004). For a tenant release, `promoteAiRelease` requires the permission `contracts/shared/permissions.yaml` `x-ticvai-module-ai-publish` names for this module; a tenant release with no module cannot be promoted (`409 module-required`). Set when the release is registered, from the capability's module. Null on a platform release, which `PLATFORM_AI_MANAGE` promotes."},"suggestionKind":{"allOf":[{"$ref":"#/components/schemas/SuggestionKind"}],"nullable":true,"description":"Where the capability answers a `requestSuggestion` kind: promotion rewrites that kind's assignment in `AiPolicy.suggestionProviders`."},"stage":{"type":"string","enum":["draft","offlineEval","shadow","canary","production","monitored","rolledBack","rejected"],"readOnly":true},"shadowStartedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"gatePassedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the shadow run passed its gate and `promotionReady` was raised."},"canaryScope":{"type":"object","additionalProperties":true,"nullable":true,"description":"Venues or share of traffic in canary."},"promotedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"promotedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"rolledBackByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"identity.principal"},"rolledBackAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiRiskClass": {"type":"string","enum":["low","medium","high","critical"],"description":"Business, customer, financial, operational, security and compliance impact of a capability or action type (AIC-144, ADM-521). The governance decision point scores against it."},
 "AiRiskRegisterEntry": {"type":"object","x-ticvai-persistence":"ai.risk_register","description":"**The AI risk register** (ADM-550): ongoing risks of AI capabilities with likelihood, impact, controls and residual rating. Board 1 classifies capabilities; this manages the risks over time.","required":["title","category","likelihood","impact"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"title":{"type":"string"},"category":{"type":"string","enum":["customer","commercial","financial","operational","security","modelQuality","privacy","compliance"]},"capabilityKeys":{"type":"array","items":{"type":"string"}},"likelihood":{"type":"integer","minimum":1,"maximum":5},"impact":{"type":"integer","minimum":1,"maximum":5},"inherentRating":{"type":"string","enum":["low","medium","high","critical"],"readOnly":true},"controlKeys":{"type":"array","items":{"type":"string"}},"residualRating":{"type":"string","enum":["low","medium","high","critical"]},"treatment":{"type":"string","enum":["accept","mitigate","transfer","avoid"]},"ownerPrincipalId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"identity.principal"},"status":{"type":"string","enum":["open","mitigating","accepted","closed"]},"reviewDueAt":{"type":"string","format":"date-time","nullable":true},"updatedAt":{"type":"string","format":"date-time","readOnly":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiTrainingRun": {"type":"object","x-ticvai-persistence":"ai.training_run","description":"**One per-tenant training run** (29 September, AI functions review; design 3.5): trained on the tenant's own data only, backtested, then run in shadow. When its shadow period passes the gate, the release moves to `gatePassedAt` and a `promotionReady` alert goes to the admin (AI-D16).","required":["capabilityKey","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"capabilityKey":{"type":"string"},"suggestionKind":{"allOf":[{"$ref":"#/components/schemas/SuggestionKind"}],"nullable":true},"forecastDefinitionKey":{"type":"string","nullable":true},"trainingWindowFrom":{"type":"string","format":"date"},"trainingWindowTo":{"type":"string","format":"date"},"dataCutoffAt":{"type":"string","format":"date-time"},"includesImportedHistory":{"type":"boolean","default":false},"featureSetVersion":{"type":"string"},"artefactRef":{"type":"string","nullable":true,"description":"The model file in the tenant's Blob container."},"backtestRunId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.eval_run"},"releaseId":{"type":"string","format":"uuid","nullable":true,"x-ticvai-references":"ai.release"},"status":{"type":"string","enum":["queued","training","backtesting","shadow","gatePassed","gateFailed","failed"]},"metrics":{"type":"object","additionalProperties":true,"nullable":true},"startedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."}}},
 "AiUsageReport": {"type":"object","x-ticvai-persistence":"none — aggregated from ai.activity","properties":{"currency":{"type":"string","minLength":3,"maxLength":3,"readOnly":true,"description":"**The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD** (CHG-RUL-017; Chinmay, 2 October, workbook Q8; CHG-CSA-004). Every `cost` here is in it; token counts sit beside each cost."},"ceiling":{"type":"object","nullable":true,"readOnly":true,"description":"The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far (CHG-CSA-004).","properties":{"spend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"tokens":{"type":"integer","nullable":true},"usedSpend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"usedTokens":{"type":"integer"}}},"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"groupBy":{"type":"string"},"rows":{"type":"array","items":{"type":"object","properties":{"key":{"type":"string"},"interactions":{"type":"integer"},"promptTokens":{"type":"integer"},"completionTokens":{"type":"integer"},"cost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"p95LatencyMs":{"type":"integer"},"refusalRate":{"type":"number"},"rejectionRate":{"type":"number","description":"Proposals a person refused. **The number that says whether the assistant is worth having**, and the one nobody thinks to measure.\n"}}}},"forecast":{"type":"object","nullable":true,"description":"**A month-end projection, labelled a forecast** (AI design 2.3, 4.5). Present where `to` is inside the current month. Never added into `rows`.\n","properties":{"label":{"type":"string","enum":["forecast"]},"periodEnd":{"type":"string","format":"date"},"projectedTokens":{"type":"integer"},"projectedCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"basis":{"type":"string","description":"How it was projected, e.g. the run rate of the last 7 days."}}}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
 "Permission": {"type":"string","enum":["SESSION_FORCE_LOGOUT","USER_MANAGE","ROLE_MANAGE","PERMISSION_GRANT","PERMISSION_VIEW","PERMISSION_MANAGE","PLATFORM_TENANT_VIEW","PLATFORM_TENANT_MANAGE","PLATFORM_TENANT_TERMINATE","PLATFORM_PLAN_MANAGE","PLATFORM_CELL_VIEW","PLATFORM_CELL_MANAGE","PLATFORM_BILLING_VIEW","PLATFORM_AI_MANAGE","PLATFORM_BILLING_MANAGE","PLATFORM_RELEASE_VIEW","PLATFORM_RELEASE_MANAGE","PLATFORM_RELEASE_PROMOTE","PLATFORM_MIGRATION_VIEW","PLATFORM_MIGRATION_APPLY","PLATFORM_TENANT_ACCESS","TENANT_CONFIGURE","TENANT_VIEW","TENANT_PUBLISH","SCOPE_VIEW","SCOPE_MANAGE","REGION_CONFIGURE","WORKSTATION_CONFIGURE","PRODUCT_VIEW","PRODUCT_CONFIGURE","PRODUCT_APPROVE","PRODUCT_PUBLISH","PRICE_VIEW","PRICE_CONFIGURE","EVENT_CONFIGURE","PERFORMANCE_CONFIGURE","CAPACITY_CONFIGURE","ORDER_VIEW","ORDER_VIEW_OTHER","ORDER_CREATE","ORDER_MODIFY","ORDER_DISCOUNT","ORDER_CANCEL","ORDER_VOID","ORDER_REFUND","ORDER_REFUND_APPROVE","ORDER_REFUND_BULK","ORDER_EXCHANGE","ORDER_RESCHEDULE","ORDER_REPRINT","PRICE_OVERRIDE","DISCOUNT_APPLY","CREDIT_MANAGE","CREDIT_OVERRIDE","WALLET_VIEW","WALLET_OPERATE","WALLET_CONFIGURE","PAYMENT_VIEW","PAYMENT_CONFIGURE","PAYMENT_PROVIDER_MANAGE","PAYMENT_DISPUTE","SHIFT_OPEN","SHIFT_CLOSE","SHIFT_SUSPEND","SHIFT_CLOSE_OTHER","SHIFT_APPROVE_OPEN","SHIFT_APPROVE_CLOSE","SHIFT_REOPEN","CASH_LIFT","CASH_ADD","CASH_NO_SALE","DEPOSIT_BOX_MODIFY_OWN","DEPOSIT_BOX_MODIFY_OTHER","OVERSHORT_ACCEPT","ACCESS_VALIDATE","ACCESS_OVERRIDE","ACCESS_POINT_CONFIGURE","TURNSTILE_MODE_SET","TICKET_LOOKUP","ACCREDITATION_VIEW","ACCREDITATION_APPLY","ACCREDITATION_APPROVE","ACCREDITATION_ISSUE","ACCREDITATION_MANAGE","ACCREDITATION_CONFIGURE","REPORT_VIEW_OWN","REPORT_VIEW_WORKSTATION","REPORT_VIEW_VENUE","REPORT_VIEW_REGION","REPORT_VIEW_TENANT","REPORT_EXPORT","REPORT_EXPORT_PII","REPORT_MANAGE","REPORT_SCHEDULE","LEDGER_VIEW","LEDGER_POST","LEDGER_APPROVE","TAX_CONFIGURE","ACCOUNT_CONFIGURE","SETTLEMENT_VIEW","SETTLEMENT_RECONCILE","GUEST_VIEW","GUEST_VIEW_PII","GUEST_MANAGE","VENUE_MAP_VIEW","VENUE_MAP_MANAGE","VENUE_MAP_PUBLISH","RESOURCE_VIEW","RESOURCE_BOOK","RESOURCE_MANAGE","RESOURCE_CONFIGURE","RENTAL_VIEW","RENTAL_BOOK","RENTAL_OPERATE","RENTAL_MANAGE","RENTAL_CONFIGURE","RENTAL_PRICE","RENTAL_APPROVE","RENTAL_OVERRIDE","DEVELOPER_VIEW","DEVELOPER_MANAGE","DEVELOPER_ADMIN","LOYALTY_ACCRUE","LOYALTY_REDEEM","LOYALTY_ADJUST","MARKETING_VIEW","MARKETING_MANAGE","MARKETING_SEND","CASE_VIEW","CASE_MANAGE","ASSET_LIBRARY_VIEW","ASSET_LIBRARY_MANAGE","ASSET_LIBRARY_APPROVE","ASSET_LIBRARY_SHARE","QUEUE_VIEW","QUEUE_MANAGE","QUEUE_REDEEM","QUEUE_OVERRIDE","TRANSPORT_VIEW","TRANSPORT_MANAGE","TRANSPORT_PRICE","ASSET_VIEW","ASSET_MANAGE","WORK_ORDER_VIEW","WORK_ORDER_MANAGE","WORK_ORDER_VERIFY","INSPECTION_VIEW","INSPECTION_SUBMIT","INSPECTION_MANAGE","INCIDENT_REPORT","INCIDENT_VIEW","INCIDENT_MANAGE","KIOSK_ATTEND","DEVICE_VIEW","DEVICE_CONFIGURE","DEVICE_MANAGE","APPROVAL_ACT","APPROVAL_DELEGATE","AI_USE","AI_CONFIGURE","AI_APPROVE","AI_AUDIT_VIEW","RISK_REVIEW","RISK_INVESTIGATE","AUDIT_VIEW","APPROVAL_VIEW","APPROVAL_REQUEST","APPROVAL_DECIDE","APPROVAL_CONFIGURE","MAINTENANCE_EXECUTE","MAINTENANCE_APPROVE","WORKFORCE_VIEW","WORKFORCE_MANAGE","ATTENDANCE_RECORD","ANNOUNCEMENT_PUBLISH","ANNOUNCEMENT_EMERGENCY","PARTNER_VIEW","PARTNER_MANAGE","PARKING_CONFIGURE","PAYMENT_VOID","PROCUREMENT_VIEW","PROCUREMENT_REQUEST","PROCUREMENT_MANAGE","PROCUREMENT_RECEIVE","CORE_AI_PUBLISH","TICKETING_AI_PUBLISH","ACCESS_AI_PUBLISH","FNB_AI_PUBLISH","RETAIL_AI_PUBLISH","INVENTORY_AI_PUBLISH","SEATING_AI_PUBLISH","MEMBERSHIP_AI_PUBLISH","MARKETING_AI_PUBLISH","RESOURCES_AI_PUBLISH","QUEUE_AI_PUBLISH","TRANSPORT_AI_PUBLISH","GAMES_AI_PUBLISH","MAINTENANCE_AI_PUBLISH","ACCREDITATION_AI_PUBLISH","PARTNER_AI_PUBLISH","ANALYTICS_AI_PUBLISH","BIOMETRIC_IMAGE_VIEW","ACCESS_DIRECTION_SET","REPORT_GOVERNANCE_MANAGE"]},
-"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
+"PlatformStaffGrant": {"type":"object","x-ticvai-persistence":"identity.platform_staff_grant","description":"**One platform operator's time-boxed access into this tenant** (decided 28 September, audit R098). Written by `openPlatformStaffGrant`, read by the tenant through `listPlatformStaffGrants`, and never edited: a grant ends at `expiresAt`, and a new need is a new grant.\n","required":["id","operatorPrincipalId","permissions","reason","openedAt","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"operatorPrincipalId":{"x-ticvai-references":"identity.principal","type":"string","format":"uuid","readOnly":true,"description":"The platform operator, from the Control Plane token. Set by the server."},"operatorDisplayName":{"type":"string","readOnly":true},"permissions":{"type":"array","items":{"$ref":"../shared/permissions.yaml#/components/schemas/Permission"}},"reason":{"type":"string"},"ticketRef":{"type":"string","nullable":true},"openedAt":{"type":"string","format":"date-time","readOnly":true},"expiresAt":{"type":"string","format":"date-time"},"scopePath":{"type":"string","readOnly":true,"description":"The tenant root. **Operations write it at `tenant` scope**; the server sets it."}}},
 "SuggestionKind": {"type":"string","description":"What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline. Every change names a point or performance of that day's venue only, rides, dining and retail alike (30 September client meeting, MoM 4.7).\n","enum":["price","replenishment","requisition","demandForecast","prepPlan","menuEngineering","staffing","slaTarget","waitTime","upsell","segmentation","anomaly","scenario","sendTime","wasteRisk","queueBalancing","itinerary"]},
 "SuspensionMode": {"type":"string","description":"Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets.\n","enum":["readOnly","noNewSales","fullLockout"]},
-"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Tenant": {"x-ticvai-persistence":"control.tenant","type":"object","required":["id","code","name","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"x-ticvai-unique":"tenant","type":"string"},"name":{"type":"string"},"status":{"$ref":"#/components/schemas/TenantStatus"},"suspensionMode":{"$ref":"#/components/schemas/SuspensionMode"},"suspensionReason":{"type":"string","nullable":true},"suspensionEffectiveAt":{"type":"string","format":"date-time","nullable":true,"description":"When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. **A future value is a pending suspension**: the tenant stays `active` until then, and this row is the only place that says a suspension is coming."},"suspensionNoticeMessage":{"$ref":"#/components/schemas/subscription::LocalisedText","description":"The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`."},"terminationScheduledAt":{"type":"string","format":"date-time","nullable":true,"description":"When `terminateTenant` started the retention window. Null when no termination is under way."},"terminationRetentionUntil":{"type":"string","format":"date-time","nullable":true,"description":"`terminationScheduledAt` plus the request's `retentionDays`. **Stored, not recomputed** — the day count is client-supplied and exists nowhere else, and this is the date the cells are destroyed after."},"terminationReason":{"type":"string","maxLength":1000,"nullable":true},"terminationRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true},"planId":{"type":"string","format":"uuid","nullable":true},"planName":{"type":"string","nullable":true},"cellCount":{"type":"integer"},"venueCount":{"type":"integer"},"regionId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The tenant's home region: the `tenancy` region node whose `RegionSettings` govern tenant-wide gates, today `allowedAiResidencies` (decided 28 September, audit R203). Written by the server when the tenant's first region is created; null until then. ADM-037 reads it to show the region's residency restriction, and `ai.setAiProvider` checks against the same region.\n"},"billingEmail":{"type":"string"},"billingAddress":{"type":"string","maxLength":500,"nullable":true,"description":"Accepted by `createTenant` and `updateTenant`; stored here so the response can return what was sent."},"accountManagerPrincipalId":{"type":"string","format":"uuid","nullable":true},"createdAt":{"type":"string","format":"date-time"},"activatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "TenantStatus": {"type":"string","enum":["onboarding","active","suspended","terminating","terminated"]}
 }
 ```

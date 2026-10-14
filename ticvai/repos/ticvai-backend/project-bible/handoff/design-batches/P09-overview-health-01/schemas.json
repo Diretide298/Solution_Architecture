@@ -1,231 +1,4 @@
 {
- "AiActionPlanDetail": {
-  "type": "object",
-  "x-ticvai-persistence": "none — ai.action_plan with its ai.action_step rows",
-  "description": "A plan with its steps in DAG order.",
-  "required": [
-   "plan",
-   "steps"
-  ],
-  "properties": {
-   "plan": {
-    "$ref": "#/components/schemas/AiActionPlan"
-   },
-   "steps": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AiActionStep"
-    }
-   }
-  }
- },
- "AiDecisionRecord": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.decision_record",
-  "description": "**The standard record for every governed decision** (design 3.9, C12; AIC-193..209): a recommendation summary, a risk assessment, a forecast publication, a plan step, an assistant answer at significant depth, a governance block, a Help me choose suggestion. **Append-only; corrections are annotations; hash-chained per tenant** so tampering is detectable (AIC-203, AIC-204). **AI log database** (design 2.4): append-only, partitioned by month, one Postgres database per tenant on the regional AI log server. The table name stays `ai.<table>`; which server holds it is a deployment matter, not a contract one.",
-  "required": [
-   "traceId",
-   "capabilityKey",
-   "outcome",
-   "recordHash"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "traceId": {
-    "type": "string"
-   },
-   "capabilityKey": {
-    "type": "string"
-   },
-   "task": {
-    "type": "string",
-    "nullable": true
-   },
-   "subjectKind": {
-    "type": "string",
-    "nullable": true
-   },
-   "subjectRef": {
-    "type": "string",
-    "nullable": true
-   },
-   "inputsRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "Where the inputs are kept (Blob or `ai.activity`), never the prompt text itself."
-   },
-   "evidence": {
-    "$ref": "#/components/schemas/AiEvidenceItemList"
-   },
-   "producer": {
-    "type": "string",
-    "nullable": true
-   },
-   "modelVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "promptTemplateVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "featureSetVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "knowledgeVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "ruleVersions": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true
-   },
-   "governanceOutcome": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/AiGovernanceOutcome"
-     }
-    ],
-    "nullable": true
-   },
-   "policyVersion": {
-    "type": "string",
-    "nullable": true
-   },
-   "approvals": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "Approval requests and their decisions."
-   },
-   "humanDecision": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true,
-    "description": "Override or intervention, where a person changed the outcome."
-   },
-   "executionResult": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true
-   },
-   "outcomeRef": {
-    "type": "string",
-    "nullable": true,
-    "description": "The business outcome it links to (an order, a published version, a closed case)."
-   },
-   "outcome": {
-    "type": "string",
-    "enum": [
-     "answered",
-     "refused",
-     "allowed",
-     "blocked",
-     "executed",
-     "failed",
-     "approvedThenFailed",
-     "published",
-     "suggested"
-    ],
-    "description": "`approvedThenFailed` is kept distinct from `executed` (design 1.2 Audit)."
-   },
-   "annotations": {
-    "type": "array",
-    "items": {
-     "type": "object",
-     "properties": {
-      "at": {
-       "type": "string",
-       "format": "date-time"
-      },
-      "byPrincipalId": {
-       "type": "string",
-       "format": "uuid"
-      },
-      "note": {
-       "type": "string"
-      }
-     }
-    },
-    "readOnly": true,
-    "description": "Corrections, appended; the original fields are never edited."
-   },
-   "previousHash": {
-    "type": "string",
-    "readOnly": true
-   },
-   "recordHash": {
-    "type": "string",
-    "readOnly": true
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
-   }
-  }
- },
- "AiDecisionTrace": {
-  "type": "object",
-  "x-ticvai-persistence": "none — ai.decision_record with the rows it references",
-  "description": "**The full trace of one decision** (ADM-540..546): record, evidence, candidates and rules, model and runtime, governance and approvals, execution and business outcome. Depth is gated by permission (AIC-195).",
-  "required": [
-   "record"
-  ],
-  "properties": {
-   "record": {
-    "$ref": "#/components/schemas/AiDecisionRecord"
-   },
-   "depth": {
-    "type": "string",
-    "enum": [
-     "business",
-     "governance",
-     "technical"
-    ]
-   },
-   "explanation": {
-    "type": "string",
-    "description": "Built from structured evidence, never a model's chain of thought (AIC-192)."
-   },
-   "activity": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AiInteraction"
-    },
-    "description": "The model calls behind it (`technical` depth)."
-   },
-   "plan": {
-    "allOf": [
-     {
-      "$ref": "#/components/schemas/AiActionPlanDetail"
-     }
-    ],
-    "nullable": true
-   },
-   "interventions": {
-    "type": "array",
-    "items": {
-     "$ref": "#/components/schemas/AiIntervention"
-    }
-   },
-   "chainVerified": {
-    "type": "boolean",
-    "description": "The hash chain around this record verifies."
-   }
-  }
- },
  "AiInteraction": {
   "type": "object",
   "x-ticvai-persistence": "ai.activity",
@@ -388,83 +161,6 @@
    "createdAt": {
     "type": "string",
     "format": "date-time"
-   }
-  }
- },
- "AiIntervention": {
-  "type": "object",
-  "x-ticvai-persistence": "ai.intervention",
-  "description": "**A person stepping in** (AIC-187, ADM-535, ADM-536): an override, pause, resume, stop, retry or rollback, with the original AI decision and the human one side by side.",
-  "required": [
-   "kind",
-   "targetKind",
-   "targetRef"
-  ],
-  "properties": {
-   "id": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true
-   },
-   "kind": {
-    "type": "string",
-    "enum": [
-     "override",
-     "pause",
-     "resume",
-     "cancel",
-     "retry",
-     "rollback",
-     "capabilityPause",
-     "capabilityResume"
-    ]
-   },
-   "targetKind": {
-    "type": "string",
-    "enum": [
-     "plan",
-     "step",
-     "decision",
-     "capability"
-    ]
-   },
-   "targetRef": {
-    "type": "string"
-   },
-   "decisionRecordId": {
-    "type": "string",
-    "format": "uuid",
-    "nullable": true
-   },
-   "originalDecision": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true
-   },
-   "humanDecision": {
-    "type": "object",
-    "additionalProperties": true,
-    "nullable": true
-   },
-   "reason": {
-    "type": "string",
-    "maxLength": 2000
-   },
-   "principalId": {
-    "type": "string",
-    "format": "uuid",
-    "readOnly": true,
-    "x-ticvai-references": "identity.principal"
-   },
-   "createdAt": {
-    "type": "string",
-    "format": "date-time",
-    "readOnly": true
-   },
-   "scopePath": {
-    "type": "string",
-    "readOnly": true,
-    "description": "**The partition key** (ADR-0005). Row-level security compares it with `ticvai.scope_paths` (`platform.apply_scope_rls`), on the tenant database and on the AI log database alike (design 3.1)."
    }
   }
  },
@@ -1284,6 +980,7 @@
     "format": "uuid"
    },
    "operatorPrincipalId": {
+    "x-ticvai-references": "identity.principal",
     "type": "string",
     "format": "uuid",
     "readOnly": true,
@@ -1391,6 +1088,7 @@
   ],
   "properties": {
    "rolloutId": {
+    "x-ticvai-references": "control.rollout",
     "type": "string",
     "format": "uuid",
     "description": "The rollout this row belongs to (`control.rollout`)."
@@ -1583,6 +1281,7 @@
     "format": "uuid"
    },
    "code": {
+    "x-ticvai-unique": "tenant",
     "type": "string"
    },
    "name": {

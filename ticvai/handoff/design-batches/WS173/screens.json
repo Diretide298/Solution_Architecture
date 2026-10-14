@@ -5,6 +5,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "9",
@@ -14,7 +15,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/recommendation-command-center-bo-1033",
-   "component": "apps/venue-management-web/src/routes/access-venue/RecommendationCommandCenter.tsx",
+   "component": "src/routes/access-venue/RecommendationCommandCenter.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -108,7 +109,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {
@@ -252,6 +253,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "9",
@@ -261,7 +263,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/best-seat-recommendations-bo-1034",
-   "component": "apps/venue-management-web/src/routes/access-venue/BestSeatRecommendations.tsx",
+   "component": "src/routes/access-venue/BestSeatRecommendations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -285,6 +287,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Rank the strongest overall options for the requested quantity. Score view, distance, orientation, row, aisle, obstruction, amenities, demand and customer preference. Return valid seat groups with match score, total price, view summary, rationale and trade-offs. Support rule-based fallback when AI is unavailable or confidence falls below the configured threshold. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatRecommendationRules`, `setSeatRecommendationRules` with BO-1035, BO-1036, BO-1037, BO-1041; this screen is Best Seat Recommendations (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 9.02, page 38): rank the strongest overall options for the requested quantity. Score view, distance, orientation, row, aisle, obstruction, amenities, demand and customer preference. Return valid seat groups with match score, total price, view summary, rationale and trade-offs. Support rule-based fallback when AI is unavailable or confidence falls below the configured threshold. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -390,6 +393,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "9",
@@ -399,7 +403,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/best-value-recommendations-bo-1035",
-   "component": "apps/venue-management-web/src/routes/access-venue/BestValueRecommendations.tsx",
+   "component": "src/routes/access-venue/BestValueRecommendations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -422,6 +426,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Balance quality and price to identify strong value options. Calculate value from price, view, distance, category, demand, historical preference and comparable inventory. Present a price-versus-quality matrix and explain why each option represents better value. Respect minimum/maximum budget, promotion eligibility, fee transparency and price-lock policy. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 38",
+  "division": "Shares `getSeatRecommendationRules`, `setSeatRecommendationRules` with BO-1034, BO-1036, BO-1037, BO-1041; this screen is Best Value Recommendations (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 9.03, page 38): balance quality and price to identify strong value options. Calculate value from price, view, distance, category, demand, historical preference and comparable inventory. Present a price-versus-quality matrix and explain why each option represents better value. Respect minimum/maximum budget, promotion eligibility, fee transparency and price-lock policy. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 38.",
   "gaps": [
    {
     "operation": null,
@@ -527,6 +532,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "9",
@@ -536,7 +542,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/closest-to-stage-recommendations-bo-1036",
-   "component": "apps/venue-management-web/src/routes/access-venue/ClosestToStageRecommendations.tsx",
+   "component": "src/routes/access-venue/ClosestToStageRecommendations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -559,6 +565,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Rank seats by meaningful proximity to the event focal point. Use configured stage/field/focal point, seat coordinates, orientation, level and route rather than row number alone. Show distance, section, row, elevation, obstruction and route information for each option. Support multiple focal points and event-specific stage layouts with the correct layout version. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatRecommendationRules`, `setSeatRecommendationRules` with BO-1034, BO-1035, BO-1037, BO-1041; this screen is Closest-to-Stage Recommendations (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 9.04, page 39): rank seats by meaningful proximity to the event focal point. Use configured stage/field/focal point, seat coordinates, orientation, level and route rather than row number alone. Show distance, section, row, elevation, obstruction and route information for each option. Support multiple focal points and event-specific stage layouts with the correct layout version. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -664,6 +671,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "9",
@@ -673,7 +681,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/family-seating-recommendations-bo-1037",
-   "component": "apps/venue-management-web/src/routes/access-venue/FamilySeatingRecommendations.tsx",
+   "component": "src/routes/access-venue/FamilySeatingRecommendations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -696,6 +704,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Find safe and practical seat groups for families. Prioritize contiguity, aisle preference, child-friendly areas, short routes and proximity to approved facilities. Consider adult/child ratio, age policy, stroller/service needs, family membership and budget. Explain splits or compromises and never separate minors contrary to configured policy. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatRecommendationRules`, `setSeatRecommendationRules` with BO-1034, BO-1035, BO-1036, BO-1041; this screen is Family Seating Recommendations (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 9.05, page 39): find safe and practical seat groups for families. Prioritize contiguity, aisle preference, child-friendly areas, short routes and proximity to approved facilities. Consider adult/child ratio, age policy, stroller/service needs, family membership and budget. Explain splits or compromises and never separate minors contrary to configured policy. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -801,6 +810,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "9",
@@ -810,7 +820,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/accessibility-recommendations-bo-1038",
-   "component": "apps/venue-management-web/src/routes/access-venue/AccessibilityRecommendations.tsx",
+   "component": "src/routes/access-venue/AccessibilityRecommendations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -930,6 +940,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "9",
@@ -939,7 +950,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/seat-upgrade-recommendations-bo-1039",
-   "component": "apps/venue-management-web/src/routes/access-venue/SeatUpgradeRecommendations.tsx",
+   "component": "src/routes/access-venue/SeatUpgradeRecommendations.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -962,6 +973,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Offer an eligible higher-value alternative before or after purchase. Compare current and candidate seat on view, distance, level, amenities, accessibility and price difference. Apply membership, loyalty, promotion, exchange, refund, fee and event cutoff rules. Show expected value and acquire new inventory before releasing the original seat through a safe exchange flow. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 39",
+  "division": "Shares `getSeatAvailability`, `recommendSeats` with BO-1001, BO-1002; this screen is Seat Upgrade Recommendations (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 9.07, page 39): offer an eligible higher-value alternative before or after purchase. Compare current and candidate seat on view, distance, level, amenities, accessibility and price difference. Apply membership, loyalty, promotion, exchange, refund, fee and event cutoff rules. Show expected value and acquire new inventory before releasing the original seat through a safe exchange flow. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history. Configuration Scope of Work | Version 1.0 39.",
   "gaps": [
    {
     "operation": null,
@@ -1070,6 +1082,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "PRODUCT_VIEW",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "9",
@@ -1079,7 +1092,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/alternatives-reseating-bo-1040",
-   "component": "apps/venue-management-web/src/routes/access-venue/AlternativesReseating.tsx",
+   "component": "src/routes/access-venue/AlternativesReseating.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1214,6 +1227,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "9",
@@ -1223,7 +1237,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/scoring-rules-model-governance-bo-1041",
-   "component": "apps/venue-management-web/src/routes/access-venue/ScoringRulesModelGovernance.tsx",
+   "component": "src/routes/access-venue/ScoringRulesModelGovernance.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1246,6 +1260,7 @@
   "pattern": "listDetail",
   "patternReason": "**nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than passed off as a decision",
   "purpose": "Configure recommendation objectives, constraints and AI controls. Set weighted factors, hard constraints, tie-breakers, minimum score, fallback, audience and use-case priority. Manage model/version, training/evaluation metadata, approval, effective dates and rollback. Run test personas, backtests, bias/accessibility checks and scenario comparison before publication. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
+  "division": "Shares `getSeatRecommendationRules`, `setSeatRecommendationRules` with BO-1034, BO-1035, BO-1036, BO-1037; this screen is Scoring Rules & Model Governance (pack Seat_Management_Venue_Mapping_Reference v1.0.pdf, board 9.09, page 40): configure recommendation objectives, constraints and AI controls. Set weighted factors, hard constraints, tie-breakers, minimum score, fallback, audience and use-case priority. Manage model/version, training/evaluation metadata, approval, effective dates and rollback. Run test personas, backtests, bias/accessibility checks and scenario comparison before publication. Recommendations must be explainable, confidence-scored and subordinate to availability, price, lock, accessibility, eligibility and consent rules; models cannot write inventory state directly. Acceptance condition: Authorized users can complete the described task end to end; saved changes are validated, permission-controlled, integrated with the named shared services and traceable in the immutable audit history.",
   "gaps": [
    {
     "operation": null,
@@ -1351,6 +1366,7 @@
   "module": "Access & Venue",
   "requiresModule": "seating",
   "wave": 3,
+  "permission": "CAPACITY_CONFIGURE",
   "source": {
    "pack": "Seat_Management_Venue_Mapping_Reference v1.0.pdf",
    "board": "9",
@@ -1360,7 +1376,7 @@
   "implementation": {
    "app": "venue-management-web",
    "route": "/access-venue/performance-feedback-audit-bo-1042",
-   "component": "apps/venue-management-web/src/routes/access-venue/PerformanceFeedbackAudit.tsx",
+   "component": "src/routes/access-venue/PerformanceFeedbackAudit.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1394,7 +1410,7 @@
    "template": "split",
    "regions": [
     {
-     "name": "contentBody",
+     "name": "contentBodyHeadline",
      "slot": "headline",
      "components": [
       {

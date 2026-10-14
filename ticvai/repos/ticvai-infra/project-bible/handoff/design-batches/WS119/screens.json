@@ -5,6 +5,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -165,61 +166,73 @@
       {
        "kind": "metricTile",
        "label": "Forecast Attendance Today",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Forecast Attendance Tomorrow",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Forecast Attendance Next 7 Days",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Forecast Revenue",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Current Bookings",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Expected Walk-In",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Forecast Occupancy",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Demand Index",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Forecast Confidence",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Forecast vs Actual",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Revenue Forecast Accuracy",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       },
       {
        "kind": "metricTile",
        "label": "Active Forecast Alerts",
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 4 §Header KPIs"
       }
      ]
@@ -350,6 +363,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -732,6 +746,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -826,10 +841,12 @@
        "derived": true,
        "impliedBy": "setForecastDefinition",
        "label": "Save forecast definition",
+       "operation": "setForecastDefinition",
        "notes": "The act the screen exists for."
       },
       {
        "kind": "dataTable",
+       "operation": "listForecastSignals",
        "derived": true,
        "impliedBy": "listForecastSignals",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -869,13 +886,6 @@
     "provenance": "build, 29 September 2026"
    },
    {
-    "operationId": "configureForecastSignalSource",
-    "contract": "ai",
-    "purpose": "Set up a forecast signal",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
     "operationId": "listTenants",
     "contract": "subscription",
     "purpose": "The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided 2 October 2026, CHG-SBO-001)",
@@ -895,6 +905,13 @@
     "invalidates": [
      "listOwnPlatformStaffGrants"
     ]
+   },
+   {
+    "operationId": "configureForecastSignalSource",
+    "contract": "ai",
+    "purpose": "Set up a forecast signal",
+    "trigger": "onAction",
+    "provenance": "build, 29 September 2026"
    }
   ],
   "wireframe": {
@@ -975,6 +992,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -1066,12 +1084,14 @@
       },
       {
        "kind": "primaryButton",
+       "operation": "configureAnomalyDetector",
        "derived": true,
        "impliedBy": "configureAnomalyDetector",
        "notes": "The act the screen exists for."
       },
       {
        "kind": "dataTable",
+       "operation": "getForecast",
        "derived": true,
        "impliedBy": "listAiInsights",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -1108,13 +1128,6 @@
     "contract": "ai",
     "purpose": "Set an alert when the forecast crosses a threshold (e.g. attendance p50 above N, occupancy above % of capacity)",
     "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAiInsights",
-    "contract": "ai",
-    "purpose": "Forecast threshold alerts (kind forecastThreshold)",
-    "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -1213,6 +1226,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -1512,6 +1526,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -1791,6 +1806,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -2089,6 +2105,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -2438,6 +2455,7 @@
   "module": "Analytics",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -2536,7 +2554,7 @@
         "Operational Implications"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getForecast",
        "provenance": "pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 18 §Show"
       }
      ]
@@ -2549,6 +2567,7 @@
        "kind": "detailPanel",
        "label": "The selected forecast scenario what-if",
        "bindsTo": null,
+       "operation": "getForecast",
        "columns": [
         "Attendance",
         "Revenue",
@@ -2579,20 +2598,6 @@
     "contract": "ai",
     "purpose": "Forecast values",
     "trigger": "onLoad",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "createForecastScenario",
-    "contract": "ai",
-    "purpose": "Run a what-if",
-    "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "compareForecastScenarios",
-    "contract": "ai",
-    "purpose": "Compare scenarios",
-    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -2693,6 +2698,7 @@
   "module": "AI",
   "requiresModule": "core",
   "wave": 1,
+  "permission": "AI_USE",
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",

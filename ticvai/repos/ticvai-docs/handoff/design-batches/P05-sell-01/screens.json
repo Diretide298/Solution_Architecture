@@ -9,7 +9,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/attract-loop",
-   "component": "apps/guest-app/src/routes/sell/AttractLoopDetail.tsx",
+   "component": "src/routes/sell/AttractLoopDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -198,7 +198,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/language-select",
-   "component": "apps/guest-app/src/routes/sell/LanguageSelectDetail.tsx",
+   "component": "src/routes/sell/LanguageSelectDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -353,7 +353,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/what-are-you-buying",
-   "component": "apps/guest-app/src/routes/sell/WhatAreYouBuyingDetail.tsx",
+   "component": "src/routes/sell/WhatAreYouBuyingDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -492,7 +492,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/choose-tickets",
-   "component": "apps/guest-app/src/routes/sell/ChooseTicketsDetail.tsx",
+   "component": "src/routes/sell/ChooseTicketsDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -635,7 +635,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/choose-a-session",
-   "component": "apps/guest-app/src/routes/sell/ChooseASessionDetail.tsx",
+   "component": "src/routes/sell/ChooseASessionDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -766,7 +766,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/review",
-   "component": "apps/guest-app/src/routes/sell/ReviewDetail.tsx",
+   "component": "src/routes/sell/ReviewDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -942,7 +942,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/payment",
-   "component": "apps/guest-app/src/routes/sell/PaymentDetail.tsx",
+   "component": "src/routes/sell/PaymentDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1069,7 +1069,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/payment-unresolved",
-   "component": "apps/guest-app/src/routes/sell/PaymentUnresolvedDetail.tsx",
+   "component": "src/routes/sell/PaymentUnresolvedDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1221,7 +1221,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/ticket-issued",
-   "component": "apps/guest-app/src/routes/sell/TicketIssuedDetail.tsx",
+   "component": "src/routes/sell/TicketIssuedDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1397,7 +1397,7 @@
   "implementation": {
    "app": "guest-app",
    "route": "/sell/print-failure",
-   "component": "apps/guest-app/src/routes/sell/PrintFailureDetail.tsx",
+   "component": "src/routes/sell/PrintFailureDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {

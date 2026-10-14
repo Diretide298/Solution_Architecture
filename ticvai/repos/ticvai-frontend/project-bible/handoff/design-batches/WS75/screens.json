@@ -5,6 +5,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "2",
@@ -328,6 +329,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_MANAGE",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "2",
@@ -430,16 +432,6 @@
   },
   "apis": [
    {
-    "operationId": "analyseMediaAsset",
-    "contract": "assets",
-    "purpose": "Auto-tag and describe",
-    "trigger": "onAction",
-    "provenance": "board reading, 19 September 2026",
-    "invalidates": [
-     "getMediaAsset"
-    ]
-   },
-   {
     "operationId": "setMediaAssetTags",
     "contract": "assets",
     "purpose": "Promote the proposals",
@@ -447,6 +439,16 @@
     "provenance": "board reading, 19 September 2026",
     "invalidates": [
      "searchMedia",
+     "getMediaAsset"
+    ]
+   },
+   {
+    "operationId": "analyseMediaAsset",
+    "contract": "assets",
+    "purpose": "Auto-tag and describe",
+    "trigger": "onAction",
+    "provenance": "board reading, 19 September 2026",
+    "invalidates": [
      "getMediaAsset"
     ]
    }
@@ -496,6 +498,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "2",
@@ -555,7 +558,7 @@
         "dimensions"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "searchMedia",
        "provenance": "pack Digital Asset Management DAM.pdf, page 28 §Each result should show"
       }
      ]
@@ -568,6 +571,7 @@
        "kind": "detailPanel",
        "label": "The selected semantic natural-language asset",
        "bindsTo": null,
+       "operation": "searchMedia",
        "columns": [
         "Thumbnail",
         "asset",
@@ -645,6 +649,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "2",
@@ -803,6 +808,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "2",
@@ -1023,6 +1029,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "2",
@@ -1075,6 +1082,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listMediaAssetVersions",
        "derived": true,
        "impliedBy": "listMediaAssetVersions",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -1174,6 +1182,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "2",
@@ -1226,6 +1235,7 @@
      "components": [
       {
        "kind": "dataTable",
+       "operation": "listMediaAssetVersions",
        "derived": true,
        "impliedBy": "listMediaAssetVersions",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
@@ -1295,6 +1305,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "2",
@@ -1341,12 +1352,14 @@
       },
       {
        "kind": "dataTable",
+       "operation": "listMediaRenditions",
        "derived": true,
        "impliedBy": "listMediaRenditions",
        "notes": "**Cursor pagination, never offset** — offset drifts under concurrent writes, which on a venue's busiest hour is a list that skips rows."
       },
       {
        "kind": "primaryButton",
+       "operation": "requestMediaRendition",
        "derived": true,
        "impliedBy": "requestMediaRendition",
        "notes": "The act the screen exists for."
@@ -1433,6 +1446,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "2",
@@ -1587,6 +1601,7 @@
   "module": "Media Library",
   "requiresModule": "core",
   "wave": 3,
+  "permission": "ASSET_LIBRARY_VIEW",
   "source": {
    "pack": "Digital Asset Management DAM.pdf",
    "board": "2",
@@ -1653,7 +1668,7 @@
         "estimated/actual AI consumption cost"
        ],
        "bindsTo": null,
-       "operation": null,
+       "operation": "getMediaUsageAnalytics",
        "provenance": "pack Digital Asset Management DAM.pdf, page 35 §Track"
       }
      ]
@@ -1666,6 +1681,7 @@
        "kind": "detailPanel",
        "label": "The selected quality intelligence review",
        "bindsTo": null,
+       "operation": "getMediaUsageAnalytics",
        "columns": [
         "Assets processed",
         "images analyzed",

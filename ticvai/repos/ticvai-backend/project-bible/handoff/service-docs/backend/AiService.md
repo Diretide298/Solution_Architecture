@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `ai` |
 | Schemas owned | `ai`, `qdrant` |
-| Operations in the slice | 65 of 144 |
+| Operations in the slice | 66 of 144 |
 | Scale | Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else. |
 | If it is down | Down degrades suggestions and the concierge. Nothing that takes money depends on it. |
 
@@ -33,7 +33,7 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| actions | [`overrideAiDecision`](#overrideaidecision) | POST | `/decision-records/{decisionRecordId}/override` | core | 1 | ADM-533, ADM-536 |
+| actions | [`overrideAiDecision`](#overrideaidecision) | POST | `/decision-records/{decisionRecordId}/override` | core | 1 | ADM-536 |
 | ai | [`getTranslationProposals`](#gettranslationproposals) | GET | `/ai/translate/{translationJobId}` | core | 1 | BO-785, CMS-011 |
 | ai | [`proposeTranslations`](#proposetranslations) | POST | `/ai/translate` | core | 1 | BO-785, BO-793, CMS-011 |
 | ai | [`proposeVenueLabels`](#proposevenuelabels) | POST | `/ai/venue-map/{mapId}/propose-labels` | core | 1 | BO-093 |
@@ -42,7 +42,7 @@
 | ai | [`testAiProvider`](#testaiprovider) | POST | `/ai-providers/{providerId}/test` | core | 1 | ADM-037 |
 | assist | [`createAiConversation`](#createaiconversation) | POST | `/conversations` | core | 1 | BO-928, BO-932, CMS-104, EMP-019, EMP-020, GST-031 … |
 | assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 1 | BO-932, EMP-019, EMP-020, GST-031, GST-033, GST-068 … |
-| assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 1 | ADM-533, BO-928, BO-929, BO-932, CMS-104, EMP-019 … |
+| assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 1 | BO-928, BO-929, BO-932, CMS-104, EMP-019, EMP-020 … |
 | config | [`getAiByokEnablement`](#getaibyokenablement) | GET | `/tenants/{tenantId}/byok` | core | 1 | ADM-037, BO-091 |
 | config | [`getAiPolicy`](#getaipolicy) | GET | `/policy` | core | 1 | BO-091 |
 | config | [`listAiProviders`](#listaiproviders) | GET | `/providers` | core | 1 | ADM-037 |
@@ -50,54 +50,55 @@
 | config | [`setAiPolicy`](#setaipolicy) | PUT | `/policy` | setup | 1 | BO-091 |
 | configure | [`getGuidedChoiceSuggestion`](#getguidedchoicesuggestion) | GET | `/guided-choice-suggestions/{suggestionId}` | core | 1 | CMS-101 |
 | configure | [`suggestGuidedChoice`](#suggestguidedchoice) | POST | `/venues/{venueId}/guided-choice-suggestions` | core | 1 | CMS-101 |
-| forecast | [`createForecastScenario`](#createforecastscenario) | POST | `/forecast-scenarios` | setup | 1 | ADM-507, ADM-517, ANL-057, BO-919, BO-931 |
-| forecast | [`decideOperationalRequirement`](#decideoperationalrequirement) | POST | `/operational-requirements/{requirementId}/decide` | setup | 1 | ADM-518, BO-927 |
+| forecast | [`createForecastScenario`](#createforecastscenario) | POST | `/forecast-scenarios` | setup | 1 | ANL-057, BO-919, BO-931 |
+| forecast | [`decideOperationalRequirement`](#decideoperationalrequirement) | POST | `/operational-requirements/{requirementId}/decide` | setup | 1 | BO-927 |
 | forecast | [`getAiVenueSettings`](#getaivenuesettings) | GET | `/venues/{venueId}/ai-settings` | core | 1 | ADM-489, ANL-071, BO-927 |
 | forecast | [`getForecast`](#getforecast) | GET | `/forecasts` | core | 1 | ADM-499, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506 … |
 | forecast | [`getForecastAccuracy`](#getforecastaccuracy) | GET | `/forecast-accuracy` | core | 1 | ADM-503, ADM-506, ADM-508 |
 | forecast | [`getVenueHistoryImport`](#getvenuehistoryimport) | GET | `/history-imports/{importId}` | core | 1 | ANL-071 |
 | forecast | [`importVenueHistory`](#importvenuehistory) | POST | `/venues/{venueId}/history-imports` | core | 1 | ANL-071 |
 | forecast | [`listForecastVersions`](#listforecastversions) | GET | `/forecast-versions` | core | 1 | ADM-506, ADM-508 |
-| forecast | [`listOperationalRequirements`](#listoperationalrequirements) | GET | `/operational-requirements` | core | 1 | ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514 … |
+| forecast | [`listOperationalRequirements`](#listoperationalrequirements) | GET | `/operational-requirements` | core | 1 | ADM-510, BO-919, BO-925, BO-926, BO-927 |
 | forecast | [`listVenueHistoryImports`](#listvenuehistoryimports) | GET | `/venues/{venueId}/history-imports` | core | 1 | ANL-071 |
 | forecast | [`publishForecastVersion`](#publishforecastversion) | POST | `/forecast-versions/{versionId}/publish` | setup | 1 | ADM-508 |
 | forecast | [`runForecast`](#runforecast) | POST | `/forecast-definitions/{definitionKey}/runs` | setup | 1 | ADM-500, ADM-508 |
 | forecast | [`setAiVenueSettings`](#setaivenuesettings) | PUT | `/venues/{venueId}/ai-settings` | core | 1 | ADM-471, ADM-489, ANL-071, BO-927 |
 | forecast | [`setForecastDefinition`](#setforecastdefinition) | PUT | `/forecast-definitions/{definitionKey}` | setup | 1 | ADM-500, ADM-501 |
 | generate | [`proposeMarketingContent`](#proposemarketingcontent) | POST | `/ai/content-drafts` | core | 1 | BO-766, BO-772, BO-785, BO-786, BO-787, BO-789 … |
-| governance | [`createAiGovernancePolicyDraft`](#createaigovernancepolicydraft) | POST | `/governance/policy-drafts` | setup | 1 | ADM-523, ADM-524, ADM-525, ADM-530 |
-| governance | [`decideProposedAction`](#decideproposedaction) | POST | `/proposed-actions/{actionId}/decide` | core | 1 | ADM-492, ADM-531, ADM-532, ANL-009, BO-093, BO-598 … |
+| governance | [`createAiGovernancePolicyDraft`](#createaigovernancepolicydraft) | POST | `/governance/policy-drafts` | setup | 1 | ADM-523, ADM-524 |
+| governance | [`decideProposedAction`](#decideproposedaction) | POST | `/proposed-actions/{actionId}/decide` | core | 1 | ADM-532, ANL-009, BO-093, BO-598, BO-762, BO-793 … |
 | governance | [`evaluateAiGovernance`](#evaluateaigovernance) | POST | `/governance/evaluate` | core | 1 |  |
 | governance | [`getAiUsage`](#getaiusage) | GET | `/usage` | core | 1 | ADM-549, ANL-070, BO-091 |
-| governance | [`getEffectiveAiPolicy`](#geteffectiveaipolicy) | GET | `/governance/effective-policy` | core | 1 | ADM-489, ADM-522, ADM-525, ADM-526, ADM-528, ANL-060 … |
-| governance | [`listAiCapabilities`](#listaicapabilities) | GET | `/governance/capabilities` | core | 1 | ADM-519, ADM-520, ADM-521, ADM-522, ADM-536, ANL-060 … |
-| governance | [`listAiGovernancePolicyVersions`](#listaigovernancepolicyversions) | GET | `/governance/policy-versions` | core | 1 | ADM-523, ADM-524, ADM-526, ADM-527, ADM-528, ADM-530 |
-| governance | [`pauseAiCapability`](#pauseaicapability) | POST | `/governance/capabilities/{capabilityKey}/pause` | core | 1 | ADM-519, ADM-536, ADM-556, ADM-696 |
+| governance | [`getEffectiveAiPolicy`](#geteffectiveaipolicy) | GET | `/governance/effective-policy` | core | 1 | ADM-522, ADM-525, ADM-526, ADM-528, BO-091 |
+| governance | [`listAiCapabilities`](#listaicapabilities) | GET | `/governance/capabilities` | core | 1 | ADM-519, ADM-520, ADM-521, ADM-536, BO-091 |
+| governance | [`listAiGovernancePolicyVersions`](#listaigovernancepolicyversions) | GET | `/governance/policy-versions` | core | 1 | ADM-523, ADM-524, ADM-527, ADM-528 |
+| governance | [`listProposedActions`](#listproposedactions) | GET | `/proposed-actions` | core | 1 | ADM-529, ADM-534, ANL-009, BO-093, BO-762, BO-793 … |
+| governance | [`pauseAiCapability`](#pauseaicapability) | POST | `/governance/capabilities/{capabilityKey}/pause` | core | 1 | ADM-536, ADM-556, ADM-696 |
 | governance | [`publishAiGovernancePolicy`](#publishaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/publish` | setup | 1 | ADM-528 |
 | governance | [`revokeAiPolicyException`](#revokeaipolicyexception) | POST | `/governance/policy-exceptions/{exceptionId}/revoke` | core | 1 | ADM-526 |
 | governance | [`simulateAiGovernancePolicy`](#simulateaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/simulate` | setup | 1 | ADM-527, ADM-538 |
-| insights | [`decideAiInsight`](#decideaiinsight) | POST | `/insights/{insightId}/decide` | setup | 1 | ANL-019, ANL-059, BO-772, BO-782 |
+| insights | [`decideAiInsight`](#decideaiinsight) | POST | `/insights/{insightId}/decide` | setup | 1 | ANL-019, BO-772, BO-782 |
 | insights | [`explainMetricChange`](#explainmetricchange) | POST | `/insights/explain-metric-change` | setup | 1 | ADM-505, ADM-506, ANL-019, ANL-056 |
-| knowledge | [`configureAssistantProfile`](#configureassistantprofile) | PUT | `/assistant-profiles/{profileKey}` | setup | 1 | BO-091, SUP-018 |
-| knowledge | [`recordAnswerFeedback`](#recordanswerfeedback) | POST | `/messages/{messageId}/feedback` | core | 1 | EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
-| models | [`listAiEvaluations`](#listaievaluations) | GET | `/evaluations` | core | 1 | ADM-554, ANL-060 |
+| knowledge | [`configureAssistantProfile`](#configureassistantprofile) | PUT | `/assistant-profiles/{profileKey}` | setup | 1 | BO-091 |
+| knowledge | [`recordAnswerFeedback`](#recordanswerfeedback) | POST | `/messages/{messageId}/feedback` | core | 1 | EMP-020, GST-031, GST-033, WEB-044 |
+| models | [`listAiEvaluations`](#listaievaluations) | GET | `/evaluations` | core | 1 | ADM-554 |
 | models | [`listAiTrainingRuns`](#listaitrainingruns) | GET | `/training-runs` | core | 1 | ADM-554 |
-| models | [`promoteAiRelease`](#promoteairelease) | POST | `/releases/{releaseId}/promote` | setup | 1 | ADM-519, ADM-554 |
+| models | [`promoteAiRelease`](#promoteairelease) | POST | `/releases/{releaseId}/promote` | setup | 1 | ADM-554 |
 | models | [`publishPromptTemplate`](#publishprompttemplate) | POST | `/prompt-templates/{templateKey}/versions` | setup | 1 | ADM-037 |
 | models | [`rollbackAiRelease`](#rollbackairelease) | POST | `/releases/{releaseId}/rollback` | setup | 1 | ADM-554, ADM-556, ADM-696 |
-| models | [`runAiEvaluation`](#runaievaluation) | POST | `/evaluations` | setup | 1 | ADM-554, ANL-060 |
+| models | [`runAiEvaluation`](#runaievaluation) | POST | `/evaluations` | setup | 1 | ADM-554 |
 | models | [`setAiModel`](#setaimodel) | PUT | `/models/{modelId}` | setup | 1 | ADM-037 |
 | monitoring | [`containAiIncident`](#containaiincident) | POST | `/incidents/{incidentId}/contain` | setup | 1 | ADM-556 |
-| monitoring | [`listAiGovernanceAlerts`](#listaigovernancealerts) | GET | `/governance-alerts` | core | 1 | ADM-519, ADM-549, ADM-552, ADM-553, ADM-554, ADM-555 … |
+| monitoring | [`listAiGovernanceAlerts`](#listaigovernancealerts) | GET | `/governance-alerts` | core | 1 | ADM-549, ADM-552, ADM-553, ADM-554, ADM-555 |
 | monitoring | [`listAiIncidents`](#listaiincidents) | GET | `/incidents` | core | 1 | ADM-549, ADM-556 |
-| monitoring | [`openAiIncident`](#openaiincident) | POST | `/incidents` | core | 1 | ADM-555, ADM-556 |
-| recommend | [`decideRecommendations`](#deciderecommendations) | POST | `/recommendations/decide` | core | 1 | BO-102, BO-1048, BO-119, GST-001, GST-036, GST-048 … |
-| recommend | [`recordRecommendationEvents`](#recordrecommendationevents) | POST | `/recommendations/events` | core | 1 | GST-001, GST-036, GST-048, WEB-001, WEB-008, WEB-043 |
+| monitoring | [`openAiIncident`](#openaiincident) | POST | `/incidents` | core | 1 | ADM-556 |
+| recommend | [`decideRecommendations`](#deciderecommendations) | POST | `/recommendations/decide` | core | 1 | BO-102, BO-1048, BO-119, GST-048, WEB-008 |
+| recommend | [`recordRecommendationEvents`](#recordrecommendationevents) | POST | `/recommendations/events` | core | 1 | GST-048, WEB-008 |
 | retrieval | [`createKnowledgeCollection`](#createknowledgecollection) | POST | `/collections` | setup | 1 |  |
 | retrieval | [`ingestKnowledgeDocument`](#ingestknowledgedocument) | POST | `/collections/{collectionId}/documents` | setup | 1 | BO-798 |
 | retrieval | [`reindexSource`](#reindexsource) | POST | `/index-sources/{sourceId}/reindex` | setup | 1 |  |
 | retrieval | [`semanticSearch`](#semanticsearch) | POST | `/search` | core | 1 | CMS-010, CMS-062, EMP-040, EMP-041, SUP-006 |
-| retrieval | [`setIndexSource`](#setindexsource) | PUT | `/index-sources` | setup | 1 |  |
+| retrieval | [`setIndexSource`](#setindexsource) | PUT | `/index-sources/{sourceId}` | setup | 1 |  |
 
 ## Group: actions
 
@@ -119,7 +120,7 @@ The action pipeline and human oversight (design C3)
 | Conflict policy | serverWins |
 | Reads | `ai.decision_record`, `ai.intervention`, `cache:idempotency` |
 | Writes | `ai.decision_record`, `ai.intervention`, `cache:idempotency` |
-| Called by | ADM-533, ADM-536 |
+| Called by | ADM-536 |
 
 **Parameters**
 
@@ -579,6 +580,9 @@ Scoped to a module and a role, because the same question means different things 
 8.4.30. Retained because an assistant with no memory of yesterday is a search box, and because the governance requirements need the history to exist (8.3.59).
 **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own assistant conversations; another guest's conversation is refused exactly as one that does not exist, never returned. `AI_USE` is what a staff caller must hold to act for any guest (ADR-0025).
 
+
+**Order.** Newest first, by `startedAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `AI_USE` |
@@ -644,7 +648,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 | Conflict policy | append |
 | Reads | `ai.assistant_profile`, `ai.capability`, `ai.chunk_embedding`, `ai.conversation`, `ai.knowledge_document`, `ai.message`, `ai.policy`, `ai.proposed_action`, `ai.provider`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
 | Writes | `ai.activity`, `ai.decision_record`, `ai.knowledge_gap`, `ai.message`, `ai.proposed_action`, `cache:answer`, `cache:idempotency`, `qdrant:knowledge` |
-| Called by | ADM-533, BO-928, BO-929, BO-932, CMS-104, EMP-019, EMP-020, GST-031, GST-032, GST-033, GST-054, KSK-015, WEB-044 |
+| Called by | BO-928, BO-929, BO-932, CMS-104, EMP-019, EMP-020, GST-031, GST-032, GST-033, GST-054, KSK-015, WEB-044 |
 
 **Parameters**
 
@@ -749,7 +753,7 @@ Read by ADM-037 beside the tenant's providers, and by the tenant's own staff wit
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
-| tenantId | string (uuid) | yes |  |
+| tenantId | string (uuid) | yes | (read-only) |
 | enabled | boolean | yes |  |
 | coverage | enum (perTask, allTasks) |  | Whether the tenant may supply a key per task or one key for everything. (default perTask) |
 | allowedTasks | array of string |  | Where coverage is perTask: the gateway tasks a tenant key may serve. |
@@ -806,7 +810,7 @@ Read by ADM-037 beside the tenant's providers, and by the tenant's own staff wit
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | scopeLevel | enum (tenant, venue) | yes | Tenant sets the default; a venue may narrow it and never widen it. |
-| scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
+| scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. (read-only) |
 | enabledCapabilities | array of enum (assist, search, generateConfiguration, generateLayout, summarise, explain, gatewayAndModels, governance, …) | yes | Extended on 29 September to the fourteen capabilities of the AI design (section 1.1, AiCapabilityFamily). |
 | allowedRoleIds | array of string (uuid) |  |  |
 | maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
@@ -926,7 +930,7 @@ Read by ADM-037 beside the tenant's providers, and by the tenant's own staff wit
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
-| tenantId | string (uuid) | yes |  |
+| tenantId | string (uuid) | yes | (read-only) |
 | enabled | boolean | yes |  |
 | coverage | enum (perTask, allTasks) |  | Whether the tenant may supply a key per task or one key for everything. (default perTask) |
 | allowedTasks | array of string |  | Where coverage is perTask: the gateway tasks a tenant key may serve. |
@@ -946,7 +950,7 @@ Read by ADM-037 beside the tenant's providers, and by the tenant's own staff wit
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | id | string (uuid) |  | (read-only) |
-| tenantId | string (uuid) | yes |  |
+| tenantId | string (uuid) | yes | (read-only) |
 | enabled | boolean | yes |  |
 | coverage | enum (perTask, allTasks) |  | Whether the tenant may supply a key per task or one key for everything. (default perTask) |
 | allowedTasks | array of string |  | Where coverage is perTask: the gateway tasks a tenant key may serve. |
@@ -1005,7 +1009,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | scopeLevel | enum (tenant, venue) | yes | Tenant sets the default; a venue may narrow it and never widen it. |
-| scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
+| scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. (read-only) |
 | enabledCapabilities | array of enum (assist, search, generateConfiguration, generateLayout, summarise, explain, gatewayAndModels, governance, …) | yes | Extended on 29 September to the fourteen capabilities of the AI design (section 1.1, AiCapabilityFamily). |
 | allowedRoleIds | array of string (uuid) |  |  |
 | maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
@@ -1063,7 +1067,7 @@ Masking is the part to get right. `maskedFields` names what is redacted before a
 |---|---|---|---|
 | id | string (uuid) |  | Added 20 August. (read-only) |
 | scopeLevel | enum (tenant, venue) | yes | Tenant sets the default; a venue may narrow it and never widen it. |
-| scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
+| scopePath | string | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. (read-only) |
 | enabledCapabilities | array of enum (assist, search, generateConfiguration, generateLayout, summarise, explain, gatewayAndModels, governance, …) | yes | Extended on 29 September to the fourteen capabilities of the AI design (section 1.1, AiCapabilityFamily). |
 | allowedRoleIds | array of string (uuid) |  |  |
 | maskedFields | array of string |  | Redacted before a prompt leaves the platform (8.3.73). |
@@ -1277,7 +1281,7 @@ Forecasting and operational requirements (design C8)
 | Conflict policy | serverWins |
 | Reads | `ai.forecast_point`, `ai.forecast_scenario`, `ai.forecast_version`, `cache:idempotency` |
 | Writes | `ai.forecast_point`, `ai.forecast_scenario`, `cache:idempotency` |
-| Called by | ADM-507, ADM-517, ANL-057, BO-919, BO-931 |
+| Called by | ANL-057, BO-919, BO-931 |
 
 **Parameters**
 
@@ -1342,7 +1346,7 @@ Forecasting and operational requirements (design C8)
 | Conflict policy | serverWins |
 | Reads | `ai.operational_requirement`, `cache:idempotency` |
 | Writes | `ai.decision_record`, `ai.operational_requirement`, `cache:idempotency` |
-| Called by | ADM-518, BO-927 |
+| Called by | BO-927 |
 | State model | AI operational requirement ([states/ai-operational-requirement.yaml](../../../states/ai-operational-requirement.yaml)): moves `issued` -> `accepted`, `issued` -> `modified`, `issued` -> `rejected` |
 
 **Parameters**
@@ -1467,7 +1471,7 @@ Forecasting and operational requirements (design C8)
 | Read routing | replica |
 | Reads | `ai.forecast_definition`, `ai.forecast_point`, `ai.forecast_version` |
 | Writes | - |
-| Called by | ADM-499, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506, ADM-507, ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ANL-008, ANL-057, BO-919, BO-926, BO-927 |
+| Called by | ADM-499, ADM-502, ADM-503, ADM-504, ADM-505, ADM-506, ADM-507, ADM-509, ADM-510, ADM-511, ADM-512, ADM-515, ADM-516, ANL-008, ANL-057, BO-919, BO-926, BO-927 |
 
 **Parameters**
 
@@ -1540,6 +1544,9 @@ Forecasting and operational requirements (design C8)
 **`GET /forecast-accuracy`**: Measured forecast accuracy
 
 **Accuracy by horizon, labelled measured** (AIP-044, design 5.6; ADM-506, ADM-508): WAPE, bias and interval coverage against the baseline rule, per producer. These are the figures the promotion gate reads.
+
+
+**Order.** Soonest first, by `periodStart` ascending, then by `id`.
 
 |  |  |
 |---|---|
@@ -1731,6 +1738,9 @@ The job's status, rows read, loaded and rejected, and each finding (a bad date, 
 
 Immutable versions (AIP-032) with basis, producer, data cut-off, quality checks and status (ADM-508).
 
+
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `AI_USE` |
@@ -1798,6 +1808,9 @@ Immutable versions (AIP-032) with basis, producer, data cut-off, quality checks 
 
 **Staff, POS, gates, F&B, stock and resources** derived from a published version with the tenant's productivity standards (design 2.2 C step 6, AIP-067; ADM-509..518, BO-919, BO-925..927).
 
+
+**Order.** Soonest first, by `periodStart` ascending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `AI_USE` |
@@ -1809,7 +1822,7 @@ Immutable versions (AIP-032) with basis, producer, data cut-off, quality checks 
 | Read routing | replica |
 | Reads | `ai.forecast_version`, `ai.operational_requirement` |
 | Writes | - |
-| Called by | ADM-509, ADM-510, ADM-511, ADM-512, ADM-513, ADM-514, ADM-515, ADM-516, ADM-517, ADM-518, BO-919, BO-925, BO-926, BO-927 |
+| Called by | ADM-510, BO-919, BO-925, BO-926, BO-927 |
 
 **Parameters**
 
@@ -1860,6 +1873,10 @@ Immutable versions (AIP-032) with basis, producer, data cut-off, quality checks 
 **`GET /venues/{venueId}/history-imports`**: The venue's history imports
 
 Imports of the venue's own history, newest first, with the months each covered and its result.
+
+
+**Order.** Newest first, by `createdAt` descending, then by `id`.
+**Statuses.** Every `status` is returned, ended ones included (`failed`); a screen that shows only live rows filters on `status` itself.
 
 |  |  |
 |---|---|
@@ -2345,7 +2362,7 @@ Logging, approval, explainability and cost
 | Conflict policy | serverWins |
 | Reads | `ai.governance_policy`, `ai.governance_policy_version`, `cache:idempotency` |
 | Writes | `ai.governance_policy`, `ai.governance_policy_version`, `cache:idempotency` |
-| Called by | ADM-523, ADM-524, ADM-525, ADM-530 |
+| Called by | ADM-523, ADM-524 |
 | State model | AI governance policy version ([states/ai-governance-policy-version.yaml](../../../states/ai-governance-policy-version.yaml)): created as `draft` |
 
 **Parameters**
@@ -2435,7 +2452,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Conflict policy | serverWins |
 | Reads | `ai.action_plan`, `ai.proposed_action`, `cache:idempotency` |
 | Writes | `ai.action_plan`, `ai.activity`, `ai.decision_record`, `ai.proposed_action`, `cache:idempotency` |
-| Called by | ADM-492, ADM-531, ADM-532, ANL-009, BO-093, BO-598, BO-762, BO-793, BO-928, BO-929, BO-970, BO-975, CMS-007, CMS-008 |
+| Called by | ADM-532, ANL-009, BO-093, BO-598, BO-762, BO-793, BO-928, BO-929, BO-970, BO-975, CMS-007, CMS-008 |
 | State model | AI action plan ([states/ai-action-plan.yaml](../../../states/ai-action-plan.yaml)): moves `awaitingApproval` -> `approved`, `awaitingApproval` -> `cancelled`<br/>AI proposed action ([states/ai-proposed-action.yaml](../../../states/ai-proposed-action.yaml)): moves `proposed` -> `approved`, `proposed` -> `rejected` |
 
 **Parameters**
@@ -2638,7 +2655,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Read routing | replica |
 | Reads | `ai.capability`, `ai.governance_policy`, `ai.governance_policy_version`, `ai.policy`, `ai.policy_exception` |
 | Writes | - |
-| Called by | ADM-489, ADM-522, ADM-525, ADM-526, ADM-528, ANL-060, BO-091 |
+| Called by | ADM-522, ADM-525, ADM-526, ADM-528, BO-091 |
 
 **Parameters**
 
@@ -2702,6 +2719,9 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 
 **Every AI capability operating in the tenant, and nothing that is not in it** (AIC-143..145; ADM-519..522). Owner, family, risk class, the autonomy level in force against its ceiling, data categories, lifecycle per environment and whether it is paused. The P09 governance area and ANL-060 read this first.
 
+
+**Order.** Newest first, by `updatedAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `AI_USE` |
@@ -2713,7 +2733,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Read routing | replica |
 | Reads | `ai.capability` |
 | Writes | - |
-| Called by | ADM-519, ADM-520, ADM-521, ADM-522, ADM-536, ANL-060, BO-091 |
+| Called by | ADM-519, ADM-520, ADM-521, ADM-536, BO-091 |
 
 **Parameters**
 
@@ -2767,6 +2787,9 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 
 Every version of every governance policy at the scope, newest first (ADM-523, ADM-526..528). Filter by `policyId` for one policy's history, or by `status` for what is in force.
 
+
+**Order.** Newest first, by `publishedAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `AI_USE` |
@@ -2778,7 +2801,7 @@ Every version of every governance policy at the scope, newest first (ADM-523, AD
 | Read routing | replica |
 | Reads | `ai.governance_policy`, `ai.governance_policy_version` |
 | Writes | - |
-| Called by | ADM-523, ADM-524, ADM-526, ADM-527, ADM-528, ADM-530 |
+| Called by | ADM-523, ADM-524, ADM-527, ADM-528 |
 
 **Parameters**
 
@@ -2826,6 +2849,33 @@ Every version of every governance policy at the scope, newest first (ADM-523, AD
 | 200 |  | Governance policies and their versions |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### listProposedActions
+
+**`GET /proposed-actions`**: What the assistant has proposed and nobody has decided
+
+8.3.61–8.3.66. Pricing, promotional, operational and financial proposals wait here for approval, and multi-level approval is supported because a pricing change and a discount rule do not carry the same authority.
+**What a caller sees follows who may decide** (audit R213 (3)): a caller holding `AI_APPROVE` sees every open proposal at the scope; a caller with `AI_USE` only sees the proposals they prompted, because those are the level 1 proposals they may approve themselves.
+
+|  |  |
+|---|---|
+| Permission | `AI_USE` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `ai.proposed_action` |
+| Writes | - |
+| Called by | ADM-529, ADM-534, ANL-009, BO-093, BO-762, BO-793, BO-928, BO-929, CMS-008 |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Awaiting a decision |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### pauseAiCapability
 
 **`POST /governance/capabilities/{capabilityKey}/pause`**: Stop a capability now
@@ -2842,7 +2892,7 @@ Every version of every governance policy at the scope, newest first (ADM-523, AD
 | Conflict policy | serverWins |
 | Reads | `ai.capability`, `cache:idempotency` |
 | Writes | `ai.action_plan`, `ai.capability`, `ai.decision_record`, `ai.intervention`, `cache:idempotency` |
-| Called by | ADM-519, ADM-536, ADM-556, ADM-696 |
+| Called by | ADM-536, ADM-556, ADM-696 |
 | State model | AI capability ([states/ai-capability.yaml](../../../states/ai-capability.yaml)): moves `active` -> `paused` |
 
 **Parameters**
@@ -3096,7 +3146,7 @@ Moves an insight along new → reviewed → accepted/rejected → actioned (AIP-
 | Conflict policy | serverWins |
 | Reads | `ai.insight`, `cache:idempotency` |
 | Writes | `ai.anomaly_detector`, `ai.insight`, `cache:idempotency` |
-| Called by | ANL-019, ANL-059, BO-772, BO-782 |
+| Called by | ANL-019, BO-772, BO-782 |
 | State model | AI insight ([states/ai-insight.yaml](../../../states/ai-insight.yaml)): moves `new` -> `reviewed`, `reviewed` -> `accepted`, `reviewed` -> `rejected`, `accepted` -> `actioned` |
 
 **Parameters**
@@ -3246,7 +3296,7 @@ Knowledge gaps, answer feedback and assistant profiles (design C4, C5)
 | Conflict policy | serverWins |
 | Reads | `ai.assistant_profile`, `ai.policy`, `cache:idempotency` |
 | Writes | `ai.assistant_profile`, `cache:idempotency` |
-| Called by | BO-091, SUP-018 |
+| Called by | BO-091 |
 
 **Parameters**
 
@@ -3319,7 +3369,7 @@ One label per message per person (AIC-062): helpful or not, and why. Guests can 
 | Guest callable | True |
 | Reads | `ai.answer_feedback`, `ai.message`, `cache:idempotency` |
 | Writes | `ai.answer_feedback`, `ai.knowledge_gap`, `cache:idempotency` |
-| Called by | EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
+| Called by | EMP-020, GST-031, GST-033, WEB-044 |
 
 **Parameters**
 
@@ -3358,6 +3408,7 @@ One label per message per person (AIC-062): helpful or not, and why. Guests can 
 |---|---|---|
 | 201 |  | Say whether an answer helped |
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | This person has already labelled this answer; it takes one label per message per person (AIC-062). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 
@@ -3371,6 +3422,9 @@ Model catalogue, prompt registry, evaluation and release (design C1, C13)
 
 Runs with metrics and gate results, newest first.
 
+
+**Order.** Newest first, by `startedAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `AI_USE` |
@@ -3382,7 +3436,7 @@ Runs with metrics and gate results, newest first.
 | Read routing | analytical |
 | Reads | `ai.eval_run`, `ai.eval_suite` |
 | Writes | - |
-| Called by | ADM-554, ANL-060 |
+| Called by | ADM-554 |
 
 **Parameters**
 
@@ -3428,6 +3482,9 @@ Runs with metrics and gate results, newest first.
 **`GET /training-runs`**: The per-tenant training and backtest runs
 
 **The registry of training runs** (29 September, AI functions review; design 3.5). Each trained producer is retrained weekly on the tenant's own data only (AIP-149), backtested against past actuals (`ai.eval_run` kind `backtest`), and run in shadow beside the live answer. A run whose shadow period passes the promotion gate raises a `promotionReady` governance alert to the admin; **nothing switches by itself** (AI-D16). Runs are scheduled by the platform; this reads them.
+
+
+**Order.** Newest first, by `startedAt` descending, then by `id`.
 
 |  |  |
 |---|---|
@@ -3499,7 +3556,7 @@ Runs with metrics and gate results, newest first.
 | Conflict policy | serverWins |
 | Reads | `ai.eval_run`, `ai.governance_alert`, `ai.release`, `cache:idempotency` |
 | Writes | `ai.decision_record`, `ai.forecast_definition`, `ai.governance_alert`, `ai.policy`, `ai.release`, `cache:idempotency` |
-| Called by | ADM-519, ADM-554 |
+| Called by | ADM-554 |
 | State model | AI governance alert ([states/ai-governance-alert.yaml](../../../states/ai-governance-alert.yaml)): moves `open` -> `resolved`, `acknowledged` -> `resolved` |
 
 **Parameters**
@@ -3691,7 +3748,7 @@ Offline golden set, backtest or shadow comparison of a candidate against its bas
 | Conflict policy | serverWins |
 | Reads | `ai.eval_run`, `ai.eval_suite`, `ai.release`, `cache:idempotency` |
 | Writes | `ai.eval_run`, `ai.release`, `cache:idempotency` |
-| Called by | ADM-554, ANL-060 |
+| Called by | ADM-554 |
 
 **Parameters**
 
@@ -3943,6 +4000,9 @@ Records containment and performs it: pause a capability, roll back a release, re
 
 **Policy, control, data, behaviour and operational alerts in one place** (AIC-210..223; ADM-549..555), including `promotionReady` when a shadow model passes its gate (design 3.12), which the P09 governance area shows as a tile.
 
+
+**Order.** Newest first, by `raisedAt` descending, then by `id`.
+
 |  |  |
 |---|---|
 | Permission | `AI_USE` |
@@ -3954,7 +4014,7 @@ Records containment and performs it: pause a capability, roll back a release, re
 | Read routing | replica |
 | Reads | `ai.governance_alert` |
 | Writes | - |
-| Called by | ADM-519, ADM-549, ADM-552, ADM-553, ADM-554, ADM-555, ADM-558 |
+| Called by | ADM-549, ADM-552, ADM-553, ADM-554, ADM-555 |
 
 **Parameters**
 
@@ -4000,6 +4060,9 @@ Records containment and performs it: pause a capability, roll back a release, re
 **`GET /incidents`**: AI incidents
 
 Governance incidents from detection to closure (ADM-549, ADM-556), linked to operational incidents where both apply (AIC-250).
+
+
+**Order.** Newest first, by `openedAt` descending, then by `id`.
 
 |  |  |
 |---|---|
@@ -4078,7 +4141,7 @@ From one or more governance alerts, or by hand (ADM-555, ADM-556). Emits `ai.inc
 | Conflict policy | serverWins |
 | Reads | `ai.governance_alert`, `ai.incident`, `cache:idempotency` |
 | Writes | `ai.governance_alert`, `ai.incident`, `cache:idempotency` |
-| Called by | ADM-555, ADM-556 |
+| Called by | ADM-556 |
 | State model | AI incident ([states/ai-incident.yaml](../../../states/ai-incident.yaml)): created as `open` |
 
 **Parameters**
@@ -4159,7 +4222,7 @@ The recommendation and upsell engine (design C11)
 | Guest callable | True |
 | Reads | `ai.rec_decline`, `ai.release`, `cache:idempotency`, `cache:rec-candidates`, `cache:rec-features` |
 | Writes | `ai.decision_record`, `ai.rec_decision`, `cache:idempotency` |
-| Called by | BO-102, BO-1048, BO-119, GST-001, GST-036, GST-048, WEB-001, WEB-008, WEB-043 |
+| Called by | BO-102, BO-1048, BO-119, GST-048, WEB-008 |
 
 **Parameters**
 
@@ -4230,7 +4293,7 @@ Impressions, clicks, add-to-cart, dismissals and explicit declines, batched. A `
 | Guest callable | True |
 | Reads | `ai.rec_decision`, `cache:idempotency` |
 | Writes | `ai.rec_decline`, `ai.rec_event`, `cache:idempotency` |
-| Called by | GST-001, GST-036, GST-048, WEB-001, WEB-008, WEB-043 |
+| Called by | GST-048, WEB-008 |
 
 **Parameters**
 
@@ -4505,7 +4568,7 @@ Results are scoped to the principal, and each carries the collection it came fro
 
 ### setIndexSource
 
-**`PUT /index-sources`**: Declare a source indexed
+**`PUT /index-sources/{sourceId}`**: Declare a source indexed
 
 Names the table, the fields that carry retrievable text, the collection it lands in and the event that invalidates it.
 **`textFields` is the important one.** Indexing an entire row embeds ids, timestamps and foreign keys as though they were meaning, and a search for "annual pass" then matches a UUID. Only the fields a person would read are embedded; the rest becomes payload used for filtering.
@@ -4528,6 +4591,7 @@ Names the table, the fields that carry retrievable text, the collection it lands
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| sourceId | path | yes | string (uuid) | Addresses the item this write creates or replaces: its id. |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
 **Request body**: `IndexSource`
@@ -4796,6 +4860,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | execution_result | jsonb | no |  |
 | outcome_ref | text | no | The business outcome it links to (an order, a published version, a closed case). |
 | outcome | text | yes | approvedThenFailed is kept distinct from executed (design 1.2 Audit). |
+| annotations | jsonb | no | Corrections, appended; the original fields are never edited. |
 | previous_hash | text | no |  |
 | record_hash | text | yes |  |
 | created_at | timestamptz | no |  |
@@ -4901,6 +4966,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | id | uuid | yes |  |
 | name | text | no |  |
 | base_version_id | uuid | yes |  |
+| changes | jsonb | yes |  |
 | status | text | no |  |
 | result | jsonb | no | Deltas against the base version by subject and period. |
 | created_by_principal_id | uuid | no |  |
@@ -4989,6 +5055,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | trigger | text | yes |  |
 | status | text | yes |  |
 | product_count | integer | no |  |
+| questions | jsonb | no | The questions chosen, in the order asked. |
 | wording_source | text | no | Where the text came from. |
 | model_version | text | no |  |
 | prompt_template_version | text | no |  |
@@ -5007,7 +5074,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | asset_id | uuid | no |  |
 | source_system | text | no |  |
 | column_mapping | jsonb | no |  |
-| dry_run | boolean | no |  |
+| is_dry_run | boolean | no |  |
 | status | text | yes |  |
 | period_from | date | no |  |
 | period_to | date | no |  |
@@ -5015,6 +5082,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | rows_read | integer | no |  |
 | rows_loaded | integer | no |  |
 | rows_rejected | integer | no |  |
+| findings | jsonb | no |  |
 | requested_by_principal_id | uuid | no |  |
 | created_at | timestamptz | no |  |
 | completed_at | timestamptz | no |  |
@@ -5048,6 +5116,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | capability_keys | text[] | no |  |
 | alert_ids | text[] | no |  |
 | operational_incident_ref | text | no | The linked operational incident, where both apply (AIC-250). |
+| containment | jsonb | no |  |
 | root_cause | text | no |  |
 | remediation | text | no |  |
 | impact | text | no | The post-incident review's impact (closeAiIncident, CHG-CSA-045). |
@@ -5239,8 +5308,8 @@ Every table this service owns that the slice reads or writes, with its columns a
 | model_name | text | yes | The deployment or model name as the provider knows it, or the package and version for a classical model. |
 | capabilities | text[] | no |  |
 | context_tokens | integer | no |  |
-| tool_calling | boolean | no |  |
-| structured_output | boolean | no |  |
+| supports_tool_calling | boolean | no |  |
+| supports_structured_output | boolean | no |  |
 | languages | text[] | no |  |
 | residency | text | no | Where inference happens. |
 | input_cost_per_million_tokens | numeric(18,4) | no |  |
@@ -5249,6 +5318,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | is_default_for_tasks | text[] | no | Tasks this model is the default for (AIC-010), e.g. |
 | curated_range | jsonb | no | TICVAI's curated range: the tasks this model may serve (Chinmay, 2 October, workbook Q1, Q2 and Q9; the AI/ML model selection of 2 October; CHG-CSA-001). |
 | residency_classes | text[] | no | The tenant residency classes whose calls this model may serve (CHG-CSA-002). |
+| task_fitness | jsonb | no | Evaluated fitness per task (21 September minutes, M21-09, our proposal): a score from the task's golden set (runAiEvaluation) and the band the task needs. |
 | scope_path | text | no | The partition key (ADR-0005). |
 
 ### `ai.operational_requirement`
@@ -5294,7 +5364,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | guest_capability_scope | text[] | no | What a guest-facing assistant may help with, and nothing else (2.1.28). |
 | retrieve_top_k | integer | no | How many chunks retrieval returns before reranking. |
 | rerank_top_k | integer | no | How many survive the rerank and reach the model. |
-| cache_answers | boolean | no | The largest cost lever available at a kiosk. |
+| caches_answers | boolean | no | The largest cost lever available at a kiosk. |
 | cache_ttl_minutes | integer | no | An upper bound on top of event invalidation, not instead of it. |
 | retain_interactions_days | integer | no | How long prompts and responses are kept. |
 | semantic_cache_threshold | numeric | no | Similarity above which a cached answer serves a new question. |
@@ -5306,7 +5376,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | per_request_token_ceiling | integer | no | One runaway conversation can spend a tenant's month. |
 | streams_by_capability | text[] | no | Time to first token and total latency are separate targets. |
 | fallback_provider_id | uuid | no | BL-151: a provider outage with no fallback is every AI surface going dark at once. |
-| guardrail_short_circuit | boolean | no | A refusal a rule can decide never reaches a model. |
+| has_guardrail_short_circuit | boolean | no | A refusal a rule can decide never reaches a model. |
 | suggestion_providers | jsonb | no | Which producer answers each SuggestionKind, and what requestSuggestion routes by. |
 | tenant_id | uuid | yes | Points at platform.tenant. |
 
@@ -5351,7 +5421,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | id | uuid | yes |  |
-| interaction_id | uuid | no |  |
+| activity_id | uuid | no |  |
 | translation_job_id | uuid | no | The proposeTranslations job that drafted this proposal; getTranslationProposals reads a job's rows by it. |
 | kind | text | yes | content (a marketing or storefront draft from proposeMarketingContent) and audience (a lookalike segment from proposeLookalikeSegment) added 29 September (build); both are applied by a person in the… |
 | target_contract | text | yes | Which contract would perform it. |
@@ -5381,7 +5451,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | capability | text | yes |  |
 | model | text | no |  |
 | failover_provider_id | uuid | no | BL-151. |
-| degrade_gracefully | boolean | no | Where no fallback answers, the surface degrades rather than errors. |
+| degrades_gracefully | boolean | no | Where no fallback answers, the surface degrades rather than errors. |
 | priority | integer | yes | Failover order (8.4.26). |
 | scope_level | text | no | Where this provider configuration applies, and therefore whose token pays for it. |
 | scope_path | text | no | Resolved scope node. |
@@ -5400,6 +5470,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | managed_by | text | no | Who holds the provider account, and so who pays (AI design 5.9, decided 29 September). |
 | model_id | uuid | no | The model in the catalogue (listAiModels) this provider serves. |
 | task_keys | text[] | no | Which agent tasks this provider serves (21 September minutes, M21-03: different agents may use different models chosen for the task). |
+| fitness_warnings | jsonb | no | The model-fitness check at the last write (21 September minutes, M21-09). |
 | region_id | uuid | yes | Points at platform.org_unit. |
 
 ### `ai.rec_decision`
@@ -5529,6 +5600,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | venue_type | text | yes |  |
 | is_outdoor | boolean | no | Outdoor venues take the summer-heat and weather effects. |
 | capacity | integer | no |  |
+| opening_hours | jsonb | no | The usual week. |
 | typical_weekday_attendance | integer | no |  |
 | typical_weekend_attendance | integer | no |  |
 | peak_months | integer[] | no |  |
@@ -5541,7 +5613,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-79 operations, added to this service in later releases without changing any of the above.
+78 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -5552,7 +5624,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | configure | `answerConfigurationQuestion`, `attachConfigurationSource`, `buildConfigurationPlan`, `decideBlueprintRecommendation`, `getConfigurationBlueprint`, `listConfigurationSessions`, `listConfigurationSources`, `proposeSeatMapChanges`, `startConfigurationSession` |
 | forecast | `compareForecastScenarios`, `configureForecastSignalSource`, `exportForecastVersion`, `listForecastDefinitions`, `listForecastSignals` |
 | generate | `generateConfiguration`, `generateVenueLayout`, `proposeLookalikeSegment` |
-| governance | `configureAiCapability`, `createAiPolicyException`, `listAiInteractions`, `listProposedActions`, `resumeAiCapability` |
+| governance | `configureAiCapability`, `createAiPolicyException`, `listAiInteractions`, `resumeAiCapability` |
 | insights | `configureAnomalyDetector`, `listAiInsights`, `listAnomalyDetectors`, `listMarketingRecommendations` |
 | knowledge | `listAssistantProfiles`, `listKnowledgeGaps` |
 | models | `listAiModels`, `listPromptTemplates` |

@@ -42,9 +42,9 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: ReportingService
-  operationCalls: 123
+  operationCalls: 115
 - service: AiService
-  operationCalls: 40
+  operationCalls: 27
 - service: TenancyService
   operationCalls: 4
 - service: IdentityService
@@ -429,7 +429,6 @@ screens:
   density: compact
   operations:
   - getKpiValues
-  - listAlerts
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -650,7 +649,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - createDashboard
   - getDashboard
   - listDashboards
   - recordDashboardView
@@ -851,6 +849,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - getDashboard
   - updateDashboard
   states:
   - emptyFirstRun
@@ -875,7 +874,6 @@ screens:
   density: compact
   operations:
   - getDashboard
-  - listAnalyticsPipelines
   - recordDashboardView
   states:
   - emptyFirstRun
@@ -1090,7 +1088,6 @@ screens:
   operations:
   - cancelReportExecution
   - getReportExecution
-  - runReport
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1115,7 +1112,6 @@ screens:
   density: compact
   operations:
   - getReportResult
-  - runReport
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1140,7 +1136,6 @@ screens:
   density: compact
   operations:
   - listReportDeliveries
-  - listReportSchedules
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1237,7 +1232,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - exportReportResult
   - getReportExport
   states:
   - emptyFirstRun
@@ -1475,8 +1469,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - configureAnomalyDetector
-  - listAiInsights
   - listAnomalyDetectors
   states:
   - emptyFirstRun
@@ -1525,10 +1517,7 @@ screens:
   density: compact
   operations:
   - createForecastScenario
-  - exportForecastVersion
   - getForecast
-  - getKpiValues
-  - listForecastDefinitions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1550,7 +1539,6 @@ screens:
   wave: 3
   density: compact
   operations:
-  - listAiInsights
   - listAnalyticsAnomalies
   states:
   - emptyFirstRun
@@ -1573,10 +1561,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - decideAiInsight
-  - listAiInsights
   - listAiInteractions
-  - listAnalyticsAnomalies
   - searchAiDecisions
   states:
   - emptyFirstRun
@@ -1599,13 +1584,7 @@ screens:
   wave: 3
   density: compact
   operations:
-  - configureAiCapability
-  - getEffectiveAiPolicy
-  - listAiCapabilities
-  - listAiEvaluations
   - listAiModels
-  - listPromptTemplates
-  - runAiEvaluation
   states:
   - emptyFirstRun
   - emptyNoAccess

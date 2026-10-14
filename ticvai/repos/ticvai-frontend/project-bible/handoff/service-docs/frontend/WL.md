@@ -8,6 +8,7 @@
 | Runtime | reactWeb |
 | App | venue-management-web |
 | Repository | P09 none yet: ask the lead; P13 none yet: ask the lead |
+| Repository layout | no repository yet |
 | Offline | no |
 | Themes |  |
 | Directions | ltr, rtl |
@@ -37,8 +38,8 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | [CMS-004](#cms-004-logo-assets) | Logo & Assets | White Label | 1 | 7 |
 | [CMS-005](#cms-005-theme-editor) | Theme Editor | White Label | 1 | 2 |
 | [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 1 | 6 |
-| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 1 | 14 |
-| [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 1 | 10 |
+| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 1 | 15 |
+| [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 1 | 11 |
 | [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 1 | 7 |
 | [CMS-010](#cms-010-media-library) | Media Library | White Label | 1 | 11 |
 | [CMS-011](#cms-011-translations) | Translations | White Label | 1 | 4 |
@@ -602,6 +603,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `listLandingPageTemplates` | [WhiteLabelService](../backend/WhiteLabelService.md#listlandingpagetemplates) | onLoad | The landing-page templates TICVAI provides (DEC-548) | `TENANT_CONFIGURE` |
 | `listContentBlocks` | [WhiteLabelService](../backend/WhiteLabelService.md#listcontentblocks) | onLoad | The page's existing blocks, in order: agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026 | `TENANT_CONFIGURE` |
 | `updateContentBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#updatecontentblock) | onAction | Edit or reorder a block (position): agreed with the contracts agent, runs/fix-s12/LEDGER.md, 4 October 2026 | `TENANT_CONFIGURE` |
+| `listProposedActions` | [AiService](../backend/AiService.md#listproposedactions) | onInterval | Follows decideProposedAction (202) until what it started settles: What the assistant has proposed and nobody has decided | `AI_USE` |
 
 **States**
 
@@ -657,6 +659,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | `deleteBanner` | [WhiteLabelService](../backend/WhiteLabelService.md#deletebanner) | onAction | Delete a banner | `TENANT_CONFIGURE` |
 | `proposeMarketingContent` | [AiService](../backend/AiService.md#proposemarketingcontent) | onAction | Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply | `AI_USE` |
 | `decideProposedAction` | [AiService](../backend/AiService.md#decideproposedaction) | onAction | Record which AI draft or proposal was used, or why it was refused | `AI_USE` |
+| `listProposedActions` | [AiService](../backend/AiService.md#listproposedactions) | onInterval | Follows the drafts proposeMarketingContent queued and the decisions decideProposedAction routed: each is an ai.proposed_action, polled while the screen is open until it is applied or refused | `AI_USE` |
 
 **States**
 
@@ -1016,6 +1019,12 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | Repository | none yet: ask the lead |
 | Component | `SiteSettingsDetail` |
 | Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| analyticsProviderId | navigation |
 
 **Operations**
 

@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-288` | Membership Entitlement & Admission Benefit Builder | B | 14 | 0 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
 | `BO-289` | Membership Usage, Visit & Consumption Rules | B | 19 | 20 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
 | `BO-290` | Family, Household & Dependent Membership Configuration | B | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-291` | Membership Commercial, Pricing & Channel Association | B | 35 | 0 | 5 | 4 | 0 | 0 | — | notStarted (generated) |
+| `BO-291` | Membership Commercial, Pricing & Channel Association | A | 35 | 0 | 5 | 4 | 0 | 0 | — | notStarted (generated) |
 | `BO-292` | Renewal, Auto-Renewal & Membership Continuity Configuration | B | 11 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
 | `BO-293` | Membership Product Validation, Approval, Publication & Versioning | B | 14 | 69 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
 

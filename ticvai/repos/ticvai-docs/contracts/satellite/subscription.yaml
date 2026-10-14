@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Subscription & Licensing
   version: 0.1.0
-  x-ticvai-screen-count: 130
+  x-ticvai-screen-count: 131
   x-ticvai-tier: satellite
   x-ticvai-module: 20 — Subscription & Licensing Management
   x-ticvai-requirements: 59
@@ -64,6 +64,102 @@ tags:
 - name: cell
 - name: metering
 - name: billing
+x-ticvai-queries:
+  # Queries other modules ask this module (ADR-0055 amendment, 14 October 2026): module, inputs, returns, rule, served.
+  # **Data reads other modules ask this module for** (MOD audit, 14 October 2026, CHG-MOD-001): one query per
+  # table, instead of a raw read of it (check-cross-module-reads XR-UNCOVERED; ADR-0055 rule 2, amended
+  # 14 October).
+  licenceAddOnRecords:
+    module: subscription
+    table: control.licence_add_on
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.licence_add_on rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/LicenceAddOn'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.licence_add_on rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements.
+    served: [in-process]
+  partnerAgreementRecords:
+    module: subscription
+    table: control.partner_agreement
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.partner_agreement rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/PartnerAgreement'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.partner_agreement rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked
+      from another deployable through Platform's service route (serviceAuth).
+    served: [service]
+  tenantRecords:
+    module: subscription
+    table: control.tenant
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The control.tenant rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Tenant'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its control.tenant rows, as it stores them and as the caller's scope lets
+      it see them (the table's row-level security, under the caller's connection and transaction). It decides
+      nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and a
+      question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements, and asked from another
+      deployable through Platform's service route (serviceAuth).
+    served: [in-process, service]
+  contractRecords:
+    module: subscription
+    table: subscription.contract
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The subscription.contract rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Subscription'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its subscription.contract rows, as it stores them and as the caller's
+      scope lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements.
+    served: [in-process]
+  planRecords:
+    module: subscription
+    table: subscription.plan
+    inputs:
+      ids: {type: array, items: {type: string, format: uuid}, description: 'The subscription.plan rows asked for, by id.'}
+      where: {type: object, additionalProperties: true, description: 'Or the rows whose columns equal these values (a key the asker holds, such as subjectId, orderId or venueId); ids and where together narrow.'}
+    returns:
+      type: array
+      description: 'The rows found, each as Platform stores it; an id with no visible row is absent.'
+      items: {$ref: '#/components/schemas/Plan'}
+    rule: >-
+      A data read, not a rule question (MOD audit of 14 October 2026, CHG-MOD-001; ADR-0055 rule 2 as amended 14
+      October). Platform answers with its subscription.plan rows, as it stores them and as the caller's scope
+      lets it see them (the table's row-level security, under the caller's connection and transaction). It
+      decides nothing: an asker that refuses or chooses on these rows states that rule in its own operation, and
+      a question with a rule of its own (open, live, sellable) is declared as a query of its own. It is asked in
+      process within operations, through the C# query interface Platform implements.
+    served: [in-process]
 paths:
   /onboarding-applications:
     post:
@@ -95,7 +191,7 @@ paths:
       - bearerAuth: []
       - prospectAuth: []
       x-ticvai-audience:
-      - public
+      - staff
       - prospect
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -138,7 +234,6 @@ paths:
       x-ticvai-permission: TENANT_CONFIGURE
       x-ticvai-audience:
       - staff
-      - public
       x-ticvai-scope-level: tenant
       x-ticvai-read-routing: replica
       x-ticvai-offline-capable: false
@@ -164,6 +259,10 @@ paths:
         format: uuid
     get:
       operationId: listPartnerUsers
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       summary: Users beneath a partner, by branch
       tags:
@@ -191,6 +290,10 @@ paths:
       operationId: createPartnerUser
       x-ticvai-consumed-by:
         - "P10 PTR-025 Partner Contacts & User Administration"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.write
       summary: Add a user to a partner branch
       description: '2.7.51. **Quota and credit resolve nearest-ancestor-wins**, like configuration — a
@@ -239,6 +342,10 @@ paths:
       operationId: listChannelListings
       x-ticvai-consumed-by:
         - "P08 BO-013 Channel & Distribution"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: What is listed on which OTA
       tags:
       - subscription
@@ -260,10 +367,21 @@ paths:
                   $ref: '#/components/schemas/ChannelListing'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /channel-listings/{listingId}:
     put:
       operationId: setChannelListing
       x-ticvai-consumed-by:
         - "P08 BO-013 Channel & Distribution"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: List a product on a channel, with its own allocation
       description: 'BL-076. **An OTA pulls a feed, caches it and sells against the cache**, so the gap
         between pushes is the oversell window and the allocation is the bound on it.
@@ -281,6 +399,11 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
+      - name: listingId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -310,6 +433,16 @@ paths:
         format: uuid
     post:
       operationId: exportPartnerInvoice
+      x-ticvai-read-via:
+      - query: finance#legalEntityRecords
+        route: service
+        for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       summary: Partner invoice and settlement, in an ERP format
       description: '2.7.41 and 5.12.7, BL-077. **`subscription.generateInvoice` bills a tenant for the
         platform — a different ledger from invoicing a partner for tickets sold.**
@@ -362,8 +495,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: '#/components/schemas/PartnerInvoiceExport'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /ai-usage/settle:
@@ -371,13 +503,20 @@ paths:
       operationId: settleAiUsage
       x-ticvai-consumed-by:
         - "P09 ADM-461 Consumption Reconciliation & Billing Approval"
+      x-ticvai-read-via:
+      - query: ai#activityRecords
+        route: service
+        for: 'its read of ai.activity, AI''s data (CHG-MOD-001)'
+      - query: ai#policyRecords
+        route: service
+        for: 'its read of ai.policy, AI''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Turn metered AI interactions into a billable usage record
       description: '**The link between the meter and the invoice, and it did not exist.** It lives in
         `subscription` rather than `ai` because **AI meters and subscription bills** — an AI operation
         writing a billing record would break the read-only rule in ADR-0020, which is how this landed
-        in the wrong contract on 17 August. `ai.interaction` recorded tokens and cost per call; `recordUsage`
+        in the wrong contract on 17 August. `ai.activity` recorded tokens and cost per call; `recordUsage`
         wrote a billing line; nothing joined them.
 
         Runs per tenant per period, aggregating from the interaction log and writing one `control.usage_record`
@@ -386,7 +525,7 @@ paths:
         each into a `metered` invoice line (metric `aiTokens`) at the AI module''s metered price (decided 29
         September: AI token usage is a metered line).
 
-        **Reads the primary, not the analytical replica.** `ai.interaction` sits on the analytical store
+        **Reads the primary, not the analytical replica.** `ai.activity` sits on the analytical store
         (ADR-0020) and replica lag at period close would invoice a number that changes after it is sent.
 
         '
@@ -474,6 +613,7 @@ paths:
 
                       '
         '409':
+          x-ticvai-problem-types: [ai-usage-already-settled]
           description: 'Already settled for this period. **Settling twice would invoice twice**, and the
             idempotency key alone does not protect a re-run with a different key.
 
@@ -558,6 +698,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscription'
+        '409':
+          description: 'The subscription is already `cancelled` (`subscription-already-cancelled`), or is `trial` or `expired` (`subscription-not-active`); only an `active` or `pastDue` subscription is cancelled. Nothing changes.'
+          x-ticvai-problem-types: [subscription-already-cancelled, subscription-not-active]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /partner-agreements:
@@ -609,6 +756,13 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createPartnerAgreement
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: tenancy#tenantRecords
+        route: service
+        for: 'its read of platform.tenant, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -659,6 +813,10 @@ paths:
         format: uuid
     patch:
       operationId: updatePartnerAgreement
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Amend, suspend or terminate
@@ -679,7 +837,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PartnerAgreement'
+              $ref: '#/components/schemas/UpdatePartnerAgreementRequest'
       responses:
         '200':
           headers:
@@ -799,6 +957,16 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-011 Quote Management"
         - "P10 PTR-017 Commission Statement"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - staff
@@ -864,9 +1032,7 @@ paths:
         - "P09 ADM-031 Security & Compliance Dashboard"
         - "P09 ADM-037 AI Provider & Credentials"
         - "P09 ADM-068 Tax, Fee & Calculation Command Center"
-        - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-370 Customer Subscription & Commercial Portfolio"
-        - "P09 ADM-374 Trial & Conversion Monitor"
         - "P09 ADM-411 Billing & Legal Entity Information"
         - "P09 ADM-412 Payment Method & Settlement Setup"
         - "P09 ADM-420 Tenant & Organization Provisioning"
@@ -967,6 +1133,7 @@ paths:
         - "P09 ADM-557 AI Compliance, Assurance & Governance Reporting"
         - "P09 ADM-558 AI Governance Review, Action Plan & Continuous Improvement"
         - "P09 ADM-619 Reconciliation & Settlement Command Center"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -1045,6 +1212,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tenant'
         '409':
+          x-ticvai-problem-types: [duplicate-code]
           description: Code already in use
           content:
             application/problem+json:
@@ -1215,6 +1383,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Tenant'
+        '409':
+          description: 'The tenant is already `suspended` (`tenant-already-suspended`), or is not `active` (`onboarding`, `terminating` or `terminated`; `tenant-not-active`). Nothing changes.'
+          x-ticvai-problem-types: [tenant-already-suspended, tenant-not-active]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/reactivate:
@@ -1251,6 +1426,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tenant'
         '409':
+          x-ticvai-problem-types: [tenant-terminated]
           description: Tenant is terminated, not suspended. Termination is not reversible here
           content:
             application/problem+json:
@@ -1322,12 +1498,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/TerminationSchedule'
         '400':
+          x-ticvai-problem-types: [confirmation-code-mismatch]
           description: Confirmation code does not match
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [unsettled-ledger-balances]
           description: Unsettled ledger balances exist
           content:
             application/problem+json:
@@ -1433,11 +1611,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Plan'
         '422':
+          x-ticvai-problem-types: [tenant-offer-on-standard-package, offered-tenant-not-found]
           description: '`offeredToTenantId` on a standard package, or a tenant that does not exist'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /plans/{planId}:
@@ -1511,11 +1692,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Plan'
         '422':
+          x-ticvai-problem-types: [tenant-offer-on-standard-package, offered-tenant-not-found]
           description: '`offeredToTenantId` on a standard package, or a tenant that does not exist'
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+        '409':
+          $ref: '../shared/common.yaml#/components/responses/DuplicateCode'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tenants/{tenantId}/subscription:
@@ -1533,7 +1717,6 @@ paths:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-009 Tenant Billing & Invoicing"
         - "P09 ADM-011 Licence & Seat Management"
-        - "P09 ADM-369 Commercial Command Center"
         - "P09 ADM-371 Customer Commercial 360°"
         - "P09 ADM-418 Subscription Lifecycle & Trial-to-Paid Handoff"
       x-ticvai-audience:
@@ -1563,7 +1746,6 @@ paths:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-410 Contract & Billing Cycle Selection"
         - "P09 ADM-417 Subscription Confirmation & Commercial Activation"
-        - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P17 SGN-019 Contract & Billing Cycle Selection"
         - "P17 SGN-024 Subscription Confirmation & Commercial Activation"
       security:
@@ -1662,6 +1844,10 @@ paths:
         - "P09 ADM-414 Order & Commercial Pricing Review"
         - "P09 ADM-463 Subscription & Commercial Change Management"
         - "P17 SGN-022 Order & Commercial Pricing Review"
+      x-ticvai-read-via:
+      - query: tenancy#tenantRecords
+        route: service
+        for: 'its read of platform.tenant, Tenancy''s data (CHG-MOD-001)'
       security:
       - bearerAuth: []
       - prospectAuth: []
@@ -1760,7 +1946,6 @@ paths:
         - "P09 ADM-005 Tenant Directory"
         - "P09 ADM-007 Module & Feature Entitlement"
         - "P09 ADM-011 Licence & Seat Management"
-        - "P09 ADM-422 Administrator & Security Initialization"
       x-ticvai-audience:
       - staff
       summary: License a module outside the plan
@@ -1866,9 +2051,12 @@ paths:
         - "P09 ADM-011 Licence & Seat Management"
         - "P09 ADM-012 Tenant Isolation & Resource Pool"
         - "P09 ADM-015 API Rate Limit & Quota Management"
-        - "P09 ADM-371 Customer Commercial 360°"
         - "P09 ADM-449 Usage & License Command Center"
         - "P09 ADM-457 AI Usage Forecast & Commercial Optimization"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: analytical
@@ -1973,6 +2161,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Cell'
         '400':
+          x-ticvai-problem-types: [placement-outside-jurisdiction, no-cloud-region-in-country]
           description: 'Placement is outside the region''s jurisdiction, or the target cloud has no region
             in that country.
 
@@ -1982,6 +2171,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [region-cell-exists]
           description: A cell already exists for this region
           content:
             application/problem+json:
@@ -2070,6 +2260,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CellJob'
         '400':
+          x-ticvai-problem-types: [tier-unavailable-in-jurisdiction]
           description: Target tier is unavailable in this jurisdiction
           content:
             application/problem+json:
@@ -2121,6 +2312,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [cell-not-active]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2171,6 +2363,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [cell-not-decommissioning]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2331,6 +2524,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/CellCluster'
         '409':
+          x-ticvai-problem-types: [model-cell-mid-migration]
           description: 'The model cell is mid-migration. Replicating a cell whose schema is moving produces
             a cluster at neither version.
 
@@ -2383,6 +2577,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [tenant-migration-not-cutting-over]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2579,6 +2774,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TenantMigration'
         '409':
+          x-ticvai-problem-types: [migration-plan-stale, tenant-traded-since-plan]
           description: Plan stale, or the tenant has traded since it was computed
           content:
             application/problem+json:
@@ -2641,6 +2837,9 @@ paths:
         - "P09 ADM-014 Auto-Scaling Configuration"
         - "P09 ADM-029 Deployment Monitor"
         - "P09 ADM-419 Provisioning Command Center"
+      description: '**Order.** Newest first, by `createdAt` descending, then by `id`.
+
+        **Statuses.** Every `status` is returned, ended ones included (`failed`); a screen that shows only live rows filters on `status` itself.'
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -2731,6 +2930,10 @@ paths:
   /usage-records:
     post:
       operationId: recordUsage
+      x-ticvai-read-via:
+      - query: ai#activityRecords
+        route: service
+        for: 'its read of ai.activity, AI''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - service
       security:
@@ -2795,6 +2998,10 @@ paths:
       operationId: recordInvoicePayment
       x-ticvai-consumed-by:
         - "P09 ADM-462 Invoice & Payment Management"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       summary: Record payment against an invoice
@@ -2829,6 +3036,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [invoice-not-payable]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2880,6 +3088,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [invoice-not-disputable]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2929,6 +3138,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [invoice-not-disputed]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -2980,6 +3190,7 @@ paths:
               $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Done
         '409':
+          x-ticvai-problem-types: [invoice-not-cancellable]
           description: Not in a state that permits this
           content:
             application/problem+json:
@@ -3092,7 +3303,9 @@ paths:
       description: 'Platform billing to the tenant. Distinct from the tenant''s own ledger, which records
         their sales to guests.
 
-        '
+        
+
+        **Order.** Newest first, by `issuedAt` descending, then by `id`.'
       tags:
       - billing
       x-ticvai-permission: PLATFORM_BILLING_VIEW
@@ -3181,6 +3394,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/SubscriptionInvoice'
         '409':
+          x-ticvai-problem-types: [period-already-invoiced]
           description: An invoice already exists for this period
           content:
             application/problem+json:
@@ -3191,6 +3405,10 @@ paths:
   /burst-environments:
     get:
       operationId: listBurstEnvironments
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       summary: On-sale environments
       description: '**What is running and what it is costing.** An environment nobody is watching is the
         one left up for a month.'
@@ -3216,6 +3434,10 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: requestBurstEnvironment
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
       summary: Stand one up for a performance
       description: '**Threshold-based, not manual.** Requested when a performance''s expected demand exceeds
         what the shared cell absorbs — `catalogue.performance` carries `onSaleFrom`, `onSaleTo` and capacity,
@@ -3307,11 +3529,22 @@ paths:
           content:
             application/json:
               schema: *id001
+        '409':
+          description: 'The environment is not `live` (not live yet, already `draining` or beyond, or `failed`); only a live environment is drained. Nothing changes.'
+          x-ticvai-problem-types: [burst-environment-not-live]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /burst-environments/{burstEnvironmentId}/reconcile:
     post:
       operationId: reconcileBurstEnvironment
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: orders.order_line
         operation: syncOrders
@@ -3374,11 +3607,22 @@ paths:
                     type: integer
                   complete:
                     type: boolean
+        '409':
+          description: 'The environment has not been drained (still `requested`, `provisioning`, `warming` or `live`, or `failed`; `burst-environment-not-drained`), or is already `reconciled` or `decommissioned` (`burst-environment-already-reconciled`). Nothing is replayed.'
+          x-ticvai-problem-types: [burst-environment-not-drained, burst-environment-already-reconciled]
+          content:
+            application/problem+json:
+              schema:
+                $ref: '../shared/common.yaml#/components/schemas/Problem'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /burst-environments/{burstEnvironmentId}/decommission:
     post:
       operationId: decommissionBurstEnvironment
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'the orders the burst environment took, reconciled into the cell first (409 not-reconciled) (CHG-MOD-003)'
       summary: Tear it down
       description: '**Refused unless the environment is `reconciled`.** An environment torn down before
         its orders reach the permanent platform has lost real money and real tickets, and **`decommissioned`
@@ -3408,6 +3652,7 @@ paths:
             application/json:
               schema: *id001
         '409':
+          x-ticvai-problem-types: [not-reconciled]
           description: Not reconciled — orders would be lost
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -3496,6 +3741,16 @@ paths:
       operationId: listMembershipAnnualPass
       x-ticvai-consumed-by:
         - "P08 BO-284 Membership & Annual Pass Command Center"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.4-5 (13.1.1
@@ -3514,7 +3769,9 @@ paths:
         structure, effective dates). Quick actions Create Membership, Clone, Edit, Preview, Submit for Approval,
         Publish, Suspend and View Members are buttons on BO-284; Create/Clone/Edit open setMembershipProductTier,
         Preview/Submit for Approval/Publish are served by approveMembershipProductValidation, View Members opens
-        listMember filtered by product.'
+        listMember filtered by product.
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `productId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -3604,6 +3861,12 @@ paths:
       operationId: setMembershipProductTier
       x-ticvai-consumed-by:
         - "P08 BO-285 Membership Product & Tier Builder"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.5-7 (13.1.2
@@ -3659,6 +3922,12 @@ paths:
       operationId: setMembershipEligibilityQualification
       x-ticvai-consumed-by:
         - "P08 BO-286 Membership Eligibility & Qualification Rule Builder"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.7-8 (13.1.3
@@ -3709,6 +3978,12 @@ paths:
       operationId: setValidityActivationExpiry
       x-ticvai-consumed-by:
         - "P08 BO-287 Validity, Activation & Expiry Configuration"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.8-9 (13.1.4
@@ -3758,6 +4033,15 @@ paths:
       operationId: setMembershipEntitlementAdmission
       x-ticvai-consumed-by:
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
+      x-ticvai-read-via:
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.9-11 (13.1.5
@@ -3808,6 +4092,10 @@ paths:
       operationId: listMembershipUsageVisit
       x-ticvai-consumed-by:
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.11-12 (13.1.6
@@ -3823,7 +4111,9 @@ paths:
         reservation options became reservationRequirement; no-show example became a threshold/window/restriction
         triple; the counter example dropped (counters live on listVisitAdmissionEntitlement); duplicates merged;
         types corrected; paged. One row per membership product/tier usage rule set. Access Control consumes
-        the resulting entitlement decision and does not recreate these rules (pack p.12).'
+        the resulting entitlement decision and does not recreate these rules (pack p.12).
+
+        **Order.** Sorted by `membershipCode` ascending.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -3867,6 +4157,12 @@ paths:
       operationId: setFamilyHouseholdDependent
       x-ticvai-consumed-by:
         - "P08 BO-290 Family, Household & Dependent Membership Configuration"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.12-14 (13.1.7
@@ -3916,6 +4212,16 @@ paths:
       operationId: listMembershipCommercialPricing
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.14-15 (13.1.8
@@ -3932,7 +4238,9 @@ paths:
         four payment flags became paymentTerms; five sales-period flags became salesPeriod with window and capacity;
         profiles typed as references, not money; Upgrade Price Policy added; paged. One row per membership product.
         All monetary calculation stays in pricing (Area 10) and payment processing outside the membership engine;
-        tier and renewal prices are shown as read from the linked pricing profile.'
+        tier and renewal prices are shown as read from the linked pricing profile.
+
+        **Order.** Sorted by `membershipCode` ascending.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -3988,6 +4296,12 @@ paths:
       operationId: setRenewalAutoMembership
       x-ticvai-consumed-by:
         - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.15-16 (13.1.9
@@ -4040,6 +4354,13 @@ paths:
       operationId: getMembershipProductValidation
       x-ticvai-consumed-by:
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       summary: A membership product's validation, as the approver sees it
       description: |-
         **Added 4 October 2026 (CHG-FXC-010; VM-BO-293): `approveMembershipProductValidation` was the only operation, and the
@@ -4081,6 +4402,18 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-284 Membership & Annual Pass Command Center"
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -4164,6 +4497,16 @@ paths:
       operationId: listMember
       x-ticvai-consumed-by:
         - "P08 BO-294 Member Operations Command Center"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.21-22 (13.2.1
@@ -4181,7 +4524,9 @@ paths:
         purchased/pending stages) and renewalStatus (grace period, renewed); dates and usage typed; filters
         typed and venue, tier, acquisition channel and at-risk added; paged. Rows open setMemberMembershipAccount
         (Member 360). The pack''s Renewed and Replaced statuses are lifecycle events shown in listMemberLifecycleCase,
-        not states.'
+        not states.
+
+        **Order.** Soonest first, by `expiryDate` ascending, then by `customerId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4318,6 +4663,21 @@ paths:
       operationId: setMemberMembershipAccount
       x-ticvai-consumed-by:
         - "P08 BO-295 Member 360° Membership Account Workspace"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership, the one the body''s `membershipId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.22-24 (13.2.2
@@ -4369,6 +4729,19 @@ paths:
       operationId: listMembershipActivationCredential
       x-ticvai-consumed-by:
         - "P08 BO-296 Membership Activation, Assignment & Credential Management"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.24-25 (13.2.3
@@ -4385,7 +4758,9 @@ paths:
         filter; eight required checks became requiredChecks; seven credential types became credentialTypes;
         duplicate detection added; dates typed; paged. Assignment associates the purchased membership with a
         customer/member; actual credential generation uses the Ticket Media/Credential services; an unactivated
-        membership expires at activationDeadline (MoM 25 Aug fallback expiry).'
+        membership expires at activationDeadline (MoM 25 Aug fallback expiry).
+
+        **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4447,6 +4822,13 @@ paths:
       operationId: listVisitAdmissionEntitlement
       x-ticvai-consumed-by:
         - "P08 BO-297 Visit, Admission & Entitlement Usage Monitor"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.26-27 (13.2.4
@@ -4463,7 +4845,9 @@ paths:
         usage exceptions; the manual-adjustment form and the guest-ticket example dropped from the row; types
         corrected; paged by membership. Access Control stays the authoritative admission-validation engine (pack
         p.27); counter corrections are an Entitlement Adjustment exception (listMemberExceptionOverride) needing
-        reason, previous and new value, user and approval where required, recorded in the lifecycle history.'
+        reason, previous and new value, user and approval where required, recorded in the lifecycle history.
+
+        **Order.** Sorted by `code` ascending, then by `visitId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4537,6 +4921,13 @@ paths:
       operationId: listMembershipFreezeSuspension
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.27-28 (13.2.5
@@ -4554,7 +4945,9 @@ paths:
         typed in days, approver as a name; suspension reasons, validity treatment, entitlement treatment, new
         expiry and the record''s own status added; paged. Freeze and Resume execute via catalogue freezeEntitlement/reinstateEntitlement,
         Suspend and Reactivate via suspendEntitlement/reinstateEntitlement; before reactivation TICVAI checks
-        suspension resolved, payment status, eligibility, credential and the new expiry (pack p.28).'
+        suspension resolved, payment status, eligibility, credential and the new expiry (pack p.28).
+
+        **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4608,6 +5001,19 @@ paths:
       operationId: listMembershipUpgradeDowngrade
       x-ticvai-consumed-by:
         - "P08 BO-299 Membership Upgrade, Downgrade & Product Migration Operations"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.29-30 (13.2.6
@@ -4628,7 +5034,9 @@ paths:
         transaction: Area 11 conversion rules decide eligibility and consumed-benefit treatment, Area 10 prices
         the pro-rata credit and difference (MoM 1 Sep §4.9), Area 12 raises the order and payment. A downgrade
         takes effect at the next renewal unless the configured conversion rule says otherwise, so no mid-term
-        refund arises from it (decided 29 September, readiness close-out).'
+        refund arises from it (decided 29 September, readiness close-out).
+
+        **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4682,6 +5090,19 @@ paths:
       operationId: listRenewalAuto
       x-ticvai-consumed-by:
         - "P08 BO-300 Renewal Operations & Auto-Renewal Management"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.30-31 (13.2.7
@@ -4701,7 +5122,9 @@ paths:
         payment method, consent and membership version; auto-renew runs Scheduled -> Pre-Notification -> Payment
         Attempt (payments module charges the card on file) -> Success/Failure -> Membership Extension via orders
         renewMembership, retrying per setRenewalAutoMembership; the renewed period starts the day after the
-        current expiry so there is no gap.'
+        current expiry so there is no gap.
+
+        **Order.** Sorted by `membershipId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4785,6 +5208,16 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
         - "P08 BO-949 Approval, Exception & Override Control Center"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.32-33 (13.2.8
@@ -4801,7 +5234,9 @@ paths:
         as money, duration in days); approval status, approver, remedy and AI suggestion added; paged. Approval
         is configured by exception type, value, duration, tier and user role; high-value exceptions require
         requestor != approver; remedies priced through central commercial services; AI suggestions are advisory.
-        Served alongside BO-949''s general approval centre.'
+        Served alongside BO-949''s general approval centre.
+
+        **Order.** Sorted by `exceptionId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4840,6 +5275,7 @@ paths:
               - applied
           description: Approval status
         - name: membershipId
+          x-ticvai-column: access.entitlement.id
           in: query
           required: false
           schema:
@@ -4868,6 +5304,25 @@ paths:
       operationId: listMemberLifecycleCase
       x-ticvai-consumed-by:
         - "P08 BO-302 Member Lifecycle History, Audit & Case Timeline"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.33-35 (13.2.9
@@ -4883,7 +5338,9 @@ paths:
         and related-transaction words became eventType, actorType and relatedTransactions; before/after became
         field/previousValue/newValue; export audiences and examples dropped; paged. Events are immutable; authorised
         users add case notes as caseNote events without changing history. Export (pack p.35) produces governed
-        history exports for customer service, finance, audit, compliance and management.'
+        history exports for customer service, finance, audit, compliance and management.
+
+        **Order.** Newest first, by `occurredAt` descending, then by `id`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -4893,6 +5350,7 @@ paths:
       x-ticvai-read-routing: replica
       parameters:
         - name: membershipId
+          x-ticvai-column: access.entitlement.id
           in: query
           required: false
           schema:
@@ -4972,6 +5430,22 @@ paths:
       operationId: listMembershipRenewalRetention
       x-ticvai-consumed-by:
         - "P08 BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center"
+      x-ticvai-read-via:
+      - query: access#entitlementRecords
+        route: service
+        for: 'its read of access.entitlement, Access''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: pack ''Membership___Annual_Pass_Management_Reference.pdf'' pp.35-37 (13.2.10
@@ -4990,7 +5464,9 @@ paths:
         renewal with drivers and recommended actions; the driver examples, the NL question and stray register
         text dropped; filters typed; churn flag added; paged. Predictions expose confidence, key drivers, model
         version and data freshness and never make irreversible member changes automatically; any commercial
-        offer uses approved pricing/promotion rules; natural-language questions go through the assistant.'
+        offer uses approved pricing/promotion rules; natural-language questions go through the assistant.
+
+        **Order.** Soonest first, by `expiryDate` ascending, then by `membershipId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5085,7 +5561,13 @@ paths:
       operationId: listPartner
       x-ticvai-consumed-by:
         - "P10 PTR-022 Partner Management Command Center"
-        - "P10 PTR-042 Partner Operations Command Center"
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -5107,7 +5589,9 @@ paths:
         Assign Account Manager are served by setPartnerProfileOrganization, Review Application by listPartnerOnboardingApplication,
         Approve and Suspend by approvePartnerStatuLifecycle, Open Commercial Profile by listCommercialAgreementHealth,
         View Users by listPartnerContactUser, View Documents by listPartnerDocumentationCompliance and View
-        Performance by listPartnerPerformanceScorecard; AI attention flags are advisory.'
+        Performance by listPartnerPerformanceScorecard; AI attention flags are advisory.
+
+        **Order.** Sorted by `partnerId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5245,6 +5729,12 @@ paths:
       operationId: setPartnerProfileOrganization
       x-ticvai-consumed-by:
         - "P10 PTR-023 Partner Profile & Organization Setup"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
@@ -5295,6 +5785,10 @@ paths:
       operationId: listPartnerOnboardingApplication
       x-ticvai-consumed-by:
         - "P10 PTR-024 Partner Onboarding & Application Workflow"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -5316,7 +5810,9 @@ paths:
         Applications arrive through registerPartner from the registration link; Approve, Reject, Request More
         Information, Reassign and Escalate are PTR-024 actions routed through the approvals engine, which holds
         the configurable sequential/parallel, mandatory/optional stages and SLAs; a partner cannot become active
-        until every mandatory stage is complete.'
+        until every mandatory stage is complete.
+
+        **Order.** Newest first, by `submittedAt` descending, then by `applicationId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5389,6 +5885,10 @@ paths:
       operationId: listPartnerContactUser
       x-ticvai-consumed-by:
         - "P10 PTR-025 Partner Contacts & User Administration"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -5409,7 +5909,9 @@ paths:
         is an action; names aligned with PartnerUser. User actions Invite, Activate, Disable, Reset Access,
         Reassign Role and Revoke Access are PTR-025 buttons served by createPartnerUser and the Identity/RBAC
         operations; the main agent and sub-agents are users on the partner''s branch tree; a user''s permissions
-        can never exceed the partner ceiling from listPartnerAccessRole.'
+        can never exceed the partner ceiling from listPartnerAccessRole.
+
+        **Order.** Sorted by `position` ascending, then by `contactId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5506,7 +6008,9 @@ paths:
         dropped and allowed/not-allowed carried as one flag; the four exclusivity and three sub-agent options
         became enums; Review Date added from the pack; overlapping exclusive rights reported as validationIssues.
         One row is one distribution right of one partner; a blank territory dimension means all within the dimensions
-        above it; overlapping exclusive rights for the same market and period are rejected on save.'
+        above it; overlapping exclusive rights for the same market and period are rejected on save.
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `partnerId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -5583,6 +6087,8 @@ paths:
       operationId: setPartnerBrandVenue
       x-ticvai-consumed-by:
         - "P10 PTR-027 Partner Brand, Venue & Business Scope Assignment"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - partner
@@ -5650,7 +6156,9 @@ paths:
         and the seven status fields verificationStatus; compliance-rule options became expiryAction; Issue Date
         added from the pack; dates typed. Review, Accept, Reject and Resubmit (MoM 31 Aug 4.3) are PTR-028 actions;
         AI extraction is advisory and human verification stays required; a missing or expired mandatory document
-        applies its expiryAction to the partner.'
+        applies its expiryAction to the partner.
+
+        **Order.** Soonest first, by `expiryDate` ascending, then by `documentId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5715,6 +6223,10 @@ paths:
       operationId: listPartnerAccessRole
       x-ticvai-consumed-by:
         - "P08 PTR-029 Partner Access, Roles & Permission Profile"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -5733,7 +6245,9 @@ paths:
         option fields became one row per partner capability grant: capability (the pack''s 18 plus refund, reschedule
         and the sensitive functions), allowed, requiresInternalApproval and grantType with dates. The partner
         grant is the ceiling: Identity/RBAC never gives a partner user a permission its partner lacks (pack
-        p.17); sensitive functions may need internal approval through the approvals engine.'
+        p.17); sensitive functions may need internal approval through the approvals engine.
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `partnerId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -5814,6 +6328,12 @@ paths:
       operationId: approvePartnerStatuLifecycle
       x-ticvai-consumed-by:
         - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
+      x-ticvai-read-via:
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -5870,6 +6390,19 @@ paths:
       operationId: listPartnerProfileReadiness
       x-ticvai-consumed-by:
         - "P10 PTR-031 Partner 360° Profile, Readiness & AI Review"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -5889,7 +6422,9 @@ paths:
         the sections typed as counts and lists; actions and prose fragments dropped; Board/Area references renamed
         to what they hold. Actions Approve Partner, Activate, Restrict (approvePartnerStatuLifecycle), Return
         for Changes, Assign Action and Schedule Review are PTR-031 buttons; AI may recommend, final approval
-        stays with configured human authorization.'
+        stays with configured human authorization.
+
+        **Order.** Sorted by `partnerId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -5951,6 +6486,16 @@ paths:
       operationId: listCommercialAgreement
       x-ticvai-consumed-by:
         - "P10 PTR-032 Commercial Agreement Command Center"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -5969,7 +6514,9 @@ paths:
         with the approval stage held by the approvals engine); effective dates renamed validFrom/validTo and
         payment terms creditTermDays as on PartnerAgreement; pricing, commission and allocation models typed
         as their vocabularies; paymentModel and partnerId added; Expiry filter replaced by expiringWithinDays.
-        Row opens setAgreementContractTerm and listCommercialAgreementHealth; AI commercial-risk flags are advisory.'
+        Row opens setAgreementContractTerm and listCommercialAgreementHealth; AI commercial-risk flags are advisory.
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `agreementId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -6084,6 +6631,15 @@ paths:
         - "P09 ADM-415 Commercial Agreement, Billable Definition & Customer Acceptance"
         - "P10 PTR-033 Agreement & Contract Terms Builder"
         - "P17 SGN-023 Commercial Agreement, Billable Definition & Customer Acceptance"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: finance#legalEntityRecords
+        route: service
+        for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -6092,6 +6648,7 @@ paths:
       - bearerAuth: []
       - prospectAuth: []
       x-ticvai-audience:
+      - staff
       - partner
       - prospect
       x-ticvai-agreed: '29 September: pack ''B2B, Reseller & OTA Partner Management_Reference.pdf'' pp.25-27
@@ -6143,6 +6700,15 @@ paths:
       operationId: setPartnerRateNet
       x-ticvai-consumed-by:
         - "P10 PTR-034 Partner Rate & Net Pricing Configuration"
+      x-ticvai-read-via:
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -6198,6 +6764,13 @@ paths:
       operationId: listCommissionMarginIncentive
       x-ticvai-consumed-by:
         - "P08 PTR-035 Commission, Margin & Incentive Management"
+      x-ticvai-read-via:
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6215,7 +6788,9 @@ paths:
         **Agreed (decided 29 September, readiness close-out).** The eight commission-model fields became commissionModel;
         one row is one commission rule with its dimensions, rate or tiers, incentive type and effective dates;
         margin visibility and overlap detection added read-only. Rules are governed and effective-dated; overlapping
-        rules are flagged; AI analysis of commission against incremental sales is advisory.'
+        rules are flagged; AI analysis of commission against incremental sales is advisory.
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `agreementId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -6276,6 +6851,16 @@ paths:
       operationId: listCreditLimitExposure
       x-ticvai-consumed-by:
         - "P08 PTR-036 Credit Limit & Exposure Management"
+      x-ticvai-read-via:
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6296,7 +6881,9 @@ paths:
         fields renamed to percentages with Block at 100% added; temporary limit given its end date; actions
         and prose dropped; money typed. Increase Limit, Reduce Limit, Temporary Increase (approval required),
         Place Credit Hold, Release Hold and Block Credit Transactions are PTR-036 actions; a credit sale confirms
-        only if transaction amount + exposure <= available credit unless an approved exception exists (approveBookingLimitCommercial).'
+        only if transaction amount + exposure <= available credit unless an approved exception exists (approveBookingLimitCommercial).
+
+        **Order.** Soonest first, by `effectiveFrom` ascending, then by `agreementId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -6359,6 +6946,13 @@ paths:
       operationId: listDepositGuaranteeFinancial
       x-ticvai-consumed-by:
         - "P08 PTR-037 Deposit, Guarantee & Financial Security Management"
+      x-ticvai-read-via:
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6376,7 +6970,9 @@ paths:
         the example coverage figures became creditExposure, securityCoverage and unsecuredExposure; the five
         expiry-rule options became expiryAction; references renamed to ids; dates and money typed. Expiry alerts
         and "exposure exceeds verified security" are raised by the finance controls; an expired security applies
-        its expiryAction automatically.'
+        its expiryAction automatically.
+
+        **Order.** Soonest first, by `expiryDate` ascending, then by `agreementId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -6446,6 +7042,21 @@ paths:
       operationId: setPaymentTermBilling
       x-ticvai-consumed-by:
         - "P10 PTR-038 Payment Terms, Billing & Account Configuration"
+      x-ticvai-read-via:
+      - query: finance#legalEntityRecords
+        route: service
+        for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner agreement, the one the body''s `agreementId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -6509,6 +7120,19 @@ paths:
       operationId: listCommercialAllocationQuota
       x-ticvai-consumed-by:
         - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6528,7 +7152,9 @@ paths:
         and the five commitment-rule fields commitmentRule and releaseMode; Release Date added from the pack;
         references renamed to ids; performance figures typed. Approved contractual allocation feeds the Area
         4 channel allocation and never exceeds core capacity; unused allocation is released automatically or
-        manually per releaseMode; AI under-utilisation flags are advisory.'
+        manually per releaseMode; AI under-utilisation flags are advisory.
+
+        **Order.** Sorted by `allocationId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -6587,6 +7213,12 @@ paths:
       operationId: approveBookingLimitCommercial
       x-ticvai-consumed-by:
         - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per partner, the one the body''s `partnerId` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -6646,6 +7278,22 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-032 Commercial Agreement Command Center"
         - "P10 PTR-041 Commercial Agreement 360°, Health & AI Review"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6665,7 +7313,9 @@ paths:
         options became recommendations; actions and prose dropped. Actions Start Renewal, Request Commercial
         Review, Change Terms (setAgreementContractTerm), Request Credit Review, Create Exception (approveBookingLimitCommercial)
         and Suspend Commercial Access (approvePartnerStatuLifecycle) are PTR-041 buttons; scenario simulation
-        is an on-demand AI action, not part of this read; AI output is advisory.'
+        is an on-demand AI action, not part of this read; AI output is advisory.
+
+        **Order.** Soonest first, by `validFrom` ascending, then by `agreementId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -6729,6 +7379,22 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-022 Partner Management Command Center"
         - "P10 PTR-042 Partner Operations Command Center"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6745,7 +7411,9 @@ paths:
         feed) beside a paged operations table; money, counts and rates typed; partnerId, operational status
         and risk given their vocabularies; the missing filters (partner, partner type, account manager, operational
         status, risk) added and date split into a range. AI attention flags are advisory and ranked by business
-        impact; rows open the partner''s orders (listPartnerOrderBooking) and statement (listPartnerStatementAccount).'
+        impact; rows open the partner''s orders (listPartnerOrderBooking) and statement (listPartnerStatementAccount).
+
+        **Order.** Newest first, by `at` descending, then by `partnerId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -6858,6 +7526,25 @@ paths:
       operationId: listPartnerOrderBooking
       x-ticvai-consumed-by:
         - "P10 PTR-043 Partner Orders & Booking Management"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -6876,7 +7563,9 @@ paths:
         dates typed. View, Modify, Cancel, Rebook, Resend Tickets, Reissue, Add Internal Note, Escalate and
         Open Financial Record are PTR-043 actions served by the Orders service; before any modification agreement,
         product eligibility, rate, allocation, credit, booking limit and cancellation policy are revalidated;
-        the order stays owned by Order Management.'
+        the order stays owned by Order Management.
+
+        **Order.** Soonest first, by `visitDate` ascending, then by `orderId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -6898,6 +7587,7 @@ paths:
             type: string
           description: Partner Order Reference
         - name: ticvaiOrderId
+          x-ticvai-column: orders.payment.order_id
           in: query
           required: false
           schema:
@@ -6985,6 +7675,16 @@ paths:
       operationId: listReservationHoldRelease
       x-ticvai-consumed-by:
         - "P10 PTR-044 Reservations, Holds & Release Management"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7003,7 +7703,9 @@ paths:
         actions and prose dropped; timestamps, money and status typed; partnerId and extensions used added.
         Extend Hold, Reduce Hold, Release Hold, Convert to Booking, Reassign and Escalate are PTR-044 actions;
         an expired hold returns to its capacity pool automatically unless an approved extension exists; AI release
-        suggestions are advisory.'
+        suggestions are advisory.
+
+        **Order.** Sorted by `product` ascending, then by `holdId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7069,6 +7771,19 @@ paths:
       operationId: listPartnerCancellationRefund
       x-ticvai-consumed-by:
         - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
+      x-ticvai-read-via:
+      - query: approvals#requestRecords
+        route: service
+        for: 'its read of approvals.request, Tenancy''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7086,7 +7801,9 @@ paths:
         pack''s worked example became the evaluated outcome (original value, fee, refund/credit, allocation
         and commission impact); audit fields typed. The permitted action is evaluated from product policy, partner
         agreement, channel rule and transaction context; approval runs through the approvals engine; the cancellation
-        fee and refund amounts come from the client-configured policies, this record only carries them.'
+        fee and refund amounts come from the client-configured policies, this record only carries them.
+
+        **Order.** Newest first, by `requestedAt` descending, then by `partnerId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7167,6 +7884,19 @@ paths:
       operationId: listPartnerStatementAccount
       x-ticvai-consumed-by:
         - "P10 PTR-046 Partner Statement & Account Activity"
+      x-ticvai-read-via:
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7183,7 +7913,9 @@ paths:
         to a summary beside the paged ledger lines; the statement-period options became period/from/to filters;
         transaction type and line status given their vocabularies; money typed. Accounting entries stay owned
         by Finance; this is a partner-centric view; an authorised partner user can view and download its own
-        statement.'
+        statement.
+
+        **Order.** Sorted by `dueDate` ascending.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7265,6 +7997,19 @@ paths:
       operationId: listPartnerReconciliationException
       x-ticvai-consumed-by:
         - "P08 PTR-047 Partner Reconciliation & Exception Management"
+      x-ticvai-read-via:
+      - query: finance#postingRecords
+        route: service
+        for: 'its read of ledger.posting, Ledger''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7284,7 +8029,9 @@ paths:
         partnerAmount, ticvaiAmount and difference; resolution actions dropped in favour of a resolution status;
         ids added. Match, Correct, Accept Difference, Create Adjustment, Assign, Escalate and Dispute (listPartnerDisputeCase)
         are PTR-047 actions; every unresolved difference stays open until resolved; AI grouping and root-cause
-        suggestions are advisory.'
+        suggestions are advisory.
+
+        **Order.** Sorted by `exceptionId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -7356,6 +8103,22 @@ paths:
       operationId: listCommissionCalculationSettlement
       x-ticvai-consumed-by:
         - "P08 PTR-048 Commission Calculation & Settlement Management"
+      x-ticvai-read-via:
+      - query: finance#fxRateRecords
+        route: service
+        for: 'its read of ledger.fx_rate, Ledger''s data (CHG-MOD-001)'
+      - query: finance#legalEntityRecords
+        route: service
+        for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7374,7 +8137,9 @@ paths:
         beside paged calculation lines; the settlement-period and adjustment options became settlementPeriod
         and adjustmentReason; the lifecycle carried as status; money typed and names aligned with CommissionStatement.
         Finance creates settlement batches by partner, currency, period and legal entity; payment is blocked
-        until the lines and adjustments are reconciled; posting and payment execution belong to Finance.'
+        until the lines and adjustments are reconciled; posting and payment execution belong to Finance.
+
+        **Order.** Sorted by `product` ascending, then by `lineId`.'
       tags:
       - drafted
       x-ticvai-permission: PARTNER_VIEW
@@ -7443,6 +8208,13 @@ paths:
       operationId: listPartnerDisputeCase
       x-ticvai-consumed-by:
         - "P10 PTR-049 Partner Disputes, Cases & Service Management"
+      x-ticvai-read-via:
+      - query: approvals#slaPolicyRecords
+        route: service
+        for: 'its read of approvals.sla_policy, Tenancy''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7460,7 +8232,9 @@ paths:
         flag); collaboration items (notes, assignments, escalations, reviews) dropped as case actions, attachments
         folded into evidence; priority given values. Notes, attachments, assignment, department escalation,
         finance review and technical review are PTR-049 case actions; AI summaries, categorisation, related-transaction
-        and policy suggestions are advisory.'
+        and policy suggestions are advisory.
+
+        **Order.** Sorted by `priority` ascending, then by `caseId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7554,6 +8328,19 @@ paths:
       operationId: listPartnerPerformanceScorecard
       x-ticvai-consumed-by:
         - "P10 PTR-050 Partner Performance Scorecard & Risk Monitoring"
+      x-ticvai-read-via:
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#paymentRecords
+        route: service
+        for: 'its read of orders.payment, Orders''s data (CHG-MOD-001)'
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7569,7 +8356,9 @@ paths:
         **Agreed (decided 29 September, readiness close-out).** The three trend fields became trend and the
         four benchmark fields a benchmark object; overall and per-dimension scores, risk rating and the pack''s
         missing Refund Rate and Sync Reliability added; metrics typed (money, percent, days, counts); agreementStatus
-        refs PartnerAgreementStatus. One row per partner for the selected period; AI risk detection is advisory.'
+        refs PartnerAgreementStatus. One row per partner for the selected period; AI risk detection is advisory.
+
+        **Order.** Sorted by `partnerId` descending (a UUIDv7, so newest first).'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7647,6 +8436,13 @@ paths:
       operationId: listPartnerRelationship
       x-ticvai-consumed-by:
         - "P10 PTR-051 Partner AI Intelligence & Relationship Optimization"
+      x-ticvai-read-via:
+      - query: orders#refundRecords
+        route: service
+        for: 'its read of orders.refund, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.read
       x-ticvai-audience:
       - partner
@@ -7666,7 +8462,9 @@ paths:
         example fragments and the architecture register prose dropped. Accept, Modify, Reject, Simulate, Assign
         and Create Commercial Review are PTR-051 actions; natural-language questions and scenario simulation
         are served by the AI assistant over governed data, not by this list; AI never changes credit, rates,
-        commission, allocation, status or exceptions without an explicitly governed automation policy.'
+        commission, allocation, status or exceptions without an explicitly governed automation policy.
+
+        **Order.** Newest first, by `createdAt` descending, then by `partnerId`.'
       tags:
       - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
@@ -7771,6 +8569,8 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-390 VSI Model Builder"
         - "P09 ADM-391 VSI Scoring & Tier Threshold Configuration"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per platform, the caller''s platform: a PUT replaces it whole. There is no key in the path.'
       summary: Weights, thresholds and the tiers they map to
       tags:
       - subscription
@@ -7894,6 +8694,7 @@ paths:
                   $ref: '#/components/schemas/LicensingModel'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /licensing-models/{licensingModelId}:
     put:
       operationId: setLicensingModel
       x-ticvai-consumed-by:
@@ -7910,6 +8711,11 @@ paths:
       x-ticvai-scope-level: platform
       x-ticvai-config-scope: tenant
       parameters:
+      - name: licensingModelId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -7980,6 +8786,7 @@ paths:
                   $ref: '#/components/schemas/ModuleListing'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /module-catalogue/{moduleCode}:
     put:
       operationId: setModuleListing
       summary: Define a module's dependencies, incompatibilities and price
@@ -7990,6 +8797,11 @@ paths:
       - staff
       x-ticvai-scope-level: platform
       parameters:
+      - name: moduleCode
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `moduleCode`, when sent, must equal it.'
+        schema: { type: string }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -8064,7 +8876,7 @@ paths:
                 $ref: '#/components/schemas/PackageSimulation'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /trial-configurations:
+  /trial-configurations/{trialConfigurationId}:
     put:
       operationId: setTrialConfiguration
       x-ticvai-consumed-by:
@@ -8087,6 +8899,11 @@ paths:
       x-ticvai-scope-level: platform
       x-ticvai-config-scope: tenant
       parameters:
+      - name: trialConfigurationId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces: its `id`. The body''s `id`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -8112,8 +8929,16 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-595 AI Setup Command Center"
         - "P08 BO-596 Guided Setup Plan"
+        - "P08 BO-603 Configuration Health & AI Review"
         - "P08 BO-604 Setup Completion & Handoff to Go-Live"
         - "P08 BO-605 Go-Live Readiness Command Center"
+        - "P08 BO-606 Automated Validation Plan"
+        - "P08 BO-607 Ticketing & Product Validation"
+        - "P08 BO-608 End-to-End Sales Channel Testing"
+        - "P08 BO-609 Payment & Financial Validation"
+        - "P08 BO-610 Ticket, QR & Access Validation"
+        - "P08 BO-611 User, Security & Integration Validation"
+        - "P08 BO-612 Communication & Customer Journey Validation"
         - "P08 BO-613 Blocker, Warning & AI Resolution Center"
         - "P08 BO-614 Final Go-Live Approval & Production Launch"
         - "P09 ADM-427 Provisioning Validation & Exception Management"
@@ -8208,8 +9033,6 @@ paths:
       operationId: getLicenceEnforcement
       x-ticvai-consumed-by:
         - "P09 ADM-377 Subscription Exceptions & Commercial Alerts"
-        - "P09 ADM-378 Executive AI Commercial Intelligence"
-        - "P09 ADM-452 Operational Usage & Threshold Monitor"
         - "P09 ADM-454 Minimum Guarantee & Variable Consumption Monitor"
       summary: Where a tenant stands against its entitlements, and what happens next
       description: 'Board 9.5. **`getEntitlementUsage` reported consumption and nothing said what to do
@@ -8248,6 +9071,8 @@ paths:
       operationId: setLicenceEnforcementPolicy
       x-ticvai-consumed-by:
         - "P09 ADM-453 License Enforcement & Decision Engine"
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per platform, the caller''s platform: a PUT replaces it whole. There is no key in the path.'
       summary: What happens at each threshold
       tags:
       - subscription
@@ -8364,6 +9189,101 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /commercial-metrics:
+    get:
+      operationId: getCommercialMetrics
+      x-ticvai-consumed-by:
+        - "P09 ADM-369 Commercial Command Center"
+        - "P09 ADM-372 Operational Profile, VSI & Commercial Model Intelligence"
+        - "P09 ADM-373 Revenue & Commercial Model Analytics"
+        - "P09 ADM-374 Trial & Conversion Monitor"
+        - "P09 ADM-375 Renewal & Retention Center"
+        - "P09 ADM-376 Commercial Optimization & Expansion Opportunities"
+        - "P09 ADM-378 Executive AI Commercial Intelligence"
+        - "P09 ADM-389 Commercial Rules Engine Overview"
+        - "P09 ADM-459 Billing & Commercial Command Center"
+        - "P09 ADM-464 Renewal Management Center"
+      x-ticvai-agreed: '14 October: Block A audit, class S-METRIC-NO-OP (CHG-SCO-006); the P09 commercial command
+        centres (pack Subscription_Licensing_AI_Self_Service.pdf boards 1, 3 and 10, Primary KPIs) show these figures
+        and no operation read them; shape follows reporting getKpiValues'
+      summary: The commercial figures across the customer portfolio, by code
+      description: 'Subscription boards 1, 3 and 10 (§Primary KPIs). **The tiles of the commercial command
+        centres**: customers, subscriptions and trials, recurring revenue and its movement, renewals, guarantees
+        and utilisation, read in one call as one value per metric code, like reporting''s `getKpiValues`.
+        Computed from the subscription, licence, usage-metering and invoice records this service already
+        keeps; nothing is stored for it.
+
+
+        **Codes name the figures the commercial command centres show** (ADM-369, ADM-372 to ADM-376, ADM-378,
+        ADM-389, ADM-459, ADM-464): customers and trials (`activeCustomers`, `newCustomers`, `churnedCustomers`,
+        `activeSubscriptions`, `activeTrials`, `newTrials`, `expiringTrials`, `trialToPaidRate`,
+        `averageTrialDays`), recurring revenue and its movement (`mrr`, `arr`, `newRevenue`, `expansionRevenue`,
+        `contractionRevenue`, `churnedRevenue`, `nrr`, `arpc`, `growthRate`), renewals and opportunities
+        (`renewalsDue30`, `renewalsDue60`, `renewalsDue90`, `renewalValue`, `renewalRate`, `atRiskRevenue`,
+        `autoRenewValue`, `expansionOpportunityValue`, `optimisationOpportunityValue`, `opportunityCount`),
+        the commercial model (`customersByVsiBand`, `customersByOperationalProfile`,
+        `customersByCommercialModel`, `averageVsi`, `customersNearThreshold`, `customersAboveAllowance`,
+        `upgradeCandidates`, `downgradeCandidates`, `activeCommercialModels`, `activeTiers`,
+        `pendingRuleChanges`), guarantees and usage (`billableTickets`, `billableTransactions`,
+        `eligibleTransactionValue`, `variableRevenue`, `minimumGuaranteedRevenue`, `guaranteeUtilisation`,
+        `revenueAboveGuarantee`) and one customer''s billing (`currentCharge`, `nextInvoiceAmount`,
+        `ytdRevenue`, `outstandingBalance`). A code split by a dimension (the `customersBy...` codes) carries
+        `groupKey` on each row. An unknown code is `400`. The full list of codes, and the formula of each, is
+        settled with the commercial team before the first of these screens is built.
+
+
+        **One customer or the portfolio.** With `tenantId` the figures are that customer''s (the billing and
+        renewal centres); without it, the whole portfolio. With no `period`, the current calendar month.'
+      tags:
+      - subscription
+      x-ticvai-permission: PLATFORM_BILLING_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-read-routing: replica
+      parameters:
+      - name: codes
+        in: query
+        description: Comma-separated metric codes; every code when absent.
+        schema:
+          type: string
+      - name: tenantId
+        in: query
+        description: One customer's figures; the portfolio when absent.
+        schema:
+          type: string
+          format: uuid
+      - name: period
+        in: query
+        description: '`YYYY-MM`, `YYYY-Qn` or `YYYY`; the current month when absent.'
+        schema:
+          type: string
+      - name: compareTo
+        in: query
+        schema:
+          type: string
+          enum:
+          - previousPeriod
+          - samePeriodLastYear
+      responses:
+        '200':
+          description: The figures
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommercialMetricSet'
+        '400':
+          description: An unknown metric code or a malformed period
+          x-ticvai-problem-types:
+          - unknown-metric-code
+          - invalid-period
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+
   /plans/{planId}/tiers:
     get:
       operationId: getPlanTiers
@@ -8439,6 +9359,12 @@ paths:
       operationId: setMembershipUsagePolicy
       x-ticvai-consumed-by:
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
+      x-ticvai-read-via:
+      - query: catalogue#productRecords
+        route: service
+        for: 'the membership product''s catalogue product (404, 409) (CHG-MOD-003)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 open (subscription.membership_usage_policy had no writer,
@@ -8490,18 +9416,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/MembershipUsageVisitConsumptionRulesView'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No membership product with this code
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [product-version-closed]
           description: The product version is retired or expired and cannot take new rules
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [cooldown-minutes-required, no-show-settings-required, limit-period-required]
           description: A conditional field is missing (cooldown for afterMinutes, the no-show triple for restrictReservations,
             the period for an admissions limit)
           content:
@@ -8515,6 +9444,18 @@ paths:
       operationId: setMembershipCommercialConfig
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
+      x-ticvai-read-via:
+      - query: catalogue#priceListRecords
+        route: service
+        for: 'its read of catalogue.price_list, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: payments#instalmentPolicyRecords
+        route: service
+        for: 'whether payments supports instalments for the product (422 instalments-not-supported) (CHG-MOD-003)'
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'One per membership product, the one the body''s `membershipCode` names, within the caller''s tenant: a PUT replaces it whole. There is no key in the path.'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 open (the commercial columns of subscription.membership_product
@@ -8569,18 +9510,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/MembershipCommercialPricingChannelAssociationView'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No membership product with this code
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [product-version-closed]
           description: The product version is retired or expired and cannot be changed
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [unknown-profile, not-auto-renew-eligible, instalments-not-supported, billing-frequency-invalid]
           description: An unknown or inactive profile, autoRenewPayment on a product that is not auto-renew eligible,
             or installments where payments does not support them, or a recurring billing frequency without them or longer
             than the term
@@ -8602,6 +9546,10 @@ paths:
       operationId: actOnPartnerApplicationReview
       x-ticvai-consumed-by:
         - "P10 PTR-024 Partner Onboarding & Application Workflow"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -8656,18 +9604,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerApplication'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such application
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-application-transition-not-allowed]
           description: The action does not fit the application's status (states/partner-application.yaml)
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [department-review-task-not-open, information-request-note-required]
           description: No open review task for that department, or a requestInformation without a note
           content:
             application/problem+json:
@@ -8675,7 +9626,7 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
-  /partner-contacts:
+  /partner-contacts/{contactId}:
     put:
       operationId: setPartnerContact
       x-ticvai-consumed-by:
@@ -8704,6 +9655,11 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
+      - name: contactId
+        in: path
+        required: true
+        description: 'Addresses the item this write creates or replaces. The body''s `contactId`, when sent, must equal it.'
+        schema: { type: string, format: uuid }
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
@@ -8722,12 +9678,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerContact'
         '404':
+          x-ticvai-problem-types: [contact-not-found, partner-not-found]
           description: No such contact or partner
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-contact-transition-not-allowed, last-primary-contact]
           description: The action does not fit the contact's status (states/partner-contact.yaml), or it would leave
             the partner with no active primary contact
           content:
@@ -8748,6 +9706,10 @@ paths:
       operationId: setPartnerDistributionRights
       x-ticvai-consumed-by:
         - "P08 PTR-026 Territory, Market & Distribution Rights"
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_distribution_right had no writer; listTerritoryMarketDistribution
@@ -8799,18 +9761,21 @@ paths:
                     items:
                       $ref: '#/components/schemas/PartnerDistributionRight'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such partner
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [exclusive-right-overlap]
           description: An exclusive right overlaps another partner's exclusive right
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [dates-out-of-order, sub-agent-depth-required]
           description: Dates out of order, or sub-agents allowed with no maximum depth
           content:
             application/problem+json:
@@ -8830,6 +9795,10 @@ paths:
       operationId: setPartnerCapabilityGrants
       x-ticvai-consumed-by:
         - "P08 PTR-029 Partner Access, Roles & Permission Profile"
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_capability_grant had no writer; listPartnerAccessRole
@@ -8886,18 +9855,21 @@ paths:
                     items:
                       $ref: '#/components/schemas/PartnerCapabilityGrant'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such partner
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-credit-not-enabled]
           description: useCredit granted while the partner's credit is not enabled
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [grant-end-date-required, grant-event-required]
           description: A time-limited grant with no end date, or an eventSpecific grant with no event
           content:
             application/problem+json:
@@ -8917,6 +9889,13 @@ paths:
       operationId: setPartnerCommissionRules
       x-ticvai-consumed-by:
         - "P08 PTR-035 Commission, Margin & Incentive Management"
+      x-ticvai-read-via:
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -8975,18 +9954,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerApprovalRoutedResult'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such agreement
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [commission-rules-overlap, commission-on-net-rate]
           description: Two rules overlap, or commission on a net-rate agreement
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [commission-rule-incomplete, tiers-out-of-order]
           description: A rule is missing the fields its model needs, or tiers out of order
           content:
             application/problem+json:
@@ -9006,6 +9988,10 @@ paths:
       operationId: setPartnerCreditProfile
       x-ticvai-consumed-by:
         - "P08 PTR-036 Credit Limit & Exposure Management"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -9053,12 +10039,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerApprovalRoutedResult'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such agreement
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [thresholds-out-of-order, credit-status-read-only, temporary-limit-end-required]
           description: Thresholds out of order, a computed credit status sent, or a temporary limit with no end
           content:
             application/problem+json:
@@ -9116,18 +10104,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerSecurity'
         '404':
+          x-ticvai-problem-types: [not-found, security-not-found]
           description: No such partner or security
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [verifier-is-recorder, supporting-document-required]
           description: Verified by the person who recorded it, or verified with no supporting document
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [expired-status-not-settable, dates-out-of-order]
           description: expired sent, or dates out of order
           content:
             application/problem+json:
@@ -9147,6 +10138,19 @@ paths:
       operationId: setPartnerAllocations
       x-ticvai-consumed-by:
         - "P08 PTR-039 Commercial Allocation, Quota & Commitment Management"
+      x-ticvai-read-via:
+      - query: catalogue#channelCapacityRecords
+        route: service
+        for: 'its read of catalogue.channel_capacity, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#eventRecords
+        route: service
+        for: 'its read of catalogue.event, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -9199,18 +10203,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerApprovalRoutedResult'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such agreement
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [allocation-below-sold]
           description: A quantity below what is already sold against the allocation
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [allocation-incomplete]
           description: An allocation is missing the fields its model or release mode needs
           content:
             application/problem+json:
@@ -9223,6 +10230,19 @@ paths:
       operationId: createPartnerChangeRequest
       x-ticvai-consumed-by:
         - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
+      x-ticvai-read-via:
+      - query: catalogue#performanceRecords
+        route: service
+        for: 'its read of catalogue.performance, Catalogue''s data (CHG-MOD-001)'
+      - query: catalogue#productRecords
+        route: service
+        for: 'its read of catalogue.product, Catalogue''s data (CHG-MOD-001)'
+      - query: orders#orderLineRecords
+        route: service
+        for: 'its read of orders.order_line, Orders''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-write-via:
       - table: approvals.request
         operation: createApprovalRequest
@@ -9285,12 +10305,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerChangeRequest'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such order for this partner
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [change-request-field-missing]
           description: A field the request type needs is missing
           content:
             application/problem+json:
@@ -9310,6 +10332,10 @@ paths:
       operationId: actOnPartnerReconciliationException
       x-ticvai-consumed-by:
         - "P08 PTR-047 Partner Reconciliation & Exception Management"
+      x-ticvai-read-via:
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_reconciliation_exception had no owner
@@ -9385,18 +10411,21 @@ paths:
                       nullable: true
                       description: The partner case opened by dispute
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such exception
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-reconciliation-exception-transition-not-allowed]
           description: The action does not fit the exception's status (states/partner-reconciliation-exception.yaml)
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [assignee-required, adjustment-ref-required, write-off-note-required]
           description: assign with no assignee, adjust with no adjustmentRef, or a write-off above tolerance with
             no note
           content:
@@ -9476,18 +10505,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerCommissionLine'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such line
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-commission-line-transition-not-allowed]
           description: The action does not fit the line's status (states/partner-commission-line.yaml)
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [reason-required, dispute-case-required]
           description: hold or reverse with no reason, dispute with no case
           content:
             application/problem+json:
@@ -9507,6 +10539,10 @@ paths:
       operationId: actOnPartnerSettlementBatch
       x-ticvai-consumed-by:
         - "P08 PTR-048 Commission Calculation & Settlement Management"
+      x-ticvai-read-via:
+      - query: finance#legalEntityRecords
+        route: service
+        for: 'its read of ledger.legal_entity, Ledger''s data (CHG-MOD-001)'
       x-ticvai-audience:
       - staff
       x-ticvai-agreed: '29 September: writers pass; DM4 (control.partner_settlement_batch is created by the settlement
@@ -9579,6 +10615,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerSettlementBatch'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such batch
           content:
             application/problem+json:
@@ -9592,6 +10629,7 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [schedule-date-required, reason-required, dispute-case-required]
           description: schedule with no date, hold or void with no reason, dispute with no case
           content:
             application/problem+json:
@@ -9604,6 +10642,13 @@ paths:
       operationId: createPartnerCase
       x-ticvai-consumed-by:
         - "P10 PTR-049 Partner Disputes, Cases & Service Management"
+      x-ticvai-read-via:
+      - query: approvals#slaPolicyRecords
+        route: service
+        for: 'its read of approvals.sla_policy, Tenancy''s data (CHG-MOD-001)'
+      - query: orders#salesOrderRecords
+        route: service
+        for: 'its read of orders.sales_order, Orders''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -9645,6 +10690,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerCase'
         '422':
+          x-ticvai-problem-types: [money-category-subject-missing, unknown-sla-policy]
           description: A money category with nothing named, or an unknown SLA policy
           content:
             application/problem+json:
@@ -9664,6 +10710,13 @@ paths:
       operationId: actOnPartnerCase
       x-ticvai-consumed-by:
         - "P10 PTR-049 Partner Disputes, Cases & Service Management"
+      x-ticvai-read-via:
+      - query: approvals#slaPolicyRecords
+        route: service
+        for: 'its read of approvals.sla_policy, Tenancy''s data (CHG-MOD-001)'
+      - query: identity#principalRecords
+        route: service
+        for: 'its read of identity.principal, Identity''s data (CHG-MOD-001)'
       x-ticvai-api-scope: partner.write
       x-ticvai-audience:
       - staff
@@ -9743,18 +10796,21 @@ paths:
               schema:
                 $ref: '#/components/schemas/PartnerCase'
         '404':
+          x-ticvai-problem-types: [not-found]
           description: No such case
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
+          x-ticvai-problem-types: [partner-case-transition-not-allowed, reopen-window-closed]
           description: The action does not fit the case's status, or the reopening window has passed
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [action-field-missing]
           description: A field the action needs is missing
           content:
             application/problem+json:
@@ -9819,12 +10875,14 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
+          x-ticvai-problem-types: [invoice-not-creditable]
           description: The invoice is a draft or cancelled and cannot be credited
           content:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
+          x-ticvai-problem-types: [credit-exceeds-invoice, line-not-on-invoice]
           description: The credit would take the invoice's credited total above its total, or a line names no line of the invoice
           content:
             application/problem+json:
@@ -9843,8 +10901,6 @@ paths:
     get:
       operationId: listCreditNotes
       x-ticvai-consumed-by:
-        - "P09 ADM-009 Tenant Billing & Invoicing"
-        - "P09 ADM-462 Invoice & Payment Management"
         - "P09 ADM-467 Discount, Credit & Commercial Override Management"
       x-ticvai-audience:
       - staff
@@ -9924,7 +10980,9 @@ paths:
         **A person acts**: an account manager applies an accepted recommendation through `previewSubscriptionChange`
         then `setSubscription`, or `addCapacityPack`; nothing is changed by this read and the tenant is not told by it.
 
-        '
+        
+
+        **Order.** Sorted by `targetPlanId` descending (a UUIDv7, so newest first).'
       tags:
       - subscription
       x-ticvai-permission: PLATFORM_BILLING_VIEW
@@ -10202,9 +11260,11 @@ components:
           description: '**Gapless, per issuing legal entity, in its own sequence** (the R152 rule for invoices, decided 28
             September, applied to credit notes): assigned at issue, never reused.'
         invoiceId:
+          x-ticvai-references: control.invoice
           type: string
           description: The invoice credited.
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         reasonCode:
@@ -10666,6 +11726,7 @@ components:
           items:
             $ref: '#/components/schemas/SubscriptionTierModule'
     SubscriptionTierAllowance:
+      x-ticvai-retired-columns: [tier_id]
       type: object
       x-ticvai-persistence: subscription.tier_allowance
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines usage/quantity allowances included in a subscription tier.'
@@ -10681,6 +11742,8 @@ components:
           type: string
           format: uuid
         tierId:
+          x-ticvai-column: plan_id
+          x-ticvai-references: subscription.plan
           type: string
           format: uuid
         code:
@@ -10708,6 +11771,7 @@ components:
           format: date-time
           nullable: true
     SubscriptionTierModule:
+      x-ticvai-retired-columns: [tier_id]
       type: object
       x-ticvai-persistence: subscription.tier_module
       description: '**Taken from the backend workbook, 20 September.** NEW TABLE. Defines which TICVAI technical modules are commercially included in a subscription tier.'
@@ -10722,6 +11786,8 @@ components:
           type: string
           format: uuid
         tierId:
+          x-ticvai-column: plan_id
+          x-ticvai-references: subscription.plan
           type: string
           format: uuid
         code:
@@ -10753,6 +11819,8 @@ components:
         version:
           type: integer
         factors:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -10784,6 +11852,8 @@ components:
                     points:
                       type: number
         tiers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -10924,6 +11994,8 @@ components:
           additionalProperties:
             type: integer
         overagePricing:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -11175,6 +12247,8 @@ components:
           - readyWithWarnings
           - ready
         groups:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -11238,6 +12312,8 @@ components:
           type: string
           format: uuid
         thresholds:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -11321,6 +12397,7 @@ components:
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: none
           type: string
           format: uuid
         unit:
@@ -11348,6 +12425,60 @@ components:
           type: string
           format: uuid
           nullable: true
+    CommercialMetricSet:
+      type: object
+      description: 'The commercial command centres'' figures, one row per metric code (getCommercialMetrics).'
+      properties:
+        tenantId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The customer the figures are for; null for the whole portfolio.
+        period:
+          type: string
+        asOf:
+          type: string
+          format: date-time
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommercialMetric'
+    CommercialMetric:
+      type: object
+      description: 'One commercial figure. Money-valued codes carry a `Money`; counts, rates and days a number
+        (naming-and-style 5.1: money is never a float).'
+      required:
+      - code
+      - value
+      properties:
+        code:
+          type: string
+        groupKey:
+          type: string
+          nullable: true
+          description: The band, profile or model this row is for, on a code split by one; null otherwise.
+        unit:
+          type: string
+          enum:
+          - count
+          - currency
+          - percent
+          - days
+        value:
+          oneOf:
+          - type: number
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+        comparison:
+          nullable: true
+          oneOf:
+          - type: number
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+        direction:
+          type: string
+          enum:
+          - up
+          - down
+          - flat
     BillingReconciliation:
       type: object
       description: 'Boards 10.2 and 10.3. **The first invoice sets the tone for the relationship.**'
@@ -11416,6 +12547,7 @@ components:
       - id
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         partnerId:
@@ -11472,6 +12604,7 @@ components:
       - status
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         companyName:
@@ -11496,6 +12629,7 @@ components:
           type: string
           format: uuid
         status:
+          readOnly: true
           type: string
           enum:
           - submitted
@@ -11682,6 +12816,7 @@ components:
       - branchScopePath
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         partnerId:
@@ -11759,6 +12894,7 @@ components:
       - status
       properties:
         id:
+          readOnly: true
           type: string
           format: uuid
         channelName:
@@ -12337,6 +13473,439 @@ components:
           description: The partition key (ADR-0005), written at `tenant` scope, as every control.partner_* row
             carries it, so row-level security scopes the agreement the same way (decided 29 September, writers
             pass; DM4)
+    UpdatePartnerAgreementRequest:
+      type: object
+      x-ticvai-persistence: none — request only; a partial update of control.partner_agreement
+      description: '**A partial update of PartnerAgreement** (the CR-089 pattern; CHG-SHP-008): `updatePartnerAgreement` sends only what changes, and a field left out keeps its stored value. Nothing is required and nothing has a default, so a generated client never resends a value it did not mean to change. The server''s own fields (approvalRequestId, id, partnerName, version) are not sendable.'
+      minProperties: 1
+      properties:
+        partnerId:
+          x-ticvai-references: control.partner
+          type: string
+          format: uuid
+          description: The partner (control.partner) this agreement is with. The agreement carries the terms;
+            control.partner carries who the partner is and whether it may trade. **Resolves to control.partner**,
+            not to platform.tenant as the naming convention guessed before the partner master existed (decided
+            29 September, writers pass; DM4)
+        status:
+          $ref: '#/components/schemas/PartnerAgreementStatus'
+        rateMode:
+          $ref: '#/components/schemas/PartnerRateMode'
+        commissionPercent:
+          type: number
+          nullable: true
+        volumeTiers:
+          type: array
+          deprecated: true
+          x-ticvai-persisted: false
+          description: '**Retired: the tiers are rows of control.partner_rate_volume_band** (`PartnerRate.volumeBands`,
+            written by setPartnerRateNet), one set per rate row, so a tier can differ by product, venue or channel.
+            Accepted and ignored on write; not returned once the bands exist. `volumeWindow` below still says
+            over which window the bands count (decided 29 September, writers pass; DM4).
+
+
+            2.7.57. **A tier that changes at a threshold needs the sale to look back at cumulative
+            volume, and nothing did.** Flat net rates and per-channel price lists cover the simple case
+            and stop there.
+
+            **The window is the argument, not the tier.** A partner who sells 400 in January and 400 in
+            February is either a 400-tier partner twice or an 800-tier partner once, and the two are different
+            money. `volumeWindow` says which.
+
+            '
+          items:
+            type: object
+            required:
+            - fromUnits
+            - commissionPercent
+            properties:
+              fromUnits:
+                type: integer
+              commissionPercent:
+                type: number
+              appliesRetrospectively:
+                type: boolean
+                default: false
+                description: '**Whether crossing a tier reprices what came before it.** Retrospective
+                  is what a partner assumes and prospective is what a venue budgets for — it has to be
+                  stated.
+
+                  '
+        volumeWindow:
+          type: string
+          nullable: true
+          enum:
+          - calendarMonth
+          - calendarQuarter
+          - calendarYear
+          - agreementYear
+          - rolling12Months
+        seasonalRates:
+          type: array
+          deprecated: true
+          x-ticvai-persisted: false
+          description: '**Retired: a seasonal rate is a control.partner_rate row** with `seasonalRate: true`
+            and its own `effectiveFrom`/`effectiveTo` (`PartnerRate`, written by setPartnerRateNet); the most
+            specific row in force wins. Accepted and ignored on write (decided 29 September, writers pass; DM4).
+
+
+            Rates that change by date range. **Separate from the volume tier because they
+            compound** — a peak-season rate at a high volume tier is both, and a single rate table cannot
+            say so.
+
+            '
+          items:
+            type: object
+            properties:
+              from:
+                type: string
+                format: date
+              to:
+                type: string
+                format: date
+              commissionPercent:
+                type: number
+        segmentTier:
+          type: string
+          nullable: true
+        brandingAssetId:
+          type: string
+          format: uuid
+          nullable: true
+          description: '2.7.x, BL-078. **A reseller selling a venue''s tickets under their own brand is
+            a second scope level white-label does not have** — `BrandIdentity` and `setTheme` are tenant-scoped
+            throughout.
+
+            **Co-branding rather than replacement.** The venue''s identity stays on the ticket because
+            the ticket admits to the venue; the partner''s sits beside it.
+
+            '
+        storefrontSubdomain:
+          type: string
+          nullable: true
+        sponsorship:
+          type: object
+          nullable: true
+          description: 'BL-050. **Sponsorship inventory is sellable capacity of a different kind** — logo
+            placements, hospitality allocations, naming rights. It is closer to a partner agreement than
+            to a product: **a sponsor buys a relationship for a season, not a ticket for a date.**
+
+            Modelled here rather than as a `ProductKind` because the commercial terms — the term, the
+            exclusivity, the settlement — are the agreement''s, and duplicating them onto a product would
+            mean two places to disagree.
+
+            '
+          properties:
+            placements:
+              type: array
+              items:
+                type: object
+                properties:
+                  surface:
+                    type: string
+                    enum:
+                    - signage
+                    - ticketFace
+                    - appBanner
+                    - emailFooter
+                    - venueNaming
+                    - zoneNaming
+                    - uniform
+                    - printedMap
+                  quantity:
+                    type: integer
+                  exclusive:
+                    type: boolean
+                    default: false
+                    description: '**Exclusivity is the expensive word.** A sponsor paying for category
+                      exclusivity has bought the absence of a competitor, and a second agreement breaching
+                      it is a legal problem rather than a scheduling one.
+
+                      '
+            hospitalityAllocation:
+              type: integer
+              nullable: true
+              description: Tickets or cabanas included. **Issued as invitations, not sales** — no revenue
+                attaches.
+            categoryExclusivity:
+              type: string
+              nullable: true
+        netRates:
+          type: array
+          deprecated: true
+          x-ticvai-persisted: false
+          description: '**Retired: net rates are rows of control.partner_rate** (`PartnerRate` with `pricingModel:
+            netRate`, `netRate` and the `maxDiscountPercent` guardrail), written by setPartnerRateNet. Per product or category; absent means the commission applies across the catalogue.
+            Accepted and ignored on write (decided 29 September, writers pass; DM4)'
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                format: uuid
+                nullable: true
+              categoryId:
+                type: string
+                format: uuid
+                nullable: true
+              netPrice:
+                $ref: ../shared/common.yaml#/components/schemas/Money
+              maxDiscountPercent:
+                type: number
+                nullable: true
+                description: '1.6.10. **What the partner may not undercut.** A reseller selling below
+                  the venue''s own price damages the direct channel, and the venue usually cares more
+                  about that than the margin.
+
+                  '
+        creditTermDays:
+          type: integer
+          description: 2.7.36. Net 30, net 60. Drives when an invoice becomes overdue.
+        acceptedByPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: 'BL-079. **Electronic acceptance against a version**, following the `signatureRef`
+            precedent. An agreement accepted with no version recorded is an agreement nobody can produce
+            in a dispute.
+
+            '
+        acceptedVersion:
+          type: integer
+          nullable: true
+        acceptedAt:
+          type: string
+          format: date-time
+          nullable: true
+        signatureRef:
+          type: string
+          nullable: true
+        corporateAllocations:
+          type: array
+          deprecated: true
+          x-ticvai-persisted: false
+          description: '**Retired: allocations are rows of control.partner_allocation** (`PartnerAllocation`,
+            written by setPartnerAllocations and read by listCommercialAllocationQuota); used quantity is counted
+            from orders against the row, not stored. Accepted and ignored on write (decided 29 September, writers
+            pass; DM4).
+
+
+            BL-035. **`PartnerAgreement` covered commercial terms and not allocations.** A
+            corporate account with fifty places for its staff is the same structure as a reseller with
+            fifty to sell, and **the difference is that a corporate member does not pay.**
+
+            '
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                format: uuid
+              quantity:
+                type: integer
+              usedQuantity:
+                type: integer
+                readOnly: true
+              perMemberLimit:
+                type: integer
+                nullable: true
+              validTo:
+                type: string
+                format: date
+                nullable: true
+        settlementCurrency:
+          type: string
+          pattern: ^[A-Z]{3}$
+          description: '**The currency this partner is billed and settles in**, which is often not the
+            venue''s. A UK tour operator selling a Dubai attraction is invoiced in GBP against sales booked
+            in AED, and the difference is somebody''s exposure.
+
+            **`creditLimit` and `netRates` are expressed in this currency**, not the venue''s — a limit
+            in the wrong currency is a limit that moves with the exchange rate.
+
+            '
+        fxPolicy:
+          type: string
+          enum:
+          - rateAtSale
+          - rateAtInvoice
+          - fixedRate
+          description: '**Which rate converts a sale into the settlement currency, and it is a commercial
+            term.** `rateAtSale` puts the movement on the partner; `rateAtInvoice` puts it on the venue;
+            `fixedRate` puts it on whoever guessed wrong when the agreement was signed.
+
+            **Not a default to leave alone** — on a monthly statement across a moving rate the three produce
+            materially different numbers, and the partner will have assumed one of them.
+
+            '
+        fixedRate:
+          type: number
+          nullable: true
+          description: Where `fxPolicy` is `fixedRate`. **An amendment creates a version** so an old statement
+            stays readable.
+        creditLimit:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        allowedChannels:
+          type: array
+          items:
+            $ref: ../shared/common.yaml#/components/schemas/SalesChannel
+        allowedVenueIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        requiresApprovalAboveValue:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: 2.7.39. Routes through `approvals` rather than a second mechanism here.
+        validFrom:
+          type: string
+          format: date
+        validTo:
+          type: string
+          format: date
+          nullable: true
+          description: '2.7.37. **An agreement that lapses silently keeps selling at rates nobody agreed
+            to**, discovered at settlement rather than at sale. Null means open-ended, which should be
+            rare and deliberate.
+
+            '
+        expiryAlertDays:
+          type: integer
+        notes:
+          type: string
+        agreementName:
+          type: string
+          nullable: true
+          description: Agreement name (decided 29 September, data model DM4)
+        agreementType:
+          type: string
+          nullable: true
+          description: Agreement type code, seeded with reseller, ota, travelTrade, corporate, wholesale, affiliate,
+            distribution, apiCommercial (pack p.26) (decided 29 September, data model DM4)
+        contractReference:
+          type: string
+          nullable: true
+          description: Contract reference (decided 29 September, data model DM4)
+        legalEntityId:
+          type: string
+          format: uuid
+          nullable: true
+          description: The contracting legal entity (ledger.legal_entity) (decided 29 September, data model DM4)
+        brandId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Brand the agreement covers; empty for every brand of the tenant (decided 29 September,
+            data model DM4)
+        territory:
+          type: string
+          nullable: true
+          description: Territory (decided 29 September, data model DM4)
+        commercialOwnerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Commercial owner, a staff principal (decided 29 September, data model DM4)
+        financeOwnerPrincipalId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Finance owner, a staff principal (decided 29 September, data model DM4)
+        pricingBasis:
+          type: string
+          enum:
+          - retailPrice
+          - netRate
+          - discountFromRetail
+          - markup
+          - derivedRate
+          nullable: true
+          description: Pricing basis (pack p.27 pricing models); the rows are `control.partner_rate` (decided
+            29 September, data model DM4)
+        paymentModel:
+          type: string
+          enum:
+          - creditAccount
+          - prepaid
+          - payPerTransaction
+          nullable: true
+          description: 'Payment model, the three confirmed at MoM 5 Aug and MoM 31 Aug 4.4: creditAccount (sells
+            to an approved credit ceiling, invoiced periodically), prepaid (pre-funded wallet drawn down per sale)
+            or payPerTransaction (card at each sale). Held here once; the billing screen reads and sets this column
+            (decided 29 September, data model DM4)'
+        renewalType:
+          type: string
+          enum:
+          - manual
+          - auto
+          nullable: true
+          description: Renewal type (decided 29 September, data model DM4)
+        renewalNoticeDays:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: Renewal notice period in days (decided 29 September, data model DM4)
+        renegotiationRequired:
+          type: boolean
+          description: Renegotiation required before renewal (decided 29 September, data model DM4)
+        renewalRequiresApproval:
+          type: boolean
+          description: Renewal needs approval (decided 29 September, data model DM4)
+        minimumCommitment:
+          type: integer
+          minimum: 0
+          nullable: true
+          description: 'Minimum commitment: tickets over the agreement term (decided 29 September, data model
+            DM4)'
+        salesTarget:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: Sales target over the agreement term (decided 29 September, data model DM4)
+        agreementValue:
+          allOf:
+          - $ref: ../shared/common.yaml#/components/schemas/Money
+          nullable: true
+          description: 'Agreement value (MoM 31 Aug 4.4: each agreement captures term/value) (decided 29 September,
+            data model DM4)'
+        commissionTerms:
+          type: string
+          nullable: true
+          description: Commission terms as written in the contract; the rules that compute it are `control.partner_commission_rule`
+            (decided 29 September, data model DM4)
+        creditTerms:
+          type: string
+          nullable: true
+          description: Credit terms as written in the contract (decided 29 September, data model DM4)
+        allocationTerms:
+          type: string
+          nullable: true
+          description: Allocation terms as written in the contract; the allocations are `control.partner_allocation`
+            (decided 29 September, data model DM4)
+        cancellationConditions:
+          type: string
+          nullable: true
+          description: Cancellation conditions (decided 29 September, data model DM4)
+        refundConditions:
+          type: string
+          nullable: true
+          description: Refund conditions (pack p.26) (decided 29 September, data model DM4)
+        bookingRestrictions:
+          type: string
+          nullable: true
+          description: Booking restrictions as written in the contract; the enforced limits are `control.partner_booking_limit`
+            (decided 29 September, data model DM4)
+        settlementTerms:
+          type: string
+          nullable: true
+          description: Settlement terms (decided 29 September, data model DM4)
+        scopePath:
+          type: string
+          description: The partition key (ADR-0005), written at `tenant` scope, as every control.partner_* row
+            carries it, so row-level security scopes the agreement the same way (decided 29 September, writers
+            pass; DM4)
     PartnerAccountStatus:
       type: string
       description: 'The partner account lifecycle, pack p.6 and p.18 merged with MoM 31 Aug 4.3 (lead -> submitted
@@ -12728,6 +14297,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -12824,6 +14394,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -12944,6 +14515,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -13026,6 +14598,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -13135,6 +14708,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -13228,6 +14802,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -13330,10 +14905,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -13510,10 +15087,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -13658,10 +15237,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -13778,6 +15359,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -13876,10 +15458,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -13983,10 +15567,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -14201,6 +15787,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -14303,6 +15890,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -14467,6 +16055,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -14571,10 +16160,12 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
         agreementId:
+          x-ticvai-references: control.partner_agreement
           type: string
           format: uuid
           description: The agreement (control.partner_agreement) this row belongs to.
@@ -14701,6 +16292,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -14780,6 +16372,7 @@ components:
           format: uuid
           readOnly: true
         partnerId:
+          x-ticvai-references: control.partner
           type: string
           format: uuid
           description: The partner (control.partner).
@@ -15020,6 +16613,7 @@ components:
           type: string
           format: uuid
         code:
+          x-ticvai-unique: tenant
           type: string
         name:
           type: string
@@ -15176,6 +16770,7 @@ components:
       - basePrice
       properties:
         code:
+          x-ticvai-unique: tenant
           type: string
           maxLength: 64
         name:
@@ -15791,6 +17386,7 @@ components:
           type: string
           format: uuid
         cellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         name:
@@ -15912,12 +17508,15 @@ components:
           type: string
           format: uuid
         cellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         instanceId:
+          x-ticvai-references: control.cell_instance
           type: string
           format: uuid
           description: Which instance of the cell holds this database. **Required, not nullable** — a
@@ -16168,9 +17767,11 @@ components:
           type: string
           format: uuid
         fromCellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         toCellId:
+          x-ticvai-references: control.cell
           type: string
           format: uuid
         fromKind:
@@ -16180,6 +17781,8 @@ components:
         canProceed:
           type: boolean
         blockers:
+          x-ticvai-persistence-column: jsonb
+          x-ticvai-persistence-kind: valueObject
           type: array
           items:
             type: object
@@ -16516,6 +18119,7 @@ components:
 
             '
         tenantId:
+          x-ticvai-references: control.tenant
           type: string
           format: uuid
         periodStart:
@@ -18944,6 +20548,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19014,6 +20619,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19098,6 +20704,7 @@ components:
           description: 'Benefit Dependencies (pack p.11): valid only with a valid visit the same day, e.g.
             parking'
         pricingRuleId:
+          x-ticvai-references: none
           type: string
           nullable: true
           description: 'For a discount benefit (F&B, retail, rental): the central pricing rule that calculates
@@ -19133,6 +20740,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19253,6 +20861,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19409,6 +21018,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19548,6 +21158,7 @@ components:
           format: uuid
           readOnly: true
         membershipProductId:
+          x-ticvai-references: subscription.membership_product
           type: string
           format: uuid
           description: The governed product version this row belongs to (subscription.membership_product).
@@ -19594,6 +21205,7 @@ components:
           format: uuid
           nullable: true
         changedByPrincipalId:
+          x-ticvai-references: identity.principal
           type: string
           format: uuid
         scopePath:
@@ -25161,6 +26773,22 @@ components:
           type: string
           format: date-time
           description: Generated at
+    PartnerInvoiceExport:
+      type: object
+      x-ticvai-persistence: none — response only; built from the partner's ledger postings for the period
+      description: '**One partner invoice for one period, in the requested ERP format** (`exportPartnerInvoice`). Idempotent on the period: a second export of the same period returns the same `invoiceNumber` with `isRepeat` true.'
+      required: [partnerId, periodFrom, periodTo, format, invoiceNumber, fileName, contentType, content, generatedAt, isRepeat]
+      properties:
+        partnerId: { type: string, format: uuid }
+        periodFrom: { type: string, format: date }
+        periodTo: { type: string, format: date }
+        format: { type: string, enum: [sapIdoc, csv, json, ubl] }
+        invoiceNumber: { type: string }
+        fileName: { type: string }
+        contentType: { type: string, description: 'The media type of `content`, e.g. application/xml for sapIdoc and ubl.' }
+        content: { type: string, description: 'The export document; base64 when the format is binary.' }
+        generatedAt: { type: string, format: date-time }
+        isRepeat: { type: boolean, description: 'True when this period was exported before and the same invoice is returned.' }
   securitySchemes:
     prospectAuth:
       type: http

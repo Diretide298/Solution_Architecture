@@ -189,7 +189,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-584` | Rental Executive Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-585` | Rental Revenue & Commercial Analytics | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-585` | Rental Revenue & Commercial Analytics | D | 2 | 140 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-586` | Utilization & Capacity Analytics | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-587` | Inventory & Equipment Performance Analytics | B | 0 | 12 | 6 | 0 | 1 | 4 | — | notStarted (—) |
 | `BO-588` | Rental Duration, Extension & Return Analytics | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
@@ -297,6 +297,8 @@ kpis: 'October: AED 186,400 · 4,120 rentals · utilisation 62% · on-time 91% �
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -401,25 +403,195 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Shown**
 
-**Gross Rental Revenue** (metric tile)
+**Gross Rental Revenue** (metric tile, from `getKpiValues`)
 
-**Net Rental Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Average Transaction Value** (metric tile)
+**Net Rental Revenue** (metric tile, from `getKpiValues`)
 
-**Average Revenue per Rental Hour** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Extension Revenue** (metric tile)
+**Average Transaction Value** (metric tile, from `getKpiValues`)
 
-**Late-Fee Revenue** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Damage Charges** (metric tile)
+**Average Revenue per Rental Hour** (metric tile, from `getKpiValues`)
 
-**Deposit Captures** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
-**Discount Value** (metric tile)
+**Extension Revenue** (metric tile, from `getKpiValues`)
 
-**Refund Value** (metric tile)
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Late-Fee Revenue** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Damage Charges** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Deposit Captures** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Discount Value** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
+
+**Refund Value** (metric tile, from `getKpiValues`)
+
+| Shows | Format | Notes |
+|---|---|---|
+| Kpi | the name it points at, never the id | — |
+| Code | text | — |
+| Bucket start | 1 Oct 2026, 14:30 | The start of the bucket this value covers, when `getKpiValues` was asked for an `interval`; null otherwise. |
+| Group key | text | The value of the `groupBy` dimension this row is for (a status, a category code, a tier); null when no `groupBy` was asked. |
+| Name | text | — |
+| Period | text | — |
+| Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
+| Variance percent | 1,234.5 | — |
+| Direction | chip: Up, Down, Flat | — |
+| Status | chip: Green, Amber, Red, No target | — |
+| As of | 1 Oct 2026, 14:30 | — |
+| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -463,6 +635,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_VENUE`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -494,7 +668,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (140 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-585?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-584`.
@@ -639,6 +813,8 @@ insight: Saturday bike utilisation reaches 97% between 15:00 and 18:00 while Mon
 - `getResourceUtilisation` → `RESOURCE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RESOURCE_VIEW`
 
 #### Requirements it meets
 
@@ -962,6 +1138,8 @@ kpis: Planned 1 h 42 · actual 1 h 55 · extensions 14% · late 9% · critical o
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `RENTAL_VIEW`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1088,6 +1266,8 @@ kpis: Damage 22 cases · lost 3 · captured AED 2,340 · released AED 61,800 · 
 - `listRentalBookings` → `RENTAL_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RENTAL_VIEW`
 
 #### Requirements it meets
 
@@ -1253,6 +1433,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `REPORT_VIEW_TENANT`
+
 #### Requirements it meets
 
 No matrix row traces to this screen's operations or data.
@@ -1383,6 +1565,8 @@ forecast:
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
+Screen guard: `PRODUCT_VIEW`
+
 #### Requirements it meets
 
 3 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
@@ -1496,7 +1680,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Maintenance status change | text | not in the schema: `Maintenance status change` |
 | Asset retirement | text | not in the schema: `Asset retirement` |
 
-**The selected audit governance operational** (detail panel): The pack groups this record's detail under its own headings: “Audit Table”, “Export”, “Rental Operator”, “Maintenance”, “Finance”, “Manager”.
+**The selected audit governance operational** (detail panel, from `getResourceAuditTrail`): The pack groups this record's detail under its own headings: “Audit Table”, “Export”, “Rental Operator”, “Maintenance”, “Finance”, “Manager”.
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1587,6 +1771,8 @@ rows:
 - `getResourceAuditTrail` → `RESOURCE_VIEW` (read) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `RESOURCE_VIEW`
 
 #### Requirements it meets
 
@@ -1703,6 +1889,8 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `askReportingQuestion` → `REPORT_VIEW_VENUE` (operate) · staff, partner
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+
+Screen guard: `REPORT_VIEW_VENUE`
 
 #### Requirements it meets
 
@@ -1869,8 +2057,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "MetricValue": {"x-ticvai-persistence-column":"numeric(18,4)","description":"**A reading of a metric or KPI, or a threshold on one.** A `Money` where the metric is money-valued — `MetricSource` lists those in `x-ticvai-money-valued`, and a KPI is when its `unit` is `currency` — and a plain number otherwise. naming-and-style 5.1: money is never a float, at any layer.\nStored as `numeric(18,4)` either way: a money value stores its amount, and currency and scale resolve from the scope as they do for every `Money`.\n","oneOf":[{"type":"number"},{"$ref":"../shared/common.yaml#/components/schemas/Money"}]},
 "NaturalLanguageAnswer": {"x-ticvai-persistence":"none — computed","type":"object","required":["conversationId","question","interpretation","result","reliability"],"properties":{"conversationId":{"type":"string"},"question":{"type":"string"},"interpretation":{"type":"string","description":"What the question was understood to mean, in plain language. When the question is outside the semantic model, the \"not available yet\" sentence."},"semanticSpec":{"allOf":[{"$ref":"#/components/schemas/ReportingSemanticQuerySpec"}],"nullable":true,"description":"What the model returned instead of SQL (design 2.2 E, 5.7): metric, dimensions, filters, period, comparison, as validated against the semantic model. Null when the question is outside it. **Also kept**, on `NaturalLanguageQuery`, so a follow-up edits it.\n"},"generatedQuery":{"allOf":[{"$ref":"#/components/schemas/GeneratedQuery"}],"nullable":true,"description":"The query the spec compiled to: data source, columns, filters, grouping, and the compiled SQL in `compiledSql`. Returned so the answer can be checked. An answer nobody can verify is worse than no answer. **Also kept, as `NaturalLanguageQuery`**, for `saveNaturalLanguageQuery`. Null when the question is outside the semantic model.\n"},"result":{"allOf":[{"$ref":"#/components/schemas/ReportResult"}],"nullable":true,"description":"Null when the question is outside the semantic model."},"dataAsOf":{"type":"string","format":"date-time","nullable":true,"description":"Replica position the answer was read at, the result's `dataAsOf`, stated beside the answer so a figure that moved is not argued about. Null when nothing was run."},"reliability":{"$ref":"#/components/schemas/ReportingAnswerReliability"},"unavailableReason":{"allOf":[{"$ref":"#/components/schemas/ReportingUnavailableReason"}],"nullable":true,"description":"Set only when `reliability` is `insufficientEvidence` because the question is outside the semantic model (\"not available yet\"); names which part is not modelled."},"confidence":{"type":"number","minimum":0,"maximum":1,"deprecated":true,"description":"Superseded by `reliability` on 29 September (design 5.6, never a bare percentage for analytics). Returned for one release, then removed."},"suggestedFollowUps":{"type":"array","items":{"type":"string"}},"modelVersion":{"type":"string"},"tokensUsed":{"type":"integer"}}},
 "Page": {"type":"object","required":["items","hasMore"],"properties":{"items":{"type":"array","items":{}},"nextCursor":{"type":"string"},"hasMore":{"type":"boolean"}}},
-"RentalBooking": {"type":"object","x-ticvai-persistence":"rental.booking","description":"Board 5. **The booking outlives the order** — an order completes at payment and the rental is still out.\n","required":["id","productId","from","to","status"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"productId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"returnLocationId":{"type":"string","format":"uuid","nullable":true},"customerId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer"},"status":{"type":"string","enum":["draft","confirmed","awaitingArrival","checkedOut","overdue","partiallyReturned","completed","completedWithDamage","notReturned","cancelled","noShow"]},"checkedOutAt":{"type":"string","format":"date-time","nullable":true},"dueBackAt":{"type":"string","format":"date-time","nullable":true},"returnedAt":{"type":"string","format":"date-time","nullable":true},"depositAuthorisationId":{"type":"string","format":"uuid","nullable":true,"description":"The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."},"accruedLateFee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"readiness":{"type":"array","readOnly":true,"description":"**Computed, not stored** — agreement, requirements, deposit, equipment.","items":{"type":"object","properties":{"check":{"type":"string"},"satisfied":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"participants":{"type":"array","items":{"$ref":"#/components/schemas/RentalParticipant"}},"scopePath":{"type":"string"}}},
-"RentalParticipant": {"type":"object","x-ticvai-persistence":"rental.participant","description":"Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"isPrimaryRenter":{"type":"boolean","default":false},"dateOfBirth":{"type":"string","format":"date","nullable":true},"idNumber":{"type":"string","nullable":true},"guardianName":{"type":"string","nullable":true},"emergencyContact":{"type":"string","nullable":true},"hasSignedWaiver":{"type":"boolean","readOnly":true},"customFields":{"type":"object","additionalProperties":true}}},
+"RentalBooking": {"type":"object","x-ticvai-persistence":"rental.booking","description":"Board 5. **The booking outlives the order** — an order completes at payment and the rental is still out.\n","required":["id","productId","from","to","status"],"properties":{"id":{"type":"string","format":"uuid"},"reference":{"type":"string"},"productId":{"x-ticvai-references":"rental.product","type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"returnLocationId":{"type":"string","format":"uuid","nullable":true},"customerId":{"type":"string","format":"uuid","nullable":true},"orderId":{"type":"string","format":"uuid","nullable":true},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time"},"quantity":{"type":"integer"},"status":{"type":"string","enum":["draft","confirmed","awaitingArrival","checkedOut","overdue","partiallyReturned","completed","completedWithDamage","notReturned","cancelled","noShow"]},"checkedOutAt":{"type":"string","format":"date-time","nullable":true},"dueBackAt":{"type":"string","format":"date-time","nullable":true},"returnedAt":{"type":"string","format":"date-time","nullable":true},"depositAuthorisationId":{"x-ticvai-references":"orders.stored_value_authorisation","type":"string","format":"uuid","nullable":true,"description":"The card deposit's terminal pre-authorisation, written by `checkOutRental` (workbook Q304; CHG-CSA-029). The hold is kept whole until every unit is back (workbook Q306)."},"accruedLateFee":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"readiness":{"x-ticvai-persisted":false,"type":"array","readOnly":true,"description":"**Computed, not stored** — agreement, requirements, deposit, equipment.","items":{"type":"object","properties":{"check":{"type":"string"},"satisfied":{"type":"boolean"},"detail":{"type":"string","nullable":true}}}},"participants":{"type":"array","items":{"$ref":"#/components/schemas/RentalParticipant"}},"scopePath":{"type":"string"},"changeReason":{"type":"string","nullable":true,"readOnly":true,"description":"Why the booking was last changed (`updateRentalBooking`)."}}},
+"RentalParticipant": {"required":["scopePath"],"x-ticvai-rls":"grant-holder-read","type":"object","x-ticvai-persistence":"rental.participant","description":"Board 5.5. **A group rental is one booking with participants**, because the agreement, the deposit and the return are handled together.\n","properties":{"scopePath":{"type":"string","readOnly":true,"description":"Where the row is owned: the path of the scope that wrote it (its venue, or the region or tenant that configured it), set by the server from the caller's scope and never taken from a request. Row-level security reads it, so a venue writes and reads its own rows (MOD audit, 14 October 2026, CHG-MOD-007)."},"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"isPrimaryRenter":{"type":"boolean","default":false},"dateOfBirth":{"type":"string","format":"date","nullable":true},"idNumber":{"type":"string","nullable":true},"guardianName":{"type":"string","nullable":true},"emergencyContact":{"type":"string","nullable":true},"hasSignedWaiver":{"type":"boolean","readOnly":true},"customFields":{"type":"object","additionalProperties":true}}},
 "ReportResult": {"x-ticvai-persistence":"none — result set, cached in object storage","type":"object","required":["executionId","columns","rows"],"properties":{"executionId":{"type":"string"},"columns":{"type":"array","items":{"type":"object","properties":{"key":{"type":"string"},"label":{"type":"string"},"type":{"$ref":"#/components/schemas/FieldType"}}}},"rows":{"type":"array","description":"**Open on purpose; the shape is `columns`.** Each row is keyed by `columns[].key`, and each value is of that column's `type` — money as a `Money`, dates, date-times and uuids as strings. A report's columns are chosen at run time, so no fixed schema can name them.\n","items":{"type":"object","additionalProperties":true}},"totals":{"type":"object","additionalProperties":true,"description":"Aggregated columns only, keyed and typed as a row is."},"rowCount":{"type":"integer"},"nextCursor":{"type":"string","nullable":true},"generatedAt":{"type":"string","format":"date-time"},"dataAsOf":{"type":"string","format":"date-time","description":"Replica position the result was read at. Reporting reads a lag-tolerant replica, so this may trail the primary by seconds — stating it prevents an argument about a figure that moved.\n"}}},
 "ReportingAnswerReliability": {"type":"string","description":"**How far an analytics answer can be relied on** (decided 29 September, AI system design 5.6): a category, never a bare percentage. `grounded`: every figure comes from a result of the compiled spec. `partial`: part of the question was answered and the rest was not modelled. `conflictingSources`: the result and a cited source disagree. `insufficientEvidence`: the question could not be answered, including \"not available yet\" outside the semantic model. The same four values as `ai.yaml`'s assistant answers.\n","enum":["grounded","partial","conflictingSources","insufficientEvidence"]},
 "ReportingSemanticQuerySpec": {"x-ticvai-persistence":"none — embedded; stored whole in `reporting.natural_language_query`","type":"object","description":"**A question in the semantic model's own vocabulary** (decided 29 September, AI system design 2.2 E and 5.7). What the model returns for a live-number question instead of SQL, and what `runSemanticQuery` takes. Every code is a `SemanticModel` field code or a KPI code; Reporting validates the spec against the published model and compiles it deterministically, so the same spec compiles to the same SQL for the same model version.\n","required":["metric","period"],"properties":{"metric":{"type":"string","description":"A measure field code in the `SemanticModel`, or a `KpiDefinition.code`. The governed definition the dashboards use, so the number matches them."},"dimensions":{"type":"array","maxItems":5,"description":"Field codes to group by. Each must be reachable from the metric's dataset through a relationship the semantic model declares.","items":{"type":"string"}},"filters":{"type":"array","items":{"type":"object","required":["field","operator"],"properties":{"field":{"type":"string","description":"A `SemanticModel` field code."},"operator":{"type":"string","enum":["equals","notEquals","greaterThan","lessThan","between","in","notIn","isNull","isNotNull"]},"values":{"type":"array","description":"**Open on purpose; typed by the field.** One value for the comparison operators, exactly two (from, to) for `between`, any number for `in` and `notIn`, none for `isNull` and `isNotNull`.\n","items":{}}}}},"period":{"type":"string","description":"ISO 8601 interval in the venue's time zone, e.g. `2026-09-21/2026-09-27`, the form `explainMetricChange` takes."},"comparison":{"type":"string","nullable":true,"description":"As `getKpiValues` `compareTo`. With one, each row carries the metric for the comparison beside the current value.","enum":["previousPeriod","samePeriodLastYear","target","benchmark"]},"semanticModelVersion":{"type":"integer","readOnly":true,"description":"The `SemanticModel.version` the spec was validated and compiled against. Set by Reporting."}}},
