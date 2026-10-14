@@ -1348,11 +1348,8 @@ screens:
       is no data* and sends somebody to support with the wrong question. A caller who can see the screen
       but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_VALIDATE`
       for `consumeCrossRegionEntitlement`.'
-    offline: '**A delegated right in this scanner''s offline package is admitted**, and its consumption
-      (`consumeCrossRegionEntitlement`, locally authoritative) is queued in the outbox and sent when the
-      link returns; a count the issuing region later disputes is surfaced in reconciliation, never silently
-      resolved. A right not in the package cannot be verified from a local bundle and is refused with
-      the reason on screen — admitting on trust is how a pass gets used twice in two countries.'
+    offline: '**Not available offline.** A delegated right issued in another region cannot be verified
+      from a local bundle, and admitting on trust is how a pass gets used twice in two countries'
   apis:
   - operationId: getCrossRegionEntitlement
     contract: cross-region

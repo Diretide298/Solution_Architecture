@@ -9575,8 +9575,7 @@ screens:
       to show this screen, and names that permission. **Never an empty table** — that reads as *there
       is no data* and sends somebody to support with the wrong question. A caller who can see the screen
       but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `semanticSearch`.'
-    offline: Cached progress, with its age. Search (`semanticSearch`) needs the connection and is disabled
-      offline.
+    offline: Cached progress; completions queue
   apis:
   - operationId: semanticSearch
     contract: ai
@@ -14278,10 +14277,9 @@ screens:
       and sends somebody to support with the wrong question. A caller who can see the screen but lacks
       what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST` for
       `createRequisition`.'
-    offline: '**The alert list is not available offline**: `listAlerts` reads the analytical replica (ADR-0016).
-      Acknowledging an alert and raising a requisition (`acknowledgeAlert`, `createRequisition`, both
-      offline-capable) are queued in the outbox and sent when the connection returns, as on EMP-061 and
-      EMP-063.'
+    offline: '**Not available offline.** `listAlerts` reads the analytical replica (ADR-0016). **Corrected
+      24 August** — the shared "works from cache and queues what it records" wording was applied to a
+      screen whose only operation is an analytical read.'
   apis:
   - operationId: listAlerts
     contract: reporting
