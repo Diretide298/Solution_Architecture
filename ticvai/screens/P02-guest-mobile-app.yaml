@@ -25,11 +25,7 @@ platform:
   screenCount: 77
   app: guest-app
   appStatus: scaffolded
-  packages:
-  - design-tokens
-  - ui
-  - api-client
-  - offline-core
+  packages: []
   deployment:
     target: iOS / Android native
     distribution: App Store + Play, tenant developer account
@@ -107,7 +103,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/home-default
-    component: apps/guest-app/src/routes/general/HomeDefaultDashboard.tsx
+    component: src/screens/general/HomeDefaultDashboard.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
@@ -769,7 +765,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/explore-categories
-    component: apps/guest-app/src/routes/general/ExploreCategoriesList.tsx
+    component: src/screens/general/ExploreCategoriesList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -924,7 +920,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/buy-tickets
-    component: apps/guest-app/src/routes/general/BuyTicketsList.tsx
+    component: src/screens/general/BuyTicketsList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1159,7 +1155,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/item-detail
-    component: apps/guest-app/src/routes/general/ItemDetail.tsx
+    component: src/screens/general/ItemDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1462,7 +1458,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/whats-on
-    component: apps/guest-app/src/routes/general/WhatsOnList.tsx
+    component: src/screens/general/WhatsOnList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1618,7 +1614,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/event-exhibition-details
-    component: apps/guest-app/src/routes/general/EventExhibitionDetailsDetail.tsx
+    component: src/screens/general/EventExhibitionDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1737,7 +1733,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/select-date-and-time
-    component: apps/guest-app/src/routes/general/SelectDateAndTimeDetail.tsx
+    component: src/screens/general/SelectDateAndTimeDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2070,7 +2066,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/tickets-and-add-ons
-    component: apps/guest-app/src/routes/general/TicketsAndAddOnsList.tsx
+    component: src/screens/general/TicketsAndAddOnsList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2330,7 +2326,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/review-and-payment
-    component: apps/guest-app/src/routes/general/ReviewAndPaymentForm.tsx
+    component: src/screens/general/ReviewAndPaymentForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2633,7 +2629,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/booking-confirmation
-    component: apps/guest-app/src/routes/general/BookingConfirmationDetail.tsx
+    component: src/screens/general/BookingConfirmationDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -2842,7 +2838,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/wallet-overview
-    component: apps/guest-app/src/routes/general/WalletOverviewDashboard.tsx
+    component: src/screens/general/WalletOverviewDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3057,7 +3053,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/my-tickets
-    component: apps/guest-app/src/routes/general/MyTicketsList.tsx
+    component: src/screens/general/MyTicketsList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3278,7 +3274,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ticket-details
-    component: apps/guest-app/src/routes/general/TicketDetailsDetail.tsx
+    component: src/screens/general/TicketDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3479,7 +3475,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ticket-transfer
-    component: apps/guest-app/src/routes/general/TicketTransferDetail.tsx
+    component: src/screens/general/TicketTransferDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3631,7 +3627,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/memberships
-    component: apps/guest-app/src/routes/general/MembershipsDetail.tsx
+    component: src/screens/general/MembershipsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -3947,7 +3943,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/my-reservations
-    component: apps/guest-app/src/routes/general/MyReservationsDetail.tsx
+    component: src/screens/general/MyReservationsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4098,7 +4094,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/reservation-details
-    component: apps/guest-app/src/routes/general/ReservationDetailsDetail.tsx
+    component: src/screens/general/ReservationDetailsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4214,7 +4210,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/add-to-calendar-reminders
-    component: apps/guest-app/src/routes/general/AddToCalendarRemindersDetail.tsx
+    component: src/screens/general/AddToCalendarRemindersDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4388,7 +4384,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/order-history-wallet
-    component: apps/guest-app/src/routes/general/OrderHistoryWalletDashboard.tsx
+    component: src/screens/general/OrderHistoryWalletDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4626,7 +4622,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/saved-items-wishlist
-    component: apps/guest-app/src/routes/general/SavedItemsWishlistList.tsx
+    component: src/screens/general/SavedItemsWishlistList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4747,7 +4743,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/interactive-map
-    component: apps/guest-app/src/routes/general/InteractiveMapCanvas.tsx
+    component: src/screens/general/InteractiveMapCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -4961,7 +4957,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/attraction-wait-times
-    component: apps/guest-app/src/routes/general/AttractionWaitTimesDetail.tsx
+    component: src/screens/general/AttractionWaitTimesDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5062,7 +5058,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/virtual-queue-join-queue
-    component: apps/guest-app/src/routes/general/VirtualQueueJoinQueueDetail.tsx
+    component: src/screens/general/VirtualQueueJoinQueueDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5241,7 +5237,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/fandb-browse-and-order
-    component: apps/guest-app/src/routes/general/FandbBrowseAndOrderList.tsx
+    component: src/screens/general/FandbBrowseAndOrderList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5479,7 +5475,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/fandb-order-tracking
-    component: apps/guest-app/src/routes/general/FandbOrderTrackingDetail.tsx
+    component: src/screens/general/FandbOrderTrackingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5606,7 +5602,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/retail-merchandise
-    component: apps/guest-app/src/routes/general/RetailMerchandiseDetail.tsx
+    component: src/screens/general/RetailMerchandiseDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5826,7 +5822,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/parking-reserve-and-pay
-    component: apps/guest-app/src/routes/general/ParkingReserveAndPayDetail.tsx
+    component: src/screens/general/ParkingReserveAndPayDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6048,7 +6044,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/parking-reservation-confirmed
-    component: apps/guest-app/src/routes/general/ParkingReservationConfirmedDetail.tsx
+    component: src/screens/general/ParkingReservationConfirmedDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6220,7 +6216,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/venue-info-and-services
-    component: apps/guest-app/src/routes/general/VenueInfoAndServicesDetail.tsx
+    component: src/screens/general/VenueInfoAndServicesDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6352,7 +6348,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/in-venue-notifications
-    component: apps/guest-app/src/routes/general/InVenueNotificationsDetail.tsx
+    component: src/screens/general/InVenueNotificationsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6464,7 +6460,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ai-concierge-home
-    component: apps/guest-app/src/routes/general/AiConciergeHomeDashboard.tsx
+    component: src/screens/general/AiConciergeHomeDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6689,7 +6685,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ai-concierge-chat
-    component: apps/guest-app/src/routes/general/AiConciergeChatDetail.tsx
+    component: src/screens/general/AiConciergeChatDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6988,7 +6984,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ai-concierge-contextual-help
-    component: apps/guest-app/src/routes/general/AiConciergeContextualHelpDetail.tsx
+    component: src/screens/general/AiConciergeContextualHelpDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7129,7 +7125,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/lost-and-found
-    component: apps/guest-app/src/routes/general/LostAndFoundDetail.tsx
+    component: src/screens/general/LostAndFoundDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7327,7 +7323,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/feedback-and-ratings
-    component: apps/guest-app/src/routes/general/FeedbackAndRatingsList.tsx
+    component: src/screens/general/FeedbackAndRatingsList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7481,7 +7477,7 @@ screens:
   implementation:
     app: guest-app
     route: /loyalty-rewards
-    component: apps/guest-app/src/routes/LoyaltyRewards.tsx
+    component: src/screens/LoyaltyRewards.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7719,7 +7715,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/offers-and-promotions
-    component: apps/guest-app/src/routes/general/OffersAndPromotionsDetail.tsx
+    component: src/screens/general/OffersAndPromotionsDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7869,7 +7865,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/at-the-venue
-    component: apps/guest-app/src/routes/general/AtTheVenueDetail.tsx
+    component: src/screens/general/AtTheVenueDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8042,7 +8038,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/profile
-    component: apps/guest-app/src/routes/general/ProfileDashboard.tsx
+    component: src/screens/general/ProfileDashboard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8230,7 +8226,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/help-and-support
-    component: apps/guest-app/src/routes/general/HelpAndSupportDetail.tsx
+    component: src/screens/general/HelpAndSupportDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8451,7 +8447,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/checkout-entry
-    component: apps/guest-app/src/routes/general/CheckoutEntryForm.tsx
+    component: src/screens/general/CheckoutEntryForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -8746,7 +8742,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/simple-registration-and-otp
-    component: apps/guest-app/src/routes/general/SimpleRegistrationAndOtpDetail.tsx
+    component: src/screens/general/SimpleRegistrationAndOtpDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9123,7 +9119,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/arabic-rtl-experience
-    component: apps/guest-app/src/routes/general/ArabicRtlExperienceDetail.tsx
+    component: src/screens/general/ArabicRtlExperienceDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9199,7 +9195,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/multi-currency-and-pricing
-    component: apps/guest-app/src/routes/general/MultiCurrencyAndPricingDetail.tsx
+    component: src/screens/general/MultiCurrencyAndPricingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9359,7 +9355,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ticket-delivery-and-sharing
-    component: apps/guest-app/src/routes/general/TicketDeliveryAndSharingDetail.tsx
+    component: src/screens/general/TicketDeliveryAndSharingDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9490,7 +9486,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/branded-queue-waiting-room
-    component: apps/guest-app/src/routes/general/BrandedQueueWaitingRoomDetail.tsx
+    component: src/screens/general/BrandedQueueWaitingRoomDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9603,7 +9599,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/maintenance-page
-    component: apps/guest-app/src/routes/general/MaintenancePageDetail.tsx
+    component: src/screens/general/MaintenancePageDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9724,7 +9720,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/upsell-cross-sell
-    component: apps/guest-app/src/routes/general/UpsellCrossSellDetail.tsx
+    component: src/screens/general/UpsellCrossSellDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9874,7 +9870,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/interactive-seat-selection
-    component: apps/guest-app/src/routes/general/InteractiveSeatSelectionCanvas.tsx
+    component: src/screens/general/InteractiveSeatSelectionCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10098,7 +10094,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/resource-booking-cabana
-    component: apps/guest-app/src/routes/general/ResourceBookingCabanaDetail.tsx
+    component: src/screens/general/ResourceBookingCabanaDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10261,7 +10257,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/plan-your-adventure-start
-    component: apps/guest-app/src/routes/general/PlanYourAdventureStartDetail.tsx
+    component: src/screens/general/PlanYourAdventureStartDetail.tsx
     status: notStarted
   navigation:
     isEntryPoint: true
@@ -10471,7 +10467,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/suggested-itineraries
-    component: apps/guest-app/src/routes/general/SuggestedItinerariesDetail.tsx
+    component: src/screens/general/SuggestedItinerariesDetail.tsx
     status: notStarted
   navigation:
     inferred: false
@@ -10613,7 +10609,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/your-plan
-    component: apps/guest-app/src/routes/general/YourPlanDetail.tsx
+    component: src/screens/general/YourPlanDetail.tsx
     status: notStarted
   navigation:
     inferred: false
@@ -10885,7 +10881,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/ai-planner
-    component: apps/guest-app/src/routes/general/AIPlannerDetail.tsx
+    component: src/screens/general/AIPlannerDetail.tsx
     status: notStarted
   navigation:
     inferred: false
@@ -11129,7 +11125,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/dynamic-qr-ticket
-    component: apps/guest-app/src/routes/general/DynamicQrTicketCanvas.tsx
+    component: src/screens/general/DynamicQrTicketCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11296,7 +11292,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/bundle-package
-    component: apps/guest-app/src/routes/general/BundlePackageDetail.tsx
+    component: src/screens/general/BundlePackageDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11450,7 +11446,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/accessibility-information
-    component: apps/guest-app/src/routes/general/AccessibilityInformationForm.tsx
+    component: src/screens/general/AccessibilityInformationForm.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11562,7 +11558,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/resource-availability-cabana
-    component: apps/guest-app/src/routes/general/ResourceAvailabilityCabanaDetail.tsx
+    component: src/screens/general/ResourceAvailabilityCabanaDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11700,7 +11696,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/plan-my-day-in-progress
-    component: apps/guest-app/src/routes/general/PlanMyDayInProgressDetail.tsx
+    component: src/screens/general/PlanMyDayInProgressDetail.tsx
     status: notStarted
   navigation:
     inferred: false
@@ -11861,7 +11857,7 @@ screens:
   implementation:
     app: guest-app
     route: /in-venue-experience/menu-item-detail
-    component: apps/guest-app/src/routes/in-venue-experience/MenuItemDetail.tsx
+    component: src/screens/in-venue-experience/MenuItemDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12001,7 +11997,7 @@ screens:
   implementation:
     app: guest-app
     route: /in-venue-experience/shop-and-drop-collection
-    component: apps/guest-app/src/routes/in-venue-experience/ShopAndDropCollectionList.tsx
+    component: src/screens/in-venue-experience/ShopAndDropCollectionList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12109,7 +12105,7 @@ screens:
   implementation:
     app: guest-app
     route: /search
-    component: apps/guest-app/src/routes/Search.tsx
+    component: src/screens/Search.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12217,7 +12213,7 @@ screens:
   implementation:
     app: guest-app
     route: /newsletter-preferences
-    component: apps/guest-app/src/routes/NewsletterPreferences.tsx
+    component: src/screens/NewsletterPreferences.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12363,7 +12359,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/privacy-my-data
-    component: apps/guest-app/src/routes/account/PrivacyMyData.tsx
+    component: src/screens/account/PrivacyMyData.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12543,7 +12539,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/refunds-resale
-    component: apps/guest-app/src/routes/account/RefundsResale.tsx
+    component: src/screens/account/RefundsResale.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12689,7 +12685,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/help-my-cases
-    component: apps/guest-app/src/routes/account/HelpMyCases.tsx
+    component: src/screens/account/HelpMyCases.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -12853,7 +12849,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/face-pass
-    component: apps/guest-app/src/routes/account/FacePass.tsx
+    component: src/screens/account/FacePass.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -13062,7 +13058,7 @@ screens:
   implementation:
     app: guest-app
     route: /reserve-table
-    component: apps/guest-app/src/routes/ReserveTable.tsx
+    component: src/screens/ReserveTable.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -13335,7 +13331,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/payment-methods
-    component: apps/guest-app/src/routes/account/PaymentMethods.tsx
+    component: src/screens/account/PaymentMethods.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -13593,7 +13589,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/share-group-booking
-    component: apps/guest-app/src/routes/account/ShareGroupBooking.tsx
+    component: src/screens/account/ShareGroupBooking.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -13823,7 +13819,7 @@ screens:
   implementation:
     app: guest-app
     route: /account/security-sign-in
-    component: apps/guest-app/src/routes/account/SecuritySignIn.tsx
+    component: src/screens/account/SecuritySignIn.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -14066,7 +14062,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/map-booking
-    component: apps/guest-app/src/routes/general/MapBookingCanvas.tsx
+    component: src/screens/general/MapBookingCanvas.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14321,7 +14317,7 @@ screens:
   implementation:
     app: guest-app
     route: /general/space-by-the-hour
-    component: apps/guest-app/src/routes/general/SpaceByTheHourWizard.tsx
+    component: src/screens/general/SpaceByTheHourWizard.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14482,7 +14478,7 @@ screens:
   implementation:
     app: guest-app
     route: /transport/route-and-schedule
-    component: apps/guest-app/src/routes/transport/RouteAndScheduleList.tsx
+    component: src/screens/transport/RouteAndScheduleList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14670,7 +14666,7 @@ screens:
   implementation:
     app: guest-app
     route: /transport/route-and-passengers
-    component: apps/guest-app/src/routes/transport/RouteAndPassengersDetail.tsx
+    component: src/screens/transport/RouteAndPassengersDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14866,7 +14862,7 @@ screens:
   implementation:
     app: guest-app
     route: /transport/multi-trip-passes
-    component: apps/guest-app/src/routes/transport/MultiTripPassesList.tsx
+    component: src/screens/transport/MultiTripPassesList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -15002,7 +14998,7 @@ screens:
   implementation:
     app: guest-app
     route: /transport/favourite-routes
-    component: apps/guest-app/src/routes/transport/FavouriteRoutesList.tsx
+    component: src/screens/transport/FavouriteRoutesList.tsx
     status: notStarted
   navigation:
     entryFrom:

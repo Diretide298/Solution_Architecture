@@ -1,0 +1,64 @@
+id: CHG-RPO-001
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Every frontend repository has an `observed:` layout in docs/active/frontend-repos.yaml and a profile the
+  generators read: ticvai-guest-app as #27741 found it (one React Native CLI app at the repository root, npm, Redux
+  Toolkit, React Navigation, src/, no shared packages, no typecheck script), and the other five recorded as not read
+  because the clone was refused, so their profile stays the assumed default. P02''s platform no longer names the
+  workspace packages its repository does not have.'
+decision:
+  what: 'docs/active/frontend-repos.yaml gains `layout.default` (the profile of a repository nobody has read: srcRoot
+    src, screensDir src/routes, package manager and scripts unknown) and an `observed:` block on each of the six
+    entries with a repository (by, date, how, reachable, confirmed; and for a repository read, workspace, stack,
+    packageManager, state, navigation, appRoot, srcRoot, packages, scripts). P02 ticvai-guest-app is observed from
+    #27741 problem 3; its screens folder is not observed and is kept apart under `profile:` as assumed
+    (src/screens: React Navigation has no file routes). P01, P04, P05, P06 and P08 are `reachable: false`: a
+    shallow read-only clone with the GitLab access the package team holds was answered "project not found" on
+    14 October, so nothing inside them was read. screens/P02-guest-mobile-app.yaml platform.packages becomes []
+    (the repository has none of design-tokens, ui, api-client, offline-core). tools/frontend_repos.py profile()
+    lays observed over default; check-frontend-repos FR-FIELDS holds the observed block''s fields, FR-LAYOUT-
+    MISMATCH compares only a layout that was read, and check-frontend warns (no longer errors) when an
+    offline-capable platform''s read repository has no offline-core: its writes go through the repository''s own
+    single offline store (frontend-patterns 4.4).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Class check-frontend-repos/FR-LAYOUT-UNCONFIRMED (CHG-SWP-003): 6 findings before (P01, P02, P04, P05, P06,
+  P08: no `observed:` layout, every location their tickets suggest assumed), 0 after. Evidence (outside git, rule 12):
+  classes.json of the audit run audit-1014. The lead''s decision 3 of 14 October 2026: frontend repository layouts
+  are read from the cloned repositories and recorded as observed; owners confirm afterwards. Recording P02''s
+  observation would have raised FR-LAYOUT-MISMATCH for the four workspace packages P02 named (the finding of
+  CHG-SWP-003''s trial); the package is corrected instead.'
+keys_touched:
+  screens:
+  - P02 platform.packages
+  files:
+  - docs/active/frontend-repos.yaml
+  - tools/frontend_repos.py
+  - tools/check-frontend-repos.py
+  - tools/check-frontend.py
+  other:
+  - FR-LAYOUT-UNCONFIRMED
+  - FR-FIELDS
+  - FR-LAYOUT-MISMATCH
+root_class: A05 STARTER-APPS
+tickets:
+  started: []
+  unstarted:
+  - AM-IDENTITY-SECURITY-P02 (#27741)
+  - every Block A ticket linked to a screen of P01, P02, P04, P05, P06 or P08 (the impact list of CHG-RPO-002)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-frontend-repos.py
+status: open
+notes: 'Batch RPO (Block A audit), 14 October 2026. Five repositories could not be read: the GitLab group''s projects
+  are not visible to the access the package team holds, so their `observed:` records the refused clone, not a
+  layout, and check-frontend-repos notes them on every run. Each owner confirms (or corrects) the profile and sets
+  `confirmed: true`; a corrected profile is applied with tools/apply-repo-layout.py (CHG-RPO-002). P02''s lint,
+  test and build scripts were not reported by #27741 and stay unknown. Detail left open by the ruling: whether an
+  unreadable repository counts as observed. Taken as the lead''s instruction for this batch: record the refusal as
+  observed and say so; the check notes the unread ones rather than counting them as findings.'

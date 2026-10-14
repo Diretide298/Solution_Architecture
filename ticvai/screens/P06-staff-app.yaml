@@ -60,7 +60,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/sign-in
-    component: apps/venue-staff-app/src/routes/operations/SignInDetail.tsx
+    component: src/routes/operations/SignInDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -288,7 +288,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/select-venue-role
-    component: apps/venue-staff-app/src/routes/operations/SelectVenueRoleDetail.tsx
+    component: src/routes/operations/SelectVenueRoleDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -444,7 +444,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/home-on-duty
-    component: apps/venue-staff-app/src/routes/operations/HomeOnDutyDetail.tsx
+    component: src/routes/operations/HomeOnDutyDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1072,7 +1072,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/opening-checklist
-    component: apps/venue-staff-app/src/routes/operations/OpeningChecklistDetail.tsx
+    component: src/routes/operations/OpeningChecklistDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1216,7 +1216,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/end-shift
-    component: apps/venue-staff-app/src/routes/operations/EndShiftDetail.tsx
+    component: src/routes/operations/EndShiftDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1530,7 +1530,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/scan-ready
-    component: apps/venue-staff-app/src/routes/operations/ScanReadyDetail.tsx
+    component: src/routes/operations/ScanReadyDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -1725,7 +1725,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/ticket-lookup
-    component: apps/venue-staff-app/src/routes/operations/TicketLookupDetail.tsx
+    component: src/routes/operations/TicketLookupDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2010,7 +2010,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/group-scan
-    component: apps/venue-staff-app/src/routes/operations/GroupScanDetail.tsx
+    component: src/routes/operations/GroupScanDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2282,7 +2282,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/sync-reconciliation
-    component: apps/venue-staff-app/src/routes/operations/SyncReconciliationDetail.tsx
+    component: src/routes/operations/SyncReconciliationDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2576,7 +2576,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/offline-package
-    component: apps/venue-staff-app/src/routes/operations/OfflinePackageDetail.tsx
+    component: src/routes/operations/OfflinePackageDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2740,7 +2740,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/task-list
-    component: apps/venue-staff-app/src/routes/operations/TaskListDetail.tsx
+    component: src/routes/operations/TaskListDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -2999,7 +2999,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/task-detail
-    component: apps/venue-staff-app/src/routes/operations/TaskDetailDetail.tsx
+    component: src/routes/operations/TaskDetailDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -3459,7 +3459,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/raise-a-task
-    component: apps/venue-staff-app/src/routes/operations/RaiseATaskDetail.tsx
+    component: src/routes/operations/RaiseATaskDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -3963,7 +3963,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/handover-notes
-    component: apps/venue-staff-app/src/routes/operations/HandoverNotesDetail.tsx
+    component: src/routes/operations/HandoverNotesDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4091,7 +4091,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/shift-summary
-    component: apps/venue-staff-app/src/routes/operations/ShiftSummaryDetail.tsx
+    component: src/routes/operations/ShiftSummaryDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4290,7 +4290,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/ai-assistant-home
-    component: apps/venue-staff-app/src/routes/operations/AiAssistantHomeDetail.tsx
+    component: src/routes/operations/AiAssistantHomeDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4463,7 +4463,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/ai-assistant-answer
-    component: apps/venue-staff-app/src/routes/operations/AiAssistantAnswerDetail.tsx
+    component: src/routes/operations/AiAssistantAnswerDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4671,7 +4671,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/queue-monitor
-    component: apps/venue-staff-app/src/routes/operations/QueueMonitorDetail.tsx
+    component: src/routes/operations/QueueMonitorDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -4932,7 +4932,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/manual-wait-entry
-    component: apps/venue-staff-app/src/routes/operations/ManualWaitEntryDetail.tsx
+    component: src/routes/operations/ManualWaitEntryDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -5109,7 +5109,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/capacity-view
-    component: apps/venue-staff-app/src/routes/operations/CapacityViewDetail.tsx
+    component: src/routes/operations/CapacityViewDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -5294,7 +5294,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/walk-up-sale
-    component: apps/venue-staff-app/src/routes/operations/WalkUpSaleDetail.tsx
+    component: src/routes/operations/WalkUpSaleDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -5869,7 +5869,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/payment-on-device
-    component: apps/venue-staff-app/src/routes/operations/PaymentOnDeviceDetail.tsx
+    component: src/routes/operations/PaymentOnDeviceDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6047,7 +6047,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/issue-media
-    component: apps/venue-staff-app/src/routes/operations/IssueMediaDetail.tsx
+    component: src/routes/operations/IssueMediaDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6222,7 +6222,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/notifications
-    component: apps/venue-staff-app/src/routes/operations/NotificationsDetail.tsx
+    component: src/routes/operations/NotificationsDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6418,7 +6418,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/announcements
-    component: apps/venue-staff-app/src/routes/operations/AnnouncementsDetail.tsx
+    component: src/routes/operations/AnnouncementsDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6570,7 +6570,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/emergency-mode
-    component: apps/venue-staff-app/src/routes/operations/EmergencyModeDetail.tsx
+    component: src/routes/operations/EmergencyModeDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6734,7 +6734,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/post-incident-restore
-    component: apps/venue-staff-app/src/routes/operations/PostIncidentRestoreDetail.tsx
+    component: src/routes/operations/PostIncidentRestoreDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -6928,7 +6928,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/roster
-    component: apps/venue-staff-app/src/routes/operations/RosterDetail.tsx
+    component: src/routes/operations/RosterDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -7101,7 +7101,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/my-rota
-    component: apps/venue-staff-app/src/routes/operations/MyRotaDetail.tsx
+    component: src/routes/operations/MyRotaDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -7279,7 +7279,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/swap-request
-    component: apps/venue-staff-app/src/routes/operations/SwapRequestDetail.tsx
+    component: src/routes/operations/SwapRequestDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -7463,7 +7463,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/clock-in-out
-    component: apps/venue-staff-app/src/routes/operations/ClockInOutDetail.tsx
+    component: src/routes/operations/ClockInOutDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -7659,7 +7659,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/break-management
-    component: apps/venue-staff-app/src/routes/operations/BreakManagementDetail.tsx
+    component: src/routes/operations/BreakManagementDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -7823,7 +7823,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/incident-report
-    component: apps/venue-staff-app/src/routes/operations/IncidentReportDetail.tsx
+    component: src/routes/operations/IncidentReportDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -8083,7 +8083,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/incident-detail
-    component: apps/venue-staff-app/src/routes/operations/IncidentDetailDetail.tsx
+    component: src/routes/operations/IncidentDetailDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -8305,7 +8305,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/lost-found
-    component: apps/venue-staff-app/src/routes/operations/LostFoundDetail.tsx
+    component: src/routes/operations/LostFoundDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -8603,7 +8603,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/guest-assistance
-    component: apps/venue-staff-app/src/routes/operations/GuestAssistanceDetail.tsx
+    component: src/routes/operations/GuestAssistanceDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9037,7 +9037,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/venue-map
-    component: apps/venue-staff-app/src/routes/operations/VenueMapDetail.tsx
+    component: src/routes/operations/VenueMapDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9184,7 +9184,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/broadcast-to-team
-    component: apps/venue-staff-app/src/routes/operations/BroadcastToTeamDetail.tsx
+    component: src/routes/operations/BroadcastToTeamDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9384,7 +9384,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/knowledge-base
-    component: apps/venue-staff-app/src/routes/operations/KnowledgeBaseDetail.tsx
+    component: src/routes/operations/KnowledgeBaseDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9477,7 +9477,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/training
-    component: apps/venue-staff-app/src/routes/operations/TrainingDetail.tsx
+    component: src/routes/operations/TrainingDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9611,7 +9611,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/profile
-    component: apps/venue-staff-app/src/routes/operations/ProfileDetail.tsx
+    component: src/routes/operations/ProfileDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -9842,7 +9842,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/device-settings
-    component: apps/venue-staff-app/src/routes/operations/DeviceSettingsDetail.tsx
+    component: src/routes/operations/DeviceSettingsDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10002,7 +10002,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/accessibility
-    component: apps/venue-staff-app/src/routes/operations/AccessibilityDetail.tsx
+    component: src/routes/operations/AccessibilityDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10068,7 +10068,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/arabic-rtl
-    component: apps/venue-staff-app/src/routes/operations/ArabicRtlDetail.tsx
+    component: src/routes/operations/ArabicRtlDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10134,7 +10134,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/sign-out
-    component: apps/venue-staff-app/src/routes/operations/SignOutDetail.tsx
+    component: src/routes/operations/SignOutDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10218,7 +10218,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/hand-over-the-journal
-    component: apps/venue-staff-app/src/routes/operations/HandOverTheJournalDetail.tsx
+    component: src/routes/operations/HandOverTheJournalDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10386,7 +10386,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/restaurant-service-command-center
-    component: apps/venue-staff-app/src/routes/operations/RestaurantServiceCommandCenterDetail.tsx
+    component: src/routes/operations/RestaurantServiceCommandCenterDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10540,7 +10540,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/floor-plan-table-map
-    component: apps/venue-staff-app/src/routes/operations/FloorPlanTableMapDetail.tsx
+    component: src/routes/operations/FloorPlanTableMapDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10646,7 +10646,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/table-seating-configuration
-    component: apps/venue-staff-app/src/routes/operations/TableSeatingConfigurationDetail.tsx
+    component: src/routes/operations/TableSeatingConfigurationDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10807,7 +10807,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/reservation-calendar-timeline
-    component: apps/venue-staff-app/src/routes/operations/ReservationCalendarTimelineDetail.tsx
+    component: src/routes/operations/ReservationCalendarTimelineDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10943,7 +10943,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/create-edit-reservation
-    component: apps/venue-staff-app/src/routes/operations/CreateEditReservationDetail.tsx
+    component: src/routes/operations/CreateEditReservationDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11167,7 +11167,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/walk-in-waitlist-management
-    component: apps/venue-staff-app/src/routes/operations/WalkInWaitlistManagementDetail.tsx
+    component: src/routes/operations/WalkInWaitlistManagementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11346,7 +11346,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/guest-profile-dining-history
-    component: apps/venue-staff-app/src/routes/operations/GuestProfileDiningHistoryDetail.tsx
+    component: src/routes/operations/GuestProfileDiningHistoryDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -11595,7 +11595,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/live-table-service-management
-    component: apps/venue-staff-app/src/routes/operations/LiveTableServiceManagementDetail.tsx
+    component: src/routes/operations/LiveTableServiceManagementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12009,7 +12009,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/table-order-bill-payment-management
-    component: apps/venue-staff-app/src/routes/operations/TableOrderBillPaymentManagementDetail.tsx
+    component: src/routes/operations/TableOrderBillPaymentManagementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12299,7 +12299,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/reservation-table-performance
-    component: apps/venue-staff-app/src/routes/operations/ReservationTablePerformanceDetail.tsx
+    component: src/routes/operations/ReservationTablePerformanceDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12452,7 +12452,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/retail-inventory-command-center
-    component: apps/venue-staff-app/src/routes/operations/RetailInventoryCommandCenterDetail.tsx
+    component: src/routes/operations/RetailInventoryCommandCenterDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12629,7 +12629,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/store-stock-sku-availability
-    component: apps/venue-staff-app/src/routes/operations/StoreStockSkuAvailabilityDetail.tsx
+    component: src/routes/operations/StoreStockSkuAvailabilityDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12778,7 +12778,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/requisition-smart-store-replenishment
-    component: apps/venue-staff-app/src/routes/operations/RequisitionSmartStoreReplenishmentDetail.tsx
+    component: src/routes/operations/RequisitionSmartStoreReplenishmentDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -12970,7 +12970,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/store-to-store-warehouse-transfers
-    component: apps/venue-staff-app/src/routes/operations/StoreToStoreWarehouseTransfersDetail.tsx
+    component: src/routes/operations/StoreToStoreWarehouseTransfersDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13158,7 +13158,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/receiving-store-put-away
-    component: apps/venue-staff-app/src/routes/operations/ReceivingStorePutAwayDetail.tsx
+    component: src/routes/operations/ReceivingStorePutAwayDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13391,7 +13391,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/stock-count-cycle-count-management
-    component: apps/venue-staff-app/src/routes/operations/StockCountCycleCountManagementDetail.tsx
+    component: src/routes/operations/StockCountCycleCountManagementDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13612,7 +13612,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/damage-loss-shrinkage-stock-adjustment
-    component: apps/venue-staff-app/src/routes/operations/DamageLossShrinkageStockAdjustmentDetail.tsx
+    component: src/routes/operations/DamageLossShrinkageStockAdjustmentDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13861,7 +13861,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/reservation-allocation-omnichannel-inventory
-    component: apps/venue-staff-app/src/routes/operations/ReservationAllocationOmnichannelInDetail.tsx
+    component: src/routes/operations/ReservationAllocationOmnichannelInDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14019,7 +14019,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/barcode-rfid-serialized-stock-traceability
-    component: apps/venue-staff-app/src/routes/operations/BarcodeRfidSerializedStockTraceabiDetail.tsx
+    component: src/routes/operations/BarcodeRfidSerializedStockTraceabiDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14150,7 +14150,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /operations/inventory-exceptions-ai-replenishment-action-cen
-    component: apps/venue-staff-app/src/routes/operations/InventoryExceptionsAiReplenishmentDetail.tsx
+    component: src/routes/operations/InventoryExceptionsAiReplenishmentDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -14358,7 +14358,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/rental-checkout-command-center-emp-071
-    component: apps/venue-staff-app/src/routes/rentals/RentalCheckoutCommandCenter.tsx
+    component: src/routes/rentals/RentalCheckoutCommandCenter.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-544`, for the attendant at the rental counter. Decided 11 September
@@ -14539,7 +14539,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/voucher-scan-reservation-retrieval-emp-072
-    component: apps/venue-staff-app/src/routes/rentals/VoucherScanReservationRetrieval.tsx
+    component: src/routes/rentals/VoucherScanReservationRetrieval.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-545`, for the attendant at the rental counter. Decided 11 September
@@ -14627,7 +14627,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/checkout-readiness-validation-emp-073
-    component: apps/venue-staff-app/src/routes/rentals/CheckoutReadinessValidation.tsx
+    component: src/routes/rentals/CheckoutReadinessValidation.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-546`, for the attendant at the rental counter. Decided 11 September
@@ -14714,7 +14714,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/equipment-assignment-workspace-emp-074
-    component: apps/venue-staff-app/src/routes/rentals/EquipmentAssignmentWorkspace.tsx
+    component: src/routes/rentals/EquipmentAssignmentWorkspace.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-547`, for the attendant at the rental counter. Decided 11 September
@@ -14818,7 +14818,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/equipment-scan-validation-emp-075
-    component: apps/venue-staff-app/src/routes/rentals/EquipmentScanValidation.tsx
+    component: src/routes/rentals/EquipmentScanValidation.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-548`, for the attendant at the rental counter. Decided 11 September
@@ -14924,7 +14924,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/pre-rental-condition-inspection-emp-076
-    component: apps/venue-staff-app/src/routes/rentals/PreRentalConditionInspection.tsx
+    component: src/routes/rentals/PreRentalConditionInspection.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-549`, for the attendant at the rental counter. Decided 11 September
@@ -15024,7 +15024,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/safety-handover-checklist-emp-077
-    component: apps/venue-staff-app/src/routes/rentals/SafetyHandoverChecklist.tsx
+    component: src/routes/rentals/SafetyHandoverChecklist.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-550`, for the attendant at the rental counter. Decided 11 September
@@ -15123,7 +15123,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/deposit-financial-handover-validation-emp-078
-    component: apps/venue-staff-app/src/routes/rentals/DepositFinancialHandoverValidation.tsx
+    component: src/routes/rentals/DepositFinancialHandoverValidation.tsx
     status: notStarted
   density: comfortable
   notes: 'The staff-app form of `BO-551`, for the attendant at the rental counter. Decided 11 September
@@ -15226,7 +15226,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/group-multi-item-checkout-emp-079
-    component: apps/venue-staff-app/src/routes/rentals/GroupMultiItemCheckout.tsx
+    component: src/routes/rentals/GroupMultiItemCheckout.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-552`, for the attendant at the rental counter. Decided 11 September
@@ -15322,7 +15322,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/checkout-confirmation-rental-activation-emp-080
-    component: apps/venue-staff-app/src/routes/rentals/CheckoutConfirmationRentalActivation.tsx
+    component: src/routes/rentals/CheckoutConfirmationRentalActivation.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-553`, for the attendant at the rental counter. Decided 11 September
@@ -15403,7 +15403,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/active-rental-operations-command-center-emp-081
-    component: apps/venue-staff-app/src/routes/rentals/ActiveRentalOperationsCommandCenter.tsx
+    component: src/routes/rentals/ActiveRentalOperationsCommandCenter.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-554`, for the attendant at the rental counter. Decided 11 September
@@ -15579,7 +15579,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/active-rental-detail-live-timeline-emp-082
-    component: apps/venue-staff-app/src/routes/rentals/ActiveRentalDetailLiveTimeline.tsx
+    component: src/routes/rentals/ActiveRentalDetailLiveTimeline.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-555`, for the attendant at the rental counter. Decided 11 September
@@ -15666,7 +15666,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/rental-extension-request-emp-083
-    component: apps/venue-staff-app/src/routes/rentals/RentalExtensionRequest.tsx
+    component: src/routes/rentals/RentalExtensionRequest.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-556`, for the attendant at the rental counter. Decided 11 September
@@ -15789,7 +15789,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/extension-pricing-confirmation-emp-084
-    component: apps/venue-staff-app/src/routes/rentals/ExtensionPricingConfirmation.tsx
+    component: src/routes/rentals/ExtensionPricingConfirmation.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-557`, for the attendant at the rental counter. Decided 11 September
@@ -15889,7 +15889,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/equipment-swap-replacement-emp-085
-    component: apps/venue-staff-app/src/routes/rentals/EquipmentSwapReplacement.tsx
+    component: src/routes/rentals/EquipmentSwapReplacement.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-558`, for the attendant at the rental counter. Decided 11 September
@@ -15984,7 +15984,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/rental-incident-operational-exception-emp-086
-    component: apps/venue-staff-app/src/routes/rentals/RentalIncidentOperationalException.tsx
+    component: src/routes/rentals/RentalIncidentOperationalException.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-559`, for the attendant at the rental counter. Decided 11 September
@@ -16070,7 +16070,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/due-soon-customer-notification-management-emp-087
-    component: apps/venue-staff-app/src/routes/rentals/DueSoonCustomerNotificationManagement.tsx
+    component: src/routes/rentals/DueSoonCustomerNotificationManagement.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-560`, for the attendant at the rental counter. Decided 11 September
@@ -16151,7 +16151,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/overdue-rental-management-emp-088
-    component: apps/venue-staff-app/src/routes/rentals/OverdueRentalManagement.tsx
+    component: src/routes/rentals/OverdueRentalManagement.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-561`, for the attendant at the rental counter. Decided 11 September
@@ -16243,7 +16243,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/active-group-rental-management-emp-089
-    component: apps/venue-staff-app/src/routes/rentals/ActiveGroupRentalManagement.tsx
+    component: src/routes/rentals/ActiveGroupRentalManagement.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-562`, for the attendant at the rental counter. Decided 11 September
@@ -16330,7 +16330,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/active-rental-intelligence-operational-alerts-emp-090
-    component: apps/venue-staff-app/src/routes/rentals/ActiveRentalIntelligenceOperationalAlerts.tsx
+    component: src/routes/rentals/ActiveRentalIntelligenceOperationalAlerts.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-563`, for the attendant at the rental counter. Decided 11 September
@@ -16432,7 +16432,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/rental-return-command-center-emp-091
-    component: apps/venue-staff-app/src/routes/rentals/RentalReturnCommandCenter.tsx
+    component: src/routes/rentals/RentalReturnCommandCenter.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-564`, for the attendant at the rental counter. Decided 11 September
@@ -16619,7 +16619,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/return-scan-rental-retrieval-emp-092
-    component: apps/venue-staff-app/src/routes/rentals/ReturnScanRentalRetrieval.tsx
+    component: src/routes/rentals/ReturnScanRentalRetrieval.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-565`, for the attendant at the rental counter. Decided 11 September
@@ -16707,7 +16707,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/return-summary-actual-return-time-emp-093
-    component: apps/venue-staff-app/src/routes/rentals/ReturnSummaryActualReturnTime.tsx
+    component: src/routes/rentals/ReturnSummaryActualReturnTime.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-566`, for the attendant at the rental counter. Decided 11 September
@@ -16803,7 +16803,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/post-rental-condition-inspection-emp-094
-    component: apps/venue-staff-app/src/routes/rentals/PostRentalConditionInspection.tsx
+    component: src/routes/rentals/PostRentalConditionInspection.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-567`, for the attendant at the rental counter. Decided 11 September
@@ -16897,7 +16897,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/before-vs-after-condition-comparison-emp-095
-    component: apps/venue-staff-app/src/routes/rentals/BeforeVsAfterConditionComparison.tsx
+    component: src/routes/rentals/BeforeVsAfterConditionComparison.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-568`, for the attendant at the rental counter. Decided 11 September
@@ -16995,7 +16995,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/damage-assessment-charge-workflow-emp-096
-    component: apps/venue-staff-app/src/routes/rentals/DamageAssessmentChargeWorkflow.tsx
+    component: src/routes/rentals/DamageAssessmentChargeWorkflow.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-569`, for the attendant at the rental counter. Decided 11 September
@@ -17090,7 +17090,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/partial-return-missing-equipment-emp-097
-    component: apps/venue-staff-app/src/routes/rentals/PartialReturnMissingEquipment.tsx
+    component: src/routes/rentals/PartialReturnMissingEquipment.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-570`, for the attendant at the rental counter. Decided 11 September
@@ -17187,7 +17187,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/late-fees-damage-fees-final-settlement-emp-098
-    component: apps/venue-staff-app/src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx
+    component: src/routes/rentals/LateFeesDamageFeesFinalSettlement.tsx
     status: notStarted
   density: comfortable
   notes: 'The staff-app form of `BO-571`, for the attendant at the rental counter. Decided 11 September
@@ -17290,7 +17290,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/deposit-release-capture-customer-confirmation-emp-099
-    component: apps/venue-staff-app/src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx
+    component: src/routes/rentals/DepositReleaseCaptureCustomerConfirmation.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-572`, for the attendant at the rental counter. Decided 11 September
@@ -17400,7 +17400,7 @@ screens:
   implementation:
     app: venue-staff-app
     route: /rentals/return-completion-equipment-disposition-emp-100
-    component: apps/venue-staff-app/src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx
+    component: src/routes/rentals/ReturnCompletionEquipmentDisposition.tsx
     status: notStarted
   density: comfortable
   notes: The staff-app form of `BO-573`, for the attendant at the rental counter. Decided 11 September

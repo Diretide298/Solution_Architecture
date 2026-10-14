@@ -1,0 +1,52 @@
+id: CHG-RPO-002
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'Every screen on a platform with a GitLab repository names its component where that repository''s profile
+  puts it, relative to the repository''s root (src/routes/<area>/<Component>.tsx, src/screens/... in the guest app),
+  not under the old one-workspace folder apps/<app>/. The paths are generated from the profile by
+  tools/apply-repo-layout.py, and every generator that writes a component path goes through the same rule.'
+decision:
+  what: 'tools/frontend_repos.py component_path() is the generator rule: `<screensDir>/<area>/<Component>.tsx` from
+    the platform''s profile (CHG-RPO-001), the tail read from whichever layout wrote the old path; a platform with no
+    repository keeps its authored path. tools/apply-repo-layout.py applies it line by line to the
+    `implementation.component` lines of screens/P*.yaml (1,935 screens: P01 50, P02 77, P04 32, P05 17, P06 96,
+    P08 1,663; nothing else in the files moves). derive-pack-screens.py writes new screens'' paths through it;
+    check-frontend holds a repository platform''s screens to it instead of apps/<app>/src/routes/; check-frontend-
+    repos FR-OLD-PATH now also reports a screen not where its profile puts it.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Class check-frontend-repos/FR-OLD-PATH (CHG-SWP-003): 1,935 findings before, 0 after. Evidence (outside git,
+  rule 12): classes.json of the audit run audit-1014 (972 Block A tickets, 443 due by 28 October). #27741 problem 3: ADAM
+  served GST-073 as apps/guest-app/src/routes/account/SecuritySignIn.tsx, a folder of the Nx/pnpm workspace the
+  guest app''s repository is not (a single React Native CLI app with src/ at its root). Ruling (triage.py): component
+  paths follow each repository''s observed layout, generated from a per-repository profile, not by hand.'
+keys_touched:
+  screens:
+  - every screen of P01, P02, P04, P05, P06 and P08 (implementation.component only)
+  files:
+  - tools/frontend_repos.py
+  - tools/apply-repo-layout.py
+  - tools/derive-pack-screens.py
+  - tools/check-frontend.py
+  - tools/check-frontend-repos.py
+  - tools/refresh.sh
+  other:
+  - FR-OLD-PATH
+root_class: A05 STARTER-APPS
+tickets:
+  started: []
+  unstarted:
+  - 887 Block A tickets linked to a changed screen (388 frontend), all New on 14 October; list in the batch hand-back
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-frontend-repos.py
+status: open
+notes: 'Batch RPO (Block A audit), 14 October 2026. The five repositories not read keep the package''s app folder at
+  their root (src/routes/...), assumed; the guest app''s screens folder (src/screens) is assumed too. When an owner
+  confirms or corrects a profile, run tools/apply-repo-layout.py --setup and re-derive the ticket text; the check
+  fails until then. Platforms with no repository (P07, P09 to P17) keep apps/<app>/... for the one-workspace starter.'
