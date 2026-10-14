@@ -278,8 +278,12 @@ def main() -> int:
             guard.add("S-NO-READ", sid, f"{sid}: edits a record ({', '.join(sorted(methods))}) and reads nothing")
         # --- R288 asynchronous operations ------------------------------------------------------
         gets = {o for o, f in facts.items() if f and f["method"] == "get"}
+        # A shell beacon sent in the background (an append-only batch of events, `record...Events`) has nothing to
+        # follow (Block A audit, 14 October 2026, CHG-SCR-011); every other 202 still needs its read.
+        beacons = {a["operationId"] for a in apis if a.get("trigger") == "background"
+                   and re.match(r"^record\w*Events$", a["operationId"])}
         for o, f in facts.items():
-            if f and "202" in {str(k) for k in (f["op"].get("responses") or {})}:
+            if f and o not in beacons and "202" in {str(k) for k in (f["op"].get("responses") or {})}:
                 same = {x for x in gets if ops[x]["contract"] == f["contract"]}
                 if not same:
                     guard.add("S-ASYNC-POLL", f"{sid}:{o}",

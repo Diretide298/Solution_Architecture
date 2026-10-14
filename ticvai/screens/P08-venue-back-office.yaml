@@ -32431,6 +32431,12 @@ screens:
     trigger: onAction
     invalidates:
     - listCampaigns
+  - operationId: getReportExecution
+    contract: reporting
+    purpose: 'Follows runReport (202) until what it started settles: Execution status, and where its result
+      is'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   entryState:
     params:
     - name: venueId
@@ -92547,6 +92553,10 @@ screens:
     directory — it is settings, not a population
   purpose: Allow AI to analyze the complete configuration and identify missing, inconsistent, or potentially
     incorrect settings before formal go-live validation.
+  division: 'Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-606, BO-607, BO-608, BO-609, BO-610,
+    BO-611, BO-612; this screen is Configuration Health & AI Review (pack Subscription_Licensing_AI_Self_Service.pdf,
+    board 7.9, page 91): allow AI to analyze the complete configuration and identify missing, inconsistent,
+    or potentially incorrect settings before formal go-live validation.'
   layout:
     template: form
     regions:
@@ -92583,6 +92593,12 @@ screens:
     provenance: board reading, 19 September 2026
     invalidates: &id008
     - getGoLiveReadiness
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: 'Follows runGoLiveValidation (202) until what it started settles: Everything that must pass
+      before a tenant can sell'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-603
@@ -92911,6 +92927,11 @@ screens:
   purpose: 'Automatically create the correct testing plan based on what the customer has actually purchased
     and configured. For example, if the customer purchased: Ticketing POS B2C B2B Access Control the system
     automatically creates the relevant validation plan.'
+  division: 'Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-607, BO-608, BO-609, BO-610,
+    BO-611, BO-612; this screen is Automated Validation Plan (pack Subscription_Licensing_AI_Self_Service.pdf,
+    board 8.2, page 98): automatically create the correct testing plan based on what the customer has
+    actually purchased and configured. For example, if the customer purchased: Ticketing POS B2C B2B Access
+    Control the system automatically creates the relevant validation plan.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -92952,6 +92973,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id008
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: 'Follows runGoLiveValidation (202) until what it started settles: Everything that must pass
+      before a tenant can sell'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-606
@@ -92995,6 +93022,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Validate that configured products can actually operate correctly.
+  division: 'Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-608, BO-609, BO-610,
+    BO-611, BO-612; this screen is Ticketing & Product Validation (pack Subscription_Licensing_AI_Self_Service.pdf,
+    board 8.3, page 99): validate that configured products can actually operate correctly.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -93036,6 +93066,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id008
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: 'Follows runGoLiveValidation (202) until what it started settles: Everything that must pass
+      before a tenant can sell'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-607
@@ -93079,6 +93115,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Test the real customer transaction journey across each activated sales channel.
+  division: 'Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-607, BO-609, BO-610,
+    BO-611, BO-612; this screen is End-to-End Sales Channel Testing (pack Subscription_Licensing_AI_Self_Service.pdf,
+    board 8.4, page 100): test the real customer transaction journey across each activated sales channel.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -93120,6 +93159,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id008
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: 'Follows runGoLiveValidation (202) until what it started settles: Everything that must pass
+      before a tenant can sell'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-608
@@ -93164,6 +93209,10 @@ screens:
     rather than passed off as a decision'
   purpose: Confirm that payment, taxation, refunds, and financial configuration work before accepting
     real customer money.
+  division: 'Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-607, BO-608, BO-610,
+    BO-611, BO-612; this screen is Payment & Financial Validation (pack Subscription_Licensing_AI_Self_Service.pdf,
+    board 8.5, page 101): confirm that payment, taxation, refunds, and financial configuration work before
+    accepting real customer money.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -93205,6 +93254,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id008
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: 'Follows runGoLiveValidation (202) until what it started settles: Everything that must pass
+      before a tenant can sell'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-609
@@ -93248,6 +93303,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Validate the complete journey from ticket creation to physical admission.
+  division: 'Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-607, BO-608, BO-609,
+    BO-611, BO-612; this screen is Ticket, QR & Access Validation (pack Subscription_Licensing_AI_Self_Service.pdf,
+    board 8.6, page 102): validate the complete journey from ticket creation to physical admission.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -93289,6 +93347,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id008
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: 'Follows runGoLiveValidation (202) until what it started settles: Everything that must pass
+      before a tenant can sell'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-610
@@ -93332,6 +93396,9 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Verify that the environment is technically and operationally secure before launch.
+  division: 'Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-607, BO-608, BO-609,
+    BO-610, BO-612; this screen is User, Security & Integration Validation (pack Subscription_Licensing_AI_Self_Service.pdf,
+    board 8.7, page 103): verify that the environment is technically and operationally secure before launch.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -93383,6 +93450,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id008
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: 'Follows runGoLiveValidation (202) until what it started settles: Everything that must pass
+      before a tenant can sell'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-611
@@ -93426,6 +93499,10 @@ screens:
     display directory, no configuration directory. It falls to the default, and the fallback is recorded
     rather than passed off as a decision'
   purpose: Ensure that the customer receives the correct information throughout the booking journey.
+  division: 'Shares `getGoLiveReadiness`, `runGoLiveValidation` with BO-603, BO-606, BO-607, BO-608, BO-609,
+    BO-610, BO-611; this screen is Communication & Customer Journey Validation (pack Subscription_Licensing_AI_Self_Service.pdf,
+    board 8.8, page 104): ensure that the customer receives the correct information throughout the booking
+    journey.'
   gaps:
   - operation: null
     why: '**The pack gives this screen nothing that can be drawn.** Its sections are prose — purpose,
@@ -93467,6 +93544,12 @@ screens:
     trigger: onAction
     provenance: board reading, 19 September 2026
     invalidates: *id008
+  - operationId: getGoLiveReadiness
+    contract: subscription
+    purpose: 'Follows runGoLiveValidation (202) until what it started settles: Everything that must pass
+      before a tenant can sell'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-612
@@ -109766,6 +109849,12 @@ screens:
     purpose: Propose a lookalike segment from a seed segment or list, as rules to save
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listProposedActions
+    contract: ai
+    purpose: 'Follows decideProposedAction (202) until what it started settles: What the assistant has
+      proposed and nobody has decided'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-762
@@ -113372,6 +113461,12 @@ screens:
     purpose: Draft other languages of a message template (any channel) for review
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: listProposedActions
+    contract: ai
+    purpose: 'Follows decideProposedAction (202) until what it started settles: What the assistant has
+      proposed and nobody has decided'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-793
@@ -145835,6 +145930,12 @@ screens:
     purpose: Drill down
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getReportExecution
+    contract: reporting
+    purpose: 'Follows runReport (202) until what it started settles: Execution status, and where its result
+      is'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1059
@@ -145944,6 +146045,12 @@ screens:
     purpose: Export it
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: getReportExport
+    contract: reporting
+    purpose: 'Follows exportReportResult (202) until what it started settles: Export status and download
+      link'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1060
@@ -147119,6 +147226,12 @@ screens:
     purpose: Promote configuration
     trigger: onAction
     provenance: board reading, 19 September 2026
+  - operationId: listProfileDeployments
+    contract: tenancy
+    purpose: 'Follows deployConfigurationProfile (202) until what it started settles: Recent deployments,
+      with a date, a target and an outcome'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#bo-1068
@@ -209317,6 +209430,12 @@ screens:
     purpose: The files and feeds reconciliation is run against
     trigger: onLoad
     provenance: wiring fix, 2 October 2026 (CHG-WIR-025)
+  - operationId: getSettlement
+    contract: finance
+    purpose: 'Follows ingestSettlementFile (202) until what it started settles: Settlement detail with
+      match results'
+    trigger: onInterval
+    provenance: 'Block A audit, 14 October 2026: the read that follows a 202 (CHG-SCR-011)'
   wireframe:
     status: notStarted
     board: wireframes/P08 Venue Management.dc.html#adm-620

@@ -650,6 +650,44 @@ def fix_button_form(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
                           f"collects nowhere (client-approved UI)"))
 
 
+# ── S-ASYNC-POLL ────────────────────────────────────────────────────────────────────────────────
+# An operation that answers 202 has started something the screen must follow. The read that follows it is the GET of
+# the same contract returning the schema the 202 carries (one record before a list); it is declared `onInterval`
+# (a poll, invisible). A shell beacon (background) has nothing to follow. Where the contract has no such read, the
+# member is reported as a contract gap.
+
+def fix_async(s: dict, ops: dict, log: list, keeps: list, **_) -> None:
+    known = {a["operationId"]: a for a in apis(s) if a["operationId"] in ops}
+    for o, a in list(known.items()):
+        f = ops[o]
+        resp = f["op"].get("responses") or {}
+        if "202" not in {str(k) for k in resp} or a.get("trigger") == "background":
+            continue
+        if any(ops[x]["method"] == "get" and ops[x]["contract"] == f["contract"] for x in known):
+            continue
+        r202 = json.dumps(resp.get("202") or resp.get(202), default=str)
+        refs = set(re.findall(r"#/components/schemas/(\w+)", r202))
+        cands = []
+        for x, h in ops.items():
+            if h["contract"] == f["contract"] and h["method"] == "get" and refs:
+                rr = json.dumps({c: v for c, v in (h["op"].get("responses") or {}).items() if str(c).startswith("2")},
+                                default=str)
+                if refs & set(re.findall(r"#/components/schemas/(\w+)", rr)):
+                    cands.append(x)
+        cands.sort(key=lambda x: (not x.startswith("get"), x))
+        if not cands:
+            keeps.append((s["id"], "S-ASYNC-POLL", f"{o} answers 202 and the {f['contract']} contract has no read of "
+                          f"what it starts (a contract gap)"))
+            continue
+        poll = cands[0]
+        s.setdefault("apis", []).append({
+            "operationId": poll, "contract": ops[poll]["contract"],
+            "purpose": f"Follows {o} (202) until what it started settles: {summary(ops, poll)}",
+            "trigger": "onInterval", "provenance": f"{STAMP}: the read that follows a 202 (CHG-SCR-011)"})
+        known[poll] = s["apis"][-1]
+        log.append(f"{s['id']}: polls {poll} after {o}")
+
+
 STEPS = {
     "S-PURPOSE-BOILERPLATE": fix_screen_purpose,
     "S-PURPOSE-TEMPLATE": fix_api_purpose,
@@ -659,6 +697,7 @@ STEPS = {
     "S-NO-READ": fix_no_read,
     "S-DUP-REGION": fix_dup_regions,
     "S-OP-UNREACHED": fix_unreached,
+    "S-ASYNC-POLL": fix_async,
     "S-BUTTON-FORM": fix_button_form,
     "S-DUP-SCREEN": fix_division,
 }

@@ -1,0 +1,49 @@
+id: CHG-SCR-011
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: 'A screen calling an operation that answers 202 polls the read that follows what it started (declared
+  onInterval), by a deriver on the refresh; a background event beacon has nothing to follow.'
+decision:
+  what: 'tools/derive-screen-wiring.py gains rule S-ASYNC-POLL (fix_async): the GET of the same contract that returns
+    the schema the 202 carries (one record before a list) is declared `onInterval`, purpose "Follows <op> (202) until
+    what it started settles". tools/check-screen-wiring.py S-ASYNC-POLL exempts a background `record...Events` beacon
+    (an append-only event batch; asked by the guest-screens batch), and stays strict for every other 202. The
+    contracts'' x-ticvai-consumed-by for the P08 polls is link-screens-contracts.py''s output, committed with the P08
+    screens. Invisible: a poll read (client-approved UI, Chinmay, 14 October 2026).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Audit finding, Block A audit of 14 October 2026 (R288): check-screen-wiring/S-ASYNC-POLL had 44 members
+  (evidence audit/ticvai/runs/audit-1014/classes.json, 125 Block A tickets). Default ruling (triage.py): "A 202
+  operation''s screen reads the job or record that follows it". After: 13 package-wide, each a contract gap the
+  deriver reports (no read of what the 202 starts: exportSubjectData, deleteGuestAccount, deployReaderConfiguration,
+  proposeMarketingContent, createForecastScenario, submitChargebackEvidence, createApprovalEvidencePackage,
+  analyseMediaAsset). 6 beacon members cleared by the exemption, 25 by polls.'
+keys_touched:
+  files:
+  - tools/derive-screen-wiring.py
+  - tools/check-screen-wiring.py
+  - screens/P08-venue-back-office.yaml
+  - contracts/satellite/ai.yaml
+  - contracts/satellite/reporting.yaml
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/tenancy.yaml
+  screens:
+  - P08 on this branch; the other platforms at the refresh
+  other:
+  - S-ASYNC-POLL
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - the Block A screen tickets in the batch's impact list (hand-back)
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/derive-screen-wiring.py::fix_async
+status: open
+notes: Batch SCR, 14 October 2026.

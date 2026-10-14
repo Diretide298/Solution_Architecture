@@ -949,6 +949,8 @@ paths:
     get:
       operationId: getReportExecution
       x-ticvai-consumed-by:
+        - "P08 BO-1059 Heat Maps & Drill-Down"
+        - "P08 BO-118 Campaign & Audience Management"
         - "P16 ANL-039 Report Preview, Test & Validation"
       x-ticvai-audience:
       - staff
@@ -1297,6 +1299,7 @@ paths:
     get:
       operationId: getReportExport
       x-ticvai-consumed-by:
+        - "P08 BO-1060 Report Builder, Export & Audit"
         - "P16 ANL-045 Export & Download Center"
       x-ticvai-audience:
       - staff
