@@ -455,7 +455,14 @@ def diff(area: str, old: Model, new: Model, renames: dict | None = None) -> Plan
                     p.rollback.append(f"ALTER TABLE {t} DROP COLUMN IF EXISTS {c};")
                     p.counts["columns"] += 1
                     new_cols.setdefault(t, set()).add(c)
-                    if add != d:
+                    if add != d and c == "scope_path":
+                        # CHG-GEN-008: a row with no scope_path is invisible to every grant once the table's policy reads
+                        # it, so the backfill is due in the same release as the column, not later.
+                        review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL, and row-"
+                               "level security reads it", "backfill each row's owning path in the forward migration "
+                               "that adds it (a row with a null scope_path is invisible to every grant), then ALTER "
+                               "COLUMN ... SET NOT NULL")
+                    elif add != d:
                         review("not null", f"{t}.{c}", "added nullable; the schema reference says NOT NULL",
                                "backfill, then ALTER COLUMN ... SET NOT NULL in a forward migration")
                 elif a.cols[c] != d and (t, c) not in old.handled:
