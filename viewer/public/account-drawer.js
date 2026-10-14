@@ -65,7 +65,7 @@ const BELL_HTML = `
       Mark all read
     </button>
     <a class="auth-button auth-button-quiet" href="/reviews.html">
-      All review activity
+      Open Reviews
     </a>
   </div>
 </div>`;
