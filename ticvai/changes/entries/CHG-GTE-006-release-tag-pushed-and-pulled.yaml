@@ -1,0 +1,40 @@
+id: CHG-GTE-006
+date: '2026-10-14'
+source: audit
+kind: process
+summary: 'A release is out only when ADAM serves it: the runbook pushes the tag by name to both remotes and the six
+  mirrors, checks the remotes have it, and ends with one adam_pull whose release must say r<N>; check-adam-latest-release
+  holds the runbook to that and, with --remotes, compares the newest tag with origin and github.'
+decision:
+  what: 'docs/active/release-runbook.md step 5: "git push origin main r<N>", then "git push github main r<N>", the same
+    in each of the six mirror repos, then "python3 tools/check-adam-latest-release.py --remotes"; step 6 ends with one
+    adam_pull of any ticket whose release must say r<N> (else git fetch --tags on the box and redeploy).
+    tools/check-adam-latest-release.py gains LR-TAG-PUSH (the runbook says both, read from its step 5 and the last
+    bullet of step 6) and LR-TAG-REMOTE (--remotes only: git ls-remote finds the newest local r<N> on origin and
+    github).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'PROCESS-LOG P-20 (audit/ticvai/PROCESS-LOG.md, 14 October 2026): the audit''s first test pull (#27741) said
+  "the latest release (r4)" a day after r5; the r5 tag was made locally and never pushed (a bare git push sends no
+  tag) and ADAM''s server knows only the tags it fetched. Its Open items were the runbook''s tag push and a closing
+  adam_pull. Follows CHG-ADM-001 (always the latest release). Finding count: 1 -> 0 (the runbook carried neither).'
+keys_touched:
+  files:
+  - docs/active/release-runbook.md
+  - tools/check-adam-latest-release.py
+root_class: 'new: RELEASE-DISTRIBUTION'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-adam-latest-release.py
+status: open
+notes: 'Batch GTE (audit/release-gate), 14 October 2026. What ADAM serves cannot be read offline, so the gate holds
+  the runbook text (LR-TAG-PUSH) and the remotes are compared on request (--remotes, network); the closing adam_pull
+  is the check on the server itself. Self-tested: LR-TAG-PUSH finds 3 on the audit-base runbook (no origin push, no
+  github push, no closing pull); --remotes passes today (r5 is on both). No ticket is affected.'

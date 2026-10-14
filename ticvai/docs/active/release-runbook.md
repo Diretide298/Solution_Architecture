@@ -39,8 +39,13 @@ The rule for agent edits:
 Once everything is green:
 1. Commit.
 2. `git tag r<N>` on the package **and** the six mirror repos.
-3. Push both remotes.
-4. Rebuild the setup zip from a clean HEAD.
+3. Push the branch **and the tag by name** to both remotes: `git push origin main r<N>`, then
+   `git push github main r<N>`; the same push of its branch and `r<N>` in each of the six mirror repos. A bare
+   `git push` sends no tag, and ADAM's server knows only the tags it fetched: r5 was tagged and never pushed, so
+   ADAM served r4 for a day after OpenProject said r5 (PROCESS-LOG P-20, 14 October 2026; CHG-GTE-006).
+4. `python3 tools/check-adam-latest-release.py --remotes`: it fails if the newest `r<N>` here is missing from
+   `origin` or `github`.
+5. Rebuild the setup zip from a clean HEAD.
 
 ## 6. Distribute
 - **OpenProject:** on the server, run `op-release-server.sh r<N>`: dry run, then `APPLY=1`. That one script:
@@ -65,6 +70,9 @@ Once everything is green:
 - **ADAM:** on the box, run `git pull` and deploy. ADAM serves `r<N>`, and every developer and agent is always
   on the latest release: their next `/ticket` is at `r<N>` and shows what changed since their previous pull.
 - **Client:** send the release note, `python tools/release-notes.py r<N-1> r<N>`: what their answers changed, and what is waiting on them.
+- **Last, one pull through ADAM:** once ADAM is deployed, run one `adam_pull` of any ticket. Its release must say
+  `r<N>`. If it names an older release, ADAM has not fetched the tag (on the box: `git fetch --tags`, then
+  deploy) and the release is not out yet (PROCESS-LOG P-20; CHG-GTE-006).
 
 ## 7. Re-audit, every release
 - Every check is green.
