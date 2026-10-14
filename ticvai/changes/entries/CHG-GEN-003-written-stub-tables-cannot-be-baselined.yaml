@@ -48,7 +48,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Intended to fail on this branch: D-STUB-TABLE reports the eight written stubs (marked NEW*) until batch CRD
   (cr/078-credentials-and-stubs: the credential, MFA, OTP, escalation, index-entry and credit-ledger tables) and

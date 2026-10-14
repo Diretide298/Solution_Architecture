@@ -54,7 +54,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-frontend-repos.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch RPO (Block A audit), 14 October 2026. Five repositories could not be read: the GitLab group''s projects
   are not visible to the access the package team holds, so their `observed:` records the refused clone, not a
   layout, and check-frontend-repos notes them on every run. Each owner confirms (or corrects) the profile and sets

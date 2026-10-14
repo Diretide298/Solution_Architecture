@@ -34,6 +34,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-error-sources.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch MOD, 14 October 2026. The lineage is derived: run tools/applied/mod-lineage-14-october.py --apply after
   derive-lineage --apply at the merge. Verified: E-UNFED 1 -> 0, check-write-lineage and check-states pass.'

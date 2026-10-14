@@ -38,7 +38,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SWP, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Run on the parent commit 594e51a2: 48 new findings, exit 1; on this branch 0 new, exit 0.
   S-OFFLINE-REFUSED 19 (P02 5, P04 10, P06 3, P07 1); S-OFFLINE-QUEUED 29 (P04 9, P06 13, P08 5 on BO-097 web, P15 2).

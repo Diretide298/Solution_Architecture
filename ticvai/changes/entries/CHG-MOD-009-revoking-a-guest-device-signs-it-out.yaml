@@ -57,7 +57,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-cross-deployable-writes.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch MOD, 14 October 2026. The 502 is additive (check-contract-compat passes). The guest sessions are in
   Identity''s session registry (GuestSession, persistence: Redis), with identity.guest_session the table the lineage
   names for them, as guestLogout''s does. A device registered without an installationId (an app that predates

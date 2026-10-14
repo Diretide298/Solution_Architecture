@@ -59,7 +59,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Run on the parent commit (r5, 1eb1d063) the check fails with 953 findings (944 XR-UNCOVERED, 9 XR-FOUNDATION) and no
   baseline; on this branch it fails only on exportSubjectData''s raw reads of access.entitlement and

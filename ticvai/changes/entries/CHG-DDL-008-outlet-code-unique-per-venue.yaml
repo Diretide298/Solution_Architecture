@@ -48,7 +48,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Lead to confirm: case-insensitive comparison (common.yaml''s rule for every x-ticvai-unique;
   GEN''s lower() rule makes the index (venue_id, lower(code))) against case-sensitive (option A as written). Contract

@@ -44,7 +44,8 @@ waivers:
 prevention:
   type: check
   ref: tools/check-ticket-links.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GT3 (r6 fix round 3). Follows CHG-GT1-004, whose notes already said these two would be retired at the
   apply. check-ticket-links notes the Block A tickets the last bundle cut that are no longer planned (op-retire closes
   or parks them).'

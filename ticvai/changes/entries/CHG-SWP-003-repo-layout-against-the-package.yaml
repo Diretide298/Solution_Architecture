@@ -42,7 +42,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-frontend-repos.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SWP, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Run on the parent commit 594e51a2: 1,941 findings, all new, exit 1; on this branch all
   known, exit 0. FR-OLD-PATH by platform: P01 50, P02 77, P04 32, P05 17, P06 96, P08 1,663 (every screen of the six

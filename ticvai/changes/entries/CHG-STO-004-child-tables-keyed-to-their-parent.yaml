@@ -42,7 +42,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Contract impact: MenuItem.menuSectionId is a readOnly field now always present (a response guarantee,
   no request changes). Migration effect: fnb.menu_item.menu_section_id NOT NULL is a "not null" row and its foreign key
   a "constraint added" row in handoff/migration-review.md (backfill from the section the item sits in); the policy swap

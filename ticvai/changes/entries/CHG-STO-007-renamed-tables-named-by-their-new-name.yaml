@@ -30,5 +30,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Contract impact: descriptions only. Migration effect: none.'

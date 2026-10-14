@@ -35,7 +35,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-stored-request-fields.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'derive-lineage now adds approvals.escalation to the reads of every operation that returns ApprovalRequest (and to
   the writes of createApprovalRequest, reopenApprovalRequest and resubmitApprovalRequest, whose bodies ref it); that is
   its additive ref-following rule, committed as it derived. Verified with derive-schema and derive-ddl --apply in the worktree

@@ -31,5 +31,6 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/adam-links.py::touches_from
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: ADAM loads adam-links.json at the release (viewer/api/load_links.py); no ADAM change is needed for features.

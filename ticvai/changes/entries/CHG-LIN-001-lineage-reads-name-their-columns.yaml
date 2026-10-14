@@ -57,7 +57,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-read-columns.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch LIN, 14 October 2026, branched from 2f2db2e0 (one viewer commit above r5 1eb1d063; nothing under
   ticvai/ differs). Released outside the Tue/Fri window by the lead''s waiver, 14 October 2026: "Release today as an
   exception." This completes the 12 October decision''s "A later". check-read-columns run on the parent commit (r5

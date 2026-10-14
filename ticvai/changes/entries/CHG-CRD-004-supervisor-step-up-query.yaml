@@ -54,7 +54,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: contracts/spine/identity.yaml::x-ticvai-queries
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'The read-ownership check that makes an undeclared cross-module read fail is batch GEN''s (x-ticvai-queries / x-ticvai-read-via
   support in derive-lineage and its check); this entry only writes the declarations. The new operation is not permission-gated
   (x-ticvai-permission null, x-ticvai-auth service, like issueOrderEntitlements); the permission it checks is an input from

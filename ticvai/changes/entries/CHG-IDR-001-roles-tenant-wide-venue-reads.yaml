@@ -68,7 +68,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-ddl.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
   IDR, branch cr/076-077-079-identity-roles. The prevention is batch GEN''s: the x-ticvai-rls rule in
   tools/derive-ddl.py (read-beneath / grant-holder-read) and its check joining an operation''s lineage scope level

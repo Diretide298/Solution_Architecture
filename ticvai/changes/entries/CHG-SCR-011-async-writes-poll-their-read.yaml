@@ -45,7 +45,8 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/derive-screen-wiring.py::fix_async
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. A poll that reads one record needs its id (check-screens'' entry-parameter rule):
   the deriver declares it optional on entry ("Optional: opened without it, <op> answers 202 with it and <poll> follows
   it"), the way screen_patterns.param_for writes an id the screen makes itself (BO-118, BO-1059 executionId, BO-1060

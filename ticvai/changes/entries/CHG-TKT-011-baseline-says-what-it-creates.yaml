@@ -28,5 +28,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'A started ticket''s OpenProject text is never rewritten: if 27646 is started it gets this through its CR comment.'

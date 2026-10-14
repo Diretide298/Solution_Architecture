@@ -44,8 +44,9 @@ decision_owner: Chinmay
 adam_cr: pending (raised at the r6 settlement)
 triage: fix-forward
 prevention:
-  type: generator-rule
-  ref: tools/derive-screen-wiring.py::fix_states
-status: open
+  type: check
+  ref: tools/check-screen-wiring.py::S-STATE-BOILERPLATE
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. The 16 keeps are listed by the deriver on every run. check-screen-wiring holds the
   class: once the lead re-records the baseline, a new member fails.'

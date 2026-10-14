@@ -34,6 +34,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/derive-screen-wiring.py::fix_incoming
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. W-NO-DESIGN is a keep by the lead''s decision (screens the prototype lacks are
   built from the screen YAML) and is untouched.'

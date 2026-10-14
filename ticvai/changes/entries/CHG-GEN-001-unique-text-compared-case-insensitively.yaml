@@ -54,7 +54,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   The databases already hold the 26 plain indexes (r1 910 and V0101/V0102); the forward migration replaces each
   (DROP INDEX, CREATE UNIQUE INDEX ... (lower(...))) since CHG-GEN-006 taught ddl_forward that change. If two rows

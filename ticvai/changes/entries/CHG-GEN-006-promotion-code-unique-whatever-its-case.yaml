@@ -37,7 +37,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Verified on this branch: derive-ddl --apply wrote V0104 with DROP INDEX IF EXISTS promotions.promotion_code_uniq and
   CREATE UNIQUE INDEX IF NOT EXISTS promotion_code_uniq ON promotions.promotion (lower(code)), 25 such swaps in the

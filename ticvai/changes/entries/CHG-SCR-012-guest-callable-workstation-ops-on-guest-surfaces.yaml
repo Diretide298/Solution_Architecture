@@ -33,6 +33,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. The remaining 34 are on platforms the audit/screens-other batch owns; whether the
   scanner and the partner portal sign a workstation in is a product question for the lead.'

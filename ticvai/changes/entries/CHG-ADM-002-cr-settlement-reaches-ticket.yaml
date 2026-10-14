@@ -58,7 +58,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-adam-cr-settlement.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   source is `cr`, the closest allowed value (the lead''s instruction). Details the decision left open, chosen here:
   (1) a rejection on a closed ticket gets a comment, not a ticket (nothing to build; ADAM''s ticket guard already

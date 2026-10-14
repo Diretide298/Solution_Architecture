@@ -60,7 +60,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Lead to confirm: a child table (chosen) against the CR''s jsonb column; both are additive and
   derivable (x-ticvai-persistence-column: jsonb on the property would give the column). Contract impact: none on the wire

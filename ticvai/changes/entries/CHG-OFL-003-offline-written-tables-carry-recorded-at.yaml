@@ -36,7 +36,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch OFL. On this branch derive-ddl numbered the file V0105 because V0104 is already committed; the lead''s
   r6 derive writes the seven ALTERs into r6''s forward migration (V0104). The derived files were restored before every
   commit. DepositBox already had allocatedAt (device time); recordedAt holds the same moment under the column every

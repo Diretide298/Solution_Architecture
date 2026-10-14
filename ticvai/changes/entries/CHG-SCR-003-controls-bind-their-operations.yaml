@@ -44,7 +44,8 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/derive-screen-wiring.py::fix_unreached
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. The keeps need a lead decision: either the client confirms the missing controls
   (the board draws them and the record does not list them yet), or the declarations go. Listed by the deriver
   (--only S-OP-UNREACHED --verbose).'

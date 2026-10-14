@@ -37,5 +37,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-binding-ratchet.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: Batch SCR, 14 October 2026. The lead records the lower counts with --update-baseline after the merge.

@@ -31,7 +31,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-stored-request-fields.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'tools/check-stored-request-fields.py was run on the parent commit 1eb1d063 (r5): it fails there with 20 new findings,
   among them SR-STUB-WRITE createPrincipal (initialCredential, mustChangeCredential) and SR-SECRET-UNHASHED createPrincipal.initialCredential;
   on this branch, after derive-schema, it passes (0 new, 22 known pre-existing findings baselined). Baselined (out of scope,

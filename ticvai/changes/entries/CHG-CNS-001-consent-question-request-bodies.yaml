@@ -61,7 +61,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-shapes.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
   CNS. Option A of the CR, the package''s own Create/Update split; lead to confirm two details chosen here: kind cannot
   change after create (the CR and CMS-018 both leave it out), and status is not sent on create (a question is created

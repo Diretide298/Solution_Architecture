@@ -45,7 +45,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Contract impact: x-ticvai extensions only. Migration effect: one CREATE UNIQUE INDEX per keyable rule
   in V0104 (lower(column), as common.yaml says); existing duplicates make it fail, which is the migration owner''s signal
   to merge them. retail.merchandise.barcode (venue) cannot be keyed: the table has neither venue_id nor scope_path (derive-ddl

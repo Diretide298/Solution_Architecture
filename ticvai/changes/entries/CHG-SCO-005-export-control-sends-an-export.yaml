@@ -31,6 +31,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCO, 14 October 2026. The x-ticvai-consumed-by lists of the two operations gain P11 ACC-008 at the next
   link-screens-contracts run (derived; not committed from the branch). ACC-008 is on no Block A ticket.'

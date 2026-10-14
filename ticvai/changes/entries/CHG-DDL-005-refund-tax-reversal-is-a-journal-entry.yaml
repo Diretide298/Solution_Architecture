@@ -41,7 +41,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Contract impact: additive (an x-ticvai extension; check-contract-compat PASS). Migration
   effect: MIG-ORDERS; one "constraint added" row in migration-review.md (refund_tax_reversal_entry_id_fkey: validate,

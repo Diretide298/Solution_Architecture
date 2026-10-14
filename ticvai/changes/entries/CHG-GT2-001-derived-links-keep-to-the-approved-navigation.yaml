@@ -51,7 +51,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-approved-ui.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GT2 (r6 gate fix round 2). The generator rule is tools/derive-carries-from-entrystate.py::approved_navigation.
   Carries stay invisible metadata: BO-086 -> BO-087 now carries matrixId, which check-approved-ui does not compare. A
   screen the snapshot does not have is not limited. The links never reached a ticket (r6 is not tagged); the tickets

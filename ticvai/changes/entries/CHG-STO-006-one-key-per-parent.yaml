@@ -34,7 +34,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Contract impact: none on the wire. Migration effect: two "column dropped" rows (platform.venue_settings.org_unit_id,
   platform.workstation.org_unit_id) and their foreign keys in handoff/migration-review.md: check no reader uses them, then
   the four-step drop.'

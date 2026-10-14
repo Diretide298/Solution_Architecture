@@ -39,6 +39,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. The derived division is a floor: where two screens are in fact one screen drawn
   twice, the lead and the client decide; the field says so in the meantime.'

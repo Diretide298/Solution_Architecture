@@ -35,6 +35,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Generator rule: tools/ticket_done.py::screen_calls. A screen that binds an operation outside its audience is a screen
   defect for AM-STAFF-OP / AM-GUEST-OP (batch SCR), not ticket scope.'

@@ -34,5 +34,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-navigation.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: Batch SCG, 14 October 2026. screens/_guest-pairs.yaml is untouched; a sanction is the lead's to write.

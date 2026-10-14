@@ -49,7 +49,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCG (screens, guest apps), 14 October 2026. For the lead: the removals leave these guest capabilities with
   no approved surface, which check-screens now warns about ("a guest may call it and no guest screen does"): a
   tracking-consent prompt and preference centre (tracking stays off until one is designed), wallet exit settlement,

@@ -31,7 +31,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-binding-ratchet.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Verified in w609: check-binding-ratchet passes, unbound-control 5196 -> 5195 overall,
   venue-pos A back to 26 (no count rose; 9 fell). The BO-053 listShifts table of CHG-R6G-006 is bound and adds none.'

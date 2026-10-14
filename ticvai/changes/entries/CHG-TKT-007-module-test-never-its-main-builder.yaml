@@ -46,7 +46,8 @@ waivers:
 prevention:
   type: check
   ref: tools/check-plan-owners.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Peers follow skill: the peer is whoever built the next most of the module in its stack. Plan change decided the
   day it was proposed: the lead''s words of 14 October 2026 on the audit''s rulings ("go with your recommendation"; r6 held
   so the audit''s fixes ship in it, BLOCK-A-AUDIT-PLAN-R6) are recorded as the cooling-off waiver; the lead confirms it

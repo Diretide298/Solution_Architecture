@@ -50,7 +50,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-ddl.py::RLS_MARKS
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Blocker: it blocks the 422 of createOutlet and updateOutlet on #30795. Verified on this branch: derive-schema, then
   derive-ddl --apply wrote into V0104 the column (added nullable), its GiST index and the swap to

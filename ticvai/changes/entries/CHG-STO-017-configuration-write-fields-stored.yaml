@@ -37,6 +37,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-request-fields-stored.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Contract impact: additive (x-ticvai extensions and readOnly response fields). Migration effect: each
   new field is a nullable ADD COLUMN in V0104.'

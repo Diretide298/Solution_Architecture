@@ -50,7 +50,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-error-sources.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch MOD, 14 October 2026. The vocabulary change only removes matches (no new finding can come of it); each
   phrase is one the audit found used for something other than the record, as the check''s own rule asks ("a word
   joins or leaves the list with the change that shows the need"). The transport refusals ("sold seats") ask

@@ -44,7 +44,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-adam-cr-settlement.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   A separate entry rather than folded into CHG-ADM-002, because it is a separate failure (the proxy) with its own
   route. The prevention is the CS-LINK rule added to tools/check-adam-cr-settlement.py (settle_changes.py

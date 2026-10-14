@@ -50,6 +50,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. BC-230 is in the SCR block (230-269). Whether these tickets have started is for the
   lead to confirm at the settlement; the plan shows them unstarted.'

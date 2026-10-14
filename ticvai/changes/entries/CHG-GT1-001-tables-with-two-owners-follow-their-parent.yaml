@@ -55,6 +55,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-rls-scope-fit.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GT1 (r6 gate fix round 1). V0104 is derived: deleted and re-derived (FINAL-DERIVE-CHECKLIST 5d), and a second
   derive writes nothing. 27668 and 27675 (Ready for QA) are the orders and seating migrations: a comment, not a rewrite.'

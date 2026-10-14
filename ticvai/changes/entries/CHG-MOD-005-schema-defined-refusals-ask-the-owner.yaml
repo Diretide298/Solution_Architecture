@@ -36,6 +36,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-error-sources.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch MOD, 14 October 2026. Verified: E-SCHEMA-READ-VIA 12 -> 0, 0 new; MUST_FIX (closeFiscalPeriod 409) still
   passes.'

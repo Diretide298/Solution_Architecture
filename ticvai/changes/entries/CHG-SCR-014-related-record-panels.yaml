@@ -35,7 +35,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. GST-073 needs from the contract (batch MOD): revokeGuestDevice ends every guest
   session and refresh token of that device, so the screen''s promise that revoking signs the device out holds, and the
   sessions panel shows none for a revoked device afterwards.'

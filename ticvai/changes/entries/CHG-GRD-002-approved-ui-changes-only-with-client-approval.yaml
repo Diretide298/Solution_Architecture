@@ -50,7 +50,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-approved-ui.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GRD (audit/gate-guards), 14 October 2026. The three offline-state changes stay strict findings until
   the lead decides: record the client''s approval in docs/active/approved-ui-changes.yaml (the check prints each
   `to` hash) or restore the approved text. Every screen counts as client-approved (the lead''s ruling covers the

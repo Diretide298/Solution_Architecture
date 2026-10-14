@@ -41,7 +41,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-links.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GRD (audit/gate-guards), 14 October 2026. adam-links.json is written per release (adam-links.py is a
   distribution tool, not run by refresh.sh), so the committed file stays the last release''s until the release runs it:
   the runbook''s section 4 now runs adam-links.py after the full refresh and before the gate. A planned Block A ticket

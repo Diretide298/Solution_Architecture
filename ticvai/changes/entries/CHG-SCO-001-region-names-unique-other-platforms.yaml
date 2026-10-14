@@ -35,7 +35,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCO (screens of P07, P09-P17), 14 October 2026. tools/render-screens.py (run by hand, not in the
   refresh) still collects body components by the name `contentBody`; batch SCR owns that rule. The Block A tickets
   of the changed screens are in the batch hand-back''s impact list.'

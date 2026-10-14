@@ -60,7 +60,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-request-fields-stored.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Verified with derive-schema and derive-ddl --apply (derived files restored): the forward migration adds
   platform.workstation.cashier_input_mode text DEFAULT ''hybrid'' with workstation_cashier_input_mode_chk and

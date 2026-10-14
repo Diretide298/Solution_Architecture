@@ -73,7 +73,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Contract impact: additive (x-ticvai extensions only; check-contract-compat PASS). Migration
   effect: one forward migration per schema, all listed in migration-review.md for a person: 20 "constraint added"

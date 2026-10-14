@@ -36,7 +36,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-shapes.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Run on the parent commit (r5, 1eb1d063) the tightened rule fails (41 new before the field forms were complete, 25
   with them); on this branch it fails only on listOwnPlatformStaffGrants and listPlatformStaffGrants, on purpose,

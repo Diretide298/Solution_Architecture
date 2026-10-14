@@ -40,7 +40,8 @@ waivers:
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'WHY NOT the other three (measured on this branch): BO-284 binds two Block B operations, and pulling it made a new
   Subscription & Licensing Block A completion app-module of 83 points and 30 tables that took Block B work (VM-LEDGER-LEDGER-2,
   MIG-CONTROL-19) and moved VM-LEDGER-FISCAL-1 off #28411 (In progress); ADM-098 (listPricing) and ADM-258 (listSaleChannel)

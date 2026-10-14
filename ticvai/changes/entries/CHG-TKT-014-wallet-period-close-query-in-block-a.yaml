@@ -46,7 +46,8 @@ waivers:
 prevention:
   type: generator-rule
   ref: tools/build-service-docs.py::readViaBuiltWith
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: '28411 is started: it gets this as a CR comment (rule 7). shift#unclosedShiftsInPeriod and approvals#approvalRequirement
   have no readViaBuiltWith entry yet (both owners are Block A already). Plan change decided the day it was proposed: the
   lead''s words of 14 October 2026 on the audit''s rulings ("go with your recommendation"; r6 held so the audit''s fixes

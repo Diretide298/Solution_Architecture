@@ -34,6 +34,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/derive-screen-wiring.py::fix_dup_regions
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. The ruling said rename the second; the last keeps the name instead so that no
   drawn wireframe changes.'

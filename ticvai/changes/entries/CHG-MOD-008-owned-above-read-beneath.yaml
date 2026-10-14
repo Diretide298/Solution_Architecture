@@ -39,7 +39,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-rls-scope-fit.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch MOD, 14 October 2026. For the lead: read-beneath on ledger.legal_entity (read at region by
   closeFiscalPeriod, runFxRevaluation and getVatReturn and at venue by issueTaxInvoice) also opens, for reading, the
   tables that follow it by key (ledger.account, fiscal_period, fiscal_period_event, journal_entry), as CHG-GEN-005

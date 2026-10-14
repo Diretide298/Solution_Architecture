@@ -27,6 +27,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: 'tools/derive-schema.py::_SCALAR_ARRAY'
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Migration effect: assets.media_fingerprint.embedding text[] -> numeric[] is a "column changed" row in
   handoff/migration-review.md (ALTER COLUMN ... TYPE numeric[] USING embedding::numeric[]).'

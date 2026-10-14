@@ -39,6 +39,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GT2 (r6 gate fix round 2). 27677 (Ready for QA) is the marketing migration: a comment, not a rewrite;
   the key ships in V0104, a forward migration.'

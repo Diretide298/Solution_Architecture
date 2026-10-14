@@ -41,7 +41,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-shapes.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SHP (audit/contract-shapes). Tickets: the Block A tickets (OpenProject ids) whose operations this
   changed, producers and the screens that call them; started/unstarted by their cached status in
   handoff/service-docs/adam-links.json. Re-derive with the full refresh the lead runs.'

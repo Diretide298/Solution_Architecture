@@ -39,6 +39,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-key-stability.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: SVC-CATALOGUE-CATALOGUE-11 (4 operations) and SVC-CATALOGUE-DRAFTED-10 (4) move from Block B to Block A under AM-SETUP-TICKETING-GUEST-COMMERCE-P08-REST
   (the pushed task follows its earliest block, CHG-R6-054).

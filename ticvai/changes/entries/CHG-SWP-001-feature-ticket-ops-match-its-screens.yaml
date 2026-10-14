@@ -44,7 +44,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-scope.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SWP, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Run on the parent commit 594e51a2 with the gate''s derived plan (w146): the two rules find
   704 findings, every one new, so the check fails there; on this branch the 700 are known and only the four strict

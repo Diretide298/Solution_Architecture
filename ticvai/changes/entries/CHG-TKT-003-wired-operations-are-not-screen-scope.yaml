@@ -43,5 +43,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-scope.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: No ticket text changes. If the lead wants the waits after all, it is a plan change (CHG-R4-003 reversed).

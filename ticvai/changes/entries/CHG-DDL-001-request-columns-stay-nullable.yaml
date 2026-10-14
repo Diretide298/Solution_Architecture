@@ -47,7 +47,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Contract impact: none (no contract file changed). Migration effect: none to write;
   MIG-ORDERS keeps cashier_reason nullable as built, and the r4 "not null" row disappears from migration-review.md.

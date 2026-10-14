@@ -60,7 +60,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-deployable-writes.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch XDW, 14 October 2026. The lead''s words: asked "Remove them now ?" on 14 October 2026. Released outside
   the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Prevention is the existing
   check-cross-deployable-writes, which failed these X-EXPIRED and fails X-UNROUTED on any cross-deployable write

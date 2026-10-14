@@ -82,7 +82,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-shapes.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
   IDR. New rule C-SEGREGATION-409 in check-contract-shapes (registered in run-checks.py already): a POST, PUT or PATCH
   whose description names `SegregationRule` must declare a 409 listing segregation-breach, and no response may carry

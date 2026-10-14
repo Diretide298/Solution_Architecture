@@ -36,6 +36,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/adam-links.py::touches_from
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: Needs an ADAM deploy for the `file` kind (viewer change on this branch). SVC-CATALOGUE-DRAFTED-3 (#28267) links nothing
   because op-retire closes it (out of the plan); it is not one of the 29.

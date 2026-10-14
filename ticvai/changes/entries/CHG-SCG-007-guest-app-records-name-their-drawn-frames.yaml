@@ -29,5 +29,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-wireframe-coverage.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: Batch SCG, 14 October 2026. W-NO-DESIGN stays a keep (screens the prototype lacks are built from the YAML).

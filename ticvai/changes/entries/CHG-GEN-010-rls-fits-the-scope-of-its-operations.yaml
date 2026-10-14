@@ -42,7 +42,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-rls-scope-fit.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Derive before check: the check reads the forward migration, so it is run after derive-ddl. On the parent commit
   (r5, 1eb1d063) it fails with 1,084 findings (953 RF-TENANT-ROOT, 131 RF-OWNED-ABOVE). Baselined at the gate''s

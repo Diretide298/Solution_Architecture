@@ -45,7 +45,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-shapes.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
   MKT, branch cr/086-088-guest-devices from r6-integrate 594e51a2. The order follows IDR''s wording for CR-077
   ("Ordered by `<field>` ..., `id` as the tiebreak"). Chosen (lead to confirm): the CR''s recommendation A, every

@@ -69,7 +69,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-rls-scope-fit.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch MOD, 14 October 2026. Derive before check: derive-schema, derive-read-columns --apply and derive-ddl
   --apply write the 42 scope_path columns, their indexes, the new helper and 129 policy swaps into the next forward
   migration (V0105 on this branch; derived, not committed), with each backfill named in handoff/migration-review.md

@@ -82,7 +82,8 @@ waivers:
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: Batch GT1. The six were on unpushed tasks (SVC-IDENTITY-IDENTITY-13, SVC-CROSSREGION-CROSS-REGION-2, SVC-MARKETING-MESSAGE-8
   took only sendTransactionalMessage off a Block D task); the plan now builds them in Block A completion app-modules (new
   keys at the next apply). verifySupervisorStepUp, the fourth operation of SVC-IDENTITY-IDENTITY-13, has no caller and stays

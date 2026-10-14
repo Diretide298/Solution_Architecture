@@ -29,5 +29,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-starter-fit.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: Needs the setup zip rebuilt from a clean HEAD and an ADAM deploy (viewer change on this branch).

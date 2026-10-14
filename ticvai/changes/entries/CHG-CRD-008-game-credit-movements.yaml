@@ -34,7 +34,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-stored-request-fields.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Verified with derive-schema and derive-ddl --apply in the worktree (generated tables read in V0104 and handoff/migration-review.md,
   then restored): the new columns are additive in the next forward migration; NOT NULL on new columns and the nullability
   changes on existing ones are listed in migration-review.md for the lead''s gate. Released outside the Tue/Fri window by

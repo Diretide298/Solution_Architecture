@@ -51,7 +51,8 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/derive-ddl.py::DDL_TYPES
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Contract impact: none. Migration effect: none (no DDL changes). Verified by loading ADAM''s
   buildBackend on this tree after derive-ddl --apply and build-schema-workbook: seat_reservation id uuid (DDL from

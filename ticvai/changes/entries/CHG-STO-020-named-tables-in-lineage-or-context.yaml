@@ -34,7 +34,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-parameter-columns.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Detail left open by the ruling, taken as the package does for fields (x-ticvai-persisted: false says
   a field is not stored where it is declared): the declaration is explicit and checked. Keeps (5), each a real cross-module
   read or write the lineage needs through the owner''s query or route: addIncidentPerson and reportIncident -> pii.subject

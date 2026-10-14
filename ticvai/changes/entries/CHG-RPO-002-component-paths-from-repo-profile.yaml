@@ -45,7 +45,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-frontend-repos.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch RPO (Block A audit), 14 October 2026. The five repositories not read keep the package''s app folder at
   their root (src/routes/...), assumed; the guest app''s screens folder (src/screens) is assumed too. When an owner
   confirms or corrects a profile, run tools/apply-repo-layout.py --setup and re-derive the ticket text; the check

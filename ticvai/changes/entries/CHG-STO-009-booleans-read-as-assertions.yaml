@@ -85,7 +85,8 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: 'tools/derive-schema.py::bool_assertion_name'
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Contract impact: none (the wire keeps every field name; only columns move). Migration effect: 188 "column
   renamed" rows in handoff/migration-review.md (ALTER TABLE ... RENAME COLUMN), per table in the hand-back''s impact list;
   code reading the old column names must follow.'

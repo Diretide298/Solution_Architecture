@@ -29,6 +29,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-binding-ratchet.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GT1. checks/baseline.json is not touched: the lead re-records it after the merges (--update-baseline), which
   now writes `blocks`; until then this check still fails on the move.'

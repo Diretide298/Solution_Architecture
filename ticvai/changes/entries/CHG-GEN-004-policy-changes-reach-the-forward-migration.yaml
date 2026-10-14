@@ -45,7 +45,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/ddl_forward.py::rls_call
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Verified on this branch: derive-ddl --apply wrote the tenant forward migration (V0104) with the function and
   nine policy swaps (platform.audit_record and identity.authz_audit to apply_append_audit_rls; product_media,

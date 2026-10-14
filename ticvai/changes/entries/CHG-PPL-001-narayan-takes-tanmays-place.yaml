@@ -65,7 +65,8 @@ waivers:
 prevention:
   type: check
   ref: tools/check-plan-owners.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Measured on a re-derive (build-service-docs, derive-block-a-schedule, op-descriptions --schedule) against the
   same derive of r6-integrate 8227a20b: tasks.csv 232 rows owned by Tanmay (200 tasks, 32 features) and 247 accountable
   become exactly the same keys on Narayan; plan-tasks.csv 326 and 364 likewise; block-a-schedule.json 294 assignments,

@@ -33,5 +33,6 @@ waivers:
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GT1. Plan change decided the day it was proposed: cooling-off waiver as CHG-GT1-004.'

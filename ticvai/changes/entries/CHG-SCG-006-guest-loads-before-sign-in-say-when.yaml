@@ -41,6 +41,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-preauth-session.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCG, 14 October 2026. derive-carries-from-entrystate narrows the nine derived edges into GST-039 (they
   no longer carry subjectId) at the next refresh; it rewrites whole files, so it was not run with --apply here.'

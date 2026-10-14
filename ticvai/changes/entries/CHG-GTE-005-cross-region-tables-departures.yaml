@@ -52,7 +52,8 @@ waivers:
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GTE (audit/release-gate), 14 October 2026. A plan input, so kind plan; it records a reason and moves no
   task, and the 24-hour cooling-off is waived under the lead''s Block A audit decision of 14 October ("go with your
   recommendation"; the lead to confirm at merge). MIG-PLATFORM is Ready for QA with the four tables in platform: the

@@ -68,7 +68,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-ddl.py::column_rules
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Defaults chosen as the package''s most consistent options: pinLength 4 (the client-approved POS prototype), pinReusePrevention
   last5 (what the sign-in screens promised), pinLockoutAfterAttempts 5 (R126 (6) five wrong codes). Only the two new integer
   enums carry x-ticvai-persistence-column, so the older integer enums (UrlRedirect.statusCode, AdmissionRule.formatVersion)

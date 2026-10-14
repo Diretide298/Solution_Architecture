@@ -36,7 +36,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-parameter-columns.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Keeps (14), each a cross-module data path, an undecided store or a plan change, in the hand-back: getGuestMenu.outletId
   (its lineage omits fnb.menu, the outlet''s menu; naming it moves SVC-FNB-MENU-1 from AM-FOOD-BEVERAGE-P04 to AM-ORDERS-RESERVATIONS-P02,
   a plan change for the lead), getBillingStatement.statementId (no table holds a billing statement), listBookableVenueMaps.productId

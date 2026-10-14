@@ -46,5 +46,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-approved-ui.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. CHG-SCR-001''s entry stays as the record of what was undone.'

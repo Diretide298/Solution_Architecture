@@ -54,7 +54,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
   CNS. Option A of the CR. Contract impact: additive (an x-ticvai extension only; check-contract-compat PASS).
   Migration effect: MIG-MARKETING (#27677, V0028__marketing.sql): the generated forward migration drops

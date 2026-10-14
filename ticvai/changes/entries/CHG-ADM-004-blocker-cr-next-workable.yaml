@@ -62,7 +62,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-adam-blocker-rule.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Choices where the instruction left a detail open: "accepted-not-yet-released" is an accepted CR whose resolved_ref
   is not a release tag at or below the one served (no ref counts as not released); the lineage expansion is one way

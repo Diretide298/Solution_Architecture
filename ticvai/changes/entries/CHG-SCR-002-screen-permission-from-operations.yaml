@@ -38,6 +38,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/derive-screen-wiring.py::fix_permission
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. check-screen-permissions (SP-NOACCESS) and check-screen-wiring stay green with the
   derived permissions; the no-access state''s own wording is unchanged.'

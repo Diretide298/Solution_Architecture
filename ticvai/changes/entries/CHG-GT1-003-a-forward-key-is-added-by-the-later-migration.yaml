@@ -33,7 +33,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-migration-tickets.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GT1. MIG-CONTROL-5 also moved from Block B to Block A in the merged plan (its tables are in the key closure
   of a Block A module, AM-SUBSCRIPTION-LICENSING-P09): that move came from the batches, not this change; listed for the
   lead. #27991 is Ready for QA: a comment, not a rewrite.'

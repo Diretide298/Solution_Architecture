@@ -39,7 +39,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch OFL. Keeps (12, client-approved UI): BO-097 checkOutResource, checkInResource, authoriseStoredValue,
   relinquishStoredValue, captureStoredValue (a web back office whose approved copy says "Queued locally"; decision 2
   says a web app never queues, so only the approved copy can change); POS-012 reserveMerchandise, collectShopAndDrop

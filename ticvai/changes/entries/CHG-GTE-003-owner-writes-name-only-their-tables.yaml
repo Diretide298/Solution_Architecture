@@ -39,7 +39,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-parameter-columns.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GTE (audit/release-gate), 14 October 2026, from the parked second-gate fix. Descriptions only: no
   operation, field or response changes, so no breaking change. Both tickets are Block B; no Block A ticket is
   affected.'

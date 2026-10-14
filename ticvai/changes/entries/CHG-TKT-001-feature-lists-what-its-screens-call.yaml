@@ -41,6 +41,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ticket-scope.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Generator rule: tools/build-service-docs.py (feature block, back_end_sentence). Run on audit-base the check finds
   741 (52 new); on this branch 0 after build-service-docs. the impact list is in the hand-back (scratchpad the batch impact list (lead workspace)).'

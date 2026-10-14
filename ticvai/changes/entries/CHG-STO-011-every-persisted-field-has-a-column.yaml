@@ -45,7 +45,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Contract impact: a component schema renamed (CampaignInvitation); every field and path is unchanged.
   Migration effect: marketing.invitation gains campaign_id, token, status, plus_ones, responded_at, subject_id (ADD COLUMN
   in V0104) and its Orders columns are "column dropped" rows; orders.invitation gains scope_path (ADD COLUMN, backfilled

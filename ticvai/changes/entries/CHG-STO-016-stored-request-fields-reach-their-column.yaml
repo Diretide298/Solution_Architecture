@@ -50,7 +50,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-stored-request-fields.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Keep (2): addIncidentPerson email and phone are kept, with consent, as the person''s PII subject contact
   (ADR-0023), which Identity owns; no Identity operation or event that records another module''s person is declared, so
   the write has no route (check-cross-deployable-writes): a cross-module route for the lead or batch MOD, with the same

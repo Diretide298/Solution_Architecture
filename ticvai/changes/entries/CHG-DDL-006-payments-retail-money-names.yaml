@@ -71,7 +71,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch DDL, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Lead to confirm: (1) the column names, chosen by the agent and open to correction:
   overdue_amount (the sum a dunning case chases), due_amount (an instalment), attempted_amount, transaction_amount (as

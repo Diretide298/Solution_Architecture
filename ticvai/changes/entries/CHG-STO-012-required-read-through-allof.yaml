@@ -26,6 +26,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: Batch STO. No contract or table change. A mismatch whose change migration-review lists for the migration owner is
   now a note (as D-SCOPE-NOTNULL reads a scope_path on its way to NOT NULL).

@@ -52,7 +52,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-package.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GTE (audit/release-gate), 14 October 2026. Finishes the parked second-gate fix: the parked patch made
   check-package skip a view read; the lead asked for the views to be derived into the schema reference instead, so a
   developer meeting the name in the lineage can look it up. The Read views sheet has no readColumns for the three

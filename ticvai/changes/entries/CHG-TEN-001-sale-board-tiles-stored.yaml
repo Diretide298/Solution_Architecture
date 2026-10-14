@@ -66,7 +66,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ddl-conventions.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Verified with derive-schema, derive-relationships and derive-ddl --apply (derived files restored, not committed):
   sale_board_tile gets sale_board_page_id uuid NOT NULL (declared FK to sale_board_page), position, kind (CHECK),

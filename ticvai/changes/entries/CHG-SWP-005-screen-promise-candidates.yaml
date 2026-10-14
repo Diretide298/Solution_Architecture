@@ -31,10 +31,12 @@ adam_cr: pending (raised at the r6 settlement)
 triage: fix-forward
 prevention:
   type: none
+  approved_by: 'Chinmay Parab, 14 October 2026 (decision 7: go with your recommendation)'
   reason: 'Not checkable deterministically: a screen sentence and an operation description agree or not only on
     reading. The heuristic ranks candidates for an AI sample (ticvai/CLAUDE.md rule 13: spend AI only where a check
     cannot see); each confirmed one becomes a CR. The lead approves this at the r6 settlement.'
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SWP, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". On r6: 954 pairs score above 0 (P08 425, P09 174, P06 90, P04 76, P10 43, P02 36, P01 30,
   P13 25, P12 17, P15 12, P07 9, P16 7, P14 4, P05 3, P17 3). GST-073 revokeGuestDevice ranks second on P02, after

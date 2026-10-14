@@ -41,7 +41,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-request-fields-stored.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Run on the parent commit r5 (1eb1d063, its contracts, schema reference and lineage, with this branch''s baseline):
   FAIL, 4 new (configureWorkstation.cashierInputMode, .guestDisplayContent, .loadedMediaStockId; RF-READONLY-REQUEST

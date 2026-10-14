@@ -41,7 +41,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch MOD, 14 October 2026. Detail the ruling left open, taken as the option most consistent with ADR-0055:
   one data-read query per owned table rather than per (reader, owner) pair, because a query belongs to its owner and
   one declaration then serves every reader of that table; the generated views (DB-READ-VIEWS) were not used for the

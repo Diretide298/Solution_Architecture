@@ -37,6 +37,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-approved-ui.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GRD (audit/gate-guards-2), 14 October 2026. Approvals now name a region field as `region:<slot>`
   (a region with no slot is `region:-`). docs/active/approved-ui-changes.yaml has no entries, so none needed rewriting.'

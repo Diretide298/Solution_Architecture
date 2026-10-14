@@ -47,7 +47,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-stored-request-fields.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'A guest''s second factor (rev 3 GAP-B1) is not stored here: identity.mfa_method has no subject column either, so
   guest MFA storage stays an open gap (said in MfaChallenge''s description). otp_challenge.subject_id becomes nullable (a
   register code has no subject yet); under the subject policy such a row is reachable only at the tenant root. Verified

@@ -29,6 +29,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-cited-sources.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". check-cited-sources passes (34 known, 0 new).'

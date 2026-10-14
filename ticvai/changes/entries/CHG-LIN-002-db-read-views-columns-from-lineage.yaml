@@ -40,7 +40,8 @@ waivers:
 prevention:
   type: check
   ref: tools/check-read-columns.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch LIN, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 October 2026:
   "Release today as an exception." A plan input, so kind plan; the 24-hour cooling-off is waived under the same
   words (the lead to confirm at merge). DB-READ-VIEWS is started (Hrushikant Patkar), so its text is not rewritten

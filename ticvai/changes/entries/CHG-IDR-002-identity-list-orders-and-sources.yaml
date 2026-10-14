@@ -92,7 +92,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-shapes.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
   IDR. Prevention: check-contract-shapes C-PAGED-ORDER, with this batch''s nine fixed members taken out of
   handoff/audit-baseline.json (authored: only --update-baseline or a reviewed hand edit writes it, no deriver), so a

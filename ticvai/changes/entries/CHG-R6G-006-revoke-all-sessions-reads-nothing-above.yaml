@@ -54,7 +54,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Contract impact additive: a removed vendor extension and a response field marked deprecated
   (check-contract-compat output identical to the gate''s). Verified in w609 after derive-lineage --apply and the applied

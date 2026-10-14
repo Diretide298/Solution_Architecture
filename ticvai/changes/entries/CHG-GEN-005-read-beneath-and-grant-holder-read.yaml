@@ -63,7 +63,8 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-ddl.py::RLS_MARKS
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   Verified on this branch: derive-schema, then derive-ddl --apply wrote V0104 with the six helpers, the 16 policy
   swaps (six marked tables, role_permission, and the nine of CHG-GEN-004), upsell_rule.scope_path added nullable with

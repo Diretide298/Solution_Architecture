@@ -31,6 +31,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCG, 14 October 2026. Suggested rule for batch SCR (tools/check-screen-wiring.py): a 202 called with
   trigger background whose contract declares x-ticvai-conflict-policy append (an event batch) has nothing to follow.'

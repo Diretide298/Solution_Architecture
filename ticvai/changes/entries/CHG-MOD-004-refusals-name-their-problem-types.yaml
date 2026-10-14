@@ -39,7 +39,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-error-sources.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch MOD, 14 October 2026. Batch SHP fixes C-ERROR-PROBLEM-TYPE (every inline error names a problem type) on
   the same kind of line: where both batches declare x-ticvai-problem-types on one response the merge keeps one line,
   and this batch''s slugs are the ones the response''s own reason codes give. Verified: E-PROBLEM-TYPE 60 -> 0;

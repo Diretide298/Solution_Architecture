@@ -30,7 +30,8 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/ddl_forward.py::diff
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Verified: derive-ddl with V0104 removed, then derive-ddl again, writes nothing the second time
   ("no additive change since the baseline and the forward migrations"). Migration effect: V0104 creates
   platform.outlet_opening_hour with its parent policy through platform.outlet.'

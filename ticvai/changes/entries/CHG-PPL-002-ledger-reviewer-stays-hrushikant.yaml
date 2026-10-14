@@ -44,7 +44,8 @@ waivers:
 prevention:
   type: check
   ref: tools/check-plan-owners.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'After the re-derive, all 26 LedgerService back-end tasks in tasks.csv are accountable to Hrushikant Patkar,
   as in the r6 derive before this change, so no one''s load moves. Who builds each Ledger task is unchanged (pins and
   helpers; the 6 that were Tanmay''s are Narayan''s). check-plan-owners gains O-SVC-OWNER: with the pin set to another

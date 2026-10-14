@@ -78,7 +78,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception". Batch
   MKT, branch cr/086-088-guest-devices from r6-integrate 594e51a2. Chosen where the CR left it to the owner (lead to
   confirm): the CR''s option A (installationId) and V2 (the token encrypted in the row), as ADR-0063 section 4 already

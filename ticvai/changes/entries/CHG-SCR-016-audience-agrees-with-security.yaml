@@ -38,5 +38,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: Batch SCR, 14 October 2026. The lineage's audience copies follow at the refresh (derive-lineage).

@@ -30,6 +30,7 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-parameter-columns.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Contract impact: x-ticvai extension text only (still `none - request only`, so derive-schema derives
   no columns from the drafted shape). Migration effect: none.'

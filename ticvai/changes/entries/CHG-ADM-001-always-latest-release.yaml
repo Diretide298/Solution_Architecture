@@ -54,7 +54,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-adam-latest-release.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   source is `cr`, the closest allowed value for a decision the lead made directly (the lead''s instruction). triage
   blocker is this batch''s choice: agents were asking which release on live tickets. The new check

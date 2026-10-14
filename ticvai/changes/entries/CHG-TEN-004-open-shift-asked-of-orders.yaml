@@ -61,7 +61,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-shapes.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release today as an exception".
   states/shift.yaml lists only autoClosed as terminal because closed can be reopened (isReversal); the lead''s "every
   non-terminal state" is read as every state before closed or autoClosed, since counting closed would make every

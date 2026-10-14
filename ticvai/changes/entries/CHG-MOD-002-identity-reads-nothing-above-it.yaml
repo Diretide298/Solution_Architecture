@@ -44,7 +44,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-cross-module-reads.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch MOD, 14 October 2026. The lineage is derived: run `python tools/applied/mod-lineage-14-october.py
   --apply` after derive-lineage --apply at the merge (it also carries CHG-MOD-006 and CHG-MOD-009). Verified on the branch:
   check-cross-module-reads XR-FOUNDATION 7 -> 6 and XR-UNCOVERED 7 -> 6, 0 new. The six kept are not fixed by a

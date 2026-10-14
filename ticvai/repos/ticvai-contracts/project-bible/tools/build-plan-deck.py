@@ -947,7 +947,7 @@ RELEASE_CHECKLIST = [
     ("Every block (its last three working days)", "Test", "The block test: every flow the block claims end to end, offline runs, the load run where it adds a purchase or admission path. No new feature work starts.", "The block's tester pair, led by Chinmay Parab"),
     ("Every block", "After", "The client's acceptance session on the integration environment in the following week; signed off or open items listed.", "Client"),
     ("Block A go-live", "Before", "The client has signed off every Block A wireframe batch (3 working days each, audit R252).", "Client design reviewer"),
-    ("Block A go-live", "Before", "Payment sandbox credentials in place and a full sale-refund-settlement cycle passes (the client's answer in the Decisions Register).", "Client, then Tanmay Dukhande"),
+    ("Block A go-live", "Before", "Payment sandbox credentials in place and a full sale-refund-settlement cycle passes (the client's answer in the Decisions Register).", "Client, then Narayan Gaonkar"),
     ("Block A go-live", "Before", "Offline: the POS sells and the scanner admits with the network cut, and reconcile when it returns.", "Pradnya Yeram"),
     ("Block A go-live", "Before", "Tax invoice, credit note and VAT fields checked against the client's answers (make-or-break items).", "Pranay Shinde"),
     ("Block A go-live", "Before", "Load test at the burst mix (ticket on-sale) and the venue-day mix; replicas as sized in handoff/sizing.json.", "Hrushikant Patkar"),

@@ -44,7 +44,8 @@ waivers:
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch GT1. The pushed rest-of-screen tickets APP-SETUP-ADM-603-REST (#28272) and APP-SETUP-BO-1146-REST (#28726)
   were already out of the merged plan (the screens are now one whole-screen task each): op-retire at the apply. Plan change
   decided the day it was proposed: the lead''s words of 14 October on the audit fixes are recorded as the cooling-off waiver;

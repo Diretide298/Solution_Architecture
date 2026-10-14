@@ -44,7 +44,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SWP, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". Run on the parent commit 594e51a2 (gate w146''s plan): 148 findings, none baselined, exit 1
   (and report-only there); on this branch 147 known and the one strict #27741 finding fails until GAP merges.

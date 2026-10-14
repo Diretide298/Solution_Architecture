@@ -35,7 +35,8 @@ triage: defer
 prevention:
   type: check
   ref: tools/check-glossary-terms.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch R6G, 14 October 2026. Released outside the Tue/Fri window by the lead''s waiver, 14 Oct 2026: "Release
   today as an exception". The rename (source -> channel, card -> tile, variant -> attribute, or a recorded exception
   in naming-and-style) changes stored columns and wire fields, so it is a naming-and-style CR for later: tracker

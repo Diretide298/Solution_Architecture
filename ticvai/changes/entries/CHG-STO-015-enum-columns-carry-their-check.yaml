@@ -33,7 +33,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. Contract impact: CookieScanPolicy.frequency''s enum is now the string ''off'' the wire always meant (a
   YAML 1.1 boolean before): breaking by the letter, approved as BC-280 (setCookieScanPolicy) and BC-281 (listCookieScanPolicies)
   in docs/active/breaking-changes.yaml. Migration effect: two "column changed" rows in handoff/migration-review.md (status_code

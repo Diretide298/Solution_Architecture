@@ -33,7 +33,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-storage-promises.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch STO. The stated reason is the valueObject kind (the form AiGovernanceRuleList and KitchenRoutingRules.categoryRules
   already use): nothing queries one element on its own, and a child table would be rows nobody addresses. A list a caller
   edits element by element or a report counts is a child table''s; none of these is. Contract impact: x-ticvai extensions

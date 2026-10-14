@@ -32,5 +32,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-audience-match.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: Batch SCO, 14 October 2026. ADM-415 is on no Block A ticket.

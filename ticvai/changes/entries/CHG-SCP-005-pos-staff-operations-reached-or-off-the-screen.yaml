@@ -66,7 +66,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-wiring.py
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCP, 14 October 2026. link-screens-contracts re-derives x-ticvai-consumed-by for the two contracts
   this touches (accreditation, reporting); the derived lines are not committed here. EMP-010, EMP-030 and EMP-061
   are outside Block A. recordAnswerFeedback was taken off EMP-020 in 2d097203 and put back here. check-rfp-coverage, check-spec-coverage, check-traceability and check-ticket-scope

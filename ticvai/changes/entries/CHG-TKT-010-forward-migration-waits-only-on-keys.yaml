@@ -36,4 +36,5 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-migration-tickets.py
-status: open
+status: closed
+closed_by_commit: ee22b123

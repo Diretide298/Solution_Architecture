@@ -37,7 +37,8 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/derive-screen-wiring.py::fix_metrics
-status: open
+status: closed
+closed_by_commit: ee22b123
 notes: 'Batch SCR, 14 October 2026. The 971 open tiles need a lead decision on the contract side: one KPI code per
   measure in reporting''s ReportingSystemKpi read through getKpiValues (the hubs'' pattern), or summary reads per
   module. Not done in this batch: it is contract work across every module.'
