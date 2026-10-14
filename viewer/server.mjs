@@ -116,7 +116,7 @@ const API_META = API_PUBLIC
  * `session` was in here and is the reason /api/session was 404ing.
  */
 const API_ROUTES =
-  /^\/(api\/(auth|accounts|invites|reset|settings|links|work-packages|board|pms|changes|validation|verdicts|mentions|mentionable|alerts|scopes|ips|rates|costing|test-batches|agent|chat|connector|diagram-versions|health)(\/|$)|docs|openapi\.json)/;
+  /^\/(api\/(auth|accounts|invites|reset|settings|links|work-packages|board|pms|changes|validation|verdicts|mentions|mentionable|alerts|scopes|ips|rates|budget|costing|test-batches|agent|chat|connector|diagram-versions|health)(\/|$)|docs|openapi\.json)/;
 // `api/connector` above is the accounts service — which build each install
 // reported. `/connector/version` and `/connector/bundle`, with no `/api/`, are
 // this server's own and are answered before the gate. Two similar names for two
