@@ -5462,12 +5462,6 @@ screens:
     purpose: Issue a credit memo
     trigger: onAction
     provenance: build, 29 September 2026
-  - operationId: listOrderRefunds
-    contract: orders
-    purpose: 'Follow the refund createRefund accepted (202, pendingApproval or pendingGateway) until it settles,
-      polled while the screen is open'
-    trigger: onInterval
-    provenance: Block A audit, 14 October 2026 (CHG-SCP-007)
   entryState:
     params:
     - name: workstationId
