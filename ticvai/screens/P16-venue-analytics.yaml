@@ -301,6 +301,7 @@ screens:
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
+        operation: listAiInsights
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
@@ -1324,6 +1325,7 @@ screens:
         provenance: contract inventory.yaml GET /stock-batches/expiring
       - kind: multiSelect
         label: Domain
+        operation: requestSuggestion
         notes: '**The selector that collapses 26 board screens into nine.** A domain is a filter on an
           analytics screen, not a copy of it — building three sets means maintaining one screen three
           times and watching them drift.'
@@ -1767,6 +1769,7 @@ screens:
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
+        operation: getForecast
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
@@ -1978,6 +1981,7 @@ screens:
           times and watching them drift.'
         provenance: carried from the previous definition
       - kind: chart
+        operation: getActionPlan
         notes: '**Comparison against the previous period by default.** A number with nothing beside it
           is a number nobody can act on.'
         provenance: carried from the previous definition
@@ -2515,11 +2519,6 @@ screens:
   - operationId: getKpiValues
     contract: reporting
     purpose: Live operational KPIs
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: listAlerts
-    contract: reporting
-    purpose: What needs attention
     trigger: onLoad
     provenance: board reading, 19 September 2026
   entryState:
@@ -3214,7 +3213,7 @@ screens:
         - Outstanding Loyalty Liability
         - Customer Satisfaction Score
         bindsTo: null
-        operation: null
+        operation: getKpiValues
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 8 §Display
     - name: contextPanel
       slot: selection
@@ -3222,6 +3221,7 @@ screens:
       - kind: detailPanel
         label: The selected customer membership loyalty
         bindsTo: null
+        operation: getKpiValues
         columns:
         - Unique Customers
         - New Customers
@@ -3345,7 +3345,7 @@ screens:
         - Status
         - Recommended action
         bindsTo: null
-        operation: null
+        operation: listPromotionAlertException
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 9 §Each Alert
           Shall Display
     - name: contextPanel
@@ -3354,6 +3354,7 @@ screens:
       - kind: detailPanel
         label: The selected alerts exception
         bindsTo: null
+        operation: listPromotionAlertException
         columns:
         - Severity
         - KPI
@@ -4032,13 +4033,6 @@ screens:
     purpose: Open one
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: createDashboard
-    contract: reporting
-    purpose: Start a new one
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - listDashboards
   - operationId: recordDashboardView
     contract: reporting
     purpose: Record that a dashboard was opened — fired once when the dashboard renders; nothing on the
@@ -4110,58 +4104,76 @@ screens:
       components:
       - kind: selectField
         label: Dashboard Name
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Description
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Category
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Business Domain
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Dashboard Owner
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Tags
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Language
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Default Currency
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: textField
         label: Step 2 — Scope
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Configure
       - kind: selectField
         label: Tenant
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Organization
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Site(s)
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Venue(s)
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Attraction(s)
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Business Unit(s)
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: textField
         label: Step 3 — Data Domains
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
       - kind: selectField
         label: Queue • Accreditation
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
           one or multiple domains
       - kind: textField
         label: Step 4 — Template
+        operation: createDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 15 §Select
           one or multiple domains
   states:
@@ -4523,7 +4535,7 @@ screens:
         - Gauge
         - Progress Indicator
         bindsTo: null
-        operation: null
+        operation: getSemanticModel
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 17 §KPI Components
     - name: contextPanel
       slot: selection
@@ -4531,6 +4543,7 @@ screens:
       - kind: detailPanel
         label: The selected widget visualization
         bindsTo: null
+        operation: getSemanticModel
         columns:
         - KPI Card
         - Target Card
@@ -4783,7 +4796,7 @@ screens:
         - Tolerance
         - Evaluation Frequency
         bindsTo: null
-        operation: null
+        operation: listKpis
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 19 §For each
           KPI
     - name: contextPanel
@@ -4792,6 +4805,7 @@ screens:
       - kind: detailPanel
         label: The selected targets thresholds kpi
         bindsTo: null
+        operation: listKpis
         columns:
         - Target
         - Minimum
@@ -4913,6 +4927,7 @@ screens:
           may be
       - kind: multiSelect
         label: Filter by
+        operation: updateDashboard
         columns:
         - Global
         - Widget-level
@@ -4929,51 +4944,67 @@ screens:
       components:
       - kind: selectField
         label: Data Domain
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Dataset
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Measure
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Dimension
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Aggregation
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Date Field
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Relationship
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Calculation
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Select
       - kind: selectField
         label: Date Range
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Site
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Venue
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Attraction
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Channel
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Product
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Customer Segment
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
       - kind: selectField
         label: Currency
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 20 §Configure
   states:
     loading: The data filter configuration as saved.
@@ -5057,30 +5088,39 @@ screens:
       components:
       - kind: selectField
         label: Click behavior
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Cross-filtering
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Drill-down
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Drill-up
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Drill-through
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Tooltip
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Detail page
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Related dashboard
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
       - kind: selectField
         label: Underlying report
+        operation: updateDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 22 §Define
   states:
     loading: The drill-down interaction designer configuration as saved.
@@ -5278,7 +5318,7 @@ screens:
         - User Count
         - Usage Frequency
         bindsTo: null
-        operation: null
+        operation: getDashboard
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 23 §Display
     - name: contextPanel
       slot: selection
@@ -5286,6 +5326,7 @@ screens:
       - kind: detailPanel
         label: The selected preview validation health
         bindsTo: null
+        operation: getDashboard
         columns:
         - Data Last Refreshed
         - Refresh Frequency
@@ -5313,11 +5354,6 @@ screens:
     contract: reporting
     purpose: Preview
     trigger: onAction
-    provenance: board reading, 19 September 2026
-  - operationId: listAnalyticsPipelines
-    contract: reporting
-    purpose: Whether its data is fresh
-    trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: recordDashboardView
     contract: reporting
@@ -5442,7 +5478,7 @@ screens:
         - Status
         - Usage Count
         bindsTo: null
-        operation: null
+        operation: listReports
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 27 §Each report
           shall display
     - name: contextPanel
@@ -5451,6 +5487,7 @@ screens:
       - kind: detailPanel
         label: The selected report catalogue
         bindsTo: null
+        operation: listReports
         columns:
         - Report Name
         - Report ID
@@ -5552,31 +5589,40 @@ screens:
       components:
       - kind: selectField
         label: Report Name
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: selectField
         label: Description
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: selectField
         label: Category
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: selectField
         label: Owner
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: selectField
         label: Tags
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: selectField
         label: Language
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: textField
         label: Step 2 — Business Domain
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Configure
       - kind: textField
         label: Inventory • Resources • Marketing
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Select
           one or multiple domains
       - kind: textField
         label: Step 3 — Report Type
+        operation: createReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 28 §Select
           one or multiple domains
   states:
@@ -5657,7 +5703,7 @@ screens:
         - Data Owner
         - Security Classification
         bindsTo: null
-        operation: null
+        operation: getSemanticModel
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 29 §Show
     - name: contextPanel
       slot: selection
@@ -5665,6 +5711,7 @@ screens:
       - kind: detailPanel
         label: The selected data domain dataset
         bindsTo: null
+        operation: getSemanticModel
         columns:
         - Dataset Name
         - Description
@@ -5858,6 +5905,7 @@ screens:
           Filters
       - kind: multiSelect
         label: Filter by
+        operation: updateReport
         columns:
         - Date Range
         - Site
@@ -5970,6 +6018,7 @@ screens:
           can group by
       - kind: multiSelect
         label: Filter by
+        operation: updateReport
         columns:
         - Site
         - Attraction
@@ -6179,24 +6228,31 @@ screens:
       components:
       - kind: selectField
         label: Column labels
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Number format
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Currency
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Percentage
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Date format
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Decimal precision
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
       - kind: selectField
         label: Conditional formatting
+        operation: updateReport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 35 §Configure
     - name: actionBar
       slot: publish
@@ -6292,7 +6348,7 @@ screens:
         - Execution Time
         - Data Refresh Time
         bindsTo: null
-        operation: null
+        operation: getReportExecution
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 36 §Display
     - name: contextPanel
       slot: selection
@@ -6300,6 +6356,7 @@ screens:
       - kind: detailPanel
         label: The selected report preview test
         bindsTo: null
+        operation: getReportExecution
         columns:
         - Sample Results
         - Total Records
@@ -6321,23 +6378,11 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: runReport
-    contract: reporting
-    purpose: Run it against a sample
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getReportExecution
     contract: reporting
     purpose: How the run went
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: cancelReportExecution
-    contract: reporting
-    purpose: Stop a run that is going to be wrong anyway
-    trigger: onAction
-    provenance: wiring gap, 19 September 2026 — the screen showed the noun and could not act on it
-    invalidates:
-    - listReportExecutions
   entryState:
     preloaded:
     - Sample Results
@@ -6490,11 +6535,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: runReport
-    contract: reporting
-    purpose: Run it
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getReportResult
     contract: reporting
     purpose: The results
@@ -6663,11 +6703,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listReportSchedules
-    contract: reporting
-    purpose: What runs when
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: listReportDeliveries
     contract: reporting
     purpose: What arrived and what did not
@@ -6729,79 +6764,102 @@ screens:
       components:
       - kind: selectField
         label: Schedule Name
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Report
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Report Version
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Owner
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Start Date
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: End Date
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Time
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Time Zone
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Frequency
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Run immediately
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Retry on failure
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Maximum retries
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Timeout
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: textField
         label: Skip if source data is stale
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: textField
         label: Wait for source refresh
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Configure
       - kind: selectField
         label: Once
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Hourly
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Daily
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Weekly
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Monthly
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Quarterly
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Yearly
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
       - kind: selectField
         label: Custom
+        operation: createReportSchedule
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 41 §Frequency
           Options
   states:
@@ -6887,6 +6945,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listReportSubscriptions
         derived: true
         impliedBy: listReportSubscriptions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -6977,45 +7036,59 @@ screens:
       components:
       - kind: selectField
         label: Destination
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Recipient
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Format
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Language
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Time Zone
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: File Naming
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Password/Security Policy
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Expiration
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Delivery Priority
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Define
       - kind: selectField
         label: Email Subject
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
       - kind: selectField
         label: Email Body Template
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
       - kind: selectField
         label: Attachment
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
       - kind: selectField
         label: Secure Link
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
       - kind: selectField
         label: Branding
+        operation: createReportSubscription
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 44 §Configure
     - name: actionBar
       slot: publish
@@ -7117,7 +7190,7 @@ screens:
         - Status
         - Expiration
         bindsTo: null
-        operation: null
+        operation: getReportExport
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 45 §Display
     - name: contextPanel
       slot: selection
@@ -7125,6 +7198,7 @@ screens:
       - kind: detailPanel
         label: The selected export download
         bindsTo: null
+        operation: getReportExport
         columns:
         - Export ID
         - Report
@@ -7150,11 +7224,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: exportReportResult
-    contract: reporting
-    purpose: Export
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getReportExport
     contract: reporting
     purpose: Collect the file
@@ -7570,7 +7639,7 @@ screens:
         - Error
         - Retry Count
         bindsTo: null
-        operation: null
+        operation: listReportDeliveries
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 48 §Display
     - name: contextPanel
       slot: selection
@@ -7578,6 +7647,7 @@ screens:
       - kind: detailPanel
         label: The selected delivery monitoring failure
         bindsTo: null
+        operation: listReportDeliveries
         columns:
         - Job ID
         - Report
@@ -7818,53 +7888,67 @@ screens:
       components:
       - kind: selectField
         label: Report Definitions
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Dashboard Versions
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Generated Reports
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Export Files
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Audit Logs
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Schedule History
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: API Logs
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Historical Analytics
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Configure
           retention separately for
       - kind: selectField
         label: Retention Period
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
       - kind: selectField
         label: Archive After
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
       - kind: selectField
         label: Delete After
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
       - kind: selectField
         label: Legal/Compliance Hold
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
       - kind: selectField
         label: Storage Location
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
       - kind: selectField
         label: Retrieval Rules
+        operation: setDataRetentionSetting
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 50 §Define
   states:
     loading: The retention archive governance configuration as saved.
@@ -8009,7 +8093,7 @@ screens:
         - Recommendations Pending Review
         - AI Queries Today
         bindsTo: null
-        operation: null
+        operation: listAnalyticsAnomalies
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 109 §Display
     - name: contextPanel
       slot: selection
@@ -8017,6 +8101,7 @@ screens:
       - kind: detailPanel
         label: The selected analytics
         bindsTo: null
+        operation: listAnalyticsAnomalies
         columns:
         - Executive Insights
         - Revenue Insights
@@ -8419,7 +8504,7 @@ screens:
         - Affected Domain
         - Confidence
         bindsTo: null
-        operation: null
+        operation: listAnomalyDetectors
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 113 §Each
           Anomaly Displays
     - name: contextPanel
@@ -8428,6 +8513,7 @@ screens:
       - kind: detailPanel
         label: The selected anomaly detection
         bindsTo: null
+        operation: listAnomalyDetectors
         columns:
         - KPI
         - Expected Range
@@ -8453,16 +8539,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAiInsights
-    contract: ai
-    purpose: Insights and anomalies
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: configureAnomalyDetector
-    contract: ai
-    purpose: Set up anomaly detection on a KPI
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listAnomalyDetectors
     contract: ai
     purpose: Anomaly detectors
@@ -8541,6 +8617,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listAnalyticsAnomalies
         derived: true
         impliedBy: listAnalyticsAnomalies
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -8639,24 +8716,31 @@ screens:
       components:
       - kind: selectField
         label: Next Hour
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Today
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Tomorrow
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Next 7 Days
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Month End
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Quarter
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
       - kind: selectField
         label: Custom
+        operation: createForecastScenario
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 116 §Configure
     - name: actionBar
       slot: publish
@@ -8702,16 +8786,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: getKpiValues
-    contract: reporting
-    purpose: The series being forecast
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: listForecastDefinitions
-    contract: ai
-    purpose: What is forecast
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: getForecast
     contract: ai
     purpose: Forecast values
@@ -8720,11 +8794,6 @@ screens:
   - operationId: createForecastScenario
     contract: ai
     purpose: Run a what-if
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: exportForecastVersion
-    contract: ai
-    purpose: Export the forecast version as CSV, Excel or JSON
     trigger: onAction
     provenance: build, 29 September 2026
   wireframe:
@@ -8797,6 +8866,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listAnalyticsAnomalies
         derived: true
         impliedBy: listNextBestAction
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -8816,11 +8886,6 @@ screens:
     purpose: What to act on
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: listAiInsights
-    contract: ai
-    purpose: Insights and anomalies
-    trigger: onLoad
-    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-058
@@ -8897,21 +8962,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAnalyticsAnomalies
-    contract: reporting
-    purpose: Past insights and their evidence
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: listAiInsights
-    contract: ai
-    purpose: Insights and anomalies
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: decideAiInsight
-    contract: ai
-    purpose: Review, accept, reject or mark an insight actioned
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: searchAiDecisions
     contract: ai
     purpose: The decision records behind each insight
@@ -9002,7 +9052,7 @@ screens:
         - Tenant
         - Module
         bindsTo: null
-        operation: null
+        operation: listAiModels
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 119 §Display
     - name: contextPanel
       slot: selection
@@ -9010,6 +9060,7 @@ screens:
       - kind: detailPanel
         label: The selected analytics governance model
         bindsTo: null
+        operation: listAiModels
         columns:
         - AI Service
         - Model
@@ -9046,39 +9097,9 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listAiCapabilities
-    contract: ai
-    purpose: The capability registry
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: configureAiCapability
-    contract: ai
-    purpose: Register a capability, or change its owner, risk class or autonomy
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: getEffectiveAiPolicy
-    contract: ai
-    purpose: The policy in force for a capability at a scope
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: listAiModels
     contract: ai
     purpose: The model catalogue
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listPromptTemplates
-    contract: ai
-    purpose: The prompt registry
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: runAiEvaluation
-    contract: ai
-    purpose: Evaluate a candidate
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listAiEvaluations
-    contract: ai
-    purpose: Evaluation runs
     trigger: onLoad
     provenance: build, 29 September 2026
   entryState:
@@ -9246,7 +9267,7 @@ screens:
         columns:
         - Healthy / Warning / Critical / Offline
         bindsTo: null
-        operation: null
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 123 §Each
           component shall show
     - name: contextPanel
@@ -9255,6 +9276,7 @@ screens:
       - kind: detailPanel
         label: The selected analytics administration
         bindsTo: null
+        operation: listAnalyticsPipelines
         columns:
         - Healthy / Warning / Critical / Offline
         notes: null
@@ -9349,7 +9371,7 @@ screens:
         - Inventory
         - Resources
         bindsTo: null
-        operation: null
+        operation: listKpis
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 124 §KPI Categories
     - name: contextPanel
       slot: selection
@@ -9357,6 +9379,7 @@ screens:
       - kind: detailPanel
         label: The selected enterprise kpi
         bindsTo: null
+        operation: listKpis
         columns:
         - Executive
         - Sales
@@ -9451,34 +9474,42 @@ screens:
       components:
       - kind: selectField
         label: Organization
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Site
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Venue
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Attraction
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Business Unit
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Product
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Channel
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
       - kind: selectField
         label: Period
+        operation: setKpiTargets
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 125 §Targets
           may be configured by
   states:
@@ -9738,7 +9769,7 @@ screens:
         - Status
         - Data Classification
         bindsTo: null
-        operation: null
+        operation: listAnalyticsPipelines
         provenance: pack Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf, page 128 §Display
     - name: contextPanel
       slot: selection
@@ -9746,6 +9777,7 @@ screens:
       - kind: detailPanel
         label: The selected data source integration
         bindsTo: null
+        operation: listAnalyticsPipelines
         columns:
         - Source Name
         - Source Type

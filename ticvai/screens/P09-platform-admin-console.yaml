@@ -1450,11 +1450,6 @@ screens:
     contract: ai
     purpose: Every prompt, response and action
     trigger: onLoad
-  - operationId: getAiDecisionTrace
-    contract: ai
-    purpose: The full trace of a decision
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listAuditRecords
     contract: tenancy
     purpose: Who did what, where, and when
@@ -3320,11 +3315,6 @@ screens:
     contract: subscription
     purpose: List tenants
     trigger: onLoad
-  - operationId: listCreditNotes
-    contract: subscription
-    purpose: Credit notes beside the invoices
-    trigger: onLoad
-    provenance: build, 29 September 2026
   entryState:
     params:
     - name: tenantId
@@ -10437,6 +10427,7 @@ screens:
       slot: collection
       components:
       - kind: publishGate
+        operation: publishPromptTemplate
         impliedBy: publishPromptTemplate
         notes: 'Declares `publishPromptTemplate`. **The gate names what the publish will affect before
           it happens**: which tenants, venues or capabilities take the new version, and that the previous
@@ -11085,6 +11076,7 @@ screens:
       - kind: detailPanel
         label: The selected tax fee calculation
         bindsTo: TaxFeeCalculationCommandCenterView
+        operation: listTaxFeeCalculation
         columns:
         - TaxFeeCalculationCommandCenterView.profileName
         - TaxFeeCalculationCommandCenterView.type
@@ -11136,16 +11128,6 @@ screens:
     contract: catalogue
     purpose: Tax, Fee & Calculation Command Center
     trigger: onLoad
-  - operationId: listTaxInvoices
-    contract: finance
-    purpose: List tax invoices
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getVatReturn
-    contract: finance
-    purpose: VAT return (FTA boxes) for a period
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -11603,16 +11585,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listTenants
-    contract: subscription
-    purpose: The commercial portfolio
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: getSubscription
-    contract: subscription
-    purpose: One customer
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getCommercialMetrics
     contract: subscription
     purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
@@ -11716,7 +11688,7 @@ screens:
         - Subscription Status
         - Commercial Health
         bindsTo: null
-        operation: null
+        operation: listTenants
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 8 §Table Columns
     - name: contextPanel
       slot: selection
@@ -11724,6 +11696,7 @@ screens:
       - kind: detailPanel
         label: The selected customer subscription commercial
         bindsTo: null
+        operation: listTenants
         columns:
         - Customer
         - Venue / Group
@@ -11825,6 +11798,7 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+        operation: getSubscription
         derived: true
         impliedBy: getSubscription
         notes: One record, read-only.
@@ -11841,11 +11815,6 @@ screens:
   - operationId: getSubscription
     contract: subscription
     purpose: Commercial 360
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: getEntitlementUsage
-    contract: subscription
-    purpose: What they consume
     trigger: onLoad
     provenance: board reading, 19 September 2026
   wireframe:
@@ -11939,11 +11908,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: scoreVsiAssessment
-    contract: subscription
-    purpose: Their VSI and model
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getCommercialMetrics
     contract: subscription
     purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
@@ -12055,7 +12019,7 @@ screens:
         - Contracts Above Guarantee
         - Contracts at Guarantee
         bindsTo: null
-        operation: null
+        operation: getBillingReconciliation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 11 §Show
     - name: contextPanel
       slot: selection
@@ -12063,6 +12027,7 @@ screens:
       - kind: detailPanel
         label: The selected revenue commercial model
         bindsTo: null
+        operation: getBillingReconciliation
         columns:
         - Guaranteed Revenue
         - Actual Variable Revenue
@@ -12185,11 +12150,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listTenants
-    contract: subscription
-    purpose: Trials running
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: getCommercialMetrics
     contract: subscription
     purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
@@ -12214,6 +12174,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '1'
@@ -12366,6 +12327,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '1'
@@ -12796,16 +12758,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: getLicenceEnforcement
-    contract: subscription
-    purpose: Exceptions and overage
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: getPlanRecommendations
-    contract: subscription
-    purpose: Commercial recommendations beside the enforcement position
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: getCommercialMetrics
     contract: subscription
     purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
@@ -13141,7 +13093,7 @@ screens:
       - kind: multiSelect
         label: Venue type
         bindsTo: null
-        operation: null
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 23 §Visual cards
         notes: The venue types the prospect chooses from (Museum, Attraction, Theme Park, Waterpark, Stadium,
           Theatre, Exhibition / Event Venue, Zoo / Aquarium, Tour Operator, Entertainment Center, Multi-Venue
@@ -13315,36 +13267,47 @@ screens:
       components:
       - kind: selectField
         label: ☐ On-site POS
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: textField
         label: ☐ Own Website / B2C
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Mobile App
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Tour Operators
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Hotels
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Resellers
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Corporate Customers
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Call Center
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: selectField
         label: ☐ Kiosk
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: textField
         label: ☐ Flying / Mobile POS
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
       - kind: textField
         label: ☐ OTA / Third-Party Channels
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 24 §Selectable options
   states:
     loading: The sales channel assessment configuration as saved.
@@ -13414,48 +13377,63 @@ screens:
       components:
       - kind: selectField
         label: General Admission
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Dated Admission
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Timeslot Admission
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Open-Dated Ticket
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Multi-Day Ticket
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Family Ticket
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Group Ticket
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Membership
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Annual Pass
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Season Pass
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Voucher
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Bundle
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Add-On
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Camp / Course
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
       - kind: selectField
         label: Special Event
+        operation: scoreVsiAssessment
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 25 §Selectable options
   states:
     loading: The ticketing product requirements configuration as saved.
@@ -13607,6 +13585,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listModuleCatalogue
         derived: true
         impliedBy: listModuleCatalogue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -13932,11 +13911,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: listLicensingModels
-    contract: subscription
-    purpose: The rules engine
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: getCommercialMetrics
     contract: subscription
     purpose: The commercial figures the tiles show, one value per metric code (audit fix S-METRIC-NO-OP, CHG-SCO-006)
@@ -13995,33 +13969,43 @@ screens:
       components:
       - kind: selectField
         label: Factor Name
+        operation: setVsiModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields
       - kind: selectField
         label: Weight
+        operation: setVsiModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields
       - kind: selectField
         label: Data Source
+        operation: setVsiModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields
       - kind: selectField
         label: Minimum Value
+        operation: setVsiModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields
       - kind: selectField
         label: Maximum Value
+        operation: setVsiModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields
       - kind: selectField
         label: Scoring Method
+        operation: setVsiModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields
       - kind: selectField
         label: Mandatory/Optional
+        operation: setVsiModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields
       - kind: selectField
         label: Venue Type Applicability
+        operation: setVsiModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields
       - kind: selectField
         label: Market Applicability
+        operation: setVsiModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields
       - kind: selectField
         label: Effective Date
+        operation: setVsiModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 32 §Configuration Fields
   states:
     loading: The vsi model configuration as saved.
@@ -14188,6 +14172,7 @@ screens:
         label: Create plan
         notes: The act the screen exists for.
       - kind: dataTable
+        operation: listPlans
         derived: true
         impliedBy: listPlans
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -14263,30 +14248,39 @@ screens:
       components:
       - kind: selectField
         label: Metric
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance
       - kind: selectField
         label: Quantity
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance
       - kind: selectField
         label: Measurement Period
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance
       - kind: selectField
         label: Reset Period
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance
       - kind: selectField
         label: Warning Threshold
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance
       - kind: selectField
         label: Enforcement Type
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance
       - kind: selectField
         label: Overage Allowed
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance
       - kind: selectField
         label: Overage Rate
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance
       - kind: selectField
         label: Additional Pack Allowed
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 35 §Configuration per Allowance
   states:
     loading: The tier included allowances configuration as saved.
@@ -14352,86 +14346,109 @@ screens:
       components:
       - kind: selectField
         label: Commercial Model
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Charging Unit
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Rate
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Currency
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Billing Period
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Included Volume
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Minimum Guarantee
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Guarantee Period
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Percentage Rate
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Fixed Base Fee
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Module Charging
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Effective Date
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Expiry
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: Contract Applicability
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Commercial Configuration
           Fields
       - kind: selectField
         label: POS Limit
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure
       - kind: selectField
         label: Access Device Limit
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure
       - kind: selectField
         label: User Limit
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure
       - kind: selectField
         label: Venue Limit
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure
       - kind: selectField
         label: API Limit
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure
       - kind: selectField
         label: Storage Limit
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure
       - kind: selectField
         label: Module Entitlements
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure
       - kind: selectField
         label: Technical Capacity Profile
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure
       - kind: selectField
         label: Hard/Soft/Approval Enforcement
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 36 §Separately configure
   states:
     loading: The commercial licensing model configuration as saved.
@@ -14496,54 +14513,71 @@ screens:
       components:
       - kind: selectField
         label: Ticket Sold
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support
       - kind: selectField
         label: Ticket Issued
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support
       - kind: selectField
         label: Paid Ticket
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support
       - kind: selectField
         label: Transaction
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support
       - kind: selectField
         label: Admission/Redemption
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support
       - kind: selectField
         label: Gross Transaction Value
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support
       - kind: selectField
         label: Net Transaction Value
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support
       - kind: selectField
         label: Custom Billable Event
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configuration should support
       - kind: selectField
         label: 50 billable tickets
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Commercial rule can specify
       - kind: selectField
         label: 1 billable transaction
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Commercial rule can specify
       - kind: selectField
         label: Guarantee Amount
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure
       - kind: textField
         label: Monthly / Quarterly / Annual
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure
       - kind: selectField
         label: Carry Forward Allowed
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure
       - kind: selectField
         label: Carry Forward Period
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure
       - kind: selectField
         label: Reconciliation Method
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure
       - kind: selectField
         label: Currency
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure
       - kind: selectField
         label: Effective Dates
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 38 §Configure
   states:
     loading: The billable unit minimum configuration as saved.
@@ -14607,36 +14641,47 @@ screens:
       components:
       - kind: selectField
         label: Pack Name
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
       - kind: selectField
         label: Resource
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
       - kind: selectField
         label: Quantity
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
       - kind: selectField
         label: Price
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
       - kind: selectField
         label: Recurring/One-Time
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
       - kind: selectField
         label: Validity
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
       - kind: selectField
         label: Applicable Tier
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
       - kind: selectField
         label: Applicable Commercial Model
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
       - kind: selectField
         label: Auto-Renew
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
       - kind: selectField
         label: Proration
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
       - kind: selectField
         label: Effective Dates
+        operation: setLicensingModel
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 39 §Pack Configuration
   states:
     loading: The overage pricing capacity configuration as saved.
@@ -15043,6 +15088,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listPlans
         derived: true
         impliedBy: listPlans
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -15139,7 +15185,7 @@ screens:
         - Recommended / Required
         - Trial Availability
         bindsTo: null
-        operation: null
+        operation: listModuleCatalogue
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 46 §Each module displays
     - name: contextPanel
       slot: selection
@@ -15147,6 +15193,7 @@ screens:
       - kind: detailPanel
         label: The selected module marketplace
         bindsTo: null
+        operation: listModuleCatalogue
         columns:
         - Module Name
         - Description
@@ -15245,7 +15292,7 @@ screens:
         - Confidence
         - Reason
         bindsTo: null
-        operation: null
+        operation: listModuleCatalogue
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 48 §Each recommendation shows
     - name: contextPanel
       slot: selection
@@ -15253,6 +15300,7 @@ screens:
       - kind: detailPanel
         label: The selected module package recommendations
         bindsTo: null
+        operation: listModuleCatalogue
         columns:
         - Additional Monthly Cost
         - Annual Cost
@@ -15343,6 +15391,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listModuleCatalogue
         derived: true
         impliedBy: listModuleCatalogue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -15429,6 +15478,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listModuleCatalogue
         derived: true
         impliedBy: listModuleCatalogue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -15698,7 +15748,7 @@ screens:
         - Capacity Override
         - Contract Exception
         bindsTo: null
-        operation: null
+        operation: simulateCommercialPackage
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 53 §Show
     - name: contextPanel
       slot: selection
@@ -15706,6 +15756,7 @@ screens:
       - kind: detailPanel
         label: The selected package review commercial
         bindsTo: null
+        operation: simulateCommercialPackage
         columns:
         - Discount
         - Special Rate
@@ -16155,11 +16206,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `ACCOUNT_CONFIGURE`, expiry). The same state returns
       when the grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: createLegalEntity
-    contract: finance
-    purpose: Billing and legal entity
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -16533,51 +16579,67 @@ screens:
       components:
       - kind: selectField
         label: Trial Start
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: Trial End
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: Duration
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: Modules Enabled
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: POS Limit
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: Access Limit
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: User Limit
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: Transaction Limit
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: Ticket Limit
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: API Limit
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: Storage Limit
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Trial Configuration
       - kind: selectField
         label: Free Trial
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Configure
       - kind: selectField
         label: Paid Trial
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Configure
       - kind: selectField
         label: Trial Credit
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Configure
       - kind: selectField
         label: Limited Usage
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Configure
       - kind: selectField
         label: Full Package Trial
+        operation: setTrialConfiguration
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 62 §Configure
   states:
     loading: The trial conversion rules configuration as saved.
@@ -16653,7 +16715,7 @@ screens:
         - Approved By
         - Expiry
         bindsTo: null
-        operation: null
+        operation: previewSubscriptionChange
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 64 §Show
     - name: contextPanel
       slot: selection
@@ -16661,6 +16723,7 @@ screens:
       - kind: detailPanel
         label: The selected order commercial pricing
         bindsTo: null
+        operation: previewSubscriptionChange
         columns:
         - Discount Type
         - Value
@@ -17040,7 +17103,7 @@ screens:
         - License Request
         - Provisioning Request
         bindsTo: null
-        operation: null
+        operation: getSubscription
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 69 §Show
     - name: contextPanel
       slot: selection
@@ -17048,6 +17111,7 @@ screens:
       - kind: detailPanel
         label: The selected subscription lifecycle trial-to-paid
         bindsTo: null
+        operation: getSubscription
         columns:
         - Trial Usage
         - Trial Ticket Volume
@@ -17329,6 +17393,7 @@ screens:
         derived: true
         impliedBy: createOrgUnit
         label: Create org unit
+        operation: createOrgUnit
         notes: The act the screen exists for.
       - kind: secondaryButton
         label: Cancel
@@ -17695,26 +17760,32 @@ screens:
         provenance: contract identity.yaml GET /platform-staff-grants/mine
       - kind: progressIndicator
         label: Administrator Account Created
+        operation: getTenantLicences
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
         notes: A progress output of initialisation, not an input.
       - kind: progressIndicator
         label: Email Verified
+        operation: getTenantLicences
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
         notes: A progress output of initialisation, not an input.
       - kind: progressIndicator
         label: Tenant Access Assigned
+        operation: getTenantLicences
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
         notes: A progress output of initialisation, not an input.
       - kind: progressIndicator
         label: Default Role Applied
+        operation: getTenantLicences
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
         notes: A progress output of initialisation, not an input.
       - kind: progressIndicator
         label: Security Policy Applied
+        operation: getTenantLicences
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
         notes: A progress output of initialisation, not an input.
       - kind: progressIndicator
         label: Audit Logging Enabled
+        operation: getTenantLicences
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 75 §Security Setup
         notes: A progress output of initialisation, not an input.
       - kind: selectField
@@ -17773,11 +17844,6 @@ screens:
     contract: subscription
     purpose: Licence and entitlement activation
     trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: addLicenceAddOn
-    contract: subscription
-    purpose: Activate an add-on
-    trigger: onAction
     provenance: board reading, 19 September 2026
   - operationId: openPlatformStaffGrant
     contract: identity
@@ -17901,6 +17967,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listModuleCatalogue
         derived: true
         impliedBy: listModuleCatalogue
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -18371,42 +18438,53 @@ screens:
         provenance: contract identity.yaml GET /platform-staff-grants/mine
       - kind: selectField
         label: Currency
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as
       - kind: selectField
         label: Time Zone
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as
       - kind: selectField
         label: Language
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as
       - kind: selectField
         label: Venue Type
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Low-risk settings such as
       - kind: selectField
         label: Ticket prices
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings
           such as
       - kind: selectField
         label: Tax
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings
           such as
       - kind: selectField
         label: Refund policy
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings
           such as
       - kind: selectField
         label: Payment rules
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings
           such as
       - kind: selectField
         label: Access rules
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings
           such as
       - kind: selectField
         label: Settlement
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings
           such as
       - kind: selectField
         label: Capacity
+        operation: runGoLiveValidation
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 78 §Business-critical settings
           such as
       - kind: dataTable
@@ -18697,6 +18775,7 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+        operation: getEntitlementUsage
         derived: true
         impliedBy: getEntitlementUsage
         notes: One record, read-only.
@@ -18776,6 +18855,7 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+        operation: getTenantLicences
         derived: true
         impliedBy: getTenantLicences
         notes: One record, read-only.
@@ -18855,6 +18935,7 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+        operation: getUsageMetering
         derived: true
         impliedBy: getUsageMetering
         notes: One record, read-only.
@@ -18942,11 +19023,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: getLicenceEnforcement
-    contract: subscription
-    purpose: Thresholds and position
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
   - operationId: getPlanRecommendations
     contract: subscription
     purpose: What to do about a unit approaching or over its limit (tier versus capacity pack)
@@ -19114,7 +19190,7 @@ screens:
         - Projected month-end billable tickets
         - 'Projected variable billing basis: AED 32,850'
         bindsTo: null
-        operation: null
+        operation: getLicenceEnforcement
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 114 §Forecast
     - name: contextPanel
       slot: selection
@@ -19122,6 +19198,7 @@ screens:
       - kind: detailPanel
         label: The selected minimum guarantee variable
         bindsTo: null
+        operation: getLicenceEnforcement
         columns:
         - Projected month-end billable tickets
         - 'Projected variable billing basis: AED 32,850'
@@ -19193,30 +19270,39 @@ screens:
       components:
       - kind: selectField
         label: Resource
+        operation: addCapacityPack
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields
       - kind: selectField
         label: Quantity
+        operation: addCapacityPack
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields
       - kind: selectField
         label: Start
+        operation: addCapacityPack
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields
       - kind: selectField
         label: Expiry
+        operation: addCapacityPack
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields
       - kind: selectField
         label: Venue
+        operation: addCapacityPack
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields
       - kind: selectField
         label: Reason
+        operation: addCapacityPack
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields
       - kind: selectField
         label: Requested By
+        operation: addCapacityPack
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields
       - kind: selectField
         label: Commercial Treatment
+        operation: addCapacityPack
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields
       - kind: selectField
         label: Approval
+        operation: addCapacityPack
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 115 §Fields
   states:
     loading: The overage capacity temporary configuration as saved.
@@ -19364,6 +19450,7 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+        operation: getEntitlementUsage
         derived: true
         impliedBy: getEntitlementUsage
         notes: One record, read-only.
@@ -19449,7 +19536,7 @@ screens:
         - Timestamp
         - Effective Date
         bindsTo: null
-        operation: null
+        operation: getUsageMetering
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 119 §Track
     - name: contextPanel
       slot: selection
@@ -19457,6 +19544,7 @@ screens:
       - kind: detailPanel
         label: The selected license metering commercial
         bindsTo: null
+        operation: getUsageMetering
         columns:
         - Contract Version
         - License Version
@@ -19646,7 +19734,7 @@ screens:
         - Discounts/Credits
         - Tax
         bindsTo: null
-        operation: null
+        operation: listSubscriptionInvoices
         provenance: pack Subscription_Licensing_AI_Self_Service.pdf, page 122 §Show
     - name: contextPanel
       slot: selection
@@ -19654,6 +19742,7 @@ screens:
       - kind: detailPanel
         label: The selected billing commercial
         bindsTo: null
+        operation: listSubscriptionInvoices
         columns:
         - Platform Fee
         - Module Fees
@@ -19994,6 +20083,7 @@ screens:
         impliedBy: recordInvoicePayment
         notes: The act the screen exists for.
       - kind: dataTable
+        operation: listSubscriptionInvoices
         derived: true
         impliedBy: listSubscriptionInvoices
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -20027,11 +20117,6 @@ screens:
     contract: subscription
     purpose: Issue a full or partial credit note
     trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listCreditNotes
-    contract: subscription
-    purpose: Credit notes issued
-    trigger: onLoad
     provenance: build, 29 September 2026
   wireframe:
     status: notStarted
@@ -20134,11 +20219,6 @@ screens:
     purpose: Model a change
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: setSubscription
-    contract: subscription
-    purpose: Apply it
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   entryState:
     preloaded:
     - Current Monthly Equivalent
@@ -20163,6 +20243,7 @@ screens:
   module: Tenants & Licensing
   requiresModule: core
   wave: 3
+  permission: PLATFORM_BILLING_VIEW
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '10'
@@ -20386,11 +20467,6 @@ screens:
     purpose: Right-sizing options
     trigger: onAction
     provenance: board reading, 19 September 2026
-  - operationId: getPlanRecommendations
-    contract: subscription
-    purpose: Upgrade, downgrade and right-sizing recommendations for the tenant, priced
-    trigger: onLoad
-    provenance: build, 29 September 2026
   wireframe:
     status: notStarted
     board: wireframes/P09 TICVAI Web.dc.html#adm-465
@@ -20580,16 +20656,6 @@ screens:
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
   apis:
-  - operationId: cancelInvoice
-    contract: subscription
-    purpose: Credit or cancel
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-  - operationId: disputeInvoice
-    contract: subscription
-    purpose: Raise a dispute
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: issueCreditNote
     contract: subscription
     purpose: Credit an invoice in full or in part
@@ -20853,7 +20919,7 @@ screens:
         - Session Type Progress Last Activity Status
         - Summer Festival Event 100% Yesterday Blueprint Ready
         bindsTo: null
-        operation: null
+        operation: listConfigurationSessions
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 4 §Show intelligent cards such
           as
     - name: contextPanel
@@ -20862,6 +20928,7 @@ screens:
       - kind: detailPanel
         label: The selected home start
         bindsTo: null
+        operation: listConfigurationSessions
         columns:
         - Museum
         - Theme Park
@@ -20887,6 +20954,7 @@ screens:
       components:
       - kind: primaryButton
         label: Create New Configuration
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 4 §Allow
       - kind: secondaryButton
         label: Modify Existing Configuration
@@ -20919,11 +20987,6 @@ screens:
     contract: ai
     purpose: Configuration-assistant sessions
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: attachConfigurationSource
-    contract: ai
-    purpose: Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -21071,48 +21134,63 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: selectField
         label: 'Action: Create'
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup
       - kind: selectField
         label: 'Object: Venue'
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup
       - kind: selectField
         label: 'Venue Type: Museum'
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup
       - kind: selectField
         label: 'Organization: Existing'
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup
       - kind: selectField
         label: 'Location: Dubai'
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup
       - kind: selectField
         label: 'Operation Type: Permanent'
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup
       - kind: selectField
         label: 'Confidence: 96%'
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Detected Setup
       - kind: selectField
         label: ✓ Venue
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas
       - kind: selectField
         label: ✓ Products
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas
       - kind: selectField
         label: ✓ Schedule
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas
       - kind: selectField
         label: ✓ Capacity
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas
       - kind: selectField
         label: ✓ Pricing
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas
       - kind: selectField
         label: ✓ Sales Channels
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas
       - kind: selectField
         label: ✓ Ticket Media
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas
       - kind: selectField
         label: ✓ Access
+        operation: startConfigurationSession
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 5 §Likely Configuration Areas
   states:
     loading: The type business intent configuration as saved.
@@ -21132,21 +21210,6 @@ screens:
     contract: ai
     purpose: Start the configuration assistant
     trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: answerConfigurationQuestion
-    contract: ai
-    purpose: Answer the current question
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: attachConfigurationSource
-    contract: ai
-    purpose: Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listConfigurationSources
-    contract: ai
-    purpose: Attached documents with extraction status and what they could not read
-    trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -21287,93 +21350,123 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: selectField
         label: Venue Name
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Venue Type
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Country
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: City
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Time Zone
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Currency
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Operating Model
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: textField
         label: Permanent / Seasonal / Temporary
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: textField
         label: Indoor / Outdoor / Mixed
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Number of Locations
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: textField
         label: Number of Attractions / Experiences
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Business Model Discovery
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: General Admission
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Dated Admission
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Open-Dated Admission
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Timeslot Admission
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Assigned Seating
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Multi-Day Admission
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Membership
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Subscription
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Pass
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Attraction / Ride-Based
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Mixed Model
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Conditional Logic
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Venue = Theatre
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Performances
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Seat Map
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Sections
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Price Categories
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
       - kind: selectField
         label: Show Schedule
+        operation: answerConfigurationQuestion
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 7 §Capture as relevant
     - name: actionBar
       slot: publish
@@ -21403,11 +21496,6 @@ screens:
     contract: ai
     purpose: Answer the current question
     trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: getConfigurationBlueprint
-    contract: ai
-    purpose: The blueprint so far
-    trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: setAiVenueSettings
     contract: ai
@@ -21572,10 +21660,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: primaryButton
+        operation: answerConfigurationQuestion
         derived: true
         impliedBy: answerConfigurationQuestion
         notes: The act the screen exists for.
       - kind: detailPanel
+        operation: getConfigurationBlueprint
         derived: true
         impliedBy: getConfigurationBlueprint
         notes: One record, read-only.
@@ -21749,10 +21839,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: primaryButton
+        operation: answerConfigurationQuestion
         derived: true
         impliedBy: answerConfigurationQuestion
         notes: The act the screen exists for.
       - kind: detailPanel
+        operation: getConfigurationBlueprint
         derived: true
         impliedBy: getConfigurationBlueprint
         notes: One record, read-only.
@@ -21938,6 +22030,7 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getConfigurationBlueprint
         derived: true
         impliedBy: getConfigurationBlueprint
         notes: One record, read-only.
@@ -22112,10 +22205,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: primaryButton
+        operation: answerConfigurationQuestion
         derived: true
         impliedBy: answerConfigurationQuestion
         notes: The act the screen exists for.
       - kind: detailPanel
+        operation: getConfigurationBlueprint
         derived: true
         impliedBy: getConfigurationBlueprint
         notes: One record, read-only.
@@ -22280,15 +22375,19 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: selectField
         label: Configure Now
+        operation: decideBlueprintRecommendation
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 14 §Options
       - kind: selectField
         label: Use Recommended Policy
+        operation: decideBlueprintRecommendation
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 14 §Options
       - kind: selectField
         label: Decide Later
+        operation: decideBlueprintRecommendation
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 14 §Options
       - kind: selectField
         label: Required Rule
+        operation: decideBlueprintRecommendation
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 14 §Options
   states:
     loading: The required recommended optional configuration as saved.
@@ -22304,11 +22403,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: getConfigurationBlueprint
-    contract: ai
-    purpose: The blueprint so far
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: decideBlueprintRecommendation
     contract: ai
     purpose: Accept, modify, reject or defer a blueprint decision
@@ -22484,29 +22578,9 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: answerConfigurationQuestion
-    contract: ai
-    purpose: Answer the current question
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: getConfigurationBlueprint
     contract: ai
     purpose: The blueprint so far
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: decideBlueprintRecommendation
-    contract: ai
-    purpose: Accept, modify, reject or defer a blueprint decision
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: attachConfigurationSource
-    contract: ai
-    purpose: Attach an uploaded brief, brochure, price list, spreadsheet or brand asset to seed the session
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listConfigurationSources
-    contract: ai
-    purpose: Attached documents with extraction status and what they could not read
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
@@ -22657,10 +22731,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getConfigurationBlueprint
         derived: true
         impliedBy: getConfigurationBlueprint
         notes: One record, read-only.
       - kind: primaryButton
+        operation: buildConfigurationPlan
         derived: true
         impliedBy: buildConfigurationPlan
         notes: The act the screen exists for.
@@ -22938,11 +23014,6 @@ screens:
     purpose: The blueprint so far
     trigger: onLoad
     provenance: build, 29 September 2026
-  - operationId: buildConfigurationPlan
-    contract: ai
-    purpose: Compile the blueprint into a plan
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -23087,10 +23158,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getActionPlan
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
       - kind: primaryButton
+        operation: decideBlueprintRecommendation
         derived: true
         impliedBy: decideBlueprintRecommendation
         notes: The act the screen exists for.
@@ -23116,11 +23189,6 @@ screens:
   - operationId: getActionPlan
     contract: ai
     purpose: A plan with its steps
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getConfigurationBlueprint
-    contract: ai
-    purpose: The blueprint so far
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: decideBlueprintRecommendation
@@ -23275,10 +23343,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getActionPlan
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
       - kind: primaryButton
+        operation: decideBlueprintRecommendation
         derived: true
         impliedBy: decideBlueprintRecommendation
         notes: The act the screen exists for.
@@ -23304,11 +23374,6 @@ screens:
   - operationId: getActionPlan
     contract: ai
     purpose: A plan with its steps
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getConfigurationBlueprint
-    contract: ai
-    purpose: The blueprint so far
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: decideBlueprintRecommendation
@@ -23462,10 +23527,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getActionPlan
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
       - kind: primaryButton
+        operation: decideBlueprintRecommendation
         derived: true
         impliedBy: decideBlueprintRecommendation
         notes: The act the screen exists for.
@@ -23491,11 +23558,6 @@ screens:
   - operationId: getActionPlan
     contract: ai
     purpose: A plan with its steps
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getConfigurationBlueprint
-    contract: ai
-    purpose: The blueprint so far
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: decideBlueprintRecommendation
@@ -23693,11 +23755,6 @@ screens:
     purpose: A plan with its steps
     trigger: onLoad
     provenance: build, 29 September 2026
-  - operationId: getConfigurationBlueprint
-    contract: ai
-    purpose: The blueprint so far
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: decideBlueprintRecommendation
     contract: ai
     purpose: Accept, modify, reject or defer a blueprint decision
@@ -23855,10 +23912,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getActionPlan
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
       - kind: primaryButton
+        operation: decideBlueprintRecommendation
         derived: true
         impliedBy: decideBlueprintRecommendation
         notes: The act the screen exists for.
@@ -23884,11 +23943,6 @@ screens:
   - operationId: getActionPlan
     contract: ai
     purpose: A plan with its steps
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getConfigurationBlueprint
-    contract: ai
-    purpose: The blueprint so far
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: decideBlueprintRecommendation
@@ -24043,10 +24097,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getActionPlan
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
       - kind: primaryButton
+        operation: decideBlueprintRecommendation
         derived: true
         impliedBy: decideBlueprintRecommendation
         notes: The act the screen exists for.
@@ -24072,11 +24128,6 @@ screens:
   - operationId: getActionPlan
     contract: ai
     purpose: A plan with its steps
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getConfigurationBlueprint
-    contract: ai
-    purpose: The blueprint so far
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: decideBlueprintRecommendation
@@ -24229,10 +24280,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getActionPlan
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
       - kind: primaryButton
+        operation: decideBlueprintRecommendation
         derived: true
         impliedBy: decideBlueprintRecommendation
         notes: The act the screen exists for.
@@ -24258,11 +24311,6 @@ screens:
   - operationId: getActionPlan
     contract: ai
     purpose: A plan with its steps
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: getConfigurationBlueprint
-    contract: ai
-    purpose: The blueprint so far
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: decideBlueprintRecommendation
@@ -24466,11 +24514,6 @@ screens:
     purpose: A plan with its steps
     trigger: onLoad
     provenance: build, 29 September 2026
-  - operationId: simulateActionPlan
-    contract: ai
-    purpose: Validate and simulate a plan without changing anything
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -24604,73 +24647,91 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: selectField
         label: 👤 User Provided
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §Three Sources of Configuration
       - kind: textField
         label: 1. AI Configuration Build Command Center
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 2. Venue & Organization Configuration
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 3. Product Configuration Assistant
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 4. Schedule, Capacity & Availability Configuration
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 5. Pricing & Commercial Configuration
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 6. Promotion, Bundle & Upsell Configuration
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 7. Seating, Access & Operational Configuration
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 8. Channel, Media & Fulfillment Configuration
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 9. Cross-Module Conflict & Dependency Validation
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 10. Configuration Preview & Impact Analysis
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: “Tell TICVAI what your business needs.”
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: selectField
         label: ↓
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: “Govern, approve, and safely execute those changes.”
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: selectField
         label: '& Continuous Configuration'
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 'Module: AI Configuration Assistant'
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: textField
         label: 'Board: 3 of 3'
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
       - kind: selectField
         label: 'Screens: 10'
+        operation: simulateActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 37 §AI Configuration Builder &
           Validation
   states:
@@ -24687,11 +24748,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: getActionPlan
-    contract: ai
-    purpose: A plan with its steps
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: simulateActionPlan
     contract: ai
     purpose: Validate and simulate a plan without changing anything
@@ -24952,11 +25008,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state
       returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: getEffectiveAiPolicy
-    contract: ai
-    purpose: The policy in force for a capability at a scope
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: getActionPlan
     contract: ai
     purpose: A plan with its steps
@@ -25143,10 +25194,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getActionPlan
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
       - kind: primaryButton
+        operation: simulateActionPlan
         derived: true
         impliedBy: simulateActionPlan
         notes: The act the screen exists for.
@@ -25326,7 +25379,7 @@ screens:
         - Administrator
         - Reason
         bindsTo: null
-        operation: null
+        operation: getConfigurationBlueprint
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 47 §Track
     - name: contextPanel
       slot: selection
@@ -25334,6 +25387,7 @@ screens:
       - kind: detailPanel
         label: The selected recommendations best-practice review
         bindsTo: null
+        operation: getConfigurationBlueprint
         columns:
         - Recommendation
         - Family Package
@@ -25363,11 +25417,6 @@ screens:
     contract: ai
     purpose: The blueprint so far
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: decideBlueprintRecommendation
-    contract: ai
-    purpose: Accept, modify, reject or defer a blueprint decision
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -25545,21 +25594,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: getActionPlan
-    contract: ai
-    purpose: A plan with its steps
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listProposedActions
-    contract: ai
-    purpose: What the assistant has proposed and nobody has decided
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: decideProposedAction
-    contract: ai
-    purpose: Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -25707,10 +25741,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getActionPlan
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
       - kind: primaryButton
+        operation: pauseActionPlan
         derived: true
         impliedBy: pauseActionPlan
         notes: The act the screen exists for.
@@ -25718,6 +25754,7 @@ screens:
         derived: true
         impliedBy: cancelActionPlan
         label: Cancel action plan
+        operation: cancelActionPlan
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — which
           action plan is affected and what goes with it, in the screen''s own words; *are you sure* is
           not a confirmation.'
@@ -25914,7 +25951,7 @@ screens:
         - 🔴 Pricing Profile Creation Failed
         - Weekend Adult Pricing
         bindsTo: null
-        operation: null
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 51 §Show
     - name: contextPanel
       slot: selection
@@ -25922,6 +25959,7 @@ screens:
       - kind: detailPanel
         label: The selected execution progress dependency
         bindsTo: null
+        operation: getActionPlan
         columns:
         - Venue ✓
         - ↓
@@ -25965,21 +26003,6 @@ screens:
     contract: ai
     purpose: A plan with its steps
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: pauseActionPlan
-    contract: ai
-    purpose: Pause an executing plan
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: resumeActionPlan
-    contract: ai
-    purpose: Resume a paused plan
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: retryActionStep
-    contract: ai
-    purpose: Retry a failed step
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -26136,7 +26159,7 @@ screens:
         - MED-0082
         - ACC-0142
         bindsTo: null
-        operation: null
+        operation: getActionPlan
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 53 §Show
     - name: contextPanel
       slot: selection
@@ -26144,6 +26167,7 @@ screens:
       - kind: detailPanel
         label: The selected results object mapping
         bindsTo: null
+        operation: getActionPlan
         columns:
         - VEN-1028
         - ↓
@@ -26174,11 +26198,6 @@ screens:
     contract: ai
     purpose: A plan with its steps
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: rollbackActionPlan
-    contract: ai
-    purpose: Plan a rollback
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -26359,21 +26378,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: startConfigurationSession
-    contract: ai
-    purpose: Start the configuration assistant
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: answerConfigurationQuestion
-    contract: ai
-    purpose: Answer the current question
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: buildConfigurationPlan
-    contract: ai
-    purpose: Compile the blueprint into a plan
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -26516,14 +26520,17 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getActionPlan
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
       - kind: primaryButton
+        operation: rollbackActionPlan
         derived: true
         impliedBy: rollbackActionPlan
         notes: The act the screen exists for.
       - kind: dataTable
+        operation: listConfigurationSessions
         derived: true
         impliedBy: listConfigurationSessions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -26853,7 +26860,7 @@ screens:
         - ⚙ System Derived
         - 📋 Existing Configuration
         bindsTo: null
-        operation: null
+        operation: getAiDecisionTrace
         provenance: pack AI_Configuration_Assistant_Reference.pdf, page 57 §For each configuration value
           show
     - name: contextPanel
@@ -26862,6 +26869,7 @@ screens:
       - kind: detailPanel
         label: The selected audit governance
         bindsTo: null
+        operation: getAiDecisionTrace
         columns:
         - Source
         - 👤 User Provided
@@ -27583,8 +27591,10 @@ screens:
         derived: true
         impliedBy: setForecastDefinition
         label: Save forecast definition
+        operation: setForecastDefinition
         notes: The act the screen exists for.
       - kind: dataTable
+        operation: listForecastSignals
         derived: true
         impliedBy: listForecastSignals
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -27617,11 +27627,6 @@ screens:
     contract: ai
     purpose: Forecast signals and their freshness
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: configureForecastSignalSource
-    contract: ai
-    purpose: Set up a forecast signal
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -27769,10 +27774,12 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: primaryButton
+        operation: configureAnomalyDetector
         derived: true
         impliedBy: configureAnomalyDetector
         notes: The act the screen exists for.
       - kind: dataTable
+        operation: getForecast
         derived: true
         impliedBy: listAiInsights
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -27806,11 +27813,6 @@ screens:
     purpose: Set an alert when the forecast crosses a threshold (e.g. attendance p50 above N, occupancy
       above % of capacity)
     trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listAiInsights
-    contract: ai
-    purpose: Forecast threshold alerts (kind forecastThreshold)
-    trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -28914,7 +28916,7 @@ screens:
         - Confidence
         - Operational Implications
         bindsTo: null
-        operation: null
+        operation: getForecast
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 18 §Show
     - name: contextPanel
       slot: selection
@@ -28922,6 +28924,7 @@ screens:
       - kind: detailPanel
         label: The selected forecast scenario what-if
         bindsTo: null
+        operation: getForecast
         columns:
         - Attendance
         - Revenue
@@ -28951,16 +28954,6 @@ screens:
     contract: ai
     purpose: Forecast values
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: createForecastScenario
-    contract: ai
-    purpose: Run a what-if
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: compareForecastScenarios
-    contract: ai
-    purpose: Compare scenarios
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -29511,11 +29504,6 @@ screens:
     purpose: Forecast values
     trigger: onLoad
     provenance: build, 29 September 2026
-  - operationId: listOperationalRequirements
-    contract: ai
-    purpose: Requirements derived from the forecast
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -29655,11 +29643,13 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
+        operation: getForecast
         derived: true
         impliedBy: listOperationalRequirements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
+        operation: configureAnomalyDetector
         derived: true
         impliedBy: configureAnomalyDetector
         notes: The act the screen exists for.
@@ -29697,11 +29687,6 @@ screens:
     purpose: Set an alert when the forecast crosses a threshold (e.g. attendance p50 above N, occupancy
       above % of capacity)
     trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listAiInsights
-    contract: ai
-    purpose: Forecast threshold alerts (kind forecastThreshold)
-    trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -29850,11 +29835,13 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
+        operation: getForecast
         derived: true
         impliedBy: listOperationalRequirements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
+        operation: requestSuggestion
         derived: true
         impliedBy: requestSuggestion
         notes: The act the screen exists for.
@@ -29880,11 +29867,6 @@ screens:
   - operationId: getForecast
     contract: ai
     purpose: Forecast values
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listOperationalRequirements
-    contract: ai
-    purpose: Requirements derived from the forecast
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: requestSuggestion
@@ -30031,6 +30013,7 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
+        operation: getForecast
         derived: true
         impliedBy: listOperationalRequirements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -30052,11 +30035,6 @@ screens:
   - operationId: getForecast
     contract: ai
     purpose: Forecast values
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listOperationalRequirements
-    contract: ai
-    purpose: Requirements derived from the forecast
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
@@ -30204,7 +30182,7 @@ screens:
         - Credential mix
         - Manual validation rate
         bindsTo: null
-        operation: null
+        operation: getStaffingCoverage
         provenance: pack AI_Forecasting_and_Predictive_Intelligence_Reference.pdf, page 38 §Show
     - name: contextPanel
       slot: selection
@@ -30212,6 +30190,7 @@ screens:
       - kind: detailPanel
         label: The selected workforce demand staffing
         bindsTo: null
+        operation: getStaffingCoverage
         columns:
         - Required Staff
         - Currently Scheduled
@@ -30239,16 +30218,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, `WORKFORCE_VIEW`, expiry). The same state
       returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: getForecast
-    contract: ai
-    purpose: Forecast values
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listOperationalRequirements
-    contract: ai
-    purpose: Requirements derived from the forecast
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: getStaffingCoverage
     contract: workforce
     purpose: Workforce demand and staffing forecast against rostered staff (basis=forecastRequirement)
@@ -30439,16 +30408,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: getForecast
-    contract: ai
-    purpose: Forecast values
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listOperationalRequirements
-    contract: ai
-    purpose: Requirements derived from the forecast
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -30597,6 +30556,7 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
+        operation: getForecast
         derived: true
         impliedBy: listOperationalRequirements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -30618,11 +30578,6 @@ screens:
   - operationId: getForecast
     contract: ai
     purpose: Forecast values
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listOperationalRequirements
-    contract: ai
-    purpose: Requirements derived from the forecast
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
@@ -30764,6 +30719,7 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
+        operation: getForecast
         derived: true
         impliedBy: listOperationalRequirements
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -30785,11 +30741,6 @@ screens:
   - operationId: getForecast
     contract: ai
     purpose: Forecast values
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listOperationalRequirements
-    contract: ai
-    purpose: Requirements derived from the forecast
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
@@ -30954,20 +30905,10 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: createForecastScenario
-    contract: ai
-    purpose: Run a what-if
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: compareForecastScenarios
     contract: ai
     purpose: Compare scenarios
     trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listOperationalRequirements
-    contract: ai
-    purpose: Requirements derived from the forecast
-    trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -31156,16 +31097,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: listOperationalRequirements
-    contract: ai
-    purpose: Requirements derived from the forecast
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: decideOperationalRequirement
-    contract: ai
-    purpose: Accept, modify or reject a requirement
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -31426,21 +31357,6 @@ screens:
   - operationId: listAiCapabilities
     contract: ai
     purpose: The capability registry
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: pauseAiCapability
-    contract: ai
-    purpose: Stop a capability now
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: promoteAiRelease
-    contract: ai
-    purpose: Promote a release to its next stage (a person)
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listAiGovernanceAlerts
-    contract: ai
-    purpose: Governance alerts
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listAiCapabilityMaturity
@@ -31822,11 +31738,13 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
+        operation: listAiCapabilities
         derived: true
         impliedBy: listAiCapabilities
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
+        operation: configureAiCapability
         derived: true
         impliedBy: configureAiCapability
         notes: The act the screen exists for.
@@ -31991,30 +31909,39 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: selectField
         label: Tenant
+        operation: configureAiCapability
         provenance: pack AI_Governance_Reference.pdf, page 9 §Configure by
       - kind: selectField
         label: Venue
+        operation: configureAiCapability
         provenance: pack AI_Governance_Reference.pdf, page 9 §Configure by
       - kind: selectField
         label: AI Capability
+        operation: configureAiCapability
         provenance: pack AI_Governance_Reference.pdf, page 9 §Configure by
       - kind: selectField
         label: Module
+        operation: configureAiCapability
         provenance: pack AI_Governance_Reference.pdf, page 9 §Configure by
       - kind: selectField
         label: Action Type
+        operation: configureAiCapability
         provenance: pack AI_Governance_Reference.pdf, page 9 §Configure by
       - kind: selectField
         label: User Role
+        operation: configureAiCapability
         provenance: pack AI_Governance_Reference.pdf, page 9 §Configure by
       - kind: selectField
         label: Environment
+        operation: configureAiCapability
         provenance: pack AI_Governance_Reference.pdf, page 9 §Configure by
       - kind: selectField
         label: Risk Level
+        operation: configureAiCapability
         provenance: pack AI_Governance_Reference.pdf, page 9 §Configure by
       - kind: selectField
         label: Business Unit
+        operation: configureAiCapability
         provenance: pack AI_Governance_Reference.pdf, page 9 §Configure by
   states:
     loading: The autonomy level configuration as saved.
@@ -32030,11 +31957,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state
       returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: listAiCapabilities
-    contract: ai
-    purpose: The capability registry
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: configureAiCapability
     contract: ai
     purpose: Register a capability, or change its owner, risk class or autonomy
@@ -32459,8 +32381,10 @@ screens:
         derived: true
         impliedBy: createAiGovernancePolicyDraft
         label: Create
+        operation: createAiGovernancePolicyDraft
         notes: The act the screen exists for.
       - kind: dataTable
+        operation: listAiGovernancePolicyVersions
         derived: true
         impliedBy: listAiGovernancePolicyVersions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -32493,16 +32417,6 @@ screens:
     contract: ai
     purpose: Governance policies and their versions
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listDataRetentionSettings
-    contract: tenancy
-    purpose: AI data retention (prompts, conversations, decision records, index)
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: setDataRetentionSetting
-    contract: tenancy
-    purpose: Set an AI class's period
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -32686,11 +32600,6 @@ screens:
     contract: ai
     purpose: The policy in force for a capability at a scope
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: createAiGovernancePolicyDraft
-    contract: ai
-    purpose: Draft a governance policy, or a new version of one
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -32881,11 +32790,6 @@ screens:
   - operationId: getEffectiveAiPolicy
     contract: ai
     purpose: The policy in force for a capability at a scope
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listAiGovernancePolicyVersions
-    contract: ai
-    purpose: Governance policies and their versions
     trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: createAiPolicyException
@@ -33607,11 +33511,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: getActionPlan
-    contract: ai
-    purpose: A plan with its steps
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listProposedActions
     contract: ai
     purpose: What the assistant has proposed and nobody has decided
@@ -33822,21 +33721,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, `APPROVAL_CONFIGURE`, `APPROVAL_VIEW`,
       expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: createAiGovernancePolicyDraft
-    contract: ai
-    purpose: Draft a governance policy, or a new version of one
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listAiGovernancePolicyVersions
-    contract: ai
-    purpose: Governance policies and their versions
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listAiTools
-    contract: ai
-    purpose: The tool registry
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: listApprovalMatrices
     contract: approvals
     purpose: The matrices AI actions route through
@@ -34000,9 +33884,11 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: textField
         label: Adult Weekend Price AED 140 AED 150
+        operation: simulateActionPlan
         provenance: pack AI_Governance_Reference.pdf, page 33 §Configuration Current Proposed
       - kind: textField
         label: Effective Date Current 1 Oct 2026
+        operation: simulateActionPlan
         provenance: pack AI_Governance_Reference.pdf, page 33 §Configuration Current Proposed
   states:
     loading: The approval review configuration as saved.
@@ -34018,19 +33904,9 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: getActionPlan
-    contract: ai
-    purpose: A plan with its steps
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: simulateActionPlan
     contract: ai
     purpose: Validate and simulate a plan without changing anything
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: decideProposedAction
-    contract: ai
-    purpose: Approve or reject a proposal (tier 1 here; tier 2 routed to Approvals)
     trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
@@ -34185,6 +34061,7 @@ screens:
         notes: One record, read-only.
         operation: getActionPlan
       - kind: primaryButton
+        operation: decideProposedAction
         derived: true
         impliedBy: decideProposedAction
         notes: The act the screen exists for.
@@ -34393,7 +34270,7 @@ screens:
         - Alternatives
         - Ask AI
         bindsTo: null
-        operation: null
+        operation: getAiDecisionTrace
         provenance: pack AI_Governance_Reference.pdf, page 36 §Show
     - name: contextPanel
       slot: selection
@@ -34401,6 +34278,7 @@ screens:
       - kind: detailPanel
         label: The selected human review challenge
         bindsTo: null
+        operation: getAiDecisionTrace
         columns:
         - Proposed Action
         - Business Context
@@ -34427,20 +34305,10 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_APPROVE`, `AI_AUDIT_VIEW`, `AI_USE`, expiry).
       The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: overrideAiDecision
-    contract: ai
-    purpose: Override an AI decision
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: getAiDecisionTrace
     contract: ai
     purpose: The full trace of a decision
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: sendAiMessage
-    contract: ai
-    purpose: Ask the assistant
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -35555,24 +35423,31 @@ screens:
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: selectField
         label: Risk
+        operation: simulateAiGovernancePolicy
         provenance: pack AI_Governance_Reference.pdf, page 44 §Board 1 defines
       - kind: selectField
         label: Autonomy
+        operation: simulateAiGovernancePolicy
         provenance: pack AI_Governance_Reference.pdf, page 44 §Board 1 defines
       - kind: selectField
         label: AI permissions
+        operation: simulateAiGovernancePolicy
         provenance: pack AI_Governance_Reference.pdf, page 44 §Board 1 defines
       - kind: selectField
         label: Data usage
+        operation: simulateAiGovernancePolicy
         provenance: pack AI_Governance_Reference.pdf, page 44 §Board 1 defines
       - kind: selectField
         label: Policy
+        operation: simulateAiGovernancePolicy
         provenance: pack AI_Governance_Reference.pdf, page 44 §Board 1 defines
       - kind: selectField
         label: Governance decision
+        operation: simulateAiGovernancePolicy
         provenance: pack AI_Governance_Reference.pdf, page 44 §Board 1 defines
       - kind: textField
         label: Important Boundary — Owning Modules
+        operation: simulateAiGovernancePolicy
         provenance: pack AI_Governance_Reference.pdf, page 44 §Board 1 defines
     - name: actionBar
       slot: publish
@@ -35597,11 +35472,6 @@ screens:
   - operationId: simulateAiGovernancePolicy
     contract: ai
     purpose: Test a draft policy before it is published
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: simulateActionPlan
-    contract: ai
-    purpose: Validate and simulate a plan without changing anything
     trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
@@ -36026,6 +35896,7 @@ screens:
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
       - kind: detailPanel
+        operation: getAiDecisionTrace
         derived: true
         impliedBy: getAiDecisionTrace
         notes: One record, read-only.
@@ -36603,7 +36474,7 @@ screens:
         - VIP Tour
         - Remaining Capacity = 0
         bindsTo: null
-        operation: null
+        operation: getAiDecisionTrace
         provenance: pack AI_Governance_Reference.pdf, page 62 §Show
     - name: contextPanel
       slot: selection
@@ -36611,6 +36482,7 @@ screens:
       - kind: detailPanel
         label: The selected candidate rule decision
         bindsTo: null
+        operation: getAiDecisionTrace
         columns:
         - Rule
         - CAP-014
@@ -36635,11 +36507,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, `AI_USE`, expiry). The same state
       returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: explainRecommendationDecision
-    contract: ai
-    purpose: Why these recommendations
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: getAiDecisionTrace
     contract: ai
     purpose: The full trace of a decision
@@ -36818,7 +36685,7 @@ screens:
         - Fallback Provider
         - Success
         bindsTo: null
-        operation: null
+        operation: listAiModels
         provenance: pack AI_Governance_Reference.pdf, page 64 §Show
     - name: contextPanel
       slot: selection
@@ -36826,6 +36693,7 @@ screens:
       - kind: detailPanel
         label: The selected model provider runtime
         bindsTo: null
+        operation: getAiDecisionTrace
         columns:
         - AI Capability
         - Engine
@@ -37211,6 +37079,7 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: detailPanel
+        operation: getActionPlan
         derived: true
         impliedBy: getActionPlan
         notes: One record, read-only.
@@ -37232,11 +37101,6 @@ screens:
     contract: ai
     purpose: A plan with its steps
     trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: getAiDecisionTrace
-    contract: ai
-    purpose: The full trace of a decision
-    trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -37420,16 +37284,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, expiry). The same state returns
       when the grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: searchAiDecisions
-    contract: ai
-    purpose: Find AI decisions
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: exportAiEvidencePackage
-    contract: ai
-    purpose: Export an evidence package
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -37573,7 +37427,7 @@ screens:
         - Governance v1.5
         - Comparison
         bindsTo: null
-        operation: null
+        operation: getAiDecisionTrace
         provenance: pack AI_Governance_Reference.pdf, page 71 §Compare
     - name: contextPanel
       slot: selection
@@ -37581,6 +37435,7 @@ screens:
       - kind: detailPanel
         label: The selected trace investigation replay
         bindsTo: null
+        operation: getAiDecisionTrace
         columns:
         - Model v3.2
         - Model v3.3
@@ -37610,11 +37465,6 @@ screens:
     contract: ai
     purpose: The full trace of a decision
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: replayAiDecision
-    contract: ai
-    purpose: Re-simulate a decision
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -38126,16 +37976,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_CONFIGURE`, `AI_USE`, expiry). The same state
       returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: listAiRiskRegister
-    contract: ai
-    purpose: The AI risk register
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: setAiRiskRegisterEntry
-    contract: ai
-    purpose: Record or update a risk register entry
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -38280,11 +38120,13 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
+        operation: listAiControls
         derived: true
         impliedBy: listAiControls
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
+        operation: runAiControlTest
         derived: true
         impliedBy: runAiControlTest
         notes: The act the screen exists for.
@@ -38533,11 +38375,6 @@ screens:
     purpose: Governance alerts
     trigger: onLoad
     provenance: build, 29 September 2026
-  - operationId: decideAiGovernanceAlert
-    contract: ai
-    purpose: Acknowledge, dismiss, resolve, or open an incident
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -38779,11 +38616,6 @@ screens:
     contract: ai
     purpose: Governance alerts
     trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: decideAiGovernanceAlert
-    contract: ai
-    purpose: Acknowledge, dismiss, resolve, or open an incident
-    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
@@ -39219,11 +39051,13 @@ screens:
           audit R135).
         provenance: contract identity.yaml POST /platform-staff-grants
       - kind: dataTable
+        operation: listAiGovernanceAlerts
         derived: true
         impliedBy: listAiGovernanceAlerts
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
+        operation: decideAiGovernanceAlert
         derived: true
         impliedBy: decideAiGovernanceAlert
         notes: The act the screen exists for.
@@ -39254,11 +39088,6 @@ screens:
   - operationId: decideAiGovernanceAlert
     contract: ai
     purpose: Acknowledge, dismiss, resolve, or open an incident
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: openAiIncident
-    contract: ai
-    purpose: Open an AI incident
     trigger: onAction
     provenance: build, 29 September 2026
   - operationId: listTenants
@@ -39772,21 +39601,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, `AI_USE`, expiry). The same state
       returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: exportAiEvidencePackage
-    contract: ai
-    purpose: Export an evidence package
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listAiRiskRegister
-    contract: ai
-    purpose: The AI risk register
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listAiControls
-    contract: ai
-    purpose: Governance controls
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -39946,16 +39760,6 @@ screens:
       (`openPlatformStaffGrant`: reason, permissions `AI_USE`, expiry). The same state returns when the
       grant reaches `expiresAt` (audit R098; CHG-SBO-001).'
   apis:
-  - operationId: listAiGovernanceAlerts
-    contract: ai
-    purpose: Governance alerts
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: listAiRiskRegister
-    contract: ai
-    purpose: The AI risk register
-    trigger: onLoad
-    provenance: build, 29 September 2026
   - operationId: listTenants
     contract: subscription
     purpose: 'The tenant picker: the operator picks a tenant before acting in its cell (audit R098; decided
@@ -40185,7 +39989,7 @@ screens:
         - Variance
         - Overdue
         bindsTo: null
-        operation: null
+        operation: listReconciliationSources
         provenance: pack Payment_Payment_Orchestration.pdf, page 138 §Show
     - name: contextPanel
       slot: selection
@@ -40193,6 +39997,7 @@ screens:
       - kind: detailPanel
         label: The selected reconciliation settlement \t139
         bindsTo: null
+        operation: listReconciliationSources
         columns:
         - Expected
         - Pending

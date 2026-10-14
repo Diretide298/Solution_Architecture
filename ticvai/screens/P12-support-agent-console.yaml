@@ -2109,6 +2109,7 @@ screens:
       - kind: detailPanel
         label: The selected customer service
         bindsTo: CustomerServiceCommandCenterView
+        operation: listCustomerService
         columns:
         - CustomerServiceCommandCenterView.myOpenCases
         - CustomerServiceCommandCenterView.newCases
@@ -2267,6 +2268,7 @@ screens:
       - kind: detailPanel
         label: The selected customer 360° service
         bindsTo: Customer360ServiceProfileView
+        operation: listCustomerServiceProfile
         columns:
         - Customer360ServiceProfileView.customerName
         - Customer360ServiceProfileView.customerId
@@ -3400,11 +3402,6 @@ screens:
     contract: marketing-crm
     purpose: AI Customer Service Copilot & Knowledge Workspace
     trigger: onAction
-  - operationId: configureAssistantProfile
-    contract: ai
-    purpose: Define an assistant profile
-    trigger: onAction
-    provenance: build, 29 September 2026
   - operationId: listAssistantProfiles
     contract: ai
     purpose: Assistant profiles

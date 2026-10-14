@@ -1890,6 +1890,7 @@ screens:
       components:
       - kind: cardList
         bindsTo: KitchenTicket[]
+        operation: listKitchenTickets
         notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
           sits above one that arrived first, because a kitchen works to when food is wanted.'
         provenance: carried from the previous definition

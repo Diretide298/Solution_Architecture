@@ -3121,6 +3121,7 @@ screens:
         notes: What is published and what is waiting in the draft. Maintenance is live state, never published
           or restored, so it is shown only as context, apart from what Publish changes.
       - kind: publishGate
+        operation: listBookingFlows
         impliedBy: publishTenantConfig
         notes: 'Declares `publishTenantConfig`. **The gate names what the publish will affect before it
           happens** — a disabled Publish with no reason is the state operators escalate. **Booking flows
@@ -5893,103 +5894,133 @@ screens:
       components:
       - kind: selectField
         label: Country
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Brand
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Channel
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Customer age
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Customer status
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Product
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Membership
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Existing consents
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Existing policy acceptance
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Language
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Requested processing
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Configure
       - kind: selectField
         label: Missing policy
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing consent mapping
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing language
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Conflicting consent rules
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing processing purpose
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Invalid effective dates
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Unmapped tracking technology
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Missing guardian rule
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Unpublished dependency
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: Circular configuration dependency
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Detect configuration
           problems such as
       - kind: selectField
         label: 1 Center
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: selectField
         label: 2 Registry processed
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: textField
         label: '# Backend Screen Core Responsibility'
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: selectField
         label: '3'
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: textField
         label: 17.1. Communication Preference & Marketing Marketing/channel
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: textField
         label: 4 Permission Configuration permissions
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: selectField
         label: 17.1. Cookie/SDK/tracker
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: textField
         label: Cookie, Tracking & Digital Technology Registry
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
       - kind: selectField
         label: 5 inventory
+        operation: approvePrivacyTesting
         provenance: pack Privacy__Consent___Preference_Management_Reference.pdf, page 16 §Central configuration
     - name: actionBar
       slot: publish
@@ -6411,6 +6442,7 @@ screens:
       - kind: detailPanel
         label: The selected consent evidence history
         bindsTo: ConsentEvidenceHistoryWithdrawalManagementView
+        operation: listConsentEvidenceWithdrawal
         columns:
         - ConsentEvidenceHistoryWithdrawalManagementView.propagation[].target
         - ConsentEvidenceHistoryWithdrawalManagementView.propagation[].status
@@ -7310,6 +7342,7 @@ screens:
       - kind: detailPanel
         label: The selected privacy analytics compliance
         bindsTo: PrivacyAnalyticsAiComplianceIntelligenceView
+        operation: listPrivacyCompliance
         columns:
         - PrivacyAnalyticsAiComplianceIntelligenceView.consentRate
         - PrivacyAnalyticsAiComplianceIntelligenceView.withdrawalRate
@@ -8721,17 +8754,21 @@ screens:
       components:
       - kind: selectField
         label: Required fields configured
+        operation: approveWaiverTesting
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Fields
       - kind: selectField
         label: 11.1.1
+        operation: approveWaiverTesting
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Configuration
           experience
       - kind: selectField
         label: '0'
+        operation: approveWaiverTesting
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Configuration
           experience
       - kind: textField
         label: → Approve & Publish
+        operation: approveWaiverTesting
         provenance: pack Waiver, Consent & Digital Form Management_Reference.pdf, page 21 §Board 1 Configuration
           Flow
     - name: actionBar
@@ -9971,6 +10008,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listWaiverComplianceRisk
         derived: true
         impliedBy: listWaiverComplianceRisk
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -10227,6 +10265,7 @@ screens:
         provenance: pack Digital Asset Management DAM.pdf, page 5 §Allow filtering by
       - kind: multiSelect
         label: Filter by
+        operation: semanticSearch
         columns:
         - Tenant
         - Venue
@@ -10248,6 +10287,7 @@ screens:
           media are not library assets.'
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         bindsTo: MediaAsset.sizeBytes
+        operation: semanticSearch
     - name: contentBody
       slot: collection
       components:
@@ -10264,7 +10304,7 @@ screens:
         - owner
         - updated date
         bindsTo: null
-        operation: null
+        operation: searchMedia
         provenance: pack Digital Asset Management DAM.pdf, page 5 §Each card should show
     - name: contextPanel
       slot: selection
@@ -10272,6 +10312,7 @@ screens:
       - kind: detailPanel
         label: The selected central digital asset
         bindsTo: null
+        operation: searchMedia
         columns:
         - Thumbnail
         - asset name
@@ -10316,11 +10357,6 @@ screens:
   - operationId: searchMedia
     contract: assets
     purpose: Browse and filter the library
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: listCollections
-    contract: assets
-    purpose: Collections to file into
     trigger: onLoad
     provenance: board reading, 19 September 2026
   - operationId: semanticSearch
@@ -10403,6 +10439,7 @@ screens:
         provenance: pack Digital Asset Management DAM.pdf, page 6 §Support
       - kind: secondaryButton
         label: Bulk Upload
+        operation: completeUpload
         provenance: pack Digital Asset Management DAM.pdf, page 6 §Support
       - kind: secondaryButton
         label: Import from Approved Source
@@ -10434,13 +10471,6 @@ screens:
     invalidates:
     - searchMedia
     - getMediaUsageAnalytics
-  - operationId: analyseMediaAsset
-    contract: assets
-    purpose: Auto-tag on ingest
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getMediaAsset
   wireframe:
     status: notStarted
     board: wireframes/P13 Venue CMS.dc.html#cms-063
@@ -10716,21 +10746,25 @@ screens:
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Dubai Park
         bindsTo: MediaAsset.venueId
+        operation: setMediaAssetTags
       - kind: selectField
         label: Category
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Marketing
         bindsTo: MediaAsset.categoryId
+        operation: setMediaAssetTags
       - kind: selectField
         label: Campaign
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Summer 2026
         bindsTo: MediaAsset.tags
+        operation: setMediaAssetTags
       - kind: selectField
         label: Tags
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: e.g. Family, Outdoor
         bindsTo: MediaAsset.tags
+        operation: setMediaAssetTags
   states:
     loading: The tags keywords classification configuration as saved.
     error: Could not load. Names which read failed and leaves the tags keywords classification untouched.
@@ -10928,7 +10962,7 @@ screens:
         - Tags
         - Keywords
         bindsTo: null
-        operation: null
+        operation: listMediaAssetVersions
         provenance: pack Digital Asset Management DAM.pdf, page 13 §Show
     - name: contextPanel
       slot: selection
@@ -10936,6 +10970,7 @@ screens:
       - kind: detailPanel
         label: The selected digital asset 360°
         bindsTo: null
+        operation: getMediaAsset
         columns:
         - Asset ID
         - title
@@ -10977,11 +11012,6 @@ screens:
     contract: assets
     purpose: Its revisions
     trigger: onAction
-    provenance: board reading, 19 September 2026
-  - operationId: getMediaDistribution
-    contract: assets
-    purpose: Where it is used
-    trigger: onLoad
     provenance: board reading, 19 September 2026
   entryState:
     preloaded:
@@ -11161,7 +11191,7 @@ screens:
         - Used Storage
         - Monthly Growth
         bindsTo: null
-        operation: null
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 16 §Display
     - name: contextPanel
       slot: selection
@@ -11169,6 +11199,7 @@ screens:
       - kind: detailPanel
         label: The selected asset activity recent
         bindsTo: null
+        operation: getMediaUsageAnalytics
         columns:
         - Assets Added
         - Assets Updated
@@ -11542,13 +11573,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: analyseMediaAsset
-    contract: assets
-    purpose: Auto-tag and describe
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getMediaAsset
   - operationId: setMediaAssetTags
     contract: assets
     purpose: Promote the proposals
@@ -11627,7 +11651,7 @@ screens:
         - format
         - dimensions
         bindsTo: null
-        operation: null
+        operation: searchMedia
         provenance: pack Digital Asset Management DAM.pdf, page 28 §Each result should show
     - name: contextPanel
       slot: selection
@@ -11635,6 +11659,7 @@ screens:
       - kind: detailPanel
         label: The selected semantic natural-language asset
         bindsTo: null
+        operation: searchMedia
         columns:
         - Thumbnail
         - asset
@@ -11998,6 +12023,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listMediaAssetVersions
         derived: true
         impliedBy: listMediaAssetVersions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -12104,6 +12130,7 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+        operation: listMediaAssetVersions
         derived: true
         impliedBy: listMediaAssetVersions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
@@ -12180,11 +12207,13 @@ screens:
         label: Rendition Presets
         provenance: pack Digital Asset Management DAM.pdf, page 33 §Administrators should configure
       - kind: dataTable
+        operation: listMediaRenditions
         derived: true
         impliedBy: listMediaRenditions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
       - kind: primaryButton
+        operation: requestMediaRendition
         derived: true
         impliedBy: requestMediaRendition
         notes: The act the screen exists for.
@@ -12399,7 +12428,7 @@ screens:
         - AI requests
         - estimated/actual AI consumption cost
         bindsTo: null
-        operation: null
+        operation: getMediaUsageAnalytics
         provenance: pack Digital Asset Management DAM.pdf, page 35 §Track
     - name: contextPanel
       slot: selection
@@ -12407,6 +12436,7 @@ screens:
       - kind: detailPanel
         label: The selected quality intelligence review
         bindsTo: null
+        operation: getMediaUsageAnalytics
         columns:
         - Assets processed
         - images analyzed
@@ -12592,7 +12622,7 @@ screens:
         - Blocked
         - Critical Alerts
         bindsTo: null
-        operation: null
+        operation: getExpiringRights
         provenance: pack Digital Asset Management DAM.pdf, page 43 §Display
     - name: contextPanel
       slot: selection
@@ -12600,6 +12630,7 @@ screens:
       - kind: detailPanel
         label: The selected dam governance rights
         bindsTo: null
+        operation: getExpiringRights
         columns:
         - Active Assets
         - Pending Approval
@@ -12642,11 +12673,6 @@ screens:
   - operationId: getExpiringRights
     contract: assets
     purpose: Rights about to lapse
-    trigger: onLoad
-    provenance: board reading, 19 September 2026
-  - operationId: getMediaUsageAnalytics
-    contract: assets
-    purpose: Governance coverage
     trigger: onLoad
     provenance: board reading, 19 September 2026
   entryState:
@@ -12725,6 +12751,7 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+        operation: getMediaAsset
         derived: true
         impliedBy: getMediaAsset
         notes: One record, read-only.
@@ -12743,11 +12770,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: updateMediaAsset
-    contract: assets
-    purpose: Set owner and responsibility
-    trigger: onAction
-    provenance: board reading, 19 September 2026
   - operationId: getMediaAsset
     contract: assets
     purpose: The asset being assigned
@@ -13360,7 +13382,7 @@ screens:
         - Expires in 60 Days
         - Expired
         bindsTo: null
-        operation: null
+        operation: getExpiringRights
         provenance: pack Digital Asset Management DAM.pdf, page 52 §Show
     - name: contextPanel
       slot: selection
@@ -13368,6 +13390,7 @@ screens:
       - kind: detailPanel
         label: The selected rights expiry renewal
         bindsTo: null
+        operation: getExpiringRights
         columns:
         - Expires in 7 Days
         - Expires in 30 Days
@@ -13412,14 +13435,6 @@ screens:
     purpose: What lapses, and what it would break
     trigger: onLoad
     provenance: board reading, 19 September 2026
-  - operationId: setMediaAssetRights
-    contract: assets
-    purpose: Renew
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getMediaAsset
-    - getExpiringRights
   entryState:
     preloaded:
     - Expires in 7 Days
@@ -13573,7 +13588,7 @@ screens:
         - Approval SLA Breaches
         - Risk Queue
         bindsTo: null
-        operation: null
+        operation: getExpiringRights
         provenance: pack Digital Asset Management DAM.pdf, page 54 §Display
     - name: contextPanel
       slot: selection
@@ -13581,6 +13596,7 @@ screens:
       - kind: detailPanel
         label: The selected governance risk compliance
         bindsTo: null
+        operation: getExpiringRights
         columns:
         - Assets Without Rights
         - Expired Assets
@@ -13748,7 +13764,7 @@ screens:
         - ⚪ Inactive
         - Critical Alerts
         bindsTo: null
-        operation: null
+        operation: getMediaDistribution
         provenance: pack Digital Asset Management DAM.pdf, page 62 §Display
     - name: contextPanel
       slot: selection
@@ -13756,6 +13772,7 @@ screens:
       - kind: detailPanel
         label: The selected asset distribution delivery
         bindsTo: null
+        operation: getMediaDistribution
         columns:
         - Assets in Active Use
         - Active Asset References
@@ -13890,7 +13907,7 @@ screens:
         - Marketing Campaign — 3
         - Digital Signage — 1
         bindsTo: null
-        operation: null
+        operation: getMediaDistribution
         provenance: pack Digital Asset Management DAM.pdf, page 64 §Show
     - name: contextPanel
       slot: selection
@@ -13898,6 +13915,7 @@ screens:
       - kind: detailPanel
         label: The selected asset usage distribution
         bindsTo: null
+        operation: getMediaDistribution
         columns:
         - TICVAI DAM Asset
         - ↓
@@ -13979,42 +13997,55 @@ screens:
       components:
       - kind: selectField
         label: Channel name
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: channel type
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: tenant
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: venue scope
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: allowed asset types
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: allowed categories
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: required approval
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: required rights
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: preferred rendition
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: fallback rendition
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: delivery method
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: caching policy
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
       - kind: selectField
         label: authentication requirement
+        operation: setMediaDistributionChannels
         provenance: pack Digital Asset Management DAM.pdf, page 65 §Configure
   states:
     loading: The channel distribution configuration as saved.
@@ -14124,13 +14155,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: setMediaDistributionChannels
-    contract: assets
-    purpose: Signed URLs and rendition delivery
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - getMediaDistribution
   - operationId: listMediaRenditions
     contract: assets
     purpose: What can be delivered
@@ -14230,14 +14254,6 @@ screens:
     emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
       data* and sends somebody to support with the wrong question.
   apis:
-  - operationId: replaceMediaAsset
-    contract: assets
-    purpose: Replace and propagate
-    trigger: onAction
-    provenance: board reading, 19 September 2026
-    invalidates:
-    - listMediaAssetVersions
-    - getMediaDistribution
   - operationId: getMediaDistribution
     contract: assets
     purpose: Everywhere it would propagate to
@@ -14309,6 +14325,7 @@ screens:
         provenance: corrected 2 October 2026 (CHG-SGU-023, design-notes correction)
         notes: Picked from the library (e.g. DAM-IMG-009211, "Default Dubai Park Hero").
         bindsTo: MediaAsset.id
+        operation: setMediaDistributionChannels
     - name: actionBar
       slot: publish
       components:
@@ -15491,6 +15508,7 @@ screens:
         provenance: contract marketing-crm.yaml GET /consent-questions
       - kind: livePreview
         label: Preview
+        operation: getPublishedBookingFlow
         notes: '**The flow as a guest meets it, step by step, on web and on mobile**, redrawn on every
           change and drawn from the record in hand. Calls nothing and publishes nothing; guests keep the
           published flow (`getPublishedBookingFlow`, shown beside it for comparison) until the site is

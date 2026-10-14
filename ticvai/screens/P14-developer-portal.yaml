@@ -927,6 +927,7 @@ screens:
         provenance: contract public-api.yaml GET /webhook-subscriptions/{subscriptionId}/deliveries
       - kind: dataTable
         bindsTo: WebhookDelivery[]
+        operation: listWebhookDeliveries
         notes: 'Status, attempts, response code and an excerpt of the receiver''s own error. **The excerpt
           is what makes the log useful** — a 500 with their own message in it answers the question without
           a support conversation.
@@ -976,6 +977,7 @@ screens:
       components:
       - kind: cardList
         bindsTo: WebhookSubscription[]
+        operation: listWebhookSubscriptions
         notes: 'Failing subscriptions sort first and carry the consecutive-failure count. **A developer
           is told before it is disabled, not after.**
 
@@ -1015,11 +1017,6 @@ screens:
     trigger: onAction
     invalidates:
     - listWebhookSubscriptions
-  - operationId: listWebhookEventTypes
-    contract: public-api
-    purpose: Events a subscription can take
-    trigger: onLoad
-    provenance: build, 29 September 2026
   entryState:
     params:
     - name: subscriptionId

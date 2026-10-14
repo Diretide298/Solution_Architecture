@@ -186,11 +186,6 @@ screens:
     purpose: Register the applicant, the organisation and the coverage requested
     trigger: onAction
     provenance: readiness close-out, 29 September 2026
-  - operationId: submitAccreditationDocument
-    contract: accreditation
-    purpose: Each supporting document, against the requirement it satisfies
-    trigger: onAction
-    provenance: readiness close-out, 29 September 2026
   - operationId: updateAccreditationApplication
     contract: accreditation
     purpose: Save the draft as each step is completed (Save and finish later)
@@ -219,26 +214,32 @@ screens:
       components:
       - kind: textField
         label: Organisation
+        operation: createAccreditationApplication
         notes: Who you work for. Free text — an outlet that is not on a list is still an outlet.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
       - kind: selectField
         label: Role
+        operation: createAccreditationApplication
         notes: Photographer, writer, broadcast, technical. **Drives what coverage may be requested.**
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
       - kind: textField
         label: Press card number
+        operation: createAccreditationApplication
         notes: Optional, and marked so. Its absence is a reviewer's signal, not a blocker.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
       - kind: textField
         label: Commissioning editor
+        operation: createAccreditationApplication
         notes: Who commissioned the coverage, where there is one.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
       - kind: fileUpload
         label: Supporting documents
+        operation: createAccreditationApplication
         notes: Commission letter and badge photo. Accepted formats stated before the picker opens.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-002
       - kind: consentBlock
         label: Consent
+        operation: createAccreditationApplication
         notes: '**Stated once, unticked, and collected before documents rather than after.** The 2 September
           session recorded consent language as a live question for face data; the same principle applies
           to a press photograph. An accepted-by-default consent is not consent.
@@ -252,6 +253,7 @@ screens:
         label: Continue
       - kind: secondaryButton
         label: Save and finish later
+        operation: updateAccreditationApplication
   overlays:
   - id: saveAndExit
     component: confirmDialog
@@ -340,11 +342,6 @@ screens:
     purpose: Submit the reviewed draft; blocking-submission requirements are checked here
     trigger: onAction
     provenance: build, 29 September 2026
-  - operationId: updateAccreditationApplication
-    contract: accreditation
-    purpose: Apply a change made through a Change link
-    trigger: onAction
-    provenance: build, 29 September 2026
   layout:
     template: wizard
     regions:
@@ -387,6 +384,7 @@ screens:
       components:
       - kind: primaryButton
         label: Submit application
+        operation: submitAccreditationApplication
   overlays:
   - id: submitConfirm
     component: confirmDialog
@@ -488,21 +486,6 @@ screens:
     purpose: Withdraw this application
     trigger: onAction
     provenance: build, 29 September 2026
-  - operationId: submitAccreditationDocument
-    contract: accreditation
-    purpose: Add a document the reviewer asked for
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: updateAccreditationApplication
-    contract: accreditation
-    purpose: Amend answers after a return for information
-    trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: resubmitAccreditationApplication
-    contract: accreditation
-    purpose: Send it back after a return for information or a rejection
-    trigger: onAction
-    provenance: build, 29 September 2026
   gaps:
   - operation: getAccreditationApplicationByReference
     why: '**A status screen with no status read.** The screen declared no operation. It also cannot use
@@ -533,6 +516,7 @@ screens:
       - kind: timeline
         label: Where it has been
         bindsTo: ApprovalRequest.decisions
+        operation: listMyAccreditationApplications
         notes: Received, documents checked, decision — each with its date.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
     - name: contentBody
@@ -541,6 +525,7 @@ screens:
       - kind: detailPanel
         label: Application
         bindsTo: ApprovalRequest.summary
+        operation: listMyAccreditationApplications
         notes: The reference, the performances, and what was requested.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-004
     - name: actionBar
@@ -550,6 +535,7 @@ screens:
         label: Add a document
       - kind: destructiveButton
         label: Withdraw this application
+        operation: withdrawAccreditationApplication
   overlays:
   - id: confirmWithdraw
     component: confirmDialog
@@ -819,6 +805,7 @@ screens:
       - kind: dataTable
         label: Queue
         bindsTo: ApprovalRequest[]
+        operation: listAccreditationApplications
         columns:
         - ApprovalRequest.summary
         - ApprovalRequest.requestedAt
@@ -837,6 +824,7 @@ screens:
       - kind: detailPanel
         label: Selected application
         bindsTo: ApprovalRequest
+        operation: listAccreditationApplications
         notes: Enough to approve without opening `ACC-007`.
         provenance: frame claude-design/Accreditation Board.dc.html#acc-006
     - name: actionBar
@@ -945,16 +933,6 @@ screens:
     purpose: The application under review
     trigger: onLoad
     provenance: build, 29 September 2026
-  - operationId: listAccreditationDocuments
-    contract: accreditation
-    purpose: The application's documents (applicationId), each with its state
-    trigger: onLoad
-    provenance: build, 29 September 2026
-  - operationId: verifyAccreditationDocument
-    contract: accreditation
-    purpose: Verify or refuse each document
-    trigger: onAction
-    provenance: build, 29 September 2026
   gaps:
   - operation: getApprovalRequest
     why: 'The screen shows one application and the only read is a list. **A detail screen that fetches
@@ -971,6 +949,7 @@ screens:
       - kind: detailPanel
         label: The application
         bindsTo: ApprovalRequest
+        operation: getAccreditationApplication
         notes: 'Role, outlet, press card, commission — **including the ones that are absent**, stated
           as *Not stated* and *None attached* rather than left blank. A blank field and a declared absence
           look identical and only one is information.
@@ -987,12 +966,14 @@ screens:
       - kind: banner
         label: Decision due
         bindsTo: ApprovalRequest.slaDueAt
+        operation: getAccreditationApplication
         provenance: frame claude-design/Accreditation Board.dc.html#acc-007
     - name: actionBar
       slot: decision
       components:
       - kind: primaryButton
         label: Approve
+        operation: decideAccreditationApplication
         permission: APPROVAL_DECIDE
       - kind: destructiveButton
         label: Refuse
@@ -1014,6 +995,9 @@ screens:
       what is granted**, so the two screens must agree.
 
       '
+    confirm:
+      label: Approve
+      operation: decideAccreditationApplication
     provenance: frame claude-design/Accreditation Board.dc.html#acc-005
   states:
     loading: The application.
@@ -1160,6 +1144,7 @@ screens:
       - kind: dataTable
         label: Credential register
         bindsTo: AccreditationBadge[]
+        operation: listAccreditationCredentials
         columns:
         - AccreditationBadge.holderName
         - AccreditationBadge.zones
@@ -1176,6 +1161,7 @@ screens:
       - kind: detailPanel
         label: Credential
         bindsTo: AccreditationBadge
+        operation: listAccreditationCredentials
         provenance: frame claude-design/Accreditation Board.dc.html#acc-008
     - name: actionBar
       slot: rowActions
