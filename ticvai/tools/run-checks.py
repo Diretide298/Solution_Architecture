@@ -141,6 +141,9 @@ CHECKS = [
     "check-screen-permissions",
     # 12 October (CHG-R6-031..038): a promise has its operation, field, binding or reader; one business day.
     "check-promises-kept",
+    # 14 October (ADAM CR-004 on DB-READ-VIEWS, CHG-LIN-001): a read of personal data by another module names its
+    # columns, so its view is narrow; every read's column list is the derived one (tools/derive-read-columns.py).
+    "check-read-columns",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.
