@@ -305,6 +305,11 @@ check('and only an owner may call for it',
   && !mayCall('admin', 'reviewer', 'build')
   && !mayCall('reviewer', 'client', 'build'));
 
+// The Audit page's payload: administrators, owner included, and nobody below.
+check('only an owner or admin may call for the audit',
+  mayCall('owner', 'reviewer', 'audit') && mayCall('admin', 'client', 'audit')
+  && !['pm', 'lead', 'dev', 'reviewer', 'client'].some((r) => mayCall(r, 'reviewer', 'audit')));
+
 check('the rest of the strip is unchanged for everybody else',
   layersFor('reviewer', 'reviewer').join(' ') === 'frontend uiux contracts domain backend services cicd decisions',
   layersFor('reviewer', 'reviewer').join(' '));

@@ -1,126 +1,106 @@
-/* The dump audit.
+/* Audit the package.
 
-   A reading page, not a dashboard. It is read once when a delivery lands and
-   then argued about, so it is set as prose with the figures pulled out — a wall
-   of tiles would make a reader hunt for the sentence that says what happened. */
+   Built on the sheet (sheet.css): the verdict, the ledger, the filter and the
+   tables are the shared parts. What is here is only what this page has and no
+   other does: the check strip, the stale-run banner, and the dated record kept
+   under History.
 
-.au-main { max-width: 1080px; }
+   ── where the boldness goes ────────────────────────────────────────
+   The check strip. One mark per check, in the order the run takes them, at a
+   size that makes three red marks among ninety teal ones the first thing seen.
+   Nothing else on the page is heavier than type. */
 
-.au-hero { padding: 6px 2px 22px; border-bottom: 1px solid var(--line); }
-.au-eyebrow {
-  margin: 0 0 8px;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  color: var(--accent);
-}
-.au-title { margin: 0; font-size: 30px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
-.au-sub { margin: 10px 0 0; max-width: 72ch; font-size: 14px; line-height: 1.65; color: var(--text-dim); }
-
-.au-h2 {
-  margin: 34px 0 4px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-.au-h3 { margin: 30px 0 8px; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
-.au-lead { margin: 0 0 14px; max-width: 78ch; font-size: 13.5px; line-height: 1.65; color: var(--text-dim); }
-.au-fine { margin: 10px 0 0; max-width: 78ch; font-size: 12px; line-height: 1.6; color: var(--text-faint); }
-
-/* ── the live figures ───────────────────────────────────────────── */
-.au-figures {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
-  gap: 14px;
-  margin: 14px 0 6px;
-}
-.au-figure {
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--panel-2);
-}
-/* A figure that is a symptom rather than a fact. Amber on the rule down the
-   side and on the number; the card itself stays quiet, because two of these on
-   a page of five would otherwise read as an alarm. */
-.au-figure.is-bad { border-left: 3px solid var(--warning); padding-left: 13px; }
-.au-figure.is-bad .au-figure-value { color: var(--warning); }
-.au-figure-label {
-  margin: 0 0 6px;
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-}
-.au-figure-value { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
-.au-figure-note { margin: 7px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--text-faint); }
-
-/* ── the callout ────────────────────────────────────────────────── */
-.au-callout {
-  margin: 6px 0 4px;
-  padding: 16px 18px;
-  border: 1px solid var(--line);
-  border-left: 3px solid var(--warning);
-  border-radius: 12px;
-  background: var(--panel-2);
-}
-.au-callout p { margin: 0 0 10px; max-width: 76ch; font-size: 13px; line-height: 1.65; }
-.au-callout p:last-child { margin-bottom: 0; }
-.au-pre {
-  margin: 0 0 12px;
-  padding: 11px 13px;
-  border-radius: 8px;
-  background: var(--bg);
-  font-family: var(--mono);
-  font-size: 11.5px;
-  line-height: 1.55;
-  color: var(--warning);
-  white-space: pre-wrap;
+/* The rail's title is the page's h1. The shared rail hides it on a phone,
+   where it becomes a row of pills; this page keeps its name in sight there,
+   because the pills alone do not say which page this is. */
+@media (max-width: 860px) {
+  .au-page .set-nav-title { display: block; margin: 0 0 8px; font-size: 18px; }
 }
 
-/* ── tables ─────────────────────────────────────────────────────── */
-.au-table {
-  width: 100%;
-  margin: 12px 0 0;
-  border-collapse: collapse;
-  font-size: 12.5px;
+/* ── a run for an older release than the one served ─────────────── */
+.au-stale {
+  margin: 0 0 18px; padding: 12px 14px;
+  border: 1.5px solid var(--st-late); border-radius: 9px;
+  background: color-mix(in srgb, var(--st-late) 9%, transparent);
+  font-size: 13.5px; line-height: 1.55; color: var(--text);
 }
-.au-table th {
-  padding: 7px 10px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  font-family: var(--mono);
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--text-faint);
+.au-stale[hidden] { display: none; }
+.au-stale strong { font-weight: 750; }
+
+/* ── the check strip ─────────────────────────────────────────────── */
+.au-strip-figure { align-self: start; }
+.au-strip {
+  display: flex; flex-wrap: wrap; gap: 3px;
+  padding: 10px; border-radius: 9px; background: var(--st-track);
 }
-.au-table td {
-  padding: 8px 10px;
-  border-bottom: 1px solid var(--border-soft);
-  line-height: 1.5;
-  vertical-align: top;
-  color: var(--text-dim);
+.au-mark {
+  display: inline-grid; place-items: center;
+  width: 16px; height: 30px; border-radius: 3px;
+  font-size: 13px; font-weight: 800; line-height: 1; color: #fff;
+  transition: opacity 120ms ease;
 }
-.au-table td:first-child { color: var(--text); }
-.au-table tr:last-child td { border-bottom: 0; }
+/* A failing mark is taller than its row and carries a cross, so the strip
+   still reads to somebody who cannot tell red from teal. */
+.au-mark.is-fail { width: 20px; box-shadow: 0 0 0 1.5px var(--bg-panel), 0 0 0 3px var(--st-late); }
+.au-mark.is-warn { color: #1b1300; }
+.au-mark.is-dim { opacity: .18; }
+
+.au-strip-names { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 8px; }
+.au-name {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: inherit; font-family: var(--mono); font-size: 12px; color: var(--text);
+  background: transparent; border: 1px solid var(--border); border-radius: 7px;
+  padding: 4px 8px 4px 5px; cursor: pointer;
+}
+.au-name:hover { background: var(--bg-hover); }
+.au-name:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.au-name .sh-badge { font-family: var(--sans, inherit); }
+
+/* ── every check ─────────────────────────────────────────────────── */
+.au-check { display: grid; gap: 3px; }
+.au-check-name { font-family: var(--mono); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.au-check-why { font-weight: 400; max-width: 34ch; line-height: 1.45; }
+.au-status { display: grid; gap: 4px; justify-items: start; }
+.au-findings { display: grid; gap: 2px; justify-items: end; }
+.au-first { display: grid; gap: 3px; max-width: 60ch; }
+.au-line { display: block; color: var(--text); }
+.au-summary { color: var(--text-dim); }
+.sh-table tr.is-fail > th { box-shadow: inset 3px 0 0 var(--st-late); }
 
 .au-code {
   font-family: var(--mono);
   font-size: 11.5px;
-  /* These are paths, and a path broken at a random character is a path you
-     cannot copy. It wraps at the separators or it scrolls. */
+  /* Paths: a path broken at a random character is a path you cannot copy, so
+     it wraps anywhere only when it must. */
   overflow-wrap: anywhere;
   color: var(--text);
 }
 
-@media (max-width: 720px) {
-  .au-title { font-size: 24px; }
-  .au-table { font-size: 12px; }
-  .au-table th, .au-table td { padding: 6px 7px; }
+/* ── history: one dated record, closed ───────────────────────────── */
+.au-entry { border: 1px solid var(--border); border-radius: 9px; }
+.au-entry > summary {
+  cursor: pointer; padding: 12px 14px; font-size: 13.5px; color: var(--text-dim);
+  list-style-position: inside;
+}
+.au-entry > summary strong { color: var(--text); margin-right: 4px; }
+.au-entry > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 9px; }
+.au-entry[open] > summary { border-bottom: 1px solid var(--border); }
+.au-entry-body { padding: 4px 16px 16px; }
+.au-h3 { margin: 22px 0 6px; font-size: 14.5px; font-weight: 700; color: var(--text); }
+.au-p { margin: 0 0 10px; max-width: 76ch; font-size: 13px; line-height: 1.6; color: var(--text-dim); }
+.au-fine { margin: 8px 0 0; max-width: 76ch; font-size: 12px; line-height: 1.55; color: var(--text-faint); }
+.au-pre {
+  margin: 0 0 12px; padding: 10px 12px; border-radius: 8px;
+  background: var(--bg); border: 1px solid var(--border);
+  font-family: var(--mono); font-size: 11.5px; line-height: 1.55; color: var(--text);
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .au-mark { width: 13px; height: 26px; font-size: 11px; }
+  .au-mark.is-fail { width: 17px; }
+  .au-first { max-width: 40ch; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .au-mark { transition: none; }
 }

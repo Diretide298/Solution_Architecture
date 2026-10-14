@@ -57,6 +57,12 @@ const CLIENT_DENIED = new Set(['decisions']);
  *  the door as well as on the strip, and this is the door. */
 const OWNER_ONLY = new Set(['build']);
 
+/** Routes for administrators (the owner and admins) only. `audit` is the
+ *  Audit page's payload: how the delivery package was checked, which is about
+ *  the delivery process and is drawn for admins alone, so it is refused here
+ *  as well as hidden in the menu. */
+const ADMIN_ONLY = new Set(['audit']);
+
 /**
  * Whether this reader may call this package route at all.
  *
@@ -76,6 +82,7 @@ export function mayCall(accountRole, projectRole, route) {
   // An account-level question: Build is the super admin's, whatever their
   // standing on any particular package.
   if (OWNER_ONLY.has(route)) return accountRole === 'owner';
+  if (ADMIN_ONLY.has(route)) return accountRole === 'owner' || accountRole === 'admin';
   // A project-level one: being a client is about this package.
   if (projectRole === 'client') return !CLIENT_DENIED.has(route);
   return true;
