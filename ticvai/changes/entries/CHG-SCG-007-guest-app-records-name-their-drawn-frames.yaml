@@ -1,0 +1,33 @@
+id: CHG-SCG-007
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: The 17 guest app screens with a frame captured from the client's mobile v4 prototype in
+  wireframes/incoming/P02-mobile-v4/ now name that frame in their wireframe record.
+decision:
+  what: 'Add a wireframe note naming wireframes/incoming/P02-mobile-v4/gst-<n>.html (and its manifest) to GST-001,
+    GST-002, GST-003, GST-004, GST-006, GST-007, GST-008, GST-012, GST-021, GST-022, GST-038, GST-041, GST-049, GST-051,
+    GST-053, GST-054 and GST-063 (appended to the existing note on GST-021 and GST-049). Status stays notStarted (the
+    design workflow''s call); the frames and the prototype are unchanged.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, finding class check-wireframe-coverage W-INCOMING-UNLINKED (R258; ruling "A
+  drawn frame in wireframes/incoming is named by its screen record", lead: "go with your recommendation"). Evidence:
+  audit/ticvai/runs/audit-1014/classes.json. 17 findings before, 0 after (all on P02).'
+keys_touched:
+  screens: [GST-001, GST-002, GST-003, GST-004, GST-006, GST-007, GST-008, GST-012, GST-021, GST-022, GST-038, GST-041,
+    GST-049, GST-051, GST-053, GST-054, GST-063]
+  files: [screens/P02-guest-mobile-app.yaml]
+root_class: A33 WIREFRAMES
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-wireframe-coverage.py
+status: open
+notes: Batch SCG, 14 October 2026. W-NO-DESIGN stays a keep (screens the prototype lacks are built from the YAML).

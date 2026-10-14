@@ -1,0 +1,33 @@
+id: CHG-SCG-003
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: The storefront session beacon (recordStorefrontSessionEvents) on the guest web and app Home is sent by the app
+  shell in the background, not written on the screen's load.
+decision:
+  what: 'On WEB-001 and GST-001, recordStorefrontSessionEvents changes from trigger onLoad to background, the trigger the
+    guest screens already use for silent runtime calls (createCart, refreshToken, registerGuestDevice). Its purpose
+    already says it is the app shell''s beacon. No visible change.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, finding class check-screen-wiring S-ONLOAD-WRITE (R268; ruling "No write on
+  load; move it to an action (analytics events go through the event sink)", lead: "go with your recommendation"). The
+  beacon is the event sink''s call, made by the runtime. Evidence: audit/ticvai/runs/audit-1014/classes.json. Guest
+  platforms: 2 findings before, 0 after (package-wide 3 -> 1). Also clears these two members of S-OP-UNREACHED.'
+keys_touched:
+  screens: [WEB-001, GST-001]
+  operations: [recordStorefrontSessionEvents]
+  files: [screens/P01-guest-web-storefront.yaml, screens/P02-guest-mobile-app.yaml]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: Batch SCG (screens, guest apps), 14 October 2026.

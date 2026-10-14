@@ -1,0 +1,36 @@
+id: CHG-SCG-005
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: The guest ticket screens that send tickets (WEB-018, GST-012, GST-013) re-read the guest's transfers after
+  transferOrderTickets answers 202, so a ticket shows as offered, claimed or returned.
+decision:
+  what: 'Add listTicketTransfers (orders, guest, the caller''s own transfers) as a background read on WEB-018, GST-012
+    and GST-013, following transferOrderTickets'' 202, as WEB-030 and GST-045 already read it. No visible change.
+    Kept: recordRecommendationEvents on WEB-008 and GST-048 (a fire-and-forget event batch; no guest read follows it)
+    and deleteGuestAccount and exportSubjectData on GST-066 (the outcome reaches the guest out of band; no guest read
+    of the request exists and the approved screen shows no status).'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, finding class check-screen-wiring S-ASYNC-POLL (R288; ruling "A 202
+  operation''s screen reads the job or record that follows it", lead: "go with your recommendation"). Evidence:
+  audit/ticvai/runs/audit-1014/classes.json. Guest platforms: 11 findings before, 4 after, all keeps (4 went with the
+  recommendation slot removed in CHG-SCG-004, 3 fixed here). Package-wide 44 -> 37.'
+keys_touched:
+  screens: [WEB-018, GST-012, GST-013]
+  operations: [listTicketTransfers, transferOrderTickets]
+  files: [screens/P01-guest-web-storefront.yaml, screens/P02-guest-mobile-app.yaml]
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCG, 14 October 2026. Suggested rule for batch SCR (tools/check-screen-wiring.py): a 202 called with
+  trigger background whose contract declares x-ticvai-conflict-policy append (an event batch) has nothing to follow.'

@@ -1,0 +1,58 @@
+id: CHG-SCG-004
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: Every operation a guest web, guest app or kiosk screen declares is reached by a component, an overlay, a
+  transition, or the runtime in the background; 34 that nothing on the client-approved screen reaches are taken off
+  the screen and recorded in its gaps.
+decision:
+  what: 'Without changing anything visible: (1) calls the runtime makes, not a control, become trigger background with
+    a purpose that says so (getCookieConsentRuntime on WEB-001/GST-001, getCart after addCartLine on WEB-006/GST-007,
+    claimDeviceConsent and createMfaChallenge after sign-in on WEB-016/GST-042, recordRecommendationEvents on
+    WEB-008/GST-048, relinquishSeatHold on WEB-007/GST-049, addCartLine for a table deposit on WEB-036,
+    createAiConversation and requestSuggestion on GST-054); (2) two existing components bind the read that fills them
+    (GST-011 Auto top-up shows getWalletAutoReloadSetting; WEB-011 Booking consent questions records
+    recordConsentAnswers); (3) operations with no control or display on the client-approved screen are removed from
+    its apis and listed in its gaps (removed: true, with why): the Home and Loyalty recommendation slot
+    (decideRecommendations, recordRecommendationEvents on WEB-001, GST-001, WEB-043, GST-036), the tracking-consent
+    prompt and preference centre (recordDeviceConsent on WEB-001/GST-001; getCookieConsentRuntime,
+    listPublishedTrackingTechnologies, getDeviceConsentHistory, recordDeviceConsent on WEB-024/GST-066), wallet exit
+    settlement (getWalletExitBalance, settleWalletAtExit on WEB-021/GST-011) and web auto top-up (WEB-021), membership
+    instalments (WEB-023/GST-015), answer feedback on GST-032 and KSK-015, two-step method removal (WEB-024, GST-073),
+    the step-up challenge on GST-073, two-step enrolment on WEB-024, identity verification on WEB-020,
+    getTransportRoute on WEB-049/GST-077, getWaitTimes on GST-051, getCart and listProducts on GST-053.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, finding class check-screen-wiring S-OP-UNREACHED (R273; ruling "An operation no
+  component reaches: wire onLoad reads to the load; otherwise remove it from the screen", lead: "go with your
+  recommendation"; the approved UI is fixed, lead 14 October 2026). Evidence: audit/ticvai/runs/audit-1014/classes.json.
+  Guest platforms P01, P02, P05: 62 findings before, 0 after (package-wide 2171 -> 2109).'
+keys_touched:
+  screens: [WEB-001, WEB-006, WEB-007, WEB-008, WEB-011, WEB-016, WEB-020, WEB-021, WEB-023, WEB-024, WEB-036, WEB-043,
+    WEB-049, GST-001, GST-007, GST-011, GST-015, GST-032, GST-036, GST-042, GST-048, GST-049, GST-051, GST-053, GST-054,
+    GST-066, GST-073, GST-077, KSK-015]
+  operations: [decideRecommendations, recordRecommendationEvents, getCookieConsentRuntime, recordDeviceConsent,
+    listPublishedTrackingTechnologies, getDeviceConsentHistory, claimDeviceConsent, getCart, getWalletAutoReloadSetting,
+    setWalletAutoReloadSetting, getWalletExitBalance, settleWalletAtExit, listInstalmentPlans, createInstalmentPlan,
+    recordAnswerFeedback, createMfaChallenge, verifyMfaChallenge, enrolMfaMethod, verifyMfaEnrolment, removeMfaMethod,
+    relinquishSeatHold, getWaitTimes, listProducts, createAiConversation, requestSuggestion, getTransportRoute,
+    recordConsentAnswers, getMyIdentityVerification, submitGuestIdentityDocument, addCartLine]
+  files: [screens/P01-guest-web-storefront.yaml, screens/P02-guest-mobile-app.yaml, screens/P05-guest-kiosk.yaml]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch SCG (screens, guest apps), 14 October 2026. For the lead: the removals leave these guest capabilities with
+  no approved surface, which check-screens now warns about ("a guest may call it and no guest screen does"): a
+  tracking-consent prompt and preference centre (tracking stays off until one is designed), wallet exit settlement,
+  membership instalments, removing a two-step method, guest identity verification. Each needs a client-approved
+  design before it can come back. x-ticvai-consumed-by in the contracts is re-derived by link-screens-contracts at
+  the refresh.'

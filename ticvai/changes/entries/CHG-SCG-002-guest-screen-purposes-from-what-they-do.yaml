@@ -1,0 +1,34 @@
+id: CHG-SCG-002
+date: '2026-10-14'
+source: audit
+kind: spec
+summary: The 23 guest web and guest app screens whose purpose was the generator template ("Find X for this venue.")
+  now say what the screen does, read from its components and operations.
+decision:
+  what: 'Rewrite the screen purpose of GST-005, GST-006, GST-012, GST-013, GST-014, GST-015, GST-016, GST-017, GST-018,
+    GST-022, GST-030, GST-034, GST-037, GST-045, GST-048, GST-049, GST-056, WEB-008, WEB-018, WEB-019, WEB-021,
+    WEB-023 and WEB-028 from what the client-approved screen shows and calls. The purpose is screen metadata; no
+    visible copy changes.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, finding class check-screen-wiring S-PURPOSE-BOILERPLATE (CHG-WIR-003; ruling
+  "Screen purpose written from what the screen does, not the template", lead: "go with your recommendation").
+  Evidence: audit/ticvai/runs/audit-1014/classes.json. Guest platforms P01, P02, P05: 23 findings before, 0 after
+  (package-wide 81 -> 58).'
+keys_touched:
+  screens: [GST-005, GST-006, GST-012, GST-013, GST-014, GST-015, GST-016, GST-017, GST-018, GST-022, GST-030, GST-034,
+    GST-037, GST-045, GST-048, GST-049, GST-056, WEB-008, WEB-018, WEB-019, WEB-021, WEB-023, WEB-028]
+  files: [screens/P01-guest-web-storefront.yaml, screens/P02-guest-mobile-app.yaml]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: Batch SCG (screens, guest apps), 14 October 2026.

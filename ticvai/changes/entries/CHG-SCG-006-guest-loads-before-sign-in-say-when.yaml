@@ -1,0 +1,46 @@
+id: CHG-SCG-006
+date: '2026-10-14'
+source: audit
+kind: contract
+summary: A guest screen reachable before sign-in loads only public reads, or says that a load runs only when signed in
+  (offered sign-in, GFIX-4); Profile and the kiosk assistant declare their session; getTransportDeparture is readable
+  without a session like the other published transport reads.
+decision:
+  what: '(1) The conditional loads say so in their purpose, in the GFIX-4 / GFIX-6 wording already used on the guest
+    screens: listMyCases (WEB-025), listMyOrders and getForm (WEB-026, GST-035), listMyTableReservations (WEB-036),
+    getParkingEntitlement (WEB-041, GST-027), listAiConversations (GST-031, GST-033), createAiConversation,
+    getGuestConversation and requestSuggestion on the AI concierge (WEB-044, GST-031, GST-032, GST-033), getCart on
+    GST-048 (the cart session). (2) GST-039 Profile takes subjectId from the session (it took it from GST-001), as
+    every account screen does. (3) KSK-015 declares sessionId from the session, the kiosk guest session KSK-013
+    already declares. (4) contracts/satellite/transport.yaml getTransportDeparture gains the optional credential
+    (security {}), as searchTransportDepartures and getTransportRoute have: published network data, audience guest
+    and public, loaded by GST-077 before sign-in. Widening, not breaking: no breaking-changes entry. No visible change.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Block A audit of 14 October 2026, finding classes check-preauth-session PS-UNDECLARED-SIGNIN and
+  PS-LOAD-NEEDS-SESSION (council of 2 October typed properties; rulings "A pre-sign-in screen that loads the guest''s
+  own record declares sign-in" and "A pre-sign-in screen loads only public reads", lead: "go with your
+  recommendation"). Evidence: audit/ticvai/runs/audit-1014/classes.json. PS-UNDECLARED-SIGNIN 18 -> 0,
+  PS-LOAD-NEEDS-SESSION 5 -> 0 (all on P01, P02, P05).'
+keys_touched:
+  screens: [WEB-025, WEB-026, WEB-036, WEB-041, WEB-044, GST-027, GST-031, GST-032, GST-033, GST-035, GST-039, GST-048,
+    GST-077, KSK-015]
+  operations: [listMyCases, listMyOrders, getForm, listMyTableReservations, getParkingEntitlement, listAiConversations,
+    createAiConversation, getGuestConversation, requestSuggestion, getCart, getMyProfile, getGuestConsents,
+    getTransportDeparture]
+  files: [screens/P01-guest-web-storefront.yaml, screens/P02-guest-mobile-app.yaml, screens/P05-guest-kiosk.yaml,
+    contracts/satellite/transport.yaml]
+root_class: A23 AUTH-SCOPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-preauth-session.py
+status: open
+notes: 'Batch SCG, 14 October 2026. derive-carries-from-entrystate narrows the nine derived edges into GST-039 (they
+  no longer carry subjectId) at the next refresh; it rewrites whole files, so it was not run with --apply here.'
