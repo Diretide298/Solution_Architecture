@@ -5638,7 +5638,8 @@ screens:
   pattern: listDetail
   patternReason: '`listOrders` reads the population and `getCurrentShift` reads one of them — list, select,
     act'
-  purpose: Omnichannel Order & Fulfilment Center — from the client design board, 20 August.
+  purpose: 'Hand over the orders waiting at this outlet (takeaway, delivery and collection), reserve
+    merchandise for a guest to collect, and hand dropped goods back to the guest.'
   layout:
     template: split
     regions:
@@ -6232,7 +6233,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`recordNoSale`, `voidOrder`, `applyManualDiscount`)
     and no read of a population — it is settings, not a list
-  purpose: Sales Exceptions, Controls & Operational Actions — from the client design board, 20 August.
+  purpose: 'Handle the till''s exceptions on an order: open the drawer without a sale, with a
+    reason, void an order, or apply a manual discount.'
   layout:
     template: form
     regions:
@@ -6833,7 +6835,8 @@ screens:
   pattern: configEditor
   patternReason: the screen declares only writes (`createCashMovement`) and no read of a population —
     it is settings, not a list
-  purpose: Cash In / Cash Out Operations — from the client design board, 20 August.
+  purpose: 'Record cash added to or lifted from the drawer during the shift, counted by denomination
+    and with a reason, against the shift''s movements so far.'
   layout:
     template: form
     regions:
@@ -7401,7 +7404,8 @@ screens:
   pattern: approvalInbox
   patternReason: '`decideApprovalRequest` decides items that `listAlerts` queues — every row is waiting
     for a person, so the empty state is success'
-  purpose: Shift Exceptions & Alerts — from the client design board, 20 August.
+  purpose: 'Work the shift''s alerts and the approval requests waiting for this supervisor, decide
+    them, and record a no-sale.'
   gaps:
   - operation: recordNoSale
     why: '**A no-sale with no reason is the single most reliable indicator of till theft** (F32 step 5),
