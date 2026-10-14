@@ -3413,17 +3413,17 @@ screens:
       trigger: Recall this held sale
       control: dataTable#heldList
       guard: sale.resume
+      operation: resumeOrder
       carries:
-      - cart
-      - cartHoldExpiresAt
-      - guest
-      - discount
-      - table
-      - orderType
+      - orderId
+      - subjectId
       returnsTo: POS-006
       provenance: board TICVAI POS Terminal · recall (4000). **The hold clock travels with the cart**
         — a destination that re-fetches the lines has lost the lease, and the guest's seats go back on
-        sale while they are standing at the till.
+        sale while they are standing at the till. **The parked cart is the held order** (CHG-SPO-015), so
+        the recall resumes it (`resumeOrder`) and carries its `orderId` and the guest's `subjectId`; its
+        lines, discounts, hold clock (`heldUntil`), table and order type are the order's own fields, which
+        POS-002 reads with the order (Block A audit, CHG-SCP-004).
     - to: POS-003
       trigger: Sell — Timed Entry
       provenance: 'derived — POS-003 declares entryState.params inventoryHoldId, productId and POS-006
