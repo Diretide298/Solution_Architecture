@@ -1,0 +1,37 @@
+id: CHG-GT1-005
+date: '2026-10-14'
+source: audit
+kind: plan
+proposed: '2026-10-14'
+summary: platform.device_heartbeat, retired by CHG-STO-008, leaves MIG-PLATFORM with its reason in departures.
+decision:
+  what: 'docs/active/block-a-extra-tasks.json departures: ''table platform.device_heartbeat'', retired (a device''s heartbeat
+    is platform.device lastHeartbeatAt and status); its drop is the migration-review row for a person.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Class check-plan-closure/C-GONE (CHG-RONEP-002): 1 new at the r6 release gate on r6-gate1 (23eb3d98, every r6 batch
+  merged and fully derived), 0 after (evidence docs/active/audit-runs/audit-1014/classes.json). CHG-STO-008 retired the
+  stub table and recorded no departure.'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+  tables:
+  - platform.device_heartbeat
+root_class: A16 STORAGE-SHAPE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-14'
+    quote: go with your recommendation
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'Batch GT1. Plan change decided the day it was proposed: cooling-off waiver as CHG-GT1-004.'

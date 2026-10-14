@@ -1,0 +1,89 @@
+id: CHG-GT1-009
+date: '2026-10-14'
+source: audit
+kind: plan
+proposed: '2026-10-14'
+summary: 'An operation a Block A operation calls or writes through is built in Block A: endGuestDeviceSessions, updateGuestSubjectDetails,
+  recordConsentIdentifier, recordSyncRejection, recordSyncRejectionResolution and sendTransactionalMessage; a new rule,
+  C-CALLS, holds it.'
+decision:
+  what: 'docs/active/block-a-extra-tasks.json blockAOperations: the six, each naming its Block A caller (revokeGuestDevice,
+    updateMyProfile, recordDeviceConsent, syncOrders and syncScans, resolveSyncRejection, verifyGuestEmail). tools/check-plan-closure.py
+    C-CALLS: an operation a Block A operation names in x-ticvai-calls or x-ticvai-write-via is built in the caller''s drop
+    or an earlier one.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'The lead''s brief for the r6 gate fix round (14 October 2026): new operations go in the plan ''Block A where their
+  caller is Block A'' (identity endGuestDeviceSessions, CHG-MOD-009). Measured on the r6 release gate on r6-gate1 (23eb3d98,
+  every r6 batch merged and fully derived): 7 such calls into Block B or D (the identity and cross-region owner writes of
+  CHG-XDW-002, -004, -005 and CHG-MOD-009, and guest sign-up''s verification email); C-CALLS finds 7 on the gate''s plan
+  and 0 after.'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+  - tools/check-plan-closure.py
+  operations:
+  - endGuestDeviceSessions
+  - updateGuestSubjectDetails
+  - recordConsentIdentifier
+  - recordSyncRejection
+  - recordSyncRejectionResolution
+  - sendTransactionalMessage
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted:
+  - '27687'
+  - '27691'
+  - '27703'
+  - '27704'
+  - '27705'
+  - '27707'
+  - '27709'
+  - '27726'
+  - '27733'
+  - '27737'
+  - '27740'
+  - '27741'
+  - '27742'
+  - '27745'
+  - '27746'
+  - '27747'
+  - '27795'
+  - '27805'
+  - '27866'
+  - '27924'
+  - '28138'
+  - '28139'
+  - '28140'
+  - '28253'
+  - '28258'
+  - '28357'
+  - '28371'
+  - '28373'
+  - '28797'
+  - '28809'
+  - '28811'
+  - '28812'
+  - '28814'
+  - '28821'
+  - '28892'
+  - '29002'
+  - '29006'
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-14'
+    quote: go with your recommendation
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: Batch GT1. The six were on unpushed tasks (SVC-IDENTITY-IDENTITY-13, SVC-CROSSREGION-CROSS-REGION-2, SVC-MARKETING-MESSAGE-8
+  took only sendTransactionalMessage off a Block D task); the plan now builds them in Block A completion app-modules (new
+  keys at the next apply). verifySupervisorStepUp, the fourth operation of SVC-IDENTITY-IDENTITY-13, has no caller and stays
+  in Block B. Cooling-off waiver as CHG-GT1-004.

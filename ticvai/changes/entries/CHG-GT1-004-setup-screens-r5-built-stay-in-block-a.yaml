@@ -1,0 +1,51 @@
+id: CHG-GT1-004
+date: '2026-10-14'
+source: audit
+kind: plan
+proposed: '2026-10-14'
+summary: setInstalmentPolicy and its screen ADM-603, and BO-1146 (setWalletRefundPolicy's screen), stay in Block A as r5
+  planned them, until the lead decides the guest features CHG-SCG-004 left without a screen.
+decision:
+  what: 'docs/active/block-a-extra-tasks.json: blockAOperations setInstalmentPolicy; blockAScreens ADM-603 and BO-1146,
+    each with the reason. The plan builds SVC-ORDER-PAYMENTS-2 (#28049), APP-SETUP-ADM-603 (#28054) and APP-SETUP-BO-1146
+    (#28037) in Block A completion app-modules.'
+  by: Chinmay
+  date: '2026-10-14'
+why: 'Class check-plan-closure/C-UNTICKETED (CHG-RONEP-002): 3 new at the r6 release gate on r6-gate1 (23eb3d98, every r6
+  batch merged and fully derived), 0 after (evidence docs/active/audit-runs/audit-1014/classes.json). CHG-SCG-004 took membership
+  instalments and wallet exit settlement off the client-approved guest screens, so the delivery slice lost 14 operations
+  and the two setup screens fell to Block C with no decision. The precedent is CHG-RFM-006 (BO-1111 and expireCreditLots
+  restored to Block A as r2 planned them); whether those features get a design or are dropped is the lead''s (FINAL-DERIVE-CHECKLIST
+  5).'
+keys_touched:
+  files:
+  - docs/active/block-a-extra-tasks.json
+  operations:
+  - setInstalmentPolicy
+  screens:
+  - ADM-603
+  - BO-1146
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted:
+  - '28037'
+  - '28049'
+  - '28054'
+release_tag: r6
+decision_owner: Chinmay
+adam_cr: pending (raised at the r6 settlement)
+triage: fix-forward
+waivers:
+  cooling_off:
+    by: Chinmay
+    date: '2026-10-14'
+    quote: go with your recommendation
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'Batch GT1. The pushed rest-of-screen tickets APP-SETUP-ADM-603-REST (#28272) and APP-SETUP-BO-1146-REST (#28726)
+  were already out of the merged plan (the screens are now one whole-screen task each): op-retire at the apply. Plan change
+  decided the day it was proposed: the lead''s words of 14 October on the audit fixes are recorded as the cooling-off waiver;
+  confirmed at the r6 settlement.'
